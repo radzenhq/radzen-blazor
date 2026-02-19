@@ -1,0 +1,2591 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenPivotDataGrid&lt;TItem&gt;
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenPivotDataGrid&lt;TItem&gt;
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1">
+
+
+  <h1 id="Radzen_Blazor_RadzenPivotDataGrid_1" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1" class="text-break">Class RadzenPivotDataGrid&lt;TItem&gt;
+</h1>
+  <div class="markdown level0 summary"><p>RadzenPivotDataGrid component for creating pivot tables with cross-tabulation functionality.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><a class="xref" href="Radzen.PagedDataBoundComponent-1.html">PagedDataBoundComponent</a>&lt;TItem&gt;</div>
+    <div class="level4"><span class="xref">RadzenPivotDataGrid&lt;TItem&gt;</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_skip">PagedDataBoundComponent&lt;TItem&gt;.skip</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_topPager">PagedDataBoundComponent&lt;TItem&gt;.topPager</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_bottomPager">PagedDataBoundComponent&lt;TItem&gt;.bottomPager</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_OnCollectionChanged_System_Object_System_Collections_Specialized_NotifyCollectionChangedEventArgs_">PagedDataBoundComponent&lt;TItem&gt;.OnCollectionChanged(object, NotifyCollectionChangedEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_Dispose">PagedDataBoundComponent&lt;TItem&gt;.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">PagedDataBoundComponent&lt;TItem&gt;.SetParametersAsync(ParameterView)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_OnParametersSetAsync">PagedDataBoundComponent&lt;TItem&gt;.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_OnAfterRenderAsync_System_Boolean_">PagedDataBoundComponent&lt;TItem&gt;.OnAfterRenderAsync(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_OnPageChanged_Radzen_PagerEventArgs_">PagedDataBoundComponent&lt;TItem&gt;.OnPageChanged(PagerEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_OnPageSizeChanged_System_Int32_">PagedDataBoundComponent&lt;TItem&gt;.OnPageSizeChanged(int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_CalculatePager">PagedDataBoundComponent&lt;TItem&gt;.CalculatePager()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_GoToPage_System_Int32_System_Boolean_">PagedDataBoundComponent&lt;TItem&gt;.GoToPage(int, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_FirstPage_System_Boolean_">PagedDataBoundComponent&lt;TItem&gt;.FirstPage(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PrevPage">PagedDataBoundComponent&lt;TItem&gt;.PrevPage()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_NextPage">PagedDataBoundComponent&lt;TItem&gt;.NextPage()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_LastPage">PagedDataBoundComponent&lt;TItem&gt;.LastPage()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PagerPosition">PagedDataBoundComponent&lt;TItem&gt;.PagerPosition</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PagerAlwaysVisible">PagedDataBoundComponent&lt;TItem&gt;.PagerAlwaysVisible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PagerHorizontalAlign">PagedDataBoundComponent&lt;TItem&gt;.PagerHorizontalAlign</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_Density">PagedDataBoundComponent&lt;TItem&gt;.Density</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_AllowPaging">PagedDataBoundComponent&lt;TItem&gt;.AllowPaging</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PageSize">PagedDataBoundComponent&lt;TItem&gt;.PageSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PageNumbersCount">PagedDataBoundComponent&lt;TItem&gt;.PageNumbersCount</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_Count">PagedDataBoundComponent&lt;TItem&gt;.Count</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_CurrentPage">PagedDataBoundComponent&lt;TItem&gt;.CurrentPage</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_Template">PagedDataBoundComponent&lt;TItem&gt;.Template</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_LoadingTemplate">PagedDataBoundComponent&lt;TItem&gt;.LoadingTemplate</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_Data">PagedDataBoundComponent&lt;TItem&gt;.Data</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PageSizeOptions">PagedDataBoundComponent&lt;TItem&gt;.PageSizeOptions</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PageSizeText">PagedDataBoundComponent&lt;TItem&gt;.PageSizeText</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_ShowPagingSummary">PagedDataBoundComponent&lt;TItem&gt;.ShowPagingSummary</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PagingSummaryFormat">PagedDataBoundComponent&lt;TItem&gt;.PagingSummaryFormat</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PagingSummaryTemplate">PagedDataBoundComponent&lt;TItem&gt;.PagingSummaryTemplate</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_FirstPageTitle">PagedDataBoundComponent&lt;TItem&gt;.FirstPageTitle</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_FirstPageAriaLabel">PagedDataBoundComponent&lt;TItem&gt;.FirstPageAriaLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PrevPageLabel">PagedDataBoundComponent&lt;TItem&gt;.PrevPageLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PrevPageTitle">PagedDataBoundComponent&lt;TItem&gt;.PrevPageTitle</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PrevPageAriaLabel">PagedDataBoundComponent&lt;TItem&gt;.PrevPageAriaLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_LastPageTitle">PagedDataBoundComponent&lt;TItem&gt;.LastPageTitle</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_LastPageAriaLabel">PagedDataBoundComponent&lt;TItem&gt;.LastPageAriaLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_NextPageLabel">PagedDataBoundComponent&lt;TItem&gt;.NextPageLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_NextPageTitle">PagedDataBoundComponent&lt;TItem&gt;.NextPageTitle</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_NextPageAriaLabel">PagedDataBoundComponent&lt;TItem&gt;.NextPageAriaLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PageTitleFormat">PagedDataBoundComponent&lt;TItem&gt;.PageTitleFormat</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PageAriaLabelFormat">PagedDataBoundComponent&lt;TItem&gt;.PageAriaLabelFormat</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PagedView">PagedDataBoundComponent&lt;TItem&gt;.PagedView</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_LoadData">PagedDataBoundComponent&lt;TItem&gt;.LoadData</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_Page">PagedDataBoundComponent&lt;TItem&gt;.Page</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnInitialized">RadzenComponent.OnInitialized()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenPivotDataGrid_1_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[CascadingTypeParameter(&quot;TItem&quot;)]
+public class RadzenPivotDataGrid&lt;TItem&gt; : PagedDataBoundComponent&lt;TItem&gt;, IComponent, IHandleEvent, IHandleAfterRender, IDisposable</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TItem</span></td>
+        <td><p>The type of the PivotDataGrid data item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Radzen_Blazor_RadzenPivotDataGrid_1_examples"><strong>Examples</strong></h5>
+  <pre><code class="lang-csharp">&lt;RadzenPivotDataGrid @data=@orders TItem="Order" AllowSorting="true" AllowPaging="true" AllowFiltering="true"&gt;
+    &lt;Columns&gt;
+        &lt;RadzenPivotColumn TItem="Order" Property="Category" Title="Category" /&gt;
+        &lt;RadzenPivotColumn TItem="Order" Property="Region" Title="Region" /&gt;
+    &lt;/Columns&gt;
+    &lt;Rows&gt;
+        &lt;RadzenPivotRow TItem="Order" Property="Product" Title="Product" /&gt;
+        &lt;RadzenPivotRow TItem="Order" Property="Year" Title="Year" /&gt;
+    &lt;/Rows&gt;
+    &lt;Aggregates&gt;
+        &lt;RadzenPivotAggregate TItem="Order" Property="Amount" Title="Amount" Aggregate="AggregateFunction.Sum" /&gt;
+        &lt;RadzenPivotAggregate TItem="Order" Property="Quantity" Title="Quantity" Aggregate="AggregateFunction.Count" /&gt;
+    &lt;/Aggregates&gt;
+&lt;/RadzenPivotDataGrid&gt;</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1__ctor_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1__ctor" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.#ctor">RadzenPivotDataGrid()</h4>
+  <div class="markdown level1 summary"><p>RadzenPivotDataGrid component for creating pivot tables with cross-tabulation functionality.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenPivotDataGrid()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenPivotDataGrid_1__ctor_examples">Examples</h5>
+  <pre><code class="lang-csharp">&lt;RadzenPivotDataGrid @data=@orders TItem="Order" AllowSorting="true" AllowPaging="true" AllowFiltering="true"&gt;
+    &lt;Columns&gt;
+        &lt;RadzenPivotColumn TItem="Order" Property="Category" Title="Category" /&gt;
+        &lt;RadzenPivotColumn TItem="Order" Property="Region" Title="Region" /&gt;
+    &lt;/Columns&gt;
+    &lt;Rows&gt;
+        &lt;RadzenPivotRow TItem="Order" Property="Product" Title="Product" /&gt;
+        &lt;RadzenPivotRow TItem="Order" Property="Year" Title="Year" /&gt;
+    &lt;/Rows&gt;
+    &lt;Aggregates&gt;
+        &lt;RadzenPivotAggregate TItem="Order" Property="Amount" Title="Amount" Aggregate="AggregateFunction.Sum" /&gt;
+        &lt;RadzenPivotAggregate TItem="Order" Property="Quantity" Title="Quantity" Aggregate="AggregateFunction.Count" /&gt;
+    &lt;/Aggregates&gt;
+&lt;/RadzenPivotDataGrid&gt;</code></pre>
+
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_Aggregates_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.Aggregates*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_Aggregates" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.Aggregates">Aggregates</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the aggregates collection for pivot aggregates/measures.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? Aggregates { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AggregatesCollection_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AggregatesCollection*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AggregatesCollection" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AggregatesCollection">AggregatesCollection</h4>
+  <div class="markdown level1 summary"><p>Gets the aggregates collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public IList&lt;RadzenPivotAggregate&lt;TItem&gt;&gt; AggregatesCollection { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenPivotAggregate-1.html">RadzenPivotAggregate</a>&lt;TItem&gt;&gt;</td>
+        <td><p>The aggregates collection.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AggregatesText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AggregatesText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AggregatesText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AggregatesText">AggregatesText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the Aggregates text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string AggregatesText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowAlternatingRows_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowAlternatingRows*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowAlternatingRows" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowAlternatingRows">AllowAlternatingRows</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether RadzenPivotDataGrid should use alternating row styles.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowAlternatingRows { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowDrillDown_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowDrillDown*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowDrillDown" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowDrillDown">AllowDrillDown</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether drill down functionality is enabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowDrillDown { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowFieldsPicking_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowFieldsPicking*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowFieldsPicking" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowFieldsPicking">AllowFieldsPicking</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether picking of fields runtime is allowed. Set to <code>false</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowFieldsPicking { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if picking of fields runtime is allowed; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowFilterDateInput_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowFilterDateInput*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowFilterDateInput" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowFilterDateInput">AllowFilterDateInput</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether to allow filter date input.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowFilterDateInput { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowFiltering_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowFiltering*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowFiltering" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowFiltering">AllowFiltering</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether filtering is enabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowFiltering { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowSorting_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowSorting*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AllowSorting" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AllowSorting">AllowSorting</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether sorting is enabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowSorting { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AndOperatorText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AndOperatorText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AndOperatorText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AndOperatorText">AndOperatorText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the and operator text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string AndOperatorText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ApplyText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ApplyText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ApplyText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ApplyText">ApplyText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the apply text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ApplyText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ClearText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ClearText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ClearText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ClearText">ClearText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the clear text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ClearText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_Columns_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.Columns*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_Columns" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.Columns">Columns</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the columns collection for pivot columns.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? Columns { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ColumnsCollection_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ColumnsCollection*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ColumnsCollection" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ColumnsCollection">ColumnsCollection</h4>
+  <div class="markdown level1 summary"><p>Gets the columns collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public IList&lt;RadzenPivotColumn&lt;TItem&gt;&gt; ColumnsCollection { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenPivotColumn-1.html">RadzenPivotColumn</a>&lt;TItem&gt;&gt;</td>
+        <td><p>The columns collection.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ColumnsText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ColumnsText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ColumnsText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ColumnsText">ColumnsText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the Columns text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ColumnsText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ContainsText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ContainsText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ContainsText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ContainsText">ContainsText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the contains text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ContainsText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The contains text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_CustomText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.CustomText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_CustomText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.CustomText">CustomText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the custom filter operator text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string CustomText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The custom filter operator text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_DoesNotContainText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.DoesNotContainText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_DoesNotContainText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.DoesNotContainText">DoesNotContainText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the does not contain text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string DoesNotContainText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The does not contain text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_EmptyTemplate_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EmptyTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_EmptyTemplate" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EmptyTemplate">EmptyTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the empty template shown when Data is empty collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? EmptyTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_EmptyText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EmptyText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_EmptyText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EmptyText">EmptyText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the empty text shown when Data is empty collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string EmptyText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_EndsWithText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EndsWithText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_EndsWithText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EndsWithText">EndsWithText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the ends with text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string EndsWithText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The ends with text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_EnumFilterSelectText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EnumFilterSelectText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_EnumFilterSelectText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EnumFilterSelectText">EnumFilterSelectText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the enum filter select text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string EnumFilterSelectText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_EnumFilterTranslationFunc_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EnumFilterTranslationFunc*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_EnumFilterTranslationFunc" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EnumFilterTranslationFunc">EnumFilterTranslationFunc</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the enum filter translation function.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Func&lt;object, string&gt;? EnumFilterTranslationFunc { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_EqualsText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EqualsText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_EqualsText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.EqualsText">EqualsText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the equals text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string EqualsText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The equals text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_FieldsPickerExpanded_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FieldsPickerExpanded*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_FieldsPickerExpanded" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FieldsPickerExpanded">FieldsPickerExpanded</h4>
+  <div class="markdown level1 summary"><p>Gets or sets value indicating if the fields picker is expanded.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool FieldsPickerExpanded { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p>The fields picker expanded.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_FieldsPickerHeaderTemplate_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FieldsPickerHeaderTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_FieldsPickerHeaderTemplate" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FieldsPickerHeaderTemplate">FieldsPickerHeaderTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the fields picker header template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? FieldsPickerHeaderTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>The fields picker header template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_FieldsPickerHeaderText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FieldsPickerHeaderText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_FieldsPickerHeaderText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FieldsPickerHeaderText">FieldsPickerHeaderText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the fields picker header text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FieldsPickerHeaderText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The fields picker header text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterCaseSensitivity_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterCaseSensitivity*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterCaseSensitivity" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterCaseSensitivity">FilterCaseSensitivity</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter case sensitivity.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public FilterCaseSensitivity FilterCaseSensitivity { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterCaseSensitivity.html">FilterCaseSensitivity</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterIcon_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterIcon*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterIcon" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterIcon">FilterIcon</h4>
+  <div class="markdown level1 summary"><p>Gets or set the filter icon to use.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FilterIcon { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterOperatorAriaLabel_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterOperatorAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterOperatorAriaLabel" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterOperatorAriaLabel">FilterOperatorAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter operator aria label.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FilterOperatorAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterText">FilterText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FilterText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterValueAriaLabel_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterValueAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_FilterValueAriaLabel" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.FilterValueAriaLabel">FilterValueAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter value aria label.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FilterValueAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_GreaterThanOrEqualsText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GreaterThanOrEqualsText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_GreaterThanOrEqualsText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GreaterThanOrEqualsText">GreaterThanOrEqualsText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the greater than or equals text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string GreaterThanOrEqualsText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The greater than or equals text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_GreaterThanText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GreaterThanText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_GreaterThanText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GreaterThanText">GreaterThanText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the greater than text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string GreaterThanText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The greater than text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_GridLines_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GridLines*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_GridLines" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GridLines">GridLines</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the grid lines style.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public DataGridGridLines GridLines { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.DataGridGridLines.html">DataGridGridLines</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_InText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.InText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_InText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.InText">InText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the in operator text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string InText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The in operator text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_IsEmptyText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsEmptyText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_IsEmptyText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsEmptyText">IsEmptyText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the is empty text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string IsEmptyText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The empty text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_IsLoading_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsLoading*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_IsLoading" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsLoading">IsLoading</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this instance loading indicator is shown.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool IsLoading { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if this instance loading indicator is shown; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_IsNotEmptyText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsNotEmptyText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_IsNotEmptyText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsNotEmptyText">IsNotEmptyText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the is not empty text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string IsNotEmptyText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The not empty text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_IsNotNullText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsNotNullText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_IsNotNullText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsNotNullText">IsNotNullText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the not null text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string IsNotNullText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The not null text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_IsNullText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsNullText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_IsNullText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.IsNullText">IsNullText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the is null text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string IsNullText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The null text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_LessThanOrEqualsText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.LessThanOrEqualsText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_LessThanOrEqualsText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.LessThanOrEqualsText">LessThanOrEqualsText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the less than or equals text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string LessThanOrEqualsText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The less than or equals text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_LessThanText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.LessThanText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_LessThanText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.LessThanText">LessThanText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the less than text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string LessThanText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The less than text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_LogicalFilterOperator_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.LogicalFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_LogicalFilterOperator" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.LogicalFilterOperator">LogicalFilterOperator</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the logical filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public LogicalFilterOperator LogicalFilterOperator { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_LogicalOperatorAriaLabel_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.LogicalOperatorAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_LogicalOperatorAriaLabel" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.LogicalOperatorAriaLabel">LogicalOperatorAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the logical operator aria label.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string LogicalOperatorAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_NotEqualsText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.NotEqualsText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_NotEqualsText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.NotEqualsText">NotEqualsText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the not equals text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string NotEqualsText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The not equals text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_NotInText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.NotInText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_NotInText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.NotInText">NotInText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the not in operator text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string NotInText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The not in operator text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_OrOperatorText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.OrOperatorText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_OrOperatorText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.OrOperatorText">OrOperatorText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the or operator text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string OrOperatorText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_Rows_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.Rows*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_Rows" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.Rows">Rows</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the rows collection for pivot rows.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? Rows { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_RowsCollection_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.RowsCollection*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_RowsCollection" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.RowsCollection">RowsCollection</h4>
+  <div class="markdown level1 summary"><p>Gets the rows collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public IList&lt;RadzenPivotRow&lt;TItem&gt;&gt; RowsCollection { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenPivotRow-1.html">RadzenPivotRow</a>&lt;TItem&gt;&gt;</td>
+        <td><p>The rows collection.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_RowsText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.RowsText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_RowsText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.RowsText">RowsText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the Rows text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string RowsText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_SecondFilterOperatorAriaLabel_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.SecondFilterOperatorAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_SecondFilterOperatorAriaLabel" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.SecondFilterOperatorAriaLabel">SecondFilterOperatorAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the second filter operator aria label.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string SecondFilterOperatorAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_SecondFilterValueAriaLabel_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.SecondFilterValueAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_SecondFilterValueAriaLabel" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.SecondFilterValueAriaLabel">SecondFilterValueAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the second filter value aria label.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string SecondFilterValueAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ShowColumnsTotals_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ShowColumnsTotals*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ShowColumnsTotals" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ShowColumnsTotals">ShowColumnsTotals</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether to show column totals.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ShowColumnsTotals { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ShowRowsTotals_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ShowRowsTotals*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ShowRowsTotals" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ShowRowsTotals">ShowRowsTotals</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether to show row totals.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ShowRowsTotals { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_SortAriaLabelFormat_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.SortAriaLabelFormat*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_SortAriaLabelFormat" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.SortAriaLabelFormat">SortAriaLabelFormat</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the sort aria label format.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string SortAriaLabelFormat { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The sort aria label format.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_StartsWithText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.StartsWithText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_StartsWithText" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.StartsWithText">StartsWithText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the starts with text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string StartsWithText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The starts with text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_View_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.View*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_View" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.View">View</h4>
+  <div class="markdown level1 summary"><p>Override the View property to apply sorting and filtering.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override IQueryable&lt;TItem&gt; View { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;TItem&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_View">PagedDataBoundComponent&lt;TItem&gt;.View</a></div>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AddPivotAggregate_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AddPivotAggregate*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AddPivotAggregate_Radzen_Blazor_RadzenPivotAggregate__0__" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AddPivotAggregate(Radzen.Blazor.RadzenPivotAggregate{`0})">AddPivotAggregate(RadzenPivotAggregate&lt;TItem&gt;)</h4>
+  <div class="markdown level1 summary"><p>Adds a pivot aggregate to the pivot grid if it does not already exist.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void AddPivotAggregate(RadzenPivotAggregate&lt;TItem&gt; aggregate)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenPivotAggregate-1.html">RadzenPivotAggregate</a>&lt;TItem&gt;</td>
+        <td><span class="parametername">aggregate</span></td>
+        <td><p>The pivot aggregate to add.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AddPivotColumn_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AddPivotColumn*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AddPivotColumn_Radzen_Blazor_RadzenPivotColumn__0__" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AddPivotColumn(Radzen.Blazor.RadzenPivotColumn{`0})">AddPivotColumn(RadzenPivotColumn&lt;TItem&gt;)</h4>
+  <div class="markdown level1 summary"><p>Adds a pivot column to the pivot grid if it does not already exist.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void AddPivotColumn(RadzenPivotColumn&lt;TItem&gt; column)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenPivotColumn-1.html">RadzenPivotColumn</a>&lt;TItem&gt;</td>
+        <td><span class="parametername">column</span></td>
+        <td><p>The pivot column to add.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AddPivotField_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AddPivotField*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AddPivotField_Radzen_Blazor_RadzenPivotField__0__" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AddPivotField(Radzen.Blazor.RadzenPivotField{`0})">AddPivotField(RadzenPivotField&lt;TItem&gt;)</h4>
+  <div class="markdown level1 summary"><p>Adds a pivot field to the pivot grid if it does not already exist.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void AddPivotField(RadzenPivotField&lt;TItem&gt; field)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenPivotField-1.html">RadzenPivotField</a>&lt;TItem&gt;</td>
+        <td><span class="parametername">field</span></td>
+        <td><p>The pivot field to add.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_AddPivotRow_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AddPivotRow*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_AddPivotRow_Radzen_Blazor_RadzenPivotRow__0__" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.AddPivotRow(Radzen.Blazor.RadzenPivotRow{`0})">AddPivotRow(RadzenPivotRow&lt;TItem&gt;)</h4>
+  <div class="markdown level1 summary"><p>Adds a pivot row to the pivot grid if it does not already exist.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void AddPivotRow(RadzenPivotRow&lt;TItem&gt; row)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenPivotRow-1.html">RadzenPivotRow</a>&lt;TItem&gt;</td>
+        <td><span class="parametername">row</span></td>
+        <td><p>The pivot row to add.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_GetAggregateValue_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GetAggregateValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_GetAggregateValue_System_Linq_IQueryable__0__Radzen_Blazor_RadzenPivotAggregate__0__" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GetAggregateValue(System.Linq.IQueryable{`0},Radzen.Blazor.RadzenPivotAggregate{`0})">GetAggregateValue(IQueryable&lt;TItem&gt;, RadzenPivotAggregate&lt;TItem&gt;)</h4>
+  <div class="markdown level1 summary"><p>Gets the aggregate value for items.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public object? GetAggregateValue(IQueryable&lt;TItem&gt; items, RadzenPivotAggregate&lt;TItem&gt; aggregate)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;TItem&gt;</td>
+        <td><span class="parametername">items</span></td>
+        <td><p>The items to aggregate.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenPivotAggregate-1.html">RadzenPivotAggregate</a>&lt;TItem&gt;</td>
+        <td><span class="parametername">aggregate</span></td>
+        <td><p>The aggregate configuration.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><p>The aggregated value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_GetComponentCssClass_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GetComponentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_GetComponentCssClass" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_GetFilterOperatorText_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GetFilterOperatorText*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_GetFilterOperatorText_System_Nullable_Radzen_FilterOperator__" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GetFilterOperatorText(System.Nullable{Radzen.FilterOperator})">GetFilterOperatorText(FilterOperator?)</h4>
+  <div class="markdown level1 summary"><p>Gets the filter operator text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetFilterOperatorText(FilterOperator? filterOperator)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a>?</td>
+        <td><span class="parametername">filterOperator</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_GetTableCssClass_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GetTableCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_GetTableCssClass" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.GetTableCssClass">GetTableCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the table CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string GetTableCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_OnDataChanged_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.OnDataChanged*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_OnDataChanged" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.OnDataChanged">OnDataChanged()</h4>
+  <div class="markdown level1 summary"><p>Called when [data changed].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void OnDataChanged()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_OnDataChanged">PagedDataBoundComponent&lt;TItem&gt;.OnDataChanged()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_Reload_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.Reload*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_Reload" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.Reload">Reload()</h4>
+  <div class="markdown level1 summary"><p>Reloads this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task Reload()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_Reload">PagedDataBoundComponent&lt;TItem&gt;.Reload()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_RenderFooter_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.RenderFooter*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_RenderFooter" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.RenderFooter">RenderFooter()</h4>
+  <div class="markdown level1 summary"><p>Renders footer with grand totals for each value column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected RenderFragment RenderFooter()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_RenderPivotRows_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.RenderPivotRows*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_RenderPivotRows" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.RenderPivotRows">RenderPivotRows()</h4>
+  <div class="markdown level1 summary"><p>Renders pivot rows with real data aggregation and grouping.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual RenderFragment RenderPivotRows()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ToggleColumnDrillDown_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ToggleColumnDrillDown*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ToggleColumnDrillDown_System_String_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ToggleColumnDrillDown(System.String)">ToggleColumnDrillDown(string)</h4>
+  <div class="markdown level1 summary"><p>Toggles the drill down state for a column group.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task ToggleColumnDrillDown(string pathKey)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">pathKey</span></td>
+        <td><p>The path key identifying the column group.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPivotDataGrid_1_ToggleRowDrillDown_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ToggleRowDrillDown*"></a>
+  <h4 id="Radzen_Blazor_RadzenPivotDataGrid_1_ToggleRowDrillDown_System_String_" data-uid="Radzen.Blazor.RadzenPivotDataGrid`1.ToggleRowDrillDown(System.String)">ToggleRowDrillDown(string)</h4>
+  <div class="markdown level1 summary"><p>Toggles the drill down state for a row group.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task ToggleRowDrillDown(string pathKey)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">pathKey</span></td>
+        <td><p>The path key identifying the row group.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

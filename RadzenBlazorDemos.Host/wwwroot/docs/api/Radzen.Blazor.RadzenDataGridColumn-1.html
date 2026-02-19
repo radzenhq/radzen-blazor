@@ -1,0 +1,3292 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenDataGridColumn&lt;TItem&gt;
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenDataGridColumn&lt;TItem&gt;
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenDataGridColumn`1">
+
+
+  <h1 id="Radzen_Blazor_RadzenDataGridColumn_1" data-uid="Radzen.Blazor.RadzenDataGridColumn`1" class="text-break">Class RadzenDataGridColumn&lt;TItem&gt;
+</h1>
+  <div class="markdown level0 summary"><p>Defines a column in a RadzenDataGrid, specifying how data is displayed, sorted, filtered, and edited.
+RadzenDataGridColumn supports data binding via Property, custom templates, formatting, sorting, filtering, grouping, aggregation, and inline editing.
+Must be placed inside a <a class="xref" href="Radzen.Blazor.RadzenDataGrid-1.html">RadzenDataGrid&lt;TItem&gt;</a> within the Columns template.
+Each column represents one field or computed value from the data source.
+Features data binding using Property to bind to a data field or Template for custom content, display properties (Title, FormatString, TextAlign, Width, Frozen for locked scrolling),
+Sortable property enabling/disabling sorting, Filterable property with FilterTemplate for custom filter UI and FilterValue for programmatic filtering,
+EditTemplate for inline editing with Editable property to control edit permission, GroupProperty for hierarchical data grouping,
+FooterTemplate with Sum()/Average()/Count() aggregation functions, child columns for multi-level headers,
+and Visible property with responsive breakpoint properties (visible-sm, visible-md, etc.).
+Use Template for complete control over cell rendering, or EditTemplate for edit mode cells.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><span class="xref">RadzenDataGridColumn&lt;TItem&gt;</span></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenDropDownDataGridColumn.html">RadzenDropDownDataGridColumn</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrenderasync">ComponentBase.OnAfterRenderAsync(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenDataGridColumn_1_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenDataGridColumn&lt;TItem&gt; : ComponentBase, IComponent, IHandleEvent, IHandleAfterRender, IDisposable where TItem : notnull</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TItem</span></td>
+        <td><p>The type of data items in the parent DataGrid. Must match the grid's TItem type.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Radzen_Blazor_RadzenDataGridColumn_1_examples"><strong>Examples</strong></h5>
+  <p>Simple data-bound column:</p>
+<pre><code class="lang-csharp">&lt;RadzenDataGridColumn TItem="Order" Property="OrderId" Title="Order ID" /&gt;</code></pre>
+<p>Formatted column with custom width:</p>
+<pre><code class="lang-csharp">&lt;RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Date" FormatString="{0:d}" Width="120px" /&gt;</code></pre>
+<p>Column with custom template:</p>
+<pre><code class="lang-csharp">&lt;RadzenDataGridColumn TItem="Order" Title="Actions" Sortable="false" Filterable="false"&gt;
+    &lt;Template Context="order"&gt;
+        &lt;RadzenButton Icon="edit" Click="@(args =&gt; EditOrder(order))" /&gt;
+        &lt;RadzenButton Icon="delete" Click="@(args =&gt; DeleteOrder(order))" /&gt;
+    &lt;/Template&gt;
+&lt;/RadzenDataGridColumn&gt;</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1__ctor_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1__ctor" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.#ctor">RadzenDataGridColumn()</h4>
+  <div class="markdown level1 summary"><p>Defines a column in a RadzenDataGrid, specifying how data is displayed, sorted, filtered, and edited.
+RadzenDataGridColumn supports data binding via Property, custom templates, formatting, sorting, filtering, grouping, aggregation, and inline editing.
+Must be placed inside a <a class="xref" href="Radzen.Blazor.RadzenDataGrid-1.html">RadzenDataGrid&lt;TItem&gt;</a> within the Columns template.
+Each column represents one field or computed value from the data source.
+Features data binding using Property to bind to a data field or Template for custom content, display properties (Title, FormatString, TextAlign, Width, Frozen for locked scrolling),
+Sortable property enabling/disabling sorting, Filterable property with FilterTemplate for custom filter UI and FilterValue for programmatic filtering,
+EditTemplate for inline editing with Editable property to control edit permission, GroupProperty for hierarchical data grouping,
+FooterTemplate with Sum()/Average()/Count() aggregation functions, child columns for multi-level headers,
+and Visible property with responsive breakpoint properties (visible-sm, visible-md, etc.).
+Use Template for complete control over cell rendering, or EditTemplate for edit mode cells.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenDataGridColumn()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenDataGridColumn_1__ctor_examples">Examples</h5>
+  <p>Simple data-bound column:</p>
+<pre><code class="lang-csharp">&lt;RadzenDataGridColumn TItem="Order" Property="OrderId" Title="Order ID" /&gt;</code></pre>
+<p>Formatted column with custom width:</p>
+<pre><code class="lang-csharp">&lt;RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Date" FormatString="{0:d}" Width="120px" /&gt;</code></pre>
+<p>Column with custom template:</p>
+<pre><code class="lang-csharp">&lt;RadzenDataGridColumn TItem="Order" Title="Actions" Sortable="false" Filterable="false"&gt;
+    &lt;Template Context="order"&gt;
+        &lt;RadzenButton Icon="edit" Click="@(args =&gt; EditOrder(order))" /&gt;
+        &lt;RadzenButton Icon="delete" Click="@(args =&gt; DeleteOrder(order))" /&gt;
+    &lt;/Template&gt;
+&lt;/RadzenDataGridColumn&gt;</code></pre>
+
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_AllowCheckBoxListVirtualization_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.AllowCheckBoxListVirtualization*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_AllowCheckBoxListVirtualization" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.AllowCheckBoxListVirtualization">AllowCheckBoxListVirtualization</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether virtualization is enabled for the CheckBoxList filter dropdown.
+When enabled, only visible checkbox items are rendered for better performance with large datasets.
+Only applicable when using FilterMode.CheckBoxList.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowCheckBoxListVirtualization { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> to enable filter list virtualization; otherwise, <code>false</code>. Default is <code>true</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_AlwaysShowAllCheckBoxListData_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.AlwaysShowAllCheckBoxListData*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_AlwaysShowAllCheckBoxListData" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.AlwaysShowAllCheckBoxListData">AlwaysShowAllCheckBoxListData</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether the CheckBoxList filter should display all distinct values regardless of filters applied to other columns.
+When false (default), the filter list is dynamically filtered based on other active column filters.
+Set to true to always show the complete list of distinct values from the original dataset.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AlwaysShowAllCheckBoxListData { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> to show all data in filter list; <code>false</code> to filter the list based on other active filters. Default is <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_CalculatedCssClass_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CalculatedCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_CalculatedCssClass" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CalculatedCssClass">CalculatedCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a function that calculates the CSS class based on the <code class="typeparamref">TItem</code> value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Func&lt;RadzenDataGridColumn&lt;TItem&gt;, TItem, string&gt;? CalculatedCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;TItem&gt;, TItem, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>The dynamic CSS class applied to data cells.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_CollectionFilterMode_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CollectionFilterMode*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_CollectionFilterMode" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CollectionFilterMode">CollectionFilterMode</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the mode that determines whether the filter applies to any or all items in a collection.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public CollectionFilterMode CollectionFilterMode { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.CollectionFilterMode.html">CollectionFilterMode</a></td>
+        <td><p>A <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html#Radzen_Blazor_RadzenDataGridColumn_1_CollectionFilterMode">CollectionFilterMode</a> value indicating whether the filter is satisfied by any or all items.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_ColumnPickerTitle_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ColumnPickerTitle*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_ColumnPickerTitle" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ColumnPickerTitle">ColumnPickerTitle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the title in column picker.
+Value of Title is used when ColumnPickerTitle is not set</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ColumnPickerTitle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The column picker title.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Columns_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Columns*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Columns" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Columns">Columns</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the child columns render fragment for creating composite/hierarchical column headers.
+When set, this column becomes a header grouping column, and child columns are rendered beneath it.
+Useful for creating multi-level column headers where related columns are grouped under a common header.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? Columns { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>The render fragment containing child column definitions.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_ColumnsCollection_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ColumnsCollection*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_ColumnsCollection" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ColumnsCollection">ColumnsCollection</h4>
+  <div class="markdown level1 summary"><p>Gets the child columns.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public IList&lt;RadzenDataGridColumn&lt;TItem&gt;&gt; ColumnsCollection { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;TItem&gt;&gt;</td>
+        <td><p>The child columns.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_CssClass_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_CssClass" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CssClass">CssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the CSS class applied to data cells.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string CssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The CSS class applied to data cells.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_CustomFilterExpression_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CustomFilterExpression*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_CustomFilterExpression" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CustomFilterExpression">CustomFilterExpression</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the custom filter dynamic Linq dictionary.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string CustomFilterExpression { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The custom filter dynamic Linq dictionary.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_EditTemplate_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.EditTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_EditTemplate" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.EditTemplate">EditTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the edit template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;TItem&gt;? EditTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;TItem&gt;</td>
+        <td><p>The edit template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterMode_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterMode*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterMode" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterMode">FilterMode</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filtering UI mode for this column.
+Controls whether the column uses simple filter controls (textbox in header), advanced filter menu, CheckBoxList, or no filtering.
+If not set, inherits from the parent grid's FilterMode setting.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public FilterMode? FilterMode { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterMode.html">FilterMode</a>?</td>
+        <td><p>The filter mode, or null to use the grid's default FilterMode. Default is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterOperator" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterOperator">FilterOperator</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public FilterOperator FilterOperator { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a></td>
+        <td><p>The filter operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterOperators_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterOperators*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterOperators" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterOperators">FilterOperators</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter operators.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IEnumerable&lt;FilterOperator&gt;? FilterOperators { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a>&gt;</td>
+        <td><p>The filter operators.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterPlaceholder_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterPlaceholder*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterPlaceholder" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterPlaceholder">FilterPlaceholder</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter placeholder.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FilterPlaceholder { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The filter placeholder value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterProperty_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterProperty*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterProperty" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterProperty">FilterProperty</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter property name.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FilterProperty { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The filter property name.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterPropertyType_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterPropertyType*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterPropertyType" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterPropertyType">FilterPropertyType</h4>
+  <div class="markdown level1 summary"><p>Gets the filter property type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Type? FilterPropertyType { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterTemplate_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterTemplate" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterTemplate">FilterTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;RadzenDataGridColumn&lt;TItem&gt;&gt;? FilterTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;TItem&gt;&gt;</td>
+        <td><p>The filter template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterValue_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterValue" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterValue">FilterValue</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public object? FilterValue { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><p>The filter value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FilterValueTemplate_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterValueTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FilterValueTemplate" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FilterValueTemplate">FilterValueTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the filter value template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;RadzenDataGridColumn&lt;TItem&gt;&gt;? FilterValueTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;TItem&gt;&gt;</td>
+        <td><p>The filter value template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Filterable_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Filterable*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Filterable" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Filterable">Filterable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a> is filterable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Filterable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if filterable; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FooterCssClass_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FooterCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FooterCssClass" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FooterCssClass">FooterCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the footer CSS class applied to footer cell.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FooterCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The footer CSS class applied to footer cell.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FooterTemplate_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FooterTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FooterTemplate" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FooterTemplate">FooterTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the footer template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? FooterTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>The footer template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FormatProvider_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FormatProvider*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FormatProvider" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FormatProvider">FormatProvider</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the IFormatProvider used for FormatString.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IFormatProvider? FormatProvider { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iformatprovider">IFormatProvider</a></td>
+        <td><p>The IFormatProvider.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FormatString_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FormatString*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FormatString" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FormatString">FormatString</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the format string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string FormatString { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The format string.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Frozen_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Frozen*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Frozen" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Frozen">Frozen</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a> is frozen.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Frozen { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if frozen will disable horizontal scroll for the column; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_FrozenPosition_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FrozenPosition*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_FrozenPosition" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.FrozenPosition">FrozenPosition</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the frozen position this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public FrozenColumnPosition FrozenPosition { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FrozenColumnPosition.html">FrozenColumnPosition</a></td>
+        <td><p><a class="xref" href="Radzen.FrozenColumnPosition.html#Radzen_FrozenColumnPosition_Left">Left</a> or <a class="xref" href="Radzen.FrozenColumnPosition.html#Radzen_FrozenColumnPosition_Right">Right</a>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Grid_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Grid*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Grid" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Grid">Grid</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the parent RadzenDataGrid that contains this column.
+This is set automatically via cascading parameter and provides access to grid functionality.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[CascadingParameter]
+public RadzenDataGrid&lt;TItem&gt; Grid { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenDataGrid-1.html">RadzenDataGrid</a>&lt;TItem&gt;</td>
+        <td><p>The parent DataGrid component.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GroupFooterCssClass_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GroupFooterCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GroupFooterCssClass" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GroupFooterCssClass">GroupFooterCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the group footer CSS class applied to group footer cell.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string GroupFooterCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The group footer CSS class applied to group footer cell.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GroupFooterTemplate_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GroupFooterTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GroupFooterTemplate" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GroupFooterTemplate">GroupFooterTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the group footer template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;Group&gt;? GroupFooterTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;<a class="xref" href="Radzen.Group.html">Group</a>&gt;</td>
+        <td><p>The group footer template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GroupProperty_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GroupProperty*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GroupProperty" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GroupProperty">GroupProperty</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the group property name.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string GroupProperty { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The group property name.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Groupable_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Groupable*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Groupable" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Groupable">Groupable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a> is groupable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Groupable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if groupable; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_HeaderCssClass_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.HeaderCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_HeaderCssClass" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.HeaderCssClass">HeaderCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the header CSS class applied to header cell.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string HeaderCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The header CSS class applied to header cell.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_HeaderTemplate_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.HeaderTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_HeaderTemplate" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.HeaderTemplate">HeaderTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the header template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? HeaderTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>The header template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_HeaderTooltip_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.HeaderTooltip*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_HeaderTooltip" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.HeaderTooltip">HeaderTooltip</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the header tooltip.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string HeaderTooltip { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The header tooltip.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_HeaderWhiteSpace_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.HeaderWhiteSpace*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_HeaderWhiteSpace" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.HeaderWhiteSpace">HeaderWhiteSpace</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the header white space style.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public WhiteSpace HeaderWhiteSpace { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.WhiteSpace.html">WhiteSpace</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_IsInEditMode_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.IsInEditMode*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_IsInEditMode" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.IsInEditMode">IsInEditMode</h4>
+  <div class="markdown level1 summary"><p>Allows the column to override whether or not this column's the <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html#Radzen_Blazor_RadzenDataGridColumn_1_EditTemplate">EditTemplate</a> is visible at runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Func&lt;string, TItem, bool&gt; IsInEditMode { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, TItem, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_LogicalFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.LogicalFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_LogicalFilterOperator" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.LogicalFilterOperator">LogicalFilterOperator</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the logical filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public LogicalFilterOperator LogicalFilterOperator { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td><p>The logical filter operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_MaxWidth_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.MaxWidth*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_MaxWidth" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.MaxWidth">MaxWidth</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the max-width.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string MaxWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The max-width.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_MinWidth_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.MinWidth*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_MinWidth" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.MinWidth">MinWidth</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the min-width.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string MinWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The min-width.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_OrderIndex_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.OrderIndex*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_OrderIndex" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.OrderIndex">OrderIndex</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the order index.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int? OrderIndex { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td><p>The order index.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Parent_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Parent*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Parent" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Parent">Parent</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the parent column when this column is nested within a composite column structure.
+This is set automatically via cascading parameter for child columns in hierarchical headers.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[CascadingParameter]
+public RadzenDataGridColumn&lt;TItem&gt;? Parent { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;TItem&gt;</td>
+        <td><p>The parent column, or null if this is a top-level column.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Pickable_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Pickable*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Pickable" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Pickable">Pickable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a> is pickable - listed when DataGrid AllowColumnPicking is set to true.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Pickable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if pickable; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Property_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Property*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Property" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Property">Property</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the property name.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string Property { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The property name.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Reorderable_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Reorderable*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Reorderable" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Reorderable">Reorderable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a> is reorderable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Reorderable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if reorderable; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Resizable_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Resizable*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Resizable" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Resizable">Resizable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a> is resizable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Resizable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if resizable; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SecondFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SecondFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SecondFilterOperator" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SecondFilterOperator">SecondFilterOperator</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the second filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public FilterOperator SecondFilterOperator { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a></td>
+        <td><p>The second filter operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SecondFilterValue_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SecondFilterValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SecondFilterValue" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SecondFilterValue">SecondFilterValue</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the second filter value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public object? SecondFilterValue { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><p>The second filter value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SecondFilterValueTemplate_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SecondFilterValueTemplate*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SecondFilterValueTemplate" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SecondFilterValueTemplate">SecondFilterValueTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the second filter value template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;RadzenDataGridColumn&lt;TItem&gt;&gt;? SecondFilterValueTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;TItem&gt;&gt;</td>
+        <td><p>The second filter value template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_ShowCellDataAsTooltip_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ShowCellDataAsTooltip*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_ShowCellDataAsTooltip" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ShowCellDataAsTooltip">ShowCellDataAsTooltip</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether cell values should automatically display as tooltips on hover.
+Useful for columns that may contain truncated text, allowing users to see the full value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ShowCellDataAsTooltip { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> to show cell data as tooltips; otherwise, <code>false</code>. Default is <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SortOrder_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SortOrder*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SortOrder" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SortOrder">SortOrder</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the sort order.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public SortOrder? SortOrder { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.SortOrder.html">SortOrder</a>?</td>
+        <td><p>The sort order.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SortOrderSequence_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SortOrderSequence*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SortOrderSequence" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SortOrderSequence">SortOrderSequence</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the sequence of the <a class="xref" href="Radzen.SortOrder.html">SortOrder</a>s to use when sorting the column interactively.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public SortOrder?[] SortOrderSequence { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.SortOrder.html">SortOrder</a>?[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SortProperty_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SortProperty*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SortProperty" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SortProperty">SortProperty</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the sort property name.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string SortProperty { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The sort property name.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Sortable_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Sortable*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Sortable" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Sortable">Sortable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a> is sortable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Sortable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if sortable; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Template_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Template*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Template" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Template">Template</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;TItem&gt;? Template { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;TItem&gt;</td>
+        <td><p>The template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_TextAlign_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.TextAlign*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_TextAlign" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.TextAlign">TextAlign</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the text align.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public TextAlign TextAlign { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.TextAlign.html">TextAlign</a></td>
+        <td><p>The text align.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Title_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Title*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Title" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Title">Title</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the title.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string Title { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The title.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Type_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Type*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Type" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Type">Type</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the data type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Type? Type { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><p>The data type.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_UniqueID_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.UniqueID*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_UniqueID" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.UniqueID">UniqueID</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the unique identifier.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string UniqueID { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The unique identifier.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_UseDisplayName_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.UseDisplayName*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_UseDisplayName" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.UseDisplayName">UseDisplayName</h4>
+  <div class="markdown level1 summary"><p>Indicates whether the column should automatically use the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.dataannotations.displayattribute.name">Name</a>
+of the bound property as the header.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool UseDisplayName { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Visible_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Visible*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Visible" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Visible">Visible</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn&lt;TItem&gt;</a> is visible.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Visible { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if visible; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_WhiteSpace_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.WhiteSpace*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_WhiteSpace" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.WhiteSpace">WhiteSpace</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the white space style.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public WhiteSpace WhiteSpace { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.WhiteSpace.html">WhiteSpace</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Width_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Width*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Width" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Width">Width</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the width.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string Width { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The width.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_ClearFilters_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ClearFilters*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_ClearFilters" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ClearFilters">ClearFilters()</h4>
+  <div class="markdown level1 summary"><p>Sets to default column filter values and operators.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void ClearFilters()</code></pre>
+  </div>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_CloseFilter_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CloseFilter*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_CloseFilter" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.CloseFilter">CloseFilter()</h4>
+  <div class="markdown level1 summary"><p>Closes this column filter popup.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task CloseFilter()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_Dispose_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Dispose*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_Dispose" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Disposes this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void Dispose()</code></pre>
+  </div>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetCollectionFilterMode_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetCollectionFilterMode*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetCollectionFilterMode" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetCollectionFilterMode">GetCollectionFilterMode()</h4>
+  <div class="markdown level1 summary"><p>Get column collection filter mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public CollectionFilterMode GetCollectionFilterMode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.CollectionFilterMode.html">CollectionFilterMode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetColumnODataFilter_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetColumnODataFilter*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetColumnODataFilter_System_Boolean_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetColumnODataFilter(System.Boolean)">GetColumnODataFilter(bool)</h4>
+  <div class="markdown level1 summary"><p>Gets an OData expression to filter by this column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetColumnODataFilter(bool second = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">second</span></td>
+        <td><p>Whether to use <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html#Radzen_Blazor_RadzenDataGridColumn_1_SecondFilterValue">SecondFilterValue</a> instead of <a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html#Radzen_Blazor_RadzenDataGridColumn_1_FilterValue">FilterValue</a></p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>An OData expression to filter by this column.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetColumnODataFilter_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetColumnODataFilter*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetColumnODataFilter_System_Object_Radzen_FilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetColumnODataFilter(System.Object,Radzen.FilterOperator)">GetColumnODataFilter(object?, FilterOperator)</h4>
+  <div class="markdown level1 summary"><p>Gets an OData expression to filter by this column.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string GetColumnODataFilter(object? filterValue, FilterOperator filterOperator)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">filterValue</span></td>
+        <td><p>The specific value to filter by</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a></td>
+        <td><span class="parametername">filterOperator</span></td>
+        <td><p>The operator used to compare to <code class="paramref">filterValue</code></p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>An OData expression to filter by this column.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetCustomFilterExpression_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetCustomFilterExpression*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetCustomFilterExpression" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetCustomFilterExpression">GetCustomFilterExpression()</h4>
+  <div class="markdown level1 summary"><p>Get custom filter linq.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetCustomFilterExpression()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterOperator" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterOperator">GetFilterOperator()</h4>
+  <div class="markdown level1 summary"><p>Get column filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public FilterOperator GetFilterOperator()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterOperatorText_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterOperatorText*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterOperatorText_Radzen_FilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterOperatorText(Radzen.FilterOperator)">GetFilterOperatorText(FilterOperator)</h4>
+  <div class="markdown level1 summary"><p>Get filter operator text</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? GetFilterOperatorText(FilterOperator filterOperator)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a></td>
+        <td><span class="parametername">filterOperator</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterOperators_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterOperators*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterOperators" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterOperators">GetFilterOperators()</h4>
+  <div class="markdown level1 summary"><p>Get possible column filter operators.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual IEnumerable&lt;FilterOperator&gt; GetFilterOperators()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterPlaceholder_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterPlaceholder*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterPlaceholder" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterPlaceholder">GetFilterPlaceholder()</h4>
+  <div class="markdown level1 summary"><p>Gets the filter placeholder.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetFilterPlaceholder()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterProperty_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterProperty*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterProperty" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterProperty">GetFilterProperty()</h4>
+  <div class="markdown level1 summary"><p>Gets the filter property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetFilterProperty()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterValue_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetFilterValue" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetFilterValue">GetFilterValue()</h4>
+  <div class="markdown level1 summary"><p>Get column filter value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public object? GetFilterValue()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetGroupProperty_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetGroupProperty*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetGroupProperty" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetGroupProperty">GetGroupProperty()</h4>
+  <div class="markdown level1 summary"><p>Gets the group property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetGroupProperty()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetLogicalFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetLogicalFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetLogicalFilterOperator" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetLogicalFilterOperator">GetLogicalFilterOperator()</h4>
+  <div class="markdown level1 summary"><p>Get column logical filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public LogicalFilterOperator GetLogicalFilterOperator()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetOrderIndex_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetOrderIndex*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetOrderIndex" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetOrderIndex">GetOrderIndex()</h4>
+  <div class="markdown level1 summary"><p>Gets the order index.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public int? GetOrderIndex()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetSecondFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSecondFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetSecondFilterOperator" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSecondFilterOperator">GetSecondFilterOperator()</h4>
+  <div class="markdown level1 summary"><p>Get column second filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public FilterOperator GetSecondFilterOperator()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetSecondFilterValue_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSecondFilterValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetSecondFilterValue" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSecondFilterValue">GetSecondFilterValue()</h4>
+  <div class="markdown level1 summary"><p>Get column second filter value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public object? GetSecondFilterValue()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetSortIndex_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSortIndex*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetSortIndex" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSortIndex">GetSortIndex()</h4>
+  <div class="markdown level1 summary"><p>Gets the column sort descriptor index indicating order of applied column sort in case of multiple sorting.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public int? GetSortIndex()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetSortOrder_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSortOrder*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetSortOrder" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSortOrder">GetSortOrder()</h4>
+  <div class="markdown level1 summary"><p>Get column sort order.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public SortOrder? GetSortOrder()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.SortOrder.html">SortOrder</a>?</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetSortProperty_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSortProperty*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetSortProperty" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetSortProperty">GetSortProperty()</h4>
+  <div class="markdown level1 summary"><p>Gets the sort property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetSortProperty()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetStyle_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetStyle*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetStyle_System_Boolean_System_Boolean_System_Boolean_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetStyle(System.Boolean,System.Boolean,System.Boolean)">GetStyle(bool, bool, bool)</h4>
+  <div class="markdown level1 summary"><p>Gets the cell style.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual string GetStyle(bool forCell = false, bool isHeaderOrFooterCell = false, bool isForCol = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">forCell</span></td>
+        <td><p>if set to <code>true</code> [for cell].</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">isHeaderOrFooterCell</span></td>
+        <td><p>if set to <code>true</code> [is header or footer cell].</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">isForCol</span></td>
+        <td><p>if set to <code>true</code> [is for col element].</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetTitle_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetTitle*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetTitle" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetTitle">GetTitle()</h4>
+  <div class="markdown level1 summary"><p>Gets the column title.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetTitle()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetValue_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetValue__0_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetValue(`0)">GetValue(TItem)</h4>
+  <div class="markdown level1 summary"><p>Gets the value for specified item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual object? GetValue(TItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TItem</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><p>System.Object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetVisible_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetVisible*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetVisible" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetVisible">GetVisible()</h4>
+  <div class="markdown level1 summary"><p>Gets if the column is visible or not.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool GetVisible()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p>System.Boolean.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_GetWidth_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetWidth*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_GetWidth" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.GetWidth">GetWidth()</h4>
+  <div class="markdown level1 summary"><p>Get column width.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetWidth()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_OnInitialized_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.OnInitialized*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_OnInitialized" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.OnInitialized">OnInitialized()</h4>
+  <div class="markdown level1 summary"><p>Called when initialized.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void OnInitialized()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitialized">ComponentBase.OnInitialized()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetCollectionFilterMode_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetCollectionFilterMode*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetCollectionFilterMode_System_Nullable_Radzen_CollectionFilterMode__" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetCollectionFilterMode(System.Nullable{Radzen.CollectionFilterMode})">SetCollectionFilterMode(CollectionFilterMode?)</h4>
+  <div class="markdown level1 summary"><p>Set column collection filter mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void SetCollectionFilterMode(CollectionFilterMode? value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.CollectionFilterMode.html">CollectionFilterMode</a>?</td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetCustomFilterExpression_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetCustomFilterExpression*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetCustomFilterExpression_System_String_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetCustomFilterExpression(System.String)">SetCustomFilterExpression(string?)</h4>
+  <div class="markdown level1 summary"><p>Set column custom filter linq.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void SetCustomFilterExpression(string? value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetCustomFilterExpressionAsync_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetCustomFilterExpressionAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetCustomFilterExpressionAsync_System_String_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetCustomFilterExpressionAsync(System.String)">SetCustomFilterExpressionAsync(string?)</h4>
+  <div class="markdown level1 summary"><p>Set column custom filter linq and reload grid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task SetCustomFilterExpressionAsync(string? value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Filter value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetFilterOperator_System_Nullable_Radzen_FilterOperator__" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetFilterOperator(System.Nullable{Radzen.FilterOperator})">SetFilterOperator(FilterOperator?)</h4>
+  <div class="markdown level1 summary"><p>Set column filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void SetFilterOperator(FilterOperator? value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a>?</td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetFilterValue_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetFilterValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetFilterValue_System_Object_System_Boolean_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetFilterValue(System.Object,System.Boolean)">SetFilterValue(object?, bool)</h4>
+  <div class="markdown level1 summary"><p>Set column filter value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void SetFilterValue(object? value, bool isFirst = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">isFirst</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetFilterValueAsync_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetFilterValueAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetFilterValueAsync_System_Object_System_Boolean_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetFilterValueAsync(System.Object,System.Boolean)">SetFilterValueAsync(object, bool)</h4>
+  <div class="markdown level1 summary"><p>Set column filter value and reload grid.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task SetFilterValueAsync(object value, bool isFirst = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Filter value.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">isFirst</span></td>
+        <td><p><code>true</code> if FilterValue; <code>false</code> for SecondFilterValue</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetLogicalFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetLogicalFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetLogicalFilterOperator_Radzen_LogicalFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetLogicalFilterOperator(Radzen.LogicalFilterOperator)">SetLogicalFilterOperator(LogicalFilterOperator)</h4>
+  <div class="markdown level1 summary"><p>Set column logical operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void SetLogicalFilterOperator(LogicalFilterOperator value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetParametersAsync_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetParametersAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Set parameters as an asynchronous operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A Task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.setparametersasync">ComponentBase.SetParametersAsync(ParameterView)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetSecondFilterOperator_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetSecondFilterOperator*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetSecondFilterOperator_System_Nullable_Radzen_FilterOperator__" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetSecondFilterOperator(System.Nullable{Radzen.FilterOperator})">SetSecondFilterOperator(FilterOperator?)</h4>
+  <div class="markdown level1 summary"><p>Set column second filter operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void SetSecondFilterOperator(FilterOperator? value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterOperator.html">FilterOperator</a>?</td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetTitle_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetTitle*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetTitle_System_String_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetTitle(System.String)">SetTitle(string)</h4>
+  <div class="markdown level1 summary"><p>Sets the column title.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void SetTitle(string value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_SetWidth_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetWidth*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_SetWidth_System_String_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.SetWidth(System.String)">SetWidth(string?)</h4>
+  <div class="markdown level1 summary"><p>Set column width.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void SetWidth(string? value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">value</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_ShowTimeForDateTimeFilter_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ShowTimeForDateTimeFilter*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_ShowTimeForDateTimeFilter" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ShowTimeForDateTimeFilter">ShowTimeForDateTimeFilter()</h4>
+  <div class="markdown level1 summary"><p>Gets value indicating if the user can specify time in DateTime column filter.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual bool ShowTimeForDateTimeFilter()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenDataGridColumn_1_ShowUpDownForNumericFilter_" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ShowUpDownForNumericFilter*"></a>
+  <h4 id="Radzen_Blazor_RadzenDataGridColumn_1_ShowUpDownForNumericFilter" data-uid="Radzen.Blazor.RadzenDataGridColumn`1.ShowUpDownForNumericFilter">ShowUpDownForNumericFilter()</h4>
+  <div class="markdown level1 summary"><p>Gets value indicating if up and down buttons are displayed in numeric column filter.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual bool ShowUpDownForNumericFilter()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

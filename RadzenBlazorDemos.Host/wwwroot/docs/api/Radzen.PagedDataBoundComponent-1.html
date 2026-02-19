@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class PagedDataBoundComponent&lt;T&gt;
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class PagedDataBoundComponent&lt;T&gt;
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.PagedDataBoundComponent`1">
+
+
+  <h1 id="Radzen_PagedDataBoundComponent_1" data-uid="Radzen.PagedDataBoundComponent`1" class="text-break">Class PagedDataBoundComponent&lt;T&gt;
+</h1>
+  <div class="markdown level0 summary"><p>Base classes of components that support paging.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><span class="xref">PagedDataBoundComponent&lt;T&gt;</span></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenDataGrid-1.html">RadzenDataGrid&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenDataList-1.html">RadzenDataList&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenPivotDataGrid-1.html">RadzenPivotDataGrid&lt;TItem&gt;</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnInitialized">RadzenComponent.OnInitialized()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_PagedDataBoundComponent_1_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class PagedDataBoundComponent&lt;T&gt; : RadzenComponent, IComponent, IHandleEvent, IHandleAfterRender, IDisposable</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The type of the data item</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1__ctor_" data-uid="Radzen.PagedDataBoundComponent`1.#ctor*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1__ctor" data-uid="Radzen.PagedDataBoundComponent`1.#ctor">PagedDataBoundComponent()</h4>
+  <div class="markdown level1 summary"><p>Base classes of components that support paging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public PagedDataBoundComponent()</code></pre>
+  </div>
+  <h3 id="fields">Fields
+</h3>
+
+
+  <h4 id="Radzen_PagedDataBoundComponent_1_bottomPager" data-uid="Radzen.PagedDataBoundComponent`1.bottomPager">bottomPager</h4>
+  <div class="markdown level1 summary"><p>The bottom pager</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected RadzenPager bottomPager</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenPager.html">RadzenPager</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h4 id="Radzen_PagedDataBoundComponent_1_skip" data-uid="Radzen.PagedDataBoundComponent`1.skip">skip</h4>
+  <div class="markdown level1 summary"><p>The skip</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected int skip</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h4 id="Radzen_PagedDataBoundComponent_1_topPager" data-uid="Radzen.PagedDataBoundComponent`1.topPager">topPager</h4>
+  <div class="markdown level1 summary"><p>The top pager</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected RadzenPager topPager</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenPager.html">RadzenPager</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_AllowPaging_" data-uid="Radzen.PagedDataBoundComponent`1.AllowPaging*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_AllowPaging" data-uid="Radzen.PagedDataBoundComponent`1.AllowPaging">AllowPaging</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether paging is allowed. Set to <code>false</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowPaging { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if paging is allowed; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_Count_" data-uid="Radzen.PagedDataBoundComponent`1.Count*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_Count" data-uid="Radzen.PagedDataBoundComponent`1.Count">Count</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the count.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int Count { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The count.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_CurrentPage_" data-uid="Radzen.PagedDataBoundComponent`1.CurrentPage*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_CurrentPage" data-uid="Radzen.PagedDataBoundComponent`1.CurrentPage">CurrentPage</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the current page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public int CurrentPage { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The current page.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_Data_" data-uid="Radzen.PagedDataBoundComponent`1.Data*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_Data" data-uid="Radzen.PagedDataBoundComponent`1.Data">Data</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IEnumerable&lt;T&gt;? Data { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;T&gt;</td>
+        <td><p>The data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_Density_" data-uid="Radzen.PagedDataBoundComponent`1.Density*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_Density" data-uid="Radzen.PagedDataBoundComponent`1.Density">Density</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating pager density.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Density Density { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Density.html">Density</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_FirstPageAriaLabel_" data-uid="Radzen.PagedDataBoundComponent`1.FirstPageAriaLabel*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_FirstPageAriaLabel" data-uid="Radzen.PagedDataBoundComponent`1.FirstPageAriaLabel">FirstPageAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's first page button's aria-label attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? FirstPageAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_FirstPageTitle_" data-uid="Radzen.PagedDataBoundComponent`1.FirstPageTitle*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_FirstPageTitle" data-uid="Radzen.PagedDataBoundComponent`1.FirstPageTitle">FirstPageTitle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's first page button's title attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? FirstPageTitle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_LastPageAriaLabel_" data-uid="Radzen.PagedDataBoundComponent`1.LastPageAriaLabel*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_LastPageAriaLabel" data-uid="Radzen.PagedDataBoundComponent`1.LastPageAriaLabel">LastPageAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's last page button's aria-label attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? LastPageAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_LastPageTitle_" data-uid="Radzen.PagedDataBoundComponent`1.LastPageTitle*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_LastPageTitle" data-uid="Radzen.PagedDataBoundComponent`1.LastPageTitle">LastPageTitle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's last page button's title attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? LastPageTitle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_LoadData_" data-uid="Radzen.PagedDataBoundComponent`1.LoadData*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_LoadData" data-uid="Radzen.PagedDataBoundComponent`1.LoadData">LoadData</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the load data.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;LoadDataArgs&gt; LoadData { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.LoadDataArgs.html">LoadDataArgs</a>&gt;</td>
+        <td><p>The load data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_LoadingTemplate_" data-uid="Radzen.PagedDataBoundComponent`1.LoadingTemplate*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_LoadingTemplate" data-uid="Radzen.PagedDataBoundComponent`1.LoadingTemplate">LoadingTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the loading template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? LoadingTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>The loading template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_NextPageAriaLabel_" data-uid="Radzen.PagedDataBoundComponent`1.NextPageAriaLabel*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_NextPageAriaLabel" data-uid="Radzen.PagedDataBoundComponent`1.NextPageAriaLabel">NextPageAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's next page button's aria-label attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? NextPageAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_NextPageLabel_" data-uid="Radzen.PagedDataBoundComponent`1.NextPageLabel*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_NextPageLabel" data-uid="Radzen.PagedDataBoundComponent`1.NextPageLabel">NextPageLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's optional next page button's label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? NextPageLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_NextPageTitle_" data-uid="Radzen.PagedDataBoundComponent`1.NextPageTitle*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_NextPageTitle" data-uid="Radzen.PagedDataBoundComponent`1.NextPageTitle">NextPageTitle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's next page button's title attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? NextPageTitle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_Page_" data-uid="Radzen.PagedDataBoundComponent`1.Page*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_Page" data-uid="Radzen.PagedDataBoundComponent`1.Page">Page</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the page callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;PagerEventArgs&gt; Page { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.PagerEventArgs.html">PagerEventArgs</a>&gt;</td>
+        <td><p>The page callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PageAriaLabelFormat_" data-uid="Radzen.PagedDataBoundComponent`1.PageAriaLabelFormat*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PageAriaLabelFormat" data-uid="Radzen.PagedDataBoundComponent`1.PageAriaLabelFormat">PageAriaLabelFormat</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's numeric page number buttons' aria-label attributes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? PageAriaLabelFormat { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PageNumbersCount_" data-uid="Radzen.PagedDataBoundComponent`1.PageNumbersCount*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PageNumbersCount" data-uid="Radzen.PagedDataBoundComponent`1.PageNumbersCount">PageNumbersCount</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the page numbers count.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int PageNumbersCount { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The page numbers count.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PageSize_" data-uid="Radzen.PagedDataBoundComponent`1.PageSize*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PageSize" data-uid="Radzen.PagedDataBoundComponent`1.PageSize">PageSize</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the size of the page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int PageSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The size of the page.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PageSizeOptions_" data-uid="Radzen.PagedDataBoundComponent`1.PageSizeOptions*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PageSizeOptions" data-uid="Radzen.PagedDataBoundComponent`1.PageSizeOptions">PageSizeOptions</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the page size options.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IEnumerable&lt;int&gt;? PageSizeOptions { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a>&gt;</td>
+        <td><p>The page size options.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PageSizeText_" data-uid="Radzen.PagedDataBoundComponent`1.PageSizeText*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PageSizeText" data-uid="Radzen.PagedDataBoundComponent`1.PageSizeText">PageSizeText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the page size description text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? PageSizeText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The page size description text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PageTitleFormat_" data-uid="Radzen.PagedDataBoundComponent`1.PageTitleFormat*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PageTitleFormat" data-uid="Radzen.PagedDataBoundComponent`1.PageTitleFormat">PageTitleFormat</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's numeric page number buttons' title attributes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? PageTitleFormat { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PagedView_" data-uid="Radzen.PagedDataBoundComponent`1.PagedView*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PagedView" data-uid="Radzen.PagedDataBoundComponent`1.PagedView">PagedView</h4>
+  <div class="markdown level1 summary"><p>Gets the paged view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual IQueryable&lt;T&gt; PagedView { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><p>The paged view.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PagerAlwaysVisible_" data-uid="Radzen.PagedDataBoundComponent`1.PagerAlwaysVisible*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PagerAlwaysVisible" data-uid="Radzen.PagedDataBoundComponent`1.PagerAlwaysVisible">PagerAlwaysVisible</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether pager is visible even when not enough data for paging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool PagerAlwaysVisible { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if pager is visible even when not enough data for paging otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PagerHorizontalAlign_" data-uid="Radzen.PagedDataBoundComponent`1.PagerHorizontalAlign*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PagerHorizontalAlign" data-uid="Radzen.PagedDataBoundComponent`1.PagerHorizontalAlign">PagerHorizontalAlign</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the horizontal align.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public HorizontalAlign PagerHorizontalAlign { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.HorizontalAlign.html">HorizontalAlign</a></td>
+        <td><p>The horizontal align.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PagerPosition_" data-uid="Radzen.PagedDataBoundComponent`1.PagerPosition*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PagerPosition" data-uid="Radzen.PagedDataBoundComponent`1.PagerPosition">PagerPosition</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager position. Set to <code>PagerPosition.Bottom</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public PagerPosition PagerPosition { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.PagerPosition.html">PagerPosition</a></td>
+        <td><p>The pager position.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PagingSummaryFormat_" data-uid="Radzen.PagedDataBoundComponent`1.PagingSummaryFormat*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PagingSummaryFormat" data-uid="Radzen.PagedDataBoundComponent`1.PagingSummaryFormat">PagingSummaryFormat</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager summary format. <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PagingSummaryTemplate">PagingSummaryTemplate</a> has preference over this property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? PagingSummaryFormat { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The pager summary format.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PagingSummaryTemplate_" data-uid="Radzen.PagedDataBoundComponent`1.PagingSummaryTemplate*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PagingSummaryTemplate" data-uid="Radzen.PagedDataBoundComponent`1.PagingSummaryTemplate">PagingSummaryTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager summary template. Has preference over <a class="xref" href="Radzen.PagedDataBoundComponent-1.html#Radzen_PagedDataBoundComponent_1_PagingSummaryFormat">PagingSummaryFormat</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;PagingInformation&gt;? PagingSummaryTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;<a class="xref" href="Radzen.Blazor.PagingInformation.html">PagingInformation</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PrevPageAriaLabel_" data-uid="Radzen.PagedDataBoundComponent`1.PrevPageAriaLabel*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PrevPageAriaLabel" data-uid="Radzen.PagedDataBoundComponent`1.PrevPageAriaLabel">PrevPageAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's previous page button's aria-label attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? PrevPageAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PrevPageLabel_" data-uid="Radzen.PagedDataBoundComponent`1.PrevPageLabel*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PrevPageLabel" data-uid="Radzen.PagedDataBoundComponent`1.PrevPageLabel">PrevPageLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's optional previous page button's label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? PrevPageLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PrevPageTitle_" data-uid="Radzen.PagedDataBoundComponent`1.PrevPageTitle*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PrevPageTitle" data-uid="Radzen.PagedDataBoundComponent`1.PrevPageTitle">PrevPageTitle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager's previous page button's title attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? PrevPageTitle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_ShowPagingSummary_" data-uid="Radzen.PagedDataBoundComponent`1.ShowPagingSummary*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_ShowPagingSummary" data-uid="Radzen.PagedDataBoundComponent`1.ShowPagingSummary">ShowPagingSummary</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the pager summary visibility.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ShowPagingSummary { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p>The pager summary visibility.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_Template_" data-uid="Radzen.PagedDataBoundComponent`1.Template*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_Template" data-uid="Radzen.PagedDataBoundComponent`1.Template">Template</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;T&gt;? Template { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;T&gt;</td>
+        <td><p>The template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_View_" data-uid="Radzen.PagedDataBoundComponent`1.View*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_View" data-uid="Radzen.PagedDataBoundComponent`1.View">View</h4>
+  <div class="markdown level1 summary"><p>Gets the view.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual IQueryable&lt;T&gt; View { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><p>The view.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_CalculatePager_" data-uid="Radzen.PagedDataBoundComponent`1.CalculatePager*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_CalculatePager" data-uid="Radzen.PagedDataBoundComponent`1.CalculatePager">CalculatePager()</h4>
+  <div class="markdown level1 summary"><p>Calculates the pager.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected void CalculatePager()</code></pre>
+  </div>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_Dispose_" data-uid="Radzen.PagedDataBoundComponent`1.Dispose*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_Dispose" data-uid="Radzen.PagedDataBoundComponent`1.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Detaches event handlers and disposes <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">Reference</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override void Dispose()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Dispose">RadzenComponent.Dispose()</a></div>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_FirstPage_" data-uid="Radzen.PagedDataBoundComponent`1.FirstPage*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_FirstPage_System_Boolean_" data-uid="Radzen.PagedDataBoundComponent`1.FirstPage(System.Boolean)">FirstPage(bool)</h4>
+  <div class="markdown level1 summary"><p>Firsts the page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task FirstPage(bool forceReload = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">forceReload</span></td>
+        <td><p>if set to <code>true</code> [force reload].</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_GoToPage_" data-uid="Radzen.PagedDataBoundComponent`1.GoToPage*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_GoToPage_System_Int32_System_Boolean_" data-uid="Radzen.PagedDataBoundComponent`1.GoToPage(System.Int32,System.Boolean)">GoToPage(int, bool)</h4>
+  <div class="markdown level1 summary"><p>Goes to page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task GoToPage(int page, bool forceReload = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">page</span></td>
+        <td><p>The page.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">forceReload</span></td>
+        <td><p>if set to <code>true</code> [force reload].</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_LastPage_" data-uid="Radzen.PagedDataBoundComponent`1.LastPage*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_LastPage" data-uid="Radzen.PagedDataBoundComponent`1.LastPage">LastPage()</h4>
+  <div class="markdown level1 summary"><p>Lasts the page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task LastPage()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_NextPage_" data-uid="Radzen.PagedDataBoundComponent`1.NextPage*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_NextPage" data-uid="Radzen.PagedDataBoundComponent`1.NextPage">NextPage()</h4>
+  <div class="markdown level1 summary"><p>Nexts the page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task NextPage()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_OnAfterRenderAsync_" data-uid="Radzen.PagedDataBoundComponent`1.OnAfterRenderAsync*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_OnAfterRenderAsync_System_Boolean_" data-uid="Radzen.PagedDataBoundComponent`1.OnAfterRenderAsync(System.Boolean)">OnAfterRenderAsync(bool)</h4>
+  <div class="markdown level1 summary"><p>Called when [after render asynchronous].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override Task OnAfterRenderAsync(bool firstRender)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">firstRender</span></td>
+        <td><p>if set to <code>true</code> [first render].</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>Task.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnAfterRenderAsync_System_Boolean_">RadzenComponent.OnAfterRenderAsync(bool)</a></div>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_OnCollectionChanged_" data-uid="Radzen.PagedDataBoundComponent`1.OnCollectionChanged*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_OnCollectionChanged_System_Object_System_Collections_Specialized_NotifyCollectionChangedEventArgs_" data-uid="Radzen.PagedDataBoundComponent`1.OnCollectionChanged(System.Object,System.Collections.Specialized.NotifyCollectionChangedEventArgs)">OnCollectionChanged(object?, NotifyCollectionChangedEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Called when INotifyCollectionChanged CollectionChanged is raised.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">sender</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.specialized.notifycollectionchangedeventargs">NotifyCollectionChangedEventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_OnDataChanged_" data-uid="Radzen.PagedDataBoundComponent`1.OnDataChanged*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_OnDataChanged" data-uid="Radzen.PagedDataBoundComponent`1.OnDataChanged">OnDataChanged()</h4>
+  <div class="markdown level1 summary"><p>Called when [data changed].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual void OnDataChanged()</code></pre>
+  </div>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_OnPageChanged_" data-uid="Radzen.PagedDataBoundComponent`1.OnPageChanged*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_OnPageChanged_Radzen_PagerEventArgs_" data-uid="Radzen.PagedDataBoundComponent`1.OnPageChanged(Radzen.PagerEventArgs)">OnPageChanged(PagerEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Handles the page changed event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Task OnPageChanged(PagerEventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.PagerEventArgs.html">PagerEventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td><p>The <a class="xref" href="Radzen.PagerEventArgs.html">PagerEventArgs</a> instance containing the event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_OnPageSizeChanged_" data-uid="Radzen.PagedDataBoundComponent`1.OnPageSizeChanged*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_OnPageSizeChanged_System_Int32_" data-uid="Radzen.PagedDataBoundComponent`1.OnPageSizeChanged(System.Int32)">OnPageSizeChanged(int)</h4>
+  <div class="markdown level1 summary"><p>Called when [page size changed].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual Task OnPageSizeChanged(int value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>The value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_OnParametersSetAsync_" data-uid="Radzen.PagedDataBoundComponent`1.OnParametersSetAsync*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_OnParametersSetAsync" data-uid="Radzen.PagedDataBoundComponent`1.OnParametersSetAsync">OnParametersSetAsync()</h4>
+  <div class="markdown level1 summary"><p>Called when [parameters set asynchronous].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override Task OnParametersSetAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>Task.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a></div>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_PrevPage_" data-uid="Radzen.PagedDataBoundComponent`1.PrevPage*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_PrevPage" data-uid="Radzen.PagedDataBoundComponent`1.PrevPage">PrevPage()</h4>
+  <div class="markdown level1 summary"><p>Previouses the page.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task PrevPage()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_Reload_" data-uid="Radzen.PagedDataBoundComponent`1.Reload*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_Reload" data-uid="Radzen.PagedDataBoundComponent`1.Reload">Reload()</h4>
+  <div class="markdown level1 summary"><p>Reloads this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual Task Reload()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_PagedDataBoundComponent_1_SetParametersAsync_" data-uid="Radzen.PagedDataBoundComponent`1.SetParametersAsync*"></a>
+  <h4 id="Radzen_PagedDataBoundComponent_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.PagedDataBoundComponent`1.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Set parameters as an asynchronous operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A Task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">RadzenComponent.SetParametersAsync(ParameterView)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

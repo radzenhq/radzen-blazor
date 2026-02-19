@@ -6,12 +6,11 @@ WORKDIR /src
 
 # Copy project files first for better caching
 COPY Radzen.Blazor/*.csproj Radzen.Blazor/
+COPY Radzen.Blazor.Api/*.csproj Radzen.Blazor.Api/
+COPY Radzen.Blazor.Api.Generator/*.csproj Radzen.Blazor.Api.Generator/
 COPY RadzenBlazorDemos/*.csproj RadzenBlazorDemos/
 COPY RadzenBlazorDemos.Host/*.csproj RadzenBlazorDemos.Host/
 COPY RadzenBlazorDemos.Tools/*.csproj RadzenBlazorDemos.Tools/
-
-# Radzen.DocFX usually has no csproj → copy full folder
-COPY Radzen.DocFX/ Radzen.DocFX/
 
 # Restore dependencies (Host + Tools for llms.txt generation)
 RUN dotnet restore RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj \
@@ -20,17 +19,7 @@ RUN dotnet restore RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj \
 # Copy full source after restore layer
 COPY . .
 
-# Install docfx (build stage only)
-RUN dotnet tool install -g docfx
-ENV PATH="$PATH:/root/.dotnet/tools"
-
-# Build shared project (keep net8.0 if required)
-RUN dotnet build -c Release Radzen.Blazor/Radzen.Blazor.csproj -f net8.0
-
-# Generate documentation
-RUN docfx Radzen.DocFX/docfx.json
-
-# Publish the Blazor host app
+# Publish the Blazor host app (API reference pages are generated at build time via MSBuild target)
 WORKDIR /src/RadzenBlazorDemos.Host
 RUN dotnet publish -c Release -o /app/out
 

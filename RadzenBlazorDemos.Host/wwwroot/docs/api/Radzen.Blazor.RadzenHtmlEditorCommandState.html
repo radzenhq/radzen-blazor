@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenHtmlEditorCommandState
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenHtmlEditorCommandState
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState">
+
+
+  <h1 id="Radzen_Blazor_RadzenHtmlEditorCommandState" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState" class="text-break">Class RadzenHtmlEditorCommandState
+</h1>
+  <div class="markdown level0 summary"><p>Represents the state of various commands available in the Radzen HTML editor.
+Used to track the status of editor commands such as formatting, undo/redo, and text alignment.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">RadzenHtmlEditorCommandState</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenHtmlEditorCommandState_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenHtmlEditorCommandState</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState__ctor_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState__ctor" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.#ctor">RadzenHtmlEditorCommandState()</h4>
+  <div class="markdown level1 summary"><p>Represents the state of various commands available in the Radzen HTML editor.
+Used to track the status of editor commands such as formatting, undo/redo, and text alignment.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenHtmlEditorCommandState()</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Bold_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Bold*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Bold" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Bold">Bold</h4>
+  <div class="markdown level1 summary"><p>Indicates whether bold formatting is currently applied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Bold { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_FontName_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.FontName*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_FontName" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.FontName">FontName</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the name of the currently selected font.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? FontName { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_FontSize_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.FontSize*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_FontSize" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.FontSize">FontSize</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the size of the currently selected font.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? FontSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_FormatBlock_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.FormatBlock*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_FormatBlock" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.FormatBlock">FormatBlock</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the current formatting block (e.g., paragraph, heading).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? FormatBlock { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Html_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Html*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Html" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Html">Html</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the current HTML content of the editor.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? Html { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Italic_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Italic*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Italic" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Italic">Italic</h4>
+  <div class="markdown level1 summary"><p>Indicates whether italic formatting is currently applied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Italic { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_JustifyCenter_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.JustifyCenter*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_JustifyCenter" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.JustifyCenter">JustifyCenter</h4>
+  <div class="markdown level1 summary"><p>Indicates whether text is currently center-aligned.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool JustifyCenter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_JustifyFull_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.JustifyFull*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_JustifyFull" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.JustifyFull">JustifyFull</h4>
+  <div class="markdown level1 summary"><p>Indicates whether text is currently justified.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool JustifyFull { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_JustifyLeft_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.JustifyLeft*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_JustifyLeft" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.JustifyLeft">JustifyLeft</h4>
+  <div class="markdown level1 summary"><p>Indicates whether text is currently left-aligned.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool JustifyLeft { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_JustifyRight_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.JustifyRight*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_JustifyRight" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.JustifyRight">JustifyRight</h4>
+  <div class="markdown level1 summary"><p>Indicates whether text is currently right-aligned.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool JustifyRight { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Redo_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Redo*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Redo" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Redo">Redo</h4>
+  <div class="markdown level1 summary"><p>Indicates whether the redo command is currently available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Redo { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_StrikeThrough_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.StrikeThrough*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_StrikeThrough" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.StrikeThrough">StrikeThrough</h4>
+  <div class="markdown level1 summary"><p>Indicates whether strikethrough formatting is currently applied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool StrikeThrough { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Subscript_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Subscript*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Subscript" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Subscript">Subscript</h4>
+  <div class="markdown level1 summary"><p>Indicates whether subscript formatting is currently applied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Subscript { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Superscript_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Superscript*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Superscript" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Superscript">Superscript</h4>
+  <div class="markdown level1 summary"><p>Indicates whether superscript formatting is currently applied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Superscript { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Underline_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Underline*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Underline" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Underline">Underline</h4>
+  <div class="markdown level1 summary"><p>Indicates whether underline formatting is currently applied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Underline { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Undo_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Undo*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Undo" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Undo">Undo</h4>
+  <div class="markdown level1 summary"><p>Indicates whether the undo command is currently available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Undo { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenHtmlEditorCommandState_Unlink_" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Unlink*"></a>
+  <h4 id="Radzen_Blazor_RadzenHtmlEditorCommandState_Unlink" data-uid="Radzen.Blazor.RadzenHtmlEditorCommandState.Unlink">Unlink</h4>
+  <div class="markdown level1 summary"><p>Indicates whether the unlink command is currently available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Unlink { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

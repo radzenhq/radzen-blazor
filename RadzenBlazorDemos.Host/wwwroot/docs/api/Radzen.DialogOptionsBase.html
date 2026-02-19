@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class DialogOptionsBase
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class DialogOptionsBase
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.DialogOptionsBase">
+
+
+  <h1 id="Radzen_DialogOptionsBase" data-uid="Radzen.DialogOptionsBase" class="text-break">Class DialogOptionsBase
+</h1>
+  <div class="markdown level0 summary"><p>Base Class for dialog options</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">DialogOptionsBase</span></div>
+      <div class="level2"><a class="xref" href="Radzen.DialogOptions.html">DialogOptions</a></div>
+      <div class="level2"><a class="xref" href="Radzen.SideDialogOptions.html">SideDialogOptions</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifypropertychanged">INotifyPropertyChanged</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_DialogOptionsBase_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public abstract class DialogOptionsBase : INotifyPropertyChanged</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_DialogOptionsBase__ctor_" data-uid="Radzen.DialogOptionsBase.#ctor*"></a>
+  <h4 id="Radzen_DialogOptionsBase__ctor" data-uid="Radzen.DialogOptionsBase.#ctor">DialogOptionsBase()</h4>
+  <div class="markdown level1 summary"><p>Base Class for dialog options</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected DialogOptionsBase()</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_DialogOptionsBase_AriaLabel_" data-uid="Radzen.DialogOptionsBase.AriaLabel*"></a>
+  <h4 id="Radzen_DialogOptionsBase_AriaLabel" data-uid="Radzen.DialogOptionsBase.AriaLabel">AriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the dialog aria-label text when no title is rendered.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? AriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The dialog aria-label text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_CloseAriaLabel_" data-uid="Radzen.DialogOptionsBase.CloseAriaLabel*"></a>
+  <h4 id="Radzen_DialogOptionsBase_CloseAriaLabel" data-uid="Radzen.DialogOptionsBase.CloseAriaLabel">CloseAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the close button aria-label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string CloseAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The close button aria-label text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_CloseDialogOnOverlayClick_" data-uid="Radzen.DialogOptionsBase.CloseDialogOnOverlayClick*"></a>
+  <h4 id="Radzen_DialogOptionsBase_CloseDialogOnOverlayClick" data-uid="Radzen.DialogOptionsBase.CloseDialogOnOverlayClick">CloseDialogOnOverlayClick</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool CloseDialogOnOverlayClick { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if closeable; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_CloseTabIndex_" data-uid="Radzen.DialogOptionsBase.CloseTabIndex*"></a>
+  <h4 id="Radzen_DialogOptionsBase_CloseTabIndex" data-uid="Radzen.DialogOptionsBase.CloseTabIndex">CloseTabIndex</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value the dialog escape tabindex. Set to <code>0</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public int CloseTabIndex { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_ContentCssClass_" data-uid="Radzen.DialogOptionsBase.ContentCssClass*"></a>
+  <h4 id="Radzen_DialogOptionsBase_ContentCssClass" data-uid="Radzen.DialogOptionsBase.ContentCssClass">ContentCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the CSS classes added to the dialog's content element.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? ContentCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_CssClass_" data-uid="Radzen.DialogOptionsBase.CssClass*"></a>
+  <h4 id="Radzen_DialogOptionsBase_CssClass" data-uid="Radzen.DialogOptionsBase.CssClass">CssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets dialog box custom class</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? CssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_Height_" data-uid="Radzen.DialogOptionsBase.Height*"></a>
+  <h4 id="Radzen_DialogOptionsBase_Height" data-uid="Radzen.DialogOptionsBase.Height">Height</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the height of the dialog.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? Height { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The height.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_Resizable_" data-uid="Radzen.DialogOptionsBase.Resizable*"></a>
+  <h4 id="Radzen_DialogOptionsBase_Resizable" data-uid="Radzen.DialogOptionsBase.Resizable">Resizable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the dialog is resizable. Set to <code>false</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool Resizable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if resizable; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_ShowClose_" data-uid="Radzen.DialogOptionsBase.ShowClose*"></a>
+  <h4 id="Radzen_DialogOptionsBase_ShowClose" data-uid="Radzen.DialogOptionsBase.ShowClose">ShowClose</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether to show the close button. Set to <code>true</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool ShowClose { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the close button is shown; otherwise, <code>false</code>. Default is <code>true</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_ShowTitle_" data-uid="Radzen.DialogOptionsBase.ShowTitle*"></a>
+  <h4 id="Radzen_DialogOptionsBase_ShowTitle" data-uid="Radzen.DialogOptionsBase.ShowTitle">ShowTitle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether to show the title bar. Set to <code>true</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool ShowTitle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if title bar is shown; otherwise, <code>false</code>. Default is <code>true</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_Style_" data-uid="Radzen.DialogOptionsBase.Style*"></a>
+  <h4 id="Radzen_DialogOptionsBase_Style" data-uid="Radzen.DialogOptionsBase.Style">Style</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the CSS style of the dialog</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? Style { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The style.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_TitleContent_" data-uid="Radzen.DialogOptionsBase.TitleContent*"></a>
+  <h4 id="Radzen_DialogOptionsBase_TitleContent" data-uid="Radzen.DialogOptionsBase.TitleContent">TitleContent</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the title content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RenderFragment&lt;DialogService&gt;? TitleContent { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;<a class="xref" href="Radzen.DialogService.html">DialogService</a>&gt;</td>
+        <td><p>The title content.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_Width_" data-uid="Radzen.DialogOptionsBase.Width*"></a>
+  <h4 id="Radzen_DialogOptionsBase_Width" data-uid="Radzen.DialogOptionsBase.Width">Width</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the width of the dialog.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? Width { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The width.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_DialogOptionsBase_WrapperCssClass_" data-uid="Radzen.DialogOptionsBase.WrapperCssClass*"></a>
+  <h4 id="Radzen_DialogOptionsBase_WrapperCssClass" data-uid="Radzen.DialogOptionsBase.WrapperCssClass">WrapperCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the CSS classes added to the dialog's wrapper element.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? WrapperCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_DialogOptionsBase_OnPropertyChanged_" data-uid="Radzen.DialogOptionsBase.OnPropertyChanged*"></a>
+  <h4 id="Radzen_DialogOptionsBase_OnPropertyChanged_System_String_" data-uid="Radzen.DialogOptionsBase.OnPropertyChanged(System.String)">OnPropertyChanged(string)</h4>
+  <div class="markdown level1 summary"><p>Raises the <a class="xref" href="Radzen.DialogOptionsBase.html#Radzen_DialogOptionsBase_PropertyChanged">PropertyChanged</a> event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual void OnPropertyChanged(string propertyName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">propertyName</span></td>
+        <td><p>The name of the property that changed.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="events">Events
+</h3>
+
+
+  <h4 id="Radzen_DialogOptionsBase_PropertyChanged" data-uid="Radzen.DialogOptionsBase.PropertyChanged">PropertyChanged</h4>
+  <div class="markdown level1 summary"><p>Occurs when a property value changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public event PropertyChangedEventHandler? PropertyChanged</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.propertychangedeventhandler">PropertyChangedEventHandler</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.inotifypropertychanged">INotifyPropertyChanged</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

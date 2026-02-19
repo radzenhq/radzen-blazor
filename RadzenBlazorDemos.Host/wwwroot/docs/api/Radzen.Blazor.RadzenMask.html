@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenMask
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenMask
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenMask">
+
+
+  <h1 id="Radzen_Blazor_RadzenMask" data-uid="Radzen.Blazor.RadzenMask" class="text-break">Class RadzenMask
+</h1>
+  <div class="markdown level0 summary"><p>A masked text input component that enforces a specific format pattern as users type (e.g., phone numbers, dates, credit cards).
+RadzenMask guides users to enter data in the correct format by automatically formatting input according to a mask pattern.
+Uses a pattern string where asterisks (<em>) represent user-input positions and other characters are literals. As users type, the input is automatically formatted to match the mask.
+Features mask pattern definition using * for input positions (e.g., &quot;(</em>**) <em><strong>-</strong></em>*&quot; for phone numbers), character filtering via Pattern (regex) to remove invalid characters and CharacterPattern (regex) to specify valid characters,
+automatic insertion of literal characters (parentheses, dashes, spaces, etc.), and placeholder showing the expected format to guide users.
+Common uses include phone numbers, dates, credit cards, SSN, postal codes, or any fixed-format data entry. The mask helps prevent input errors and improves data consistency.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><a class="xref" href="Radzen.FormComponent-1.html">FormComponent</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</div>
+    <div class="level4"><a class="xref" href="Radzen.FormComponentWithAutoComplete-1.html">FormComponentWithAutoComplete</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</div>
+    <div class="level5"><span class="xref">RadzenMask</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    <div><a class="xref" href="Radzen.IRadzenFormComponent.html">IRadzenFormComponent</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.FormComponentWithAutoComplete-1.html#Radzen_FormComponentWithAutoComplete_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">FormComponentWithAutoComplete&lt;string&gt;.SetParametersAsync(ParameterView)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponentWithAutoComplete-1.html#Radzen_FormComponentWithAutoComplete_1_AutoCompleteType">FormComponentWithAutoComplete&lt;string&gt;.AutoCompleteType</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponentWithAutoComplete-1.html#Radzen_FormComponentWithAutoComplete_1_AutoCompleteAttribute">FormComponentWithAutoComplete&lt;string&gt;.AutoCompleteAttribute</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponentWithAutoComplete-1.html#Radzen_FormComponentWithAutoComplete_1_DefaultAutoCompleteAttribute">FormComponentWithAutoComplete&lt;string&gt;.DefaultAutoCompleteAttribute</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponentWithAutoComplete-1.html#Radzen_FormComponentWithAutoComplete_1_DefaultAriaAutoCompleteAttribute">FormComponentWithAutoComplete&lt;string&gt;.DefaultAriaAutoCompleteAttribute</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponentWithAutoComplete-1.html#Radzen_FormComponentWithAutoComplete_1_AriaAutoCompleteAttribute">FormComponentWithAutoComplete&lt;string&gt;.AriaAutoCompleteAttribute</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1__value">FormComponent&lt;string&gt;._value</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Dispose">FormComponent&lt;string&gt;.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_GetValue">FormComponent&lt;string&gt;.GetValue()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">FormComponent&lt;string&gt;.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_GetClassList_System_String_">FormComponent&lt;string&gt;.GetClassList(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_FocusAsync">FormComponent&lt;string&gt;.FocusAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Name">FormComponent&lt;string&gt;.Name</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_TabIndex">FormComponent&lt;string&gt;.TabIndex</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Placeholder">FormComponent&lt;string&gt;.Placeholder</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Disabled">FormComponent&lt;string&gt;.Disabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_EditContext">FormComponent&lt;string&gt;.EditContext</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Form">FormComponent&lt;string&gt;.Form</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_ValueChanged">FormComponent&lt;string&gt;.ValueChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_HasValue">FormComponent&lt;string&gt;.HasValue</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_IsBound">FormComponent&lt;string&gt;.IsBound</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Value">FormComponent&lt;string&gt;.Value</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Change">FormComponent&lt;string&gt;.Change</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_FieldIdentifier">FormComponent&lt;string&gt;.FieldIdentifier</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_ValueExpression">FormComponent&lt;string&gt;.ValueExpression</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_FormFieldContext">FormComponent&lt;string&gt;.FormFieldContext</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_CurrentPlaceholder">FormComponent&lt;string&gt;.CurrentPlaceholder</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnInitialized">RadzenComponent.OnInitialized()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnAfterRenderAsync_System_Boolean_">RadzenComponent.OnAfterRenderAsync(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenMask_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenMask : FormComponentWithAutoComplete&lt;string&gt;, IComponent, IHandleEvent, IHandleAfterRender, IDisposable, IRadzenFormComponent</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenMask_examples"><strong>Examples</strong></h5>
+  <p>Phone number mask:</p>
+<pre><code class="lang-csharp">&lt;RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" @bind-Value=@phoneNumber /&gt;</code></pre>
+<p>Date mask:</p>
+<pre><code class="lang-csharp">&lt;RadzenMask Mask="**/**/****" CharacterPattern="[0-9]" Placeholder="MM/DD/YYYY" @bind-Value=@dateString /&gt;</code></pre>
+<p>Credit card mask:</p>
+<pre><code class="lang-csharp">&lt;RadzenMask Mask="**** **** **** ****" Pattern="[^0-9]" Placeholder="0000 0000 0000 0000" @bind-Value=@cardNumber /&gt;</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenMask__ctor_" data-uid="Radzen.Blazor.RadzenMask.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask__ctor" data-uid="Radzen.Blazor.RadzenMask.#ctor">RadzenMask()</h4>
+  <div class="markdown level1 summary"><p>A masked text input component that enforces a specific format pattern as users type (e.g., phone numbers, dates, credit cards).
+RadzenMask guides users to enter data in the correct format by automatically formatting input according to a mask pattern.
+Uses a pattern string where asterisks (<em>) represent user-input positions and other characters are literals. As users type, the input is automatically formatted to match the mask.
+Features mask pattern definition using * for input positions (e.g., &quot;(</em>**) <em><strong>-</strong></em>*&quot; for phone numbers), character filtering via Pattern (regex) to remove invalid characters and CharacterPattern (regex) to specify valid characters,
+automatic insertion of literal characters (parentheses, dashes, spaces, etc.), and placeholder showing the expected format to guide users.
+Common uses include phone numbers, dates, credit cards, SSN, postal codes, or any fixed-format data entry. The mask helps prevent input errors and improves data consistency.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenMask()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenMask__ctor_examples">Examples</h5>
+  <p>Phone number mask:</p>
+<pre><code class="lang-csharp">&lt;RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" @bind-Value=@phoneNumber /&gt;</code></pre>
+<p>Date mask:</p>
+<pre><code class="lang-csharp">&lt;RadzenMask Mask="**/**/****" CharacterPattern="[0-9]" Placeholder="MM/DD/YYYY" @bind-Value=@dateString /&gt;</code></pre>
+<p>Credit card mask:</p>
+<pre><code class="lang-csharp">&lt;RadzenMask Mask="**** **** **** ****" Pattern="[^0-9]" Placeholder="0000 0000 0000 0000" @bind-Value=@cardNumber /&gt;</code></pre>
+
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenMask_CharacterPattern_" data-uid="Radzen.Blazor.RadzenMask.CharacterPattern*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_CharacterPattern" data-uid="Radzen.Blazor.RadzenMask.CharacterPattern">CharacterPattern</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a regular expression pattern specifying which characters are valid for user input.
+Only characters matching this pattern are accepted as the user types.
+If both <a class="xref" href="Radzen.Blazor.RadzenMask.html#Radzen_Blazor_RadzenMask_Pattern">Pattern</a> and CharacterPattern are set, CharacterPattern takes precedence.
+Example: &quot;[0-9]&quot; allows only digit characters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? CharacterPattern { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The regex pattern for valid input characters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenMask_Immediate_" data-uid="Radzen.Blazor.RadzenMask.Immediate*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_Immediate" data-uid="Radzen.Blazor.RadzenMask.Immediate">Immediate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether the component should update the bound value immediately as the user types (oninput event),
+rather than waiting for the input to lose focus (onchange event).
+This enables real-time value updates but may trigger more frequent change events.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Immediate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> for immediate updates; <code>false</code> for deferred updates. Default is <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenMask_Mask_" data-uid="Radzen.Blazor.RadzenMask.Mask*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_Mask" data-uid="Radzen.Blazor.RadzenMask.Mask">Mask</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the mask pattern that defines the input format.
+Use asterisks (<em>) for user input positions and literal characters for formatting.
+Example: &quot;(</em>**) <em><strong>-</strong></em>*&quot; creates a phone number format like &quot;(555) 123-4567&quot;.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Mask { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The mask pattern string where * represents input positions.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenMask_MaxLength_" data-uid="Radzen.Blazor.RadzenMask.MaxLength*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_MaxLength" data-uid="Radzen.Blazor.RadzenMask.MaxLength">MaxLength</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the maximum number of characters that can be entered.
+Typically matches the mask length, but can be set for additional constraints.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public long? MaxLength { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</td>
+        <td><p>The maximum character length, or null for no limit beyond the mask. Default is null.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenMask_Pattern_" data-uid="Radzen.Blazor.RadzenMask.Pattern*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_Pattern" data-uid="Radzen.Blazor.RadzenMask.Pattern">Pattern</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a regular expression pattern for removing invalid characters from user input.
+Characters matching this pattern are stripped out as the user types.
+Example: &quot;[^0-9]&quot; removes all non-digit characters for numeric-only input.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Pattern { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The regex pattern for invalid characters to remove.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenMask_ReadOnly_" data-uid="Radzen.Blazor.RadzenMask.ReadOnly*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_ReadOnly" data-uid="Radzen.Blazor.RadzenMask.ReadOnly">ReadOnly</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether the masked input is read-only and cannot be edited.
+When true, displays the formatted value but prevents user input.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ReadOnly { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the input is read-only; otherwise, <code>false</code>. Default is <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenMask_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenMask.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenMask.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenMask_GetComponentCssClass_" data-uid="Radzen.Blazor.RadzenMask.GetComponentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_GetComponentCssClass" data-uid="Radzen.Blazor.RadzenMask.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenMask_OnAfterRender_" data-uid="Radzen.Blazor.RadzenMask.OnAfterRender*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_OnAfterRender_System_Boolean_" data-uid="Radzen.Blazor.RadzenMask.OnAfterRender(System.Boolean)">OnAfterRender(bool)</h4>
+  <div class="markdown level1 summary"><p>Method invoked after each time the component has rendered interactively and the UI has finished
+updating (for example, after elements have been added to the browser DOM). Any <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a>
+fields will be populated by the time this runs.</p>
+<p>This method is not invoked during prerendering or server-side rendering, because those processes
+are not attached to any live browser DOM and are already complete before the DOM is updated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void OnAfterRender(bool firstRender)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">firstRender</span></td>
+        <td><p>Set to <code>true</code> if this is the first time <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">OnAfterRender(bool)</a> has been invoked
+on this component instance; otherwise <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a></div>
+  <h5 id="Radzen_Blazor_RadzenMask_OnAfterRender_System_Boolean__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">OnAfterRender(bool)</a> and <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrenderasync">OnAfterRenderAsync(bool)</a> lifecycle methods
+are useful for performing interop, or interacting with values received from <code>@ref</code>.
+Use the <code class="paramref">firstRender</code> parameter to ensure that initialization work is only performed
+once.</p>
+</div>
+
+
+  <a id="Radzen_Blazor_RadzenMask_OnChange_" data-uid="Radzen.Blazor.RadzenMask.OnChange*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_OnChange_Microsoft_AspNetCore_Components_ChangeEventArgs_" data-uid="Radzen.Blazor.RadzenMask.OnChange(Microsoft.AspNetCore.Components.ChangeEventArgs)">OnChange(ChangeEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Handles the change event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Task OnChange(ChangeEventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.changeeventargs">ChangeEventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.changeeventargs">ChangeEventArgs</a> instance containing the event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenMask_OnInput_" data-uid="Radzen.Blazor.RadzenMask.OnInput*"></a>
+  <h4 id="Radzen_Blazor_RadzenMask_OnInput_Microsoft_AspNetCore_Components_ChangeEventArgs_" data-uid="Radzen.Blazor.RadzenMask.OnInput(Microsoft.AspNetCore.Components.ChangeEventArgs)">OnInput(ChangeEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Handles the oninput event when Immediate=&quot;true&quot;.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Task OnInput(ChangeEventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.changeeventargs">ChangeEventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.changeeventargs">ChangeEventArgs</a> instance containing the event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+  <div>
+      <a class="xref" href="Radzen.IRadzenFormComponent.html">IRadzenFormComponent</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

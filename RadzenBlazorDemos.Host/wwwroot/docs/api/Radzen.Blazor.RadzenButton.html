@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenButton
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenButton
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenButton">
+
+
+  <h1 id="Radzen_Blazor_RadzenButton" data-uid="Radzen.Blazor.RadzenButton" class="text-break">Class RadzenButton
+</h1>
+  <div class="markdown level0 summary"><p>A clickable button component that supports various visual styles, icons, images, and loading states.
+RadzenButton provides a consistent and accessible way to trigger actions in your Blazor application.
+Supports multiple visual variants (Filled, Flat, Outlined, Text), color styles (Primary, Secondary, Success, etc.),
+and sizes (ExtraSmall, Small, Medium, Large). It can display text, icons, images, or a combination of these.
+When <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_IsBusy">IsBusy</a> is true, the button shows a loading indicator and becomes disabled.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><span class="xref">RadzenButton</span></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenFab.html">RadzenFab</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenFabMenuItem.html">RadzenFabMenuItem</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenToggleButton.html">RadzenToggleButton</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnInitialized">RadzenComponent.OnInitialized()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">RadzenComponent.SetParametersAsync(ParameterView)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnAfterRenderAsync_System_Boolean_">RadzenComponent.OnAfterRenderAsync(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Dispose">RadzenComponent.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenButton_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenButton : RadzenComponent, IComponent, IHandleEvent, IHandleAfterRender, IDisposable</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenButton_examples"><strong>Examples</strong></h5>
+  <p>Basic usage with text and click handler:</p>
+<pre><code class="lang-csharp">&lt;RadzenButton Click=@(args =&gt; Console.WriteLine("Button clicked")) Text="Click Me" /&gt;</code></pre>
+<p>Button with icon and custom style:</p>
+<pre><code class="lang-csharp">&lt;RadzenButton Icon="save" Text="Save" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Large" /&gt;</code></pre>
+<p>Button with busy state:</p>
+<pre><code class="lang-csharp">&lt;RadzenButton IsBusy=@isSaving BusyText="Saving..." Text="Save" Click=@SaveData /&gt;</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenButton__ctor_" data-uid="Radzen.Blazor.RadzenButton.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton__ctor" data-uid="Radzen.Blazor.RadzenButton.#ctor">RadzenButton()</h4>
+  <div class="markdown level1 summary"><p>A clickable button component that supports various visual styles, icons, images, and loading states.
+RadzenButton provides a consistent and accessible way to trigger actions in your Blazor application.
+Supports multiple visual variants (Filled, Flat, Outlined, Text), color styles (Primary, Secondary, Success, etc.),
+and sizes (ExtraSmall, Small, Medium, Large). It can display text, icons, images, or a combination of these.
+When <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_IsBusy">IsBusy</a> is true, the button shows a loading indicator and becomes disabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenButton()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenButton__ctor_examples">Examples</h5>
+  <p>Basic usage with text and click handler:</p>
+<pre><code class="lang-csharp">&lt;RadzenButton Click=@(args =&gt; Console.WriteLine("Button clicked")) Text="Click Me" /&gt;</code></pre>
+<p>Button with icon and custom style:</p>
+<pre><code class="lang-csharp">&lt;RadzenButton Icon="save" Text="Save" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Large" /&gt;</code></pre>
+<p>Button with busy state:</p>
+<pre><code class="lang-csharp">&lt;RadzenButton IsBusy=@isSaving BusyText="Saving..." Text="Save" Click=@SaveData /&gt;</code></pre>
+
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenButton_BusyText_" data-uid="Radzen.Blazor.RadzenButton.BusyText*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_BusyText" data-uid="Radzen.Blazor.RadzenButton.BusyText">BusyText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the text displayed when the button is in a busy state (<a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_IsBusy">IsBusy</a> is true).
+If not set, the button will show a loading indicator without text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string BusyText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The busy state text. Default is empty string.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_ButtonStyle_" data-uid="Radzen.Blazor.RadzenButton.ButtonStyle*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_ButtonStyle" data-uid="Radzen.Blazor.RadzenButton.ButtonStyle">ButtonStyle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the semantic color style of the button.
+Determines the button's color scheme based on its purpose (e.g., Primary for main actions, Danger for destructive actions).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public ButtonStyle ButtonStyle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.ButtonStyle.html">ButtonStyle</a></td>
+        <td><p>The button style. Default is <a class="xref" href="Radzen.ButtonStyle.html#Radzen_ButtonStyle_Primary">Primary</a>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_ButtonType_" data-uid="Radzen.Blazor.RadzenButton.ButtonType*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_ButtonType" data-uid="Radzen.Blazor.RadzenButton.ButtonType">ButtonType</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the HTML button type attribute.
+Use <a class="xref" href="Radzen.ButtonType.html#Radzen_ButtonType_Submit">Submit</a> for form submissions or <a class="xref" href="Radzen.ButtonType.html#Radzen_ButtonType_Button">Button</a> for regular clickable buttons.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public ButtonType ButtonType { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.ButtonType.html">ButtonType</a></td>
+        <td><p>The button type. Default is <a class="xref" href="Radzen.ButtonType.html#Radzen_ButtonType_Button">Button</a>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_ChildContent_" data-uid="Radzen.Blazor.RadzenButton.ChildContent*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_ChildContent" data-uid="Radzen.Blazor.RadzenButton.ChildContent">ChildContent</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the custom child content to be rendered inside the button.
+When set, this content will be displayed instead of the <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Text">Text</a>, <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Icon">Icon</a>, or <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Image">Image</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? ChildContent { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>The child content.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_Click_" data-uid="Radzen.Blazor.RadzenButton.Click*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_Click" data-uid="Radzen.Blazor.RadzenButton.Click">Click</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the callback invoked when the button is clicked.
+This event will not fire if the button is <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Disabled">Disabled</a> or <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_IsBusy">IsBusy</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;MouseEventArgs&gt; Click { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a>&gt;</td>
+        <td><p>The click event callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_Disabled_" data-uid="Radzen.Blazor.RadzenButton.Disabled*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_Disabled" data-uid="Radzen.Blazor.RadzenButton.Disabled">Disabled</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether the button is disabled and cannot be clicked.
+When true, the button will have a disabled appearance and will not respond to user interactions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Disabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the button is disabled; otherwise, <code>false</code>. Default is <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_Icon_" data-uid="Radzen.Blazor.RadzenButton.Icon*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_Icon" data-uid="Radzen.Blazor.RadzenButton.Icon">Icon</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the Material icon name to be displayed in the button.
+Use Material Symbols icon names (e.g., &quot;save&quot;, &quot;delete&quot;, &quot;add&quot;). The icon will be rendered using the rzi icon font.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Icon { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The Material icon name.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_IconColor_" data-uid="Radzen.Blazor.RadzenButton.IconColor*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_IconColor" data-uid="Radzen.Blazor.RadzenButton.IconColor">IconColor</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a custom color for the icon.
+This overrides the default icon color determined by the button's <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_ButtonStyle">ButtonStyle</a> and <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Variant">Variant</a>.
+Supports any valid CSS color value (e.g., &quot;#FF0000&quot;, &quot;rgb(255, 0, 0)&quot;, &quot;var(--my-color)&quot;).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? IconColor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The icon color as a CSS color value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_Image_" data-uid="Radzen.Blazor.RadzenButton.Image*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_Image" data-uid="Radzen.Blazor.RadzenButton.Image">Image</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the URL of an image to be displayed in the button.
+The image will be rendered as an img element. For icon fonts, use the <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Icon">Icon</a> property instead.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Image { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The image URL or path.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_ImageAlternateText_" data-uid="Radzen.Blazor.RadzenButton.ImageAlternateText*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_ImageAlternateText" data-uid="Radzen.Blazor.RadzenButton.ImageAlternateText">ImageAlternateText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the alternate text for the button's image.
+This is used as the alt attribute when an <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Image">Image</a> is specified, improving accessibility.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ImageAlternateText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The image alternate text. Default is &quot;button&quot;.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_IsBusy_" data-uid="Radzen.Blazor.RadzenButton.IsBusy*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_IsBusy" data-uid="Radzen.Blazor.RadzenButton.IsBusy">IsBusy</h4>
+  <div class="markdown level1 summary"><p>Gets or sets whether the button is in a busy/loading state.
+When true, the button displays a loading indicator, shows the <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_BusyText">BusyText</a>, and becomes disabled.
+This is useful for indicating asynchronous operations are in progress.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool IsBusy { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the button is busy; otherwise, <code>false</code>. Default is <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_IsDisabled_" data-uid="Radzen.Blazor.RadzenButton.IsDisabled*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_IsDisabled" data-uid="Radzen.Blazor.RadzenButton.IsDisabled">IsDisabled</h4>
+  <div class="markdown level1 summary"><p>Gets a value indicating whether this button is effectively disabled.
+The button is disabled if either <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Disabled">Disabled</a> is true or <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_IsBusy">IsBusy</a> is true.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool IsDisabled { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the button is disabled or busy; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_Shade_" data-uid="Radzen.Blazor.RadzenButton.Shade*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_Shade" data-uid="Radzen.Blazor.RadzenButton.Shade">Shade</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the color intensity shade for the button.
+Works in combination with <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_ButtonStyle">ButtonStyle</a> to adjust the color darkness/lightness.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public virtual Shade Shade { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Shade.html">Shade</a></td>
+        <td><p>The color shade. Default is <a class="xref" href="Radzen.Shade.html#Radzen_Shade_Default">Default</a>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_Size_" data-uid="Radzen.Blazor.RadzenButton.Size*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_Size" data-uid="Radzen.Blazor.RadzenButton.Size">Size</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the button size.
+Controls the padding, font size, and overall dimensions of the button.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public virtual ButtonSize Size { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.ButtonSize.html">ButtonSize</a></td>
+        <td><p>The button size. Default is <a class="xref" href="Radzen.ButtonSize.html#Radzen_ButtonSize_Medium">Medium</a>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_TabIndex_" data-uid="Radzen.Blazor.RadzenButton.TabIndex*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_TabIndex" data-uid="Radzen.Blazor.RadzenButton.TabIndex">TabIndex</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the tab index for keyboard navigation.
+Controls the order in which the button receives focus when the user presses the Tab key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int TabIndex { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The tab index. Default value is 0.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_Text_" data-uid="Radzen.Blazor.RadzenButton.Text*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_Text" data-uid="Radzen.Blazor.RadzenButton.Text">Text</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the text label displayed on the button.
+If both <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Text">Text</a> and <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Icon">Icon</a> are set, both will be displayed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string Text { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The button text. Default is empty string.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenButton_Variant_" data-uid="Radzen.Blazor.RadzenButton.Variant*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_Variant" data-uid="Radzen.Blazor.RadzenButton.Variant">Variant</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the design variant that controls the button's visual appearance.
+Options include Filled (solid background), Flat (subtle background), Outlined (border only), and Text (minimal styling).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public virtual Variant Variant { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Variant.html">Variant</a></td>
+        <td><p>The button variant. Default is <a class="xref" href="Radzen.Variant.html#Radzen_Variant_Filled">Filled</a>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenButton_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenButton.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenButton.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenButton_GetComponentCssClass_" data-uid="Radzen.Blazor.RadzenButton.GetComponentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_GetComponentCssClass" data-uid="Radzen.Blazor.RadzenButton.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenButton_OnClick_" data-uid="Radzen.Blazor.RadzenButton.OnClick*"></a>
+  <h4 id="Radzen_Blazor_RadzenButton_OnClick_Microsoft_AspNetCore_Components_Web_MouseEventArgs_" data-uid="Radzen.Blazor.RadzenButton.OnClick(Microsoft.AspNetCore.Components.Web.MouseEventArgs)">OnClick(MouseEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Handles the button click event. This method is called internally when the button is clicked.
+It prevents multiple simultaneous clicks and invokes the <a class="xref" href="Radzen.Blazor.RadzenButton.html#Radzen_Blazor_RadzenButton_Click">Click</a> callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual Task OnClick(MouseEventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td><p>The mouse event arguments containing click information.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

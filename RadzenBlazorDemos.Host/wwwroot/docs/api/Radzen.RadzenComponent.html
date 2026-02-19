@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenComponent
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenComponent
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.RadzenComponent">
+
+
+  <h1 id="Radzen_RadzenComponent" data-uid="Radzen.RadzenComponent" class="text-break">Class RadzenComponent
+</h1>
+  <div class="markdown level0 summary"><p>Base class for all Radzen Blazor components providing common functionality for styling, attributes, events, and lifecycle management.
+All Radzen components inherit from RadzenComponent to gain standard features like visibility control, custom attributes, mouse events, and disposal.
+Provides foundational functionality including visibility control via Visible property, custom CSS via Style property and class via Attributes,
+HTML attribute passing via unmatched parameters, MouseEnter/MouseLeave/ContextMenu event callbacks, localization support for numbers/dates/text,
+access to the rendered HTML element via Element Reference, and proper cleanup via IDisposable pattern.
+Components inheriting from RadzenComponent can override GetComponentCssClass() to provide their base CSS classes and use the protected Visible property to control rendering.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><span class="xref">RadzenComponent</span></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.GaugeBase.html">GaugeBase</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenAIChat.html">RadzenAIChat</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenAccordion.html">RadzenAccordion</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenAccordionItem.html">RadzenAccordionItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenAppearanceToggle.html">RadzenAppearanceToggle</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenBadge.html">RadzenBadge</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenBarcode.html">RadzenBarcode</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenBreadCrumbItem.html">RadzenBreadCrumbItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenButton.html">RadzenButton</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenCarousel.html">RadzenCarousel</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenChart.html">RadzenChart</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenChat.html">RadzenChat</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenCheckBoxListItem-1.html">RadzenCheckBoxListItem&lt;TValue&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenDataFilter-1.html">RadzenDataFilter&lt;TItem&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenDatePicker-1.html">RadzenDatePicker&lt;TValue&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenDropZoneItem-1.html">RadzenDropZoneItem&lt;TItem&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenFabMenu.html">RadzenFabMenu</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenFieldset.html">RadzenFieldset</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenFormField.html">RadzenFormField</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenGoogleMap.html">RadzenGoogleMap</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenGoogleMapMarker.html">RadzenGoogleMapMarker</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenGravatar.html">RadzenGravatar</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenHeading.html">RadzenHeading</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenIcon.html">RadzenIcon</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenLabel.html">RadzenLabel</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenLink.html">RadzenLink</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenLogin.html">RadzenLogin</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenMarkdown.html">RadzenMarkdown</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenMenuItem.html">RadzenMenuItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenPager.html">RadzenPager</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenPanelMenuItem.html">RadzenPanelMenuItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenPickList-1.html">RadzenPickList&lt;TItem&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenProfileMenuItem.html">RadzenProfileMenuItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenProgressBar.html">RadzenProgressBar</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenQRCode.html">RadzenQRCode</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenRadioButtonListItem-1.html">RadzenRadioButtonListItem&lt;TValue&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSSRSViewer.html">RadzenSSRSViewer</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSankeyDiagram-1.html">RadzenSankeyDiagram&lt;TItem&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenScheduler-1.html">RadzenScheduler&lt;TItem&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSelectBarItem.html">RadzenSelectBarItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSidebarToggle.html">RadzenSidebarToggle</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSkeleton.html">RadzenSkeleton</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSpeechToTextButton.html">RadzenSpeechToTextButton</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSpiderChart.html">RadzenSpiderChart</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSpiderSeries-1.html">RadzenSpiderSeries&lt;TItem&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSplitButtonItem.html">RadzenSplitButtonItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSplitter.html">RadzenSplitter</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSplitterPane.html">RadzenSplitterPane</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenSteps.html">RadzenSteps</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenStepsItem.html">RadzenStepsItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenTabs.html">RadzenTabs</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenTemplateForm-1.html">RadzenTemplateForm&lt;TItem&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenText.html">RadzenText</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenTimeSpanPicker-1.html">RadzenTimeSpanPicker&lt;TValue&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenTimeline.html">RadzenTimeline</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenTimelineItem.html">RadzenTimelineItem</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenToc.html">RadzenToc</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenTree.html">RadzenTree</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.RadzenUpload.html">RadzenUpload</a></div>
+      <div class="level3"><a class="xref" href="Radzen.Blazor.ValidatorBase.html">ValidatorBase</a></div>
+      <div class="level3"><a class="xref" href="Radzen.DataBoundFormComponent-1.html">DataBoundFormComponent&lt;T&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.FormComponent-1.html">FormComponent&lt;T&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.PagedDataBoundComponent-1.html">PagedDataBoundComponent&lt;T&gt;</a></div>
+      <div class="level3"><a class="xref" href="Radzen.RadzenComponentWithChildren.html">RadzenComponentWithChildren</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_RadzenComponent_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenComponent : ComponentBase, IComponent, IHandleEvent, IHandleAfterRender, IDisposable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_RadzenComponent__ctor_" data-uid="Radzen.RadzenComponent.#ctor*"></a>
+  <h4 id="Radzen_RadzenComponent__ctor" data-uid="Radzen.RadzenComponent.#ctor">RadzenComponent()</h4>
+  <div class="markdown level1 summary"><p>Base class for all Radzen Blazor components providing common functionality for styling, attributes, events, and lifecycle management.
+All Radzen components inherit from RadzenComponent to gain standard features like visibility control, custom attributes, mouse events, and disposal.
+Provides foundational functionality including visibility control via Visible property, custom CSS via Style property and class via Attributes,
+HTML attribute passing via unmatched parameters, MouseEnter/MouseLeave/ContextMenu event callbacks, localization support for numbers/dates/text,
+access to the rendered HTML element via Element Reference, and proper cleanup via IDisposable pattern.
+Components inheriting from RadzenComponent can override GetComponentCssClass() to provide their base CSS classes and use the protected Visible property to control rendering.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenComponent()</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_RadzenComponent_Attributes_" data-uid="Radzen.RadzenComponent.Attributes*"></a>
+  <h4 id="Radzen_RadzenComponent_Attributes" data-uid="Radzen.RadzenComponent.Attributes">Attributes</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a dictionary of additional HTML attributes that will be applied to the component's root element.
+Any attributes not explicitly defined as parameters will be captured here and rendered on the element.
+Use this to add data-* attributes, ARIA attributes, or any custom HTML attributes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter(CaptureUnmatchedValues = true)]
+public IReadOnlyDictionary&lt;string, object&gt;? Attributes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>The unmatched attributes dictionary.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_ContextMenu_" data-uid="Radzen.RadzenComponent.ContextMenu*"></a>
+  <h4 id="Radzen_RadzenComponent_ContextMenu" data-uid="Radzen.RadzenComponent.ContextMenu">ContextMenu</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the callback invoked when the user right-clicks the component.
+Commonly used with <a class="xref" href="Radzen.ContextMenuService.html">ContextMenuService</a> to display context menus.
+Receives mouse event arguments containing click position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;MouseEventArgs&gt; ContextMenu { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a>&gt;</td>
+        <td><p>The context menu (right-click) event callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_Culture_" data-uid="Radzen.RadzenComponent.Culture*"></a>
+  <h4 id="Radzen_RadzenComponent_Culture" data-uid="Radzen.RadzenComponent.Culture">Culture</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the culture used for formatting and parsing localizable data (numbers, dates, currency).
+If not set, uses the <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">DefaultCulture</a> from a parent component or falls back to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.currentculture">CurrentCulture</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public CultureInfo Culture { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></td>
+        <td><p>The culture for localization. Default is <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.currentculture">CurrentCulture</a>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_CurrentStyle_" data-uid="Radzen.RadzenComponent.CurrentStyle*"></a>
+  <h4 id="Radzen_RadzenComponent_CurrentStyle" data-uid="Radzen.RadzenComponent.CurrentStyle">CurrentStyle</h4>
+  <div class="markdown level1 summary"><p>Gets the current style as a dictionary.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected IDictionary&lt;string, string&gt; CurrentStyle { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2">IDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>The current style as a dictionary of keys and values.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_DefaultCulture_" data-uid="Radzen.RadzenComponent.DefaultCulture*"></a>
+  <h4 id="Radzen_RadzenComponent_DefaultCulture" data-uid="Radzen.RadzenComponent.DefaultCulture">DefaultCulture</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the default culture cascaded from a parent component.
+This allows setting a culture at the layout level that applies to all child Radzen components.
+Child components can override this by setting their own Culture property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[CascadingParameter(Name = &quot;DefaultCulture&quot;)]
+public CultureInfo? DefaultCulture { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></td>
+        <td><p>The cascaded default culture.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_Element_" data-uid="Radzen.RadzenComponent.Element*"></a>
+  <h4 id="Radzen_RadzenComponent_Element" data-uid="Radzen.RadzenComponent.Element">Element</h4>
+  <div class="markdown level1 summary"><p>Gets a reference to the HTML element rendered by this component.
+Can be used with JavaScript interop or for programmatic DOM manipulation.
+The reference is only valid after the component has been rendered (after OnAfterRender).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public ElementReference Element { get; protected set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><p>The element reference to the rendered HTML element.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_IsJSRuntimeAvailable_" data-uid="Radzen.RadzenComponent.IsJSRuntimeAvailable*"></a>
+  <h4 id="Radzen_RadzenComponent_IsJSRuntimeAvailable" data-uid="Radzen.RadzenComponent.IsJSRuntimeAvailable">IsJSRuntimeAvailable</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">JSRuntime</a> is available.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected bool IsJSRuntimeAvailable { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_JSRuntime_" data-uid="Radzen.RadzenComponent.JSRuntime*"></a>
+  <h4 id="Radzen_RadzenComponent_JSRuntime" data-uid="Radzen.RadzenComponent.JSRuntime">JSRuntime</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the js runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Inject]
+protected IJSRuntime? JSRuntime { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.jsinterop.ijsruntime">IJSRuntime</a></td>
+        <td><p>The js runtime.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_MouseEnter_" data-uid="Radzen.RadzenComponent.MouseEnter*"></a>
+  <h4 id="Radzen_RadzenComponent_MouseEnter" data-uid="Radzen.RadzenComponent.MouseEnter">MouseEnter</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the callback invoked when the mouse pointer enters the component's bounds.
+Commonly used with <a class="xref" href="Radzen.TooltipService.html">TooltipService</a> to display tooltips on hover.
+Receives the component's ElementReference as a parameter.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;ElementReference&gt; MouseEnter { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a>&gt;</td>
+        <td><p>The mouse enter event callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_MouseLeave_" data-uid="Radzen.RadzenComponent.MouseLeave*"></a>
+  <h4 id="Radzen_RadzenComponent_MouseLeave" data-uid="Radzen.RadzenComponent.MouseLeave">MouseLeave</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the callback invoked when the mouse pointer leaves the component's bounds.
+Commonly used with <a class="xref" href="Radzen.TooltipService.html">TooltipService</a> to hide tooltips when hover ends.
+Receives the component's ElementReference as a parameter.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;ElementReference&gt; MouseLeave { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a>&gt;</td>
+        <td><p>The mouse leave event callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_Reference_" data-uid="Radzen.RadzenComponent.Reference*"></a>
+  <h4 id="Radzen_RadzenComponent_Reference" data-uid="Radzen.RadzenComponent.Reference">Reference</h4>
+  <div class="markdown level1 summary"><p>Gets the reference for the current component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected DotNetObjectReference&lt;RadzenComponent&gt; Reference { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.jsinterop.dotnetobjectreference-1">DotNetObjectReference</a>&lt;<a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a>&gt;</td>
+        <td><p>The reference.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_Style_" data-uid="Radzen.RadzenComponent.Style*"></a>
+  <h4 id="Radzen_RadzenComponent_Style" data-uid="Radzen.RadzenComponent.Style">Style</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the inline CSS style.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public virtual string? Style { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The style.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_UniqueID_" data-uid="Radzen.RadzenComponent.UniqueID*"></a>
+  <h4 id="Radzen_RadzenComponent_UniqueID" data-uid="Radzen.RadzenComponent.UniqueID">UniqueID</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the unique identifier.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string? UniqueID { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The unique identifier.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_Visible_" data-uid="Radzen.RadzenComponent.Visible*"></a>
+  <h4 id="Radzen_RadzenComponent_Visible" data-uid="Radzen.RadzenComponent.Visible">Visible</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a> is visible. Invisible components are not rendered.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public virtual bool Visible { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if visible; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_RadzenComponent_AddContextMenu_" data-uid="Radzen.RadzenComponent.AddContextMenu*"></a>
+  <h4 id="Radzen_RadzenComponent_AddContextMenu" data-uid="Radzen.RadzenComponent.AddContextMenu">AddContextMenu()</h4>
+  <div class="markdown level1 summary"><p>Adds context menu for this component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual Task AddContextMenu()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_Debounce_" data-uid="Radzen.RadzenComponent.Debounce*"></a>
+  <h4 id="Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_" data-uid="Radzen.RadzenComponent.Debounce(System.Func{System.Threading.Tasks.Task},System.Int32)">Debounce(Func&lt;Task&gt;, int)</h4>
+  <div class="markdown level1 summary"><p>Debounces the specified action.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected void Debounce(Func&lt;Task&gt; action, int milliseconds = 500)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a>&gt;</td>
+        <td><span class="parametername">action</span></td>
+        <td><p>The action.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">milliseconds</span></td>
+        <td><p>The milliseconds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_Dispose_" data-uid="Radzen.RadzenComponent.Dispose*"></a>
+  <h4 id="Radzen_RadzenComponent_Dispose" data-uid="Radzen.RadzenComponent.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Detaches event handlers and disposes <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">Reference</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void Dispose()</code></pre>
+  </div>
+
+
+  <a id="Radzen_RadzenComponent_GetComponentCssClass_" data-uid="Radzen.RadzenComponent.GetComponentCssClass*"></a>
+  <h4 id="Radzen_RadzenComponent_GetComponentCssClass" data-uid="Radzen.RadzenComponent.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_GetCssClass_" data-uid="Radzen.RadzenComponent.GetCssClass*"></a>
+  <h4 id="Radzen_RadzenComponent_GetCssClass" data-uid="Radzen.RadzenComponent.GetCssClass">GetCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the final CSS class rendered by the component. Combines it with a <code>class</code> custom attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected string GetCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_GetId_" data-uid="Radzen.RadzenComponent.GetId*"></a>
+  <h4 id="Radzen_RadzenComponent_GetId" data-uid="Radzen.RadzenComponent.GetId">GetId()</h4>
+  <div class="markdown level1 summary"><p>Gets the unique identifier.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string? GetId()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>Returns the <code>id</code> attribute (if specified) or generates a random one.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_OnAfterRenderAsync_" data-uid="Radzen.RadzenComponent.OnAfterRenderAsync*"></a>
+  <h4 id="Radzen_RadzenComponent_OnAfterRenderAsync_System_Boolean_" data-uid="Radzen.RadzenComponent.OnAfterRenderAsync(System.Boolean)">OnAfterRenderAsync(bool)</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override Task OnAfterRenderAsync(bool firstRender)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">firstRender</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrenderasync">ComponentBase.OnAfterRenderAsync(bool)</a></div>
+
+
+  <a id="Radzen_RadzenComponent_OnContextMenu_" data-uid="Radzen.RadzenComponent.OnContextMenu*"></a>
+  <h4 id="Radzen_RadzenComponent_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_" data-uid="Radzen.RadzenComponent.OnContextMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs)">OnContextMenu(MouseEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Raises <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">ContextMenu</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual Task OnContextMenu(MouseEventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a> instance containing the event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_OnInitialized_" data-uid="Radzen.RadzenComponent.OnInitialized*"></a>
+  <h4 id="Radzen_RadzenComponent_OnInitialized" data-uid="Radzen.RadzenComponent.OnInitialized">OnInitialized()</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void OnInitialized()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitialized">ComponentBase.OnInitialized()</a></div>
+
+
+  <a id="Radzen_RadzenComponent_OnMouseEnter_" data-uid="Radzen.RadzenComponent.OnMouseEnter*"></a>
+  <h4 id="Radzen_RadzenComponent_OnMouseEnter" data-uid="Radzen.RadzenComponent.OnMouseEnter">OnMouseEnter()</h4>
+  <div class="markdown level1 summary"><p>Raises <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">MouseEnter</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task OnMouseEnter()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_OnMouseLeave_" data-uid="Radzen.RadzenComponent.OnMouseLeave*"></a>
+  <h4 id="Radzen_RadzenComponent_OnMouseLeave" data-uid="Radzen.RadzenComponent.OnMouseLeave">OnMouseLeave()</h4>
+  <div class="markdown level1 summary"><p>Raises <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">MouseLeave</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task OnMouseLeave()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_RaiseContextMenu_" data-uid="Radzen.RadzenComponent.RaiseContextMenu*"></a>
+  <h4 id="Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_" data-uid="Radzen.RadzenComponent.RaiseContextMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs)">RaiseContextMenu(MouseEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Invoked via interop when the browser &quot;oncontextmenu&quot; event is raised for this component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[JSInvokable(&quot;RadzenComponent.RaiseContextMenu&quot;)]
+public Task RaiseContextMenu(MouseEventArgs e)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a></td>
+        <td><span class="parametername">e</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a> instance containing the event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_RaiseMouseEnter_" data-uid="Radzen.RadzenComponent.RaiseMouseEnter*"></a>
+  <h4 id="Radzen_RadzenComponent_RaiseMouseEnter" data-uid="Radzen.RadzenComponent.RaiseMouseEnter">RaiseMouseEnter()</h4>
+  <div class="markdown level1 summary"><p>Invoked via interop when the browser &quot;onmouseenter&quot; event is raised for this component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[JSInvokable(&quot;RadzenComponent.RaiseMouseEnter&quot;)]
+public Task RaiseMouseEnter()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_RaiseMouseLeave_" data-uid="Radzen.RadzenComponent.RaiseMouseLeave*"></a>
+  <h4 id="Radzen_RadzenComponent_RaiseMouseLeave" data-uid="Radzen.RadzenComponent.RaiseMouseLeave">RaiseMouseLeave()</h4>
+  <div class="markdown level1 summary"><p>Invoked via interop when the browser &quot;onmouseleave&quot; event is raised for this component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[JSInvokable(&quot;RadzenComponent.RaiseMouseLeave&quot;)]
+public Task RaiseMouseLeave()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_RadzenComponent_SetParametersAsync_" data-uid="Radzen.RadzenComponent.SetParametersAsync*"></a>
+  <h4 id="Radzen_RadzenComponent_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.RadzenComponent.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime when parameters are set.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.setparametersasync">ComponentBase.SetParametersAsync(ParameterView)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

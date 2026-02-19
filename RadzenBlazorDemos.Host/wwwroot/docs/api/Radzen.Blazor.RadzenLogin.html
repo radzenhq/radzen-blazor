@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenLogin
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenLogin
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenLogin">
+
+
+  <h1 id="Radzen_Blazor_RadzenLogin" data-uid="Radzen.Blazor.RadzenLogin" class="text-break">Class RadzenLogin
+</h1>
+  <div class="markdown level0 summary"><p>A pre-built login form component with username/password fields and optional &quot;Remember Me&quot;, &quot;Register&quot;, and &quot;Reset Password&quot; features.
+RadzenLogin provides a ready-to-use authentication UI that can be customized with events for login, registration, and password reset flows.
+Must be placed inside a <a class="xref" href="Radzen.Blazor.RadzenTemplateForm-1.html">RadzenTemplateForm&lt;TItem&gt;</a>.
+Eliminates the need to manually create login forms by providing a complete, styled login interface.
+Features pre-configured text and password inputs, optional switch for persistent sessions (Remember Me), optional link to registration page/modal,
+optional link for password recovery (Reset Password), browser password manager integration with autocomplete, customizable labels/button text/layout via parameters,
+Login/Register/ResetPassword event callbacks for implementing auth logic, and built-in required field validation.
+Handle the Login event to authenticate users with your backend. Use AllowRegister and AllowResetPassword to show/hide those links based on your auth requirements.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><span class="xref">RadzenLogin</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnAfterRenderAsync_System_Boolean_">RadzenComponent.OnAfterRenderAsync(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Dispose">RadzenComponent.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenLogin_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenLogin : RadzenComponent, IComponent, IHandleEvent, IHandleAfterRender, IDisposable</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenLogin_examples"><strong>Examples</strong></h5>
+  <p>Basic login form:</p>
+<pre><code class="lang-csharp">&lt;RadzenTemplateForm Data=@("Login")&gt;
+    &lt;RadzenLogin Login=@OnLogin /&gt;
+&lt;/RadzenTemplateForm&gt;
+@code {
+    async Task OnLogin(LoginArgs args)
+    {
+        // Authenticate with backend
+        var result = await authService.Login(args.Username, args.Password);
+        if (result.Success)
+            NavigationManager.NavigateTo("/dashboard");
+    }
+}</code></pre>
+<p>Full-featured login with all options:</p>
+<pre><code class="lang-csharp">&lt;RadzenTemplateForm Data=@("Login")&gt;
+    &lt;RadzenLogin AllowRegister="true" AllowResetPassword="true"
+                 Login=@OnLogin Register=@OnRegister ResetPassword=@OnResetPassword
+                 UserText="Email" RememberMe="true" /&gt;
+&lt;/RadzenTemplateForm&gt;</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenLogin__ctor_" data-uid="Radzen.Blazor.RadzenLogin.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin__ctor" data-uid="Radzen.Blazor.RadzenLogin.#ctor">RadzenLogin()</h4>
+  <div class="markdown level1 summary"><p>A pre-built login form component with username/password fields and optional &quot;Remember Me&quot;, &quot;Register&quot;, and &quot;Reset Password&quot; features.
+RadzenLogin provides a ready-to-use authentication UI that can be customized with events for login, registration, and password reset flows.
+Must be placed inside a <a class="xref" href="Radzen.Blazor.RadzenTemplateForm-1.html">RadzenTemplateForm&lt;TItem&gt;</a>.
+Eliminates the need to manually create login forms by providing a complete, styled login interface.
+Features pre-configured text and password inputs, optional switch for persistent sessions (Remember Me), optional link to registration page/modal,
+optional link for password recovery (Reset Password), browser password manager integration with autocomplete, customizable labels/button text/layout via parameters,
+Login/Register/ResetPassword event callbacks for implementing auth logic, and built-in required field validation.
+Handle the Login event to authenticate users with your backend. Use AllowRegister and AllowResetPassword to show/hide those links based on your auth requirements.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenLogin()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenLogin__ctor_examples">Examples</h5>
+  <p>Basic login form:</p>
+<pre><code class="lang-csharp">&lt;RadzenTemplateForm Data=@("Login")&gt;
+    &lt;RadzenLogin Login=@OnLogin /&gt;
+&lt;/RadzenTemplateForm&gt;
+@code {
+    async Task OnLogin(LoginArgs args)
+    {
+        // Authenticate with backend
+        var result = await authService.Login(args.Username, args.Password);
+        if (result.Success)
+            NavigationManager.NavigateTo("/dashboard");
+    }
+}</code></pre>
+<p>Full-featured login with all options:</p>
+<pre><code class="lang-csharp">&lt;RadzenTemplateForm Data=@("Login")&gt;
+    &lt;RadzenLogin AllowRegister="true" AllowResetPassword="true"
+                 Login=@OnLogin Register=@OnRegister ResetPassword=@OnResetPassword
+                 UserText="Email" RememberMe="true" /&gt;
+&lt;/RadzenTemplateForm&gt;</code></pre>
+
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_AllowRegister_" data-uid="Radzen.Blazor.RadzenLogin.AllowRegister*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_AllowRegister" data-uid="Radzen.Blazor.RadzenLogin.AllowRegister">AllowRegister</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether register is allowed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowRegister { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if register is allowed; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_AllowRememberMe_" data-uid="Radzen.Blazor.RadzenLogin.AllowRememberMe*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_AllowRememberMe" data-uid="Radzen.Blazor.RadzenLogin.AllowRememberMe">AllowRememberMe</h4>
+  <div class="markdown level1 summary"><p>Asks the user whether to remember their credentials. Set to <code>false</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowRememberMe { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_AllowResetPassword_" data-uid="Radzen.Blazor.RadzenLogin.AllowResetPassword*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_AllowResetPassword" data-uid="Radzen.Blazor.RadzenLogin.AllowResetPassword">AllowResetPassword</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether reset password is allowed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowResetPassword { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if reset password is allowed; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_AutoComplete_" data-uid="Radzen.Blazor.RadzenLogin.AutoComplete*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_AutoComplete" data-uid="Radzen.Blazor.RadzenLogin.AutoComplete">AutoComplete</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether automatic complete of inputs is enabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AutoComplete { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if automatic complete of inputs is enabled; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_FormFieldVariant_" data-uid="Radzen.Blazor.RadzenLogin.FormFieldVariant*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_FormFieldVariant" data-uid="Radzen.Blazor.RadzenLogin.FormFieldVariant">FormFieldVariant</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the design variant of the form field.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Variant? FormFieldVariant { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Variant.html">Variant</a>?</td>
+        <td><p>The variant of the form field.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_Login_" data-uid="Radzen.Blazor.RadzenLogin.Login*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_Login" data-uid="Radzen.Blazor.RadzenLogin.Login">Login</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the login callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;LoginArgs&gt; Login { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.LoginArgs.html">LoginArgs</a>&gt;</td>
+        <td><p>The login callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_LoginText_" data-uid="Radzen.Blazor.RadzenLogin.LoginText*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_LoginText" data-uid="Radzen.Blazor.RadzenLogin.LoginText">LoginText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the login text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string LoginText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The login text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_Password_" data-uid="Radzen.Blazor.RadzenLogin.Password*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_Password" data-uid="Radzen.Blazor.RadzenLogin.Password">Password</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the password.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Password { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The password.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_PasswordAutoCompleteType_" data-uid="Radzen.Blazor.RadzenLogin.PasswordAutoCompleteType*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_PasswordAutoCompleteType" data-uid="Radzen.Blazor.RadzenLogin.PasswordAutoCompleteType">PasswordAutoCompleteType</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating the type of built-in autocomplete
+the browser should use.
+<a class="xref" href="Radzen.Blazor.AutoCompleteType.html">AutoCompleteType</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public AutoCompleteType PasswordAutoCompleteType { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.AutoCompleteType.html">AutoCompleteType</a></td>
+        <td><p>The type of built-in autocomplete.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_PasswordRequired_" data-uid="Radzen.Blazor.RadzenLogin.PasswordRequired*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_PasswordRequired" data-uid="Radzen.Blazor.RadzenLogin.PasswordRequired">PasswordRequired</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the password required.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string PasswordRequired { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The password required.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_PasswordText_" data-uid="Radzen.Blazor.RadzenLogin.PasswordText*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_PasswordText" data-uid="Radzen.Blazor.RadzenLogin.PasswordText">PasswordText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the password text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string PasswordText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The password text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_Register_" data-uid="Radzen.Blazor.RadzenLogin.Register*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_Register" data-uid="Radzen.Blazor.RadzenLogin.Register">Register</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the register callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback Register { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback">EventCallback</a></td>
+        <td><p>The register callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_RegisterMessageText_" data-uid="Radzen.Blazor.RadzenLogin.RegisterMessageText*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_RegisterMessageText" data-uid="Radzen.Blazor.RadzenLogin.RegisterMessageText">RegisterMessageText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the register message text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string RegisterMessageText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The register message text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_RegisterText_" data-uid="Radzen.Blazor.RadzenLogin.RegisterText*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_RegisterText" data-uid="Radzen.Blazor.RadzenLogin.RegisterText">RegisterText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the register text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string RegisterText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The register text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_RememberMe_" data-uid="Radzen.Blazor.RadzenLogin.RememberMe*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_RememberMe" data-uid="Radzen.Blazor.RadzenLogin.RememberMe">RememberMe</h4>
+  <div class="markdown level1 summary"><p>Sets the initial value of the remember me switch.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool RememberMe { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_RememberMeText_" data-uid="Radzen.Blazor.RadzenLogin.RememberMeText*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_RememberMeText" data-uid="Radzen.Blazor.RadzenLogin.RememberMeText">RememberMeText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the remember me text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string RememberMeText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_ResetPassword_" data-uid="Radzen.Blazor.RadzenLogin.ResetPassword*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_ResetPassword" data-uid="Radzen.Blazor.RadzenLogin.ResetPassword">ResetPassword</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the reset password callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;string&gt; ResetPassword { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>The reset password callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_ResetPasswordText_" data-uid="Radzen.Blazor.RadzenLogin.ResetPasswordText*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_ResetPasswordText" data-uid="Radzen.Blazor.RadzenLogin.ResetPasswordText">ResetPasswordText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the reset password text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ResetPasswordText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The reset password text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_ShowLoginButton_" data-uid="Radzen.Blazor.RadzenLogin.ShowLoginButton*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_ShowLoginButton" data-uid="Radzen.Blazor.RadzenLogin.ShowLoginButton">ShowLoginButton</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether default login button is shown.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ShowLoginButton { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if default login button is shown; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_UserNameAutoCompleteType_" data-uid="Radzen.Blazor.RadzenLogin.UserNameAutoCompleteType*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_UserNameAutoCompleteType" data-uid="Radzen.Blazor.RadzenLogin.UserNameAutoCompleteType">UserNameAutoCompleteType</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating the type of built-in autocomplete
+the browser should use.
+<a class="xref" href="Radzen.Blazor.AutoCompleteType.html">AutoCompleteType</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public AutoCompleteType UserNameAutoCompleteType { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.AutoCompleteType.html">AutoCompleteType</a></td>
+        <td><p>The type of built-in autocomplete.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_UserRequired_" data-uid="Radzen.Blazor.RadzenLogin.UserRequired*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_UserRequired" data-uid="Radzen.Blazor.RadzenLogin.UserRequired">UserRequired</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the user required text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string UserRequired { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The user required text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_UserText_" data-uid="Radzen.Blazor.RadzenLogin.UserText*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_UserText" data-uid="Radzen.Blazor.RadzenLogin.UserText">UserText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the user text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string UserText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The user text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_Username_" data-uid="Radzen.Blazor.RadzenLogin.Username*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_Username" data-uid="Radzen.Blazor.RadzenLogin.Username">Username</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the username.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Username { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The username.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenLogin.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenLogin.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_GetComponentCssClass_" data-uid="Radzen.Blazor.RadzenLogin.GetComponentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_GetComponentCssClass" data-uid="Radzen.Blazor.RadzenLogin.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_OnInitialized_" data-uid="Radzen.Blazor.RadzenLogin.OnInitialized*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_OnInitialized" data-uid="Radzen.Blazor.RadzenLogin.OnInitialized">OnInitialized()</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void OnInitialized()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnInitialized">RadzenComponent.OnInitialized()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_OnLogin_" data-uid="Radzen.Blazor.RadzenLogin.OnLogin*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_OnLogin" data-uid="Radzen.Blazor.RadzenLogin.OnLogin">OnLogin()</h4>
+  <div class="markdown level1 summary"><p>Called when login.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Task OnLogin()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_OnRegister_" data-uid="Radzen.Blazor.RadzenLogin.OnRegister*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_OnRegister" data-uid="Radzen.Blazor.RadzenLogin.OnRegister">OnRegister()</h4>
+  <div class="markdown level1 summary"><p>Called when register.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Task OnRegister()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_OnReset_" data-uid="Radzen.Blazor.RadzenLogin.OnReset*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_OnReset_System_EventArgs_" data-uid="Radzen.Blazor.RadzenLogin.OnReset(System.EventArgs)">OnReset(EventArgs)</h4>
+  <div class="markdown level1 summary"><p>Handles the reset event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Task OnReset(EventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> instance containing the event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenLogin_SetParametersAsync_" data-uid="Radzen.Blazor.RadzenLogin.SetParametersAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenLogin_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.Blazor.RadzenLogin.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime when parameters are set.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">RadzenComponent.SetParametersAsync(ParameterView)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

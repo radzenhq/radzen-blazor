@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenListBox&lt;TValue&gt;
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenListBox&lt;TValue&gt;
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenListBox`1">
+
+
+  <h1 id="Radzen_Blazor_RadzenListBox_1" data-uid="Radzen.Blazor.RadzenListBox`1" class="text-break">Class RadzenListBox&lt;TValue&gt;
+</h1>
+  <div class="markdown level0 summary"><p>A list box component that displays a scrollable list of items with single or multiple selection support.
+RadzenListBox provides an always-visible alternative to dropdowns, ideal for showing multiple options without requiring a popup.
+Displays all items in a scrollable container, making all options visible at once (unlike dropdowns which hide options in a popup).
+Supports single selection (default) or multiple selection via Multiple property, built-in search/filter with configurable operators and case sensitivity,
+binding to any IEnumerable data source with TextProperty and ValueProperty, custom item templates for rich list item content,
+efficient rendering of large lists via IQueryable support, optional &quot;Select All&quot; checkbox for multiple selection mode, and keyboard navigation (Arrow keys, Page Up/Down, Home/End) for accessibility.
+Use when you want to show all available options without requiring clicks to open a dropdown, or when multiple selection is needed and checkboxes would take too much space.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><a class="xref" href="Radzen.DataBoundFormComponent-1.html">DataBoundFormComponent</a>&lt;TValue&gt;</div>
+    <div class="level4"><a class="xref" href="Radzen.DropDownBase-1.html">DropDownBase</a>&lt;TValue&gt;</div>
+    <div class="level5"><span class="xref">RadzenListBox&lt;TValue&gt;</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    <div><a class="xref" href="Radzen.IRadzenFormComponent.html">IRadzenFormComponent</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_selectedItems">DropDownBase&lt;TValue&gt;.selectedItems</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_selectedItem">DropDownBase&lt;TValue&gt;.selectedItem</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_search">DropDownBase&lt;TValue&gt;.search</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_list">DropDownBase&lt;TValue&gt;.list</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_selectedIndex">DropDownBase&lt;TValue&gt;.selectedIndex</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_isPopupOpen">DropDownBase&lt;TValue&gt;.isPopupOpen</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_PreserveCollectionOnSelection">DropDownBase&lt;TValue&gt;.PreserveCollectionOnSelection</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Reset">DropDownBase&lt;TValue&gt;.Reset()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_ClearAll">DropDownBase&lt;TValue&gt;.ClearAll()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnParametersSet">DropDownBase&lt;TValue&gt;.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_GetItemOrValueFromProperty_System_Object_System_String_">DropDownBase&lt;TValue&gt;.GetItemOrValueFromProperty(object, string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnDataChanged">DropDownBase&lt;TValue&gt;.OnDataChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OpenPopupScript">DropDownBase&lt;TValue&gt;.OpenPopupScript()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OpenPopupScriptFromParent">DropDownBase&lt;TValue&gt;.OpenPopupScriptFromParent()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OpenPopup_System_String_System_Boolean_System_Boolean_">DropDownBase&lt;TValue&gt;.OpenPopup(string, bool, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_HandleKeyPress_Microsoft_AspNetCore_Components_Web_KeyboardEventArgs_System_Boolean_System_Nullable_System_Boolean__">DropDownBase&lt;TValue&gt;.HandleKeyPress(KeyboardEventArgs, bool, bool?)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnFilterKeyPress_Microsoft_AspNetCore_Components_Web_KeyboardEventArgs_">DropDownBase&lt;TValue&gt;.OnFilterKeyPress(KeyboardEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnKeyPress_Microsoft_AspNetCore_Components_Web_KeyboardEventArgs_System_Nullable_System_Boolean__">DropDownBase&lt;TValue&gt;.OnKeyPress(KeyboardEventArgs, bool?)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnSelectItem_System_Object_System_Boolean_">DropDownBase&lt;TValue&gt;.OnSelectItem(object, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnFilter_Microsoft_AspNetCore_Components_ChangeEventArgs_">DropDownBase&lt;TValue&gt;.OnFilter(ChangeEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnFilterInput_Microsoft_AspNetCore_Components_ChangeEventArgs_">DropDownBase&lt;TValue&gt;.OnFilterInput(ChangeEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnInitialized">DropDownBase&lt;TValue&gt;.OnInitialized()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnParametersSetAsync">DropDownBase&lt;TValue&gt;.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnChange_Microsoft_AspNetCore_Components_ChangeEventArgs_">DropDownBase&lt;TValue&gt;.OnChange(ChangeEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_SelectItem_System_Object_System_Boolean_">DropDownBase&lt;TValue&gt;.SelectItem(object, bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnSelectAllKeyDown_Microsoft_AspNetCore_Components_Web_KeyboardEventArgs_">DropDownBase&lt;TValue&gt;.OnSelectAllKeyDown(KeyboardEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_GetValue">DropDownBase&lt;TValue&gt;.GetValue()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_SelectItemFromValue_System_Object_">DropDownBase&lt;TValue&gt;.SelectItemFromValue(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Dispose">DropDownBase&lt;TValue&gt;.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_VirtualizationOverscanCount">DropDownBase&lt;TValue&gt;.VirtualizationOverscanCount</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Virtualize">DropDownBase&lt;TValue&gt;.Virtualize</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Count">DropDownBase&lt;TValue&gt;.Count</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_AllowVirtualization">DropDownBase&lt;TValue&gt;.AllowVirtualization</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_PageSize">DropDownBase&lt;TValue&gt;.PageSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_HasValue">DropDownBase&lt;TValue&gt;.HasValue</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_HeaderTemplate">DropDownBase&lt;TValue&gt;.HeaderTemplate</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_AllowFiltering">DropDownBase&lt;TValue&gt;.AllowFiltering</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_FilterAsYouType">DropDownBase&lt;TValue&gt;.FilterAsYouType</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_AllowClear">DropDownBase&lt;TValue&gt;.AllowClear</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Multiple">DropDownBase&lt;TValue&gt;.Multiple</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_ResetSelectedIndexOnFilter">DropDownBase&lt;TValue&gt;.ResetSelectedIndexOnFilter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_AllowSelectAll">DropDownBase&lt;TValue&gt;.AllowSelectAll</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Template">DropDownBase&lt;TValue&gt;.Template</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_ValueProperty">DropDownBase&lt;TValue&gt;.ValueProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_DisabledProperty">DropDownBase&lt;TValue&gt;.DisabledProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_RemoveChipTitle">DropDownBase&lt;TValue&gt;.RemoveChipTitle</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_ClearAriaLabel">DropDownBase&lt;TValue&gt;.ClearAriaLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_SearchAriaLabel">DropDownBase&lt;TValue&gt;.SearchAriaLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_EmptyAriaLabel">DropDownBase&lt;TValue&gt;.EmptyAriaLabel</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_SelectedItemChanged">DropDownBase&lt;TValue&gt;.SelectedItemChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Data">DropDownBase&lt;TValue&gt;.Data</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_PopupID">DropDownBase&lt;TValue&gt;.PopupID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_ListId">DropDownBase&lt;TValue&gt;.ListId</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_SearchID">DropDownBase&lt;TValue&gt;.SearchID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_FilterDelay">DropDownBase&lt;TValue&gt;.FilterDelay</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_SelectedItem">DropDownBase&lt;TValue&gt;.SelectedItem</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Separator">DropDownBase&lt;TValue&gt;.Separator</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_Items">DropDownBase&lt;TValue&gt;.Items</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_View">DropDownBase&lt;TValue&gt;.View</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_ItemComparer">DropDownBase&lt;TValue&gt;.ItemComparer</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1__view">DataBoundFormComponent&lt;TValue&gt;._view</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_GetClassList_System_String_">DataBoundFormComponent&lt;TValue&gt;.GetClassList(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_FocusAsync">DataBoundFormComponent&lt;TValue&gt;.FocusAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">DataBoundFormComponent&lt;TValue&gt;.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_TabIndex">DataBoundFormComponent&lt;TValue&gt;.TabIndex</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_FilterCaseSensitivity">DataBoundFormComponent&lt;TValue&gt;.FilterCaseSensitivity</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_FilterOperator">DataBoundFormComponent&lt;TValue&gt;.FilterOperator</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_Name">DataBoundFormComponent&lt;TValue&gt;.Name</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_Placeholder">DataBoundFormComponent&lt;TValue&gt;.Placeholder</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_Disabled">DataBoundFormComponent&lt;TValue&gt;.Disabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_Change">DataBoundFormComponent&lt;TValue&gt;.Change</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_LoadData">DataBoundFormComponent&lt;TValue&gt;.LoadData</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_Form">DataBoundFormComponent&lt;TValue&gt;.Form</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_Value">DataBoundFormComponent&lt;TValue&gt;.Value</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_ValueChanged">DataBoundFormComponent&lt;TValue&gt;.ValueChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_IsBound">DataBoundFormComponent&lt;TValue&gt;.IsBound</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_TextProperty">DataBoundFormComponent&lt;TValue&gt;.TextProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_Query">DataBoundFormComponent&lt;TValue&gt;.Query</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_SearchText">DataBoundFormComponent&lt;TValue&gt;.SearchText</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_SearchTextChanged">DataBoundFormComponent&lt;TValue&gt;.SearchTextChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_EditContext">DataBoundFormComponent&lt;TValue&gt;.EditContext</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_FieldIdentifier">DataBoundFormComponent&lt;TValue&gt;.FieldIdentifier</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_ValueExpression">DataBoundFormComponent&lt;TValue&gt;.ValueExpression</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_FormFieldContext">DataBoundFormComponent&lt;TValue&gt;.FormFieldContext</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.DataBoundFormComponent-1.html#Radzen_DataBoundFormComponent_1_CurrentPlaceholder">DataBoundFormComponent&lt;TValue&gt;.CurrentPlaceholder</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenListBox_1_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenListBox&lt;TValue&gt; : DropDownBase&lt;TValue&gt;, IComponent, IHandleEvent, IHandleAfterRender, IDisposable, IRadzenFormComponent</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TValue</span></td>
+        <td><p>The type of the selected value. Can be a single value or IEnumerable for multiple selection.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Radzen_Blazor_RadzenListBox_1_examples"><strong>Examples</strong></h5>
+  <p>Basic list box:</p>
+<pre><code class="lang-csharp">&lt;RadzenListBox @bind-Value=@selectedId TValue="int" Data=@countries TextProperty="Name" ValueProperty="Id" Style="height: 300px;" /&gt;</code></pre>
+<p>Multiple selection with Select All:</p>
+<pre><code class="lang-csharp">&lt;RadzenListBox @bind-Value=@selectedIds TValue="IEnumerable&lt;int&gt;" Multiple="true" SelectAllText="Select All"
+                Data=@items TextProperty="Name" ValueProperty="Id" Style="height: 400px;" /&gt;</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1__ctor_" data-uid="Radzen.Blazor.RadzenListBox`1.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1__ctor" data-uid="Radzen.Blazor.RadzenListBox`1.#ctor">RadzenListBox()</h4>
+  <div class="markdown level1 summary"><p>A list box component that displays a scrollable list of items with single or multiple selection support.
+RadzenListBox provides an always-visible alternative to dropdowns, ideal for showing multiple options without requiring a popup.
+Displays all items in a scrollable container, making all options visible at once (unlike dropdowns which hide options in a popup).
+Supports single selection (default) or multiple selection via Multiple property, built-in search/filter with configurable operators and case sensitivity,
+binding to any IEnumerable data source with TextProperty and ValueProperty, custom item templates for rich list item content,
+efficient rendering of large lists via IQueryable support, optional &quot;Select All&quot; checkbox for multiple selection mode, and keyboard navigation (Arrow keys, Page Up/Down, Home/End) for accessibility.
+Use when you want to show all available options without requiring clicks to open a dropdown, or when multiple selection is needed and checkboxes would take too much space.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenListBox()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenListBox_1__ctor_examples">Examples</h5>
+  <p>Basic list box:</p>
+<pre><code class="lang-csharp">&lt;RadzenListBox @bind-Value=@selectedId TValue="int" Data=@countries TextProperty="Name" ValueProperty="Id" Style="height: 300px;" /&gt;</code></pre>
+<p>Multiple selection with Select All:</p>
+<pre><code class="lang-csharp">&lt;RadzenListBox @bind-Value=@selectedIds TValue="IEnumerable&lt;int&gt;" Multiple="true" SelectAllText="Select All"
+                Data=@items TextProperty="Name" ValueProperty="Id" Style="height: 400px;" /&gt;</code></pre>
+
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_InputAttributes_" data-uid="Radzen.Blazor.RadzenListBox`1.InputAttributes*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_InputAttributes" data-uid="Radzen.Blazor.RadzenListBox`1.InputAttributes">InputAttributes</h4>
+  <div class="markdown level1 summary"><p>Specifies additional custom attributes that will be rendered by the input.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IReadOnlyDictionary&lt;string, object&gt;? InputAttributes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>The attributes.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_ItemRender_" data-uid="Radzen.Blazor.RadzenListBox`1.ItemRender*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_ItemRender" data-uid="Radzen.Blazor.RadzenListBox`1.ItemRender">ItemRender</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the row render callback. Use it to set row attributes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Action&lt;ListBoxItemRenderEventArgs&lt;TValue&gt;&gt;? ItemRender { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Radzen.ListBoxItemRenderEventArgs-1.html">ListBoxItemRenderEventArgs</a>&lt;TValue&gt;&gt;</td>
+        <td><p>The row render callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_ReadOnly_" data-uid="Radzen.Blazor.RadzenListBox`1.ReadOnly*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_ReadOnly" data-uid="Radzen.Blazor.RadzenListBox`1.ReadOnly">ReadOnly</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether is read only.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ReadOnly { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if is read only; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_SelectAllText_" data-uid="Radzen.Blazor.RadzenListBox`1.SelectAllText*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_SelectAllText" data-uid="Radzen.Blazor.RadzenListBox`1.SelectAllText">SelectAllText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the select all text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? SelectAllText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The select all text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenListBox`1.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenListBox`1.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_GetComponentCssClass_" data-uid="Radzen.Blazor.RadzenListBox`1.GetComponentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_GetComponentCssClass" data-uid="Radzen.Blazor.RadzenListBox`1.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_OnAfterRenderAsync_" data-uid="Radzen.Blazor.RadzenListBox`1.OnAfterRenderAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_OnAfterRenderAsync_System_Boolean_" data-uid="Radzen.Blazor.RadzenListBox`1.OnAfterRenderAsync(System.Boolean)">OnAfterRenderAsync(bool)</h4>
+  <div class="markdown level1 summary"><p>Called when [after render asynchronous].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override Task OnAfterRenderAsync(bool firstRender)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">firstRender</span></td>
+        <td><p>if set to <code>true</code> [first render].</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>Task.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_OnAfterRenderAsync_System_Boolean_">DropDownBase&lt;TValue&gt;.OnAfterRenderAsync(bool)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_OnKeyDown_" data-uid="Radzen.Blazor.RadzenListBox`1.OnKeyDown*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_OnKeyDown_Microsoft_AspNetCore_Components_Web_KeyboardEventArgs_" data-uid="Radzen.Blazor.RadzenListBox`1.OnKeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs)">OnKeyDown(KeyboardEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Handles the key down event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Task OnKeyDown(KeyboardEventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.keyboardeventargs">KeyboardEventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.keyboardeventargs">KeyboardEventArgs</a> instance containing the event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_SelectAll_" data-uid="Radzen.Blazor.RadzenListBox`1.SelectAll*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_SelectAll" data-uid="Radzen.Blazor.RadzenListBox`1.SelectAll">SelectAll()</h4>
+  <div class="markdown level1 summary"><p>Selects all.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override Task SelectAll()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_SelectAll">DropDownBase&lt;TValue&gt;.SelectAll()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenListBox_1_SetParametersAsync_" data-uid="Radzen.Blazor.RadzenListBox`1.SetParametersAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenListBox_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.Blazor.RadzenListBox`1.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Set parameters as an asynchronous operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A Task representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.DropDownBase-1.html#Radzen_DropDownBase_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">DropDownBase&lt;TValue&gt;.SetParametersAsync(ParameterView)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+  <div>
+      <a class="xref" href="Radzen.IRadzenFormComponent.html">IRadzenFormComponent</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

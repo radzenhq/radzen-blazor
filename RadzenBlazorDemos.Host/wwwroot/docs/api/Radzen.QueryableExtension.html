@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class QueryableExtension
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class QueryableExtension
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.QueryableExtension">
+
+
+  <h1 id="Radzen_QueryableExtension" data-uid="Radzen.QueryableExtension" class="text-break">Class QueryableExtension
+</h1>
+  <div class="markdown level0 summary"><p>Class QueryableExtension.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">QueryableExtension</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_QueryableExtension_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static class QueryableExtension</code></pre>
+  </div>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_QueryableExtension_AsODataEnumerable_" data-uid="Radzen.QueryableExtension.AsODataEnumerable*"></a>
+  <h4 id="Radzen_QueryableExtension_AsODataEnumerable__1_System_Collections_Generic_IEnumerable___0__" data-uid="Radzen.QueryableExtension.AsODataEnumerable``1(System.Collections.Generic.IEnumerable{``0})">AsODataEnumerable&lt;T&gt;(IEnumerable&lt;T&gt;)</h4>
+  <div class="markdown level1 summary"><p>Ases the o data enumerable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static ODataEnumerable&lt;T&gt; AsODataEnumerable&lt;T&gt;(this IEnumerable&lt;T&gt; source)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The source.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.ODataEnumerable-1.html">ODataEnumerable</a>&lt;T&gt;</td>
+        <td><p>ODataEnumerable&lt;T&gt;.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Average_" data-uid="Radzen.QueryableExtension.Average*"></a>
+  <h4 id="Radzen_QueryableExtension_Average_System_Linq_IQueryable_System_Type_" data-uid="Radzen.QueryableExtension.Average(System.Linq.IQueryable,System.Type)">Average(IQueryable, Type)</h4>
+  <div class="markdown level1 summary"><p>Calculates the average of the elements of an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> using the specified type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static dynamic Average(this IQueryable source, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> that contains the elements to be used for average calculation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type to cast the elements of source to.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">dynamic</span></td>
+        <td><p>The result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Cast_" data-uid="Radzen.QueryableExtension.Cast*"></a>
+  <h4 id="Radzen_QueryableExtension_Cast_System_Linq_IQueryable_System_Type_" data-uid="Radzen.QueryableExtension.Cast(System.Linq.IQueryable,System.Type)">Cast(IQueryable, Type)</h4>
+  <div class="markdown level1 summary"><p>Converts the elements of an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> to the specified type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable Cast(this IQueryable source, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> that contains the elements to be converted.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type to convert the elements of source to.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><p>An <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> that contains each element of the source sequence converted to the specified type.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Distinct_" data-uid="Radzen.QueryableExtension.Distinct*"></a>
+  <h4 id="Radzen_QueryableExtension_Distinct_System_Linq_IQueryable_" data-uid="Radzen.QueryableExtension.Distinct(System.Linq.IQueryable)">Distinct(IQueryable)</h4>
+  <div class="markdown level1 summary"><p>Returns distinct elements from a sequence by using the default equality comparer to compare values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable Distinct(this IQueryable source)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The sequence to remove duplicate elements from.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><p>An <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> that contains distinct elements from the source sequence.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_FirstOrDefault_" data-uid="Radzen.QueryableExtension.FirstOrDefault*"></a>
+  <h4 id="Radzen_QueryableExtension_FirstOrDefault_System_Linq_IQueryable_" data-uid="Radzen.QueryableExtension.FirstOrDefault(System.Linq.IQueryable)">FirstOrDefault(IQueryable)</h4>
+  <div class="markdown level1 summary"><p>Returns the first element of a sequence, or a default value if the sequence contains no elements.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static dynamic FirstOrDefault(this IQueryable source)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> to return the first element of.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">dynamic</span></td>
+        <td><p>default if source is empty; otherwise, the first element in source.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_GroupByMany_" data-uid="Radzen.QueryableExtension.GroupByMany*"></a>
+  <h4 id="Radzen_QueryableExtension_GroupByMany__1_System_Linq_IQueryable___0__System_String___" data-uid="Radzen.QueryableExtension.GroupByMany``1(System.Linq.IQueryable{``0},System.String[])">GroupByMany&lt;T&gt;(IQueryable&lt;T&gt;, string[])</h4>
+  <div class="markdown level1 summary"><p>Projects each element of a sequence to an IEnumerable and flattens the resulting sequences into one sequence.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable&lt;GroupResult&gt; GroupByMany&lt;T&gt;(this IQueryable&lt;T&gt; source, string[] properties)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>[]</td>
+        <td><span class="parametername">properties</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;<a class="xref" href="Radzen.GroupResult.html">GroupResult</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_IsEnumerable_" data-uid="Radzen.QueryableExtension.IsEnumerable*"></a>
+  <h4 id="Radzen_QueryableExtension_IsEnumerable_System_Type_" data-uid="Radzen.QueryableExtension.IsEnumerable(System.Type)">IsEnumerable(Type?)</h4>
+  <div class="markdown level1 summary"><p>Gets if type is IEnumerable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static bool IsEnumerable(Type? type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="parametername">type</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_LastOrDefault_" data-uid="Radzen.QueryableExtension.LastOrDefault*"></a>
+  <h4 id="Radzen_QueryableExtension_LastOrDefault_System_Linq_IQueryable_" data-uid="Radzen.QueryableExtension.LastOrDefault(System.Linq.IQueryable)">LastOrDefault(IQueryable)</h4>
+  <div class="markdown level1 summary"><p>Returns the last element of a sequence, or a default value if the sequence contains no elements.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static dynamic LastOrDefault(this IQueryable source)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> to return the last element of.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">dynamic</span></td>
+        <td><p>default if source is empty; otherwise, the last element in source.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Max_" data-uid="Radzen.QueryableExtension.Max*"></a>
+  <h4 id="Radzen_QueryableExtension_Max_System_Linq_IQueryable_System_Type_" data-uid="Radzen.QueryableExtension.Max(System.Linq.IQueryable,System.Type)">Max(IQueryable, Type)</h4>
+  <div class="markdown level1 summary"><p>Gets the maximum value of elements of an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> using the specified type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static dynamic Max(this IQueryable source, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> that contains the elements to be used to get the maximum value.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type to cast the elements of source to.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">dynamic</span></td>
+        <td><p>The result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Min_" data-uid="Radzen.QueryableExtension.Min*"></a>
+  <h4 id="Radzen_QueryableExtension_Min_System_Linq_IQueryable_System_Type_" data-uid="Radzen.QueryableExtension.Min(System.Linq.IQueryable,System.Type)">Min(IQueryable, Type)</h4>
+  <div class="markdown level1 summary"><p>Gets the minimum value of elements of an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> using the specified type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static dynamic Min(this IQueryable source, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> that contains the elements to be used to get the minimum value.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type to cast the elements of source to.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">dynamic</span></td>
+        <td><p>The result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_OrderBy_" data-uid="Radzen.QueryableExtension.OrderBy*"></a>
+  <h4 id="Radzen_QueryableExtension_OrderBy_System_Linq_IQueryable_System_String_" data-uid="Radzen.QueryableExtension.OrderBy(System.Linq.IQueryable,System.String)">OrderBy(IQueryable, string?)</h4>
+  <div class="markdown level1 summary"><p>Sorts the elements of a sequence in ascending or descending order according to a key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable OrderBy(this IQueryable source, string? selector = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">selector</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><p>A <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> whose elements are sorted according to the specified <code class="paramref">selector</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_OrderBy_" data-uid="Radzen.QueryableExtension.OrderBy*"></a>
+  <h4 id="Radzen_QueryableExtension_OrderBy__1_System_Linq_IQueryable___0__System_String_" data-uid="Radzen.QueryableExtension.OrderBy``1(System.Linq.IQueryable{``0},System.String)">OrderBy&lt;T&gt;(IQueryable&lt;T&gt;, string?)</h4>
+  <div class="markdown level1 summary"><p>Sorts the elements of a sequence in ascending or descending order according to a key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IOrderedQueryable&lt;T&gt; OrderBy&lt;T&gt;(this IQueryable&lt;T&gt; source, string? selector = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">selector</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iorderedqueryable-1">IOrderedQueryable</a>&lt;T&gt;</td>
+        <td><p>A <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable&lt;T&gt;</a> whose elements are sorted according to the specified <code class="paramref">selector</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Select_" data-uid="Radzen.QueryableExtension.Select*"></a>
+  <h4 id="Radzen_QueryableExtension_Select_System_Linq_IQueryable_System_Collections_Generic_IEnumerable_System_String__" data-uid="Radzen.QueryableExtension.Select(System.Linq.IQueryable,System.Collections.Generic.IEnumerable{System.String})">Select(IQueryable, IEnumerable&lt;string&gt;)</h4>
+  <div class="markdown level1 summary"><p>Projects each element of a sequence into a collection of property values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable Select(this IQueryable source, IEnumerable&lt;string&gt; propertyNames)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><span class="parametername">propertyNames</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Select_" data-uid="Radzen.QueryableExtension.Select*"></a>
+  <h4 id="Radzen_QueryableExtension_Select_System_Linq_IQueryable_System_String_" data-uid="Radzen.QueryableExtension.Select(System.Linq.IQueryable,System.String)">Select(IQueryable, string)</h4>
+  <div class="markdown level1 summary"><p>Projects each element of a sequence into a collection of property values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable Select(this IQueryable source, string propertyName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">propertyName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_SelectMany_" data-uid="Radzen.QueryableExtension.SelectMany*"></a>
+  <h4 id="Radzen_QueryableExtension_SelectMany_System_Linq_IQueryable_System_String_" data-uid="Radzen.QueryableExtension.SelectMany(System.Linq.IQueryable,System.String)">SelectMany(IQueryable, string)</h4>
+  <div class="markdown level1 summary"><p>Projects each element of a sequence to an IEnumerable and flattens the resulting sequences into one sequence.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable SelectMany(this IQueryable source, string propertyName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">propertyName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_SelectManyRecursive_" data-uid="Radzen.QueryableExtension.SelectManyRecursive*"></a>
+  <h4 id="Radzen_QueryableExtension_SelectManyRecursive__1_System_Collections_Generic_IEnumerable___0__System_Func___0_System_Collections_Generic_IEnumerable___0___" data-uid="Radzen.QueryableExtension.SelectManyRecursive``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Collections.Generic.IEnumerable{``0}})">SelectManyRecursive&lt;T&gt;(IEnumerable&lt;T&gt;, Func&lt;T, IEnumerable&lt;T&gt;&gt;)</h4>
+  <div class="markdown level1 summary"><p>Selects the many recursive.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IEnumerable&lt;T&gt; SelectManyRecursive&lt;T&gt;(this IEnumerable&lt;T&gt; source, Func&lt;T, IEnumerable&lt;T&gt;&gt; selector)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The source.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;T, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;T&gt;&gt;</td>
+        <td><span class="parametername">selector</span></td>
+        <td><p>The selector.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;T&gt;</td>
+        <td><p>IEnumerable&lt;T&gt;.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Select_" data-uid="Radzen.QueryableExtension.Select*"></a>
+  <h4 id="Radzen_QueryableExtension_Select__1_System_Linq_IQueryable___0__System_Collections_Generic_IEnumerable_System_String__" data-uid="Radzen.QueryableExtension.Select``1(System.Linq.IQueryable{``0},System.Collections.Generic.IEnumerable{System.String})">Select&lt;T&gt;(IQueryable&lt;T&gt;, IEnumerable&lt;string&gt;)</h4>
+  <div class="markdown level1 summary"><p>Projects each element of a sequence into a collection of property values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable&lt;T&gt; Select&lt;T&gt;(this IQueryable&lt;T&gt; source, IEnumerable&lt;string&gt; propertyNames)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><span class="parametername">propertyNames</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Sum_" data-uid="Radzen.QueryableExtension.Sum*"></a>
+  <h4 id="Radzen_QueryableExtension_Sum_System_Linq_IQueryable_System_Type_" data-uid="Radzen.QueryableExtension.Sum(System.Linq.IQueryable,System.Type)">Sum(IQueryable, Type)</h4>
+  <div class="markdown level1 summary"><p>Sums the elements of an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> using the specified type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static dynamic Sum(this IQueryable source, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a> that contains the elements to be summed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type to cast the elements of source to.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">dynamic</span></td>
+        <td><p>The result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_ToFilterString_" data-uid="Radzen.QueryableExtension.ToFilterString*"></a>
+  <h4 id="Radzen_QueryableExtension_ToFilterString__1_Radzen_Blazor_RadzenDataFilter___0__" data-uid="Radzen.QueryableExtension.ToFilterString``1(Radzen.Blazor.RadzenDataFilter{``0})">ToFilterString&lt;T&gt;(RadzenDataFilter&lt;T&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts a RadzenDataFilter to a Linq-compatibly filter string</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static string ToFilterString&lt;T&gt;(this RadzenDataFilter&lt;T&gt; dataFilter)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenDataFilter-1.html">RadzenDataFilter</a>&lt;T&gt;</td>
+        <td><span class="parametername">dataFilter</span></td>
+        <td><p>The RadzenDataFilter component</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>A Linq-compatible filter string</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The type that is being filtered</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_ToFilterString_" data-uid="Radzen.QueryableExtension.ToFilterString*"></a>
+  <h4 id="Radzen_QueryableExtension_ToFilterString__1_System_Collections_Generic_IEnumerable_Radzen_Blazor_RadzenDataGridColumn___0___" data-uid="Radzen.QueryableExtension.ToFilterString``1(System.Collections.Generic.IEnumerable{Radzen.Blazor.RadzenDataGridColumn{``0}})">ToFilterString&lt;T&gt;(IEnumerable&lt;RadzenDataGridColumn&lt;T&gt;&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts to filterstring.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static string ToFilterString&lt;T&gt;(this IEnumerable&lt;RadzenDataGridColumn&lt;T&gt;&gt; columns) where T : notnull</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;T&gt;&gt;</td>
+        <td><span class="parametername">columns</span></td>
+        <td><p>The columns.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_ToFilterString_" data-uid="Radzen.QueryableExtension.ToFilterString*"></a>
+  <h4 id="Radzen_QueryableExtension_ToFilterString__1_System_Collections_Generic_IEnumerable_Radzen_CompositeFilterDescriptor__Radzen_LogicalFilterOperator_Radzen_FilterCaseSensitivity_" data-uid="Radzen.QueryableExtension.ToFilterString``1(System.Collections.Generic.IEnumerable{Radzen.CompositeFilterDescriptor},Radzen.LogicalFilterOperator,Radzen.FilterCaseSensitivity)">ToFilterString&lt;T&gt;(IEnumerable&lt;CompositeFilterDescriptor&gt;, LogicalFilterOperator, FilterCaseSensitivity)</h4>
+  <div class="markdown level1 summary"><p>Converts a enumerable of CompositeFilterDescriptor to a Linq-compatibly filter string</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static string ToFilterString&lt;T&gt;(this IEnumerable&lt;CompositeFilterDescriptor&gt; filters, LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And, FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.CompositeFilterDescriptor.html">CompositeFilterDescriptor</a>&gt;</td>
+        <td><span class="parametername">filters</span></td>
+        <td><p>The enumerable of CompositeFilterDescriptor</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td><span class="parametername">logicalFilterOperator</span></td>
+        <td><p>The LogicalFilterOperator</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterCaseSensitivity.html">FilterCaseSensitivity</a></td>
+        <td><span class="parametername">filterCaseSensitivity</span></td>
+        <td><p>The FilterCaseSensitivity</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>A Linq-compatible filter string</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The type that is being filtered</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_ToList_" data-uid="Radzen.QueryableExtension.ToList*"></a>
+  <h4 id="Radzen_QueryableExtension_ToList_System_Linq_IQueryable_" data-uid="Radzen.QueryableExtension.ToList(System.Linq.IQueryable)">ToList(IQueryable)</h4>
+  <div class="markdown level1 summary"><p>Converts to list.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IList ToList(IQueryable query)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">query</span></td>
+        <td><p>The query.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ilist">IList</a></td>
+        <td><p>IList.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_ToODataFilterString_" data-uid="Radzen.QueryableExtension.ToODataFilterString*"></a>
+  <h4 id="Radzen_QueryableExtension_ToODataFilterString__1_Radzen_Blazor_RadzenDataFilter___0__" data-uid="Radzen.QueryableExtension.ToODataFilterString``1(Radzen.Blazor.RadzenDataFilter{``0})">ToODataFilterString&lt;T&gt;(RadzenDataFilter&lt;T&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts to OData filter expression.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static string ToODataFilterString&lt;T&gt;(this RadzenDataFilter&lt;T&gt; dataFilter)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenDataFilter-1.html">RadzenDataFilter</a>&lt;T&gt;</td>
+        <td><span class="parametername">dataFilter</span></td>
+        <td><p>The DataFilter.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_ToODataFilterString_" data-uid="Radzen.QueryableExtension.ToODataFilterString*"></a>
+  <h4 id="Radzen_QueryableExtension_ToODataFilterString__1_System_Collections_Generic_IEnumerable_Radzen_Blazor_RadzenDataGridColumn___0___" data-uid="Radzen.QueryableExtension.ToODataFilterString``1(System.Collections.Generic.IEnumerable{Radzen.Blazor.RadzenDataGridColumn{``0}})">ToODataFilterString&lt;T&gt;(IEnumerable&lt;RadzenDataGridColumn&lt;T&gt;&gt;)</h4>
+  <div class="markdown level1 summary"><p>Converts to odatafilterstring.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static string ToODataFilterString&lt;T&gt;(this IEnumerable&lt;RadzenDataGridColumn&lt;T&gt;&gt; columns) where T : notnull</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;T&gt;&gt;</td>
+        <td><span class="parametername">columns</span></td>
+        <td><p>The columns.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_ToODataFilterString_" data-uid="Radzen.QueryableExtension.ToODataFilterString*"></a>
+  <h4 id="Radzen_QueryableExtension_ToODataFilterString__1_System_Collections_Generic_IEnumerable_Radzen_CompositeFilterDescriptor__Radzen_LogicalFilterOperator_Radzen_FilterCaseSensitivity_" data-uid="Radzen.QueryableExtension.ToODataFilterString``1(System.Collections.Generic.IEnumerable{Radzen.CompositeFilterDescriptor},Radzen.LogicalFilterOperator,Radzen.FilterCaseSensitivity)">ToODataFilterString&lt;T&gt;(IEnumerable&lt;CompositeFilterDescriptor&gt;, LogicalFilterOperator, FilterCaseSensitivity)</h4>
+  <div class="markdown level1 summary"><p>Converts a enumerable of CompositeFilterDescriptor to a OData-compatibly filter string</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static string ToODataFilterString&lt;T&gt;(this IEnumerable&lt;CompositeFilterDescriptor&gt; filters, LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And, FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.CompositeFilterDescriptor.html">CompositeFilterDescriptor</a>&gt;</td>
+        <td><span class="parametername">filters</span></td>
+        <td><p>The enumerable of CompositeFilterDescriptor</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td><span class="parametername">logicalFilterOperator</span></td>
+        <td><p>The LogicalFilterOperator</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterCaseSensitivity.html">FilterCaseSensitivity</a></td>
+        <td><span class="parametername">filterCaseSensitivity</span></td>
+        <td><p>The FilterCaseSensitivity</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>A OData-compatible filter string</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Where_" data-uid="Radzen.QueryableExtension.Where*"></a>
+  <h4 id="Radzen_QueryableExtension_Where_System_Linq_IQueryable_System_Collections_Generic_IEnumerable_Radzen_FilterDescriptor__Radzen_LogicalFilterOperator_Radzen_FilterCaseSensitivity_" data-uid="Radzen.QueryableExtension.Where(System.Linq.IQueryable,System.Collections.Generic.IEnumerable{Radzen.FilterDescriptor},Radzen.LogicalFilterOperator,Radzen.FilterCaseSensitivity)">Where(IQueryable, IEnumerable&lt;FilterDescriptor&gt;, LogicalFilterOperator, FilterCaseSensitivity)</h4>
+  <div class="markdown level1 summary"><p>Filters using the specified filter descriptors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable Where(this IQueryable source, IEnumerable&lt;FilterDescriptor&gt; filters, LogicalFilterOperator logicalFilterOperator, FilterCaseSensitivity filterCaseSensitivity)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.FilterDescriptor.html">FilterDescriptor</a>&gt;</td>
+        <td><span class="parametername">filters</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td><span class="parametername">logicalFilterOperator</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterCaseSensitivity.html">FilterCaseSensitivity</a></td>
+        <td><span class="parametername">filterCaseSensitivity</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Where_" data-uid="Radzen.QueryableExtension.Where*"></a>
+  <h4 id="Radzen_QueryableExtension_Where_System_Linq_IQueryable_System_String_System_String_Radzen_StringFilterOperator_Radzen_FilterCaseSensitivity_" data-uid="Radzen.QueryableExtension.Where(System.Linq.IQueryable,System.String,System.String,Radzen.StringFilterOperator,Radzen.FilterCaseSensitivity)">Where(IQueryable, string, string?, StringFilterOperator, FilterCaseSensitivity)</h4>
+  <div class="markdown level1 summary"><p>Wheres the specified filters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable Where(this IQueryable source, string property, string? value, StringFilterOperator op, FilterCaseSensitivity cs)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The source.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">property</span></td>
+        <td><p>The property.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>The value.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.StringFilterOperator.html">StringFilterOperator</a></td>
+        <td><span class="parametername">op</span></td>
+        <td><p>The StringFilterOperator.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterCaseSensitivity.html">FilterCaseSensitivity</a></td>
+        <td><span class="parametername">cs</span></td>
+        <td><p>The FilterCaseSensitivity.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable">IQueryable</a></td>
+        <td><p>IQueryable&lt;T&gt;.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Where_" data-uid="Radzen.QueryableExtension.Where*"></a>
+  <h4 id="Radzen_QueryableExtension_Where__1_System_Linq_IQueryable___0__Radzen_Blazor_RadzenDataFilter___0__" data-uid="Radzen.QueryableExtension.Where``1(System.Linq.IQueryable{``0},Radzen.Blazor.RadzenDataFilter{``0})">Where&lt;T&gt;(IQueryable&lt;T&gt;, RadzenDataFilter&lt;T&gt;)</h4>
+  <div class="markdown level1 summary"><p>Wheres the specified filters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable&lt;T&gt; Where&lt;T&gt;(this IQueryable&lt;T&gt; source, RadzenDataFilter&lt;T&gt; dataFilter)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The source.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenDataFilter-1.html">RadzenDataFilter</a>&lt;T&gt;</td>
+        <td><span class="parametername">dataFilter</span></td>
+        <td><p>The DataFilter.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><p>IQueryable&lt;T&gt;.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Where_" data-uid="Radzen.QueryableExtension.Where*"></a>
+  <h4 id="Radzen_QueryableExtension_Where__1_System_Linq_IQueryable___0__System_Collections_Generic_IEnumerable_Radzen_Blazor_RadzenDataGridColumn___0___" data-uid="Radzen.QueryableExtension.Where``1(System.Linq.IQueryable{``0},System.Collections.Generic.IEnumerable{Radzen.Blazor.RadzenDataGridColumn{``0}})">Where&lt;T&gt;(IQueryable&lt;T&gt;, IEnumerable&lt;RadzenDataGridColumn&lt;T&gt;&gt;)</h4>
+  <div class="markdown level1 summary"><p>Wheres the specified columns.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable&lt;T&gt; Where&lt;T&gt;(this IQueryable&lt;T&gt; source, IEnumerable&lt;RadzenDataGridColumn&lt;T&gt;&gt; columns) where T : notnull</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td><p>The source.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.RadzenDataGridColumn-1.html">RadzenDataGridColumn</a>&lt;T&gt;&gt;</td>
+        <td><span class="parametername">columns</span></td>
+        <td><p>The columns.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><p>IQueryable&lt;T&gt;.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Where_" data-uid="Radzen.QueryableExtension.Where*"></a>
+  <h4 id="Radzen_QueryableExtension_Where__1_System_Linq_IQueryable___0__System_Collections_Generic_IEnumerable_Radzen_CompositeFilterDescriptor__Radzen_LogicalFilterOperator_Radzen_FilterCaseSensitivity_" data-uid="Radzen.QueryableExtension.Where``1(System.Linq.IQueryable{``0},System.Collections.Generic.IEnumerable{Radzen.CompositeFilterDescriptor},Radzen.LogicalFilterOperator,Radzen.FilterCaseSensitivity)">Where&lt;T&gt;(IQueryable&lt;T&gt;, IEnumerable&lt;CompositeFilterDescriptor&gt;, LogicalFilterOperator, FilterCaseSensitivity)</h4>
+  <div class="markdown level1 summary"><p>Wheres the specified filters.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable&lt;T&gt; Where&lt;T&gt;(this IQueryable&lt;T&gt; source, IEnumerable&lt;CompositeFilterDescriptor&gt; filters, LogicalFilterOperator logicalFilterOperator, FilterCaseSensitivity filterCaseSensitivity)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.CompositeFilterDescriptor.html">CompositeFilterDescriptor</a>&gt;</td>
+        <td><span class="parametername">filters</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td><span class="parametername">logicalFilterOperator</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterCaseSensitivity.html">FilterCaseSensitivity</a></td>
+        <td><span class="parametername">filterCaseSensitivity</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><p>IQueryable&lt;T&gt;.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_QueryableExtension_Where_" data-uid="Radzen.QueryableExtension.Where*"></a>
+  <h4 id="Radzen_QueryableExtension_Where__1_System_Linq_IQueryable___0__System_Collections_Generic_IEnumerable_Radzen_FilterDescriptor__Radzen_LogicalFilterOperator_Radzen_FilterCaseSensitivity_" data-uid="Radzen.QueryableExtension.Where``1(System.Linq.IQueryable{``0},System.Collections.Generic.IEnumerable{Radzen.FilterDescriptor},Radzen.LogicalFilterOperator,Radzen.FilterCaseSensitivity)">Where&lt;T&gt;(IQueryable&lt;T&gt;, IEnumerable&lt;FilterDescriptor&gt;, LogicalFilterOperator, FilterCaseSensitivity)</h4>
+  <div class="markdown level1 summary"><p>Filters using the specified filter descriptors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public static IQueryable&lt;T&gt; Where&lt;T&gt;(this IQueryable&lt;T&gt; source, IEnumerable&lt;FilterDescriptor&gt; filters, LogicalFilterOperator logicalFilterOperator, FilterCaseSensitivity filterCaseSensitivity)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td><span class="parametername">source</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.FilterDescriptor.html">FilterDescriptor</a>&gt;</td>
+        <td><span class="parametername">filters</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.LogicalFilterOperator.html">LogicalFilterOperator</a></td>
+        <td><span class="parametername">logicalFilterOperator</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.FilterCaseSensitivity.html">FilterCaseSensitivity</a></td>
+        <td><span class="parametername">filterCaseSensitivity</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1">IQueryable</a>&lt;T&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

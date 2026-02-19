@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenTimeSpanPicker&lt;TValue&gt;
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenTimeSpanPicker&lt;TValue&gt;
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1">
+
+
+  <h1 id="Radzen_Blazor_RadzenTimeSpanPicker_1" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1" class="text-break">Class RadzenTimeSpanPicker&lt;TValue&gt;
+</h1>
+  <div class="markdown level0 summary"><p>RadzenTimeSpanPicker component.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><span class="xref">RadzenTimeSpanPicker&lt;TValue&gt;</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    <div><a class="xref" href="Radzen.IRadzenFormComponent.html">IRadzenFormComponent</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenTimeSpanPicker_1_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenTimeSpanPicker&lt;TValue&gt; : RadzenComponent, IComponent, IHandleEvent, IHandleAfterRender, IDisposable, IRadzenFormComponent</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TValue</span></td>
+        <td><p><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a> and nullable <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a> are supported.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Radzen_Blazor_RadzenTimeSpanPicker_1_examples"><strong>Examples</strong></h5>
+  <pre><code class="lang-csharp">&lt;RadzenTimeSpanPicker @bind-Value="@someValue" TValue="TimeSpan" Change=@(args =&gt; Console.WriteLine($"Selected time span: {args}")) /&gt;</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1__ctor_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1__ctor" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.#ctor">RadzenTimeSpanPicker()</h4>
+  <div class="markdown level1 summary"><p>RadzenTimeSpanPicker component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenTimeSpanPicker()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenTimeSpanPicker_1__ctor_examples">Examples</h5>
+  <pre><code class="lang-csharp">&lt;RadzenTimeSpanPicker @bind-Value="@someValue" TValue="TimeSpan" Change=@(args =&gt; Console.WriteLine($"Selected time span: {args}")) /&gt;</code></pre>
+
+  <h3 id="fields">Fields
+</h3>
+
+
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_input" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.input">input</h4>
+  <div class="markdown level1 summary"><p>Gets the input reference.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected ElementReference input</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_AllowClear_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.AllowClear*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_AllowClear" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.AllowClear">AllowClear</h4>
+  <div class="markdown level1 summary"><p>Specifies whether the value can be cleared.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowClear { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if value can be cleared; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_AllowInput_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.AllowInput*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_AllowInput" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.AllowInput">AllowInput</h4>
+  <div class="markdown level1 summary"><p>Specifies whether input in the input field is allowed.
+Set to <code>true</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowInput { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if input is allowed; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Change_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Change*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Change" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Change">Change</h4>
+  <div class="markdown level1 summary"><p>Specifies the callback of the underlying nullable <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a> value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;TimeSpan?&gt; Change { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_ClearAriaLabel_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ClearAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_ClearAriaLabel" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ClearAriaLabel">ClearAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the clear button aria label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ClearAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The clear button aria label text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_ConfirmationButtonText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ConfirmationButtonText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_ConfirmationButtonText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ConfirmationButtonText">ConfirmationButtonText</h4>
+  <div class="markdown level1 summary"><p>Specifies the text of the confirmation button. Used only if <a class="xref" href="Radzen.Blazor.RadzenTimeSpanPicker-1.html#Radzen_Blazor_RadzenTimeSpanPicker_1_ShowConfirmationButton">ShowConfirmationButton</a> is <pre><code class="lang-csharp">true</code></pre>.
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ConfirmationButtonText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_DaysStep_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.DaysStep*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_DaysStep" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.DaysStep">DaysStep</h4>
+  <div class="markdown level1 summary"><p>Specifies the step of the days field in the picker panel.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? DaysStep { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_DaysUnitText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.DaysUnitText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_DaysUnitText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.DaysUnitText">DaysUnitText</h4>
+  <div class="markdown level1 summary"><p>Specifies the days label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string DaysUnitText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Disabled_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Disabled*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Disabled" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Disabled">Disabled</h4>
+  <div class="markdown level1 summary"><p>Specifies whether the input field is disabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Disabled { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if disabled; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_EditContext_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.EditContext*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_EditContext" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.EditContext">EditContext</h4>
+  <div class="markdown level1 summary"><p>Specifies the edit context of this component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[CascadingParameter]
+public EditContext? EditContext { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.forms.editcontext">EditContext</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_FieldIdentifier_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FieldIdentifier*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_FieldIdentifier" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FieldIdentifier">FieldIdentifier</h4>
+  <div class="markdown level1 summary"><p>Gets the field identifier.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public FieldIdentifier FieldIdentifier { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.forms.fieldidentifier">FieldIdentifier</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_FieldPrecision_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FieldPrecision*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_FieldPrecision" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FieldPrecision">FieldPrecision</h4>
+  <div class="markdown level1 summary"><p>Specifies the most precise time unit field in the picker panel. Set to <a class="xref" href="Radzen.TimeSpanUnit.html#Radzen_TimeSpanUnit_Second">Second</a> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public TimeSpanUnit FieldPrecision { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.TimeSpanUnit.html">TimeSpanUnit</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Form_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Form*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Form" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Form">Form</h4>
+  <div class="markdown level1 summary"><p>Specifies the form this component belongs to.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[CascadingParameter]
+public IRadzenForm? Form { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.IRadzenForm.html">IRadzenForm</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_FormFieldContext_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FormFieldContext*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_FormFieldContext" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FormFieldContext">FormFieldContext</h4>
+  <div class="markdown level1 summary"><p>Specifies the <a class="xref" href="Radzen.Blazor.RadzenFormField.html">RadzenFormField</a> context of this component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public IFormFieldContext? FormFieldContext { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.IFormFieldContext.html">IFormFieldContext</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_FormattedValue_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FormattedValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_FormattedValue" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FormattedValue">FormattedValue</h4>
+  <div class="markdown level1 summary"><p>Gets the formatted value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string FormattedValue { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_HasValue_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.HasValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_HasValue" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.HasValue">HasValue</h4>
+  <div class="markdown level1 summary"><p>Indicates whether this instance has a confirmed value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool HasValue { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if this instance has value; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_HoursStep_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.HoursStep*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_HoursStep" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.HoursStep">HoursStep</h4>
+  <div class="markdown level1 summary"><p>Specifies the step of the hours field in the picker panel.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? HoursStep { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_HoursUnitText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.HoursUnitText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_HoursUnitText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.HoursUnitText">HoursUnitText</h4>
+  <div class="markdown level1 summary"><p>Specifies the hours label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string HoursUnitText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Inline_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Inline*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Inline" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Inline">Inline</h4>
+  <div class="markdown level1 summary"><p>Specifies whether the component is inline or shows a popup.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Inline { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if inline; <code>false</code> if shows a popup.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_InputAttributes_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.InputAttributes*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_InputAttributes" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.InputAttributes">InputAttributes</h4>
+  <div class="markdown level1 summary"><p>Specifies additional custom attributes that will be rendered by the input.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IReadOnlyDictionary&lt;string, object&gt;? InputAttributes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_InputClass_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.InputClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_InputClass" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.InputClass">InputClass</h4>
+  <div class="markdown level1 summary"><p>Specifies the input CSS classes, separated with spaces.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? InputClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_IsBound_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.IsBound*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_IsBound" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.IsBound">IsBound</h4>
+  <div class="markdown level1 summary"><p>Indicates whether this instance is bound <a class="xref" href="Radzen.Blazor.RadzenTimeSpanPicker-1.html#Radzen_Blazor_RadzenTimeSpanPicker_1_ValueChanged">ValueChanged</a> callback has delegate).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool IsBound { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if this instance is bound; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Max_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Max*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Max" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Max">Max</h4>
+  <div class="markdown level1 summary"><p>Specifies the maximum time span allowed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public TimeSpan Max { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_MicrosecondsStep_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MicrosecondsStep*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_MicrosecondsStep" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MicrosecondsStep">MicrosecondsStep</h4>
+  <div class="markdown level1 summary"><p>Specifies the step of the microseconds field in the picker panel.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? MicrosecondsStep { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_MicrosecondsUnitText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MicrosecondsUnitText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_MicrosecondsUnitText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MicrosecondsUnitText">MicrosecondsUnitText</h4>
+  <div class="markdown level1 summary"><p>Specifies the microseconds label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string MicrosecondsUnitText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_MillisecondsStep_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MillisecondsStep*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_MillisecondsStep" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MillisecondsStep">MillisecondsStep</h4>
+  <div class="markdown level1 summary"><p>Specifies the step of the milliseconds field in the picker panel.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? MillisecondsStep { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_MillisecondsUnitText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MillisecondsUnitText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_MillisecondsUnitText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MillisecondsUnitText">MillisecondsUnitText</h4>
+  <div class="markdown level1 summary"><p>Specifies the milliseconds label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string MillisecondsUnitText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Min_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Min*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Min" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Min">Min</h4>
+  <div class="markdown level1 summary"><p>Specifies the minimum time span allowed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public TimeSpan Min { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_MinutesStep_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MinutesStep*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_MinutesStep" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MinutesStep">MinutesStep</h4>
+  <div class="markdown level1 summary"><p>Specifies the step of the minutes field in the picker panel.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? MinutesStep { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_MinutesUnitText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MinutesUnitText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_MinutesUnitText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.MinutesUnitText">MinutesUnitText</h4>
+  <div class="markdown level1 summary"><p>Specifies the minutes label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string MinutesUnitText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Name_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Name*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Name" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Name">Name</h4>
+  <div class="markdown level1 summary"><p>Specifies the name of the input field.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Name { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_NegativeButtonText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.NegativeButtonText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_NegativeButtonText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.NegativeButtonText">NegativeButtonText</h4>
+  <div class="markdown level1 summary"><p>Specifies the text of the negative value button.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string NegativeButtonText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_NegativeValueText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.NegativeValueText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_NegativeValueText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.NegativeValueText">NegativeValueText</h4>
+  <div class="markdown level1 summary"><p>Specifies the text displayed next to the fields in the panel when the value is negative and there's no sign picker.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string NegativeValueText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_PadTimeValues_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PadTimeValues*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_PadTimeValues" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PadTimeValues">PadTimeValues</h4>
+  <div class="markdown level1 summary"><p>Specifies whether the time fields in the panel, except for the days field, are padded with leading zeros.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool PadTimeValues { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if fields are padded; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_ParseInput_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ParseInput*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_ParseInput" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ParseInput">ParseInput</h4>
+  <div class="markdown level1 summary"><p>Specifies custom function to parse the input.
+If it's not defined or the function it returns <code>null</code>, a built-in parser us used instead.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Func&lt;string, TimeSpan?&gt;? ParseInput { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>?&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Placeholder_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Placeholder*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Placeholder" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Placeholder">Placeholder</h4>
+  <div class="markdown level1 summary"><p>Specifies the input placeholder.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Placeholder { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_PopupAriaLabel_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PopupAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_PopupAriaLabel" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PopupAriaLabel">PopupAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Specifies the aria label for the popup.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string PopupAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_PopupButtonClass_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PopupButtonClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_PopupButtonClass" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PopupButtonClass">PopupButtonClass</h4>
+  <div class="markdown level1 summary"><p>Specifies the popup toggle button CSS classes, separated with spaces.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? PopupButtonClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_PopupRenderMode_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PopupRenderMode*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_PopupRenderMode" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PopupRenderMode">PopupRenderMode</h4>
+  <div class="markdown level1 summary"><p>Specifies the render mode of the popup.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public PopupRenderMode PopupRenderMode { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.PopupRenderMode.html">PopupRenderMode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_PositiveButtonText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PositiveButtonText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_PositiveButtonText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PositiveButtonText">PositiveButtonText</h4>
+  <div class="markdown level1 summary"><p>Specifies the text of the positive value button.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string PositiveButtonText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_PositiveValueText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PositiveValueText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_PositiveValueText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.PositiveValueText">PositiveValueText</h4>
+  <div class="markdown level1 summary"><p>Specifies the text displayed next to the fields in the panel when the value is positive and there's no sign picker.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string PositiveValueText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_ReadOnly_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ReadOnly*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_ReadOnly" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ReadOnly">ReadOnly</h4>
+  <div class="markdown level1 summary"><p>Specifies whether the input field is read only.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ReadOnly { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if read only; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_SecondsStep_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.SecondsStep*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_SecondsStep" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.SecondsStep">SecondsStep</h4>
+  <div class="markdown level1 summary"><p>Specifies the step of the seconds field in the picker panel.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? SecondsStep { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_SecondsUnitText_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.SecondsUnitText*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_SecondsUnitText" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.SecondsUnitText">SecondsUnitText</h4>
+  <div class="markdown level1 summary"><p>Specifies the seconds label text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string SecondsUnitText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_ShowConfirmationButton_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ShowConfirmationButton*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_ShowConfirmationButton" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ShowConfirmationButton">ShowConfirmationButton</h4>
+  <div class="markdown level1 summary"><p>Specifies whether to display the confirmation button in the panel to accept changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ShowConfirmationButton { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the confirmation button is shown; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_ShowPopupButton_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ShowPopupButton*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_ShowPopupButton" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ShowPopupButton">ShowPopupButton</h4>
+  <div class="markdown level1 summary"><p>Specifies whether to display popup icon button in the input field.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool ShowPopupButton { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> to display the button to open the popup;
+<code>false</code> to hide the button to open the popup, clicking the input field opens the popup instead.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_TabIndex_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.TabIndex*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_TabIndex" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.TabIndex">TabIndex</h4>
+  <div class="markdown level1 summary"><p>Specifies the tab index.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int TabIndex { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_TimeSpanFormat_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.TimeSpanFormat*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_TimeSpanFormat" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.TimeSpanFormat">TimeSpanFormat</h4>
+  <div class="markdown level1 summary"><p>Specifies the time span format in the input field.
+For more details, see the documentation of
+<a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings">standard</a>
+and <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-timespan-format-strings">custom</a>
+time span format strings.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? TimeSpanFormat { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_TogglePopupAriaLabel_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.TogglePopupAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_TogglePopupAriaLabel" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.TogglePopupAriaLabel">TogglePopupAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Specifies the aria label for the toggle popup button.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string TogglePopupAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Value_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Value*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Value" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Value">Value</h4>
+  <div class="markdown level1 summary"><p>Specifies the value of the component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public TValue? Value { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TValue</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_ValueChanged_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ValueChanged*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_ValueChanged" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ValueChanged">ValueChanged</h4>
+  <div class="markdown level1 summary"><p>Specifies the callback of the value change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;TValue&gt; ValueChanged { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;TValue&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_ValueExpression_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ValueExpression*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_ValueExpression" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.ValueExpression">ValueExpression</h4>
+  <div class="markdown level1 summary"><p>Specifies the value expression used while creating the <a class="xref" href="Radzen.Blazor.RadzenTimeSpanPicker-1.html#Radzen_Blazor_RadzenTimeSpanPicker_1_FieldIdentifier">FieldIdentifier</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Expression&lt;Func&lt;TValue&gt;&gt;? ValueExpression { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.expressions.expression-1">Expression</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;TValue&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Close_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Close*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Close" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Close">Close()</h4>
+  <div class="markdown level1 summary"><p>Closes this instance popup.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task Close()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_Dispose_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Dispose*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_Dispose" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Detaches event handlers and disposes <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">Reference</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override void Dispose()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Dispose">RadzenComponent.Dispose()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_FocusAsync_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FocusAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_FocusAsync" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.FocusAsync">FocusAsync()</h4>
+  <div class="markdown level1 summary"><p>Sets the focus.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public ValueTask FocusAsync()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.valuetask">ValueTask</a></td>
+        <td><p>A ValueTask representing the asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_GetComponentCssClass_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.GetComponentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_GetComponentCssClass" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_GetValue_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.GetValue*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_GetValue" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.GetValue">GetValue()</h4>
+  <div class="markdown level1 summary"><p>Gets the value of the component.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public object? GetValue()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><p>System.Object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_OnAfterRenderAsync_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.OnAfterRenderAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_OnAfterRenderAsync_System_Boolean_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.OnAfterRenderAsync(System.Boolean)">OnAfterRenderAsync(bool)</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override Task OnAfterRenderAsync(bool firstRender)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">firstRender</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnAfterRenderAsync_System_Boolean_">RadzenComponent.OnAfterRenderAsync(bool)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_OnInitialized_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.OnInitialized*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_OnInitialized" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.OnInitialized">OnInitialized()</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void OnInitialized()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnInitialized">RadzenComponent.OnInitialized()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenTimeSpanPicker_1_SetParametersAsync_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.SetParametersAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenTimeSpanPicker_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.Blazor.RadzenTimeSpanPicker`1.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime when parameters are set.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">RadzenComponent.SetParametersAsync(ParameterView)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+  <div>
+      <a class="xref" href="Radzen.IRadzenFormComponent.html">IRadzenFormComponent</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

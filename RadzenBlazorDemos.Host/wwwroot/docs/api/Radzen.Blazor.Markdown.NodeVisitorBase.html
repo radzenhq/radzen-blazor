@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class NodeVisitorBase
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class NodeVisitorBase
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase">
+
+
+  <h1 id="Radzen_Blazor_Markdown_NodeVisitorBase" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase" class="text-break">Class NodeVisitorBase
+</h1>
+  <div class="markdown level0 summary"><p>Base class for visitors that traverse a Markdown document.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">NodeVisitorBase</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Radzen.Blazor.Markdown.INodeVisitor.html">INodeVisitor</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a>.<a class="xref" href="Radzen.Blazor.Markdown.html">Markdown</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_Markdown_NodeVisitorBase_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public abstract class NodeVisitorBase : INodeVisitor</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase__ctor_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.#ctor*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase__ctor" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.#ctor">NodeVisitorBase()</h4>
+  <div class="markdown level1 summary"><p>Base class for visitors that traverse a Markdown document.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected NodeVisitorBase()</code></pre>
+  </div>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitBlockQuote_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitBlockQuote*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitBlockQuote_Radzen_Blazor_Markdown_BlockQuote_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitBlockQuote(Radzen.Blazor.Markdown.BlockQuote)">VisitBlockQuote(BlockQuote)</h4>
+  <div class="markdown level1 summary"><p>Visits a block quote by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitBlockQuote(BlockQuote blockQuote)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.BlockQuote.html">BlockQuote</a></td>
+        <td><span class="parametername">blockQuote</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitChildren_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitChildren*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitChildren_System_Collections_Generic_IEnumerable_Radzen_Blazor_Markdown_INode__" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitChildren(System.Collections.Generic.IEnumerable{Radzen.Blazor.Markdown.INode})">VisitChildren(IEnumerable&lt;INode&gt;)</h4>
+  <div class="markdown level1 summary"><p>Visits a collection of nodes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected void VisitChildren(IEnumerable&lt;INode&gt; children)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.Markdown.INode.html">INode</a>&gt;</td>
+        <td><span class="parametername">children</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitCode_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitCode*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitCode_Radzen_Blazor_Markdown_Code_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitCode(Radzen.Blazor.Markdown.Code)">VisitCode(Code)</h4>
+  <div class="markdown level1 summary"><p>Visits a code node.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitCode(Code code)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Code.html">Code</a></td>
+        <td><span class="parametername">code</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitDocument_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitDocument*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitDocument_Radzen_Blazor_Markdown_Document_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitDocument(Radzen.Blazor.Markdown.Document)">VisitDocument(Document)</h4>
+  <div class="markdown level1 summary"><p>Visits a document by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitDocument(Document document)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Document.html">Document</a></td>
+        <td><span class="parametername">document</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitEmphasis_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitEmphasis*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitEmphasis_Radzen_Blazor_Markdown_Emphasis_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitEmphasis(Radzen.Blazor.Markdown.Emphasis)">VisitEmphasis(Emphasis)</h4>
+  <div class="markdown level1 summary"><p>Visits an emphasis by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitEmphasis(Emphasis emphasis)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Emphasis.html">Emphasis</a></td>
+        <td><span class="parametername">emphasis</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitFencedCodeBlock_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitFencedCodeBlock*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitFencedCodeBlock_Radzen_Blazor_Markdown_FencedCodeBlock_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitFencedCodeBlock(Radzen.Blazor.Markdown.FencedCodeBlock)">VisitFencedCodeBlock(FencedCodeBlock)</h4>
+  <div class="markdown level1 summary"><p>Visits a fenced code block.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitFencedCodeBlock(FencedCodeBlock fencedCodeBlock)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.FencedCodeBlock.html">FencedCodeBlock</a></td>
+        <td><span class="parametername">fencedCodeBlock</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitHeading_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitHeading*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitHeading_Radzen_Blazor_Markdown_Heading_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitHeading(Radzen.Blazor.Markdown.Heading)">VisitHeading(Heading)</h4>
+  <div class="markdown level1 summary"><p>Visits a heading by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitHeading(Heading heading)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Heading.html">Heading</a></td>
+        <td><span class="parametername">heading</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitHtmlBlock_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitHtmlBlock*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitHtmlBlock_Radzen_Blazor_Markdown_HtmlBlock_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitHtmlBlock(Radzen.Blazor.Markdown.HtmlBlock)">VisitHtmlBlock(HtmlBlock)</h4>
+  <div class="markdown level1 summary"><p>Visits an HTML block.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitHtmlBlock(HtmlBlock htmlBlock)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.HtmlBlock.html">HtmlBlock</a></td>
+        <td><span class="parametername">htmlBlock</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitHtmlInline_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitHtmlInline*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitHtmlInline_Radzen_Blazor_Markdown_HtmlInline_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitHtmlInline(Radzen.Blazor.Markdown.HtmlInline)">VisitHtmlInline(HtmlInline)</h4>
+  <div class="markdown level1 summary"><p>Visits an HTML block.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitHtmlInline(HtmlInline html)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.HtmlInline.html">HtmlInline</a></td>
+        <td><span class="parametername">html</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitImage_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitImage*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitImage_Radzen_Blazor_Markdown_Image_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitImage(Radzen.Blazor.Markdown.Image)">VisitImage(Image)</h4>
+  <div class="markdown level1 summary"><p>Visits an image by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitImage(Image image)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Image.html">Image</a></td>
+        <td><span class="parametername">image</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitIndentedCodeBlock_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitIndentedCodeBlock*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitIndentedCodeBlock_Radzen_Blazor_Markdown_IndentedCodeBlock_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitIndentedCodeBlock(Radzen.Blazor.Markdown.IndentedCodeBlock)">VisitIndentedCodeBlock(IndentedCodeBlock)</h4>
+  <div class="markdown level1 summary"><p>Visits a code block.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitIndentedCodeBlock(IndentedCodeBlock codeBlock)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.IndentedCodeBlock.html">IndentedCodeBlock</a></td>
+        <td><span class="parametername">codeBlock</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitLineBreak_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitLineBreak*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitLineBreak_Radzen_Blazor_Markdown_LineBreak_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitLineBreak(Radzen.Blazor.Markdown.LineBreak)">VisitLineBreak(LineBreak)</h4>
+  <div class="markdown level1 summary"><p>Visits a line break.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitLineBreak(LineBreak lineBreak)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.LineBreak.html">LineBreak</a></td>
+        <td><span class="parametername">lineBreak</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitLink_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitLink*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitLink_Radzen_Blazor_Markdown_Link_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitLink(Radzen.Blazor.Markdown.Link)">VisitLink(Link)</h4>
+  <div class="markdown level1 summary"><p>Visits a link by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitLink(Link link)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Link.html">Link</a></td>
+        <td><span class="parametername">link</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitListItem_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitListItem*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitListItem_Radzen_Blazor_Markdown_ListItem_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitListItem(Radzen.Blazor.Markdown.ListItem)">VisitListItem(ListItem)</h4>
+  <div class="markdown level1 summary"><p>Visits a list item by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitListItem(ListItem listItem)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.ListItem.html">ListItem</a></td>
+        <td><span class="parametername">listItem</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitOrderedList_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitOrderedList*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitOrderedList_Radzen_Blazor_Markdown_OrderedList_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitOrderedList(Radzen.Blazor.Markdown.OrderedList)">VisitOrderedList(OrderedList)</h4>
+  <div class="markdown level1 summary"><p>Visits an ordered list by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitOrderedList(OrderedList orderedList)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.OrderedList.html">OrderedList</a></td>
+        <td><span class="parametername">orderedList</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitParagraph_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitParagraph*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitParagraph_Radzen_Blazor_Markdown_Paragraph_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitParagraph(Radzen.Blazor.Markdown.Paragraph)">VisitParagraph(Paragraph)</h4>
+  <div class="markdown level1 summary"><p>Visits a paragraph by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitParagraph(Paragraph paragraph)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Paragraph.html">Paragraph</a></td>
+        <td><span class="parametername">paragraph</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitSoftLineBreak_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitSoftLineBreak*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitSoftLineBreak_Radzen_Blazor_Markdown_SoftLineBreak_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitSoftLineBreak(Radzen.Blazor.Markdown.SoftLineBreak)">VisitSoftLineBreak(SoftLineBreak)</h4>
+  <div class="markdown level1 summary"><p>Visits a soft line break.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitSoftLineBreak(SoftLineBreak softLineBreak)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.SoftLineBreak.html">SoftLineBreak</a></td>
+        <td><span class="parametername">softLineBreak</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitStrong_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitStrong*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitStrong_Radzen_Blazor_Markdown_Strong_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitStrong(Radzen.Blazor.Markdown.Strong)">VisitStrong(Strong)</h4>
+  <div class="markdown level1 summary"><p>Visits a strong by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitStrong(Strong strong)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Strong.html">Strong</a></td>
+        <td><span class="parametername">strong</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitTable_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitTable*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitTable_Radzen_Blazor_Markdown_Table_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitTable(Radzen.Blazor.Markdown.Table)">VisitTable(Table)</h4>
+  <div class="markdown level1 summary"><p>Visits a table.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitTable(Table table)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Table.html">Table</a></td>
+        <td><span class="parametername">table</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitTableCell_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitTableCell*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitTableCell_Radzen_Blazor_Markdown_TableCell_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitTableCell(Radzen.Blazor.Markdown.TableCell)">VisitTableCell(TableCell)</h4>
+  <div class="markdown level1 summary"><p>Visits a table cell by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitTableCell(TableCell cell)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.TableCell.html">TableCell</a></td>
+        <td><span class="parametername">cell</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitTableHeaderRow_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitTableHeaderRow*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitTableHeaderRow_Radzen_Blazor_Markdown_TableHeaderRow_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitTableHeaderRow(Radzen.Blazor.Markdown.TableHeaderRow)">VisitTableHeaderRow(TableHeaderRow)</h4>
+  <div class="markdown level1 summary"><p>Visits a table header row by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitTableHeaderRow(TableHeaderRow header)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.TableHeaderRow.html">TableHeaderRow</a></td>
+        <td><span class="parametername">header</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitTableRow_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitTableRow*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitTableRow_Radzen_Blazor_Markdown_TableRow_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitTableRow(Radzen.Blazor.Markdown.TableRow)">VisitTableRow(TableRow)</h4>
+  <div class="markdown level1 summary"><p>Visits a table row by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitTableRow(TableRow row)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.TableRow.html">TableRow</a></td>
+        <td><span class="parametername">row</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitText_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitText*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitText_Radzen_Blazor_Markdown_Text_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitText(Radzen.Blazor.Markdown.Text)">VisitText(Text)</h4>
+  <div class="markdown level1 summary"><p>Visits a text node.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitText(Text text)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.Text.html">Text</a></td>
+        <td><span class="parametername">text</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitThematicBreak_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitThematicBreak*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitThematicBreak_Radzen_Blazor_Markdown_ThematicBreak_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitThematicBreak(Radzen.Blazor.Markdown.ThematicBreak)">VisitThematicBreak(ThematicBreak)</h4>
+  <div class="markdown level1 summary"><p>Visits a thematic break.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitThematicBreak(ThematicBreak thematicBreak)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.ThematicBreak.html">ThematicBreak</a></td>
+        <td><span class="parametername">thematicBreak</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitUnorderedList_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitUnorderedList*"></a>
+  <h4 id="Radzen_Blazor_Markdown_NodeVisitorBase_VisitUnorderedList_Radzen_Blazor_Markdown_UnorderedList_" data-uid="Radzen.Blazor.Markdown.NodeVisitorBase.VisitUnorderedList(Radzen.Blazor.Markdown.UnorderedList)">VisitUnorderedList(UnorderedList)</h4>
+  <div class="markdown level1 summary"><p>Visits an ordered list by visiting its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual void VisitUnorderedList(UnorderedList unorderedList)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Markdown.UnorderedList.html">UnorderedList</a></td>
+        <td><span class="parametername">unorderedList</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Radzen.Blazor.Markdown.INodeVisitor.html">INodeVisitor</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

@@ -6,6 +6,7 @@
   <ItemGroup>
     <PackageReference Include="Radzen.Blazor" Version="*" Condition="'$(Configuration)' == 'Release'" />
     <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" Condition="'$(Configuration)' != 'Release'" />
+    <ProjectReference Include="..\Radzen.Blazor.Api\Radzen.Blazor.Api.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.*-*" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.*-*" />
@@ -26,6 +27,7 @@
     <BlazorWebAssemblyLazyLoad Include="Microsoft.AspNetCore.Mvc.Razor.Extensions.dll" />
     <BlazorWebAssemblyLazyLoad Include="MetadataReferenceService.BlazorWasm.dll" />
     <BlazorWebAssemblyLazyLoad Include="MetadataReferenceService.Abstractions.dll" />
+    <BlazorWebAssemblyLazyLoad Include="Radzen.Blazor.Api.dll" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="Pages\DataGridRowDragSchedulerPage.razor">

@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenTree
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenTree
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenTree">
+
+
+  <h1 id="Radzen_Blazor_RadzenTree" data-uid="Radzen.Blazor.RadzenTree" class="text-break">Class RadzenTree
+</h1>
+  <div class="markdown level0 summary"><p>A hierarchical tree view component for displaying nested data structures with expand/collapse functionality.
+RadzenTree supports both inline item definition and data-binding for displaying file systems, organization charts, category hierarchies, or any tree-structured data.
+Organizes data in a parent-child hierarchy where items can be expanded to reveal children.
+Supports static definition declaring tree structure using nested RadzenTreeItem components, data binding to hierarchical data using RadzenTreeLevel components,
+single or multiple item selection with checkboxes, individual item or programmatic expand/collapse control, custom icons per item or data-bound icon properties,
+custom rendering templates for tree items, keyboard navigation (Arrow keys, Space/Enter, Home/End) for accessibility, and Change/Expand/selection events.
+For data binding, use RadzenTreeLevel to define how to render each hierarchy level from your data model. For checkbox selection, use AllowCheckBoxes and bind to CheckedValues.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><span class="xref">RadzenTree</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnAfterRenderAsync_System_Boolean_">RadzenComponent.OnAfterRenderAsync(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Dispose">RadzenComponent.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenTree_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenTree : RadzenComponent, IComponent, IHandleEvent, IHandleAfterRender, IDisposable</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenTree_examples"><strong>Examples</strong></h5>
+  <p>Static tree with inline items:</p>
+<pre><code class="lang-csharp">&lt;RadzenTree&gt;
+    &lt;RadzenTreeItem Text="Documents" Icon="folder"&gt;
+        &lt;RadzenTreeItem Text="Work" Icon="folder"&gt;
+            &lt;RadzenTreeItem Text="report.pdf" Icon="description" /&gt;
+        &lt;/RadzenTreeItem&gt;
+        &lt;RadzenTreeItem Text="Personal" Icon="folder"&gt;
+            &lt;RadzenTreeItem Text="photo.jpg" Icon="image" /&gt;
+        &lt;/RadzenTreeItem&gt;
+    &lt;/RadzenTreeItem&gt;
+&lt;/RadzenTree&gt;</code></pre>
+<p>Data-bound tree with selection:</p>
+<pre><code class="lang-csharp">&lt;RadzenTree Data=@categories AllowCheckBoxes="true" @bind-CheckedValues=@selectedCategories Change=@OnChange&gt;
+    &lt;RadzenTreeLevel TextProperty="Name" ChildrenProperty="Children" /&gt;
+&lt;/RadzenTree&gt;
+@code {
+    IEnumerable&lt;object&gt; selectedCategories;
+    void OnChange(TreeEventArgs args) =&gt; Console.WriteLine($"Selected: {args.Text}");
+}</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenTree__ctor_" data-uid="Radzen.Blazor.RadzenTree.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree__ctor" data-uid="Radzen.Blazor.RadzenTree.#ctor">RadzenTree()</h4>
+  <div class="markdown level1 summary"><p>A hierarchical tree view component for displaying nested data structures with expand/collapse functionality.
+RadzenTree supports both inline item definition and data-binding for displaying file systems, organization charts, category hierarchies, or any tree-structured data.
+Organizes data in a parent-child hierarchy where items can be expanded to reveal children.
+Supports static definition declaring tree structure using nested RadzenTreeItem components, data binding to hierarchical data using RadzenTreeLevel components,
+single or multiple item selection with checkboxes, individual item or programmatic expand/collapse control, custom icons per item or data-bound icon properties,
+custom rendering templates for tree items, keyboard navigation (Arrow keys, Space/Enter, Home/End) for accessibility, and Change/Expand/selection events.
+For data binding, use RadzenTreeLevel to define how to render each hierarchy level from your data model. For checkbox selection, use AllowCheckBoxes and bind to CheckedValues.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenTree()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenTree__ctor_examples">Examples</h5>
+  <p>Static tree with inline items:</p>
+<pre><code class="lang-csharp">&lt;RadzenTree&gt;
+    &lt;RadzenTreeItem Text="Documents" Icon="folder"&gt;
+        &lt;RadzenTreeItem Text="Work" Icon="folder"&gt;
+            &lt;RadzenTreeItem Text="report.pdf" Icon="description" /&gt;
+        &lt;/RadzenTreeItem&gt;
+        &lt;RadzenTreeItem Text="Personal" Icon="folder"&gt;
+            &lt;RadzenTreeItem Text="photo.jpg" Icon="image" /&gt;
+        &lt;/RadzenTreeItem&gt;
+    &lt;/RadzenTreeItem&gt;
+&lt;/RadzenTree&gt;</code></pre>
+<p>Data-bound tree with selection:</p>
+<pre><code class="lang-csharp">&lt;RadzenTree Data=@categories AllowCheckBoxes="true" @bind-CheckedValues=@selectedCategories Change=@OnChange&gt;
+    &lt;RadzenTreeLevel TextProperty="Name" ChildrenProperty="Children" /&gt;
+&lt;/RadzenTree&gt;
+@code {
+    IEnumerable&lt;object&gt; selectedCategories;
+    void OnChange(TreeEventArgs args) =&gt; Console.WriteLine($"Selected: {args.Text}");
+}</code></pre>
+
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenTree_AllowCheckBoxes_" data-uid="Radzen.Blazor.RadzenTree.AllowCheckBoxes*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_AllowCheckBoxes" data-uid="Radzen.Blazor.RadzenTree.AllowCheckBoxes">AllowCheckBoxes</h4>
+  <div class="markdown level1 summary"><p>Specifies whether RadzenTree displays check boxes. Set to <code>false</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowCheckBoxes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if check boxes are displayed; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_AllowCheckChildren_" data-uid="Radzen.Blazor.RadzenTree.AllowCheckChildren*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_AllowCheckChildren" data-uid="Radzen.Blazor.RadzenTree.AllowCheckChildren">AllowCheckChildren</h4>
+  <div class="markdown level1 summary"><p>Specifies what happens when a parent item is checked. If set to <code>true</code> checking parent items also checks all of its children.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowCheckChildren { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_AllowCheckParents_" data-uid="Radzen.Blazor.RadzenTree.AllowCheckParents*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_AllowCheckParents" data-uid="Radzen.Blazor.RadzenTree.AllowCheckParents">AllowCheckParents</h4>
+  <div class="markdown level1 summary"><p>Specifies what happens with a parent item when one of its children is checked. If set to <code>true</code> checking a child item will affect the checked state of its parents.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool AllowCheckParents { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_Change_" data-uid="Radzen.Blazor.RadzenTree.Change*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_Change" data-uid="Radzen.Blazor.RadzenTree.Change">Change</h4>
+  <div class="markdown level1 summary"><p>A callback that will be invoked when the user selects an item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;TreeEventArgs&gt; Change { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.TreeEventArgs.html">TreeEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Radzen_Blazor_RadzenTree_Change_examples">Examples</h5>
+  <pre><code class="lang-csharp">&lt;RadzenTree Change=@OnChange&gt;
+    &lt;RadzenTreeItem Text="BMW"&gt;
+        &lt;RadzenTreeItem Text="M3" /&gt;
+        &lt;RadzenTreeItem Text="M5" /&gt;
+    &lt;/RadzenTreeItem&gt;
+    &lt;RadzenTreeItem Text="Audi"&gt;
+        &lt;RadzenTreeItem Text="RS4" /&gt;
+        &lt;RadzenTreeItem Text="RS6" /&gt;
+    &lt;/RadzenTreeItem&gt;
+    &lt;RadzenTreeItem Text="Mercedes"&gt;
+        &lt;RadzenTreeItem Text="C63 AMG" /&gt;
+        &lt;RadzenTreeItem Text="S63 AMG" /&gt;
+    &lt;/RadzenTreeItem&gt;
+&lt;/RadzenTree&gt;
+@code {
+  void OnChange(TreeEventArgs args) 
+  {
+
+  }
+}</code></pre>
+
+
+
+  <a id="Radzen_Blazor_RadzenTree_CheckedValues_" data-uid="Radzen.Blazor.RadzenTree.CheckedValues*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_CheckedValues" data-uid="Radzen.Blazor.RadzenTree.CheckedValues">CheckedValues</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the checked values. Use with <code>@bind-CheckedValues</code> to sync it with a property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IEnumerable&lt;object&gt;? CheckedValues { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_CheckedValuesChanged_" data-uid="Radzen.Blazor.RadzenTree.CheckedValuesChanged*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_CheckedValuesChanged" data-uid="Radzen.Blazor.RadzenTree.CheckedValuesChanged">CheckedValuesChanged</h4>
+  <div class="markdown level1 summary"><p>A callback which will be invoked when <a class="xref" href="Radzen.Blazor.RadzenTree.html#Radzen_Blazor_RadzenTree_CheckedValues">CheckedValues</a> changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;IEnumerable&lt;object&gt;&gt; CheckedValuesChanged { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_ChildContent_" data-uid="Radzen.Blazor.RadzenTree.ChildContent*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_ChildContent" data-uid="Radzen.Blazor.RadzenTree.ChildContent">ChildContent</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the child content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? ChildContent { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>The child content.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_Collapse_" data-uid="Radzen.Blazor.RadzenTree.Collapse*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_Collapse" data-uid="Radzen.Blazor.RadzenTree.Collapse">Collapse</h4>
+  <div class="markdown level1 summary"><p>A callback that will be invoked when the user collapse an item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;TreeEventArgs&gt; Collapse { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.TreeEventArgs.html">TreeEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_Data_" data-uid="Radzen.Blazor.RadzenTree.Data*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_Data" data-uid="Radzen.Blazor.RadzenTree.Data">Data</h4>
+  <div class="markdown level1 summary"><p>Specifies the collection of data items which RadzenTree will create its items from.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IEnumerable? Data { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_Expand_" data-uid="Radzen.Blazor.RadzenTree.Expand*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_Expand" data-uid="Radzen.Blazor.RadzenTree.Expand">Expand</h4>
+  <div class="markdown level1 summary"><p>A callback that will be invoked when the user expands an item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;TreeExpandEventArgs&gt; Expand { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.TreeExpandEventArgs.html">TreeExpandEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Radzen_Blazor_RadzenTree_Expand_examples">Examples</h5>
+  <pre><code class="lang-csharp">&lt;RadzenTree Expand=@OnExpand&gt;
+    &lt;RadzenTreeItem Text="BMW"&gt;
+        &lt;RadzenTreeItem Text="M3" /&gt;
+        &lt;RadzenTreeItem Text="M5" /&gt;
+    &lt;/RadzenTreeItem&gt;
+    &lt;RadzenTreeItem Text="Audi"&gt;
+        &lt;RadzenTreeItem Text="RS4" /&gt;
+        &lt;RadzenTreeItem Text="RS6" /&gt;
+    &lt;/RadzenTreeItem&gt;
+    &lt;RadzenTreeItem Text="Mercedes"&gt;
+        &lt;RadzenTreeItem Text="C63 AMG" /&gt;
+        &lt;RadzenTreeItem Text="S63 AMG" /&gt;
+    &lt;/RadzenTreeItem&gt;
+&lt;/RadzenTree&gt;
+@code {
+  void OnExpand(TreeExpandEventArgs args) 
+  {
+
+  }
+}</code></pre>
+
+
+
+  <a id="Radzen_Blazor_RadzenTree_ItemContentCssClass_" data-uid="Radzen.Blazor.RadzenTree.ItemContentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_ItemContentCssClass" data-uid="Radzen.Blazor.RadzenTree.ItemContentCssClass">ItemContentCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the CSS classes added to the item content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? ItemContentCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_ItemContextMenu_" data-uid="Radzen.Blazor.RadzenTree.ItemContextMenu*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_ItemContextMenu" data-uid="Radzen.Blazor.RadzenTree.ItemContextMenu">ItemContextMenu</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the context menu callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;TreeItemContextMenuEventArgs&gt; ItemContextMenu { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.TreeItemContextMenuEventArgs.html">TreeItemContextMenuEventArgs</a>&gt;</td>
+        <td><p>The context menu callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_ItemIconCssClass_" data-uid="Radzen.Blazor.RadzenTree.ItemIconCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_ItemIconCssClass" data-uid="Radzen.Blazor.RadzenTree.ItemIconCssClass">ItemIconCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the CSS classes added to the item icon.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? ItemIconCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_ItemLabelCssClass_" data-uid="Radzen.Blazor.RadzenTree.ItemLabelCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_ItemLabelCssClass" data-uid="Radzen.Blazor.RadzenTree.ItemLabelCssClass">ItemLabelCssClass</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the CSS classes added to the item label.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? ItemLabelCssClass { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_ItemRender_" data-uid="Radzen.Blazor.RadzenTree.ItemRender*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_ItemRender" data-uid="Radzen.Blazor.RadzenTree.ItemRender">ItemRender</h4>
+  <div class="markdown level1 summary"><p>A callback that will be invoked when item is rendered.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public Action&lt;TreeItemRenderEventArgs&gt;? ItemRender { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Radzen.TreeItemRenderEventArgs.html">TreeItemRenderEventArgs</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_SelectItemAriaLabel_" data-uid="Radzen.Blazor.RadzenTree.SelectItemAriaLabel*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_SelectItemAriaLabel" data-uid="Radzen.Blazor.RadzenTree.SelectItemAriaLabel">SelectItemAriaLabel</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the open button aria-label attribute.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? SelectItemAriaLabel { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_SingleExpand_" data-uid="Radzen.Blazor.RadzenTree.SingleExpand*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_SingleExpand" data-uid="Radzen.Blazor.RadzenTree.SingleExpand">SingleExpand</h4>
+  <div class="markdown level1 summary"><p>Specifies whether siblings items are collapsed. Set to <code>false</code> by default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool SingleExpand { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_Value_" data-uid="Radzen.Blazor.RadzenTree.Value*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_Value" data-uid="Radzen.Blazor.RadzenTree.Value">Value</h4>
+  <div class="markdown level1 summary"><p>Specifies the selected value. Use with <code>@bind-Value</code> to sync it with a property.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public object? Value { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_ValueChanged_" data-uid="Radzen.Blazor.RadzenTree.ValueChanged*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_ValueChanged" data-uid="Radzen.Blazor.RadzenTree.ValueChanged">ValueChanged</h4>
+  <div class="markdown level1 summary"><p>A callback which will be invoked when <a class="xref" href="Radzen.Blazor.RadzenTree.html#Radzen_Blazor_RadzenTree_Value">Value</a> changes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;object&gt; ValueChanged { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenTree_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenTree.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenTree.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenTree_ClearSelection_" data-uid="Radzen.Blazor.RadzenTree.ClearSelection*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_ClearSelection" data-uid="Radzen.Blazor.RadzenTree.ClearSelection">ClearSelection()</h4>
+  <div class="markdown level1 summary"><p>Clear the current selection to allow re-selection by mouse click</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void ClearSelection()</code></pre>
+  </div>
+
+
+  <a id="Radzen_Blazor_RadzenTree_GetComponentCssClass_" data-uid="Radzen.Blazor.RadzenTree.GetComponentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_GetComponentCssClass" data-uid="Radzen.Blazor.RadzenTree.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenTree_OnInitialized_" data-uid="Radzen.Blazor.RadzenTree.OnInitialized*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_OnInitialized" data-uid="Radzen.Blazor.RadzenTree.OnInitialized">OnInitialized()</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void OnInitialized()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnInitialized">RadzenComponent.OnInitialized()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenTree_Reload_" data-uid="Radzen.Blazor.RadzenTree.Reload*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_Reload_Radzen_Blazor_RadzenTreeItem_" data-uid="Radzen.Blazor.RadzenTree.Reload(Radzen.Blazor.RadzenTreeItem)">Reload(RadzenTreeItem?)</h4>
+  <div class="markdown level1 summary"><p>Forces the specified <code class="paramref">item</code> or, if
+<code class="paramref">item</code> is <code>null</code>, all items in the tree to be
+re-evaluated such that items lazily created via <a class="xref" href="Radzen.Blazor.RadzenTree.html#Radzen_Blazor_RadzenTree_Expand">Expand</a>
+are realised if the underlying data model has been changed from
+somewhere else.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task Reload(RadzenTreeItem? item = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenTreeItem.html">RadzenTreeItem</a></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item to be reloaded or <code>null</code> to refresh
+the root nodes of the tree.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A task to wait for the operation to complete.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenTree_SetParametersAsync_" data-uid="Radzen.Blazor.RadzenTree.SetParametersAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenTree_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.Blazor.RadzenTree.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime when parameters are set.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">RadzenComponent.SetParametersAsync(ParameterView)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>
