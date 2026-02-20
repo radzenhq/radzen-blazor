@@ -37,7 +37,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
         .Add($"rz-toc-{Orientation.ToString().ToLowerInvariant()}")
         .ToString();
 
-    void ActivateItem(string? path)
+    internal void ActivateItem(string? path)
     {
         foreach (var item in items)
         {
@@ -57,7 +57,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
     /// </summary>
 
     [JSInvokable]
-    public void ScrollIntoView(string selector)
+    public void ScrollIntoView(string? selector)
     {
         ActivateItem(selector);
     }
