@@ -69,7 +69,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
     {
         items.Add(item);
 
-        if (rendered)
+        if (rendered && !disposed)
         {
             await RegisterScrollListenerAsync();
         }
@@ -79,7 +79,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
     {
         items.Remove(item);
 
-        if (rendered)
+        if (rendered && !disposed)
         {
             await RegisterScrollListenerAsync();
         }
@@ -117,13 +117,15 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
 
     private async Task UnregisterScrollListenerAsync()
     {
-        if (scrollListenerRef != null)
+        var listener = scrollListenerRef;
+        scrollListenerRef = null;
+
+        if (listener != null)
         {
             try
             {
-                await scrollListenerRef.InvokeVoidAsync("dispose");
-                await scrollListenerRef.DisposeAsync();
-                scrollListenerRef = null;
+                await listener.InvokeVoidAsync("dispose");
+                await listener.DisposeAsync();
             } 
             catch (JSDisconnectedException)
             {
