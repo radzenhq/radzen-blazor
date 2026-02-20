@@ -123,7 +123,7 @@ static class XmlDocParser
             }
             else if (node is XElement el && el.Name.LocalName == "code")
             {
-                var code = el.Value.Trim();
+                var code = TrimCodeIndentation(el.Value);
                 if (!string.IsNullOrEmpty(code))
                 {
                     segments.Add(new ExampleSegment(true, code));
@@ -132,6 +132,50 @@ static class XmlDocParser
         }
 
         return segments;
+    }
+
+    static string TrimCodeIndentation(string code)
+    {
+        var lines = code.Split('\n');
+
+        // Drop leading and trailing empty lines
+        int start = 0;
+        while (start < lines.Length && string.IsNullOrWhiteSpace(lines[start]))
+            start++;
+        int end = lines.Length - 1;
+        while (end >= start && string.IsNullOrWhiteSpace(lines[end]))
+            end--;
+        if (start > end)
+            return "";
+
+        // Find the minimum leading whitespace among non-empty lines
+        int minIndent = int.MaxValue;
+        for (int i = start; i <= end; i++)
+        {
+            var line = lines[i].TrimEnd('\r');
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+            int spaces = 0;
+            while (spaces < line.Length && line[spaces] == ' ')
+                spaces++;
+            if (spaces < minIndent)
+                minIndent = spaces;
+        }
+
+        if (minIndent == int.MaxValue)
+            minIndent = 0;
+
+        var sb = new StringBuilder();
+        for (int i = start; i <= end; i++)
+        {
+            var line = lines[i].TrimEnd('\r');
+            if (string.IsNullOrWhiteSpace(line))
+                sb.AppendLine();
+            else
+                sb.AppendLine(line.Length > minIndent ? line[minIndent..] : line.TrimStart());
+        }
+
+        return sb.ToString().TrimEnd();
     }
 
     static string CleanXmlDocText(XElement? element)
