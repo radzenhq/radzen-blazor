@@ -84,6 +84,11 @@ public partial class RadzenTocItem : RadzenComponentWithChildren, IAsyncDisposab
         }
     }
 
+    private void OnClick()
+    {
+        Toc?.ActivateItem(Selector);
+    }
+
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {

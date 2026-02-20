@@ -3295,8 +3295,8 @@ window.Radzen = {
                 const isHtml = !selector || container.tagName === 'HTML';
                 const threshold = isHtml ? 10 : container.getBoundingClientRect().top + 10;
                 const atBottom = isHtml
-                    ? (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 2
-                    : (container.scrollTop + container.clientHeight) >= container.scrollHeight - 2;
+                    ? window.scrollY > 0 && (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 2
+                    : container.scrollTop > 0 && (container.scrollTop + container.clientHeight) >= container.scrollHeight - 2;
 
                 let match;
 
@@ -3322,16 +3322,7 @@ window.Radzen = {
                     }
                 }
 
-                if (!match && elements.length > 0) {
-                    for (let i = 0; i < elements.length; i++) {
-                        if (elements[i]) {
-                            match = selectors[i];
-                            break;
-                        }
-                    }
-                }
-
-                if (match && match !== currentSelector) {
+                if (match !== currentSelector) {
                     currentSelector = match;
                     try {
                         ref.invokeMethodAsync('ScrollIntoView', currentSelector);
