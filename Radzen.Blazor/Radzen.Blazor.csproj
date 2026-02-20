@@ -64,18 +64,9 @@
     <EnableDefaultSassItems>false</EnableDefaultSassItems>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Sass Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" Condition="'$(TargetFramework)' == 'net10.0'" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <SassFile Include="$(MSBuildProjectDirectory)/themes/**/*.scss" />
   </ItemGroup>
-
- <Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net10.0'">
-    <PropertyGroup>
-      <_SassFileList>@(Sass->'&quot;%(FullPath)&quot;', ' ')</_SassFileList>
-      <DartSassBuilderArgs>files $(_SassFileList) --outputstyle $(DartSassOutputStyle) --level $(DartSassOutputLevel)</DartSassBuilderArgs>
-    </PropertyGroup>
-    <Message Text="$(DartSassBuilderArgs)" Importance="$(DartSassMessageLevel)" />
-    <Message Text="Converted SassFile list to argument" Importance="$(DartSassMessageLevel)" />
-  </Target>
 
   <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net10.0'">
     <ItemGroup>
