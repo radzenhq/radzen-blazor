@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ namespace Radzen.Blazor;
 /// </summary>
 public partial class RadzenTocItem : RadzenComponentWithChildren, IAsyncDisposable
 {
+    [Inject]
+    NavigationManager? NavigationManager { get; set; }
     /// <summary>
     /// Gets or sets the text displayed in the table of contents.
     /// </summary>
@@ -36,6 +39,7 @@ public partial class RadzenTocItem : RadzenComponentWithChildren, IAsyncDisposab
     int Level { get; set; }
 
     private bool selected;
+    private string? href;
 
     /// <inheritdoc />
     protected override string GetComponentCssClass()
@@ -58,29 +62,36 @@ public partial class RadzenTocItem : RadzenComponentWithChildren, IAsyncDisposab
     private string LinkClass => ClassList.Create("rz-toc-link")
         .ToString();
 
+    private string? CreateHref(string? uri) => !string.IsNullOrEmpty(uri) && !string.IsNullOrEmpty(Selector)
+        ? new Uri(uri).PathAndQuery + Selector
+        : Selector;
+
     internal void Activate()
     {
-        selected = true;
-        StateHasChanged();
+        if (!selected)
+        {
+            selected = true;
+            StateHasChanged();
+        }
     }
 
     internal void Deactivate()
     {
-        selected = false;
-        StateHasChanged();
-    }
-
-    private async Task OnClickAsync()
-    {
-        if (Toc != null)
+        if (selected)
         {
-            await Toc.SelectItemAsync(this);
+            selected = false;
+            StateHasChanged();
         }
     }
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
+        if (NavigationManager != null)
+        {
+            NavigationManager.LocationChanged += OnLocationChanged;
+        }
+
         if (Toc != null)
         {
             await Toc.AddItemAsync(this);
@@ -88,8 +99,34 @@ public partial class RadzenTocItem : RadzenComponentWithChildren, IAsyncDisposab
     }
 
     /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        href = CreateHref(NavigationManager?.Uri);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        var newHref = CreateHref(args.Location);
+        if (href == newHref)
+        {
+            return;
+        }
+
+        href = newHref;
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
+        if (NavigationManager != null)
+        {
+            NavigationManager.LocationChanged -= OnLocationChanged;
+        }
+
         if (Toc != null)
         {
             await Toc.RemoveItemAsync(this);
