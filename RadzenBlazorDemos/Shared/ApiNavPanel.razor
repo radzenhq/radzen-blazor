@@ -43,7 +43,7 @@
         NavigationManager.LocationChanged += OnLocationChanged;
     }
 
-    void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    void OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
         var newPath = GetCurrentPath();
         if (!string.Equals(newPath, currentPath, StringComparison.OrdinalIgnoreCase))
