@@ -1,6 +1,22 @@
 @page "/changelog"
 
 <div class="changelog">
+<RadzenText Anchor="changelog#v10" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v10 Changelog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Track and review changes to Radzen Blazor Components v10
+</RadzenText>
+<RadzenText Anchor="changelog#v10-radzentoc" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    RadzenToc
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> RadzenTocItem now renders an <code>&lt;a&gt;</code> element instead of a <code>&lt;button&gt;</code>. Update CSS selectors that target <code>.rz-toc-link</code> as a button.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> The selected TOC item now uses <code>aria-selected</code> instead of <code>aria-current="location"</code>.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Scrolling no longer updates the browser address bar. The URL fragment is set only when the user clicks a TOC link.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Scroll tracking made simpler and more deterministic visible-section selection.</li>
+</ul>
+
 <RadzenText Anchor="changelog#v9" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Components v9 Changelog
 </RadzenText>
