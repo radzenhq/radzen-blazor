@@ -713,9 +713,19 @@ class Program
 
         sb.AppendLine("# Radzen Blazor Components");
         sb.AppendLine();
-        sb.AppendLine("> A free and open-source set of 90+ native Blazor UI components including DataGrid, Scheduler, Charts, Forms, and more.");
+        sb.AppendLine("> The most sophisticated free UI component library for Blazor, featuring 100+ native components. MIT licensed, used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.");
         sb.AppendLine();
-        sb.AppendLine("Radzen Blazor Components supports Blazor Server, Blazor WebAssembly, and .NET MAUI Blazor Hybrid. Built with accessibility in mind (WCAG 2.2, keyboard navigation). Available as a MIT-licensed NuGet package.");
+        sb.AppendLine("Radzen Blazor Components are written entirely in C# with no JavaScript framework dependencies. Supports Blazor Server, Blazor WebAssembly, .NET MAUI Blazor Hybrid, and the Blazor Web App model in .NET 10. Built with accessibility in mind (WCAG 2.2, keyboard navigation).");
+        sb.AppendLine();
+        sb.AppendLine("## Quick start");
+        sb.AppendLine();
+        sb.AppendLine("```bash");
+        sb.AppendLine("dotnet add package Radzen.Blazor");
+        sb.AppendLine("```");
+        sb.AppendLine();
+        sb.AppendLine("Add `<RadzenTheme Theme=\"material\" />` to `App.razor` `<head>`, `<script src=\"_content/Radzen.Blazor/Radzen.Blazor.js\"></script>` after the last `<script>`, and `builder.Services.AddRadzenComponents();` to `Program.cs`. Full setup: https://blazor.radzen.com/get-started");
+        sb.AppendLine();
+        sb.AppendLine("For premium themes, a WYSIWYG design canvas, database scaffolding, app templates, and dedicated support, see the Radzen Blazor Pro subscription: https://www.radzen.com/pricing");
         sb.AppendLine();
 
         var optionalLinks = new List<LinkInfo>();
