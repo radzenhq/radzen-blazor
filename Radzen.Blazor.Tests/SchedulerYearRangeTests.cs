@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor;
@@ -7,6 +8,7 @@ using Radzen;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -56,6 +58,73 @@ namespace Radzen.Blazor.Tests
 
             // View end must include 2024-12-31 (it should extend to end-of-week containing the real year end).
             Assert.True(view.EndDate.Date >= new DateTime(2024, 12, 31), $"EndDate was {view.EndDate:yyyy-MM-dd}");
+        }
+
+        [Fact]
+        public void YearView_LoadData_ReceivesCorrectDates_WhenStartMonthChanges()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.Services.AddScoped<DialogService>();
+            ctx.JSInterop.Setup<Rect>("Radzen.createScheduler", _ => true)
+                .SetResult(new Rect { Left = 0, Top = 0, Width = 800, Height = 600 });
+
+            var loadDataCalls = new List<SchedulerLoadDataEventArgs>();
+            var startMonth = Month.January;
+            var appointments = new List<Appointment>();
+
+            RenderFragment childContent = builder =>
+            {
+                builder.OpenComponent<RadzenYearPlannerView>(0);
+                builder.AddAttribute(1, nameof(RadzenYearPlannerView.StartMonth), startMonth);
+                builder.CloseComponent();
+            };
+
+            var cut = ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            {
+                p.Add(x => x.Data, appointments);
+                p.Add(x => x.Date, new DateTime(2024, 8, 1));
+                p.Add(x => x.StartProperty, nameof(Appointment.Start));
+                p.Add(x => x.EndProperty, nameof(Appointment.End));
+                p.Add(x => x.TextProperty, nameof(Appointment.Text));
+                p.Add(x => x.SelectedIndex, 0);
+                p.Add(x => x.LoadData, EventCallback.Factory.Create<SchedulerLoadDataEventArgs>(
+                    new object(), (SchedulerLoadDataEventArgs args) =>
+                    {
+                        loadDataCalls.Add(new SchedulerLoadDataEventArgs { Start = args.Start, End = args.End });
+                    }));
+                p.Add(x => x.ChildContent, childContent);
+            });
+
+            Assert.NotEmpty(loadDataCalls);
+            loadDataCalls.Clear();
+
+            startMonth = Month.July;
+            cut.SetParametersAndRender(p =>
+            {
+                p.Add(x => x.Data, appointments);
+                p.Add(x => x.Date, new DateTime(2024, 8, 1));
+                p.Add(x => x.StartProperty, nameof(Appointment.Start));
+                p.Add(x => x.EndProperty, nameof(Appointment.End));
+                p.Add(x => x.TextProperty, nameof(Appointment.Text));
+                p.Add(x => x.SelectedIndex, 0);
+                p.Add(x => x.LoadData, EventCallback.Factory.Create<SchedulerLoadDataEventArgs>(
+                    new object(), (SchedulerLoadDataEventArgs args) =>
+                    {
+                        loadDataCalls.Add(new SchedulerLoadDataEventArgs { Start = args.Start, End = args.End });
+                    }));
+                p.Add(x => x.ChildContent, childContent);
+            });
+
+            Assert.NotEmpty(loadDataCalls);
+            var reloadStart = loadDataCalls[^1].Start;
+
+            // With StartMonth = July and CurrentDate = 2024-08-01:
+            //   yearStart = 2024-07-01, viewStart is in late June 2024
+            // With the old (buggy) code, Reload fired BEFORE properties were updated,
+            // so LoadData would still receive January-based dates (viewStart in late Dec 2023).
+            Assert.True(reloadStart.Year == 2024 && reloadStart.Month >= 6,
+                $"Expected LoadData Start to reflect July-based year range, but got {reloadStart:yyyy-MM-dd}");
         }
     }
 }

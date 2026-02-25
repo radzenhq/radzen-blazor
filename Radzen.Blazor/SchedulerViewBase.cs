@@ -50,15 +50,14 @@ namespace Radzen.Blazor
         /// <param name="parameters">The parameters.</param>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            if (parameters.DidParameterChange(nameof(Text), Text))
-            {
-                if (Scheduler != null)
-                {
-                    await Scheduler.Reload();
-                }
-            }
+            var textChanged = parameters.DidParameterChange(nameof(Text), Text);
 
             await base.SetParametersAsync(parameters);
+
+            if (textChanged && Scheduler != null)
+            {
+                await Scheduler.Reload();
+            }
 
             if (Scheduler != null)
             {
