@@ -802,9 +802,7 @@ namespace Radzen
                 if (ResetSelectedIndexOnFilter)
                 {
                     selectedIndex = -1;
-                }                                
-
-                Debounce(DebounceFilter, FilterDelay);
+                }
             }
             else if (args.Key.Length == 1 && !args.CtrlKey && !args.AltKey && !args.ShiftKey)
             {
@@ -890,6 +888,11 @@ namespace Radzen
         /// </summary>
         async Task DebounceFilter()
         {
+            if (JSRuntime != null)
+            {
+                searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) ?? string.Empty;
+            }
+
             if (!LoadData.HasDelegate)
             {
                 _view = null;
@@ -970,12 +973,9 @@ namespace Radzen
         /// Handles filter input changes (e.g. paste).
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected virtual async Task OnFilterInput(ChangeEventArgs args)
+        protected virtual Task OnFilterInput(ChangeEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(args);
-
-            searchText = $"{args.Value}"; 
-            await SearchTextChanged.InvokeAsync(searchText);
 
             if (ResetSelectedIndexOnFilter)
             {
@@ -983,6 +983,7 @@ namespace Radzen
             }
 
             Debounce(DebounceFilter, FilterDelay);
+            return Task.CompletedTask;
         }
 
         /// <summary>
