@@ -1189,6 +1189,9 @@ window.Radzen = {
     } else if (parent.querySelector) {
       control = parent.querySelector('[aria-controls="' + id + '"]');
     }
+    if (!control && parent.getAttribute && parent.getAttribute('role') === 'combobox') {
+      control = parent;
+    }
     if (control) {
       control.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     }
