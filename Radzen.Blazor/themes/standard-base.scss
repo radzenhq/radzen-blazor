@@ -154,6 +154,9 @@ $button-hover-background-size: 100% 200%, 100% 0%  !default;
 $button-focus-background-size: 100% 200%, 100% 0%  !default;
 $button-active-background-size: 100% 0%, 100% 200%  !default;
 
+// Chip
+$chip-disabled-opacity: 0.5 !default;
+
 // SelectButton
 $selectbar-background-color: transparent !default;
 $selectbar-selected-background-color: var(--rz-primary-lighter) !default;
