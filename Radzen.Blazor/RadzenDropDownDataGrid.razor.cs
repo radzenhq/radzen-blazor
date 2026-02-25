@@ -938,9 +938,7 @@ namespace Radzen.Blazor
             else if (AllowFiltering && isFilter && FilterAsYouType)
             {
                 preventKeydown = true;
-
                 selectedIndex = -1;
-                Debounce(DebounceFilter, FilterDelay);
             }
             else
             {
@@ -950,13 +948,19 @@ namespace Radzen.Blazor
 
         async Task DebounceFilter()
         {
+            if (JSRuntime != null)
+            {
+                searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) ?? string.Empty;
+            }
+
             if (searchText != previousSearch)
             {
                 previousSearch = searchText;
                 _view = null;
-
                 await InvokeAsync(RefreshAfterFilter);
             }
+
+            await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
         }
 
         async Task CloseOnEscape(KeyboardEventArgs args)
@@ -1017,16 +1021,12 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override async Task OnFilterInput(ChangeEventArgs args)
+        protected override Task OnFilterInput(ChangeEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(args);
 
-            searchText = $"{args.Value}";
-
             if (FilterAsYouType)
             {
-                await SearchTextChanged.InvokeAsync(searchText);
-
                 if (ResetSelectedIndexOnFilter)
                 {
                     selectedIndex = -1;
@@ -1034,6 +1034,7 @@ namespace Radzen.Blazor
 
                 Debounce(DebounceFilter, FilterDelay);
             }
+            return Task.CompletedTask;
         }
 
         /// <summary>
