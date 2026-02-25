@@ -1777,6 +1777,16 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Chip usage", Anchor = "#usage" }, new () { Text = "Chip list", Anchor = "#chip-list" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Chip",
+                    Path = "chip",
+                    Updated = true,
+                    Description = "Demonstration and configuration of the Radzen Blazor Chip and ChipList components.",
+                    Icon = "\uf02b",
+                    Tags = new [] { "chip", "tag", "form", "edit" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Get and Set the value of SelectBar", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of SelectBar using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Populate SelectBar items from data", Anchor = "#populate-from-data" }, new () { Text = "Statically declared and populated SelectBar items from data", Anchor = "#populate-items-statically" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "SelectBar with icons", Anchor = "#icons" }, new () { Text = "SelectBar with images", Anchor = "#images" }, new () { Text = "SelectBar with template", Anchor = "#template" }, new () { Text = "SelectBar Size", Anchor = "#size" }, new () { Text = "SelectBar Orientation", Anchor = "#orientation" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "SelectBar",
                     Path = "selectbar",

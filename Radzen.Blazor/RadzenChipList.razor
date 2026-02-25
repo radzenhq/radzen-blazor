@@ -1,0 +1,75 @@
+@using System.Linq
+@using System.Collections
+@using Radzen
+@using Radzen.Blazor.Rendering
+@using Microsoft.AspNetCore.Components.Forms
+@typeparam TValue
+@inherits FormComponent<TValue>
+@implements IRadzenChipList
+
+@if (Items != null)
+{
+    <CascadingValue Value=this>
+        @Items
+    </CascadingValue>
+}
+@if (Visible)
+{
+    <div @ref="@Element" style="@($"{Style};{WrapStyle}")" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
+         role="listbox"
+         aria-multiselectable="@Multiple"
+         aria-disabled="@(Disabled ? "true" : "false")"
+         tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+         @onkeydown="OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+        @foreach (var item in allItems)
+        {
+            var selected = IsSelected(item);
+            var hasTemplate = item.Template != null || Template != null;
+            <div class="rz-chip-list-item"
+                 role="option"
+                 tabindex="@(Disabled || item.Disabled ? "-1" : "0")"
+                 aria-selected="@(selected ? "true" : "false")"
+                 aria-disabled="@(Disabled || item.Disabled ? "true" : "false")"
+                 @onkeydown="@(args => OnItemKeyDown(args, item))"
+                 @onclick="@(args => SelectItem(item))">
+                @if (hasTemplate)
+                {
+                    <RadzenChip Text="@item.Text"
+                                Icon="@item.Icon"
+                                ChipStyle="@(item.ChipStyle ?? ChipStyle)"
+                                Variant="@(item.Variant ?? Variant)"
+                                Shade="@Shade"
+                                Size="@Size"
+                                IsSelected="@selected"
+                                Disabled="@(Disabled || item.Disabled)"
+                                RemoveChipTitle="@RemoveChipTitle"
+                                Click="@(args => SelectItem(item))"
+                                CloseClick="@GetRemoveCallback(item)">
+                        @if (item.Template != null)
+                        {
+                            @item.Template(item)
+                        }
+                        else
+                        {
+                            @Template!(item)
+                        }
+                    </RadzenChip>
+                }
+                else
+                {
+                    <RadzenChip Text="@item.Text"
+                                Icon="@item.Icon"
+                                ChipStyle="@(item.ChipStyle ?? ChipStyle)"
+                                Variant="@(item.Variant ?? Variant)"
+                                Shade="@Shade"
+                                Size="@Size"
+                                IsSelected="@selected"
+                                Disabled="@(Disabled || item.Disabled)"
+                                RemoveChipTitle="@RemoveChipTitle"
+                                Click="@(args => SelectItem(item))"
+                                CloseClick="@GetRemoveCallback(item)" />
+                }
+            </div>
+        }
+    </div>
+}

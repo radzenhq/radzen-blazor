@@ -253,6 +253,18 @@
   --rz-chip-gap: #{$chip-gap};
   --rz-chip-border-radius: #{$chip-border-radius};
   --rz-chip-font-size: #{$chip-font-size};
+  --rz-chip-font-weight: #{$chip-font-weight};
+  --rz-chip-line-height: #{$chip-line-height};
+  --rz-chip-border-width: #{$chip-border-width};
+  --rz-chip-selected-outline: #{$chip-selected-outline};
+  --rz-chip-selected-outline-offset: #{$chip-selected-outline-offset};
+  --rz-chip-sm-font-size: #{$chip-sm-font-size};
+  --rz-chip-xs-font-size: #{$chip-xs-font-size};
+  --rz-chip-sm-padding-block: #{$chip-sm-padding-block};
+  --rz-chip-sm-padding-inline: #{$chip-sm-padding-inline};
+  --rz-chip-xs-padding-block: #{$chip-xs-padding-block};
+  --rz-chip-xs-padding-inline: #{$chip-xs-padding-inline};
+  --rz-chip-list-gap: #{$chip-list-gap};
 
   /* ColorPicker */
   --rz-colorpicker-panel-border: #{$colorpicker-panel-border};

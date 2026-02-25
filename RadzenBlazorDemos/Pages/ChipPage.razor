@@ -1,0 +1,51 @@
+@page "/chip"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Chip
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Chip</strong> and <strong>ChipList</strong> components.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    These demos showcase standalone chips with style, variant, size, icon, selection, disabled, and removable states, plus chip list scenarios for single and multiple selection, data binding, deletion, and item templating.
+</RadzenText>
+
+<RadzenText Anchor="chip#usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Chip usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>RadzenChip</code> for standalone tags, statuses, or labels with full appearance options, click events, and removable chips.
+</RadzenText>
+<RadzenExample ComponentName="Chip" Example="ChipUsage">
+    <ChipUsage />
+</RadzenExample>
+
+<RadzenText Anchor="chip#chip-list" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Chip list
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>RadzenChipList</code> for grouped chip selection with support for single or multiple selection modes, data binding, templating, and remove events.
+</RadzenText>
+<RadzenExample ComponentName="Chip" Example="ChipListUsage">
+    <ChipListUsage />
+</RadzenExample>
+
+<RadzenText Anchor="chip#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys provide a way for users to navigate and interact with Radzen Blazor Chip and ChipList components.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Move focus between chips and controls." },
+        new KeyboardShortcut { Key = "Arrow keys", Action = "Move focus between chips in ChipList." },
+        new KeyboardShortcut { Key = "Space / Enter", Action = "Select the focused chip." },
+        new KeyboardShortcut { Key = "Delete / Backspace", Action = "Remove the focused chip when delete is enabled." }
+    };
+}

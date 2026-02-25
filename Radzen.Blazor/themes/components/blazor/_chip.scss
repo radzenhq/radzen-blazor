@@ -1,10 +1,22 @@
 $chip-background-color: var(--rz-base-200) !default;
 $chip-color: var(--rz-text-color) !default;
-$chip-padding-block: 0 !default;
-$chip-padding-inline: 0.5rem 0 !default;
-$chip-gap: 0.5rem !default;
-$chip-border-radius: var(--rz-border-radius) !default;
+$chip-padding-block: 0.375rem !default;
+$chip-padding-inline: 0.75rem !default;
+$chip-gap: 0.375rem !default;
+$chip-border-radius: calc(4 * var(--rz-border-radius)) !default;
 $chip-font-size: 0.875rem !default;
+$chip-font-weight: 500 !default;
+$chip-line-height: 1.25rem !default;
+$chip-border-width: var(--rz-border-width) !default;
+$chip-selected-outline: var(--rz-outline-focus) !default;
+$chip-selected-outline-offset: var(--rz-outline-offset) !default;
+$chip-sm-font-size: 0.75rem !default;
+$chip-xs-font-size: 0.6875rem !default;
+$chip-sm-padding-block: 0.25rem !default;
+$chip-sm-padding-inline: 0.5rem !default;
+$chip-xs-padding-block: 0.1875rem !default;
+$chip-xs-padding-inline: 0.375rem !default;
+$chip-list-gap: 0.5rem !default;
 
 @mixin chip() {
   .rz-chip {
@@ -17,20 +29,177 @@ $chip-font-size: 0.875rem !default;
     color: var(--rz-chip-color);
     background-color: var(--rz-chip-background-color);
     border-radius: var(--rz-chip-border-radius);
+    border: var(--rz-chip-border-width) solid transparent;
+    white-space: nowrap;
+    font-weight: var(--rz-chip-font-weight);
+    line-height: var(--rz-chip-line-height);
+    user-select: none;
+    transition: filter 120ms ease-in-out, box-shadow 120ms ease-in-out;
   
     .rz-chip-text {
-      font-size: var(--rz-chip-font-size)
+      font-size: var(--rz-chip-font-size);
+      line-height: inherit;
+    }
+
+    .rz-chip-icon {
+      font-size: 1.125rem;
+      line-height: var(--rz-chip-line-height);
     }
   
     .rz-button {
       border-radius: var(--rz-chip-border-radius);
       box-shadow: none;
-      align-self: stretch;
+      align-self: center;
+      min-width: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      padding: 0;
+      margin-inline-start: 0.125rem;
     }
   
     .rzi {
       vertical-align: middle;
       font-size: 1rem;
     }
+
+    &.rz-state-disabled {
+      opacity: var(--rz-input-disabled-opacity);
+      pointer-events: none;
+    }
+
+    &:not(.rz-state-disabled) {
+      cursor: pointer;
+
+      &:hover {
+        filter: brightness(0.92);
+      }
+
+      &:active {
+        filter: brightness(0.85);
+      }
+    }
+
+    &.rz-chip-selected {
+      outline: var(--rz-chip-selected-outline);
+      outline-offset: var(--rz-chip-selected-outline-offset);
+    }
+
+    &.rz-chip-sm {
+      padding-block: var(--rz-chip-sm-padding-block);
+      padding-inline: var(--rz-chip-sm-padding-inline);
+
+      .rz-chip-text {
+        font-size: var(--rz-chip-sm-font-size);
+      }
+
+      .rz-chip-icon {
+        font-size: 1rem;
+      }
+    }
+
+    &.rz-chip-xs {
+      padding-block: var(--rz-chip-xs-padding-block);
+      padding-inline: var(--rz-chip-xs-padding-inline);
+
+      .rz-chip-text {
+        font-size: var(--rz-chip-xs-font-size);
+      }
+
+      .rz-chip-icon {
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  @each $style, $map in map-merge($severity-styles-map, $base-styles-map) {
+    .rz-chip-#{$style} {
+      @if $style == "light" or $style == "dark" {
+        background-color: map-get($map, background-color);
+        color: map-get($map, color);
+      } @else {
+        &.rz-shade-lighter {
+          background-color: var(--rz-#{$style}-lighter);
+          color: var(--rz-on-#{$style}-lighter);
+        }
+        &.rz-shade-light {
+          background-color: var(--rz-#{$style}-light);
+          color: var(--rz-on-#{$style}-light);
+        }
+        &.rz-shade-default {
+          background-color: var(--rz-#{$style});
+          color: var(--rz-on-#{$style});
+        }
+        &.rz-shade-dark {
+          background-color: var(--rz-#{$style}-dark);
+          color: var(--rz-on-#{$style}-dark);
+        }
+        &.rz-shade-darker {
+          background-color: var(--rz-#{$style}-darker);
+          color: var(--rz-on-#{$style}-darker);
+        }
+      }
+    }
+  }
+
+  .rz-chip-base.rz-shade-default {
+    background-color: var(--rz-base-200);
+    color: var(--rz-text-color);
+  }
+
+  @each $style, $map in map-merge($severity-styles-map, $base-styles-map) {
+    .rz-variant-outlined.rz-chip-#{$style} {
+      background-color: transparent;
+      @if $style == "light" or $style == "dark" {
+        border-color: map-get($map, background-color);
+        color: map-get($map, background-color);
+      } @else {
+        &.rz-shade-lighter { border-color: var(--rz-#{$style}-lighter); color: var(--rz-#{$style}-lighter); }
+        &.rz-shade-light { border-color: var(--rz-#{$style}-light); color: var(--rz-#{$style}-light); }
+        &.rz-shade-default { border-color: var(--rz-#{$style}); color: var(--rz-#{$style}); }
+        &.rz-shade-dark { border-color: var(--rz-#{$style}-dark); color: var(--rz-#{$style}-dark); }
+        &.rz-shade-darker { border-color: var(--rz-#{$style}-darker); color: var(--rz-#{$style}-darker); }
+      }
+    }
+  }
+
+  .rz-variant-text.rz-chip {
+    background-color: transparent;
+    border-color: transparent;
+  }
+
+  .rz-chip-list {
+    display: flex;
+    gap: var(--rz-chip-list-gap);
+    align-items: center;
+
+    &.rz-chip-list-horizontal {
+      flex-direction: row;
+    }
+
+    &.rz-chip-list-vertical {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &.rz-chip-list-nowrap {
+      flex-wrap: nowrap;
+    }
+
+    &.rz-chip-list-wrap-reverse {
+      flex-wrap: wrap-reverse;
+    }
+  }
+
+  .rz-chip-list-item {
+    display: inline-flex;
+    border-radius: var(--rz-chip-border-radius);
+    outline: none;
+
+    &:focus-visible {
+      outline: var(--rz-chip-selected-outline);
+      outline-offset: var(--rz-chip-selected-outline-offset);
+    }
   }
 }
+
+@include chip();

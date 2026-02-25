@@ -1,0 +1,46 @@
+@inherits RadzenComponent
+@if (Visible)
+{
+<span @ref="@Element"
+      style="@Style"
+      @attributes="Attributes"
+      class="@GetCssClass()"
+      id="@GetId()"
+      role="button"
+      tabindex="@TabIndexValue"
+      aria-disabled="@(Disabled ? "true" : "false")"
+      @onclick="@OnClick"
+      @onkeydown="@OnKeyDown"
+      @onkeydown:preventDefault
+      @onkeydown:stopPropagation>
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="notranslate rzi rz-chip-icon">@Icon</i>
+    }
+
+    <span class="rz-chip-text" @onkeydown:stopPropagation>
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            @Text
+        }
+    </span>
+
+    @if (CloseClick.HasDelegate)
+    {
+        <RadzenButton Icon="close"
+                      Variant="Variant.Text"
+                      Shade="Shade.Lighter"
+                      Size="ButtonSize.ExtraSmall"
+                      Click="@OnCloseClick"
+                      ButtonStyle="ButtonStyle.Base"
+                      title="@RemoveChipTitle"
+                      aria-label="@RemoveChipTitle"
+                      Disabled="@Disabled"
+                      @onclick:stopPropagation />
+    }
+</span>
+}
