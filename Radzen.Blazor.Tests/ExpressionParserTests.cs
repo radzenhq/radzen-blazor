@@ -67,6 +67,9 @@ public class ExpressionParserTests
         public string? ProductName { get; set; }
 
         public Category? Category { get; set; }
+
+        public bool IsDiscontinued { get; set; }
+        public int UnitsInStock { get; set; }
     }
 
     [Fact]
@@ -1583,5 +1586,41 @@ public class ExpressionParserTests
         expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => ((p.Value & 7) << 2) | (15 & (3 + 2))");
         func = expression.Compile();
         Assert.Equal(((25 & 7) << 2) | (15 & (3 + 2)), func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseDefaultBool()
+    {
+        var expression = ExpressionParser.ParsePredicate<OrderDetail>(
+            "x => ((x.Product == null ? default(bool) : x.Product.IsDiscontinued) == true)");
+
+        var func = expression.Compile();
+
+        Assert.True(func(new OrderDetail { Product = new Product { IsDiscontinued = true } }));
+        Assert.False(func(new OrderDetail { Product = new Product { IsDiscontinued = false } }));
+        Assert.False(func(new OrderDetail { Product = null }));
+    }
+
+    [Fact]
+    public void Should_ParseDefaultInt()
+    {
+        var expression = ExpressionParser.ParseLambda<OrderDetail, int>(
+            "x => (x.Product == null ? default(int) : x.Product.UnitsInStock)");
+
+        var func = expression.Compile();
+
+        Assert.Equal(42, func(new OrderDetail { Product = new Product { UnitsInStock = 42 } }));
+        Assert.Equal(0, func(new OrderDetail { Product = null }));
+    }
+
+    [Fact]
+    public void Should_ParseDefaultNullableBool()
+    {
+        var expression = ExpressionParser.ParsePredicate<Person>(
+            "x => (default(bool?) == null)");
+
+        var func = expression.Compile();
+
+        Assert.True(func(new Person()));
     }
 }

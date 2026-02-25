@@ -399,6 +399,20 @@ public class ExpressionParser
 
         if (token.Type == TokenType.Identifier)
         {
+            if (token.Value == "default" && Peek(1).Type == TokenType.OpenParen)
+            {
+                Advance(2);
+
+                if (!TryParseTypeReference(out var defaultType))
+                {
+                    throw new InvalidOperationException($"Could not resolve type in default expression at position {position}");
+                }
+
+                Expect(TokenType.CloseParen);
+
+                return Expression.Default(defaultType);
+            }
+
             var matchingParameter = parameterStack.FirstOrDefault(p => p.Name == token.Value);
             if (matchingParameter != null)
             {
@@ -718,6 +732,62 @@ public class ExpressionParser
         var method = type.GetMethod(methodName, [.. arguments.Select(a => a.Type)]) ?? throw new InvalidOperationException($"Method {methodName} not found on type {type.Name}");
 
         return Expression.Call(null, method, arguments);
+    }
+
+    /// <summary>
+    /// Tries to parse a type reference (e.g. bool, int, System.DateTime, System.DateTime?) and returns the resolved type.
+    /// Advances position past the type name. Does not backtrack — expects the full token sequence to be a type.
+    /// Used for contexts like default(T) where the entire content is a type name.
+    /// </summary>
+    private bool TryParseTypeReference(out Type type)
+    {
+        type = null!;
+
+        var token = Peek();
+        if (token.Type != TokenType.Identifier)
+        {
+            return false;
+        }
+
+        var startPosition = position;
+        var parts = new List<string> { token.Value };
+        Advance(1);
+
+        while (Peek().Type == TokenType.Dot)
+        {
+            Advance(1);
+            token = Peek();
+            if (token.Type != TokenType.Identifier)
+            {
+                position = startPosition;
+                return false;
+            }
+            parts.Add(token.Value);
+            Advance(1);
+        }
+
+        var nullable = false;
+        if (Peek().Type == TokenType.QuestionMark)
+        {
+            nullable = true;
+            Advance(1);
+        }
+
+        var typeName = string.Join(".", parts);
+        var resolvedType = ResolveType(typeName);
+        if (resolvedType != null)
+        {
+            if (nullable && resolvedType.IsValueType)
+            {
+                resolvedType = typeof(Nullable<>).MakeGenericType(resolvedType);
+            }
+
+            type = resolvedType;
+            return true;
+        }
+
+        position = startPosition;
+        return false;
     }
 
     /// <summary>
