@@ -1198,7 +1198,7 @@ window.Radzen = {
   },
   openPopup: function (parent, id, syncWidth, position, x, y, instance, callback, closeOnDocumentClick = true, autoFocusFirstElement = false, disableSmartPosition = false) {
     var popup = document.getElementById(id);
-    if (!popup) return;
+      if (!popup || popup && popup.style.display == 'block' && popup.classList.contains('rz-autocomplete-panel')) return;
 
     Radzen.activeElement = document.activeElement;
 
