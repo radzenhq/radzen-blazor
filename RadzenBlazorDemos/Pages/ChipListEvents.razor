@@ -1,0 +1,58 @@
+<RadzenStack class="rz-p-12" Gap="0.5rem">
+    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-secondary-color">Select or remove chips to see events logged below.</RadzenText>
+    <RadzenChipList @bind-Value="@selectedIds"
+                    TValue="IEnumerable<int>"
+                    Data="@items"
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    Multiple="true"
+                    AllowDelete="true"
+                    ChipStyle="BadgeStyle.Info"
+                    Change="@OnChange"
+                    ChipRemoved="@OnChipRemoved" />
+    <RadzenCard Variant="Variant.Outlined" class="rz-p-4">
+        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-2">Event log</RadzenText>
+        @if (events.Count == 0)
+        {
+            <RadzenText TextStyle="TextStyle.Body2" class="rz-text-secondary-color">No events yet.</RadzenText>
+        }
+        else
+        {
+            @foreach (var entry in events)
+            {
+                <RadzenText TextStyle="TextStyle.Body2">@entry</RadzenText>
+            }
+        }
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    IEnumerable<int> selectedIds = new[] { 1 };
+    List<string> events = new();
+
+    List<EventItem> items = new()
+    {
+        new EventItem(1, "Alpha"),
+        new EventItem(2, "Beta"),
+        new EventItem(3, "Gamma"),
+        new EventItem(4, "Delta")
+    };
+
+    void OnChange(object value)
+    {
+        events.Insert(0, $"Change — selection: [{string.Join(", ", selectedIds)}] at {DateTime.Now:T}");
+    }
+
+    void OnChipRemoved(object value)
+    {
+        if (value is int id)
+        {
+            var name = items.FirstOrDefault(i => i.Id == id)?.Name ?? id.ToString();
+            items = items.Where(i => i.Id != id).ToList();
+            selectedIds = selectedIds.Where(v => v != id).ToArray();
+            events.Insert(0, $"ChipRemoved — \"{name}\" (id: {id}) at {DateTime.Now:T}");
+        }
+    }
+
+    public record EventItem(int Id, string Name);
+}

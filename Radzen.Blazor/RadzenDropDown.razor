@@ -41,7 +41,7 @@
             <div class="rz-dropdown-chips-wrapper">
                 @foreach (var item in selectedItems)
                 {
-                    <div class="rz-chip">
+                    <div class="rz-chip rz-chip-base rz-variant-filled rz-shade-default">
                         <span class="rz-chip-text" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
                             @if(ValueTemplate != null)
                             {
@@ -59,7 +59,7 @@
                         <button tabindex="0"
                                 title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))"
                                 aria-label="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))"
-                                type=button class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")"
+                                type=button class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-default rz-button-icon-only @(Disabled ?"rz-state-disabled":"")"
                                 @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)">
                             <RadzenIcon Icon="close" />
                         </button>
