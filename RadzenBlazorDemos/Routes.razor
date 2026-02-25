@@ -1,6 +1,7 @@
 @using RadzenBlazorDemos.Pages
 @using System.Reflection
-@inject Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader AssemblyLoader
+@using Microsoft.Extensions.DependencyInjection
+@inject IServiceProvider ServiceProvider
 
 <Router AppAssembly="typeof(Routes).Assembly" AdditionalAssemblies="lazyAssemblies" OnNavigateAsync="OnNavigateAsync">
     <Found Context="routeData">
@@ -29,8 +30,16 @@
         {
             if (lazyAssemblies.Count == 0 || !lazyAssemblies.Any(a => a.GetName().Name == "Radzen.Blazor.Api"))
             {
-                var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { "Radzen.Blazor.Api.dll" });
-                lazyAssemblies.AddRange(assemblies);
+                var assemblyLoader = ServiceProvider.GetService<Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader>();
+                if (assemblyLoader != null)
+                {
+                    var assemblies = await assemblyLoader.LoadAssembliesAsync(new[] { "Radzen.Blazor.Api.dll" });
+                    lazyAssemblies.AddRange(assemblies);
+                }
+                else
+                {
+                    lazyAssemblies.Add(Assembly.Load("Radzen.Blazor.Api"));
+                }
             }
         }
     }
