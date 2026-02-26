@@ -28,6 +28,10 @@
   }
 
   .rz-data-grid .rz-grid-table {
+    thead tr:first-child th {
+      border-top: var(--rz-gantt-header-group-height, 0px) solid var(--rz-grid-header-background-color);
+    }
+
     tbody tr {
       height: var(--rz-gantt-row-height) !important;
     }

@@ -182,30 +182,22 @@ window.Radzen = {
       root.style.setProperty('--rz-gantt-header-height', header.getBoundingClientRect().height + 'px');
     }
 
-    // Ensure both theads always have the same height so data rows stay aligned.
+    // Measure timeline group header and set CSS variable so the grid's
+    // thead::before pseudo-row matches it. Also sync overall header height.
     function syncHeaderHeights() {
       var gridThead = grid.querySelector('thead');
       var timelineThead = timeline.querySelector('thead');
-      if (gridThead && timelineThead) {
-        gridThead.style.height = '';
-        timelineThead.style.height = '';
-        var gridH = gridThead.getBoundingClientRect().height;
-        var timelineH = timelineThead.getBoundingClientRect().height;
-        var maxH = Math.max(gridH, timelineH);
-        if (gridH !== maxH || timelineH !== maxH) {
-          gridThead.style.height = maxH + 'px';
-          timelineThead.style.height = maxH + 'px';
-        }
-        root.style.setProperty('--rz-gantt-header-height', maxH + 'px');
+      if (!gridThead || !timelineThead) return;
 
-        var groupRow = timelineThead.querySelector('.rz-gantt-header-group-row');
-        if (groupRow) {
-          var groupH = groupRow.getBoundingClientRect().height;
-          root.style.setProperty('--rz-gantt-header-group-height', groupH + 'px');
-        } else {
-          root.style.setProperty('--rz-gantt-header-group-height', '0px');
-        }
+      var groupRow = timelineThead.querySelector('.rz-gantt-header-group-row');
+      if (groupRow) {
+        root.style.setProperty('--rz-gantt-header-group-height', groupRow.offsetHeight + 'px');
+      } else {
+        root.style.setProperty('--rz-gantt-header-group-height', '0px');
       }
+
+      var maxH = Math.max(gridThead.offsetHeight, timelineThead.offsetHeight);
+      root.style.setProperty('--rz-gantt-header-height', maxH + 'px');
     }
 
     function runSyncAfterLayout() {
