@@ -27,6 +27,7 @@ namespace Radzen.Blazor
         private RadzenGanttMonthView<TItem>? monthView;
         private RadzenGanttYearView<TItem>? yearView;
         private GanttZoomLevel? pendingZoomLevel;
+        private bool scrollToFirstEvent = true;
 
         #region Data & Columns
 
@@ -104,7 +105,17 @@ namespace Radzen.Blazor
                 }
                 pendingZoomLevel = null;
                 InvalidateTimelineCache();
+                scrollToFirstEvent = true;
                 await InvokeAsync(StateHasChanged);
+            }
+
+            if (scrollToFirstEvent && Visible && JSRuntime != null)
+            {
+                var scrolled = await JSRuntime.InvokeAsync<bool>("Radzen.ganttScrollToFirstEvent", GetId());
+                if (scrolled)
+                {
+                    scrollToFirstEvent = false;
+                }
             }
         }
         /// <inheritdoc />
@@ -1404,6 +1415,7 @@ namespace Radzen.Blazor
             }
 
             InvalidateTimelineCache();
+            scrollToFirstEvent = true;
             await scheduler.SelectView(view);
             await InvokeAsync(StateHasChanged);
         }

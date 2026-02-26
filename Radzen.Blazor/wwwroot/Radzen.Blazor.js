@@ -276,6 +276,37 @@ window.Radzen = {
 
     timeline.scrollTop = grid.scrollTop;
   },
+  ganttScrollToFirstEvent: function (ganttId) {
+    if (!ganttId) return false;
+    var root = document.getElementById(ganttId);
+    if (!root) return false;
+    var timeline = root.querySelector('.rz-gantt-timeline-scroll');
+    if (!timeline) return false;
+    var events = timeline.querySelectorAll('.rz-event');
+    if (!events.length) return false;
+
+    var timelineRect = timeline.getBoundingClientRect();
+    var thead = timeline.querySelector('thead');
+    var headerHeight = thead ? thead.offsetHeight : 0;
+
+    var bestTop = Infinity;
+    var bestLeft = Infinity;
+    for (var i = 0; i < events.length; i++) {
+      var rect = events[i].getBoundingClientRect();
+      if (rect.width <= 0) continue;
+      var contentTop = rect.top - timelineRect.top + timeline.scrollTop;
+      var contentLeft = rect.left - timelineRect.left + timeline.scrollLeft;
+      if (contentTop < bestTop || (contentTop === bestTop && contentLeft < bestLeft)) {
+        bestTop = contentTop;
+        bestLeft = contentLeft;
+      }
+    }
+    if (bestTop === Infinity) return false;
+
+    timeline.scrollTop = Math.max(0, bestTop - headerHeight - 4);
+    timeline.scrollLeft = Math.max(0, bestLeft - 40);
+    return true;
+  },
   ganttSyncScrollDispose: function (ganttId) {
     if (!ganttId) {
       return;
