@@ -312,7 +312,7 @@
   .rz-gantt-bar-progress {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.18);
   }
 
   .rz-gantt-bar-label {
@@ -344,11 +344,12 @@
   .rz-gantt-critical {
     background: var(--rz-danger) !important;
     color: var(--rz-on-danger) !important;
+    box-shadow: 0 1px 4px rgba(var(--rz-danger-rgb, 244, 67, 54), 0.4);
   }
 
   .rz-gantt-link-critical {
     stroke: var(--rz-danger);
-    stroke-width: 2;
+    stroke-width: 2.5;
   }
 
   .rz-gantt-link-arrow-critical {
@@ -357,9 +358,9 @@
 
   .rz-gantt-baseline {
     position: absolute;
-    border-radius: 10px;
-    background: var(--rz-text-disabled-color);
-    opacity: 0.45;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--rz-secondary) 25%, transparent);
+    border: 1px solid var(--rz-secondary);
     pointer-events: none;
   }
 
@@ -379,7 +380,7 @@
     width: 2px;
     background: var(--rz-danger);
     pointer-events: none;
-    z-index: 3;
+    z-index: 1;
     transform: translateX(-1px);
   }
 
@@ -390,7 +391,7 @@
     width: 0;
     border-inline-start: 2px dashed var(--rz-gantt-marker-color, var(--rz-info));
     pointer-events: none;
-    z-index: 3;
+    z-index: 1;
   }
 
   .rz-gantt-marker-label {
