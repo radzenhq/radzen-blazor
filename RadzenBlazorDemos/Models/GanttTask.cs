@@ -1,4 +1,5 @@
 using System;
+using Radzen.Blazor;
 
 namespace RadzenBlazorDemos.Models
 {
@@ -17,6 +18,13 @@ namespace RadzenBlazorDemos.Models
 
         public DateTime? BaselineStart { get; set; }
         public DateTime? BaselineEnd { get; set; }
+    }
+
+    public class GanttTaskDependency
+    {
+        public int PredecessorId { get; set; }
+        public int SuccessorId { get; set; }
+        public GanttDependencyType Type { get; set; } = GanttDependencyType.FinishToStart;
     }
 #nullable disable
 }

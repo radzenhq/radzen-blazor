@@ -1212,6 +1212,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Dependency Data",
+                            Path = "gantt-dependency-data",
+                            Title = "Blazor Gantt Dependency Data Binding | Free UI Components by Radzen",
+                            Description = "Bind dependencies using a separate POCO collection with ID-based references — ideal for relational databases.",
+                            Tags = new[] { "gantt", "dependency", "data", "binding", "database", "id", "predecessor", "successor" }
+                        },
+                        new Example
+                        {
                             Name = "Critical Path",
                             Path = "gantt-critical-path",
                             Title = "Blazor Gantt Critical Path | Free UI Components by Radzen",

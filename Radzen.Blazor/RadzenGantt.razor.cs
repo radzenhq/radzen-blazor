@@ -38,10 +38,41 @@ namespace Radzen.Blazor
         public IEnumerable<TItem>? Data { get; set; }
 
         /// <summary>
-        /// Optional task dependencies to draw connecting lines.
+        /// Optional task dependencies to draw connecting lines using object references.
+        /// For database scenarios, prefer <see cref="DependencyData"/> with property-name-based binding.
         /// </summary>
         [Parameter]
         public IEnumerable<GanttDependency<TItem>>? Dependencies { get; set; }
+
+        /// <summary>
+        /// Collection of dependency items (any POCO with predecessor/successor ID properties).
+        /// Use together with <see cref="DependencyFromProperty"/>, <see cref="DependencyToProperty"/>,
+        /// and optionally <see cref="DependencyTypeProperty"/>.
+        /// When set, takes priority over <see cref="Dependencies"/>.
+        /// </summary>
+        [Parameter]
+        public IEnumerable<object>? DependencyData { get; set; }
+
+        /// <summary>
+        /// Property name on <see cref="DependencyData"/> items that holds the predecessor task ID
+        /// (must match values of <see cref="IdProperty"/> on the task items).
+        /// </summary>
+        [Parameter]
+        public string? DependencyFromProperty { get; set; }
+
+        /// <summary>
+        /// Property name on <see cref="DependencyData"/> items that holds the successor task ID
+        /// (must match values of <see cref="IdProperty"/> on the task items).
+        /// </summary>
+        [Parameter]
+        public string? DependencyToProperty { get; set; }
+
+        /// <summary>
+        /// Optional property name on <see cref="DependencyData"/> items that holds the dependency type.
+        /// When not set, all dependencies default to <see cref="GanttDependencyType.FinishToStart"/>.
+        /// </summary>
+        [Parameter]
+        public string? DependencyTypeProperty { get; set; }
 
         /// <summary>
         /// Optional columns definition for the left pane.
@@ -964,7 +995,7 @@ namespace Radzen.Blazor
 
         internal DateTime SchedulerDate => cachedSchedulerDate ??= GetSchedulerDate();
 
-        internal IEnumerable<GanttDependency<TItem>>? TimelineDependencies => Dependencies ?? BuildDefaultDependencies();
+        internal IEnumerable<GanttDependency<TItem>>? TimelineDependencies => ResolveDependencies();
 
         internal string? TimelineBaselineStartProperty => BaselineStartProperty;
         internal string? TimelineBaselineEndProperty => BaselineEndProperty;
@@ -1123,6 +1154,78 @@ namespace Radzen.Blazor
 
         #region Dependencies
 
+        private IEnumerable<GanttDependency<TItem>> ResolveDependencies()
+        {
+            if (DependencyData != null && !string.IsNullOrEmpty(DependencyFromProperty) && !string.IsNullOrEmpty(DependencyToProperty))
+            {
+                return ResolveDependencyData();
+            }
+
+            return Dependencies ?? BuildDefaultDependencies();
+        }
+
+        private IEnumerable<GanttDependency<TItem>> ResolveDependencyData()
+        {
+            if (idGetter == null || Data == null || DependencyData == null)
+            {
+                return Enumerable.Empty<GanttDependency<TItem>>();
+            }
+
+            var taskById = new Dictionary<object, TItem>();
+            foreach (var item in Data)
+            {
+                var id = idGetter(item);
+                if (id != null)
+                {
+                    taskById[id] = item;
+                }
+            }
+
+            Func<object, object>? fromGetter = null;
+            Func<object, object>? toGetter = null;
+            Func<object, object>? typeGetter = null;
+
+            var links = new List<GanttDependency<TItem>>();
+            foreach (var dep in DependencyData)
+            {
+                if (dep == null) continue;
+
+                fromGetter ??= PropertyAccess.Getter<object>(dep, DependencyFromProperty!);
+                toGetter ??= PropertyAccess.Getter<object>(dep, DependencyToProperty!);
+                if (!string.IsNullOrEmpty(DependencyTypeProperty))
+                {
+                    typeGetter ??= PropertyAccess.Getter<object>(dep, DependencyTypeProperty);
+                }
+
+                var fromId = fromGetter(dep);
+                var toId = toGetter(dep);
+                if (fromId == null || toId == null) continue;
+
+                if (!taskById.TryGetValue(fromId, out var fromTask) || !taskById.TryGetValue(toId, out var toTask))
+                {
+                    continue;
+                }
+
+                var type = GanttDependencyType.FinishToStart;
+                if (typeGetter != null)
+                {
+                    var rawType = typeGetter(dep);
+                    if (rawType is GanttDependencyType gdt)
+                    {
+                        type = gdt;
+                    }
+                    else if (rawType != null && Enum.TryParse<GanttDependencyType>(rawType.ToString(), out var parsed))
+                    {
+                        type = parsed;
+                    }
+                }
+
+                links.Add(new GanttDependency<TItem> { From = fromTask, To = toTask, Type = type });
+            }
+
+            return links;
+        }
+
         private IEnumerable<GanttDependency<TItem>> BuildDefaultDependencies()
         {
             if (idGetter == null || parentIdGetter == null || Data == null)
@@ -1171,7 +1274,8 @@ namespace Radzen.Blazor
             var startGet = GetStartGetter();
             var endGet = GetEndGetter();
 
-            if (!ShowCriticalPath || Dependencies == null || appointments == null || startGet == null || endGet == null)
+            var resolvedDeps = ResolveDependencies();
+            if (!ShowCriticalPath || resolvedDeps == null || !resolvedDeps.Any() || appointments == null || startGet == null || endGet == null)
             {
                 return;
             }
@@ -1189,7 +1293,7 @@ namespace Radzen.Blazor
 
             if (items.Count == 0) return;
 
-            var deps = (Dependencies ?? Enumerable.Empty<GanttDependency<TItem>>())
+            var deps = resolvedDeps
                 .Where(d => d != null && itemSet.Contains(d.From) && itemSet.Contains(d.To))
                 .ToList();
 
