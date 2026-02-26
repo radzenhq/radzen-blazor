@@ -1,0 +1,68 @@
+<RadzenStack class="rz-p-12" Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenStack Gap="0.25rem">
+            <RadzenText TextStyle="TextStyle.Caption">Style</RadzenText>
+            <RadzenSelectBar @bind-Value="@selectedStyle" TValue="BadgeStyle" Size="ButtonSize.Small">
+                <Items>
+                    <RadzenSelectBarItem Text="Base" Value="BadgeStyle.Base" />
+                    <RadzenSelectBarItem Text="Primary" Value="BadgeStyle.Primary" />
+                    <RadzenSelectBarItem Text="Info" Value="BadgeStyle.Info" />
+                </Items>
+            </RadzenSelectBar>
+        </RadzenStack>
+        <RadzenStack Gap="0.25rem">
+            <RadzenText TextStyle="TextStyle.Caption">Variant</RadzenText>
+            <RadzenSelectBar @bind-Value="@selectedVariant" TValue="Variant" Size="ButtonSize.Small">
+                <Items>
+                    <RadzenSelectBarItem Text="Filled" Value="Variant.Filled" />
+                    <RadzenSelectBarItem Text="Outlined" Value="Variant.Outlined" />
+                    <RadzenSelectBarItem Text="Text" Value="Variant.Text" />
+                </Items>
+            </RadzenSelectBar>
+        </RadzenStack>
+        <RadzenStack Gap="0.25rem">
+            <RadzenText TextStyle="TextStyle.Caption">Size</RadzenText>
+            <RadzenSelectBar @bind-Value="@selectedSize" TValue="ChipSize" Size="ButtonSize.Small">
+                <Items>
+                    <RadzenSelectBarItem Text="Medium" Value="ChipSize.Medium" />
+                    <RadzenSelectBarItem Text="Small" Value="ChipSize.Small" />
+                    <RadzenSelectBarItem Text="XS" Value="ChipSize.ExtraSmall" />
+                </Items>
+            </RadzenSelectBar>
+        </RadzenStack>
+    </RadzenStack>
+    <RadzenChipList @bind-Value="@selectedPriority"
+                    TValue="string"
+                    Data="@priorities"
+                    TextProperty="Name"
+                    ValueProperty="Name"
+                    ChipStyle="@selectedStyle"
+                    Variant="@selectedVariant"
+                    Size="@selectedSize">
+        <Template Context="chip">
+            <RadzenBadge Text="@GetInitial(chip.Text)" IsPill="true" BadgeStyle="BadgeStyle.Primary" class="rz-me-1" />
+            <strong>@chip.Text</strong>
+        </Template>
+    </RadzenChipList>
+</RadzenStack>
+
+@code {
+    string selectedPriority = "Medium";
+    BadgeStyle selectedStyle = BadgeStyle.Base;
+    Variant selectedVariant = Variant.Filled;
+    ChipSize selectedSize = ChipSize.Medium;
+
+    List<NamedItem> priorities = new()
+    {
+        new NamedItem("Low"),
+        new NamedItem("Medium"),
+        new NamedItem("High")
+    };
+
+    string GetInitial(string text)
+    {
+        return string.IsNullOrWhiteSpace(text) ? "?" : text.Trim()[0].ToString().ToUpperInvariant();
+    }
+
+    public record NamedItem(string Name);
+}

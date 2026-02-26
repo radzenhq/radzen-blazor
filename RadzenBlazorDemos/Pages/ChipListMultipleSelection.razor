@@ -1,0 +1,35 @@
+<RadzenStack class="rz-p-12" Gap="0.5rem">
+    <RadzenChipList @bind-Value="@selectedTagIds"
+                    TValue="IEnumerable<int>"
+                    Data="@tags"
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    Multiple="true"
+                    AllowDelete="true"
+                    ChipStyle="BadgeStyle.Secondary"
+                    ChipRemoved="@OnChipRemoved" />
+    <RadzenText TextStyle="TextStyle.Body2">Selected tags: <strong>@string.Join(", ", selectedTagIds)</strong></RadzenText>
+</RadzenStack>
+
+@code {
+    IEnumerable<int> selectedTagIds = new[] { 1, 3 };
+
+    List<TagItem> tags = new()
+    {
+        new TagItem(1, "Bug"),
+        new TagItem(2, "Feature"),
+        new TagItem(3, "Docs"),
+        new TagItem(4, "Refactor")
+    };
+
+    void OnChipRemoved(object value)
+    {
+        if (value is int id)
+        {
+            tags = tags.Where(t => t.Id != id).ToList();
+            selectedTagIds = selectedTagIds.Where(v => v != id).ToArray();
+        }
+    }
+
+    public record TagItem(int Id, string Name);
+}

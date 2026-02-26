@@ -1,0 +1,68 @@
+@page "/chiplist"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    ChipList
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>ChipList</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="chiplist#single-selection" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Single selection
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>RadzenChipList</code> to let users pick a single value from a set of chips.
+</RadzenText>
+<RadzenExample ComponentName="ChipList" Example="ChipListSingleSelection">
+    <ChipListSingleSelection />
+</RadzenExample>
+
+<RadzenText Anchor="chiplist#multiple-selection" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Multiple selection
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>Multiple="true"</code> to allow selecting more than one chip. Use <code>AllowDelete="true"</code> to enable chip removal.
+</RadzenText>
+<RadzenExample ComponentName="ChipList" Example="ChipListMultipleSelection">
+    <ChipListMultipleSelection />
+</RadzenExample>
+
+<RadzenText Anchor="chiplist#events" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Events
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Handle <code>Change</code> and <code>ChipRemoved</code> callbacks to respond to selection changes and chip removals.
+</RadzenText>
+<RadzenExample ComponentName="ChipList" Example="ChipListEvents">
+    <ChipListEvents />
+</RadzenExample>
+
+<RadzenText Anchor="chiplist#templates" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Templates
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Template</code> render fragment to customize chip content. Combine with style, variant, and size properties for full control.
+</RadzenText>
+<RadzenExample ComponentName="ChipList" Example="ChipListTemplates">
+    <ChipListTemplates />
+</RadzenExample>
+
+<RadzenText Anchor="chiplist#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys provide a way for users to navigate and interact with Radzen Blazor ChipList component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Move focus to the chip list." },
+        new KeyboardShortcut { Key = "Arrow keys", Action = "Move focus between chips." },
+        new KeyboardShortcut { Key = "Home / End", Action = "Move focus to the first or last chip." },
+        new KeyboardShortcut { Key = "Space / Enter", Action = "Select the focused chip." },
+        new KeyboardShortcut { Key = "Delete / Backspace", Action = "Remove the focused chip when delete is enabled." }
+    };
+}

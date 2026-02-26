@@ -1,0 +1,36 @@
+<RadzenStack class="rz-p-12" Gap="0.5rem">
+    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-secondary-color">Click a chip to select it, or remove it with the close icon.</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.75rem">
+        @foreach (var tag in tags)
+        {
+            <RadzenChip Text="@tag"
+                        ChipStyle="BadgeStyle.Secondary"
+                        Close="@(args => RemoveTag(tag))"
+                        Click="@(args => SelectTag(tag))"
+                        IsSelected="@(selectedTag == tag)" />
+        }
+    </RadzenStack>
+    <RadzenText TextStyle="TextStyle.Body2"><strong>Last event:</strong> @lastEvent</RadzenText>
+</RadzenStack>
+
+@code {
+    string selectedTag = string.Empty;
+    string lastEvent = "none";
+    List<string> tags = new() { "Blazor", "Radzen", "Chip", "Component" };
+
+    void SelectTag(string tag)
+    {
+        selectedTag = tag;
+        lastEvent = $"Selected: {tag}";
+    }
+
+    void RemoveTag(string tag)
+    {
+        tags.Remove(tag);
+        if (selectedTag == tag)
+        {
+            selectedTag = string.Empty;
+        }
+        lastEvent = $"Removed: {tag}";
+    }
+}

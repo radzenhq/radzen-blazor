@@ -1,0 +1,22 @@
+<RadzenStack class="rz-p-12" Gap="0.5rem">
+    <RadzenChipList @bind-Value="@selectedCategory"
+                    TValue="string"
+                    Data="@categories"
+                    TextProperty="Name"
+                    ValueProperty="Name"
+                    ChipStyle="BadgeStyle.Info" />
+    <RadzenText TextStyle="TextStyle.Body2">Selected category: <strong>@selectedCategory</strong></RadzenText>
+</RadzenStack>
+
+@code {
+    string selectedCategory = "Backend";
+
+    List<NamedItem> categories = new()
+    {
+        new NamedItem("Frontend"),
+        new NamedItem("Backend"),
+        new NamedItem("Design")
+    };
+
+    public record NamedItem(string Name);
+}

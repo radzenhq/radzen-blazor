@@ -1777,13 +1777,23 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Chip usage", Anchor = "#usage" }, new () { Text = "Chip list", Anchor = "#chip-list" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Appearance", Anchor = "#appearance" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Add / Remove", Anchor = "#add-remove" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Chip",
                     Path = "chip",
                     Updated = true,
-                    Description = "Demonstration and configuration of the Radzen Blazor Chip and ChipList components.",
+                    Description = "Demonstration and configuration of the Radzen Blazor Chip component.",
                     Icon = "\uf02b",
-                    Tags = new [] { "chip", "tag", "form", "edit" }
+                    Tags = new [] { "chip", "tag", "label", "status" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Templates", Anchor = "#templates" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "ChipList",
+                    Path = "chiplist",
+                    New = true,
+                    Description = "Demonstration and configuration of the Radzen Blazor ChipList component.",
+                    Icon = "\uf02b",
+                    Tags = new [] { "chip", "chiplist", "tag", "form", "edit", "selection" }
                 },
                 new Example
                 {

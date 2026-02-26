@@ -111,12 +111,12 @@ namespace Radzen.Blazor
 
         internal async Task OnCloseClick(MouseEventArgs args)
         {
-            if (Disabled || !CloseClick.HasDelegate)
+            if (Disabled || !Close.HasDelegate)
             {
                 return;
             }
 
-            await CloseClick.InvokeAsync(args);
+            await Close.InvokeAsync(args);
         }
 
         internal async Task OnKeyDown(KeyboardEventArgs args)
@@ -131,9 +131,9 @@ namespace Radzen.Blazor
             {
                 await Click.InvokeAsync();
             }
-            else if ((key == "Delete" || key == "Backspace") && CloseClick.HasDelegate)
+            else if ((key == "Delete" || key == "Backspace") && Close.HasDelegate)
             {
-                await CloseClick.InvokeAsync();
+                await Close.InvokeAsync();
             }
         }
 
