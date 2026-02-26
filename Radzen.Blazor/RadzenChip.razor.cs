@@ -17,7 +17,7 @@ namespace Radzen.Blazor
                                                                      .AddShade(Shade)
                                                                      .Add("rz-chip-sm", Size == ChipSize.Small)
                                                                      .Add("rz-chip-xs", Size == ChipSize.ExtraSmall)
-                                                                     .Add("rz-chip-selected", IsSelected)
+                                                                     .Add("rz-chip-selected", Selected)
                                                                      .AddDisabled(Disabled)
                                                                      .ToString();
 
@@ -67,7 +67,7 @@ namespace Radzen.Blazor
         /// Gets or sets a value indicating whether the chip is selected.
         /// </summary>
         [Parameter]
-        public bool IsSelected { get; set; }
+        public bool Selected { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the chip is disabled.
@@ -97,7 +97,7 @@ namespace Radzen.Blazor
         /// Gets or sets the callback invoked when the remove button is clicked.
         /// </summary>
         [Parameter]
-        public EventCallback<MouseEventArgs> CloseClick { get; set; }
+        public EventCallback<MouseEventArgs> Close { get; set; }
 
         internal async Task OnClick(MouseEventArgs args)
         {
