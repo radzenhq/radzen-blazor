@@ -134,6 +134,7 @@ $notification-info-icon-color: $notification-info-color !default;
 
 .rz-notification-close {
   cursor: pointer;
+  color: inherit;
   opacity: 0.75;
   background: none;
   border: none;
