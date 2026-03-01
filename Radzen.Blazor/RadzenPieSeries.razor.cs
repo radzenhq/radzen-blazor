@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Radzen.Blazor
 {
@@ -186,6 +187,8 @@ namespace Radzen.Blazor
                     builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(Items.IndexOf(data), Fills));
                     builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, () => OnLegendClick(data!)));
                     builder.AddAttribute(7, nameof(LegendItem.Clickable), clickable);
+                    builder.AddAttribute(8, nameof(LegendItem.MouseOver), EventCallback.Factory.Create(this, () => OnLegendMouseOver(data!)));
+                    builder.AddAttribute(9, nameof(LegendItem.MouseOut), EventCallback.Factory.Create(this, () => OnLegendMouseOut()));
                     builder.CloseComponent();
                 }
                 ;
@@ -207,6 +210,21 @@ namespace Radzen.Blazor
                 await chart.LegendClick.InvokeAsync(args);
             }
         }
+
+        internal object? MouseOverLegendData { get; set; }
+        private async Task OnLegendMouseOver(object data)
+        {
+            // When the mouse is over a legend item, we want to show the tooltip for the corresponding segment.
+            // To do that, we store the data of the legend item in a property that can be accessed in the DataAt method.
+            MouseOverLegendData = data;
+        }
+        private async Task OnLegendMouseOut()
+        {
+            // When the mouse leaves a legend item, we want to hide the tooltip.
+            // To do that, we clear the MouseOverLegendData property.
+            MouseOverLegendData = null;
+        }
+
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
@@ -223,6 +241,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override (object, Point) DataAt(double x, double y)
         {
+            // If the mouse is over a legend item, we want to show the tooltip for the corresponding segment.
+            // To do that, we check if MouseOverLegendData is not null and return it as the data for the tooltip.
+            if (MouseOverLegendData != null)
+            {
+                return (MouseOverLegendData!, new Point() { X = x, Y = y });
+            }
+
             if (!Contains(x, y, 0))
             {
                 return (default!, new Point());
