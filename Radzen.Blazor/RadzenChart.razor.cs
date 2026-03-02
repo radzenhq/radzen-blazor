@@ -477,6 +477,21 @@ namespace Radzen.Blazor
             }
         }
 
+        internal async Task ShowTooltip(IChartSeries series, object data)
+        {
+            if (IsJSRuntimeAvailable)
+            {
+                tooltipData = data;
+                tooltip = series.RenderTooltip(data);
+                var point = series.GetTooltipPosition(data);
+                TooltipService?.OpenChartTooltip(Element, point.X + MarginLeft, point.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+                {
+                    ColorScheme = ColorScheme
+                });
+                await Task.Yield();
+            }
+        }
+
         private bool widthAndHeightAreSet;
         private bool firstRender = true;
 

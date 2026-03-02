@@ -1,6 +1,6 @@
 @using Radzen.Blazor
 
-<span class="rz-legend-item" style="@Style" @onclick="@OnClick" role="button" aria-disabled="@(!Clickable).ToString().ToLowerInvariant()" tabindex="@(Clickable ? "0" : "-1")" @onkeypress="@OnKeyPress" @onkeypress:preventDefault=@preventKeyPress @onkeypress:stopPropagation>
+<span class="rz-legend-item" style="@Style" @onclick="@OnClick" @attributes="@MouseEventAttributes" role="button" aria-disabled="@(!Clickable).ToString().ToLowerInvariant()" tabindex="@(Clickable ? "0" : "-1")" @onkeypress="@OnKeyPress" @onkeypress:preventDefault=@preventKeyPress @onkeypress:stopPropagation>
     <svg width="@((MarkerSize * 2).ToInvariantString())" height="@((MarkerSize * 2).ToInvariantString())">
         <g class="rz-series-@Index @Class">
             <Marker X="@MarkerSize" Y="@MarkerSize" Type="@(MarkerType == MarkerType.None ? MarkerType.Square : MarkerType)" Fill="@Color" Size="@MarkerSize" />
@@ -32,12 +32,43 @@
     public EventCallback Click { get; set; }
 
     [Parameter]
+    public EventCallback<MouseEventArgs> MouseEnter { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> MouseLeave { get; set; }
+
+    [Parameter]
     public bool Clickable { get; set; } = true;
 
     [Parameter]
     public int Index { get; set; }
 
     bool preventKeyPress;
+
+    IReadOnlyDictionary<string, object>? MouseEventAttributes
+    {
+        get
+        {
+            if (!MouseEnter.HasDelegate && !MouseLeave.HasDelegate)
+            {
+                return null;
+            }
+
+            var attributes = new Dictionary<string, object>();
+
+            if (MouseEnter.HasDelegate)
+            {
+                attributes["onmouseenter"] = MouseEnter;
+            }
+
+            if (MouseLeave.HasDelegate)
+            {
+                attributes["onmouseleave"] = MouseLeave;
+            }
+
+            return attributes;
+        }
+    }
 
     async Task OnClick()
     {

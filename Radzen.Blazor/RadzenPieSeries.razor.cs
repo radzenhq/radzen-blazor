@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
@@ -84,6 +85,14 @@ namespace Radzen.Blazor
         /// <value>The stroke width in pixels. Default is 0 (no borders).</value>
         [Parameter]
         public double StrokeWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether hovering or clicking a legend item displays the tooltip for the corresponding pie/donut segment.
+        /// This is useful when small slices are difficult to hover over directly on the chart.
+        /// </summary>
+        /// <value><c>true</c> to show tooltips on legend item interaction; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool ShowTooltipOnLegend { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the starting angle (in degrees) from which pie segments begin rendering, measured clockwise from the right (0°).
@@ -186,25 +195,58 @@ namespace Radzen.Blazor
                     builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(Items.IndexOf(data), Fills));
                     builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, () => OnLegendClick(data!)));
                     builder.AddAttribute(7, nameof(LegendItem.Clickable), clickable);
+
+                    if (ShowTooltipOnLegend)
+                    {
+                        builder.AddAttribute(8, nameof(LegendItem.MouseEnter), EventCallback.Factory.Create<MouseEventArgs>(this, args => OnLegendMouseEnter(data!)));
+                        builder.AddAttribute(9, nameof(LegendItem.MouseLeave), EventCallback.Factory.Create<MouseEventArgs>(this, args => OnLegendMouseLeave()));
+                    }
+
                     builder.CloseComponent();
                 }
                 ;
             };
         }
 
+        private object? hoveredLegendData;
+
+        private async Task OnLegendMouseEnter(object data)
+        {
+            hoveredLegendData = data;
+
+            var chart = RequireChart();
+            if (chart != null)
+            {
+                await chart.ShowTooltip(this, data);
+            }
+        }
+
+        private void OnLegendMouseLeave()
+        {
+            hoveredLegendData = null;
+        }
+
         private async Task OnLegendClick(object data)
         {
             var chart = RequireChart();
-            if (chart != null && chart.LegendClick.HasDelegate)
+            if (chart != null)
             {
-                var args = new LegendClickEventArgs
+                if (ShowTooltipOnLegend)
                 {
-                    Data = data,
-                    Title = GetTitle(),
-                    IsVisible = true,
-                };
+                    await chart.ShowTooltip(this, data);
+                }
 
-                await chart.LegendClick.InvokeAsync(args);
+                if (chart.LegendClick.HasDelegate)
+                {
+                    var args = new LegendClickEventArgs
+                    {
+                        Data = data,
+                        Title = GetTitle(),
+                        IsVisible = true,
+                    };
+
+                    await chart.LegendClick.InvokeAsync(args);
+                }
             }
         }
         /// <inheritdoc />
@@ -223,6 +265,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override (object, Point) DataAt(double x, double y)
         {
+            if (hoveredLegendData != null)
+            {
+                return (hoveredLegendData, new Point() { X = x, Y = y });
+            }
+
             if (!Contains(x, y, 0))
             {
                 return (default!, new Point());

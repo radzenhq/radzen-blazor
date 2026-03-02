@@ -3,12 +3,14 @@
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
             <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
             <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            <RadzenCheckBox @bind-Value="@showTooltipOnLegend" Name="legendTooltip"></RadzenCheckBox>
+            <RadzenLabel Text="Show Tooltip On Legend" Component="legendTooltip" />
         </RadzenStack>
     </RadzenCard>
 
     <RadzenStack Style="width: 100%; max-width: 600px;">
         <RadzenChart>
-            <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180">
+            <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180" ShowTooltipOnLegend="@showTooltipOnLegend">
                 <ChildContent>
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </ChildContent>
@@ -25,6 +27,7 @@
 
 @code {
     bool showDataLabels = false;
+    bool showTooltipOnLegend = true;
 
     class DataItem
     {
