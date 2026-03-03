@@ -61,7 +61,8 @@
     /// </summary>
     /// <param name="target">The target element reference.</param>
     /// <param name="disableSmartPosition">Whether to disable smart positioning.</param>
-    public async Task ToggleAsync(ElementReference target, bool disableSmartPosition = false)
+    /// <param name="syncWidth">Whether to synchronize the width of the popup with the target element.</param>
+    public async Task ToggleAsync(ElementReference target, bool disableSmartPosition = false, bool syncWidth = false)
     {
         open = !open;
         this.target = target;
@@ -73,7 +74,7 @@
                 "Radzen.openPopup",
                 target,
                 GetId(),
-                false,
+                syncWidth,
                 null,
                 null,
                 null,
