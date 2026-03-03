@@ -66,6 +66,8 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <SassFile Include="$(MSBuildProjectDirectory)/themes/**/*.scss" />
+    <Content Remove="wwwroot/Radzen.Blazor.min.js" />
+    <Content Remove="wwwroot/css/**/*.css" />
   </ItemGroup>
 
   <Target Name="MoveCss" AfterTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net10.0'">
@@ -74,7 +76,6 @@
     </ItemGroup>
     <Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
     <ItemGroup>
-        <Content Remove="wwwroot/css/**/*.css" />
         <Content Include="wwwroot/css/**/*.css" />
     </ItemGroup>
   </Target>
@@ -82,7 +83,6 @@
   <Target Name="MinifyTest" AfterTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net10.0'">
     <TerserMinify InputFile="wwwroot\Radzen.Blazor.js" OutputFile="wwwroot\Radzen.Blazor.min.js" />
     <ItemGroup>
-        <Content Remove="wwwroot/Radzen.Blazor.min.js" />
         <Content Include="wwwroot/Radzen.Blazor.min.js" />
     </ItemGroup>
   </Target>
