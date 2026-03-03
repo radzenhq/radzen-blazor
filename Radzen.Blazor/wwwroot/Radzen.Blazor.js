@@ -2034,7 +2034,7 @@ window.Radzen = {
       var rect = ref.getBoundingClientRect();
       var x = e.clientX - rect.left;
       var y = e.clientY - rect.top;
-      if (!e.target.closest('.rz-marker')) {
+      if (!e.target.closest('.rz-marker') && !e.target.closest('.rz-legend-item')) {
         try { instance.invokeMethodAsync('Click', x, y); } catch { }
       }
     };
