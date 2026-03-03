@@ -349,3 +349,5 @@ Radzen.Blazor.min.js
 /.gitignore
 RadzenBlazorDemos/wwwroot/demos
 llms.txt
+RadzenBlazorDemos.Host/wwwroot/sitemap.xml
+RadzenBlazorDemos.Host/wwwroot/robots.txt

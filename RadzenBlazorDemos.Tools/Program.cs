@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -117,6 +118,7 @@ class Program
 
             GenerateComponentPages(categories, pagesPath, xmlDocs, typeMap, mdDir);
             GenerateIndex(categories, Path.Combine(outputDir, "llms.txt"), xmlDocs);
+            GenerateSitemap(categories, pagesPath, outputDir);
 
             var apiCount = Directory.Exists(Path.Combine(mdDir, "api")) ? Directory.GetFiles(Path.Combine(mdDir, "api"), "*.md").Length : 0;
             var pageCount = Directory.GetFiles(mdDir, "*.md").Length;
@@ -1357,5 +1359,141 @@ class Program
         result = Regex.Replace(result, @"(\r?\n\s*){3,}", Environment.NewLine + Environment.NewLine);
 
         return result.Trim();
+    }
+
+    // ── Sitemap generation ──────────────────────────────────────────────
+
+    static void GenerateSitemap(List<ExampleNode> categories, string pagesPath, string outputDir)
+    {
+        var routeFileMap = BuildRouteFileMap(pagesPath);
+        var gitRoot = FindGitRoot(pagesPath);
+
+        var urls = new List<(string Url, string Lastmod)>();
+
+        foreach (var category in categories)
+        {
+            CollectSitemapUrls(category, routeFileMap, gitRoot, urls);
+        }
+
+        var sitemapPath = Path.Combine(outputDir, "sitemap.xml");
+        WriteSitemap(sitemapPath, urls);
+
+        var robotsPath = Path.Combine(outputDir, "robots.txt");
+        WriteRobotsTxt(robotsPath);
+
+        Console.WriteLine($"Generated sitemap.xml ({urls.Count} URLs) and robots.txt in: {outputDir}");
+    }
+
+    static void CollectSitemapUrls(ExampleNode node, Dictionary<string, string> routeFileMap, string gitRoot, List<(string Url, string Lastmod)> urls)
+    {
+        if (!string.IsNullOrEmpty(node.Path))
+        {
+            var route = node.Path.TrimStart('/');
+            var url = string.IsNullOrEmpty(route) ? BaseUrl + "/" : $"{BaseUrl}/{route}";
+
+            string lastmod = null;
+            if (gitRoot != null && routeFileMap.TryGetValue(route, out var filePath))
+            {
+                lastmod = GetGitLastModified(gitRoot, filePath);
+            }
+
+            urls.Add((url, lastmod));
+        }
+
+        if (node.Children != null)
+        {
+            foreach (var child in node.Children)
+            {
+                CollectSitemapUrls(child, routeFileMap, gitRoot, urls);
+            }
+        }
+    }
+
+    static Dictionary<string, string> BuildRouteFileMap(string pagesPath)
+    {
+        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var file in Directory.GetFiles(pagesPath, "*.razor", SearchOption.AllDirectories))
+        {
+            var content = File.ReadAllText(file);
+            var match = Regex.Match(content, @"@page\s+""(/[^""]*)""\s*$", RegexOptions.Multiline);
+            if (match.Success)
+                map[match.Groups[1].Value.TrimStart('/')] = file;
+        }
+        return map;
+    }
+
+    static string FindGitRoot(string startDir)
+    {
+        var dir = Path.GetFullPath(startDir);
+        while (dir != null)
+        {
+            if (Directory.Exists(Path.Combine(dir, ".git")))
+                return dir;
+            dir = Path.GetDirectoryName(dir);
+        }
+        return null;
+    }
+
+    static string GetGitLastModified(string repoRoot, string filePath)
+    {
+        var relativePath = Path.GetRelativePath(repoRoot, filePath);
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "git",
+                Arguments = $"log --format=%aI -1 -- \"{relativePath}\"",
+                WorkingDirectory = repoRoot,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(psi);
+            var output = process.StandardOutput.ReadToEnd().Trim();
+            process.WaitForExit();
+
+            if (process.ExitCode == 0 && !string.IsNullOrEmpty(output))
+            {
+                if (DateTimeOffset.TryParse(output, out var dto))
+                    return dto.ToString("yyyy-MM-dd");
+            }
+        }
+        catch
+        {
+            // git not available — skip lastmod
+        }
+
+        return null;
+    }
+
+    static void WriteSitemap(string filePath, List<(string Url, string Lastmod)> urls)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+        sb.AppendLine("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
+
+        foreach (var (url, lastmod) in urls)
+        {
+            sb.AppendLine("  <url>");
+            sb.AppendLine($"    <loc>{url}</loc>");
+            if (!string.IsNullOrEmpty(lastmod))
+                sb.AppendLine($"    <lastmod>{lastmod}</lastmod>");
+            sb.AppendLine("  </url>");
+        }
+
+        sb.AppendLine("</urlset>");
+        File.WriteAllText(filePath, sb.ToString(), new UTF8Encoding(false));
+    }
+
+    static void WriteRobotsTxt(string filePath)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("User-agent: *");
+        sb.AppendLine($"Sitemap: {BaseUrl}/sitemap.xml");
+        sb.AppendLine("Disallow: /llms.txt");
+        sb.AppendLine("Disallow: /*.md$");
+        File.WriteAllText(filePath, sb.ToString(), new UTF8Encoding(false));
     }
 }
