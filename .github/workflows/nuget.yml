@@ -1,0 +1,88 @@
+name: Publish to NuGet
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Push package to NuGet.org
+        type: boolean
+        default: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build (Release, clean)
+        run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release --no-incremental
+
+      - name: Verify integrity hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          PROPS="Radzen.Blazor/obj/Release/net10.0/staticwebassets/msbuild.Radzen.Blazor.Microsoft.AspNetCore.StaticWebAssets.props"
+
+          if [ ! -f "$PROPS" ]; then
+            echo "::error::Static web assets props file not found: $PROPS"
+            exit 1
+          fi
+
+          ERRORS=0
+          COUNT=0
+
+          while IFS= read -r element; do
+            integrity=$(echo "$element" | grep -oP 'Integrity="\K[^"]+' || true)
+            [ -z "$integrity" ] && continue
+
+            original=$(echo "$element" | grep -oP 'OriginalItemSpec="\K[^"]+' || true)
+            [ -z "$original" ] && continue
+            [ ! -f "$original" ] && continue
+
+            actual="sha256-$(openssl dgst -sha256 -binary "$original" | openssl base64 -A)"
+            COUNT=$((COUNT + 1))
+
+            if [ "$actual" != "$integrity" ]; then
+              echo "::error::MISMATCH $original — declared=$integrity actual=$actual"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done < <(tr '\n' ' ' < "$PROPS" | grep -oP '<StaticWebAsset\s[^>]*>')
+
+          echo "Checked $COUNT assets, $ERRORS mismatches"
+
+          if [ "$ERRORS" -gt 0 ]; then
+            exit 1
+          fi
+
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::No assets with integrity hashes found"
+            exit 1
+          fi
+
+          echo "All integrity hashes verified."
+
+      - name: Test
+        run: dotnet test Radzen.Blazor.Tests/Radzen.Blazor.Tests.csproj -c Release
+
+      - name: Pack
+        run: dotnet pack Radzen.Blazor/Radzen.Blazor.csproj -c Release --no-build
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: |
+            Radzen.Blazor/bin/Release/*.nupkg
+            Radzen.Blazor/bin/Release/*.snupkg
+
+      - name: Push to NuGet
+        if: inputs.publish
+        run: dotnet nuget push "Radzen.Blazor/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
