@@ -21,8 +21,11 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Build (Release, clean)
-        run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release --no-incremental
+      - name: Clean
+        run: dotnet clean Radzen.Blazor/Radzen.Blazor.csproj -c Release
+
+      - name: Build (Release)
+        run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release
 
       - name: Verify integrity hashes
         shell: bash
@@ -30,6 +33,7 @@ jobs:
           set -euo pipefail
 
           PROPS="Radzen.Blazor/obj/Release/net10.0/staticwebassets/msbuild.Radzen.Blazor.Microsoft.AspNetCore.StaticWebAssets.props"
+          WWWROOT="Radzen.Blazor/wwwroot"
 
           if [ ! -f "$PROPS" ]; then
             echo "::error::Static web assets props file not found: $PROPS"
@@ -39,22 +43,23 @@ jobs:
           ERRORS=0
           COUNT=0
 
-          while IFS= read -r element; do
-            integrity=$(echo "$element" | grep -oP 'Integrity="\K[^"]+' || true)
-            [ -z "$integrity" ] && continue
+          # Parse RelativePath and Integrity child elements from each StaticWebAsset block
+          while IFS= read -r rel_path; do
+            IFS= read -r integrity || true
 
-            original=$(echo "$element" | grep -oP 'OriginalItemSpec="\K[^"]+' || true)
-            [ -z "$original" ] && continue
-            [ ! -f "$original" ] && continue
+            file="$WWWROOT/$rel_path"
+            [ ! -f "$file" ] && continue
 
-            actual="sha256-$(openssl dgst -sha256 -binary "$original" | openssl base64 -A)"
+            actual=$(openssl dgst -sha256 -binary "$file" | openssl base64 -A)
             COUNT=$((COUNT + 1))
 
             if [ "$actual" != "$integrity" ]; then
-              echo "::error::MISMATCH $original — declared=$integrity actual=$actual"
+              echo "::error::MISMATCH $rel_path — declared=$integrity actual=$actual"
               ERRORS=$((ERRORS + 1))
+            else
+              echo "OK: $rel_path"
             fi
-          done < <(tr '\n' ' ' < "$PROPS" | grep -oP '<StaticWebAsset\s[^>]*>')
+          done < <(sed -n 's/.*<RelativePath>\([^<]*\)<\/RelativePath>.*/\1/p; s/.*<Integrity>\([^<]*\)<\/Integrity>.*/\1/p' "$PROPS")
 
           echo "Checked $COUNT assets, $ERRORS mismatches"
 
