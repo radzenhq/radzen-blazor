@@ -21,11 +21,13 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Clean
-        run: dotnet clean Radzen.Blazor/Radzen.Blazor.csproj -c Release
-
-      - name: Build (Release)
+      - name: Build (generate CSS and minified JS)
         run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release
+
+      - name: Rebuild (ensure static web assets include generated files)
+        run: |
+          rm -rf Radzen.Blazor/obj/Release/net10.0/staticwebassets
+          dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release
 
       - name: Verify integrity hashes
         shell: bash
