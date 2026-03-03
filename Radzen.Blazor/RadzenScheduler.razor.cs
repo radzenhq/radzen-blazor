@@ -687,7 +687,7 @@ namespace Radzen.Blazor
 
             if (firstRender && JSRuntime != null)
             {
-                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createScheduler", Element, Reference);
+                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", Element, Reference);
 
                 if (!heightIsSet)
                 {
@@ -726,7 +726,7 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
-                JSRuntime.InvokeVoid("Radzen.destroyScheduler", Element);
+                JSRuntime.InvokeVoid("Radzen.destroyResizable", Element);
             }
 
             GC.SuppressFinalize(this);
