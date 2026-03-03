@@ -68,15 +68,23 @@
     <SassFile Include="$(MSBuildProjectDirectory)/themes/**/*.scss" />
   </ItemGroup>
 
-  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net10.0'">
+  <Target Name="MoveCss" BeforeTargets="AssignTargetPaths" Condition="'$(TargetFramework)' == 'net10.0'">
     <ItemGroup>
         <CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
     </ItemGroup>
     <Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
+    <ItemGroup>
+        <Content Remove="wwwroot/css/**/*.css" />
+        <Content Include="wwwroot/css/**/*.css" />
+    </ItemGroup>
   </Target>
 
   <Target Name="MinifyTest" BeforeTargets="AssignTargetPaths" Condition="'$(TargetFramework)' == 'net10.0'">
     <TerserMinify InputFile="wwwroot\Radzen.Blazor.js" OutputFile="wwwroot\Radzen.Blazor.min.js" />
+    <ItemGroup>
+        <Content Remove="wwwroot/Radzen.Blazor.min.js" />
+        <Content Include="wwwroot/Radzen.Blazor.min.js" />
+    </ItemGroup>
   </Target>
 
   <ItemGroup Label="Allow internal method to be visible to the unit tests">

@@ -6,7 +6,7 @@ on:
       publish:
         description: Push package to NuGet.org
         type: boolean
-        default: false
+        default: true
 
 jobs:
   publish:
@@ -21,13 +21,8 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Build (generate CSS and minified JS)
+      - name: Build
         run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release
-
-      - name: Rebuild (ensure static web assets include generated files)
-        run: |
-          rm -rf Radzen.Blazor/obj/Release/net10.0/staticwebassets
-          dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release
 
       - name: Verify integrity hashes
         shell: bash
@@ -83,6 +78,7 @@ jobs:
         run: dotnet pack Radzen.Blazor/Radzen.Blazor.csproj -c Release --no-build
 
       - name: Upload package artifact
+        if: ${{ !inputs.publish }}
         uses: actions/upload-artifact@v4
         with:
           name: nuget-package
@@ -91,5 +87,5 @@ jobs:
             Radzen.Blazor/bin/Release/*.snupkg
 
       - name: Push to NuGet
-        if: inputs.publish
+        if: ${{ inputs.publish }}
         run: dotnet nuget push "Radzen.Blazor/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
