@@ -75,7 +75,7 @@ jobs:
         run: dotnet test Radzen.Blazor.Tests/Radzen.Blazor.Tests.csproj -c Release
 
       - name: Pack
-        run: dotnet pack Radzen.Blazor/Radzen.Blazor.csproj -c Release --no-build
+        run: dotnet pack Radzen.Blazor/Radzen.Blazor.csproj -c Release
 
       - name: Upload package artifact
         if: ${{ !inputs.publish }}
