@@ -3052,5 +3052,56 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(raised);
         }
+
+        [Fact]
+        public void DataGrid_ShowsData_AfterVisibilityToggle()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[] { new { Col1 = "a", Col2 = "a" }, new { Col1 = "b", Col2 = "b" } };
+
+            RenderFragment columns = builder =>
+            {
+                builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                builder.AddAttribute(1, "Property", "Col1");
+                builder.AddAttribute(2, "Title", "Column 1");
+                builder.CloseComponent();
+
+                builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                builder.AddAttribute(4, "Property", "Col2");
+                builder.AddAttribute(5, "Title", "Column 2");
+                builder.CloseComponent();
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.Visible, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, columns);
+            });
+
+            var cellsBefore = component.FindAll(".rz-cell-data");
+            Assert.True(cellsBefore.Count > 0, "Grid should show data initially");
+
+            component.SetParametersAndRender(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.Visible, false);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, columns);
+            });
+
+            component.SetParametersAndRender(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.Visible, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, columns);
+            });
+
+            var cellsAfter = component.FindAll(".rz-cell-data");
+            Assert.True(cellsAfter.Count > 0, "Grid should show data after visibility toggle");
+            Assert.Equal(cellsBefore.Count, cellsAfter.Count);
+        }
     }
 }
