@@ -16,6 +16,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Overview",
             Path = "/",
+            Description = "100+ free, open-source Blazor UI components for data-rich web apps. DataGrid, Scheduler, Charts, Forms, and more. MIT licensed.",
             Icon = "\ue88a"
         },
         new Example
@@ -30,7 +31,7 @@ namespace RadzenBlazorDemos
         {
             Name = "AI",
             Path = "/ai",
-            Title = "AI and Radzen Blazor",
+            Title = "AI and Radzen Blazor | Free UI Components by Radzen",
             Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",
             Icon = "\uefac",
             Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "mcp", "nuget" },
@@ -50,7 +51,7 @@ namespace RadzenBlazorDemos
             Name = "Accessibility",
             Path = "/accessibility",
             Title = "Blazor Accessibility | Free UI Components by Radzen",
-            Description = "The accessible Radzen Blazor Components library covers highest levels of web accessibility guidelines and recommendations, making you Blazor app compliant with WAI-ARIA, WCAG 2.2, section 508, and keyboard compatibility standards.",
+            Description = "Accessible Blazor components compliant with WAI-ARIA, WCAG 2.2, Section 508, and keyboard navigation standards.",
             Icon = "\ue92c",
             Tags = new[] { "keyboard", "accessibility", "standard", "508", "wai-aria", "wcag", "shortcut"}
         },
@@ -68,7 +69,7 @@ namespace RadzenBlazorDemos
                     Path = "themes",
                     Updated = true,
                     Title = "Blazor Themes | Free UI Components by Radzen",
-                    Description = "The Radzen Blazor Components package features an array of both free and premium themes, allowing you to choose the style that best suits your project's requirements.",
+                    Description = "Free and premium Blazor themes for Radzen components. Choose the style that best suits your project.",
                     Icon = "\ue40a",
                     Tags = new[] { "theme", "color", "background", "border", "utility", "css", "var"}
                 },
@@ -77,7 +78,7 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Persist the Theme", Anchor = "#persist" }, new () { Text = "Video: Changing themes at runtime in Radzen Blazor Studio", Anchor = "#video-changing-themes-at-runtime" } ],
                     Name = "ThemeService",
                     Path = "theme-service",
-                    Title = "ThemeService",
+                    Title = "Blazor ThemeService | Free UI Components by Radzen",
                     Description = "The ThemeService allows to change the theme of the application at runtime.",
                     Icon = "\ue3ae",
                     Tags = ["theme", "service", "change", "runtime", "rtl", "right to left", "direction", "wcag", "accessibility"]
@@ -87,7 +88,7 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Switch between light and dark mode", Anchor = "#light-dark-mode" }, new () { Text = "Video: AppearanceToggle in Radzen Blazor Studio", Anchor = "#video-radzen-blazor-studio-config" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "AppearanceToggle",
                     Path = "appearance-toggle",
-                    Title = "Blazor Themes | Free UI Components by Radzen",
+                    Title = "Blazor Appearance Toggle | Free UI Components by Radzen",
                     Description = "The AppearanceToggle button allows you to switch between two predefined themes, most commonly light and dark.",
                     Icon = "\ueb37",
                     Tags = new[] { "theme", "light", "dark", "mode", "appearance", "toggle", "switch"}
@@ -157,7 +158,7 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Responsive overflow", Anchor = "#responsive-spacing" } ],
                     Name = "Overflow",
-                    Title = "Blazor Content Overflow Utilities | Free UI Components by Radzen",
+                    Title = "Blazor Overflow Utilities | Free UI Components by Radzen",
                     Description = "Overflow styles and utility CSS classes available in Radzen Blazor Components library.",
                     Path = "overflow",
                     Icon = "\uf829",
@@ -239,7 +240,7 @@ namespace RadzenBlazorDemos
             Toc = [ new () { Text = "Centered CTA", Anchor = "#centered-cta" }, new () { Text = "Left-aligned CTA", Anchor = "#left-aligned-cta" }, new () { Text = "Justified CTA", Anchor = "#left-aligned-cta" }, new () { Text = "Image to the left", Anchor = "#image-to-the-left" }, new () { Text = "Image to the right", Anchor = "#image-to-the-right" } ],
             Name = "UI Blocks",
             Pro = true,
-            Title = "Blazor UI Blocks",
+            Title = "Blazor UI Blocks | Free UI Components by Radzen",
             Description = "Ready to use UI building blocks and templates",
             Icon = "\uf51d",
             Children = new[] {
@@ -348,7 +349,7 @@ namespace RadzenBlazorDemos
         new Example
         {
             Name = "App Templates",
-            Title = "Blazor App Templates",
+            Title = "Blazor App Templates | Free UI Components by Radzen",
             Description = "Ready to use Blazor application and website templates",
             Icon = "\ue5c3",
             Children = new[] {
@@ -409,7 +410,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "IQueryable",
-                            Title = "Blazor DataGrid Component with code-less paging, sorting and filtering of IQueryable data sources | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - IQueryable Data Source | Free UI Components by Radzen",
                             Description = "Use RadzenDataGrid to display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.",
                             Path = "datagrid",
                             Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
@@ -418,7 +419,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "LoadData event",
                             Path = "datagrid-loaddata",
-                            Title = "Blazor DataGrid Component - LoadData Event | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - LoadData Event | Free UI Components by Radzen",
                             Description = "Blazor Data Grid custom data-binding via the LoadData event.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "custom" }
                         },
@@ -426,7 +427,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "OData service",
                             Path = "datagrid-odata",
-                            Title = "Blazor DataGrid Component - OData Service | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - OData Service | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports data-binding to OData.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata", "service", "rest" }
                         },
@@ -434,7 +435,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Dynamic data",
                             Path = "datagrid-dynamic",
-                            Title = "Blazor DataGrid Component - Dynamic Data | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Dynamic Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports dynamic data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
                         },
@@ -442,7 +443,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "DataTable data",
                             Path = "datagrid-datatable",
-                            Title = "Blazor DataGrid Component - DataTable Data | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - DataTable Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports DataTable sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "datatable" }
                         },
@@ -450,7 +451,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Real-time data",
                             Path = "datagrid-realtime",
-                            Title = "Blazor DataGrid Component - Real-time Data | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Real-time Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid with real-time data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "real-time" }
                         },
@@ -458,7 +459,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Crosstab data",
                             Path = "datagrid-crosstab",
-                            Title = "Blazor DataGrid Component - Crosstab Data | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Crosstab Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports crosstab data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "crosstab", "rows", "columns" }
                         },
@@ -466,7 +467,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Performance",
                             Path = "datagrid-performance",
-                            Title = "Blazor DataGrid Component - Performance | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Performance | Free UI Components by Radzen",
                             Description = "Blazor Data Grid bound to a large collection of data",
                             Tags = new [] { "datagrid", "bind", "performance", "data", "large" }
                         },
@@ -482,7 +483,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "IQueryable support",
                             Path = "datagrid-virtualization",
-                            Title = "Blazor DataGrid Component - IQueryable Virtualization | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Virtualization | Free UI Components by Radzen",
                             Description = "Virtualization allows you to render large amounts of data on demand. The RadzenDataGrid component uses Entity Framework to query the visible data.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "virtualization", "ondemand" }
                         },
@@ -490,7 +491,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "LoadData support",
                             Path = "datagrid-virtualization-loaddata",
-                            Title = "Blazor DataGrid Component - Custom Virtualization | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - LoadData Virtualization | Free UI Components by Radzen",
                             Description = "RadzenDataGrid supports virtualization with custom data-binding scenarios. Handle the LoadData event as usual.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "virtualization", "ondemand" }
                         },
@@ -507,7 +508,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Template",
                             Path = "datagrid-column-template",
-                            Title = "Blazor DataGrid Component - Column Template | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Column Template | Free UI Components by Radzen",
                             Description = "Blazor Data Grid custom appearance via column templates. The Template allows you to customize the way data is displayed.",
                             Tags = new [] { "column", "template", "grid", "datagrid", "table"}
                         },
@@ -515,7 +516,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Resizing",
                             Path = "datagrid-column-resizing",
-                            Title = "Blazor DataGrid Component - Column Resizing | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Column Resizing | Free UI Components by Radzen",
                             Description = "Enable column resizing in RadzenDataGrid by setting the AllowColumnResizing property to true.",
                             Tags = new [] { "column", "resizing", "grid", "datagrid", "table"}
                         },
@@ -523,7 +524,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Column Picker",
                             Path = "datagrid-column-picker",
-                            Title = "Blazor DataGrid Component - Column Picker | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Column Picker | Free UI Components by Radzen",
                             Description = "Enable column picker in RadzenDataGrid by setting the AllowColumnPicking property to true.",
                             Tags = new [] { "datagrid", "column", "picker", "chooser" }
                         },
@@ -532,7 +533,7 @@ namespace RadzenBlazorDemos
                             Updated = true,
                             Name = "Reorder",
                             Path = "datagrid-column-reorder",
-                            Title = "Blazor DataGrid Component - Column Reorder | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Column Reorder | Free UI Components by Radzen",
                             Description = "Enable column reorder in RadzenDataGrid by setting the AllowColumnReorder property to true. Define column initial order using column OrderIndex property.",
                             Tags = new [] { "column", "reorder", "grid", "datagrid", "table"}
                         },
@@ -540,7 +541,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Footer Totals",
                             Path = "datagrid-footer-totals",
-                            Title = "Blazor DataGrid Component - Footer Totals | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Footer Totals | Free UI Components by Radzen",
                             Description = "The FooterTemplate column property allows you to display aggregated data in the column footer.",
                             Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
                         },
@@ -548,7 +549,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Frozen Columns",
                             Path = "datagrid-frozen-columns",
-                            Title = "Blazor DataGrid Component - Frozen Columns | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Frozen Columns | Free UI Components by Radzen",
                             Description = "Lock columns in RadzenDataGrid to prevent them from scrolling out of view via the Frozen property.",
                             Tags = new [] { "datagrid", "column", "frozen", "locked" }
                         },
@@ -556,7 +557,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Composite Columns",
                             Path = "datagrid-composite-columns",
-                            Title = "Blazor DataGrid Component - Composite Columns | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Composite Columns | Free UI Components by Radzen",
                             Description = "Use RadzenDataGridColumn Columns property to define child columns.",
                             Tags = new [] { "datagrid", "column", "composite", "merged", "complex" }
                         },
@@ -564,7 +565,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Conditional Columns",
                             Path = "datagrid-conditional-columns-render",
-                            Title = "Blazor DataGrid Component - Conditional Columns Render | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Conditional Columns | Free UI Components by Radzen",
                             Description = "Use RadzenDataGridColumn Columns property to define child columns conditionally.",
                             Tags = new [] { "datagrid", "column", "conditional", "render", "complex" }
                         }
@@ -581,7 +582,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Simple Mode",
                             Path = "datagrid-simple-filter",
-                            Title = "Blazor DataGrid Component - Simple Filter Mode | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Simple Filter Mode | Free UI Components by Radzen",
                             Description = "RadzenDataGrid simple mode filtering.",
                             Tags = new [] { "filter", "simple", "grid", "datagrid", "table"}
                         },
@@ -589,7 +590,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Simple with menu",
                             Path = "datagrid-simple-filter-menu",
-                            Title = "Blazor DataGrid Component - Simple Filter Mode with Menu | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Simple Filter with Menu | Free UI Components by Radzen",
                             Description = "RadzenDataGrid simple mode filtering with Menu.",
                             Tags = new [] { "filter", "simple", "grid", "datagrid", "table", "menu" }
                         },
@@ -597,7 +598,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Advanced Mode",
                             Path = "datagrid-advanced-filter",
-                            Title = "Blazor DataGrid Component - Advanced Filter Mode | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Advanced Filter Mode | Free UI Components by Radzen",
                             Description = "RadzenDataGrid advanced mode filtering.",
                             Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"}
                         },
@@ -605,7 +606,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "CheckBoxList (Excel like)",
                             Path = "datagrid-checkboxlist-filter",
-                            Title = "Blazor DataGrid Component - Excel like filtering | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Excel like filtering | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like filtering.",
                             Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list" }
                         },
@@ -613,7 +614,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "CheckBoxList with OData",
                             Path = "datagrid-checkboxlist-filter-odata",
-                            Title = "Blazor DataGrid Component - Excel like filtering with OData | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Excel Filter with OData | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like filtering with OData.",
                             Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list", "odata" }
                         },
@@ -621,7 +622,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Mixed Mode",
                             Path = "datagrid-mixed-filter",
-                            Title = "Blazor DataGrid Component -  Excel like and Advanced mixed Filter Mode | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Mixed Filter Mode | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like and advanced mixed mode filtering.",
                             Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"}
                         },
@@ -629,7 +630,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Enum filtering",
                             Path = "datagrid-enum-filter",
-                            Title = "Blazor DataGrid Component - Enum Filtering | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Enum Filtering | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use enums in the RadzenDataGrid column filter.",
                             Tags = new [] { "filter", "enum", "grid", "datagrid", "table"}
                         },
@@ -637,7 +638,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filtering sub properties",
                             Path = "datagrid-sub-properties-filter",
-                            Title = "Blazor DataGrid Component - Sub Properties Filtering | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Sub Property Filter | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use sub properties in the RadzenDataGrid column filter.",
                             Tags = new [] { "filter", "sub properties", "grid", "datagrid", "table"}
                         },
@@ -645,7 +646,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filter API",
                             Path = "datagrid-filter-api",
-                            Title = "Blazor DataGrid Component - Filter API | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Filter API | Free UI Components by Radzen",
                             Description = "Set the initial filter of your RadzenDataGrid via the FilterValue and FilterOperator column properties.",
                             Tags = new [] { "filter", "api", "grid", "datagrid", "table"}
                         },
@@ -653,7 +654,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filter Template",
                             Path = "datagrid-filter-template",
-                            Title = "Blazor DataGrid Component - Custom Filtering | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Custom Filtering | Free UI Components by Radzen",
                             Description = "This example demonstrates how to define custom RadzenDataGrid column filter template.",
                             Tags = new [] { "datagrid", "column", "filter", "template" }
                         },
@@ -661,7 +662,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filter Value Template",
                             Path = "datagrid-filtervalue-template",
-                            Title = "Blazor DataGrid Component - Custom Filtering template | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Filter Value Template | Free UI Components by Radzen",
                             Description = "This example demonstrates how to define custom RadzenDataGrid column filter value template.",
                             Tags = new [] { "datagrid", "column", "filter", "template", "value" }
                         },
@@ -678,7 +679,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Hierarchy",
                             Path = "master-detail-hierarchy",
-                            Title = "Blazor DataGrid Component - Hierarchy | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Hierarchy | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use templates to create a hierarchy in a Blazor RadzenDataGrid.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
                         },
@@ -686,7 +687,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Hierarchy on demand",
                             Path = "master-detail-hierarchy-demand",
-                            Title = "Blazor DataGrid Component - Hierarchy on Demand | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Hierarchy on Demand | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy and load data on demand.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "on-demand" }
                         },
@@ -694,7 +695,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Self-reference hierarchy",
                             Path = "datagrid-selfref-hierarchy",
-                            Title = "Blazor DataGrid Component - Self-reference Hierarchy | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Self-Reference Hierarchy | Free UI Components by Radzen",
                             Description = "This example demonstrates how to develop and show a self-referencing hierarchy.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "hierarchy", "self-reference" }
                         },
@@ -702,7 +703,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Master/Detail",
                             Path = "master-detail",
-                            Title = "Blazor DataGrid Component - Master and Detail | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Master and Detail | Free UI Components by Radzen",
                             Description = "This example demonstrates how to create a master/detail relationship between two Blazor RadzenDataGrid components.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
                         },
@@ -719,7 +720,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Single selection",
                             Path = "datagrid-single-selection",
-                            Title = "Blazor DataGrid Component - Single Selection | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Single Selection | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable single selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "single", "selection", "datagrid", "table", "dataview" }
                         },
@@ -728,7 +729,7 @@ namespace RadzenBlazorDemos
                             Updated = true,
                             Name = "Multiple selection",
                             Path = "datagrid-multiple-selection",
-                            Title = "Blazor DataGrid Component - Multiple Selection | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Multi Selection | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable multiple selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
                         },
@@ -736,7 +737,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Cell selection",
                             Path = "datagrid-cell-selection",
-                            Title = "Blazor DataGrid Component - Cell Selection | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Cell Selection | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable cell selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "cell", "selection", "datagrid", "table", "dataview" }
                         },
@@ -752,7 +753,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Single Column Sorting",
                             Path = "datagrid-sort",
-                            Title = "Blazor DataGrid Component - Sorting | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Sorting | Free UI Components by Radzen",
                             Description = "This example demonstrates sorting in Blazor RadzenDataGrid component.",
                             Tags = new [] { "single", "sort", "datagrid", "table", "dataview" }
                         },
@@ -760,7 +761,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Multiple Column Sorting",
                             Path = "datagrid-multi-sort",
-                            Title = "Blazor DataGrid Component - Sorting by Multiple Columns | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Multi-Column Sorting | Free UI Components by Radzen",
                             Description = "This example demonstrates multiple column sorting in Blazor RadzenDataGrid component.",
                             Tags = new [] { "multi", "sort", "datagrid", "table", "dataview" }
                         },
@@ -768,7 +769,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Sort API",
                             Path = "datagrid-sort-api",
-                            Title = "Blazor DataGrid Component - Sort API | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Sort API | Free UI Components by Radzen",
                             Description = "Set the initial sort order of your RadzenDataGrid via the SortOrder column property.",
                             Tags = new [] { "api", "sort", "datagrid", "table", "dataview" }
                         }
@@ -785,7 +786,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Pager Position",
                             Path = "datagrid-pager-position",
-                            Title = "Blazor DataGrid Component - Pager Position | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Pager Position | Free UI Components by Radzen",
                             Description = "Set the pager position to Top, Bottom, or TopAndBottom.",
                             Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
                         },
@@ -793,7 +794,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Pager Horizontal Align",
                             Path = "datagrid-pager-horizontal-align",
-                            Title = "Blazor DataGrid Component - Pager Horizontal Align | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Pager Alignment | Free UI Components by Radzen",
                             Description = "See how to change the horizontal alignment of the pager in a RadzenDataGrid.",
                             Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
                         },
@@ -801,7 +802,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Pager API",
                             Path = "datagrid-pager-api",
-                            Title = "Blazor DataGrid Component - Pager API | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Pager API | Free UI Components by Radzen",
                             Description = "Blazor RadzenDataGrid Pager API.",
                             Tags = new [] { "pager", "paging", "api", "datagrid", "table", "dataview" }
                         }
@@ -819,8 +820,8 @@ namespace RadzenBlazorDemos
                             Updated = true,
                             Name = "Grouping API",
                             Path = "datagrid-grouping-api",
-                            Title = "Blazor DataGrid Component - Grouping API | Free UI Components by Radzen",
-                            Description = "Set AllowGrouping to true, to enable group by column and GroupPanelText to localize the group panel text. Set Groupable to false for column, to disable grouping by that column.",
+                            Title = "Blazor DataGrid - Grouping API | Free UI Components by Radzen",
+                            Description = "Enable DataGrid grouping with AllowGrouping. Localize group panel text and disable grouping per column.",
                             Tags = new [] { "group", "grouping", "datagrid", "table", "dataview", "api" }
                         },
                         new Example
@@ -828,7 +829,7 @@ namespace RadzenBlazorDemos
                             Updated = true,
                             Name = "Group Header Template",
                             Path = "datagrid-group-header-template",
-                            Title = "Blazor DataGrid Component - Group Header Template | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Group Header | Free UI Components by Radzen",
                             Description = "Use GroupHeaderTemplate to customize DataGrid group header rows.",
                             Tags = new [] { "group", "grouping", "template", "datagrid", "table", "dataview" }
                         },
@@ -836,7 +837,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Group Footer Template",
                             Path = "datagrid-group-footer-template",
-                            Title = "Blazor DataGrid Component - Group Footer Template | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Group Footer | Free UI Components by Radzen",
                             Description = "The GroupFooterTemplate column property allows you to display aggregated data (totals) in the column footer for each group.",
                             Tags = new [] { "group", "grouping", "footer", "template", "datagrid", "table", "dataview" }
                         }
@@ -846,7 +847,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Density",
                     Path = "datagrid-density",
-                    Title = "Blazor DataGrid Component - Density | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - Density | Free UI Components by Radzen",
                     Description = "See how to set a compact density mode of Blazor RadzenDataGrid.",
                     Icon = "\ueb9e",
                     Tags = new [] { "density", "compact", "small", "large", "tight" }
@@ -860,7 +861,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Header with button",
                             Path="datagrid-custom-header",
-                            Title = "Blazor DataGrid Component - Custom Header | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Custom Header | Free UI Components by Radzen",
                             Description = "Gives the grid a custom header, allowing the adding of components to create custom tool bars in addtion to column grouping and column picker.",
                             Tags = new [] { "grid header","header" }
                         },
@@ -868,7 +869,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Header with column picker",
                             Path="datagrid-custom-header-columnpicker",
-                            Title = "Blazor DataGrid Component - Header with Column Picker | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Header Column Picker | Free UI Components by Radzen",
                             Description = "See how to add a column picker to your Blazor RadzenDataGrid.",
                             Tags = new [] { "grid header","header" }
                         }
@@ -878,7 +879,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "GridLines",
                     Path = "datagrid-grid-lines",
-                    Title = "Blazor DataGrid Component - Grid Lines | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - Grid Lines | Free UI Components by Radzen",
                     Description = "Deside where to display grid lines in your Blazor RadzenDataGrid.",
                     Icon = "\uf016",
                     Tags = new [] { "grid", "lines", "border", "gridlines" }
@@ -887,7 +888,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Cell Context Menu",
                     Path = "datagrid-cell-contextmenu",
-                    Title = "Blazor DataGrid Component - Cell Context Menu | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - Cell Menu | Free UI Components by Radzen",
                     Description = "Right click on a table cell to open the context menu.",
                     Icon = "\ue22b",
                     Tags = new [] { "cell", "row", "contextmenu", "menu", "rightclick" }
@@ -904,8 +905,8 @@ namespace RadzenBlazorDemos
                         {
                             Name = "IQueryable",
                             Path = "datagrid-save-settings",
-                            Title = "Blazor DataGrid Component - Save / Load Settings | Free UI Components by Radzen",
-                            Description = "This example shows how to save/load DataGrid state using Settings property. The state includes current page index, page size, groups and columns filter, sort, order, width and visibility.",
+                            Title = "Blazor DataGrid - Save/Load Settings | Free UI Components by Radzen",
+                            Description = "Save and load DataGrid state including page index, page size, column filters, sort order, width, and visibility.",
                             Tags = new [] { "save", "load", "settings" }
                         },
 
@@ -913,7 +914,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "LoadData binding",
                             Path = "datagrid-save-settings-loaddata",
-                            Title = "Blazor DataGrid Component - Save / Load Settings with LoadData | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Save/Load Settings | Free UI Components by Radzen",
                             Description = "This example shows how to save/load DataGrid state using Settings property when binding using LoadData event.",
                             Tags = new [] { "save", "load", "settings", "async", "loaddata" }
                         }
@@ -931,7 +932,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Rows reorder",
                             Path = "/datagrid-rowreorder",
-                            Title = "Blazor DataGrid Component - Reorder rows | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Reorder rows | Free UI Components by Radzen",
                             Description = "This example demonstrates custom DataGrid rows reoder.",
                             Tags = new [] { "datagrid", "reorder", "row" }
                         },
@@ -939,7 +940,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Drag row between two DataGrids",
                             Path = "/datagrid-rowdragbetween",
-                            Title = "Blazor DataGrid Component - Drag rows between two DataGrids | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Drag Rows Between Grids | Free UI Components by Radzen",
                             Description = "This example demonstrates drag and drop rows between two DataGrid components.",
                             Tags = new [] { "datagrid", "drag", "row", "between" }
                         },
@@ -947,7 +948,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Drag row between DataGrid and Scheduler",
                             Path = "/datagrid-rowdrag-scheduler",
-                            Title = "Blazor DataGrid Component - Drag rows from DataGrid to Scheduler | Free UI Components by Radzen",
+                            Title = "Blazor DataGrid - Drag Rows to Scheduler | Free UI Components by Radzen",
                             Description = "This example demonstrates drag and drop rows between DataGrid and Scheduler.",
                             Tags = new [] { "datagrid", "drag", "row", "scheduler" }
                         }
@@ -958,7 +959,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "InLine Editing",
                     Path = "datagrid-inline-edit",
-                    Title = "Blazor DataGrid Component - InLine Editing | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - InLine Editing | Free UI Components by Radzen",
                     Description = "This example demonstrates how to configure the Razden Blazor DataGrid for inline editing.",
                     Icon = "\ue22b",
                     Tags = new [] { "inline", "editor", "datagrid", "table", "dataview" }
@@ -968,7 +969,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "InCell Editing",
                     Path = "datagrid-incell-edit",
-                    Title = "Blazor DataGrid Component - InCell Editing | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - InCell Editing | Free UI Components by Radzen",
                     Description = "This example demonstrates how to configure the Razden Blazor DataGrid for in-cell editing.",
                     Icon = "\ue745",
                     Tags = new [] { "in-cell", "editor", "datagrid", "table", "dataview" }
@@ -978,7 +979,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Conditional formatting",
                     Path = "datagrid-conditional-template",
-                    Title = "Blazor DataGrid Component - Conditional Formatting | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - Conditional Format | Free UI Components by Radzen",
                     Description = "This example demonstrates RadzenDataGrid with conditional rows and cells template and styles.",
                     Icon = "\ue41d",
                     Tags = new [] { "conditional", "template", "style", "datagrid", "table", "dataview" }
@@ -987,7 +988,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Export to Excel and CSV",
                     Path = "export-excel-csv",
-                    Title = "Blazor DataGrid Component - Export to Excel and CSV | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - Excel & CSV Export | Free UI Components by Radzen",
                     Description = "This example demonstrates how to export a Radzen Blazor DataGrid to Excel and CSV.",
                     Icon = "\ue0c3",
                     Tags = new [] { "export", "excel", "csv" }
@@ -996,7 +997,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Cascading DropDowns",
                     Path = "cascading-dropdowns",
-                    Title = "Blazor DataGrid Component - Cascading DropDowns | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - Cascading DropDown | Free UI Components by Radzen",
                     Description = "This example demonstrates cascading Radzen Blazor DropDown components.",
                     Icon = "\ue915",
                     Tags = new [] { "related", "parent", "child" }
@@ -1005,7 +1006,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Empty Data Grid",
                     Path = "/datagrid-empty",
-                    Title = "Blazor DataGrid Component - Empty Data Grid | Free UI Components by Radzen",
+                    Title = "Blazor DataGrid - Empty Data Grid | Free UI Components by Radzen",
                     Description = "This example demonstrates Blazor DataGrid without data.",
                     Icon = "\ue661",
                     Tags = new [] { "datagrid", "databinding" }
@@ -1024,7 +1025,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "IQueryable",
                     Path = "/pivot-data-grid",
-                    Title = "Blazor Pivot DataGrid Component - IQueryable data-binding | Free UI Components by Radzen",
+                    Title = "Blazor Pivot DataGrid - IQueryable | Free UI Components by Radzen",
                     Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
                     Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
                 },
@@ -1032,7 +1033,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "LoadData",
                     Path = "/pivot-data-grid-load-data",
-                    Title = "Blazor Pivot DataGrid custom data-binding via the LoadData event.",
+                    Title = "Blazor Pivot DataGrid - LoadData Binding | Free UI Components by Radzen",
                     Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
                     Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
                 },
@@ -1040,7 +1041,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Dynamic data",
                     Path = "/pivot-data-grid-dynamic",
-                    Title = "Blazor Pivot DataGrid Component - dynamic data sets | Free UI Components by Radzen",
+                    Title = "Blazor Pivot DataGrid - Dynamic Data | Free UI Components by Radzen",
                     Description = "Bind RadzenPivotDataGrid to schema-less IDictionary<string, object> records and configure fields dynamically.",
                     Tags = new [] { "pivot", "dynamic", "dictionary", "analysis", "aggregation", "drill-down", "datagrid", "table" }
                 },
@@ -1048,7 +1049,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "OData",
                     Path = "/pivot-data-grid-odata",
-                    Title = "Blazor Pivot DataGrid custom data-binding to OData service.",
+                    Title = "Blazor Pivot DataGrid - OData Binding | Free UI Components by Radzen",
                     Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
                     Tags = new [] { "odata", "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
                 }
@@ -1077,7 +1078,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "OData service",
-                            Title = "Blazor DataList Component - OData Service | Free UI Components by Radzen",
+                            Title = "Blazor DataList - OData Service | Free UI Components by Radzen",
                             Description = "Demonstration and configuration of the Radzen Blazor DataList component using LoadData event.",
                             Path = "datalist-loaddata",
                             Tags = new [] { "dataview", "grid", "table", "list", "odata" },
@@ -1102,7 +1103,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "LoadData",
-                            Title = "Blazor DataFilter Component - LoadData event | Free UI Components by Radzen",
+                            Title = "Blazor DataFilter - LoadData event | Free UI Components by Radzen",
                             Description = "This example demonstrates DataFilter with DataGrid LoadData event.",
                             Path = "datafilter-loaddata",
                             Tags = new [] { "dataview", "grid", "table", "filter", "loaddata" },
@@ -1110,7 +1111,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "OData service",
-                            Title = "Blazor DataFilter Component - OData Service | Free UI Components by Radzen",
+                            Title = "Blazor DataFilter - OData Service | Free UI Components by Radzen",
                             Description = "This example demonstrates data filter with OData service.",
                             Path = "datafilter-odata",
                             Tags = new [] { "dataview", "grid", "table", "filter", "odata" },
@@ -1173,7 +1174,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Data-binding",
-                            Title = "Blazor Tree Component - Data-binding | Free UI Components by Radzen",
+                            Title = "Blazor Tree - Data-binding | Free UI Components by Radzen",
                             Description = "This example demonstrates how to populate RadzenTree from a database via Entity Framework.",
                             Path = "tree-data-binding",
                             Tags = new [] { "tree", "treeview", "nodes", "data", "table" },
@@ -1181,7 +1182,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Files and directories",
-                            Title = "Blazor Tree Component - Data-binding to Files and Directories | Free UI Components by Radzen",
+                            Title = "Blazor Tree - File & Directory Binding | Free UI Components by Radzen",
                             Description = "This example demonstrates how to populate Blazor RadzenTree from the file system.",
                             Path = "tree-file-system",
                             Tags = new [] { "tree", "treeview", "nodes", "file", "directory" },
@@ -1189,7 +1190,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Selection",
-                            Title = "Blazor Tree Component - Selection | Free UI Components by Radzen",
+                            Title = "Blazor Tree - Selection | Free UI Components by Radzen",
                             Description = "This example demonstrates how to get or set the selected items of RadzenTree.",
                             Path = "tree-selection",
                             Tags = new [] { "tree", "treeview", "nodes", "selection" },
@@ -1197,7 +1198,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Checkboxes",
-                            Title = "Blazor Tree Component - Tri-state Checkboxes | Free UI Components by Radzen",
+                            Title = "Blazor Tree - Tri-State Checkboxes | Free UI Components by Radzen",
                             Description = "This example demonstrates tri-state checkboxes in RadzenTree.",
                             Path = "tree-checkboxes",
                             Tags = new [] { "tree", "treeview", "nodes", "check" },
@@ -1205,7 +1206,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Drag & Drop",
-                            Title = "Blazor Tree Component - Drag & Drop items | Free UI Components by Radzen",
+                            Title = "Blazor Tree - Drag & Drop items | Free UI Components by Radzen",
                             Description = "This example demonstrates custom drag & drop logic in RadzenTree.",
                             Path = "tree-dragdrop",
                             Tags = new [] { "tree", "treeview", "nodes", "drag", "drop" },
@@ -1213,7 +1214,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Context menu",
-                            Title = "Blazor Tree Component - Context menu | Free UI Components by Radzen",
+                            Title = "Blazor Tree - Context menu | Free UI Components by Radzen",
                             Description = "This example demonstrates context menu in RadzenTree.",
                             Path = "tree-contextmenu",
                             Tags = new [] { "tree", "treeview", "nodes", "context", "menu" },
@@ -1221,7 +1222,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Refreshing tree data-binding",
-                            Title = "Blazor Tree Component - Refreshing tree data-binding | Free UI Components by Radzen",
+                            Title = "Blazor Tree - Refresh Data Binding | Free UI Components by Radzen",
                             Description = "This example demonstrates how to refresh a lazily loaded RadzenTree.",
                             Path = "tree-data-binding-refresh",
                             Tags = new [] { "tree", "treeview", "nodes" },
@@ -1229,7 +1230,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Tree filtering",
-                            Title = "Blazor Tree Component - Filtering | Free UI Components by Radzen",
+                            Title = "Blazor Tree - Filtering | Free UI Components by Radzen",
                             Description = "This example demonstrates how to filter RadzenTree.",
                             Path = "tree-filter",
                             Tags = new [] { "tree", "treeview", "filter" },
@@ -1452,7 +1453,7 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "CanChange event", Anchor = "#canchange-event" } ],
                     Name = "Steps",
-                    Description = "Use Radzen Blazor Steps component to guide users through a process or sequence of actions. The component consists of a series of numbered steps that represent the various stages of the process.",
+                    Description = "Blazor Steps component to guide users through a process with numbered steps representing each stage.",
                     Path = "steps",
                     Icon = "\ue8be",
                     Tags = new [] { "step", "steps", "wizard" }
@@ -1593,7 +1594,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Define max labels and selected items text", Anchor = "#define-max-labels-and-selected-items-text" }, new () { Text = "Specify an Equality Comparer for item selection. Useful when binding directly to an object collection.", Anchor = "#item-comparer" } ],
                             Name = "Multiple selection",
                             Path = "dropdown-multiple",
-                            Title = "Blazor DropDown Component - Multiple Selection | Free UI Components by Radzen",
+                            Title = "Blazor DropDown - Multi Selection | Free UI Components by Radzen",
                             Description = "This example demonstrates multiple selection support in Radzen Blazor DropDown component.",
                             Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown" },
                         },
@@ -1601,7 +1602,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Virtualization",
                             Path = "dropdown-virtualization",
-                            Title = "Blazor DropDown Component - Virtualization | Free UI Components by Radzen",
+                            Title = "Blazor DropDown - Virtualization | Free UI Components by Radzen",
                             Description = "This example demonstrates virtualization using IQueryable.",
                             Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "virtualization", "paging" },
                         },
@@ -1609,7 +1610,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filtering",
                             Path = "dropdown-filtering",
-                            Title = "Blazor DropDown Component - Filtering | Free UI Components by Radzen",
+                            Title = "Blazor DropDown - Filtering | Free UI Components by Radzen",
                             Description = "This example demonstrates Blazor DropDown component filtering case sensitivity and filter operator.",
                             Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "filter" },
                         },
@@ -1617,7 +1618,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Grouping",
                             Path = "dropdown-grouping",
-                            Title = "Blazor DropDown Component - Grouping | Free UI Components by Radzen",
+                            Title = "Blazor DropDown - Grouping | Free UI Components by Radzen",
                             Description = "This example demonstrates Blazor DropDown component with grouping.",
                             Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "grouping" },
                         },
@@ -1626,7 +1627,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "DropDown data binding to enum", Anchor = "#data-binding-to-enum" } ],
                             Name = "Custom objects binding",
                             Path = "dropdown-custom-objects",
-                            Title = "Blazor DropDown Component - Custom Objects Binding | Free UI Components by Radzen",
+                            Title = "Blazor DropDown - Custom Objects | Free UI Components by Radzen",
                             Description = "This example demonstrates Blazor DropDown component binding to custom objects.",
                             Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "custom" },
                         },
@@ -1684,7 +1685,7 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Variants", Anchor = "#variants" }, new () { Text = "Input types", Anchor = "#input-types" }, new () { Text = "Start, End, and ChildContent", Anchor = "#start-end-child-content" }, new () { Text = "Floating Label", Anchor = "#floating-label" }, new () { Text = "Helper text", Anchor = "#helper-text" }, new () { Text = "Validation", Anchor = "#form-field-validation" }, new () { Text = "Disabled FormField", Anchor = "#disabled-form-field" } ],
                     Name = "FormField",
                     Path = "form-field",
-                    Description = "Radzen Blazor FormField component features a floating label effect. When the user focuses on an empty input field, the label floats above, providing a visual cue as to which field is being filled out.",
+                    Description = "Blazor FormField with floating labels, helper text, validation, and multiple input variants.",
                     Icon = "\ue578",
                     Tags = new [] { "form", "label", "floating", "float", "edit", "outline", "input", "helper", "valid" }
                 },
@@ -1707,8 +1708,8 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Custom command on Execute event", Anchor = "#command-execute-event" }, new () { Text = "Custom tool with template", Anchor = "#command-template" }, new () { Text = "Custom dialog", Anchor = "#command-dialog" } ],
                             Name = "Custom Tools",
                             Path = "html-editor-custom-tools",
-                            Title = "Blazor HTML Editor Component - Custom Tools | Free UI Components by Radzen",
-                            Description = "This example demonstrates Blazor HTML editor component with custom tools. RadzenHtmlEditor allows the developer to create custom tools via the RadzenHtmlEditorCustomTool tag.",
+                            Title = "Blazor HTML Editor - Custom Tools | Free UI Components by Radzen",
+                            Description = "Blazor HTML editor with custom tools. Create custom tools via the RadzenHtmlEditorCustomTool tag.",
                             Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
                         },
                     }
@@ -1891,7 +1892,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Chart Series", Anchor = "#series" }, new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                             Name = "Series",
                             Path = "chart-series",
-                            Title = "Blazor Chart Component - Series Configuration | Free UI Components by Radzen",
+                            Title = "Blazor Chart - Series Config | Free UI Components by Radzen",
                             Description = "Use the Radzen Blazor Chart component to display data in a graphical format.",
                             Tags = new [] { "chart", "graph", "series" }
                         },
@@ -1963,7 +1964,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Min, max and step", Anchor = "#min-max-and-step" }, new () { Text = "Format axis values", Anchor = "#format-axis-values" }, new () { Text = "Display grid lines", Anchor = "#display-grid-lines" }, new () { Text = "Set axis title", Anchor = "#set-axis-title" } ],
                             Name = "Axis",
                             Path = "chart-axis",
-                            Title = "Blazor Chart Component - Axis Configuration | Free UI Components by Radzen",
+                            Title = "Blazor Chart - Axis Config | Free UI Components by Radzen",
                             Description = "By default the Radzen Blazor Chart determines the Y axis minimum and maximum based on the range of values.",
                             Tags = new [] { "chart", "graph", "series" }
                         },
@@ -1972,7 +1973,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Legend position", Anchor = "#legend-position" }, new () { Text = "Hide the legend", Anchor = "#hide-the-legend" } ],
                             Name = "Legend",
                             Path = "chart-legend",
-                            Title = "Blazor Chart Component - Legend Configuration | Free UI Components by Radzen",
+                            Title = "Blazor Chart - Legend Config | Free UI Components by Radzen",
                             Description = "The Radzen Blazor Chart displays a legend by default. It uses the Title property of the series (or category values for pie series) as items in the legend.",
                             Tags = new [] { "chart", "graph", "legend" }
                         },
@@ -1981,8 +1982,8 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
                             Name = "ToolTip",
                             Path = "chart-tooltip",
-                            Title = "Blazor Chart Component - ToolTip Configuration | Free UI Components by Radzen",
-                            Description = "The Radzen Blazor Chart displays a tooltip when the user hovers series with the mouse. The tooltip by default includes the series category, value and series name.",
+                            Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
+                            Description = "Blazor Chart tooltip shown on hover. Customize content or disable tooltips per series.",
                             Tags = new [] { "chart", "graph", "legend" }
                         },
                         new Example
@@ -1990,7 +1991,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Auto Rotation", Anchor = "#auto-rotation" }, new () { Text = "Predefined Rotation", Anchor = "#rotation" } ],
                             Name = "Label Rotation",
                             Path = "chart-label-rotation",
-                            Title = "Blazor Chart Component - Label Rotation | Free UI Components by Radzen",
+                            Title = "Blazor Chart - Label Rotation | Free UI Components by Radzen",
                             Description = "The Radzen Blazor Chart can rotate the labels of the horizontal axis.",
                             Tags = new [] { "chart", "label", "rotate", "rotation" }
                         },
@@ -1998,15 +1999,15 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Trends",
                             Path = "chart-trends",
-                            Title = "Blazor Chart Component - Trends | Free UI Components by Radzen",
-                            Description = "The mean, median and mode are measures of central tendency. Under different conditions, some measures of central tendency become more appropriate to use than others.",
+                            Title = "Blazor Chart - Trends | Free UI Components by Radzen",
+                            Description = "Blazor Chart trend lines displaying mean, median, and mode measures of central tendency.",
                             Tags = new [] { "chart", "trend", "median", "mean", "mode" }
                         },
                         new Example
                         {
                             Name = "Annotations",
                             Path = "chart-annotations",
-                            Title = "Blazor Chart Component - Annotations | Free UI Components by Radzen",
+                            Title = "Blazor Chart - Annotations | Free UI Components by Radzen",
                             Description = "This example demonstrates RadzenSeriesAnnotation.",
                             Tags = new [] { "chart", "annotation", "label" }
                         },
@@ -2014,7 +2015,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Interpolation",
                             Path = "chart-interpolation",
-                            Title = "Blazor Chart Component - Interpolation | Free UI Components by Radzen",
+                            Title = "Blazor Chart - Interpolation | Free UI Components by Radzen",
                             Description = "This example demonstrates Radzen Blazor Chart interpolation mode.",
                             Tags = new [] { "chart", "interpolation", "spline", "step" }
                         },
@@ -2022,7 +2023,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Styling Chart",
                             Path = "styling-chart",
-                            Title = "Blazor Chart Component - Styling | Free UI Components by Radzen",
+                            Title = "Blazor Chart - Styling | Free UI Components by Radzen",
                             Description = "This example demonstrates different color schemes, custom colors and styling of Radzen Blazor Chart component.",
                             Tags = new [] { "chart", "graph", "styling" }
                         },
@@ -2067,7 +2068,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Styling Gauge",
                     Path = "styling-gauge",
-                    Title = "Blazor Gauge Component - Styling | Free UI Components by Radzen",
+                    Title = "Blazor Gauge - Styling | Free UI Components by Radzen",
                     Description = "This example demonstrates multiple pointers with RadzenRadialGauge and multiple scales with RadzenArcGauge component.",
                     Icon = "\ue41d",
                     Tags = new [] { "gauge", "graph", "styling" }
@@ -2096,7 +2097,7 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Orientation and Position", Anchor = "#orientation-and-position" }, new () { Text = "Align Items", Anchor = "#align-items" }, new () { Text = "Styling", Anchor = "#line-width" }, new () { Text = "Point Size", Anchor = "#point-size" }, new () { Text = "Point Style", Anchor = "#point-style" }, new () { Text = "Point Variant", Anchor = "#point-variant" }, new () { Text = "Point Shadow", Anchor = "#point-shadow" }, new () { Text = "Point Content", Anchor = "#point-content" } ],
                     Name = "Timeline",
                     Path = "timeline",
-                    Description = "Demonstration and configuration of Radzen Blazor Timeline component. RadzenTimeline component is a graphical representation used to display a chronological sequence of events or data points.",
+                    Description = "Blazor Timeline component for displaying a chronological sequence of events with flexible orientation and styling.",
                     Icon = "\ue00d",
                     Tags = new [] { "timeline", "time", "line" }
                 },
@@ -2135,7 +2136,7 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Alert",
-                    Title = "Blazor Alert component",
+                    Title = "Blazor Alert Component | Free UI Components by Radzen",
                     Icon = "\ue88e",
                     Tags = new [] { "message", "alert" },
                     Children = new [] {
@@ -2150,7 +2151,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Alert Styling",
-                            Title = "Blazor Alert Component - Styling | Free UI Components by Radzen",
+                            Title = "Blazor Alert - Styling | Free UI Components by Radzen",
                             Description = "This example demonstrates different styles, shades and variants of Radzen Blazor Alert component.",
                             Path = "alert-styling",
                             Tags = new [] { "message", "alert" },
@@ -2162,7 +2163,7 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Badge Style", Anchor = "#badge-style" }, new () { Text = "Badge Shade", Anchor = "#badge-shade" }, new () { Text = "Badge Variant", Anchor = "#badge-variant" }, new () { Text = "Pill", Anchor = "#pill" }, new () { Text = "Child Content", Anchor = "#child-content" } ],
                     Name = "Badge",
                     Path = "badge",
-                    Description = "The Radzen Blazor Badge component is a small graphic that displays important information, like a count or label, within a user interface. It's commonly used to draw attention to something or provide visual feedback to the user.",
+                    Description = "Blazor Badge component for displaying counts, labels, and status indicators with multiple styles and variants.",
                     Icon = "\uf7f1",
                     Tags = new[] { "badge", "link"}
                 },
@@ -2197,7 +2198,7 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Show tooltip with string message", Anchor = "#tooltip-string-message" }, new () { Text = "Tooltip positions", Anchor = "#tooltip-positions" }, new () { Text = "Show tooltip with HTML content", Anchor = "#tooltip-html-content" }, new () { Text = "Tooltip delay and duration", Anchor = "#tooltip-delay-duration" }, new () { Text = "Close Tooltip on page click", Anchor = "#tooltip-close-on-page-click" }, new () { Text = "Tooltip on HTML element", Anchor = "#tooltip-html-element" } ],
                     Name = "Tooltip",
-                    Description = "The Radzen Blazor Tooltip component is a small pop-up box that appears when the user hovers or clicks on a UI element. It is commonly used to provide additional information or context to the user.",
+                    Description = "Blazor Tooltip component with configurable positions, HTML content, delay, and duration settings.",
                     Path = "tooltip",
                     Icon = "\ue9f8",
                     Tags = new [] { "popup", "tooltip" }
@@ -2282,7 +2283,7 @@ namespace RadzenBlazorDemos
             Name = "Changelog",
             Path = "/changelog",
             Updated = true,
-            Title = "Track and review changes to Radzen Blazor Components",
+            Title = "Blazor Components Changelog | Free UI Components by Radzen",
             Description = "See what's new in Radzen Blazor Components",
             Icon = "\ue8e1"
         },
@@ -2341,7 +2342,7 @@ namespace RadzenBlazorDemos
         {
             if (example != null && example.Name != "Overview")
             {
-                return example.Title ?? $"Blazor {example.Name} Component | Free UI Components by Radzen";
+                return example.Title ?? $"Blazor {example.Name} | Free UI Components by Radzen";
             }
 
             return "Free Blazor Components | 100+ UI controls by Radzen";

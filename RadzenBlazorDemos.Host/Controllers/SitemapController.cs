@@ -38,10 +38,13 @@ public class SitemapController : Controller
         var pages = GetBlazorPages();
         foreach (var page in pages)
         {
+            var priority = page == "/" ? "1.0"
+                : page.Count(c => c == '/') <= 1 ? "0.8"
+                : "0.6";
             sb.AppendLine("  <url>");
             sb.AppendLine($"    <loc>{BaseUrl}{page}</loc>");
             sb.AppendLine("    <changefreq>weekly</changefreq>");
-            sb.AppendLine("    <priority>0.8</priority>");
+            sb.AppendLine($"    <priority>{priority}</priority>");
             sb.AppendLine("  </url>");
         }
 
