@@ -24,27 +24,32 @@ jobs:
       - name: Build
         run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release
 
+      - name: Pack
+        run: dotnet pack Radzen.Blazor/Radzen.Blazor.csproj -c Release
+
       - name: Verify integrity hashes
         shell: bash
         run: |
           set -euo pipefail
 
-          PROPS="Radzen.Blazor/obj/Release/net10.0/staticwebassets/msbuild.Radzen.Blazor.Microsoft.AspNetCore.StaticWebAssets.props"
-          WWWROOT="Radzen.Blazor/wwwroot"
+          NUPKG=$(ls Radzen.Blazor/bin/Release/*.nupkg | head -1)
+          WORKDIR=$(mktemp -d)
+          unzip -q "$NUPKG" -d "$WORKDIR"
+
+          PROPS="$WORKDIR/build/Microsoft.AspNetCore.StaticWebAssets.props"
 
           if [ ! -f "$PROPS" ]; then
-            echo "::error::Static web assets props file not found: $PROPS"
+            echo "::error::Static web assets props file not found in package"
             exit 1
           fi
 
           ERRORS=0
           COUNT=0
 
-          # Parse RelativePath and Integrity child elements from each StaticWebAsset block
           while IFS= read -r rel_path; do
             IFS= read -r integrity || true
 
-            file="$WWWROOT/$rel_path"
+            file="$WORKDIR/staticwebassets/$rel_path"
             [ ! -f "$file" ] && continue
 
             actual=$(openssl dgst -sha256 -binary "$file" | openssl base64 -A)
@@ -57,6 +62,8 @@ jobs:
               echo "OK: $rel_path"
             fi
           done < <(sed -n 's/.*<RelativePath>\([^<]*\)<\/RelativePath>.*/\1/p; s/.*<Integrity>\([^<]*\)<\/Integrity>.*/\1/p' "$PROPS")
+
+          rm -rf "$WORKDIR"
 
           echo "Checked $COUNT assets, $ERRORS mismatches"
 
@@ -73,9 +80,6 @@ jobs:
 
       - name: Test
         run: dotnet test Radzen.Blazor.Tests/Radzen.Blazor.Tests.csproj -c Release
-
-      - name: Pack
-        run: dotnet pack Radzen.Blazor/Radzen.Blazor.csproj -c Release
 
       - name: Upload package artifact
         if: ${{ !inputs.publish }}
