@@ -467,6 +467,18 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       border-inline-start: none;
     }
   }
+
+  .rz-slot-title {
+    display: flex;
+    align-items: baseline;
+    flex: 1;
+  }
+
+  .rz-event-list-btn {
+    position: static;
+    margin-inline-start: auto;
+    font-size: var(--rz-scheduler-event-list-button-font-size);
+  }
 }
 
 // Planner View

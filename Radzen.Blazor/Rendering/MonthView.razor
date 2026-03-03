@@ -44,27 +44,21 @@
                                 DragStart=@OnAppointmentDragStart />
                         }
                     }
-                    @for (var dayIndex = 0; dayIndex < week.Days.Length; dayIndex++)
-                    {
-                        var slot = week.Days[dayIndex];
-                        if (slot.Hidden > 0)
-                        {
-                            var slotWidth = 100 / 7.0;
-                            var left = dayIndex * slotWidth;
-                            var top = 1.5 * (MaxAppointmentsInSlot + 1);
-                            <button type="button" class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); })>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</button>
-                        }
-                    }
                 </div>
                 <div class="rz-slots">
                 @for (var day = 0; day < 7; day ++)
                 {
                     var dayOfWeek = StartDate.AddDays(days++);
+                    var slot = week.Days[day];
                     <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
                         <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" role="button" tabindex="0"
                              @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation
                              @onkeydown="@(args => OnDayHeaderKeyDown(args, dayOfWeek))">
                             @dayOfWeek.Day
+                            @if (slot.Hidden > 0)
+                            {
+                                <button type="button" class="rz-event-list-btn" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); }) @onclick:stopPropagation>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</button>
+                            }
                         </div>
                     </div>
                 }
