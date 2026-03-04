@@ -390,6 +390,7 @@ namespace Radzen
                 return;
 
             searchText = null;
+            _view = null;
             await SearchTextChanged.InvokeAsync(searchText);
             if (JSRuntime != null)
             {
