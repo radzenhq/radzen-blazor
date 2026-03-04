@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System;
@@ -151,6 +151,17 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        bool _itemRefreshPending;
+
+        internal void ItemRefresh()
+        {
+            if (!_itemRefreshPending)
+            {
+                _itemRefreshPending = true;
+                StateHasChanged();
+            }
+        }
+
         /// <summary>
         /// Determines whether the specified index is selected.
         /// </summary>
@@ -279,6 +290,8 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            _itemRefreshPending = false;
+
             if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
             {
                 var item = items.Where(i => i.Visible).ElementAtOrDefault(parameters.GetValueOrDefault<int>(nameof(SelectedIndex)));

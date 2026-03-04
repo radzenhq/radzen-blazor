@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Threading.Tasks;
 
@@ -187,11 +187,21 @@ namespace Radzen.Blazor
                 shouldRefresh = true;
             }
 
+            if (parameters.DidParameterChange(nameof(Text), Text) ||
+                parameters.DidParameterChange(nameof(Icon), Icon) ||
+                parameters.DidParameterChange(nameof(IconColor), IconColor) ||
+                parameters.DidParameterChange(nameof(Disabled), Disabled) ||
+                parameters.DidParameterChange(nameof(ChildContent), ChildContent) ||
+                parameters.DidParameterChange(nameof(Template), Template))
+            {
+                shouldRefresh = true;
+            }
+
             await base.SetParametersAsync(parameters);
 
             if (shouldRefresh)
             {
-                Accordion?.Refresh();
+                Accordion?.ItemRefresh();
             }
         }
 
