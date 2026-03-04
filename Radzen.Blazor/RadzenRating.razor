@@ -1,4 +1,4 @@
-﻿@using System.Linq
+@using System.Linq
 @using Microsoft.AspNetCore.Components.Forms
 @inherits FormComponent<int>
 @if (Visible)
@@ -8,7 +8,7 @@
         {
             <button type="button" id="@(GetId() + "cl")" aria-label="@ClearAriaLabel" @onclick="@(args => SetValue(0))" class="rz-rating-cancel"
                 tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-                @onkeypress="@(args => OnKeyPress(args, SetValue(0)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
+                @onkeypress="@(args => OnKeyPress(args, SetValue(0)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
                 <span class="notranslate rz-rating-icon rzi rzi-ban"></span>
             </button>
         }
@@ -16,7 +16,7 @@
         {
             <button type="button" id="@(GetId() + index.ToString() + "r")" aria-label="@RateAriaLabel" @onclick="@(args => SetValue(index))"
                 tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-               @onkeypress="@(args => OnKeyPress(args, SetValue(index)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
+               @onkeypress="@(args => OnKeyPress(args, SetValue(index)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
                 <span class="notranslate rz-rating-icon rzi @(index <= Value ? "rzi-star": "rzi-star-o")"></span>
             </button>
         }

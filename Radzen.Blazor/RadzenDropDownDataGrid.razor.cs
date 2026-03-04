@@ -44,6 +44,13 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>
     {
+        bool stopKeydownPropagation = true;
+        void OnGuardKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code ?? args.Key;
+            stopKeydownPropagation = key != "Escape";
+        }
+
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>

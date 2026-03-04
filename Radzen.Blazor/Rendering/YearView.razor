@@ -34,7 +34,7 @@
         var startMonth = realstart;
 
         <div class="rz-year-month rz-display-flex rz-flex-column rz-col-12 rz-col-sm-6 rz-col-md-4 rz-col-lg-3"
-                 tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+                 tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
                  @onfocus=@(args => {CurrentDate = currentDate; CurrentMonth = currentMonth; })>
 
             <div class="rz-slot-header rz-pb-2" role="button" tabindex="0" @onclick=@(args => OnMonthClick(startMonth)) @onkeydown="@(args => OnMonthHeaderKeyDown(args, startMonth))">
@@ -197,6 +197,7 @@
     int CurrentMonth;
 
     bool preventKeyPress;
+    bool stopKeydownPropagation;
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {
@@ -207,16 +208,19 @@
             var days = key == "ArrowLeft" || key == "ArrowRight" ? 1 : 7;
             CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" || key == "ArrowUp" ? -days : days);
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (key == "Enter")
         {
             await OnListClick(CurrentDate, AppointmentsInRange(CurrentDate, CurrentDate.AddDays(1)));
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else
         {
             preventKeyPress = false;
+            stopKeydownPropagation = false;
         }
     }
 }

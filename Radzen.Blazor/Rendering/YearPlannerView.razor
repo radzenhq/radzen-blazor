@@ -20,7 +20,7 @@
     const double NUMBER_DAYS_COLUMNS = 38.0;
 }
 
-<div @ref=view class="rz-view rz-planner-view" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+<div @ref=view class="rz-view rz-planner-view" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
      @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
     <div class="rz-view-header">
         <div class="rz-slot-header">
@@ -283,6 +283,7 @@
     int CurrentMonth = -1;
 
     bool preventKeyPress = true;
+    bool stopKeydownPropagation;
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {
@@ -314,6 +315,7 @@
             }
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (key == "ArrowUp" || key == "ArrowDown")
         {
@@ -322,12 +324,14 @@
             CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth + 1, 1);
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (key == "Enter")
         {
             await OnListClick(CurrentDate, AppointmentsInRange(CurrentDate, CurrentDate.AddDays(1)));
             await view.FocusAsync();
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (key == "Space")
         {
@@ -339,10 +343,12 @@
             }
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else
         {
             preventKeyPress = false;
+            stopKeydownPropagation = false;
         }
     }
 }

@@ -113,6 +113,7 @@ namespace Radzen.Blazor
         List<RadzenPanelMenuItem>? currentItems;
 
         bool preventKeyPress;
+        bool stopKeydownPropagation;
 
         async Task OnKeyPress(KeyboardEventArgs args)
         {
@@ -123,6 +124,7 @@ namespace Radzen.Blazor
             if (key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 if (key == "ArrowUp" && focusedIndex == 0 && currentItems.Exists(i => i.ParentItem != null))
                 {
@@ -171,6 +173,7 @@ namespace Radzen.Blazor
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 if (focusedIndex >= 0 && focusedIndex < currentItems.Count)
                 {
@@ -203,6 +206,7 @@ namespace Radzen.Blazor
             else
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
             }
 
             if (preventKeyPress)

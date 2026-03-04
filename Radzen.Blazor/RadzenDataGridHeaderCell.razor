@@ -22,7 +22,7 @@
             <span class="rz-column-title" title="@GetColumnTitleAttribute()">
                 @if (Column.HeaderTemplate != null)
                 {
-                    <span class="@Column.GetHeaderClass()" @onkeydown:stopPropagation>@Column.HeaderTemplate</span>
+                    <span class="@Column.GetHeaderClass()" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">@Column.HeaderTemplate</span>
                 }
                 else
                 {

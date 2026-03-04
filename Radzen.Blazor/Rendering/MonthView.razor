@@ -17,7 +17,7 @@
     @{
         var days = 0;
     }
-    <div @ref=contentView class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+    <div @ref=contentView class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
          @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
          @foreach (var week in (weeks ?? new List<Week>()))
          {
@@ -333,6 +333,7 @@
     int currentAppointment = -1;
     IEnumerable<AppointmentData> currentAppointments = Enumerable.Empty<AppointmentData>();
     bool preventKeyPress;
+    bool stopKeydownPropagation;
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {
@@ -349,6 +350,7 @@
             currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(MaxAppointmentsInSlot);
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (arrow && currentAppointments.Any())
         {
@@ -363,6 +365,7 @@
             }
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (key == "Enter")
         {
@@ -370,6 +373,7 @@
             await contentView.FocusAsync();
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (key == "Space")
         {
@@ -380,10 +384,12 @@
             }
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else
         {
             preventKeyPress = false;
+            stopKeydownPropagation = false;
         }
     }
 }

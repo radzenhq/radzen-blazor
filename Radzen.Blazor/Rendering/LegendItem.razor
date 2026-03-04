@@ -1,6 +1,6 @@
 @using Radzen.Blazor
 
-<span class="rz-legend-item" style="@Style" @onclick="@OnClick" @attributes="@MouseEventAttributes" role="button" aria-disabled="@(!Clickable).ToString().ToLowerInvariant()" tabindex="@(Clickable ? "0" : "-1")" @onkeypress="@OnKeyPress" @onkeypress:preventDefault=@preventKeyPress @onkeypress:stopPropagation>
+<span class="rz-legend-item" style="@Style" @onclick="@OnClick" @attributes="@MouseEventAttributes" role="button" aria-disabled="@(!Clickable).ToString().ToLowerInvariant()" tabindex="@(Clickable ? "0" : "-1")" @onkeypress="@OnKeyPress" @onkeypress:preventDefault=@preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
     <svg width="@((MarkerSize * 2).ToInvariantString())" height="@((MarkerSize * 2).ToInvariantString())">
         <g class="rz-series-@Index @Class">
             <Marker X="@MarkerSize" Y="@MarkerSize" Type="@(MarkerType == MarkerType.None ? MarkerType.Square : MarkerType)" Fill="@Color" Size="@MarkerSize" />
@@ -44,6 +44,7 @@
     public int Index { get; set; }
 
     bool preventKeyPress;
+    bool stopKeypressPropagation;
 
     IReadOnlyDictionary<string, object>? MouseEventAttributes
     {
@@ -85,12 +86,14 @@
         if (key == "Space" || key == "Enter")
         {
             preventKeyPress = true;
+            stopKeypressPropagation = true;
 
             await OnClick();
         }
         else
         {
             preventKeyPress = false;
+            stopKeypressPropagation = false;
         }
     }
 }

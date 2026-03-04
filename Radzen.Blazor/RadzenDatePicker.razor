@@ -1,4 +1,4 @@
-﻿@using Radzen
+@using Radzen
 @using Radzen.Blazor.Rendering
 
 @typeparam TValue
@@ -12,7 +12,7 @@
             @if (ShowInput || !ShowButton)
             {
                 <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-                        @onchange="@ParseDate" autocomplete="off" type="text" name="@Name" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
+                        @onchange="@ParseDate" autocomplete="off" type="text" name="@Name" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation"
                        class="rz-inputtext @InputClass @(ReadOnly ? "rz-readonly" : "") @(!ShowButton ? "rz-input-trigger" : "")" id="@Name" placeholder="@CurrentPlaceholder" />
             }
             @if (ShowButton)
@@ -52,7 +52,7 @@
                         </div>
                         @if(ShowDays)
                         {
-                        <div class="rz-calendar-view-container" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnCalendarKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+                        <div class="rz-calendar-view-container" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnCalendarKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
                             <table class="rz-calendar-view rz-calendar-month-view" style="@(Inline ? "" : "width:100%")">
                                 <thead>
                                     <tr>

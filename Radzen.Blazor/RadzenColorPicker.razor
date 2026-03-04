@@ -7,7 +7,7 @@
 {
     <div @ref=@Element style=@Style @onclick=@Toggle @attributes=@Attributes class=@GetCssClass() id=@GetId()
          role="button" aria-haspopup="dialog" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@($"{GetId()}-popup")" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
-         tabindex="@(Disabled ? -1 : TabIndex)" @onkeypress="@(args => OnKeyPress(args, Toggle()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
+         tabindex="@(Disabled ? -1 : TabIndex)" @onkeypress="@(args => OnKeyPress(args, Toggle()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
         @if (Icon != null)
         {
             <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>

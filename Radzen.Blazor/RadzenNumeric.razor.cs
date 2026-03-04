@@ -584,12 +584,14 @@ namespace Radzen.Blazor
         }
 
         bool preventKeyPress;
+        bool stopKeydownPropagation;
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
             if (key == "ArrowUp" || key == "ArrowDown")
             {
+                stopKeydownPropagation = true;
                 preventKeyPress = true;
 
                 if (key == "ArrowUp")
@@ -605,6 +607,7 @@ namespace Radzen.Blazor
             }
             else if (Immediate && args.Key.Length == 1 && char.IsDigit(args.Key[0]) && !args.CtrlKey && !args.AltKey && !args.ShiftKey)
             {
+                stopKeydownPropagation = true;
                 preventKeyPress = true;
 
                 if (JSRuntime != null)
@@ -617,6 +620,7 @@ namespace Radzen.Blazor
             }
             else
             {
+                stopKeydownPropagation = false;
                 preventKeyPress = false;
             }
         }

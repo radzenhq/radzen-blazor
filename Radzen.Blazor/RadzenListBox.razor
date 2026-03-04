@@ -44,7 +44,7 @@
                 {
                     <div class="rz-listbox-filter-container">
                         <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@(Placeholder ?? string.Empty)"
-                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@(searchText ?? string.Empty)" @onkeydown:stopPropagation="true"
+                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyDown" value="@(searchText ?? string.Empty)" @onkeydown:stopPropagation="stopKeydownPropagation"
                                @oninput="@OnFilterInput" aria-label="@SearchAriaLabel" />
                         <span class="notranslate rz-listbox-filter-icon rzi rzi-search"></span>
                     </div>

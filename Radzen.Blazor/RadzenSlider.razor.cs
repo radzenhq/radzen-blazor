@@ -360,12 +360,14 @@ namespace Radzen.Blazor
         public decimal Max { get; set; } = 100;
 
         bool preventKeyPress;
+        bool stopKeydownPropagation;
         async Task OnKeyPress(KeyboardEventArgs args, bool isMin)
         {
             var key = args?.Code ?? args?.Key;
 
             if (Orientation == Orientation.Horizontal ? key == "ArrowLeft" || key == "ArrowRight" : key == "ArrowUp" || key == "ArrowDown")
             {
+                stopKeydownPropagation = true;
                 preventKeyPress = true;
 
                 var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", ".", StringComparison.Ordinal), System.Globalization.CultureInfo.InvariantCulture);
@@ -389,6 +391,7 @@ namespace Radzen.Blazor
             }
             else
             {
+                stopKeydownPropagation = false;
                 preventKeyPress = false;
             }
         }

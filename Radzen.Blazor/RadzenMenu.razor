@@ -3,7 +3,7 @@
 @if (Visible)
 {
     <ul @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() role="menubar" aria-label="@AriaLabel"
-        tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
+        tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation"
         @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         @if (Responsive)
         {

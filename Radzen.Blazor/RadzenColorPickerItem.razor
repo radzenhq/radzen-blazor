@@ -1,5 +1,5 @@
-﻿@using Radzen.Blazor.Rendering
+@using Radzen.Blazor.Rendering
 
 <div class="rz-colorpicker-item @(isSelected ? "selected" : "")" style="background-color: @Background" @onmousedown:preventDefault @onclick=@OnClick
      role="button" aria-label="@Value" aria-disabled="@(ColorPicker?.Disabled == true ? "true" : "false")"
-     tabindex="@(ColorPicker?.Disabled == true ? -1 : 0)" @onkeypress="@(args => OnKeyPress(args, OnClick()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation></div>
+     tabindex="@(ColorPicker?.Disabled == true ? -1 : 0)" @onkeypress="@(args => OnKeyPress(args, OnClick()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation"></div>

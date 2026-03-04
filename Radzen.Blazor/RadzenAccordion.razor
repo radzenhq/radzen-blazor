@@ -1,4 +1,4 @@
-﻿@using System.Linq
+@using System.Linq
 @using Radzen.Blazor.Rendering
 
 @inherits RadzenComponent
@@ -20,7 +20,7 @@
             continue;
 
         var accordionId = $"{GetId()}-accordiontab-{items.IndexOf(item)}";
-        <div @ref="@item.Element" id="@item.GetItemId()" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" @onkeydown:stopPropagation>
+        <div @ref="@item.Element" id="@item.GetItemId()" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
             <button type="button" @onclick="@((args) => SelectItem(item))" aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)" role="tab"
                     id="@accordionId" aria-controls="@($"{accordionId}-content")" aria-expanded="@(item.GetSelected() ? "true" : "false")"
                     aria-selected="@(item.GetSelected() ? "true" : "false")" tabindex="@(item.GetSelected() ? "0" : "-1")">
@@ -41,7 +41,7 @@
         </div>
         <Expander Expanded=@item.GetSelected() role="tabpanel"
                 id="@($"{accordionId}-content")" aria-labelledby="@accordionId">
-            <div class="rz-accordion-content" @onkeydown:stopPropagation>
+            <div class="rz-accordion-content" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
                 @item.ChildContent
             </div>
         </Expander>

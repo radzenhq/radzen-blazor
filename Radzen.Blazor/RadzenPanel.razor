@@ -1,4 +1,4 @@
-﻿@using Radzen.Blazor.Rendering
+@using Radzen.Blazor.Rendering
 @inherits RadzenComponentWithChildren
 @if (Visible)
 {
@@ -23,7 +23,7 @@
                 <button id="@(GetId() + "expc")" type="button" @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
                         aria-controls="@($"{GetId()}-content")"
                         aria-expanded="@(collapsed ? "false" : "true")" aria-label="@(collapsed ? ExpandAriaLabel : CollapseAriaLabel)" title="@(collapsed ? ExpandTitle : CollapseTitle)"
-                        @onkeypress="@(args => OnKeyPress(args, Toggle(new MouseEventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
+                        @onkeypress="@(args => OnKeyPress(args, Toggle(new MouseEventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
                     <span class="notranslate rzi @(collapsed ? "rzi-plus" : "rzi-minus")"></span>
                 </button>
             }

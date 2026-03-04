@@ -1,4 +1,4 @@
-﻿@using Radzen.Blazor.Rendering
+@using Radzen.Blazor.Rendering
 @implements IDisposable
 @if ((Tabs?.RenderMode == TabRenderMode.Server ? Visible : true))
 {
@@ -10,7 +10,7 @@
        aria-disabled="@(Disabled ? "true" : "false")"
        disabled="@Disabled"
        tabindex="@(Disabled ? "-1" : (IsSelected ? "0" : "-1"))"
-       @onkeydown:stopPropagation>
+       @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
         @if (!string.IsNullOrEmpty(Icon))
         {
             <span class="notranslate rzi rz-tabview-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</span>

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections.Generic;
@@ -489,6 +489,7 @@ namespace Radzen.Blazor
         }
 
         bool preventKeyDown;
+        bool stopKeydownPropagation;
         int focusedIndex = -3;
 
         /// <summary>
@@ -505,6 +506,7 @@ namespace Radzen.Blazor
             if (key == "ArrowLeft" || key == "ArrowRight")
             {
                 preventKeyDown = true;
+                stopKeydownPropagation = true;
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), -2, numberOfDisplayedPages + 1);
 
@@ -520,6 +522,7 @@ namespace Radzen.Blazor
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyDown = true;
+                stopKeydownPropagation = true;
 
                 if (focusedIndex == -2)
                 {
@@ -559,6 +562,7 @@ namespace Radzen.Blazor
             else
             {
                 preventKeyDown = false;
+                stopKeydownPropagation = false;
                 shouldFocus = false;
             }
         }

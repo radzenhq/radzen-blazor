@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using System;
@@ -30,6 +30,18 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenListBox<TValue> : DropDownBase<TValue>
     {
+        bool stopKeydownPropagation;
+        async Task OnFilterKeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
+        {
+            stopKeydownPropagation = true;
+            await OnFilterKeyPress(args);
+            var key = args.Code ?? args.Key;
+            if (key == "Escape" || key == "Tab")
+            {
+                stopKeydownPropagation = false;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the select all text.
         /// </summary>

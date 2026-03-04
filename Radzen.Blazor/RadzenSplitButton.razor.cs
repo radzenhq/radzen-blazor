@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
@@ -277,6 +277,7 @@ namespace Radzen.Blazor
 
         internal int focusedIndex = -1;
         bool preventKeyPress = true;
+        bool stopKeydownPropagation;
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
@@ -284,6 +285,7 @@ namespace Radzen.Blazor
             if (args.AltKey && key == "ArrowDown")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
 
@@ -295,12 +297,14 @@ namespace Radzen.Blazor
             else if (key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 if (focusedIndex >= 0 && focusedIndex < items.Count)
                 {
@@ -314,12 +318,14 @@ namespace Radzen.Blazor
             else if (key == "Escape")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 Close();
             }
             else
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
             }
         }
 

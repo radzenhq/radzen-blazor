@@ -695,6 +695,7 @@ namespace Radzen.Blazor
             => ShowPopupButton ? Task.CompletedTask : ClickPopupButton();
 
         private bool preventKeyPress;
+        private bool stopKeydownPropagation;
         private async Task PressKey(KeyboardEventArgs args)
         {
             if (PreventPopupToggle)
@@ -706,12 +707,18 @@ namespace Radzen.Blazor
 
             if (key == "Enter")
             {
+                stopKeydownPropagation = true;
                 await TogglePopup();
             }
             else if (key == "Escape")
             {
+                stopKeydownPropagation = true;
                 await ClosePopup();
                 await FocusAsync();
+            }
+            else
+            {
+                stopKeydownPropagation = false;
             }
         }
         #endregion

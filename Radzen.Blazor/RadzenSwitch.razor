@@ -1,4 +1,4 @@
-﻿@using Radzen
+@using Radzen
 @using Microsoft.AspNetCore.Components.Forms
 @inherits FormComponent<bool>
 @if (Visible)
@@ -8,7 +8,7 @@
            value="@ValueAsString" tabindex="@(Disabled || ReadOnly ? "-1" : $"{TabIndex}")"
            disabled="@(Disabled || ReadOnly)" aria-checked="@(Value.ToString().ToLowerInvariant())"
            @onclick="@Toggle" @onkeydown="@OnKeyPress"
-           @onkeydown:stopPropagation class="rz-hidden-accessible" @attributes=@InputAttributes>
+           @onkeydown:stopPropagation="stopKeydownPropagation" class="rz-hidden-accessible" @attributes=@InputAttributes>
     <span class="rz-switch-circle@(Disabled ? " rz-disabled" : ReadOnly ? " rz-readonly" : "")"></span>
 </label>
 }

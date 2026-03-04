@@ -237,6 +237,8 @@ namespace Radzen.Blazor
         }
 
         bool preventKeyPress;
+        bool stopKeydownPropagation;
+        bool stopKeypressPropagation;
         async Task OnKeyPress(KeyboardEventArgs args, bool? expand = null)
         {
             var key = args.Code != null ? args.Code : args.Key;
@@ -244,6 +246,7 @@ namespace Radzen.Blazor
             if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
+                stopKeypressPropagation = true;
 
                 string? id = null;
 
@@ -267,6 +270,7 @@ namespace Radzen.Blazor
             else if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 if (JSRuntime == null || Splitter == null) return;
                 var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", GetId() + "-resize");
@@ -286,6 +290,8 @@ namespace Radzen.Blazor
             else
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
+                stopKeypressPropagation = false;
             }
         }
 

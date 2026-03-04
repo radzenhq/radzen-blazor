@@ -574,6 +574,15 @@ namespace Radzen.Blazor
         }
 
         bool preventKeyDown = true;
+        bool stopKeydownPropagation;
+
+        bool stopGuardKeydownPropagation = true;
+        void OnGuardKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code ?? args.Key;
+            stopGuardKeydownPropagation = key != "Escape";
+        }
+
         int focusedIndex = -1;
         int focusedCellIndex;
 
@@ -632,6 +641,7 @@ namespace Radzen.Blazor
             if (key == "ArrowDown" || key == "ArrowUp" || key == "ArrowLeft" || key == "ArrowRight")
             {
                 preventKeyDown = true;
+                stopKeydownPropagation = true;
 
                 if (focusedIndex == 0 && AllowFiltering && FilterMode == FilterMode.Advanced && key == "ArrowDown" && args.AltKey)
                 {
@@ -670,12 +680,14 @@ namespace Radzen.Blazor
             else if (IsVirtualizationAllowed() && (key == "PageUp" || key == "PageDown" || key == "Home" || key == "End"))
             {
                 preventKeyDown = true;
+                stopKeydownPropagation = true;
 
                 await FocusRow(key);
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyDown = true;
+                stopKeydownPropagation = true;
 
                 if (focusedIndex == 0)
                 {
@@ -707,6 +719,7 @@ namespace Radzen.Blazor
             else
             {
                 preventKeyDown = false;
+                stopKeydownPropagation = false;
             }
         }
 

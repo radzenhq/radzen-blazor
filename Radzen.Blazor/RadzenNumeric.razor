@@ -13,7 +13,7 @@
             placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" @bind:get="FormattedValue" @bind:set="SetValue"
             onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
             onblur="@GetOnInput()" onpaste="@GetOnPaste()" maxlength="@MaxLength"
-            @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
+            @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation" />
         @if (ShowUpDown)
         {
             <button aria-label=@UpAriaLabel type="button" class="rz-numeric-button rz-numeric-up rz-button" tabindex="-1"

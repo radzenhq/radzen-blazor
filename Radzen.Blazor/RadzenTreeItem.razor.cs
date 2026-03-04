@@ -519,6 +519,13 @@ namespace Radzen.Blazor
             return false;
         }
 
+        bool stopKeydownPropagation = true;
+        void OnGuardKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code ?? args.Key;
+            stopKeydownPropagation = key != "Escape";
+        }
+
         async Task OnContextMenu(MouseEventArgs args)
         {
             if (Tree?.ItemContextMenu != null)

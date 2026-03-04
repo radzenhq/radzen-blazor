@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System;
@@ -188,6 +188,13 @@ namespace Radzen.Blazor
         {
             Tabs?.RemoveItem(this);
             GC.SuppressFinalize(this);
+        }
+
+        bool stopKeydownPropagation = true;
+        void OnGuardKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code ?? args.Key;
+            stopKeydownPropagation = key != "Escape";
         }
 
         string getStyle()

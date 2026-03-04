@@ -1,4 +1,4 @@
-﻿@using Radzen.Blazor
+@using Radzen.Blazor
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -26,7 +26,7 @@
                        aria-selected="@(IsSelected(i, step) ? "true" : "false")"
                        aria-controls="@($"{GetId()}-panel-{i}")"
                        @onclick="@(async (args) => { if (!step.Disabled && AllowStepSelect) { await SelectStep(step, true); } })"
-                       @onkeypress="@(args => OnKeyPress(args, SelectStep(step, true)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
+                       @onkeypress="@(args => OnKeyPress(args, SelectStep(step, true)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation"
                        disabled="@step.Disabled" aria-disabled="@step.Disabled" class="rz-menuitem-link">
                         <span class="rz-steps-number">@(steps.Where(s => s.Visible).ToList().IndexOf(step) + 1)</span>
                         @if (step.Template != null)
@@ -65,12 +65,12 @@
         <button type="button" id="@(GetId() + "prev")" title="@PreviousTitle" aria-label="@PreviousAriaLabel"
            class='@($"rz-steps-prev {(IsFirstVisibleStep() || IsPrevStepDisabled() ?  "rz-state-disabled" : "")}")'
            disabled="@(IsFirstVisibleStep() || IsPrevStepDisabled())" aria-disabled="@(IsFirstVisibleStep() || IsPrevStepDisabled())"
-           @onkeypress="@(args => OnKeyPress(args, PrevStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
+           @onkeypress="@(args => OnKeyPress(args, PrevStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation"
            @onclick="@PrevStep"><span class="notranslate rzi"></span>@PreviousText</button>
         <button type="button" id="@(GetId() + "next")" title="@NextTitle" aria-label="@NextAriaLabel"
            class='@($"rz-steps-next {(IsLastVisibleStep() || IsNextStepDisabled() ?  "rz-state-disabled" : "")}")'
            disabled="@(IsLastVisibleStep() || IsNextStepDisabled())" aria-disabled="@(IsLastVisibleStep() || IsNextStepDisabled())"
-           @onkeypress="@(args => OnKeyPress(args, NextStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
+           @onkeypress="@(args => OnKeyPress(args, NextStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation"
            @onclick="@NextStep">@NextText<span class="notranslate rzi"></span></button>
     </div>
     }

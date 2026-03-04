@@ -1,11 +1,11 @@
-﻿@inherits RadzenComponent
+@inherits RadzenComponent
 @using System.Linq
 @using Microsoft.JSInterop
 <CascadingValue Value=this>
 @if (Visible)
 {
     <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
-         tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+         tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
         <ul role="tablist" class="rz-tabview-nav"
             aria-orientation="@(TabPosition == TabPosition.Left || TabPosition == TabPosition.Right ? "vertical" : "horizontal")">
             @Tabs
@@ -15,7 +15,7 @@
             {
                 for (var i = 0; i < tabs.Count; i++)
                 {
-                <div @onkeydown:stopPropagation class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{i}")" style="@(tabs[i] == SelectedTab ? "" : "display:none")" aria-hidden="@(tabs[i] == SelectedTab ? "false" : "true")" aria-labelledby="@($"{Id}-tabpanel-{i}-label")">
+                <div @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown" class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{i}")" style="@(tabs[i] == SelectedTab ? "" : "display:none")" aria-hidden="@(tabs[i] == SelectedTab ? "false" : "true")" aria-labelledby="@($"{Id}-tabpanel-{i}-label")">
                     @tabs[i].ChildContent
                 </div>                            
                 }
@@ -24,7 +24,7 @@
             {
                 @if (SelectedTab?.Visible == true)
                 {
-                    <div @onkeydown:stopPropagation class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{selectedIndex}")" aria-hidden="false" aria-labelledby="@($"{Id}-tabpanel-{selectedIndex}-label")">
+                    <div @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown" class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{selectedIndex}")" aria-hidden="false" aria-labelledby="@($"{Id}-tabpanel-{selectedIndex}-label")">
                         @SelectedTab.ChildContent
                     </div>
                 }

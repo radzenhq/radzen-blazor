@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
@@ -304,6 +304,15 @@ namespace Radzen.Blazor
 
         internal int focusedIndex = -1;
         bool preventKeyPress = true;
+        bool stopKeydownPropagation;
+
+        bool stopGuardKeydownPropagation = true;
+        void OnGuardKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code ?? args.Key;
+            stopGuardKeydownPropagation = key != "Escape";
+        }
+
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
@@ -315,18 +324,21 @@ namespace Radzen.Blazor
             if (key == "ArrowLeft" || key == "ArrowRight")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
             }
             else if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 focusedIndex = key == "Home" ? 0 : tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 if (focusedIndex >= 0 && focusedIndex < tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
                 {
@@ -336,6 +348,7 @@ namespace Radzen.Blazor
             else
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
             }
         }
         internal bool IsFocused(RadzenTabsItem item)

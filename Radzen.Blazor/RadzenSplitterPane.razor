@@ -26,7 +26,7 @@
             @if (IsCollapsible)
             {
                 <span tabindex="0" class="rz-collapse" id="@(GetId() + "-collapse")"
-                    @onkeypress="@(args => OnKeyPress(args, false))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
+                    @onkeypress="@(args => OnKeyPress(args, false))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation=stopKeypressPropagation
                     @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter!.OnCollapse(Index))>
                 </span>
             }
@@ -34,14 +34,14 @@
             @if (IsResizable)
             {
                 <span tabindex="0" class="rz-resize" id="@(GetId() + "-resize")"
-                    @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+                    @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation=stopKeydownPropagation>
                 </span>
             }
 
             @if (IsExpandable)
             {
                 <span tabindex="0" class="rz-expand" id="@(GetId() + "-expand")"
-                    @onkeypress="@(args => OnKeyPress(args, true))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
+                    @onkeypress="@(args => OnKeyPress(args, true))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation=stopKeypressPropagation
                     @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter!.OnExpand(Index))>
                 </span>
             }

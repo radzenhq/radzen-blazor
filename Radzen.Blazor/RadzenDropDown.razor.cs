@@ -34,6 +34,13 @@ namespace Radzen.Blazor
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
         bool isOpen;
+
+        bool stopKeydownPropagation = true;
+        void OnGuardKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code ?? args.Key;
+            stopKeydownPropagation = key != "Escape";
+        }
         /// <summary>
         /// Gets or sets additional HTML attributes to be applied to the underlying input element.
         /// This allows passing custom attributes like data-* attributes, aria-* attributes, or other HTML attributes directly to the input.

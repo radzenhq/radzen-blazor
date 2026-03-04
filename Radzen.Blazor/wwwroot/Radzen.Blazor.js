@@ -1431,6 +1431,16 @@ window.Radzen = {
             }
         }, 200);
     }
+
+    if (popup.__escapeHandler) {
+        popup.removeEventListener('keydown', popup.__escapeHandler, true);
+    }
+    popup.__escapeHandler = function (e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            Radzen.closePopup(id, instance, callback, e);
+        }
+    };
+    popup.addEventListener('keydown', popup.__escapeHandler, true);
   },
   closeAllPopups: function (e, id) {
     if (!Radzen.popups) return;
@@ -1487,6 +1497,10 @@ window.Radzen = {
       popup.classList.add("rz-close");
       popup.classList.remove("rz-open");
     }
+    if (popup && popup.__escapeHandler) {
+        popup.removeEventListener('keydown', popup.__escapeHandler, true);
+        delete popup.__escapeHandler;
+    }
     document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
     Radzen[id] = null;
@@ -1540,6 +1554,10 @@ window.Radzen = {
   destroyPopup: function (id) {
     var popup = document.getElementById(id);
     if (popup) {
+      if (popup.__escapeHandler) {
+          popup.removeEventListener('keydown', popup.__escapeHandler, true);
+          delete popup.__escapeHandler;
+      }
       popup.parentNode.removeChild(popup);
     }
     document.removeEventListener('mousedown', Radzen[id]);

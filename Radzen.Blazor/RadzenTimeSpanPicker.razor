@@ -26,7 +26,7 @@
                    placeholder="@Placeholder" tabindex="@(Disabled ? "-1" : TabIndex.ToString())" @attributes="@InputAttributes"
                    @onchange="@(args => { var value = args.Value?.ToString(); if (value != null) _ = SetValueFromInput(value); })"
                    @onclick="@(() => ClickInputField())" @onkeydown="@PressKey"
-                   @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation />
+                   @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation" />
         @if (ShowPopupButton)
         {
             <button type="button" aria-label="@TogglePopupAriaLabel" aria-haspopup="dialog"

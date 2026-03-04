@@ -1590,6 +1590,7 @@ namespace Radzen.Blazor
             if (key == "ArrowLeft" || key == "ArrowRight")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 FocusedDate = FocusedDate.AddDays(key == "ArrowLeft" ? -1 : 1);
                 CurrentDate = FocusedDate;
@@ -1597,6 +1598,7 @@ namespace Radzen.Blazor
             else if (key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 FocusedDate = FocusedDate.AddDays(key == "ArrowUp" ? -7 : 7);
                 CurrentDate = FocusedDate;
@@ -1604,6 +1606,7 @@ namespace Radzen.Blazor
             else if (key == "Enter" || (key == "Space" && Multiple))
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 if (!DateAttributes(FocusedDate).Disabled && !ReadOnly)
                 {
@@ -1619,6 +1622,7 @@ namespace Radzen.Blazor
             else if (key == "Escape")
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
 
                 await ClosePopup();
                 await FocusAsync();
@@ -1626,6 +1630,7 @@ namespace Radzen.Blazor
             else if (key == "Tab")
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
 
                 await ClosePopup();
                 await FocusAsync();
@@ -1633,6 +1638,7 @@ namespace Radzen.Blazor
             else
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
             }
         }
 
@@ -1655,6 +1661,7 @@ namespace Radzen.Blazor
             if (args.AltKey && key == "ArrowDown")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 if (PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
                 {
@@ -1669,12 +1676,14 @@ namespace Radzen.Blazor
             else if (key == "Enter")
             {
                 preventKeyPress = true;
+                stopKeydownPropagation = true;
 
                 await TogglePopup();
             }
             else if (key == "Escape")
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
 
                 await ClosePopup();
                 await FocusAsync();
@@ -1682,6 +1691,7 @@ namespace Radzen.Blazor
             else
             {
                 preventKeyPress = false;
+                stopKeydownPropagation = false;
             }
         }
 
@@ -1714,6 +1724,7 @@ namespace Radzen.Blazor
         }
 
         bool preventKeyPress;
+        bool stopKeydownPropagation;
 
         /// <inheritdoc/>
         public async ValueTask FocusAsync()

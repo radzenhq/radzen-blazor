@@ -8,7 +8,7 @@
             @StartDate.ToString("ddd", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
         </div>
     </div>
-    <div @ref=view class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
+    <div @ref=view class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
          @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         <Hours Start=@StartTime End=@EndTime TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot />
         <div class="rz-slots">
@@ -107,6 +107,7 @@
     int currentAppointment = -1;
     IEnumerable<AppointmentData> currentAppointments = Enumerable.Empty<AppointmentData>();
     bool preventKeyPress;
+    bool stopKeydownPropagation;
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {
@@ -127,6 +128,7 @@
             }
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (key == "Enter")
         {
@@ -134,6 +136,7 @@
             await view.FocusAsync();
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else if (key == "Space")
         {
@@ -144,10 +147,12 @@
             }
 
             preventKeyPress = true;
+            stopKeydownPropagation = true;
         }
         else
         {
             preventKeyPress = false;
+            stopKeydownPropagation = false;
         }
     }
 }

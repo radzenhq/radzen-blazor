@@ -77,13 +77,19 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(Value);
         }
 
+        bool stopKeydownPropagation;
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
             if (key == "Enter")
             {
+                stopKeydownPropagation = true;
                 await Toggle();
+            }
+            else
+            {
+                stopKeydownPropagation = false;
             }
         }
     }
