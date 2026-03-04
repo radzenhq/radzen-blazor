@@ -1,0 +1,97 @@
+@using System.Globalization
+@using Radzen.Blazor.Rendering
+@typeparam TItem where TItem : notnull
+@inherits SchedulerViewBase
+
+@code {
+    [CascadingParameter]
+    internal RadzenGantt<TItem>? Gantt { get; set; }
+
+    public override string Icon => "calendar_view_day";
+
+    [Parameter]
+    public override string Text { get; set; } = "Day";
+
+    public override string Title
+    {
+        get
+        {
+            var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+            return StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture);
+        }
+    }
+
+    public override DateTime StartDate
+    {
+        get
+        {
+            return Scheduler?.CurrentDate.Date ?? DateTime.Today;
+        }
+    }
+
+    public override DateTime EndDate => StartDate.AddDays(1);
+
+    public override DateTime Next()
+    {
+        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddDays(1);
+    }
+
+    public override DateTime Prev()
+    {
+        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddDays(-1);
+    }
+
+    public override RenderFragment Render()
+    {
+        var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
+        var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+        var columns = BuildHourColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 80, culture);
+        var timelineWidth = columns.Sum(c => c.WidthPx);
+
+        Gantt?.ComputeCriticalPath(appointments, Gantt?.TimelineRowIndexByItem);
+
+        return @<CascadingValue Value=@Scheduler>
+            <GanttTimelineView TItem="TItem" StartDate=@StartDate
+                               EndDate=@EndDate
+                               Columns=@columns
+                               TimelineWidthPx=@timelineWidth
+                               RowCount=@(Gantt?.TimelineRowCount ?? 0)
+                               RowIndexByItem=@(Gantt?.TimelineRowIndexByItem)
+                               RowHeightPx=@(Gantt?.RowHeightPx ?? 36)
+                               Appointments=@appointments
+                               Dependencies=@(Gantt?.TimelineDependencies)
+                               CriticalItems=@(Gantt?.CriticalPathItems)
+                               BaselineStartProperty=@(Gantt?.TimelineBaselineStartProperty)
+                               BaselineEndProperty=@(Gantt?.TimelineBaselineEndProperty)
+                               ShowTodayLine=@(Gantt?.TimelineShowTodayLine ?? true)
+                               ShowWeekends=@(Gantt?.TimelineShowWeekends ?? true)
+                               NonWorkingDays=@(Gantt?.TimelineNonWorkingDays)
+                               Markers=@(Gantt?.TimelineMarkers)
+                               TaskRender=@(Gantt?.TimelineTaskRender)
+                               AppointmentMove=OnAppointmentMove />
+        </CascadingValue>;
+    }
+
+    private static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildHourColumns(DateTime start, DateTime end, int hourWidth, CultureInfo culture)
+    {
+        var columns = new List<GanttTimelineView<TItem>.GanttTimelineColumn>();
+        for (var d = start.Date; d < end.Date; d = d.AddDays(1))
+        {
+            var dayLabel = d.ToString("ddd M/d", culture);
+            for (var h = 0; h < 24; h++)
+            {
+                var hourStart = d.AddHours(h);
+                var hourEnd = hourStart.AddHours(1);
+                columns.Add(new GanttTimelineView<TItem>.GanttTimelineColumn
+                {
+                    Start = hourStart,
+                    End = hourEnd,
+                    Label = hourStart.ToString("HH:mm", culture),
+                    GroupLabel = dayLabel,
+                    WidthPx = hourWidth
+                });
+            }
+        }
+        return columns;
+    }
+}

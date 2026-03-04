@@ -1,0 +1,74 @@
+@using RadzenBlazorDemos.Models
+
+<RadzenGantt @ref="gantt" TItem="GanttTask"
+             Data="@tasks"
+             Dependencies="@dependencies"
+             IdProperty="@nameof(GanttTask.Id)"
+             ParentIdProperty="@nameof(GanttTask.ParentId)"
+             TextProperty="@nameof(GanttTask.Name)"
+             StartProperty="@nameof(GanttTask.Start)"
+             EndProperty="@nameof(GanttTask.End)"
+             ProgressProperty="@nameof(GanttTask.Progress)"
+             Style="width: 100%; height: 480px;">
+    <Columns>
+        <RadzenGanttColumn Title="Task" Property="@nameof(GanttTask.Name)" Frozen="true" Width="200px" />
+        <RadzenGanttColumn Title="Start" Property="@nameof(GanttTask.Start)" Width="110px" FormatString="{0:d}" />
+        <RadzenGanttColumn Title="End" Property="@nameof(GanttTask.End)" Width="110px" FormatString="{0:d}" />
+    </Columns>
+</RadzenGantt>
+
+<div class="rz-mt-4">
+    <RadzenText TextStyle="TextStyle.Body2"><strong>Legend:</strong></RadzenText>
+    <RadzenText TextStyle="TextStyle.Body2">
+        A → B = Finish-to-Start &nbsp;|&nbsp;
+        C ⇉ D = Start-to-Start &nbsp;|&nbsp;
+        E ⇶ F = Finish-to-Finish &nbsp;|&nbsp;
+        G ⇋ H = Start-to-Finish
+    </RadzenText>
+</div>
+
+@code {
+    RadzenGantt<GanttTask> gantt;
+    List<GanttTask> tasks;
+    List<GanttDependency<GanttTask>> dependencies;
+
+    protected override void OnInitialized()
+    {
+        var today = DateTime.Today;
+
+        tasks = new()
+        {
+            new() { Id = 1, Name = "Finish-to-Start", Start = today, End = today.AddDays(14) },
+            new() { Id = 2, ParentId = 1, Name = "Design", Start = today, End = today.AddDays(4) },
+            new() { Id = 3, ParentId = 1, Name = "Develop", Start = today.AddDays(5), End = today.AddDays(10) },
+
+            new() { Id = 4, Name = "Start-to-Start", Start = today, End = today.AddDays(14) },
+            new() { Id = 5, ParentId = 4, Name = "Backend", Start = today.AddDays(2), End = today.AddDays(8) },
+            new() { Id = 6, ParentId = 4, Name = "Frontend", Start = today.AddDays(2), End = today.AddDays(10) },
+
+            new() { Id = 7, Name = "Finish-to-Finish", Start = today, End = today.AddDays(14) },
+            new() { Id = 8, ParentId = 7, Name = "Integration", Start = today.AddDays(4), End = today.AddDays(10) },
+            new() { Id = 9, ParentId = 7, Name = "Testing", Start = today.AddDays(6), End = today.AddDays(10) },
+
+            new() { Id = 10, Name = "Start-to-Finish", Start = today, End = today.AddDays(14) },
+            new() { Id = 11, ParentId = 10, Name = "Training prep", Start = today.AddDays(2), End = today.AddDays(6) },
+            new() { Id = 12, ParentId = 10, Name = "Go-live support", Start = today.AddDays(4), End = today.AddDays(8) },
+        };
+
+        dependencies = new()
+        {
+            new() { From = tasks[1], To = tasks[2], Type = GanttDependencyType.FinishToStart },
+            new() { From = tasks[4], To = tasks[5], Type = GanttDependencyType.StartToStart },
+            new() { From = tasks[7], To = tasks[8], Type = GanttDependencyType.FinishToFinish },
+            new() { From = tasks[10], To = tasks[11], Type = GanttDependencyType.StartToFinish },
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await gantt.ExpandRows(tasks);
+        }
+    }
+}
