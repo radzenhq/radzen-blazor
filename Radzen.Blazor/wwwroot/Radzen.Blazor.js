@@ -2538,24 +2538,6 @@ window.Radzen = {
   createGauge: function (ref, instance) {
     return this.createResizable(ref, instance);
   },
-  destroyScheduler: function (ref) {
-    if (ref && ref.resizeHandler) {
-      window.removeEventListener('resize', ref.resizeHandler);
-      delete ref.resizeHandler;
-    }
-  },
-  createScheduler: function (ref, instance) {
-    ref.resizeHandler = function () {
-      var rect = ref.getBoundingClientRect();
-
-      try { instance.invokeMethodAsync('Resize', rect.width, rect.height); } catch { }
-    };
-
-    window.addEventListener('resize', ref.resizeHandler);
-
-    var rect = ref.getBoundingClientRect();
-    return {width: rect.width, height: rect.height};
-  },
   innerHTML: function (ref, value) {
     if (value != undefined) {
         if (ref != null) {

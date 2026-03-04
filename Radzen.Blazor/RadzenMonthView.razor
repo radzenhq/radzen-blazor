@@ -8,20 +8,8 @@
     {
         var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate) ?? Enumerable.Empty<AppointmentData>();
 
-        var maxAppointmentsInSlot = 0;
-
-        if (MaxAppointmentsInSlot != null)
-        {
-            maxAppointmentsInSlot = MaxAppointmentsInSlot.Value;
-        }
-        else
-        {
-            var slotHeight = (Scheduler?.Height ?? 0 - 60) / 6;
-            maxAppointmentsInSlot = Math.Max(0, Convert.ToInt32(Math.Floor(slotHeight / 24)) - 1);
-        }
-
         return @<CascadingValue Value=@Scheduler>
-            <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@maxAppointmentsInSlot MoreText=@MoreText Appointments=@appointments AppointmentMove=OnAppointmentMove />
+            <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@MaxAppointmentsInSlot MoreText=@MoreText Appointments=@appointments AppointmentMove=OnAppointmentMove />
         </CascadingValue>;
     }
 }
