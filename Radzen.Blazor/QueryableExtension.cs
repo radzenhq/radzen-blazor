@@ -364,7 +364,8 @@ namespace Radzen
             var methodInfo = typeof(Queryable)
                 .GetTypeInfo()
                 .GetDeclaredMethods(nameof(Queryable.Min))
-                .First(mi => mi.GetParameters().Length == 1 && mi.ReturnType == type);
+                .First(mi => mi.IsGenericMethod && mi.GetParameters().Length == 1)
+                .MakeGenericMethod(type);
 
             return source.Provider.Execute(Expression.Call(null, methodInfo, source.Expression))!;
         }
@@ -380,12 +381,13 @@ namespace Radzen
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(type);
 
-            var maxMethod = typeof(Queryable).GetTypeInfo().GetDeclaredMethods(nameof(Queryable.Max)).FirstOrDefault(mi => mi.GetParameters().Length == 1 && mi.ReturnType == type);
-            if (maxMethod == null)
-            {
-                throw new InvalidOperationException($"Max method not found for type {type}");
-            }
-            return source.Provider.Execute(Expression.Call(null, maxMethod, source.Expression))!;
+            var methodInfo = typeof(Queryable)
+                .GetTypeInfo()
+                .GetDeclaredMethods(nameof(Queryable.Max))
+                .First(mi => mi.IsGenericMethod && mi.GetParameters().Length == 1)
+                .MakeGenericMethod(type);
+
+            return source.Provider.Execute(Expression.Call(null, methodInfo, source.Expression))!;
         }
 
         /// <summary>
