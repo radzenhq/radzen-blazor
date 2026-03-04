@@ -173,7 +173,7 @@
                             <span class="notranslate rz-multiselect-filter-icon rzi rzi-search"></span>
                         </div>
                     }
-                    <button type="button" id="@(GetId() + "clear")" class="rz-multiselect-close" aria-label="@ClearAriaLabel"
+                    <button type="button" tabindex="-1" id="@(GetId() + "clear")" class="rz-multiselect-close" aria-label="@ClearAriaLabel"
                             @onclick="@ClearAll" @onclick:stopPropagation="true">
                         <span class="notranslate rzi rzi-times"></span>
                     </button>
@@ -203,7 +203,7 @@
         </div>
         @if (AllowClear && (!Multiple && HasValue || Multiple && selectedItems.Count > 0))
         {
-            <button type="button" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel"
+            <button type="button" tabindex="-1" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel"
                     @onclick="@ClearAll" @onclick:stopPropagation="true"></button>
         }
     </div>

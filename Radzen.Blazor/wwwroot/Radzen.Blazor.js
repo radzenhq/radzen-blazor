@@ -607,6 +607,28 @@ window.Radzen = {
       el.focus();
     }
   },
+  focusNext: function (container, reverse) {
+    if (!container) return;
+    var selector = 'a[href]:not([disabled]):not([tabindex="-1"]), button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"]):not([disabled])';
+    var candidates = Array.from(document.querySelectorAll(selector)).filter(function (el) {
+      return (el.offsetWidth > 0 || el.offsetHeight > 0) && el !== container && !container.contains(el);
+    });
+    if (reverse) {
+      for (var i = candidates.length - 1; i >= 0; i--) {
+        if (container.compareDocumentPosition(candidates[i]) & Node.DOCUMENT_POSITION_PRECEDING) {
+          candidates[i].focus();
+          return;
+        }
+      }
+    } else {
+      for (var i = 0; i < candidates.length; i++) {
+        if (container.compareDocumentPosition(candidates[i]) & Node.DOCUMENT_POSITION_FOLLOWING) {
+          candidates[i].focus();
+          return;
+        }
+      }
+    }
+  },
   scrollCarouselItem: function (el) {
     el.parentElement.scroll(el.offsetLeft, 0);
   },
@@ -1426,7 +1448,7 @@ window.Radzen = {
     }
     Radzen.popups = [];
   },
-  closePopup: function (id, instance, callback, e) {
+  closePopup: function (id, instance, callback, e, preventFocusRestore) {
     var popup = document.getElementById(id);
     if (!popup) return;
     var popupInfo = (Radzen.popups || []).find(function (p) { return p.id === id; });
@@ -1480,13 +1502,14 @@ window.Radzen = {
         return obj.id !== id;
     });
 
-    if (Radzen.activeElement && Radzen.activeElement == document.activeElement ||
+    if (!preventFocusRestore &&
+        (Radzen.activeElement && Radzen.activeElement == document.activeElement ||
         Radzen.activeElement && document.activeElement == document.body ||
         Radzen.activeElement && document.activeElement &&
             (document.activeElement.classList.contains('rz-dropdown-filter') || 
              document.activeElement.classList.contains('rz-lookup-search-input') ||
              document.activeElement.classList.contains('rz-multiselect-filter-container') ||
-             document.activeElement.closest('.rz-multiselect-filter-container') !== null)) {
+             document.activeElement.closest('.rz-multiselect-filter-container') !== null))) {
         setTimeout(function () {
             if (e && e.target && e.target.tabIndex != -1) {
                 Radzen.activeElement = e.target;

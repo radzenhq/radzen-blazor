@@ -227,7 +227,7 @@ namespace Radzen.Blazor
         {
             if (JSRuntime != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, Reference, nameof(OnClose));
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, Reference, nameof(OnClose), null, key == "Tab");
             }
 
             isPopupOpen = false;
@@ -943,9 +943,11 @@ namespace Radzen.Blazor
             {
                 preventKeydown = false;
 
-                if (!ShowSearch && !ShowAdd && JSRuntime != null)
+                await ClosePopup(key);
+
+                if (JSRuntime != null)
                 {
-                    await ClosePopup(key);
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusNext", Element, args.ShiftKey);
                 }
             }
             else if (key == "Delete" && AllowClear)

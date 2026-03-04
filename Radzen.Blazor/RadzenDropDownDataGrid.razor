@@ -203,7 +203,7 @@
 
         @if (AllowClear && (!Multiple && HasValue || Multiple && (selectedItems.Count > 0 || SelectedValue is IEnumerable)))
         {
-            <button type="button" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel"
+            <button type="button" tabindex="-1" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel"
                     @onclick="@Clear" @onclick:stopPropagation="true"></button>
         }
     </div>
