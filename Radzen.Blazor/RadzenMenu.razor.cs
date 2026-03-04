@@ -110,8 +110,10 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    if (key == "ArrowDown")
+                    if (key == "ArrowDown" && currentItems.Count > 0)
                     {
+                        focusedIndex = Math.Clamp(focusedIndex, 0, currentItems.Count - 1);
+
                         var item = currentItems[focusedIndex];
 
                         if (item.items.Count > 0)
