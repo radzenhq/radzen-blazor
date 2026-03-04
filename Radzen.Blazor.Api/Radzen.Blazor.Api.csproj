@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RadzenBlazorDll>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net10.0\Radzen.Blazor.dll</RadzenBlazorDll>
+    <RadzenBlazorXml>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net10.0\Radzen.Blazor.xml</RadzenBlazorXml>
+    <GeneratorProject>$(MSBuildThisFileDirectory)..\Radzen.Blazor.Api.Generator\Radzen.Blazor.Api.Generator.csproj</GeneratorProject>
+    <GeneratedPagesDir>$(MSBuildThisFileDirectory)Generated\Pages</GeneratedPagesDir>
+  </PropertyGroup>
+
+  <!-- Usage: dotnet build -p:GenerateApiPages=true -->
+  <Target Name="GenerateApiPages" BeforeTargets="ResolveProjectStaticWebAssets;AssignTargetPaths"
+          Inputs="$(RadzenBlazorDll)"
+          Outputs="$(GeneratedPagesDir)\ApiIndex.razor"
+          Condition="Exists('$(RadzenBlazorDll)') AND ('$(Configuration)' == 'Release' OR '$(GenerateApiPages)' == 'true')">
+    <Message Text="Generating API reference pages..." Importance="high" />
+    <MakeDir Directories="$(GeneratedPagesDir)" />
+    <Exec Command="dotnet run --project &quot;$(GeneratorProject)&quot; -- &quot;$(RadzenBlazorDll)&quot; &quot;$(RadzenBlazorXml)&quot; &quot;$(GeneratedPagesDir)&quot;"
+          ContinueOnError="false" />
+    <Message Text="API reference pages generated in $(GeneratedPagesDir)" Importance="high" />
+  </Target>
+</Project>

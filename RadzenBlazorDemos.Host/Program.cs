@@ -119,7 +119,6 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 */
 app.UseStatusCodePagesWithReExecute("/not-found");
 app.UseHttpsRedirection();
-app.UseDefaultFiles();
 app.MapStaticAssets();
 if (!app.Environment.IsDevelopment())
 {
@@ -169,7 +168,8 @@ app.UseTrailingSlashRedirect();
 app.UseAntiforgery();
 app.MapRazorPages();
 app.MapRazorComponents<RadzenBlazorDemos.Host.App>()
-    .AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly)
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly, typeof(Radzen.Blazor.Api.ApiLayout).Assembly)
     .Add(e =>
    {
        if (e.Metadata.Any(m => m is HttpMethodMetadata http && http.HttpMethods.Contains(HttpMethods.Get)))

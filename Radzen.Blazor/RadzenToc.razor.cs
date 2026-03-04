@@ -37,15 +37,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
         .Add($"rz-toc-{Orientation.ToString().ToLowerInvariant()}")
         .ToString();
 
-    internal async Task SelectItemAsync(RadzenTocItem item)
-    {
-        if (!string.IsNullOrEmpty(item.Selector) && JSRuntime != null)
-        {
-            await JSRuntime.InvokeVoidAsync("Radzen.navigateTo", item.Selector, true);
-        }
-    }
-
-    void ActivateItem(string? path)
+    internal void ActivateItem(string? path)
     {
         foreach (var item in items)
         {
@@ -65,18 +57,19 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
     /// </summary>
 
     [JSInvokable]
-    public void ScrollIntoView(string selector)
+    public void ScrollIntoView(string? selector)
     {
         ActivateItem(selector);
     }
 
     private readonly List<RadzenTocItem> items = [];
+    private IJSObjectReference? scrollListenerRef;
 
     internal async Task AddItemAsync(RadzenTocItem item)
     {
         items.Add(item);
 
-        if (rendered)
+        if (rendered && !disposed)
         {
             await RegisterScrollListenerAsync();
         }
@@ -86,7 +79,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
     {
         items.Remove(item);
 
-        if (rendered)
+        if (rendered && !disposed)
         {
             await RegisterScrollListenerAsync();
         }
@@ -113,7 +106,8 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
         {
             try
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.registerScrollListener", Element, Reference, items.Select(items => items.Selector), Selector);
+                await UnregisterScrollListenerAsync();
+                scrollListenerRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createScrollListener", Reference, items.Select(items => items.Selector), Selector);
             } 
             catch (JSDisconnectedException)
             {
@@ -123,11 +117,15 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
 
     private async Task UnregisterScrollListenerAsync()
     {
-        if (IsJSRuntimeAvailable && JSRuntime != null)
+        var listener = scrollListenerRef;
+        scrollListenerRef = null;
+
+        if (listener != null)
         {
             try
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.unregisterScrollListener", Element);
+                await listener.InvokeVoidAsync("dispose");
+                await listener.DisposeAsync();
             } 
             catch (JSDisconnectedException)
             {

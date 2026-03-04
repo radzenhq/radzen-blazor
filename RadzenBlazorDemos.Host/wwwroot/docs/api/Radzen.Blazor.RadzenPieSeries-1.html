@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenPieSeries&lt;TItem&gt;
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenPieSeries&lt;TItem&gt;
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenPieSeries`1">
+
+
+  <h1 id="Radzen_Blazor_RadzenPieSeries_1" data-uid="Radzen.Blazor.RadzenPieSeries`1" class="text-break">Class RadzenPieSeries&lt;TItem&gt;
+</h1>
+  <div class="markdown level0 summary"><p>A chart series that displays data as a circular pie chart with segments representing proportions of a whole.
+RadzenPieSeries is ideal for showing percentage breakdowns, composition analysis, or relative comparisons of parts to a total.
+Divides a circle into segments where each segment's angle is proportional to its value relative to the sum of all values.
+Supports segment color customization via Fills, borders via Strokes with custom radius and positioning, TotalAngle to create semi-circles or partial pie charts (e.g., gauge-like displays),
+StartAngle controlling where the first segment begins, optional labels showing values or percentages on segments, interactive tooltips showing category/value/percentage,
+and legend where each segment appears as a legend item using category values.
+Use CategoryProperty for segment labels (shown in legend/tooltip) and ValueProperty for the numeric value determining segment size. For a donut chart (pie with hollow center), use RadzenDonutSeries instead.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html">RadzenChartComponentBase</a></div>
+    <div class="level3"><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html">CartesianSeries</a>&lt;TItem&gt;</div>
+    <div class="level4"><span class="xref">RadzenPieSeries&lt;TItem&gt;</span></div>
+      <div class="level5"><a class="xref" href="Radzen.Blazor.RadzenDonutSeries-1.html">RadzenDonutSeries&lt;TItem&gt;</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="Radzen.Blazor.IChartSeries.html">IChartSeries</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_RequireChart">CartesianSeries&lt;TItem&gt;.RequireChart()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_ComposeCategory_Radzen_Blazor_ScaleBase_">CartesianSeries&lt;TItem&gt;.ComposeCategory(ScaleBase)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_ComposeValue_Radzen_Blazor_ScaleBase_">CartesianSeries&lt;TItem&gt;.ComposeValue(ScaleBase)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_IsDate_System_String_">CartesianSeries&lt;TItem&gt;.IsDate(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_IsNumeric_System_String_">CartesianSeries&lt;TItem&gt;.IsNumeric(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_GetCategories">CartesianSeries&lt;TItem&gt;.GetCategories()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_TransformCategoryScale_Radzen_Blazor_ScaleBase_">CartesianSeries&lt;TItem&gt;.TransformCategoryScale(ScaleBase)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_TransformValueScale_Radzen_Blazor_ScaleBase_">CartesianSeries&lt;TItem&gt;.TransformValueScale(ScaleBase)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_RenderOverlays_Radzen_Blazor_ScaleBase_Radzen_Blazor_ScaleBase_">CartesianSeries&lt;TItem&gt;.RenderOverlays(ScaleBase, ScaleBase)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">CartesianSeries&lt;TItem&gt;.SetParametersAsync(ParameterView)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Initialize">CartesianSeries&lt;TItem&gt;.Initialize()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_InsidePolygon_Radzen_Blazor_Point_Radzen_Blazor_Point___">CartesianSeries&lt;TItem&gt;.InsidePolygon(Point, Point[])</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_RenderTooltip_System_Object_">CartesianSeries&lt;TItem&gt;.RenderTooltip(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_RenderSharedTooltipItem_System_Object_">CartesianSeries&lt;TItem&gt;.RenderSharedTooltipItem(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_GetTooltipPosition_System_Object_">CartesianSeries&lt;TItem&gt;.GetTooltipPosition(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_RenderLegendItem">CartesianSeries&lt;TItem&gt;.RenderLegendItem()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_GetMedian">CartesianSeries&lt;TItem&gt;.GetMedian()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_GetMean">CartesianSeries&lt;TItem&gt;.GetMean()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_GetMode">CartesianSeries&lt;TItem&gt;.GetMode()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_GetTrend">CartesianSeries&lt;TItem&gt;.GetTrend()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_GetTitle">CartesianSeries&lt;TItem&gt;.GetTitle()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_TooltipLabel__0_">CartesianSeries&lt;TItem&gt;.TooltipLabel(TItem)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_TooltipTitle__0_">CartesianSeries&lt;TItem&gt;.TooltipTitle(TItem)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_TooltipValue__0_">CartesianSeries&lt;TItem&gt;.TooltipValue(TItem)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_PickColor_System_Int32_System_Collections_Generic_IEnumerable_System_String__System_String_System_Collections_Generic_IList_Radzen_Blazor_SeriesColorRange__System_Double_">CartesianSeries&lt;TItem&gt;.PickColor(int, IEnumerable&lt;string&gt;, string, IList&lt;SeriesColorRange&gt;, double)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Dispose">CartesianSeries&lt;TItem&gt;.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_InvokeClick_Microsoft_AspNetCore_Components_EventCallback_Radzen_SeriesClickEventArgs__System_Object_">CartesianSeries&lt;TItem&gt;.InvokeClick(EventCallback&lt;SeriesClickEventArgs&gt;, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Title">CartesianSeries&lt;TItem&gt;.Title</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_ChildContent">CartesianSeries&lt;TItem&gt;.ChildContent</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_TooltipTemplate">CartesianSeries&lt;TItem&gt;.TooltipTemplate</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Overlays">CartesianSeries&lt;TItem&gt;.Overlays</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_CategoryProperty">CartesianSeries&lt;TItem&gt;.CategoryProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Visible">CartesianSeries&lt;TItem&gt;.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Hidden">CartesianSeries&lt;TItem&gt;.Hidden</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_ShowInLegend">CartesianSeries&lt;TItem&gt;.ShowInLegend</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_ValueProperty">CartesianSeries&lt;TItem&gt;.ValueProperty</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_RenderingOrder">CartesianSeries&lt;TItem&gt;.RenderingOrder</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Data">CartesianSeries&lt;TItem&gt;.Data</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Items">CartesianSeries&lt;TItem&gt;.Items</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Markers">CartesianSeries&lt;TItem&gt;.Markers</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_MarkerType">CartesianSeries&lt;TItem&gt;.MarkerType</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_MarkerSize">CartesianSeries&lt;TItem&gt;.MarkerSize</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_ShouldRefreshChart_Microsoft_AspNetCore_Components_ParameterView_">RadzenChartComponentBase.ShouldRefreshChart(ParameterView)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_ValidateParameters">RadzenChartComponentBase.ValidateParameters()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_DidParameterChange__1_Microsoft_AspNetCore_Components_ParameterView_System_String___0_">RadzenChartComponentBase.DidParameterChange&lt;T&gt;(ParameterView, string, T)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_Chart">RadzenChartComponentBase.Chart</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitialized">ComponentBase.OnInitialized()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrenderasync">ComponentBase.OnAfterRenderAsync(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenPieSeries_1_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenPieSeries&lt;TItem&gt; : CartesianSeries&lt;TItem&gt;, IComponent, IHandleEvent, IHandleAfterRender, IChartSeries, IDisposable</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TItem</span></td>
+        <td><p>The type of data items in the series. Each item represents one pie segment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Radzen_Blazor_RadzenPieSeries_1_examples"><strong>Examples</strong></h5>
+  <p>Basic pie chart:</p>
+<pre><code class="lang-csharp">&lt;RadzenChart&gt;
+    &lt;RadzenPieSeries Data=@marketShare CategoryProperty="Company" ValueProperty="Share" /&gt;
+&lt;/RadzenChart&gt;</code></pre>
+<p>Pie with custom colors and data labels:</p>
+<pre><code class="lang-csharp">&lt;RadzenChart&gt;
+    &lt;RadzenPieSeries Data=@data CategoryProperty="Category" ValueProperty="Value" 
+                     Fills=@(new[] { "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0" })&gt;
+        &lt;RadzenSeriesDataLabels Visible="true" /&gt;
+    &lt;/RadzenPieSeries&gt;
+&lt;/RadzenChart&gt;</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1__ctor_" data-uid="Radzen.Blazor.RadzenPieSeries`1.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1__ctor" data-uid="Radzen.Blazor.RadzenPieSeries`1.#ctor">RadzenPieSeries()</h4>
+  <div class="markdown level1 summary"><p>A chart series that displays data as a circular pie chart with segments representing proportions of a whole.
+RadzenPieSeries is ideal for showing percentage breakdowns, composition analysis, or relative comparisons of parts to a total.
+Divides a circle into segments where each segment's angle is proportional to its value relative to the sum of all values.
+Supports segment color customization via Fills, borders via Strokes with custom radius and positioning, TotalAngle to create semi-circles or partial pie charts (e.g., gauge-like displays),
+StartAngle controlling where the first segment begins, optional labels showing values or percentages on segments, interactive tooltips showing category/value/percentage,
+and legend where each segment appears as a legend item using category values.
+Use CategoryProperty for segment labels (shown in legend/tooltip) and ValueProperty for the numeric value determining segment size. For a donut chart (pie with hollow center), use RadzenDonutSeries instead.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenPieSeries()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenPieSeries_1__ctor_examples">Examples</h5>
+  <p>Basic pie chart:</p>
+<pre><code class="lang-csharp">&lt;RadzenChart&gt;
+    &lt;RadzenPieSeries Data=@marketShare CategoryProperty="Company" ValueProperty="Share" /&gt;
+&lt;/RadzenChart&gt;</code></pre>
+<p>Pie with custom colors and data labels:</p>
+<pre><code class="lang-csharp">&lt;RadzenChart&gt;
+    &lt;RadzenPieSeries Data=@data CategoryProperty="Category" ValueProperty="Value" 
+                     Fills=@(new[] { "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0" })&gt;
+        &lt;RadzenSeriesDataLabels Visible="true" /&gt;
+    &lt;/RadzenPieSeries&gt;
+&lt;/RadzenChart&gt;</code></pre>
+
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_Color_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Color*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_Color" data-uid="Radzen.Blazor.RadzenPieSeries`1.Color">Color</h4>
+  <div class="markdown level1 summary"><p>Gets the color.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override string Color { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The color.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Color">CartesianSeries&lt;TItem&gt;.Color</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_CoordinateSystem_" data-uid="Radzen.Blazor.RadzenPieSeries`1.CoordinateSystem*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_CoordinateSystem" data-uid="Radzen.Blazor.RadzenPieSeries`1.CoordinateSystem">CoordinateSystem</h4>
+  <div class="markdown level1 summary"><p>Gets the coordinate system of the series.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override CoordinateSystem CoordinateSystem { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.CoordinateSystem.html">CoordinateSystem</a></td>
+        <td><p>Coordinate system enum value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_CoordinateSystem">CartesianSeries&lt;TItem&gt;.CoordinateSystem</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_CurrentRadius_" data-uid="Radzen.Blazor.RadzenPieSeries`1.CurrentRadius*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_CurrentRadius" data-uid="Radzen.Blazor.RadzenPieSeries`1.CurrentRadius">CurrentRadius</h4>
+  <div class="markdown level1 summary"><p>Returns the current radius - either a specified <a class="xref" href="Radzen.Blazor.RadzenPieSeries-1.html#Radzen_Blazor_RadzenPieSeries_1_Radius">Radius</a> or automatically calculated one.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected double CurrentRadius { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_Fills_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Fills*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_Fills" data-uid="Radzen.Blazor.RadzenPieSeries`1.Fills">Fills</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a collection of fill colors applied to individual pie segments in sequence.
+Each segment gets the color at its index position. If fewer colors than segments, colors are reused cyclically.
+If not set, uses the chart's color scheme.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IEnumerable&lt;string&gt;? Fills { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>An enumerable collection of CSS color values for segment backgrounds.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_PositiveItems_" data-uid="Radzen.Blazor.RadzenPieSeries`1.PositiveItems*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_PositiveItems" data-uid="Radzen.Blazor.RadzenPieSeries`1.PositiveItems">PositiveItems</h4>
+  <div class="markdown level1 summary"><p>Stores Data filtered to items greater than zero as an IList of <code class="typeparamref">TItem</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected IList&lt;TItem&gt; PositiveItems { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;TItem&gt;</td>
+        <td><p>The items.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_Radius_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Radius*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_Radius" data-uid="Radzen.Blazor.RadzenPieSeries`1.Radius">Radius</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the radius of the pie chart in pixels.
+If not set, the radius is automatically calculated to fit the available chart space.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public double? Radius { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><p>The radius in pixels, or null for automatic sizing.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_StartAngle_" data-uid="Radzen.Blazor.RadzenPieSeries`1.StartAngle*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_StartAngle" data-uid="Radzen.Blazor.RadzenPieSeries`1.StartAngle">StartAngle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the starting angle (in degrees) from which pie segments begin rendering, measured clockwise from the right (0°).
+Use to rotate the pie: 90° (top), 0° (right), 180° (left), 270° (bottom).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public double StartAngle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The start angle in degrees. Default is 90 (top of circle).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_StrokeWidth_" data-uid="Radzen.Blazor.RadzenPieSeries`1.StrokeWidth*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_StrokeWidth" data-uid="Radzen.Blazor.RadzenPieSeries`1.StrokeWidth">StrokeWidth</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the width of the pie segment borders in pixels.
+Set to 0 for no borders, or increase to make segment divisions more visible.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public double StrokeWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The stroke width in pixels. Default is 0 (no borders).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_Strokes_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Strokes*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_Strokes" data-uid="Radzen.Blazor.RadzenPieSeries`1.Strokes">Strokes</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a collection of stroke (border) colors applied to individual pie segments in sequence.
+Use with <a class="xref" href="Radzen.Blazor.RadzenPieSeries-1.html#Radzen_Blazor_RadzenPieSeries_1_StrokeWidth">StrokeWidth</a> to create visible segment borders.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IEnumerable&lt;string&gt;? Strokes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>An enumerable collection of CSS color values for segment borders.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_TotalAngle_" data-uid="Radzen.Blazor.RadzenPieSeries`1.TotalAngle*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_TotalAngle" data-uid="Radzen.Blazor.RadzenPieSeries`1.TotalAngle">TotalAngle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the total angle span of the pie in degrees.
+Use 360 for a full circle, 180 for a semi-circle, or other values for partial pies (useful for gauge-like visualizations).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public double TotalAngle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The total angle in degrees. Default is 360 (full circle).</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_X_" data-uid="Radzen.Blazor.RadzenPieSeries`1.X*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_X" data-uid="Radzen.Blazor.RadzenPieSeries`1.X">X</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the horizontal center position of the pie chart in pixels.
+If not set, the pie is automatically centered horizontally within the chart area.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public double? X { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><p>The X coordinate in pixels, or null for automatic horizontal centering.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_Y_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Y*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_Y" data-uid="Radzen.Blazor.RadzenPieSeries`1.Y">Y</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the vertical center position of the pie chart in pixels.
+If not set, the pie is automatically centered vertically within the chart area.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public double? Y { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>?</td>
+        <td><p>The Y coordinate in pixels, or null for automatic vertical centering.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenPieSeries`1.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenPieSeries`1.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_Contains_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Contains*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_Contains_System_Double_System_Double_System_Double_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Contains(System.Double,System.Double,System.Double)">Contains(double, double, double)</h4>
+  <div class="markdown level1 summary"><p>Determines if the series contains the specified coordinates with a given tolerance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override bool Contains(double x, double y, double tolerance)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>The x.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">y</span></td>
+        <td><p>The y.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">tolerance</span></td>
+        <td><p>The tolerance.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the series contains the coordinates; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Contains_System_Double_System_Double_System_Double_">CartesianSeries&lt;TItem&gt;.Contains(double, double, double)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_DataAt_" data-uid="Radzen.Blazor.RadzenPieSeries`1.DataAt*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_DataAt_System_Double_System_Double_" data-uid="Radzen.Blazor.RadzenPieSeries`1.DataAt(System.Double,System.Double)">DataAt(double, double)</h4>
+  <div class="markdown level1 summary"><p>Returns the data at the specified coordinates;</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override (object, Point) DataAt(double x, double y)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>The x.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">y</span></td>
+        <td><p>The y.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="Radzen.Blazor.Point.html">Point</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_DataAt_System_Double_System_Double_">CartesianSeries&lt;TItem&gt;.DataAt(double, double)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_DegToRad_" data-uid="Radzen.Blazor.RadzenPieSeries`1.DegToRad*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_DegToRad_System_Double_" data-uid="Radzen.Blazor.RadzenPieSeries`1.DegToRad(System.Double)">DegToRad(double)</h4>
+  <div class="markdown level1 summary"><p>Converts degrees to radians.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected double DegToRad(double degrees)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">degrees</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_GetDataLabels_" data-uid="Radzen.Blazor.RadzenPieSeries`1.GetDataLabels*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_GetDataLabels_System_Double_System_Double_" data-uid="Radzen.Blazor.RadzenPieSeries`1.GetDataLabels(System.Double,System.Double)">GetDataLabels(double, double)</h4>
+  <div class="markdown level1 summary"><p>Returns data chart position</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override IEnumerable&lt;ChartDataLabel&gt; GetDataLabels(double offsetX, double offsetY)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">offsetX</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">offsetY</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<span class="xref">ChartDataLabel</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_GetDataLabels_System_Double_System_Double_">CartesianSeries&lt;TItem&gt;.GetDataLabels(double, double)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_MeasureLegend_" data-uid="Radzen.Blazor.RadzenPieSeries`1.MeasureLegend*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_MeasureLegend" data-uid="Radzen.Blazor.RadzenPieSeries`1.MeasureLegend">MeasureLegend()</h4>
+  <div class="markdown level1 summary"><p>Measures the legend.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override double MeasureLegend()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>System.Double.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_MeasureLegend">CartesianSeries&lt;TItem&gt;.MeasureLegend()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_Render_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Render*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_Render_Radzen_Blazor_ScaleBase_Radzen_Blazor_ScaleBase_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Render(Radzen.Blazor.ScaleBase,Radzen.Blazor.ScaleBase)">Render(ScaleBase, ScaleBase)</h4>
+  <div class="markdown level1 summary"><p>Renders the series with the specified category and value scales.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">categoryScale</span></td>
+        <td><p>The category scale.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">valueScale</span></td>
+        <td><p>The value scale.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>RenderFragment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Render_Radzen_Blazor_ScaleBase_Radzen_Blazor_ScaleBase_">CartesianSeries&lt;TItem&gt;.Render(ScaleBase, ScaleBase)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_RenderLegendItem_" data-uid="Radzen.Blazor.RadzenPieSeries`1.RenderLegendItem*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_RenderLegendItem_System_Boolean_" data-uid="Radzen.Blazor.RadzenPieSeries`1.RenderLegendItem(System.Boolean)">RenderLegendItem(bool)</h4>
+  <div class="markdown level1 summary"><p>Renders the legend item for this series.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override RenderFragment RenderLegendItem(bool clickable)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">clickable</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_RenderLegendItem_System_Boolean_">CartesianSeries&lt;TItem&gt;.RenderLegendItem(bool)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_Segment_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Segment*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_Segment_System_Double_System_Double_System_Double_System_Double_System_Double_System_Double_" data-uid="Radzen.Blazor.RadzenPieSeries`1.Segment(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">Segment(double, double, double, double, double, double)</h4>
+  <div class="markdown level1 summary"><p>Creates SVG path that renders the specified segment.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected string Segment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>The x.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">y</span></td>
+        <td><p>The y.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">radius</span></td>
+        <td><p>The radius.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">innerRadius</span></td>
+        <td><p>The inner radius.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">startAngle</span></td>
+        <td><p>The start angle.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">endAngle</span></td>
+        <td><p>The end angle.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_ToCartesian_" data-uid="Radzen.Blazor.RadzenPieSeries`1.ToCartesian*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_ToCartesian_System_Double_System_Double_System_Double_System_Double_" data-uid="Radzen.Blazor.RadzenPieSeries`1.ToCartesian(System.Double,System.Double,System.Double,System.Double)">ToCartesian(double, double, double, double)</h4>
+  <div class="markdown level1 summary"><p>Converts radial coordinates to to cartesian.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected (double X, double Y) ToCartesian(double x, double y, double radius, double degrees)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>The x.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">y</span></td>
+        <td><p>The y.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">radius</span></td>
+        <td><p>The radius.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">degrees</span></td>
+        <td><p>The degrees.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.a">a</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.b">b</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_TooltipClass_" data-uid="Radzen.Blazor.RadzenPieSeries`1.TooltipClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_TooltipClass__0_" data-uid="Radzen.Blazor.RadzenPieSeries`1.TooltipClass(`0)">TooltipClass(TItem)</h4>
+  <div class="markdown level1 summary"><p>Gets the tooltip CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string TooltipClass(TItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TItem</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_TooltipClass__0_">CartesianSeries&lt;TItem&gt;.TooltipClass(TItem)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenPieSeries_1_TooltipStyle_" data-uid="Radzen.Blazor.RadzenPieSeries`1.TooltipStyle*"></a>
+  <h4 id="Radzen_Blazor_RadzenPieSeries_1_TooltipStyle__0_" data-uid="Radzen.Blazor.RadzenPieSeries`1.TooltipStyle(`0)">TooltipStyle(TItem)</h4>
+  <div class="markdown level1 summary"><p>Gets the tooltip inline style.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string TooltipStyle(TItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TItem</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_TooltipStyle__0_">CartesianSeries&lt;TItem&gt;.TooltipStyle(TItem)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="Radzen.Blazor.IChartSeries.html">IChartSeries</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>
