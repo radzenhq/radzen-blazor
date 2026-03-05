@@ -531,7 +531,7 @@ namespace Radzen.Blazor
                         }
                         else if (value is IEnumerable<DateTime> dtEnum)
                         {
-                            selectedDates = dtEnum.Where(d => d != default(DateTime))
+                            selectedDates = dtEnum.Where(d => d != default(DateTime) && d != DateTime.MaxValue)
                                 .Select(d => DateTime.SpecifyKind(d.Date, Kind))
                                 .Distinct()
                                 .OrderBy(d => d)
@@ -541,7 +541,7 @@ namespace Radzen.Blazor
                         }
                         else if (value is IEnumerable<DateTime?> ndtEnum)
                         {
-                            selectedDates = ndtEnum.Where(d => d.HasValue && d.Value != default(DateTime))
+                            selectedDates = ndtEnum.Where(d => d.HasValue && d.Value != default(DateTime) && d.Value != DateTime.MaxValue)
                                 .Select(d => DateTime.SpecifyKind(d!.Value.Date, Kind))
                                 .Distinct()
                                 .OrderBy(d => d)
@@ -605,7 +605,7 @@ namespace Radzen.Blazor
                             _value = toNullableEnum;
                             _dateTimeValue = selectedDates.LastOrDefault();
                         }
-                        else if (value is DateTime dt && dt != default(DateTime))
+                        else if (value is DateTime dt && dt != default(DateTime) && dt != DateTime.MaxValue)
                         {
                             selectedDates = new List<DateTime> { DateTime.SpecifyKind(dt.Date, Kind) };
                             _value = selectedDates;
@@ -642,7 +642,7 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            if (value is DateTime dateTime && dateTime != default(DateTime))
+                            if (value is DateTime dateTime && dateTime != default(DateTime) && dateTime != DateTime.MaxValue)
                             {
                                 _dateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
                             }
@@ -764,7 +764,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Multiple ? selectedDates.Count > 0 : (DateTimeValue.HasValue && DateTimeValue != default(DateTime));
+                return Multiple ? selectedDates.Count > 0 : (DateTimeValue.HasValue && DateTimeValue != default(DateTime) && DateTimeValue != DateTime.MaxValue);
             }
         }
 

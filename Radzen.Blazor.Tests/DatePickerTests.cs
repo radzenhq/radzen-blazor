@@ -486,7 +486,7 @@ namespace Radzen.Blazor.Tests
 
 
         [Fact]
-        public void DatePicker_Respects_DateTimeMaxValue()
+        public void DatePicker_Renders_Blank_WhenValueIsMaxValue()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -497,11 +497,24 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Value, DateTime.MaxValue);
             });
 
-            Assert.Contains(DateTime.MaxValue.ToString(component.Instance.DateFormat), component.Markup);
+            Assert.Contains(@$"rz-state-empty", component.Markup);
+            Assert.Contains(@$"value=""""", component.Markup);
+        }
 
-            var exception = Record.Exception(() => component.Find(".rz-calendar-next-icon")
-                                                            .Click());
-            Assert.Null(exception);
+        [Fact]
+        public void DatePicker_Renders_Blank_WhenValueIsMinValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.Value, DateTime.MinValue);
+            });
+
+            Assert.Contains(@$"rz-state-empty", component.Markup);
+            Assert.Contains(@$"value=""""", component.Markup);
         }
 
         [Theory]
