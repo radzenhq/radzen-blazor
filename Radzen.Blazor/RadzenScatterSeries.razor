@@ -1,0 +1,29 @@
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+  public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+  {
+    var category = ComposeCategory(categoryScale);
+    var value = ComposeValue(valueScale);
+
+    var data = Items.Select(item =>
+    {
+      var x = category(item);
+      var y = value(item);
+      return new Point<TItem> { X = x, Y = y, Data = item };
+    }).ToList();
+
+    var chart = RequireChart();
+    var index = chart.Series.IndexOf(this);
+    var className = $"rz-scatter-series rz-series-{index}";
+
+    return
+    @<g class="@className">
+      <Markers Visible="true" Series="@this" Data="@data" MarkerType="@MarkerType" Stroke="@(Markers.Stroke ?? Stroke)" Fill="@(Markers.Fill ?? Fill ?? Stroke)" StrokeWidth="@(Markers.StrokeWidth > 0 ? Markers.StrokeWidth : StrokeWidth)" Size="@Markers.Size" />
+    </g>;
+  }
+}
