@@ -870,5 +870,53 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(2, timeList.Count);
             Assert.All(timeList, t => Assert.Equal(new TimeOnly(0, 0, 0), t.Value));
         }
+
+        [Fact]
+        public void DatePicker_OkClick_Fires_OnOkButtonClick()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var okClickRaised = false;
+            DateTime? okClickValue = null;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.ShowTime, true);
+                parameters.Add(p => p.ShowTimeOkButton, true);
+                parameters.Add(p => p.OkClick, args => { okClickRaised = true; okClickValue = args; });
+            });
+
+            component.Find(".rz-calendar-next-icon").Click();
+            component.FindAll(".rz-button-text").First(x => x.TextContent == "Ok").Click();
+
+            Assert.True(okClickRaised);
+            Assert.NotNull(okClickValue);
+        }
+
+        [Fact]
+        public void DatePicker_OkClick_DoesNotFire_OnDaySelection()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var okClickRaised = false;
+            var changeRaised = false;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.ShowTime, true);
+                parameters.Add(p => p.ShowTimeOkButton, true);
+                parameters.Add(p => p.Change, args => { changeRaised = true; });
+                parameters.Add(p => p.OkClick, args => { okClickRaised = true; });
+            });
+
+            component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "15").ParentElement.Click();
+
+            Assert.True(changeRaised);
+            Assert.False(okClickRaised);
+        }
     }
 }

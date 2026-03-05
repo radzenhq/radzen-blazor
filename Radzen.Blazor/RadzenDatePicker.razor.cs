@@ -256,7 +256,7 @@ namespace Radzen.Blazor
             await UpdateValueFromTime(newValue);
         }
 
-        async Task OkClick(bool shouldClose = true)
+        async Task OnOkClick(bool shouldClose = true, bool fromOkButton = false)
         {
             // Prevent single-value change path in Multiple mode
             if (Multiple)
@@ -277,6 +277,11 @@ namespace Radzen.Blazor
                 if (shouldClose)
                 {
                     Close();
+                }
+
+                if (fromOkButton && OkClick.HasDelegate)
+                {
+                    await OkClick.InvokeAsync(DateTimeValue);
                 }
 
                 return;
@@ -314,6 +319,11 @@ namespace Radzen.Blazor
                 Value = date;
 
                 await OnChange();
+
+                if (fromOkButton && OkClick.HasDelegate)
+                {
+                    await OkClick.InvokeAsync(DateTimeValue);
+                }
 
                 if (monthDropDown != null)
                 {
@@ -1184,6 +1194,15 @@ namespace Radzen.Blazor
         public EventCallback<DateTime?> Change { get; set; }
 
         /// <summary>
+        /// Gets or sets the OK click callback. Fires only when the user clicks the OK button
+        /// (visible when <see cref="ShowTimeOkButton"/> is <c>true</c>), allowing developers to
+        /// distinguish between intermediate day-selection changes and the final user confirmation.
+        /// </summary>
+        /// <value>The OK click callback.</value>
+        [Parameter]
+        public EventCallback<DateTime?> OkClick { get; set; }
+
+        /// <summary>
         /// Gets or sets the value changed callback.
         /// </summary>
         /// <value>The value changed callback.</value>
@@ -1307,7 +1326,7 @@ namespace Radzen.Blazor
             else if (ShowTimeOkButton)
             {
                 CurrentDate = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
-                await OkClick(!ShowTime);
+                await OnOkClick(!ShowTime);
             }
             else
             {

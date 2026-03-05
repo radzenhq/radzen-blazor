@@ -151,7 +151,7 @@
                         }
                         @if (ShowTimeOkButton)
                         {
-                            <button aria-label="@OkAriaLabel" type="button" class="rz-button rz-button-md rz-secondary" tabindex="0" @onclick="@(args => OkClick())">
+                            <button aria-label="@OkAriaLabel" type="button" class="rz-button rz-button-md rz-secondary" tabindex="0" @onclick="@(args => OnOkClick(fromOkButton: true))">
                                 <span class="rz-button-text">@OkAriaLabel</span>
                             </button>
                         }
