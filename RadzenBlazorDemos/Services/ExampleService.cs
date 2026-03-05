@@ -2068,6 +2068,20 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Scatter Chart",
+                            Path = "scatter-chart",
+                            Description = "Radzen Blazor Chart with scatter series for plotting numeric X/Y data points.",
+                            Tags = new [] { "chart", "graph", "scatter", "point", "xy" }
+                        },
+                        new Example
+                        {
+                            Name = "Bubble Chart",
+                            Path = "bubble-chart",
+                            Description = "Radzen Blazor Chart with bubble series for visualizing three dimensions of data.",
+                            Tags = new [] { "chart", "graph", "bubble", "scatter", "size" }
+                        },
+                        new Example
+                        {
                             Name = "Stacked Area Chart",
                             Path = "stacked-area-chart",
                             Description = "Radzen Blazor Chart with stacked area series.",

@@ -117,6 +117,21 @@ $chart-color-schemes: (
   fill-opacity: 1;
 }
 
+.rz-scatter-series .rz-marker {
+  fill-opacity: 1;
+  cursor: pointer;
+}
+
+.rz-bubble-series circle {
+  fill-opacity: 0.7;
+  cursor: pointer;
+  transition: fill-opacity var(--rz-transition);
+
+  &:hover {
+    fill-opacity: 0.9;
+  }
+}
+
 .rz-axis {
   stroke: var(--rz-chart-axis-color);
   font-size: var(--rz-chart-axis-font-size);
