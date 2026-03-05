@@ -206,10 +206,19 @@ namespace Radzen.Blazor
             seconds = Math.Max(Math.Min(v, 59), 0);
         }
 
+        DateTime? _valueBeforeTimeEdit;
+        bool _hasUncommittedTimeChange;
+
         async Task UpdateValueFromTime(DateTime newValue)
         {
             if (ShowTimeOkButton)
             {
+                if (!_hasUncommittedTimeChange)
+                {
+                    _valueBeforeTimeEdit = _dateTimeValue;
+                    _hasUncommittedTimeChange = true;
+                }
+
                 DateTimeValue = newValue;
                 CurrentDate = newValue;
             }
@@ -219,6 +228,47 @@ namespace Radzen.Blazor
                 CurrentDate = newValue;
                 await OnChange();
             }
+        }
+
+        void RevertUncommittedTimeChange()
+        {
+            if (!ShowTimeOkButton || !_hasUncommittedTimeChange) return;
+
+            _hasUncommittedTimeChange = false;
+
+            if (_valueBeforeTimeEdit.HasValue)
+            {
+                _dateTimeValue = _valueBeforeTimeEdit;
+                _value = ConvertToTValue(_dateTimeValue);
+            }
+            else
+            {
+                _dateTimeValue = null;
+                _value = null;
+            }
+
+            _currentDate = default(DateTime);
+            hour = null;
+            minutes = null;
+            seconds = null;
+        }
+
+        /// <summary>
+        /// Called from JavaScript when the popup is closed (e.g. by clicking outside) in Initial render mode.
+        /// </summary>
+        [JSInvokable("OnPopupClose")]
+        public void OnPopupClose()
+        {
+            RevertUncommittedTimeChange();
+            contentStyle = "display:none;";
+            StateHasChanged();
+        }
+
+        void OnPopupCloseFromEvent()
+        {
+            RevertUncommittedTimeChange();
+            contentStyle = "display:none;";
+            StateHasChanged();
         }
 
         async Task UpdateHour(int v)
@@ -274,6 +324,8 @@ namespace Radzen.Blazor
                     await UpdateValueFromSelectedDates(date);
                 }
 
+                _hasUncommittedTimeChange = false;
+
                 if (shouldClose)
                 {
                     Close();
@@ -286,6 +338,8 @@ namespace Radzen.Blazor
 
                 return;
             }
+
+            _hasUncommittedTimeChange = false;
 
             if (shouldClose)
             {
@@ -1234,6 +1288,8 @@ namespace Radzen.Blazor
             if (Disabled || ReadOnly || Inline)
                 return;
 
+            RevertUncommittedTimeChange();
+
             if (PopupRenderMode == PopupRenderMode.OnDemand)
             {
                 if (popup != null)
@@ -1513,7 +1569,7 @@ namespace Radzen.Blazor
 
             if (Visible && !Disabled && !ReadOnly && !Inline && PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createDatePicker", Element, PopupID);
+                await JSRuntime.InvokeVoidAsync("Radzen.createDatePicker", Element, PopupID, Reference, nameof(OnPopupClose));
             }
         }
 
@@ -1684,7 +1740,7 @@ namespace Radzen.Blazor
 
                 if (PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.openPopup", Element, PopupID, false, null, null, null, null, null, true, true);
+                    await JSRuntime.InvokeVoidAsync("Radzen.openPopup", Element, PopupID, false, null, null, null, Reference, nameof(OnPopupClose), true, true);
                 }
                 else if (popup != null)
                 {
@@ -1720,7 +1776,7 @@ namespace Radzen.Blazor
 
             if (PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, false, null, null, true, true);
+                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, false, Reference, nameof(OnPopupClose), true, true);
             }
             else if (popup != null)
             {
@@ -1731,6 +1787,8 @@ namespace Radzen.Blazor
         async Task ClosePopup()
         {
             if (Inline) return;
+
+            RevertUncommittedTimeChange();
 
             if (PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
             {
