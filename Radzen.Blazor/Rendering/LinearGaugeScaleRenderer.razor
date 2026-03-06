@@ -1,0 +1,36 @@
+@using Radzen.Blazor
+
+<g class="rz-line">
+    <line class="rz-scale-line"
+          x1="@Start.X.ToInvariantString()"
+          y1="@Start.Y.ToInvariantString()"
+          x2="@End.X.ToInvariantString()"
+          y2="@End.Y.ToInvariantString()"
+          style="@ScaleStyle" />
+</g>
+@foreach (var majorTick in Ticks)
+{
+    <g class="rz-tick">
+        <line class="rz-tick-line"
+              x1="@majorTick.Start.X.ToInvariantString()"
+              y1="@majorTick.Start.Y.ToInvariantString()"
+              x2="@majorTick.End.X.ToInvariantString()"
+              y2="@majorTick.End.Y.ToInvariantString()"
+              style="@ScaleStyle" />
+        @if (!string.IsNullOrEmpty(majorTick.Value))
+        {
+            <Radzen.Blazor.Rendering.Text Value=@majorTick.Value Class="rz-tick-text" Position=@majorTick.Text TextAnchor=@majorTick.TextAnchor />
+        }
+    </g>
+}
+@foreach (var minorTick in MinorTicks)
+{
+    <g class="rz-tick rz-minor-tick">
+        <line class="rz-tick-line"
+              x1="@minorTick.Start.X.ToInvariantString()"
+              y1="@minorTick.Start.Y.ToInvariantString()"
+              x2="@minorTick.End.X.ToInvariantString()"
+              y2="@minorTick.End.Y.ToInvariantString()"
+              style="@ScaleStyle" />
+    </g>
+}

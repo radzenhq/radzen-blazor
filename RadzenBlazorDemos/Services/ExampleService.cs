@@ -2190,6 +2190,24 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Linear Gauge",
+                    Path = "linear-gauge",
+                    Description = "Display values on a linear scale with configurable ticks, ranges, and pointer orientation.",
+                    Icon = "\ue9e4",
+                    Tags = new [] { "gauge", "graph", "linear", "scale", "bar" },
+                    Toc =
+                    [
+                        new () { Text = "Basic Usage", Anchor = "#basic-usage" },
+                        new () { Text = "Ranges and Value Display", Anchor = "#ranges" },
+                        new () { Text = "Rounded Ranges", Anchor = "#rounded-ranges" },
+                        new () { Text = "Reversed Scale", Anchor = "#reversed" },
+                        new () { Text = "Draggable Pointer", Anchor = "#draggable" },
+                        new () { Text = "Vertical Orientation", Anchor = "#vertical" },
+                        new () { Text = "Multiple Scales", Anchor = "#multiple-scales" },
+                    ]
+                },
+                new Example
+                {
                     Name = "Radial Gauge",
                     Path = "radial-gauge",
                     Description = "Demonstration and configuration of Radzen Blazor Radial Gauge component.",

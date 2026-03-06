@@ -1,0 +1,53 @@
+@using Radzen.Blazor.Rendering
+
+<g class="rz-linear-gauge-scale">
+    <LinearGaugeScaleRenderer
+        Start=@CurrentStart
+        End=@CurrentEnd
+        Orientation=@Orientation
+        StrokeWidth=@StrokeWidth
+        Stroke=@Stroke
+        TickPosition=@TickPosition
+        ShowFirstTick=@ShowFirstTick
+        ShowLastTick=@ShowLastTick
+        ShowTickLabels=@ShowTickLabels
+        TickLength=@TickLength
+        TickLabelOffset=@TickLabelOffset
+        Min=@Min
+        Max=@Max
+        Step=@Step
+        MinorStep=@MinorStep
+        FormatString=@FormatString
+        Formatter=@Formatter
+        MinorTickLength=@MinorTickLength
+        IsRTL=@IsRTL
+    />
+    @if (Click.HasDelegate && Gauge?.Width != null && Gauge?.Height != null)
+    {
+        @if (Orientation == global::Radzen.Orientation.Vertical)
+        {
+            <rect class="rz-linear-gauge-scale-overlay"
+                  x="0"
+                  y="@Math.Min(CurrentStart.Y, CurrentEnd.Y).ToInvariantString()"
+                  width="@Gauge.Width.Value.ToInvariantString()"
+                  height="@Math.Abs(CurrentStart.Y - CurrentEnd.Y).ToInvariantString()"
+                  fill="transparent"
+                  style="cursor: pointer"
+                  @onclick="HandleScaleClick" />
+        }
+        else
+        {
+            <rect class="rz-linear-gauge-scale-overlay"
+                  x="@Math.Min(CurrentStart.X, CurrentEnd.X).ToInvariantString()"
+                  y="0"
+                  width="@Math.Abs(CurrentEnd.X - CurrentStart.X).ToInvariantString()"
+                  height="@Gauge.Height.Value.ToInvariantString()"
+                  fill="transparent"
+                  style="cursor: pointer"
+                  @onclick="HandleScaleClick" />
+        }
+    }
+</g>
+<CascadingValue Value=@this IsFixed=true>
+    @ChildContent
+</CascadingValue>

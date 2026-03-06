@@ -1,0 +1,14 @@
+<RadzenLinearGauge Style="width: 100%; height: 130px;">
+    <RadzenLinearGaugeScale Step="40" Min="0" Max="200" MinorStep="10"
+                            Click="@(v => value = v)">
+        <RadzenLinearGaugeScalePointer @bind-Value=@value ShowValue="true"
+                                       Draggable="true" Fill="var(--rz-secondary)" />
+        <RadzenLinearGaugeScaleRange From="0" To="80" Fill="var(--rz-success)" Height="8" />
+        <RadzenLinearGaugeScaleRange From="80" To="140" Fill="var(--rz-warning)" Height="8" />
+        <RadzenLinearGaugeScaleRange From="140" To="200" Fill="var(--rz-danger)" Height="8" />
+    </RadzenLinearGaugeScale>
+</RadzenLinearGauge>
+
+@code {
+    double value = 60;
+}
