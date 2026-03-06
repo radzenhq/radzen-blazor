@@ -1,0 +1,19 @@
+@using Radzen.Blazor.Rendering
+
+@if (Scale != null)
+{
+    <LinearGaugePointer
+        Position=@CurrentPosition
+        Start=@Scale.CurrentStart
+        Orientation=@Scale.Orientation
+        TickPosition=@Scale.TickPosition
+        Fill=@Fill
+        Stroke=@Stroke
+        StrokeWidth=@StrokeWidth
+        Size=@Size
+        PointerType=@PointerType
+        Draggable=@Draggable
+        IsRTL=@Scale.IsRTL
+        OnDragStart=@HandleDragStart
+    />
+}

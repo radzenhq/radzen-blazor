@@ -2486,6 +2486,10 @@ window.Radzen = {
     this.destroyResizable(ref);
   },
   destroyGauge: function (ref) {
+    if (ref._gaugeRTLObserver) {
+      ref._gaugeRTLObserver.disconnect();
+      delete ref._gaugeRTLObserver;
+    }
     this.destroyResizable(ref);
   },
   destroyResizable: function (ref) {
@@ -2553,7 +2557,13 @@ window.Radzen = {
     return this.createResizable(ref, instance);
   },
   createGauge: function (ref, instance) {
-    return this.createResizable(ref, instance);
+    var result = this.createResizable(ref, instance);
+    ref._gaugeRTLObserver = new MutationObserver(function () {
+      try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+    });
+    ref._gaugeRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
+    try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+    return result;
   },
   innerHTML: function (ref, value) {
     if (value != undefined) {

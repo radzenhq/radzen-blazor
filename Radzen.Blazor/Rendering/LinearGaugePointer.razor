@@ -1,0 +1,158 @@
+<g class="rz-linear-gauge-pointer @(Draggable ? "rz-linear-gauge-pointer-draggable" : "")"
+   @onmousedown="HandlePointerMouseDown">
+    @if (PointerType == LinearGaugePointerType.Bar)
+    {
+        <rect class="rz-linear-gauge-pointer-bar"
+              x="@X.ToInvariantString()"
+              y="@Y.ToInvariantString()"
+              width="@RectWidth.ToInvariantString()"
+              height="@RectHeight.ToInvariantString()"
+              fill="@Fill"
+              stroke="@Stroke"
+              stroke-width="@StrokeWidth.ToInvariantString()" />
+    }
+    else if (PointerType == LinearGaugePointerType.Line)
+    {
+        <line class="rz-linear-gauge-pointer-line"
+              x1="@LineX1.ToInvariantString()"
+              y1="@LineY1.ToInvariantString()"
+              x2="@LineX2.ToInvariantString()"
+              y2="@LineY2.ToInvariantString()"
+              stroke="@(string.IsNullOrEmpty(Fill) ? Stroke : Fill)"
+              stroke-width="@(StrokeWidth > 0 ? StrokeWidth.ToInvariantString() : "2")" />
+    }
+    else
+    {
+        <g class="rz-linear-gauge-pointer-arrow" transform="translate(@Position.Render())">
+            <Path Fill=@Fill D=@ArrowPath Stroke=@Stroke StrokeWidth=@StrokeWidth />
+        </g>
+    }
+</g>
+
+@code {
+    [Parameter]
+    public string Stroke { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Fill { get; set; } = string.Empty;
+
+    [Parameter]
+    public double StrokeWidth { get; set; }
+
+    [Parameter]
+    public Point Position { get; set; } = new Point();
+
+    [Parameter]
+    public Point Start { get; set; } = new Point();
+
+    [Parameter]
+    public global::Radzen.Orientation Orientation { get; set; }
+
+    [Parameter]
+    public GaugeTickPosition TickPosition { get; set; }
+
+    [Parameter]
+    public double Size { get; set; } = 10;
+
+    [Parameter]
+    public LinearGaugePointerType PointerType { get; set; } = LinearGaugePointerType.Arrow;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnDragStart { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public bool IsRTL { get; set; }
+
+    // Arrow path relative to origin (Position used via translate transform)
+    private string ArrowPath { get; set; } = string.Empty;
+
+    // Bar rect geometry
+    private double X { get; set; }
+    private double Y { get; set; }
+    private double RectWidth { get; set; }
+    private double RectHeight { get; set; }
+
+    // Line geometry
+    private double LineX1 { get; set; }
+    private double LineY1 { get; set; }
+    private double LineX2 { get; set; }
+    private double LineY2 { get; set; }
+
+    private void HandlePointerMouseDown(MouseEventArgs args) => OnDragStart.InvokeAsync(args);
+
+    protected override void OnParametersSet()
+    {
+        var half = Size / 2;
+
+        if (PointerType == LinearGaugePointerType.Arrow)
+        {
+            // Path is relative to origin; parent <g> applies translate(Position)
+            if (Orientation == global::Radzen.Orientation.Vertical)
+            {
+                var arrowRight = (TickPosition == GaugeTickPosition.Outside) != IsRTL;
+                if (arrowRight)
+                {
+                    ArrowPath = $"M 0 0 L {Size.ToInvariantString()} {(-half).ToInvariantString()} L {Size.ToInvariantString()} {half.ToInvariantString()} Z";
+                }
+                else
+                {
+                    ArrowPath = $"M 0 0 L {(-Size).ToInvariantString()} {(-half).ToInvariantString()} L {(-Size).ToInvariantString()} {half.ToInvariantString()} Z";
+                }
+            }
+            else
+            {
+                if (TickPosition == GaugeTickPosition.Outside)
+                {
+                    ArrowPath = $"M 0 0 L {(-half).ToInvariantString()} {Size.ToInvariantString()} L {half.ToInvariantString()} {Size.ToInvariantString()} Z";
+                }
+                else
+                {
+                    ArrowPath = $"M 0 0 L {(-half).ToInvariantString()} {(-Size).ToInvariantString()} L {half.ToInvariantString()} {(-Size).ToInvariantString()} Z";
+                }
+            }
+        }
+        else if (PointerType == LinearGaugePointerType.Bar)
+        {
+            if (Orientation == global::Radzen.Orientation.Vertical)
+            {
+                var top = Math.Min(Start.Y, Position.Y);
+                var bottom = Math.Max(Start.Y, Position.Y);
+                X = Position.X - half;
+                Y = top;
+                RectWidth = Size;
+                RectHeight = bottom - top;
+            }
+            else
+            {
+                var left = Math.Min(Start.X, Position.X);
+                var right = Math.Max(Start.X, Position.X);
+                X = left;
+                Y = Position.Y - half;
+                RectWidth = right - left;
+                RectHeight = Size;
+            }
+        }
+        else // Line
+        {
+            if (Orientation == global::Radzen.Orientation.Vertical)
+            {
+                // Line extends equally both sides of the axis — RTL has no effect on symmetric lines
+                LineX1 = Position.X - Size;
+                LineY1 = Position.Y;
+                LineX2 = Position.X + Size;
+                LineY2 = Position.Y;
+            }
+            else
+            {
+                var direction = TickPosition == GaugeTickPosition.Outside ? 1 : -1;
+                LineX1 = Position.X;
+                LineY1 = Position.Y - direction * Size;
+                LineX2 = Position.X;
+                LineY2 = Position.Y + direction * Size;
+            }
+        }
+    }
+}

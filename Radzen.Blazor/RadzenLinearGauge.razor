@@ -1,0 +1,141 @@
+@using Radzen.Blazor.Rendering
+@inherits GaugeBase
+
+@if (Visible)
+{
+    <div @ref="Element" style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
+    @if (Width.HasValue && Height.HasValue)
+    {
+        <svg style="@(_draggingPointer != null ? "width: 100%; height: 100%; cursor: grabbing; user-select: none;" : "width: 100%; height: 100%;")"
+             @onmousemove="HandleDragMove"
+             @onmouseup="HandleDragEnd"
+             @onmouseleave="HandleDragEnd">
+            <CascadingValue Value=@this IsFixed=true>
+                @ChildContent
+            </CascadingValue>
+        </svg>
+        @if (Pointers.Count > 0)
+        {
+            @foreach (var pointer in Pointers)
+            {
+                <div class="rz-linear-gauge-value" style=@PointerStyle(pointer)>
+                    @if (pointer.ShowValue)
+                    {
+                        @if (pointer.Template != null)
+                        {
+                            @pointer.Template(pointer)
+                        }
+                        else if (!string.IsNullOrEmpty(pointer.FormatString))
+                        {
+                            @string.Format(pointer.FormatString, pointer.Value)
+                        }
+                        else
+                        {
+                            @pointer.Value
+                        }
+                    }
+                </div>
+            }
+        }
+    }
+    </div>
+}
+
+@code {
+    IList<RadzenLinearGaugeScalePointer> Pointers { get; set; } = new List<RadzenLinearGaugeScalePointer>();
+
+    RadzenLinearGaugeScalePointer? _draggingPointer;
+    double _dragStartClientX;
+    double _dragStartClientY;
+    double _dragStartValue;
+
+    internal void StartDrag(RadzenLinearGaugeScalePointer pointer, MouseEventArgs args)
+    {
+        _draggingPointer = pointer;
+        _dragStartClientX = args.ClientX;
+        _dragStartClientY = args.ClientY;
+        _dragStartValue = pointer.Value;
+        StateHasChanged();
+    }
+
+    private async Task HandleDragMove(MouseEventArgs args)
+    {
+        if (_draggingPointer == null) return;
+        var scale = _draggingPointer.Scale;
+        if (scale == null) return;
+
+        double delta;
+        if (scale.Orientation == global::Radzen.Orientation.Vertical)
+        {
+            var length = scale.CurrentStart.Y - scale.CurrentEnd.Y;
+            delta = length != 0 ? -(args.ClientY - _dragStartClientY) / length * (scale.Max - scale.Min) : 0;
+        }
+        else
+        {
+            var length = scale.CurrentEnd.X - scale.CurrentStart.X;
+            delta = length != 0 ? (args.ClientX - _dragStartClientX) / length * (scale.Max - scale.Min) : 0;
+        }
+
+        var newValue = scale.Clip(_dragStartValue + delta);
+        if (Math.Abs(newValue - _draggingPointer.Value) > 0.0001)
+        {
+            await _draggingPointer.ValueChanged.InvokeAsync(newValue);
+        }
+    }
+
+    private void HandleDragEnd(MouseEventArgs _)
+    {
+        if (_draggingPointer != null)
+        {
+            _draggingPointer = null;
+            StateHasChanged();
+        }
+    }
+
+    string PointerStyle(RadzenLinearGaugeScalePointer pointer)
+    {
+        var position = pointer.CurrentPosition;
+        var scale = pointer.Scale;
+
+        var offset = pointer.ValueOffset;
+
+        if (scale?.Orientation == global::Radzen.Orientation.Vertical)
+        {
+            var ticksGoRight = (scale.TickPosition == GaugeTickPosition.Outside) != scale.IsRTL;
+            if (ticksGoRight)
+            {
+                return $"left: {(position.X - offset).ToInvariantString()}px; top: {position.Y.ToInvariantString()}px; transform: translate(-100%, -50%);";
+            }
+            return $"left: {(position.X + offset).ToInvariantString()}px; top: {position.Y.ToInvariantString()}px; transform: translateY(-50%);";
+        }
+
+        var ticksGoDown = scale?.TickPosition == GaugeTickPosition.Outside;
+        if (ticksGoDown)
+        {
+            return $"left: {position.X.ToInvariantString()}px; top: {(position.Y - offset).ToInvariantString()}px; transform: translate(-50%, -100%);";
+        }
+        return $"left: {position.X.ToInvariantString()}px; top: {(position.Y + offset).ToInvariantString()}px; transform: translateX(-50%);";
+    }
+
+    internal void AddPointer(RadzenLinearGaugeScalePointer pointer)
+    {
+        if (!Pointers.Contains(pointer))
+        {
+            Pointers.Add(pointer);
+            StateHasChanged();
+        }
+    }
+
+    internal void RemovePointer(RadzenLinearGaugeScalePointer pointer)
+    {
+        if (Pointers.Remove(pointer))
+        {
+            StateHasChanged();
+        }
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        return "rz-linear-gauge";
+    }
+}
