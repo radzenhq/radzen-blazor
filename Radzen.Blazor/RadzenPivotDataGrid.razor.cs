@@ -1282,9 +1282,33 @@ namespace Radzen.Blazor
 
             var groups = items.GroupByMany(new string[]{ row.Property! });
 
-            var sortedGroups = (row.GetSortOrder() == SortOrder.Ascending) ? groups.OrderBy(g => g.Key)
-                : (row.GetSortOrder() == SortOrder.Descending) ? groups.OrderByDescending(g => g.Key)
-                : groups;
+            var sortedAggregate = pivotAggregates.FirstOrDefault(a => a.GetSortOrder() != null);
+
+            IEnumerable<GroupResult> sortedGroups;
+            if (sortedAggregate != null)
+            {
+                static double? ToSortKey(object? value)
+                {
+                    if (value == null) return null;
+                    try { return Convert.ToDouble(value, System.Globalization.CultureInfo.InvariantCulture); } catch { return null; }
+                }
+
+                var groupsWithValues = groups.AsEnumerable().Select(g => new
+                {
+                    Group = g,
+                    AggValue = ToSortKey(GetAggregateValue(g.Items == null ? Enumerable.Empty<TItem>().AsQueryable() : g.Items.Cast<TItem>().AsQueryable(), sortedAggregate))
+                }).ToList();
+
+                sortedGroups = (sortedAggregate.GetSortOrder() == SortOrder.Ascending)
+                    ? groupsWithValues.OrderBy(x => x.AggValue).Select(x => x.Group)
+                    : groupsWithValues.OrderByDescending(x => x.AggValue).Select(x => x.Group);
+            }
+            else
+            {
+                sortedGroups = (row.GetSortOrder() == SortOrder.Ascending) ? groups.OrderBy(g => g.Key)
+                    : (row.GetSortOrder() == SortOrder.Descending) ? groups.OrderByDescending(g => g.Key)
+                    : groups;
+            }
 
             foreach (var group in sortedGroups)
             {
