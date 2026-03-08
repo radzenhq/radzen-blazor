@@ -138,22 +138,37 @@ namespace Radzen
             ArgumentNullException.ThrowIfNull(properties);
 
             var parameter = Expression.Parameter(source.ElementType, "x");
+            var expressions = properties
+                .Select(p => Expression.Lambda<Func<T, object>>(Expression.Convert(GetNestedPropertyExpression(parameter, p), typeof(object)), parameter))
+                .ToArray();
 
-            return GroupByMany(source,
-                properties.Select(p => Expression.Lambda<Func<T, object>>(Expression.Convert(GetNestedPropertyExpression(parameter, p), typeof(object)), parameter).Compile()).ToArray(),
-                    0);
+            return GroupByMany(source, expressions, 0);
         }
 
-        private static IQueryable<GroupResult> GroupByMany<T>(IEnumerable<T> source, Func<T, object>[] lambdas, int index)
+        private static IQueryable<GroupResult> GroupByMany<T>(IQueryable<T> source, Expression<Func<T, object>>[] expressions, int index)
         {
-            return source.GroupBy(lambdas[index]).Select(
-                g => new GroupResult
-                {
-                    Key = g.Key,
-                    Count = g.Count(),
-                    Items = g,
-                    Subgroups = index < lambdas.Length - 1 ? GroupByMany(g, lambdas, index + 1) : null
-                }).AsQueryable();
+            if (index < expressions.Length - 1)
+            {
+                // Intermediate level: use IQueryable GroupBy, then AsEnumerable to allow recursive C# calls
+                return source.GroupBy(expressions[index])
+                    .AsEnumerable()
+                    .Select(g => new GroupResult
+                    {
+                        Key = g.Key,
+                        Count = g.Count(),
+                        Items = null,
+                        Subgroups = GroupByMany(g.AsQueryable(), expressions, index + 1)
+                    }).AsQueryable();
+            }
+
+            // Last (or only) level: pure IQueryable chain, no compilation or materialization
+            return source.GroupBy(expressions[index]).Select(g => new GroupResult
+            {
+                Key = g.Key,
+                Count = g.Count(),
+                Items = g,
+                Subgroups = null
+            });
         }
 
         internal static string RemoveVariableReference(string expression)
