@@ -16,7 +16,7 @@
         }
         else
         {
-            var slotHeight = (Scheduler?.Height ?? 0 - 60) / 6;
+            var slotHeight = ((Scheduler?.Height ?? 0) - 60) / 6;
             maxAppointmentsInSlot = Math.Max(0, Convert.ToInt32(Math.Floor(slotHeight / 24)) - 1);
         }
 
