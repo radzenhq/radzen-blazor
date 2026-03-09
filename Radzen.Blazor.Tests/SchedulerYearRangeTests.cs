@@ -30,6 +30,8 @@ namespace Radzen.Blazor.Tests
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Rect>("Radzen.createScheduler", _ => true)
                 .SetResult(new Rect { Left = 0, Top = 0, Width = 200, Height = 200 });
+            ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
+                .SetResult(new Rect { Left = 0, Top = 0, Width = 200, Height = 200 });
 
             // Make the first day of week Monday and use a year where Jan 1 is Monday (2024-01-01).
             var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
@@ -67,6 +69,8 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.Services.AddScoped<DialogService>();
             ctx.JSInterop.Setup<Rect>("Radzen.createScheduler", _ => true)
+                .SetResult(new Rect { Left = 0, Top = 0, Width = 800, Height = 600 });
+            ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
                 .SetResult(new Rect { Left = 0, Top = 0, Width = 800, Height = 600 });
 
             var loadDataCalls = new List<SchedulerLoadDataEventArgs>();
