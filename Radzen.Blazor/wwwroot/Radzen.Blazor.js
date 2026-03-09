@@ -1701,8 +1701,8 @@ window.Radzen = {
     }
 
     popup.style.display = 'block';
+    popup.style.visibility = 'hidden';
     popup.onanimationend = null;
-    popup.classList.add("rz-open");
     popup.classList.remove("rz-close");
     Radzen.setPopupAriaExpanded(parent, id, true);
 
@@ -1865,6 +1865,20 @@ window.Radzen = {
     Radzen.popups.push({ id, instance, callback, parent });
 
     document.body.appendChild(popup);
+
+    if (!position) {
+        var popupRect = popup.getBoundingClientRect();
+        if (popupRect.right > window.innerWidth && popupRect.width < window.innerWidth) {
+            popup.style.left = (window.innerWidth - popupRect.width + scrollLeft) + 'px';
+        }
+        if (popupRect.bottom > window.innerHeight && popupRect.height < window.innerHeight) {
+            popup.style.top = (window.innerHeight - popupRect.height + scrollTop) + 'px';
+        }
+    }
+
+    popup.style.visibility = '';
+    popup.classList.add("rz-open");
+
     document.removeEventListener('mousedown', Radzen[id]);
     document.addEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
