@@ -1028,25 +1028,25 @@ namespace Radzen.Blazor
             {
                 filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
 
-                if (FilterTemplate != null || FilterValueTemplate != null)
+                FilterValue = filterValue;
+                if (Grid != null)
                 {
-                    FilterValue = filterValue;
-                    if (Grid != null)
+                    Grid.SaveSettings();
+                    if (Grid.IsVirtualizationAllowed())
                     {
-                        Grid.SaveSettings();
-                        if (Grid.IsVirtualizationAllowed())
+                        if (Grid.virtualize != null)
                         {
-                            if (Grid.virtualize != null)
-                            {
-                                await Grid.virtualize.RefreshDataAsync();
-                            }
-                        }
-                        else
-                        {
-                            await Grid.Reload();
+                            await Grid.virtualize.RefreshDataAsync();
                         }
                     }
+                    else
+                    {
+                        await Grid.Reload();
+                    }
+                }
 
+                if (FilterTemplate != null || FilterValueTemplate != null)
+                {
                     return;
                 }
             }
