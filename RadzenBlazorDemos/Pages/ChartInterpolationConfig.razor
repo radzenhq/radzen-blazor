@@ -11,8 +11,9 @@
     </RadzenCard>
 
     <RadzenChart>
-        <RadzenLineSeries Interpolation="@interpolation" Data="@revenue2024" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue" />
-        <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2023" CategoryProperty="Date" Title="2024" ValueProperty="Revenue" />
+        <RadzenLineSeries Interpolation="@interpolation" Data="@revenue2024" CategoryProperty="Date" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
+        <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" />
+        <RadzenLineSeries Interpolation="@interpolation" Data="@revenueWithGaps" CategoryProperty="Date" Title="2022 (with gaps)" ValueProperty="Revenue" />
         <RadzenCategoryAxis Padding="20" />
         <RadzenValueAxis Formatter="@FormatAsUSD">
             <RadzenGridLines Visible="true"/>
@@ -28,6 +29,12 @@
     {
         public string Date { get; set; }
         public double Revenue { get; set; }
+    }
+
+    class NullableDataItem
+    {
+        public string Date { get; set; }
+        public double? Revenue { get; set; }
     }
 
     string FormatAsUSD(object value)
@@ -96,6 +103,21 @@
             Date = "Dec",
             Revenue = 294000
         }
+    };
+
+    NullableDataItem[] revenueWithGaps = new NullableDataItem[] {
+        new NullableDataItem { Date = "Jan", Revenue = 194000 },
+        new NullableDataItem { Date = "Feb", Revenue = 209000 },
+        new NullableDataItem { Date = "Mar", Revenue = null },
+        new NullableDataItem { Date = "Apr", Revenue = null },
+        new NullableDataItem { Date = "May", Revenue = 184000 },
+        new NullableDataItem { Date = "Jun", Revenue = 213000 },
+        new NullableDataItem { Date = "Jul", Revenue = 234000 },
+        new NullableDataItem { Date = "Aug", Revenue = null },
+        new NullableDataItem { Date = "Sept", Revenue = 233000 },
+        new NullableDataItem { Date = "Oct", Revenue = 242000 },
+        new NullableDataItem { Date = "Nov", Revenue = 249000 },
+        new NullableDataItem { Date = "Dec", Revenue = 254000 }
     };
 
     DataItem[] revenue2024 = new DataItem[] {
