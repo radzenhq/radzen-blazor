@@ -88,7 +88,15 @@ namespace Radzen.Blazor
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(args);
-            Value = $"{args.Value}";
+
+            if (!Immediate && JSRuntime != null && !string.IsNullOrEmpty(Mask))
+            {
+                Value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", Element);
+            }
+            else
+            {
+                Value = $"{args.Value}";
+            }
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
