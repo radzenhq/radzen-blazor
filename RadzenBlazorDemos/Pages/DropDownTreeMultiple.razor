@@ -1,0 +1,91 @@
+@using Radzen.Blazor.Rendering
+
+<style>
+    .rz-dropdown-tree-multi-popup {
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        width: 300px;
+        border: var(--rz-panel-border);
+        background-color: var(--rz-panel-background-color);
+        box-shadow: var(--rz-panel-shadow);
+        border-radius: var(--rz-border-radius);
+    }
+</style>
+
+<div class="rz-p-0 rz-p-lg-12">
+    <div style="display: inline-flex; flex-direction: column; gap: 0.5rem; width: 400px;">
+        <RadzenLabel Text="Departments" Component="departments" />
+        <div @ref=trigger style="position: relative;" @onclick="Toggle">
+            <div class="rz-inputtext" style="min-height: 2.5rem; cursor: pointer; display: flex; align-items: center; flex-wrap: wrap; gap: 0.25rem; padding-right: 2rem;">
+                @if (selectedItems.Any())
+                {
+                    @foreach (var item in selectedItems)
+                    {
+                        <RadzenBadge Text="@GetText(item)" BadgeStyle="BadgeStyle.Info" IsPill=true
+                            Style="font-size: 0.75rem;" />
+                    }
+                }
+                else
+                {
+                    <span style="color: var(--rz-text-tertiary-color);">Select departments...</span>
+                }
+            </div>
+            <RadzenIcon Icon="arrow_drop_down" Style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--rz-text-tertiary-color);" />
+        </div>
+    </div>
+</div>
+
+<Popup @ref=popup Lazy=true Style="padding: 0;" class="rz-dropdown-tree-multi-popup">
+    <RadzenTree AllowCheckBoxes="true" Style="width: 100%; max-height: 300px; overflow: auto;" Data=@departments
+        @bind-CheckedValues=@checkedValues>
+        <RadzenTreeLevel Text=@(e => (e as Department).Name) ChildrenProperty="Children"
+            HasChildren=@(e => (e as Department).Children?.Any() == true) Expanded=@(e => true) />
+    </RadzenTree>
+</Popup>
+
+@code {
+    ElementReference trigger;
+    Popup popup;
+    IEnumerable<object> checkedValues = Enumerable.Empty<object>();
+    IEnumerable<Department> departments;
+
+    IEnumerable<object> selectedItems => checkedValues?.Where(v => v is Department d && d.Children == null) ?? Enumerable.Empty<object>();
+
+    string GetText(object data) => data is Department d ? d.Name : string.Empty;
+
+    async Task Toggle()
+    {
+        await popup.ToggleAsync(trigger);
+    }
+
+    protected override void OnInitialized()
+    {
+        departments = new List<Department>
+        {
+            new Department("Company", new List<Department>
+            {
+                new Department("Engineering", new List<Department>
+                {
+                    new Department("Frontend"),
+                    new Department("Backend"),
+                    new Department("QA"),
+                }),
+                new Department("Design", new List<Department>
+                {
+                    new Department("UX"),
+                    new Department("Visual Design"),
+                }),
+                new Department("Marketing", new List<Department>
+                {
+                    new Department("Content"),
+                    new Department("SEO"),
+                }),
+                new Department("Sales"),
+                new Department("HR"),
+            }),
+        };
+    }
+
+    record Department(string Name, List<Department> Children = null);
+}

@@ -1,0 +1,99 @@
+@using Radzen.Blazor.Rendering
+@inject IJSRuntime JSRuntime
+
+<style>
+    .rz-dropdown-tree-popup {
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        width: 300px;
+        border: var(--rz-panel-border);
+        background-color: var(--rz-panel-background-color);
+        box-shadow: var(--rz-panel-shadow);
+        border-radius: var(--rz-border-radius);
+    }
+</style>
+
+<div class="rz-p-0 rz-p-lg-12">
+    <div style="display: inline-flex; flex-direction: column; gap: 0.5rem; width: 300px;">
+        <RadzenLabel Text="Department" Component="department" />
+        <div @ref=trigger style="position: relative;" @onclick="Toggle">
+            <RadzenTextBox ReadOnly="true" Name="department"
+                Value="@selectedText" Placeholder="Select a department..."
+                Style="width: 100%; cursor: pointer;" />
+            <RadzenIcon Icon="arrow_drop_down" Style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--rz-text-tertiary-color);" />
+        </div>
+    </div>
+</div>
+
+<Popup @ref=popup id="departmentPopup" Style="padding: 0;" class="rz-dropdown-tree-popup"
+    Close=@OnPopupClose>
+    <RadzenTree Style="width: 100%; max-height: 300px; overflow: auto;" Data=@departments
+        @bind-Value=@selection Change=@OnSelect>
+        <RadzenTreeLevel Text=@(e => (e as Department).Name) ChildrenProperty="Children"
+            HasChildren=@(e => (e as Department).Children?.Any() == true) Expanded=@(e => true) />
+    </RadzenTree>
+</Popup>
+
+@code {
+    ElementReference trigger;
+    Popup popup;
+    object selection;
+    string selectedText;
+    bool isOpen;
+    IEnumerable<Department> departments;
+
+    protected override void OnInitialized()
+    {
+        departments = new List<Department>
+        {
+            new Department("Company", new List<Department>
+            {
+                new Department("Engineering", new List<Department>
+                {
+                    new Department("Frontend"),
+                    new Department("Backend"),
+                    new Department("QA"),
+                }),
+                new Department("Design", new List<Department>
+                {
+                    new Department("UX"),
+                    new Department("Visual Design"),
+                }),
+                new Department("Marketing", new List<Department>
+                {
+                    new Department("Content"),
+                    new Department("SEO"),
+                }),
+                new Department("Sales"),
+                new Department("HR"),
+            }),
+        };
+    }
+
+    async Task Toggle()
+    {
+        isOpen = !isOpen;
+        await popup.ToggleAsync(trigger);
+    }
+
+    async Task OnSelect()
+    {
+        if(isOpen)
+        {
+            if (selection is Department dept)
+            {
+                selectedText = dept.Name;
+            }
+            isOpen = false;
+            await popup.CloseAsync(trigger);
+        }
+    }
+
+    void OnPopupClose()
+    {
+        isOpen = false;
+    }
+
+    record Department(string Name, List<Department> Children = null);
+}

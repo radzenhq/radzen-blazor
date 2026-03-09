@@ -1631,6 +1631,16 @@ namespace RadzenBlazorDemos
                             Description = "This example demonstrates Blazor DropDown component binding to custom objects.",
                             Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "custom" },
                         },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection with checkboxes", Anchor = "#multiple-selection" }, new () { Text = "Filtering", Anchor = "#filtering" } ],
+                            Name = "DropDown with Tree",
+                            Path = "dropdown-tree",
+                            Title = "Blazor DropDown Tree | Free UI Components by Radzen",
+                            Description = "Combine Popup and Tree to create a DropDownTree for hierarchical selection.",
+                            Tags = new [] { "select", "picker", "form", "edit", "dropdown", "tree", "hierarchical" },
+                            New = true,
+                        },
                     }
                 },
                 new Example

@@ -1,0 +1,38 @@
+@page "/dropdown-tree"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DropDown with Tree
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Combine <strong>Popup</strong> and <strong>Tree</strong> to create a DropDownTree component for hierarchical selection.
+</RadzenText>
+
+<RadzenText Anchor="dropdown-tree#single-selection" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Single selection
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Click the dropdown to open a tree. Selecting a node closes the popup and updates the value.
+</RadzenText>
+<RadzenExample Example="DropDownTreeSingle">
+    <DropDownTreeSingle />
+</RadzenExample>
+
+<RadzenText Anchor="dropdown-tree#multiple-selection" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Multiple selection with checkboxes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>AllowCheckBoxes</code> on the tree to enable multi-select. Selected items display as chips.
+</RadzenText>
+<RadzenExample Example="DropDownTreeMultiple">
+    <DropDownTreeMultiple />
+</RadzenExample>
+
+<RadzenText Anchor="dropdown-tree#filtering" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Filtering
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add a search box inside the popup to filter tree items.
+</RadzenText>
+<RadzenExample Example="DropDownTreeFiltering">
+    <DropDownTreeFiltering />
+</RadzenExample>
