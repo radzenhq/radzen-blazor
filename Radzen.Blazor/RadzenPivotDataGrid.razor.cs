@@ -710,11 +710,16 @@ namespace Radzen.Blazor
         /// <param name="column">The pivot column to add.</param>
         public void AddPivotColumn(RadzenPivotColumn<TItem> column)
         {
+            ArgumentNullException.ThrowIfNull(column);
+
             if (!allPivotColumns.Contains(column))
             {
                 allPivotColumns.Add(column);
 
-                pivotColumns.Add(column);
+                if (column.Selected)
+                {
+                    pivotColumns.Add(column);
+                }
 
                 _columnHeaderRows = null;
                 _cachedPivotRows = null;
@@ -732,11 +737,16 @@ namespace Radzen.Blazor
         /// <param name="row">The pivot row to add.</param>
         public void AddPivotRow(RadzenPivotRow<TItem> row)
         {
+            ArgumentNullException.ThrowIfNull(row);
+
             if (!allPivotRows.Contains(row))
             {
                 allPivotRows.Add(row);
 
-                pivotRows.Add(row);
+                if (row.Selected)
+                {
+                    pivotRows.Add(row);
+                }
 
                 _columnHeaderRows = null;
                 _cachedPivotRows = null;
@@ -754,11 +764,16 @@ namespace Radzen.Blazor
         /// <param name="aggregate">The pivot aggregate to add.</param>
         public void AddPivotAggregate(RadzenPivotAggregate<TItem> aggregate)
         {
+            ArgumentNullException.ThrowIfNull(aggregate);
+
             if (!allPivotAggregates.Contains(aggregate))
             {
                 allPivotAggregates.Add(aggregate);
 
-                pivotAggregates.Add(aggregate);
+                if (aggregate.Selected)
+                {
+                    pivotAggregates.Add(aggregate);
+                }
 
                 _columnHeaderRows = null;
                 _cachedPivotRows = null;
@@ -2254,9 +2269,14 @@ namespace Radzen.Blazor
 
         void UpdateSelected()
         {
-            selectedRows = allPivotRows.Select(r => r.Property).Where(p => p != null).Cast<string>().ToList();
-            selectedColumns = allPivotColumns.Select(c => c.Property).Where(p => p != null).Cast<string>().ToList();
-            selectedAggregates = allPivotAggregates.ToList();
+            selectedRows = pivotRows.Select(r => r.Property).Where(p => p != null).Cast<string>().ToList();
+            selectedColumns = pivotColumns.Select(c => c.Property).Where(p => p != null).Cast<string>().ToList();
+            selectedAggregates = pivotAggregates.Select(a =>
+            {
+                // For aggregates from allPivotAggregates, preserve the original instance
+                var existing = allPivotAggregates.FirstOrDefault(x => x.Property == a.Property);
+                return existing ?? a;
+            }).ToList();
         }
 
         async Task UpdateFieldsFromSelected()

@@ -44,6 +44,13 @@ namespace Radzen.Blazor
         public bool Sortable { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether this field is initially selected (active) in the pivot grid.
+        /// When set to <c>false</c>, the field will be available in the picker but not applied on initial load.
+        /// </summary>
+        [Parameter]
+        public bool Selected { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether this column is filterable.
         /// </summary>
         [Parameter]
