@@ -94,7 +94,7 @@
                             var left = ((slotIndex + 1) * slotWidth) + (100.0 / 85.0);
                             var top = ((MaxAppointmentsInSlot + 1) * 1.5) + 1.7;
                             var listDate = start;
-                            <button type="button" class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => { if (appointments != null && MoreText != null) _ = OnListClick(listDate, appointments); })>@(MoreText != null ? String.Format(MoreText, excessCount) : "")</button>
+                            <button type="button" class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; inset-inline-start: @(left.ToInvariantString())%" @onclick=@(args => { if (appointments != null && MoreText != null) _ = OnListClick(listDate, appointments); })>@(MoreText != null ? String.Format(MoreText, excessCount) : "")</button>
                         }
                     }
                 }
