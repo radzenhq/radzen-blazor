@@ -377,19 +377,13 @@ namespace Radzen.Blazor
 
             if (!string.IsNullOrEmpty(Format))
             {
-                string formattedStringWithoutPlaceholder = Format.Replace("#", "", StringComparison.Ordinal).Trim();
-                
-                if (valueStr.Contains(Format, StringComparison.Ordinal))
-                {
-                    string currencyDecimalSeparator = Culture.NumberFormat.CurrencyDecimalSeparator;
+                valueStr = valueStr.Replace(Culture.NumberFormat.CurrencySymbol, "", StringComparison.Ordinal);
+                valueStr = valueStr.Replace(Culture.NumberFormat.NumberGroupSeparator, "", StringComparison.Ordinal);
 
-                    string[] splitFormatString = formattedStringWithoutPlaceholder.Split(currencyDecimalSeparator);
-                    string[] splitValueString = valueStr.Split(currencyDecimalSeparator);
-                    int lengthDifference = splitValueString[0].Length - splitFormatString[0].Length;
-                    formattedStringWithoutPlaceholder = formattedStringWithoutPlaceholder.PadLeft(formattedStringWithoutPlaceholder.Length + lengthDifference, '0');
+                if (Culture.NumberFormat.CurrencyGroupSeparator != Culture.NumberFormat.NumberGroupSeparator)
+                {
+                    valueStr = valueStr.Replace(Culture.NumberFormat.CurrencyGroupSeparator, "", StringComparison.Ordinal);
                 }
-                
-                valueStr = valueStr.Replace(formattedStringWithoutPlaceholder, "", StringComparison.Ordinal);
             }
 
             return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray()).Replace("%", "", StringComparison.Ordinal);
