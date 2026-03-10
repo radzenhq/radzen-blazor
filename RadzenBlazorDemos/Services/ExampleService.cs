@@ -1139,6 +1139,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Empty PickList",
+                    Path = "/picklist-empty",
+                    Title = "Blazor PickList - Empty PickList | Free UI Components by Radzen",
+                    Description = "This example demonstrates Blazor PickList with empty text and empty template.",
+                    Icon = "\ue0b8",
+                    Tags = new[] { "picklist", "empty", "list", "listbox" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Scheduler",
                     Path = "scheduler",

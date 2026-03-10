@@ -58,6 +58,34 @@
                 <ul @ref="list" class="rz-listbox-list" role="listbox" aria-multiselectable="@(Multiple ? "true" : "false")">
                     @RenderItems()
                 </ul>
+                @if (!View.Cast<object>().Any())
+                {
+                    <div class="rz-listbox-empty-message">
+                        @if (EmptyTemplate != null)
+                        {
+                            @EmptyTemplate
+                        }
+                        else
+                        {
+                            <p>@EmptyText</p>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else if (EmptyTemplate != null || !string.IsNullOrEmpty(EmptyText))
+        {
+            <div class="rz-listbox-list-wrapper">
+                <div class="rz-listbox-empty-message">
+                    @if (EmptyTemplate != null)
+                    {
+                        @EmptyTemplate
+                    }
+                    else
+                    {
+                        <p>@EmptyText</p>
+                    }
+                </div>
             </div>
         }
     </div>

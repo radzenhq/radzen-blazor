@@ -136,6 +136,48 @@ namespace Radzen.Blazor
         public string? SelectAllText { get; set; }
 
         /// <summary>
+        /// Gets or sets the empty text shown when a list has no items.
+        /// </summary>
+        /// <value>The empty text.</value>
+        [Parameter]
+        public string EmptyText { get; set; } = "No records to display.";
+
+        /// <summary>
+        /// Gets or sets the empty text shown when the source list has no items. Overrides <see cref="EmptyText"/>.
+        /// </summary>
+        /// <value>The source empty text.</value>
+        [Parameter]
+        public string? SourceEmptyText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the empty text shown when the target list has no items. Overrides <see cref="EmptyText"/>.
+        /// </summary>
+        /// <value>The target empty text.</value>
+        [Parameter]
+        public string? TargetEmptyText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the empty template shown when a list has no items.
+        /// </summary>
+        /// <value>The empty template.</value>
+        [Parameter]
+        public RenderFragment? EmptyTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the empty template shown when the source list has no items. Overrides <see cref="EmptyTemplate"/>.
+        /// </summary>
+        /// <value>The source empty template.</value>
+        [Parameter]
+        public RenderFragment? SourceEmptyTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the empty template shown when the target list has no items. Overrides <see cref="EmptyTemplate"/>.
+        /// </summary>
+        /// <value>The target empty template.</value>
+        [Parameter]
+        public RenderFragment? TargetEmptyTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the row render callback. Use it to set row attributes.
         /// </summary>
         /// <value>The row render callback.</value>

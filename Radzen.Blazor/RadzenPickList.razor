@@ -16,6 +16,7 @@
                     TextProperty="@TextProperty" ValueProperty="@ValueProperty" DisabledProperty="@DisabledProperty" AllowFiltering=@AllowFiltering ItemRender="@OnSourceItemRender"
                     Template=@ListBoxTemplate Placeholder="@(SourcePlaceholder ?? Placeholder)" SelectAllText="@SelectAllText"  AllowSelectAll="@AllowSelectAll"
                     Disabled=@(Disabled || Source == null || (Source != null && !Source.Any()))
+                    EmptyText="@(SourceEmptyText ?? EmptyText)" EmptyTemplate="@(SourceEmptyTemplate ?? EmptyTemplate)"
                 />
             </RadzenStack>
             <RadzenStack Orientation="@(Orientation == Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical)" JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap" class="rz-picklist-buttons">
@@ -38,6 +39,7 @@
                     TextProperty="@TextProperty" ValueProperty="@ValueProperty" DisabledProperty="@DisabledProperty" AllowFiltering=@AllowFiltering ItemRender="@OnTargetItemRender"
                     Template=@ListBoxTemplate Placeholder="@(TargetPlaceholder ?? Placeholder)" SelectAllText="@SelectAllText" AllowSelectAll="@AllowSelectAll"
                     Disabled=@(Disabled || Target == null|| (Target != null && !Target.Any()))
+                    EmptyText="@(TargetEmptyText ?? EmptyText)" EmptyTemplate="@(TargetEmptyTemplate ?? EmptyTemplate)"
                 />
             </RadzenStack>
         </RadzenStack>

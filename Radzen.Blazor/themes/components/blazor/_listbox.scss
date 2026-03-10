@@ -77,6 +77,16 @@ $listbox-header-icon-margin: 0 !default;
   padding: var(--rz-listbox-padding);
 }
 
+.rz-listbox-empty-message {
+  padding: var(--rz-listbox-item-padding);
+  text-align: center;
+  color: var(--rz-text-disabled-color);
+
+  p {
+    margin: 0;
+  }
+}
+
 %filter-container {
   display: flex;
   flex-direction: row-reverse;
