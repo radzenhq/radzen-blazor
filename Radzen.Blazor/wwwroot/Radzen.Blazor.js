@@ -2990,12 +2990,48 @@ window.Radzen = {
         Radzen[el] = null;
     }
   },
+  updateFrozenColumnPositions: function(gridElement) {
+      if (!gridElement) return;
+      // Get frozen cell positions from the header row first, then apply to all rows
+      var headerRow = gridElement.querySelector('thead tr');
+      if (!headerRow) return;
+      var leftHeaderCells = headerRow.querySelectorAll('.rz-frozen-cell-left, .rz-frozen-cell-left-end, .rz-frozen-cell-left-inner');
+      var rightHeaderCells = headerRow.querySelectorAll('.rz-frozen-cell-right, .rz-frozen-cell-right-end, .rz-frozen-cell-right-inner');
+      // Calculate offsets from header widths
+      var leftOffsets = [];
+      var offset = 0;
+      for (var i = 0; i < leftHeaderCells.length; i++) {
+          leftOffsets.push(offset);
+          offset += leftHeaderCells[i].getBoundingClientRect().width;
+      }
+      var rightOffsets = [];
+      offset = 0;
+      for (var i = rightHeaderCells.length - 1; i >= 0; i--) {
+          rightOffsets[i] = offset;
+          offset += rightHeaderCells[i].getBoundingClientRect().width;
+      }
+      // Apply offsets to all rows
+      var rows = gridElement.querySelectorAll('tr');
+      for (var r = 0; r < rows.length; r++) {
+          var row = rows[r];
+          var leftCells = row.querySelectorAll('.rz-frozen-cell-left, .rz-frozen-cell-left-end, .rz-frozen-cell-left-inner');
+          for (var i = 0; i < leftCells.length && i < leftOffsets.length; i++) {
+              leftCells[i].style.setProperty('inset-inline-start', leftOffsets[i] + 'px');
+          }
+          var rightCells = row.querySelectorAll('.rz-frozen-cell-right, .rz-frozen-cell-right-end, .rz-frozen-cell-right-inner');
+          for (var i = 0; i < rightCells.length && i < rightOffsets.length; i++) {
+              rightCells[i].style.setProperty('inset-inline-end', rightOffsets[i] + 'px');
+          }
+      }
+  },
   startColumnResize: function(id, grid, columnIndex, clientX) {
       var el = document.getElementById(id + '-resizer');
       var cell = el.parentNode.parentNode;
       var col = document.getElementById(id + '-col');
       var dataCol = document.getElementById(id + '-data-col');
       var footerCol = document.getElementById(id + '-footer-col');
+      var isFrozen = cell.classList.contains('rz-frozen-cell');
+      var gridElement = isFrozen ? cell.closest('.rz-data-grid') : null;
       Radzen[el] = {
           clientX: clientX,
           width: cell.getBoundingClientRect().width,
@@ -3041,6 +3077,10 @@ window.Radzen = {
                   }
                   if (footerCol) {
                       footerCol.style.width = width;
+                  }
+
+                  if (gridElement) {
+                      Radzen.updateFrozenColumnPositions(gridElement);
                   }
               }
           },
