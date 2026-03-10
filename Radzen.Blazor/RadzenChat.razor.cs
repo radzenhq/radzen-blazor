@@ -114,6 +114,8 @@ namespace Radzen.Blazor
         private bool preventDefault;
         private ElementReference inputElement;
         private ElementReference messagesContainer;
+        private bool hasNewMessages;
+        private int previousMessageCount;
 
         private readonly HashSet<string> typingUsers = new();
         private bool currentUserIsTyping;
@@ -232,6 +234,12 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string EmptyMessage { get; set; } = "No messages yet. Start a conversation!";
+
+        /// <summary>
+        /// Gets or sets the text displayed on the new messages indicator button.
+        /// </summary>
+        [Parameter]
+        public string NewMessagesText { get; set; } = "New messages";
 
         /// <summary>
         /// Gets or sets whether to show participant names above messages.
@@ -601,14 +609,66 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender && messagesContainer.Context != null && JSRuntime != null)
+            if (messagesContainer.Context != null && JSRuntime != null)
             {
-                // Scroll to bottom when new messages are added
-                await JSRuntime.InvokeVoidAsync("eval", 
-                    "setTimeout(() => { " +
-                    "const container = document.querySelector('.rz-chat-messages'); " +
-                    "if (container) container.scrollTop = container.scrollHeight; " +
-                    "}, 100);");
+                var currentCount = Messages.Count();
+
+                if (firstRender || currentCount != previousMessageCount)
+                {
+                    if (firstRender)
+                    {
+                        // Always scroll to bottom on first render
+                        await JSRuntime.InvokeVoidAsync("Radzen.chatScrollToBottom", messagesContainer);
+                    }
+                    else if (currentCount > previousMessageCount)
+                    {
+                        // New messages added - only scroll if user is near bottom
+                        var isNearBottom = await JSRuntime.InvokeAsync<bool>("Radzen.chatIsNearBottom", messagesContainer, 50);
+
+                        if (isNearBottom)
+                        {
+                            await JSRuntime.InvokeVoidAsync("Radzen.chatScrollToBottom", messagesContainer);
+                        }
+                        else
+                        {
+                            hasNewMessages = true;
+                            StateHasChanged();
+                        }
+                    }
+                    else if (currentCount < previousMessageCount)
+                    {
+                        // Messages cleared
+                        hasNewMessages = false;
+                    }
+
+                    previousMessageCount = currentCount;
+                }
+            }
+        }
+
+        private async Task OnMessagesScroll()
+        {
+            if (hasNewMessages && messagesContainer.Context != null && JSRuntime != null)
+            {
+                var isNearBottom = await JSRuntime.InvokeAsync<bool>("Radzen.chatIsNearBottom", messagesContainer, 50);
+
+                if (isNearBottom)
+                {
+                    hasNewMessages = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Scrolls to the bottom of the message list and dismisses the new messages indicator.
+        /// </summary>
+        public async Task ScrollToBottom()
+        {
+            hasNewMessages = false;
+
+            if (messagesContainer.Context != null && JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.chatScrollToBottom", messagesContainer);
             }
         }
 

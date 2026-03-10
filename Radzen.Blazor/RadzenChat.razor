@@ -52,7 +52,7 @@
         }
 
         <!-- Chat Messages -->
-        <div class="rz-chat-messages" @ref="messagesContainer">
+        <div class="rz-chat-messages" @ref="messagesContainer" @onscroll="OnMessagesScroll">
             @if (Messages.Count() == 0)
             {
                 if (EmptyTemplate != null)
@@ -135,6 +135,13 @@
                 }
             }
         </div>
+
+        @if (hasNewMessages)
+        {
+            <button class="rz-chat-new-messages" @onclick="ScrollToBottom">
+                <RadzenIcon Icon="arrow_downward" /> @NewMessagesText
+            </button>
+        }
 
         <!-- Chat Input -->
         <div class="rz-chat-input">

@@ -172,6 +172,33 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     }
 }
 
+.rz-chat-new-messages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    margin: 0 auto;
+    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 1rem;
+    background-color: var(--rz-primary);
+    color: var(--rz-on-primary);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: var(--rz-shadow-2);
+    z-index: 1;
+    transition: background-color 120ms ease;
+
+    .rzi {
+        font-size: 1rem;
+    }
+
+    &:hover {
+        background-color: var(--rz-primary-dark);
+    }
+}
+
 .rz-chat-input {
     position: sticky;
     bottom: 0;

@@ -3512,3 +3512,11 @@ Radzen.unregisterFabMenu = function(element){
     delete element.__rzOutsideClickHandler;
   }
 };
+Radzen.chatIsNearBottom = function(container, threshold) {
+  if (!container) return true;
+  return container.scrollHeight - container.scrollTop - container.clientHeight <= (threshold || 50);
+};
+Radzen.chatScrollToBottom = function(container) {
+  if (!container) return;
+  container.scrollTop = container.scrollHeight;
+};
