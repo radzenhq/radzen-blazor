@@ -1011,16 +1011,32 @@ namespace Radzen.Blazor
 
             if (parameters.DidParameterChange(nameof(SortOrder), SortOrder))
             {
-                sortOrder = new SortOrder?[] { parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder)) };
+                var newSortOrder = parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder));
+                sortOrder = new SortOrder?[] { newSortOrder };
 
                 if (Grid != null)
                 {
                     var descriptor = Grid.sorts.Where(d => d.Property == GetSortProperty()).FirstOrDefault();
-                    if (descriptor == null)
+                    if (newSortOrder.HasValue)
                     {
-                        Grid.sorts.Add(new SortDescriptor() { Property = GetSortProperty(), SortOrder = sortOrder.FirstOrDefault() });
-                        Grid._view = null;
+                        if (descriptor != null)
+                        {
+                            descriptor.SortOrder = newSortOrder.Value;
+                        }
+                        else
+                        {
+                            Grid.sorts.Add(new SortDescriptor() { Property = GetSortProperty(), SortOrder = newSortOrder.Value });
+                        }
                     }
+                    else
+                    {
+                        if (descriptor != null)
+                        {
+                            Grid.sorts.Remove(descriptor);
+                        }
+                    }
+                    Grid._view = null;
+                    await Grid.Reload();
                 }
             }
 
