@@ -506,7 +506,7 @@ $height-k: auto;
       .rz-overflow-#{$breakpoint}-#{$value} { overflow: #{$value} !important; }
     }
     @each $value in $width {
-      .rz-w-#{$breakpoint}-#{$value} { width: #{$value}% !important; }
+      .rz-w-#{$breakpoint}-#{$value} { width: #{$value}#{'%'} !important; }
     }
     @each $value in $width {
       .rz-vw-#{$breakpoint}-#{$value} { width: #{$value}vw !important; }
@@ -515,13 +515,13 @@ $height-k: auto;
       .rz-w-#{$breakpoint}-#{$value} { width: #{$value} !important; }
     }
     @each $value in $width {
-      .rz-min-w-#{$breakpoint}-#{$value} { min-width: #{$value}% !important; }
+      .rz-min-w-#{$breakpoint}-#{$value} { min-width: #{$value}#{'%'} !important; }
     }
     @each $value in $width {
-      .rz-max-w-#{$breakpoint}-#{$value} { max-width: #{$value}% !important; }
+      .rz-max-w-#{$breakpoint}-#{$value} { max-width: #{$value}#{'%'} !important; }
     }
     @each $value in $height {
-      .rz-h-#{$breakpoint}-#{$value} { height: #{$value}% !important; }
+      .rz-h-#{$breakpoint}-#{$value} { height: #{$value}#{'%'} !important; }
     }
     @each $value in $height {
       .rz-vh-#{$breakpoint}-#{$value} { height: #{$value}vh !important; }
@@ -530,10 +530,10 @@ $height-k: auto;
       .rz-h-#{$breakpoint}-#{$value} { height: #{$value} !important; }
     }
     @each $value in $height {
-      .rz-min-h-#{$breakpoint}-#{$value} { min-height: #{$value}% !important; }
+      .rz-min-h-#{$breakpoint}-#{$value} { min-height: #{$value}#{'%'} !important; }
     }
     @each $value in $height {
-      .rz-max-h-#{$breakpoint}-#{$value} { max-height: #{$value}% !important; }
+      .rz-max-h-#{$breakpoint}-#{$value} { max-height: #{$value}#{'%'} !important; }
     }
   }
 }
