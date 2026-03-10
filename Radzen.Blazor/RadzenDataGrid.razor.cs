@@ -218,9 +218,9 @@ namespace Radzen.Blazor
                 lastLoadDataArgs = loadDataArgs;
             }
 
-            var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
+            var totalItemsCount = (LoadData.HasDelegate ? Count : view.Count()) + itemsToInsert.Count;
 
-            virtualDataItems = (LoadData.HasDelegate ? Data : itemsToInsert.Count > 0 ? itemsToInsert.ToList().Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top))?.ToList() ?? new List<TItem>();
+            virtualDataItems = (LoadData.HasDelegate ? (itemsToInsert.Count > 0 ? itemsToInsert.ToList().Concat(Data ?? Enumerable.Empty<TItem>()) : Data) : itemsToInsert.Count > 0 ? itemsToInsert.ToList().Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top))?.ToList() ?? new List<TItem>();
 
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
         }
