@@ -1593,6 +1593,11 @@ window.Radzen = {
         disableSmartPosition = false;
     }
 
+    if (target) {
+        target.setAttribute('aria-describedby', id);
+        Radzen[id + 'target'] = target;
+    }
+
     if (delay) {
         Radzen[id + 'delay'] = setTimeout(Radzen.openPopup, delay, target, id, false, position, clientX, clientY, instance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
     } else {
@@ -1605,6 +1610,13 @@ window.Radzen = {
   },
   closeTooltip(id) {
     Radzen.activeElement = null;
+
+    var target = Radzen[id + 'target'];
+    if (target) {
+        target.removeAttribute('aria-describedby');
+        Radzen[id + 'target'] = null;
+    }
+
     Radzen.closePopup(id);
 
     if (Radzen[id + 'delay']) {
