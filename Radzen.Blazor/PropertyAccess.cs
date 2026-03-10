@@ -216,7 +216,7 @@ public static class PropertyAccess
                 }
 
                 value = property.GetValue(value, null);
-                currentType = property.PropertyType;
+                currentType = value?.GetType() ?? property.PropertyType;
             }
         }
         return value;
