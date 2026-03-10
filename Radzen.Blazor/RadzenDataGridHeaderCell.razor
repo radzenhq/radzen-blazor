@@ -58,7 +58,8 @@
                 <div id="@(Grid.getColumnUniqueId(ColumnIndex) + "-resizer")" style="cursor:col-resize;float:right;"
                 @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer"
                 @onmousedown:preventDefault="true"
-                @onmousedown=@StartColumnResize @onmouseup=@StopColumnResize>&nbsp;</div>
+                @onmousedown=@StartColumnResize @onmouseup=@StopColumnResize
+                @ontouchstart=@StartColumnResizeTouch @ontouchend=@StopColumnResize>&nbsp;</div>
             }
             @{var filterMode = Column.FilterMode ?? Grid.FilterMode;}
             @if (Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Advanced || filterMode == FilterMode.CheckBoxList))
@@ -537,18 +538,27 @@ else
 
     async Task StartColumnResize(MouseEventArgs args)
     {
-        if(args.Button == 0) 
-        { 
+        if(args.Button == 0)
+        {
             await Grid.StartColumnResize(args, ColumnIndex);
         }
     }
 
-    async Task StopColumnResize(MouseEventArgs args)
+    async Task StartColumnResizeTouch(TouchEventArgs args)
     {
-        if (args.Button == 0)
+        if (args.ChangedTouches != null && args.ChangedTouches.Length > 0)
         {
-            await Grid.StopColumnResize(args, ColumnIndex);
+            await Grid.StartColumnResize(args.ChangedTouches[0].ClientX, ColumnIndex);
         }
+    }
+
+    async Task StopColumnResize(EventArgs args)
+    {
+        if (args is MouseEventArgs mouseArgs && mouseArgs.Button != 0)
+        {
+            return;
+        }
+        await Grid.StopColumnResize(ColumnIndex);
     }
 
     internal async Task OpenFilter()

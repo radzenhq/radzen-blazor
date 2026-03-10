@@ -3086,6 +3086,7 @@ window.Radzen = {
           },
           touchMoveHandler: function (e) {
               if (e.targetTouches[0]) {
+                  e.preventDefault();
                   Radzen[el].mouseMoveHandler(e.targetTouches[0]);
               }
           }
@@ -3093,8 +3094,8 @@ window.Radzen = {
       el.style.width = "100%";
       document.addEventListener('mousemove', Radzen[el].mouseMoveHandler);
       document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
-      document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true })
-      document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
+      document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: false })
+      document.addEventListener('touchend', Radzen[el].mouseUpHandler);
   },
       startSplitterResize: function(id,
         splitter,

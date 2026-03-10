@@ -1777,13 +1777,23 @@ namespace Radzen.Blazor
 
         internal async Task StartColumnResize(MouseEventArgs args, int columnIndex)
         {
+            await StartColumnResize(args.ClientX, columnIndex);
+        }
+
+        internal async Task StartColumnResize(double clientX, int columnIndex)
+        {
             if (JSRuntime != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnUniqueId(columnIndex), Reference, columnIndex, args.ClientX);
+                await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnUniqueId(columnIndex), Reference, columnIndex, clientX);
             }
         }
 
         internal async Task StopColumnResize(MouseEventArgs args, int columnIndex)
+        {
+            await StopColumnResize(columnIndex);
+        }
+
+        internal async Task StopColumnResize(int columnIndex)
         {
             if (JSRuntime != null)
             {
