@@ -59,6 +59,12 @@ namespace Radzen.Blazor
         public bool AllowSelectAll { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether virtualization is enabled for the source and target listboxes.
+        /// </summary>
+        /// <value><c>true</c> if virtualization is enabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowVirtualization { get; set; }
+        /// <summary>
         /// Gets or sets a value indicating whether component is disabled.
         /// </summary>
         /// <value><c>true</c> if component is disabled; otherwise, <c>false</c>.</value>

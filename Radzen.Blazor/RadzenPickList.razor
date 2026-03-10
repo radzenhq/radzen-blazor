@@ -17,6 +17,7 @@
                     Template=@ListBoxTemplate Placeholder="@(SourcePlaceholder ?? Placeholder)" SelectAllText="@SelectAllText"  AllowSelectAll="@AllowSelectAll"
                     Disabled=@(Disabled || Source == null || (Source != null && !Source.Any()))
                     EmptyText="@(SourceEmptyText ?? EmptyText)" EmptyTemplate="@(SourceEmptyTemplate ?? EmptyTemplate)"
+                    AllowVirtualization="@AllowVirtualization"
                 />
             </RadzenStack>
             <RadzenStack Orientation="@(Orientation == Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical)" JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap" class="rz-picklist-buttons">
@@ -40,6 +41,7 @@
                     Template=@ListBoxTemplate Placeholder="@(TargetPlaceholder ?? Placeholder)" SelectAllText="@SelectAllText" AllowSelectAll="@AllowSelectAll"
                     Disabled=@(Disabled || Target == null|| (Target != null && !Target.Any()))
                     EmptyText="@(TargetEmptyText ?? EmptyText)" EmptyTemplate="@(TargetEmptyTemplate ?? EmptyTemplate)"
+                    AllowVirtualization="@AllowVirtualization"
                 />
             </RadzenStack>
         </RadzenStack>
