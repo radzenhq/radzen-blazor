@@ -130,9 +130,16 @@
                     else
                     {
                     <div class="rz-lookup-search">
-                        <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@(SearchTextPlaceholder ?? string.Empty)"
-                            @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@(searchText ?? string.Empty)" style="@(ShowSearch ? "" : "margin-right:0px;")"
-                            @oninput="@OnFilterInput" />
+                        <div class="rz-lookup-search-input-container">
+                            <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@(SearchTextPlaceholder ?? string.Empty)"
+                                @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@(searchText ?? string.Empty)" style="@(ShowSearch ? "" : "margin-right:0px;")"
+                                @oninput="@OnFilterInput" />
+                            @if (!string.IsNullOrEmpty(searchText))
+                            {
+                                <button type="button" tabindex="-1" class="notranslate rz-dropdown-clear-icon rzi rzi-times"
+                                        aria-label="@ClearAriaLabel" @onclick="@ClearSearchText" @onclick:stopPropagation="true"></button>
+                            }
+                        </div>
                         @if (ShowSearch)
                         {
                             <button tabindex="0" class="rz-button rz-button-md rz-button-icon-only rz-primary" type="button"
