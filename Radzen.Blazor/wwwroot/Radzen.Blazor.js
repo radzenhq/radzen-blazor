@@ -1068,8 +1068,38 @@ window.Radzen = {
       }
     }
   },
-  scrollCarouselItem: function (el) {
-    el.parentElement.scroll(el.offsetLeft, 0);
+  scrollCarouselItem: function (el, duration) {
+    var container = el.parentElement;
+    var target = el.offsetLeft;
+    if (duration == null || duration < 0) {
+        container.scroll(target, 0);
+        return;
+    }
+    if (duration === 0) {
+        container.style.scrollBehavior = 'auto';
+        container.scroll(target, 0);
+        container.style.scrollBehavior = '';
+        return;
+    }
+    container.style.scrollBehavior = 'auto';
+    container.style.scrollSnapType = 'none';
+    var start = container.scrollLeft;
+    var distance = target - start;
+    var startTime = null;
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var elapsed = timestamp - startTime;
+        var progress = Math.min(elapsed / duration, 1);
+        var ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        container.scrollLeft = start + distance * ease;
+        if (elapsed < duration) {
+            requestAnimationFrame(step);
+        } else {
+            container.style.scrollBehavior = '';
+            container.style.scrollSnapType = '';
+        }
+    }
+    requestAnimationFrame(step);
   },
   scrollIntoViewIfNeeded: function (ref, selector) {
     var el = selector ? ref.getElementsByClassName(selector)[0] : ref;
