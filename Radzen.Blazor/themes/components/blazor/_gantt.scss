@@ -111,6 +111,10 @@ $gantt-event-border-radius: var(--rz-border-radius) !default;
     background-color: var(--rz-grid-stripe-odd-background-color);
   }
 
+  .rz-gantt-table-row:last-child > td {
+    border-bottom: none;
+  }
+
   .rz-gantt-table-row:nth-child(even) > td {
     background-color: var(--rz-grid-stripe-background-color);
   }
