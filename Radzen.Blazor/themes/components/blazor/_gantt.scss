@@ -2,6 +2,7 @@ $gantt-row-height: 2.25rem !default;
 $gantt-border: var(--rz-border-normal) !default;
 $gantt-border-radius: var(--rz-border-radius) !default;
 $gantt-background-color: var(--rz-base-background-color) !default;
+$gantt-event-border-radius: var(--rz-border-radius) !default;
 
 .rz-gantt {
   display: flex;
@@ -96,11 +97,6 @@ $gantt-background-color: var(--rz-base-background-color) !default;
     text-align: center;
     white-space: nowrap;
     box-sizing: border-box;
-  }
-
-  .rz-gantt-table-header-group {
-    font-weight: 600;
-    border-bottom: var(--rz-gantt-border);
   }
 
   .rz-gantt-table-header-cell:last-child {
@@ -203,7 +199,7 @@ $gantt-background-color: var(--rz-base-background-color) !default;
 
   .rz-gantt-bar {
     position: absolute;
-    border-radius: var(--rz-border-radius);
+    border-radius: var(--rz-gantt-event-border-radius);
     background: var(--rz-primary);
     color: var(--rz-on-primary);
     overflow: hidden;
@@ -212,6 +208,10 @@ $gantt-background-color: var(--rz-base-background-color) !default;
     padding-block: 0;
     padding-inline: 0;
     --rz-scheduler-event-content-padding: 0;
+
+    .rz-event-content {
+      border-radius: 0;
+    }
   }
 
   .rz-gantt-bar-content {
