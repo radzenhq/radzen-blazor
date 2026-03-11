@@ -1160,7 +1160,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Gantt",
                     New = true,
-                    Icon = "\ue1a1",
+                    Icon = "\ueb85",
                     Tags = new[] { "gantt", "timeline", "project", "task", "schedule" },
                     Children = new[]
                     {
@@ -2210,9 +2210,10 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Linear Gauge",
+                    New = true,
                     Path = "linear-gauge",
                     Description = "Display values on a linear scale with configurable ticks, ranges, and pointer orientation.",
-                    Icon = "\ue9e4",
+                    Icon = "\ue260",
                     Tags = new [] { "gauge", "graph", "linear", "scale", "bar" },
                     Toc =
                     [
