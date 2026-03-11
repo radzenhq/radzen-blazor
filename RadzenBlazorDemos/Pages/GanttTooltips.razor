@@ -61,11 +61,11 @@
     void OnTaskMouseEnter(GanttTaskMouseEventArgs<GanttTask> args)
     {
         TooltipService.Open(args.Element, ts =>
-    @<RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-p-6" Style="min-width: 250px; max-width: 500px;">
+    @<RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-p-2" Style="min-width: 250px; max-width: 500px;">
         <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-2" Style="color: var(--rz-tooltip-color);">
             @args.Data?.Name
         </RadzenText>
-        <RadzenText TextStyle="TextStyle.H3" class="rz-mb-4" Style="color: var(--rz-tooltip-color);">
+        <RadzenText TextStyle="TextStyle.H3" class="rz-mb-2" Style="color: var(--rz-tooltip-color);">
             @($"{args.Data?.Progress ?? 0} %")
         </RadzenText>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">

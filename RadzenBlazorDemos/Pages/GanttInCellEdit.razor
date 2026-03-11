@@ -23,6 +23,7 @@
              Sort="@(args => Reset())"
              Filter="@(args => Reset())"
              RowUpdate="@OnUpdateRow"
+             RowHeightPx="42"
              Style="width: 100%; height: 520px;">
     <Columns>
         <RadzenGanttColumn Property="@nameof(GanttTask.Id)" Title="ID" Width="140px" Frozen="true" Filterable="false" />
