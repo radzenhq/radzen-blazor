@@ -1205,12 +1205,12 @@ window.Radzen = {
                 }
             }
         }
-        if (key == 'ArrowUp' || key == 'ArrowDown' || key == 'PageUp' || key == 'PageDown') {
+        if (key == 'PageUp' || key == 'PageDown') {
             var rowHeight = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
-            var factor = key == 'PageUp' || key == 'PageDown' ? 10 : 1;
-            table.parentNode.scrollTop = table.parentNode.scrollTop + (factor * (key == 'ArrowDown' || key == 'PageDown' ? rowHeight : -rowHeight));
+            var factor = 10;
+            table.parentNode.scrollTop = table.parentNode.scrollTop + (factor * (key == 'PageDown' ? rowHeight : -rowHeight));
         }
-        else {
+        else if (key == 'Home' || key == 'End') {
             table.parentNode.scrollTop = key == 'Home' ? 0 : table.parentNode.scrollHeight;
         }
     }
@@ -1246,6 +1246,19 @@ window.Radzen = {
         table.nextSelectedIndex = rows.length - 1;
     } else if (isVirtual && (key == 'PageUp' || key == 'Home')) {
         table.nextSelectedIndex = 1;
+    }
+
+    if (isVirtual && (key == 'ArrowDown' || key == 'ArrowUp')) {
+        var minIndex = cellIndex != null ? 0 : 1;
+        if (key == 'ArrowDown' && table.nextSelectedIndex >= rows.length - 1) {
+            var rh = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
+            table.parentNode.scrollTop += rh;
+            table.nextSelectedIndex = rows.length - 1;
+        } else if (key == 'ArrowUp' && table.nextSelectedIndex <= minIndex) {
+            var rh = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
+            table.parentNode.scrollTop -= rh;
+            table.nextSelectedIndex = minIndex;
+        }
     }
 
     if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && cellIndex != null && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
