@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -103,7 +104,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-panel-menu";
+            return ClassList.Create("rz-panel-menu")
+                .Add("rz-panel-menu-stacked", DisplayStyle == MenuItemDisplayStyle.IconAndTextStacked)
+                .ToString();
         }
 
         [Inject]

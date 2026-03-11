@@ -13,11 +13,11 @@
             @if (Path != null)
             {
                 <NavLink tabindex="-1" target="@Target" class=@LinkClass style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")" href="@Path" Match="@Match" @onclick="@Toggle">
-                    @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
+                    @if (!string.IsNullOrEmpty(Icon) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {
                         <i class="notranslate rzi rz-navigation-item-icon" style="@getIconStyle()">@Icon</i>
                     }
-                    @if (!string.IsNullOrEmpty(Image) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
+                    @if (!string.IsNullOrEmpty(Image) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {
                         <img class="notranslate rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
                     }
@@ -25,7 +25,7 @@
                     {
                         @Template
                     }
-                    else if (Parent?.DisplayStyle == MenuItemDisplayStyle.Text || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText)
+                    else if (Parent?.DisplayStyle != MenuItemDisplayStyle.Icon)
                     {
                         <span class="rz-navigation-item-text">@Text</span>
                     }
@@ -42,11 +42,11 @@
                      aria-controls="@(ChildContent != null ? $"{GetId()}-submenu" : null)"
                      aria-haspopup="@(ChildContent != null ? "menu" : null)"
                      @onclick="@Toggle" @onkeydown="OnToggleKeyDown">
-                    @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
+                    @if (!string.IsNullOrEmpty(Icon) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {
                         <i class="notranslate rzi rz-navigation-item-icon" style="@getIconStyle()">@Icon</i>
                     }
-                    @if (!string.IsNullOrEmpty(Image) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
+                    @if (!string.IsNullOrEmpty(Image) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {
                         <img class="notranslate rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
                     }
@@ -54,7 +54,7 @@
                     {
                         @Template
                     }
-                    else if (Parent?.DisplayStyle == MenuItemDisplayStyle.Text || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText)
+                    else if (Parent?.DisplayStyle != MenuItemDisplayStyle.Icon)
                     {
                         <span class="rz-navigation-item-text">@Text</span>
                     }

@@ -175,6 +175,25 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     transition: var(--rz-panel-menu-item-transition);
   }
 
+  /* Stacked (NavigationRail) style */
+  &.rz-panel-menu-stacked {
+    .rz-navigation-item-link {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rz-navigation-item-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rz-navigation-item-icon {
+      margin-inline: 0;
+    }
+  }
+
   /* Second level items */
   .rz-navigation-menu {
     list-style: none;
