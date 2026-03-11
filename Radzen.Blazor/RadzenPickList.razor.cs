@@ -6,16 +6,38 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenCard component.
+    /// RadzenPickList component.
     /// </summary>
     public partial class RadzenPickList<TItem> : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets the edit context.
+        /// </summary>
+        [CascadingParameter]
+        public EditContext? EditContext { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source expression used to create the FieldIdentifier for source validation.
+        /// </summary>
+        [Parameter]
+        public Expression<Func<IEnumerable<TItem>?>>? SourceExpression { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target expression used to create the FieldIdentifier for target validation.
+        /// </summary>
+        [Parameter]
+        public Expression<Func<IEnumerable<TItem>?>>? TargetExpression { get; set; }
+
+        FieldIdentifier? sourceFieldIdentifier;
+        FieldIdentifier? targetFieldIdentifier;
+
         /// <summary>
         /// Gets or sets a value indicating whether it is allowed to move all items.
         /// </summary>
@@ -446,6 +468,19 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
+
+            if (EditContext != null)
+            {
+                if (SourceExpression != null && sourceFieldIdentifier == null)
+                {
+                    sourceFieldIdentifier = FieldIdentifier.Create(SourceExpression);
+                }
+
+                if (TargetExpression != null && targetFieldIdentifier == null)
+                {
+                    targetFieldIdentifier = FieldIdentifier.Create(TargetExpression);
+                }
+            }
         }
 
         /// <summary>
@@ -521,6 +556,19 @@ namespace Radzen.Blazor
 
             await SourceChanged.InvokeAsync(source);
             await TargetChanged.InvokeAsync(target);
+
+            if (EditContext != null)
+            {
+                if (sourceFieldIdentifier.HasValue)
+                {
+                    EditContext.NotifyFieldChanged(sourceFieldIdentifier.Value);
+                }
+
+                if (targetFieldIdentifier.HasValue)
+                {
+                    EditContext.NotifyFieldChanged(targetFieldIdentifier.Value);
+                }
+            }
 
             selectedSourceItems = null;
             selectedTargetItems = null;

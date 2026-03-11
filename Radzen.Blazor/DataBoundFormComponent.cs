@@ -285,6 +285,8 @@ namespace Radzen
         [CascadingParameter]
         public EditContext? EditContext { get; set; }
 
+        EditContext? previousEditContext;
+
         /// <summary>
         /// Gets the field identifier.
         /// </summary>
@@ -319,13 +321,20 @@ namespace Radzen
                 await OnDataChanged();
             }
 
-            if (EditContext != null && (ValueExpression != null || ValueChanged.HasDelegate) && FieldIdentifier.Model != EditContext.Model)
+            if (EditContext != null && (ValueExpression != null || ValueChanged.HasDelegate) &&
+                (FieldIdentifier.Model != EditContext.Model || EditContext != previousEditContext))
             {
+                if (previousEditContext != null && previousEditContext != EditContext)
+                {
+                    previousEditContext.OnValidationStateChanged -= ValidationStateChanged;
+                }
+
                 FieldIdentifier = ValueExpression != null
                     ? FieldIdentifier.Create(ValueExpression)
                     : FieldIdentifier.Create(() => Value);
                 EditContext.OnValidationStateChanged -= ValidationStateChanged;
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
+                previousEditContext = EditContext;
             }
 
             if (disabledChanged)
@@ -351,7 +360,12 @@ namespace Radzen
         {
             base.Dispose();
 
-            if (EditContext != null)
+            if (previousEditContext != null)
+            {
+                previousEditContext.OnValidationStateChanged -= ValidationStateChanged;
+            }
+
+            if (EditContext != null && EditContext != previousEditContext)
             {
                 EditContext.OnValidationStateChanged -= ValidationStateChanged;
             }

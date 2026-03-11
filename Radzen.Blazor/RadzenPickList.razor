@@ -1,5 +1,6 @@
 ﻿@inherits RadzenComponent
 @using System.Collections
+@using Microsoft.AspNetCore.Components.Forms
 @typeparam TItem
 
 @if (Visible)
@@ -11,14 +12,16 @@
                 {
                     @SourceHeader
                 }
-                <RadzenListBox @ref=sourceListBox Value=@selectedSourceItems ValueChanged="@(EventCallback.Factory.Create<object>(this, OnSelectedSourceItemsChanged))" Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
-                    FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                    TextProperty="@TextProperty" ValueProperty="@ValueProperty" DisabledProperty="@DisabledProperty" AllowFiltering=@AllowFiltering ItemRender="@OnSourceItemRender"
-                    Template=@ListBoxTemplate Placeholder="@(SourcePlaceholder ?? Placeholder)" SelectAllText="@SelectAllText"  AllowSelectAll="@AllowSelectAll"
-                    Disabled=@(Disabled || Source == null || (Source != null && !Source.Any()))
-                    EmptyText="@(SourceEmptyText ?? EmptyText)" EmptyTemplate="@(SourceEmptyTemplate ?? EmptyTemplate)"
-                    AllowVirtualization="@AllowVirtualization"
-                />
+                <CascadingValue Value="@((EditContext?)null)" IsFixed=true>
+                    <RadzenListBox @ref=sourceListBox Value=@selectedSourceItems ValueChanged="@(EventCallback.Factory.Create<object>(this, OnSelectedSourceItemsChanged))" Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
+                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                        TextProperty="@TextProperty" ValueProperty="@ValueProperty" DisabledProperty="@DisabledProperty" AllowFiltering=@AllowFiltering ItemRender="@OnSourceItemRender"
+                        Template=@ListBoxTemplate Placeholder="@(SourcePlaceholder ?? Placeholder)" SelectAllText="@SelectAllText"  AllowSelectAll="@AllowSelectAll"
+                        Disabled=@(Disabled || Source == null || (Source != null && !Source.Any()))
+                        EmptyText="@(SourceEmptyText ?? EmptyText)" EmptyTemplate="@(SourceEmptyTemplate ?? EmptyTemplate)"
+                        AllowVirtualization="@AllowVirtualization"
+                    />
+                </CascadingValue>
             </RadzenStack>
             <RadzenStack Orientation="@(Orientation == Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical)" JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap" class="rz-picklist-buttons">
                 <RadzenButton Icon="@SelectedSourceToTargetIcon" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(Disabled || selectedSourceItems == null || (Multiple && (selectedSourceItems as IEnumerable)?.Cast<object>().Any() != true))
@@ -35,14 +38,16 @@
                 {
                     @TargetHeader
                 }
-                <RadzenListBox @ref=targetListBox Value=@selectedTargetItems ValueChanged="@(EventCallback.Factory.Create<object>(this, OnSelectedTargetItemsChanged))" Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
-                    FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                    TextProperty="@TextProperty" ValueProperty="@ValueProperty" DisabledProperty="@DisabledProperty" AllowFiltering=@AllowFiltering ItemRender="@OnTargetItemRender"
-                    Template=@ListBoxTemplate Placeholder="@(TargetPlaceholder ?? Placeholder)" SelectAllText="@SelectAllText" AllowSelectAll="@AllowSelectAll"
-                    Disabled=@(Disabled || Target == null|| (Target != null && !Target.Any()))
-                    EmptyText="@(TargetEmptyText ?? EmptyText)" EmptyTemplate="@(TargetEmptyTemplate ?? EmptyTemplate)"
-                    AllowVirtualization="@AllowVirtualization"
-                />
+                <CascadingValue Value="@((EditContext?)null)" IsFixed=true>
+                    <RadzenListBox @ref=targetListBox Value=@selectedTargetItems ValueChanged="@(EventCallback.Factory.Create<object>(this, OnSelectedTargetItemsChanged))" Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
+                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                        TextProperty="@TextProperty" ValueProperty="@ValueProperty" DisabledProperty="@DisabledProperty" AllowFiltering=@AllowFiltering ItemRender="@OnTargetItemRender"
+                        Template=@ListBoxTemplate Placeholder="@(TargetPlaceholder ?? Placeholder)" SelectAllText="@SelectAllText" AllowSelectAll="@AllowSelectAll"
+                        Disabled=@(Disabled || Target == null|| (Target != null && !Target.Any()))
+                        EmptyText="@(TargetEmptyText ?? EmptyText)" EmptyTemplate="@(TargetEmptyTemplate ?? EmptyTemplate)"
+                        AllowVirtualization="@AllowVirtualization"
+                    />
+                </CascadingValue>
             </RadzenStack>
         </RadzenStack>
     </div>
