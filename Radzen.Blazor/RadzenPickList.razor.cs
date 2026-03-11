@@ -388,8 +388,34 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<IEnumerable<TItem>> TargetChanged { get; set; }
 
+        /// <summary>
+        /// Gets or sets the callback that is invoked when the selected source items change.
+        /// </summary>
+        /// <value>The selected source items changed callback.</value>
+        [Parameter]
+        public EventCallback<IEnumerable<TItem>> SelectedSourceChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback that is invoked when the selected target items change.
+        /// </summary>
+        /// <value>The selected target items changed callback.</value>
+        [Parameter]
+        public EventCallback<IEnumerable<TItem>> SelectedTargetChanged { get; set; }
+
         object? selectedSourceItems;
         object? selectedTargetItems;
+
+        async Task OnSelectedSourceItemsChanged(object value)
+        {
+            selectedSourceItems = value;
+            await SelectedSourceChanged.InvokeAsync(GetSelectedSources());
+        }
+
+        async Task OnSelectedTargetItemsChanged(object value)
+        {
+            selectedTargetItems = value;
+            await SelectedTargetChanged.InvokeAsync(GetSelectedTargets());
+        }
 
         string? sourceSearchText;
         string? targetSearchText;
