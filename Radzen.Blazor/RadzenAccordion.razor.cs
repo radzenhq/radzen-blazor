@@ -104,6 +104,11 @@ namespace Radzen.Blazor
         List<RadzenAccordionItem> items = new List<RadzenAccordionItem>();
 
         /// <summary>
+        /// Gets the collection of <see cref="RadzenAccordionItem" /> components that belong to this accordion.
+        /// </summary>
+        public IReadOnlyList<RadzenAccordionItem> AccordionItems => items.AsReadOnly();
+
+        /// <summary>
         /// Adds the item.
         /// </summary>
         /// <param name="item">The item.</param>
@@ -235,6 +240,40 @@ namespace Radzen.Blazor
             if (!Multiple)
             {
                 await SelectedIndexChanged.InvokeAsync(itemIndex);
+            }
+
+            StateHasChanged();
+        }
+
+        /// <summary>
+        /// Expands all accordion items.
+        /// </summary>
+        public async Task ExpandAll()
+        {
+            foreach (var item in items.Where(i => i.Visible && !i.Disabled))
+            {
+                if (!item.GetSelected())
+                {
+                    await item.SetSelected(true);
+                    await Expand.InvokeAsync(items.IndexOf(item));
+                }
+            }
+
+            StateHasChanged();
+        }
+
+        /// <summary>
+        /// Collapses all accordion items.
+        /// </summary>
+        public async Task CollapseAll()
+        {
+            foreach (var item in items.Where(i => i.Visible && !i.Disabled))
+            {
+                if (item.GetSelected())
+                {
+                    await item.SetSelected(false);
+                    await Collapse.InvokeAsync(items.IndexOf(item));
+                }
             }
 
             StateHasChanged();
