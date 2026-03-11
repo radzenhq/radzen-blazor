@@ -339,11 +339,11 @@ namespace Radzen
                 internalValue = selectedItems.AsQueryable().Cast(type);
             }
 
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             if (internalValue != null)
             {
                 await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
             }
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(internalValue);
 
             StateHasChanged();
@@ -404,8 +404,8 @@ namespace Radzen
 
             selectedIndex = -1;
 
-            await ValueChanged.InvokeAsync(internalValue != null ? (T)internalValue : default(T)!);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            await ValueChanged.InvokeAsync(internalValue != null ? (T)internalValue : default(T)!);
             await Change.InvokeAsync(internalValue);
 
             await OnFilter(new ChangeEventArgs());
@@ -1303,6 +1303,8 @@ namespace Radzen
             }
             if (raiseChange)
             {
+                if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+
                 if (ValueChanged.HasDelegate)
                 {
                     if (Multiple)
@@ -1317,8 +1319,6 @@ namespace Radzen
                         await ValueChanged.InvokeAsync(internalValue != null ? (T)internalValue : default(T)!);
                     }
                 }
-
-                if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
 
                 await Change.InvokeAsync(internalValue);
             }
