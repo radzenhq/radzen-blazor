@@ -66,7 +66,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="args">The change event arguments containing the new value.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        protected async Task OnChange(ChangeEventArgs args)
+        protected virtual async Task OnChange(ChangeEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(args);
             await SetValue($"{args.Value}");
@@ -78,7 +78,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="value">string containing the new value.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        protected async Task SetValue(string? value)
+        protected virtual async Task SetValue(string? value)
         {
             Value = $"{value}";
 

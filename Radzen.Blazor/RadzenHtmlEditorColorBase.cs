@@ -80,7 +80,7 @@ namespace Radzen.Blazor
         /// Handles the change event of built-in RadzenColorPicker.
         /// </summary>
         /// <param name="value">The new color.</param>
-        protected async Task OnChange(string value)
+        protected virtual async Task OnChange(string value)
         {
             if (Editor != null && CommandName != null)
             {
