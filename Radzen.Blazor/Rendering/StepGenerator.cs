@@ -22,14 +22,24 @@ namespace Radzen.Blazor.Rendering
             ArgumentNullException.ThrowIfNull(data);
 
             var path = new StringBuilder();
-            var start = true;
+            var needsMoveTo = true;
 
             foreach (var point in data)
             {
-                if (start)
+                if (double.IsNaN(point.X) || double.IsNaN(point.Y))
                 {
+                    needsMoveTo = true;
+                    continue;
+                }
+
+                if (needsMoveTo)
+                {
+                    if (path.Length > 0)
+                    {
+                        path.Append(" M ");
+                    }
                     path.Append(CultureInfo.InvariantCulture, $"{point.X.ToInvariantString()} {point.Y.ToInvariantString()}");
-                    start = false;
+                    needsMoveTo = false;
                     continue;
                 }
 

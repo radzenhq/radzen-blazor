@@ -123,7 +123,7 @@ namespace Radzen.Blazor
                 await Change.InvokeAsync(selectedIndex);
                 if (JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element, AnimationDuration.HasValue ? (object)AnimationDuration.Value : null);
                 }
                 StateHasChanged();
             }
@@ -142,7 +142,8 @@ namespace Radzen.Blazor
         /// </summary>
         public void Start()
         {
-            timer?.Change(TimeSpan.FromMilliseconds(Interval), TimeSpan.FromMilliseconds(Interval));
+            var totalInterval = TimeSpan.FromMilliseconds(Interval + (AnimationDuration ?? 0));
+            timer?.Change(totalInterval, totalInterval);
         }
 
         /// <summary>
@@ -214,7 +215,7 @@ namespace Radzen.Blazor
             {
                 if (JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element, AnimationDuration.HasValue ? (object)AnimationDuration.Value : null);
                 }
             }
         }
@@ -231,6 +232,15 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public double Interval { get; set; } = 4000;
+
+        /// <summary>
+        /// Gets or sets the slide transition animation duration in milliseconds.
+        /// When <c>null</c> (default), the browser's native smooth scroll is used.
+        /// Use <c>0</c> for instant transitions with no animation, or a positive value for a custom duration.
+        /// </summary>
+        /// <value>The animation duration in milliseconds, or <c>null</c> for native smooth scroll.</value>
+        [Parameter]
+        public double? AnimationDuration { get; set; }
 
         /// <summary>
         /// Gets or sets the pager position. Set to <c>PagerPosition.Bottom</c> by default.
@@ -325,8 +335,8 @@ namespace Radzen.Blazor
 
             if (firstRender)
             {
-                var ts = TimeSpan.FromMilliseconds(Interval);
-                timer = new System.Threading.Timer(state => InvokeAsync(Next), 
+                var ts = TimeSpan.FromMilliseconds(Interval + (AnimationDuration ?? 0));
+                timer = new System.Threading.Timer(state => InvokeAsync(Next),
                     null, Auto ? ts : Timeout.InfiniteTimeSpan, ts);
             }
         }

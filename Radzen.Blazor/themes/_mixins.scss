@@ -46,40 +46,6 @@
   }
 }
 
-@mixin rz-utility-list-breakpoints-css($property, $list, $breakpoints, $shorthand: 'none', $unit: 'none') {
-  @each $breakpoint, $breakpoint-value in $breakpoints {
-    @media (min-width: #{$breakpoint-value}) {
-      @each $value in $list {
-        @if $shorthand != 'none' {
-          .rz-#{$shorthand}-#{$breakpoint}-#{$value} {
-            @if $unit != 'none' {
-              @if $unit == 'percent' {
-                #{$property}: #{$value}#{'%'} !important;
-              } @else {
-                #{$property}: #{$value}#{$unit} !important;
-              }
-            } @else {
-              #{$property}: #{$value} !important;
-            }
-          }
-        } @else {
-          .rz-#{$property}-#{$breakpoint}-#{$value} {
-            @if $unit != 'none' {
-              @if $unit == 'percent' {
-                #{$property}: #{$value}#{'%'} !important;
-              } @else {
-                #{$property}: #{$value}#{$unit} !important;
-              }
-            } @else {
-              #{$property}: #{$value} !important;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 @mixin rz-ripple($ripple-background: rgba(0,0,0,.12), $pseudo: false) {
   @if $pseudo == true {
 
@@ -133,4 +99,99 @@
       @content;
     }
   }
+}
+
+@function rz-outlined-border-val($color, $use-border-color) {
+  @if $use-border-color {
+    @return $color;
+  }
+  @return inset 0 0 0 var(--rz-border-width) $color;
+}
+
+@mixin filled-shades($style) {
+  &.rz-shade-lighter { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+  &.rz-shade-light { background-color: var(--rz-#{$style}-light); color: var(--rz-on-#{$style}-light); }
+  &.rz-shade-default { background-color: var(--rz-#{$style}); color: var(--rz-on-#{$style}); }
+  &.rz-shade-dark { background-color: var(--rz-#{$style}-dark); color: var(--rz-on-#{$style}-dark); }
+  &.rz-shade-darker { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); }
+}
+
+@mixin outlined-shades($style, $map, $border-prop: 'box-shadow') {
+  $use-bc: $border-prop == 'border-color';
+  $bg: map-get($map, background-color);
+
+  @if $style == 'dark' {
+    &.rz-shade-default { #{$border-prop}: rz-outlined-border-val($bg, $use-bc); color: #{$bg}; }
+  }
+  @else if $style == 'light' {
+    @if $theme-dark == true {
+      $c: map-get($map, color);
+      &.rz-shade-default { #{$border-prop}: rz-outlined-border-val($c, $use-bc); color: #{$c}; }
+    }
+    @else {
+      &.rz-shade-default { #{$border-prop}: rz-outlined-border-val($bg, $use-bc); color: #{$bg}; }
+    }
+  }
+  @else if $style == 'base' {
+    &.rz-shade-lighter { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-lighter), $use-bc); color: var(--rz-#{$style}-light); }
+    &.rz-shade-light { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-light), $use-bc); color: var(--rz-#{$style}-light); }
+    &.rz-shade-default { #{$border-prop}: rz-outlined-border-val(var(--rz-text-color), $use-bc); color: var(--rz-text-color); }
+    &.rz-shade-dark { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-dark), $use-bc); color: var(--rz-#{$style}-dark); }
+    &.rz-shade-darker { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-darker), $use-bc); color: var(--rz-#{$style}-darker); }
+  }
+  @else {
+    @if ($fluent == true or $standard == true) and $theme-dark == true and $style == 'secondary' {
+      &.rz-shade-lighter { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-lighter), $use-bc); color: var(--rz-#{$style}-light); }
+      &.rz-shade-light   { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-light), $use-bc);   color: var(--rz-#{$style}-light); }
+      &.rz-shade-default { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}), $use-bc);         color: var(--rz-on-#{$style}); }
+      &.rz-shade-dark    { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-dark), $use-bc);    color: var(--rz-#{$style}-dark); }
+      &.rz-shade-darker  { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-darker), $use-bc);  color: var(--rz-#{$style}-darker); }
+    } @else {
+      &.rz-shade-lighter { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-lighter), $use-bc); color: var(--rz-#{$style}-light); }
+      &.rz-shade-light { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-light), $use-bc); color: var(--rz-#{$style}-light); }
+      &.rz-shade-default { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}), $use-bc); color: var(--rz-#{$style}); }
+      &.rz-shade-dark { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-dark), $use-bc); color: var(--rz-#{$style}-dark); }
+      &.rz-shade-darker { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-darker), $use-bc); color: var(--rz-#{$style}-darker); }
+    }
+  }
+  background-color: transparent;
+}
+
+@mixin text-color-shades($style, $map) {
+  @if $style == 'dark' { color: #{map-get($map, background-color)}; }
+  @else if $style == 'light' {
+    @if $theme-dark == true { color: #{map-get($map, color)}; }
+    @else { color: #{map-get($map, background-color)}; }
+  } @else if $style == 'base' {
+    &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
+    &.rz-shade-light { color: var(--rz-#{$style}-light); }
+    &.rz-shade-default { color: inherit; }
+    &.rz-shade-dark { color: var(--rz-#{$style}-dark); }
+    &.rz-shade-darker { color: var(--rz-#{$style}-darker); }
+  } @else {
+    @if ($fluent == true or $standard == true) and $theme-dark == true and $style == 'secondary' {
+      &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
+      &.rz-shade-light   { color: var(--rz-#{$style}-light); }
+      &.rz-shade-default { color: var(--rz-on-#{$style}); }
+      &.rz-shade-dark    { color: var(--rz-#{$style}-dark); }
+      &.rz-shade-darker  { color: var(--rz-#{$style}-darker); }
+    } @else {
+      &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
+      &.rz-shade-light { color: var(--rz-#{$style}-light); }
+      &.rz-shade-default { color: var(--rz-#{$style}); }
+      &.rz-shade-dark { color: var(--rz-#{$style}-dark); }
+      &.rz-shade-darker { color: var(--rz-#{$style}-darker); }
+    }
+  }
+  background-color: transparent;
+}
+
+@mixin variant-hover-bg($style) {
+  @if $style == 'light' { background-color: rgba(255, 255, 255, .12); }
+  @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); }
+  @else if $style == 'base' {
+    @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); }
+    @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+  }
+  @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
 }

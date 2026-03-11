@@ -18,6 +18,11 @@ public enum MenuItemDisplayStyle
     /// <summary>
     /// Both icons and text are displayed
     /// </summary>
-    IconAndText
+    IconAndText,
+
+    /// <summary>
+    /// Both icons and text are displayed with icon above text
+    /// </summary>
+    IconAndTextStacked
 }
 

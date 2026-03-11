@@ -37,6 +37,12 @@ namespace Radzen.Blazor
         public double? Height { get; set; }
 
         /// <summary>
+        /// Gets whether the gauge is in a right-to-left layout context.
+        /// Detected automatically from the document direction and updated dynamically.
+        /// </summary>
+        internal bool IsRTL { get; private set; }
+
+        /// <summary>
         /// The width and height are set
         /// </summary>
         bool widthAndHeightAreSet;
@@ -189,6 +195,20 @@ namespace Radzen.Blazor
             }
 
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Updates the right-to-left state when the document direction changes.
+        /// Called from JavaScript via a MutationObserver watching the html element's dir attribute.
+        /// </summary>
+        [JSInvokable]
+        public void SetRTL(bool isRTL)
+        {
+            if (IsRTL != isRTL)
+            {
+                IsRTL = isRTL;
+                StateHasChanged();
+            }
         }
 
         /// <summary>

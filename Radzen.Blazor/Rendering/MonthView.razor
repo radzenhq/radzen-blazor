@@ -1,8 +1,11 @@
 @using Radzen
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
 @inject DialogService DialogService
+@inject IJSRuntime JSRuntime
 @inherits DropableViewBase
+@implements IAsyncDisposable
 
 
 <div class="rz-view rz-month-view">
@@ -44,27 +47,21 @@
                                 DragStart=@OnAppointmentDragStart />
                         }
                     }
-                    @for (var dayIndex = 0; dayIndex < week.Days.Length; dayIndex++)
-                    {
-                        var slot = week.Days[dayIndex];
-                        if (slot.Hidden > 0)
-                        {
-                            var slotWidth = 100 / 7.0;
-                            var left = dayIndex * slotWidth;
-                            var top = 1.5 * (MaxAppointmentsInSlot + 1);
-                            <button type="button" class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; inset-inline-start: @(left.ToInvariantString())%" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); })>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</button>
-                        }
-                    }
                 </div>
                 <div class="rz-slots">
                 @for (var day = 0; day < 7; day ++)
                 {
                     var dayOfWeek = StartDate.AddDays(days++);
+                    var slot = week.Days[day];
                     <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
                         <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" role="button" tabindex="0"
                              @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation
                              @onkeydown="@(args => OnDayHeaderKeyDown(args, dayOfWeek))">
                             @dayOfWeek.Day
+                            @if (slot.Hidden > 0)
+                            {
+                                <button type="button" class="rz-event-list-btn" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); }) @onclick:stopPropagation>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</button>
+                            }
                         </div>
                     </div>
                 }
@@ -99,7 +96,7 @@
 
     Week CreateWeek(DateTime weekStart, DateTime weekEnd)
     {
-        var bands = Enumerable.Range(0, MaxAppointmentsInSlot).Select(_ => new List<AppointmentRenderInfo>()).ToArray();
+        var bands = Enumerable.Range(0, EffectiveMaxAppointmentsInSlot).Select(_ => new List<AppointmentRenderInfo>()).ToArray();
 
         var days = new List<Day>();
         var start = weekStart;
@@ -212,7 +209,75 @@
     public DateTime EndDate { get; set; }
 
     [Parameter]
-    public int MaxAppointmentsInSlot { get; set; }
+    public int? MaxAppointmentsInSlot { get; set; }
+
+    private double contentHeight;
+    private DotNetObjectReference<MonthView>? reference;
+
+    private int EffectiveMaxAppointmentsInSlot
+    {
+        get
+        {
+            if (MaxAppointmentsInSlot != null)
+            {
+                return MaxAppointmentsInSlot.Value;
+            }
+
+            var numberOfWeeks = (int)Math.Max(1, Math.Ceiling((EndDate - StartDate).TotalDays / 7));
+
+            if (contentHeight > 0)
+            {
+                var slotHeight = contentHeight / numberOfWeeks;
+                return Math.Max(0, Convert.ToInt32(Math.Floor(slotHeight / 24)) - 1);
+            }
+
+            return 0;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            reference = DotNetObjectReference.Create(this);
+            var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", contentView, reference);
+            if (rect.Height > 0 && MaxAppointmentsInSlot == null)
+            {
+                contentHeight = rect.Height;
+                Refresh();
+                StateHasChanged();
+            }
+        }
+    }
+
+    [JSInvokable]
+    public void Resize(double width, double height)
+    {
+        if (MaxAppointmentsInSlot != null)
+        {
+            return;
+        }
+
+        if (contentHeight != height)
+        {
+            contentHeight = height;
+            Refresh();
+            StateHasChanged();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", contentView);
+        }
+        catch
+        {
+        }
+
+        reference?.Dispose();
+    }
 
     [Parameter]
     public string? MoreText { get; set; }
@@ -300,6 +365,16 @@
 
     private List<Week>? weeks;
 
+    void Refresh()
+    {
+        weeks = new List<Week>();
+
+        for (var date = StartDate; date < EndDate; date = date.AddDays(7))
+        {
+            weeks.Add(CreateWeek(date, date.AddDays(7)));
+        }
+    }
+
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         var didAppointmentsChange = parameters.DidParameterChange(nameof(Appointments), Appointments);
@@ -311,14 +386,7 @@
 
         if (didAppointmentsChange || didStartDateChange || didEndDateChange || didMaxAppointmentsInSlotChange)
         {
-            weeks = new List<Week>();
-
-            for (var date = StartDate; date < EndDate; date = date.AddDays(7))
-            {
-                var week = CreateWeek(date, date.AddDays(7));
-
-                weeks.Add(week);
-            }
+            Refresh();
         }
     }
 
@@ -347,7 +415,7 @@
         {
             var days = leftright ? 1 : 7;
             CurrentDate = CurrentDate.AddDays(leftup ? -days : days);
-            currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(MaxAppointmentsInSlot);
+            currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(EffectiveMaxAppointmentsInSlot);
 
             preventKeyPress = true;
             stopKeydownPropagation = true;
@@ -361,7 +429,7 @@
             else
             {
                 CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
-                currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(MaxAppointmentsInSlot);
+                currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(EffectiveMaxAppointmentsInSlot);
             }
 
             preventKeyPress = true;

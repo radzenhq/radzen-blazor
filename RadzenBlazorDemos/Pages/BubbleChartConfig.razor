@@ -1,0 +1,58 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Min Size" />
+                <RadzenNumeric @bind-Value="@minSize" Min="2" Max="20" Style="width: 80px;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Max Size" />
+                <RadzenNumeric @bind-Value="@maxSize" Min="20" Max="80" Style="width: 80px;" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenBubbleSeries Data="@countries" CategoryProperty="GDP" ValueProperty="LifeExpectancy"
+            SizeProperty="Population" Title="Countries" MinSize="@minSize" MaxSize="@maxSize"
+            Stroke="rgb(97,142,247)" Fill="rgb(97,142,247)" />
+        <RadzenCategoryAxis>
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="GDP per capita (USD)" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis>
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Life Expectancy (years)" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    double minSize = 5;
+    double maxSize = 40;
+
+    class CountryData
+    {
+        public double GDP { get; set; }
+        public double LifeExpectancy { get; set; }
+        public double Population { get; set; }
+    }
+
+    CountryData[] countries = new CountryData[]
+    {
+        new CountryData { GDP = 12000, LifeExpectancy = 74.5, Population = 1400000 },
+        new CountryData { GDP = 45000, LifeExpectancy = 81.2, Population = 330000 },
+        new CountryData { GDP = 9500, LifeExpectancy = 72.1, Population = 210000 },
+        new CountryData { GDP = 42000, LifeExpectancy = 83.6, Population = 126000 },
+        new CountryData { GDP = 48000, LifeExpectancy = 82.9, Population = 67000 },
+        new CountryData { GDP = 55000, LifeExpectancy = 80.7, Population = 83000 },
+        new CountryData { GDP = 2100, LifeExpectancy = 69.4, Population = 1380000 },
+        new CountryData { GDP = 32000, LifeExpectancy = 82.5, Population = 52000 },
+        new CountryData { GDP = 6800, LifeExpectancy = 75.8, Population = 130000 },
+        new CountryData { GDP = 38000, LifeExpectancy = 84.5, Population = 38000 },
+        new CountryData { GDP = 8700, LifeExpectancy = 73.2, Population = 145000 },
+        new CountryData { GDP = 62000, LifeExpectancy = 83.1, Population = 9000 },
+    };
+}

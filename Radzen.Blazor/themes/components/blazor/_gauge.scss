@@ -7,7 +7,8 @@ $gauge-arc-scale-label-color: var(--rz-text-tertiary-color) !default;
 $gauge-arc-value-color: var(--rz-secondary) !default;
 
 .rz-gauge,
-.rz-arc-gauge {
+.rz-arc-gauge,
+.rz-linear-gauge {
   box-sizing: border-box;
   position: relative;
   display: inline-block;
@@ -15,7 +16,8 @@ $gauge-arc-value-color: var(--rz-secondary) !default;
   height: 300px;
 }
 
-.rz-gauge {
+.rz-gauge,
+.rz-linear-gauge {
   .rz-line,
   .rz-tick {
     stroke: var(--rz-gauge-scale-color);
@@ -39,6 +41,11 @@ $gauge-arc-value-color: var(--rz-secondary) !default;
   }
 }
 
+.rz-linear-gauge {
+  width: 300px;
+  height: 150px;
+}
+
 .rz-gauge-value {
   position: absolute;
   transform: translateX(-50%);
@@ -51,8 +58,37 @@ $gauge-arc-value-color: var(--rz-secondary) !default;
   padding: 0.5rem;
 }
 
-.rz-gauge-pointer {
+.rz-linear-gauge-value {
+  position: absolute;
+  padding: 0.5rem;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: left var(--rz-transition), top var(--rz-transition);
+}
+
+.rz-gauge-pointer,
+.rz-linear-gauge-pointer {
   fill: var(--rz-gauge-pointer-color);
+}
+
+.rz-linear-gauge-pointer-draggable {
+  cursor: grab;
+}
+
+.rz-linear-gauge-pointer-arrow {
+  transition: transform var(--rz-transition);
+}
+
+.rz-linear-gauge-pointer-bar {
+  transition: x var(--rz-transition), y var(--rz-transition), width var(--rz-transition), height var(--rz-transition);
+}
+
+.rz-linear-gauge-pointer-line {
+  transition: x1 var(--rz-transition), y1 var(--rz-transition), x2 var(--rz-transition), y2 var(--rz-transition);
+}
+
+.rz-linear-gauge-range {
+  shape-rendering: geometricPrecision;
 }
 
 .rz-arc-gauge-scale-value {

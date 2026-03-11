@@ -1,7 +1,11 @@
-﻿@using RadzenBlazorDemos.Pages
-<Router AppAssembly="typeof(Routes).Assembly">
+@using RadzenBlazorDemos.Pages
+@using System.Reflection
+@using Microsoft.Extensions.DependencyInjection
+@inject IServiceProvider ServiceProvider
+
+<Router AppAssembly="typeof(Routes).Assembly" AdditionalAssemblies="lazyAssemblies" OnNavigateAsync="OnNavigateAsync">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+        <RouteView RouteData="routeData" DefaultLayout="GetLayout(routeData)" />
     </Found>
     <NotFound>
         <LayoutView Layout="typeof(MainLayout)">
@@ -9,3 +13,34 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    private List<Assembly> lazyAssemblies = new();
+
+    static Type GetLayout(RouteData routeData)
+    {
+        return routeData.PageType.Assembly.GetName().Name == "Radzen.Blazor.Api"
+            ? typeof(ApiLayout)
+            : typeof(MainLayout);
+    }
+
+    private async Task OnNavigateAsync(NavigationContext context)
+    {
+        if (context.Path.StartsWith("docs/api", StringComparison.OrdinalIgnoreCase))
+        {
+            if (lazyAssemblies.Count == 0 || !lazyAssemblies.Any(a => a.GetName().Name == "Radzen.Blazor.Api"))
+            {
+                var assemblyLoader = ServiceProvider.GetService<Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader>();
+                if (assemblyLoader != null)
+                {
+                    var assemblies = await assemblyLoader.LoadAssembliesAsync(new[] { "Radzen.Blazor.Api.dll" });
+                    lazyAssemblies.AddRange(assemblies);
+                }
+                else
+                {
+                    lazyAssemblies.Add(Assembly.Load("Radzen.Blazor.Api"));
+                }
+            }
+        }
+    }
+}

@@ -165,9 +165,46 @@ namespace Radzen.Blazor.Rendering
         {
             var path = new StringBuilder();
 
-            var points = data.Select(item => new SplinePoint { X = item.X, Y = item.Y }).ToList();
+            var allPoints = data.ToList();
+
+            // Split into segments separated by NaN values
+            var segment = new List<SplinePoint>();
+
+            foreach (var item in allPoints)
+            {
+                if (double.IsNaN(item.X) || double.IsNaN(item.Y))
+                {
+                    if (segment.Count > 0)
+                    {
+                        AppendSegment(path, segment);
+                        segment.Clear();
+                    }
+                    continue;
+                }
+
+                segment.Add(new SplinePoint { X = item.X, Y = item.Y });
+            }
+
+            if (segment.Count > 0)
+            {
+                AppendSegment(path, segment);
+            }
+
+            return path.ToString();
+        }
+
+        private void AppendSegment(StringBuilder path, IList<SplinePoint> points)
+        {
+            if (points.Count == 0) return;
+
+            if (path.Length > 0)
+            {
+                path.Append("M ");
+            }
 
             path.Append(CultureInfo.InvariantCulture, $"{points[0].X.ToInvariantString()} {points[0].Y.ToInvariantString()} ");
+
+            if (points.Count == 1) return;
 
             var pointsWithTangents = CurveMonotone(points);
             var count = pointsWithTangents.Count;
@@ -182,8 +219,6 @@ namespace Radzen.Blazor.Rendering
                     path.Append(CultureInfo.InvariantCulture, $"C {prev.ControlPointNextX.ToInvariantString()}, {prev.ControlPointNextY.ToInvariantString()} {point.ControlPointPreviousX.ToInvariantString()}, {point.ControlPointPreviousY.ToInvariantString()} {point.X.ToInvariantString()}, {point.Y.ToInvariantString()}");
                 }
             }
-
-            return path.ToString();
         }
     }
 }

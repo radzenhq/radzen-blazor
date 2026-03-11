@@ -1,0 +1,32 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Value" Component="valueSlider" />
+                <RadzenSlider Name="valueSlider" Min="0" Max="200" @bind-Value=@value Style="width: 200px;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Tick position" Component="tickPositionDropDown" />
+                <RadzenDropDown Name="tickPositionDropDown" @bind-Value=@tickPosition Data=@tickPositions Style="width: 160px;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Pointer type" Component="pointerTypeDropDown" />
+                <RadzenDropDown Name="pointerTypeDropDown" @bind-Value=@pointerType Data=@pointerTypes Style="width: 130px;" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenLinearGauge Style="width: 100%; height: 120px;">
+        <RadzenLinearGaugeScale Step="40" Min="0" Max="200" MinorStep="10" TickPosition=@tickPosition>
+            <RadzenLinearGaugeScalePointer Value=@value PointerType=@pointerType Fill="var(--rz-primary)" />
+        </RadzenLinearGaugeScale>
+    </RadzenLinearGauge>
+</RadzenStack>
+
+@code {
+    double value = 80;
+    GaugeTickPosition tickPosition = GaugeTickPosition.Outside;
+    LinearGaugePointerType pointerType = LinearGaugePointerType.Arrow;
+    IEnumerable<GaugeTickPosition> tickPositions = Enum.GetValues<GaugeTickPosition>().Cast<GaugeTickPosition>();
+    IEnumerable<LinearGaugePointerType> pointerTypes = Enum.GetValues<LinearGaugePointerType>().Cast<LinearGaugePointerType>();
+}

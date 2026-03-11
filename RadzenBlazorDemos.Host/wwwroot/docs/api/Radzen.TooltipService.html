@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class TooltipService
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class TooltipService
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.TooltipService">
+
+
+  <h1 id="Radzen_TooltipService" data-uid="Radzen.TooltipService" class="text-break">Class TooltipService
+</h1>
+  <div class="markdown level0 summary"><p>A service for displaying tooltips programmatically on UI elements or at specific positions.
+TooltipService provides methods to show tooltips with text or custom HTML content, with configurable positioning, delays, and durations.
+To use this service, add it as a scoped service in your application's service collection and place a RadzenTooltip component in your main layout.
+Manages tooltip lifecycle, automatically closing tooltips on navigation and providing various positioning options (top, bottom, left, right).
+Tooltips can be shown on mouse enter/leave events or on demand, with configurable delays before showing and auto-close durations.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">TooltipService</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_TooltipService_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class TooltipService : IDisposable</code></pre>
+  </div>
+  <h5 id="Radzen_TooltipService_examples"><strong>Examples</strong></h5>
+  <p>Show a simple text tooltip:</p>
+<pre><code class="lang-csharp">@inject TooltipService TooltipService
+&lt;RadzenButton Text="Hover me" MouseEnter="@(args =&gt; TooltipService.Open(args, "This is a tooltip"))" /&gt;</code></pre>
+<p>Show a tooltip with HTML content and custom options:</p>
+<pre><code class="lang-csharp">@inject TooltipService TooltipService
+&lt;RadzenButton Text="Show tooltip" MouseEnter="@(args =&gt; ShowTooltipWithHtml(args))" /&gt;
+@code {
+    void ShowTooltipWithHtml(ElementReference element) =&gt; TooltipService.Open(element, ts =&gt;
+        @&lt;div&gt;
+            &lt;b&gt;Bold&lt;/b&gt; and &lt;i&gt;italic&lt;/i&gt; content
+        &lt;/div&gt;, 
+        new TooltipOptions { Position = TooltipPosition.Top, Duration = 5000 });
+}</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_TooltipService__ctor_" data-uid="Radzen.TooltipService.#ctor*"></a>
+  <h4 id="Radzen_TooltipService__ctor_Microsoft_AspNetCore_Components_NavigationManager_" data-uid="Radzen.TooltipService.#ctor(Microsoft.AspNetCore.Components.NavigationManager)">TooltipService(NavigationManager)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Radzen.TooltipService.html">TooltipService</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public TooltipService(NavigationManager uriHelper)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.navigationmanager">NavigationManager</a></td>
+        <td><span class="parametername">uriHelper</span></td>
+        <td><p>The URI helper.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_TooltipService_Close_" data-uid="Radzen.TooltipService.Close*"></a>
+  <h4 id="Radzen_TooltipService_Close" data-uid="Radzen.TooltipService.Close">Close()</h4>
+  <div class="markdown level1 summary"><p>Closes this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void Close()</code></pre>
+  </div>
+
+
+  <a id="Radzen_TooltipService_Dispose_" data-uid="Radzen.TooltipService.Dispose*"></a>
+  <h4 id="Radzen_TooltipService_Dispose" data-uid="Radzen.TooltipService.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Disposes this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void Dispose()</code></pre>
+  </div>
+
+
+  <a id="Radzen_TooltipService_Open_" data-uid="Radzen.TooltipService.Open*"></a>
+  <h4 id="Radzen_TooltipService_Open_Microsoft_AspNetCore_Components_ElementReference_Microsoft_AspNetCore_Components_RenderFragment_Radzen_TooltipService__Radzen_TooltipOptions_" data-uid="Radzen.TooltipService.Open(Microsoft.AspNetCore.Components.ElementReference,Microsoft.AspNetCore.Components.RenderFragment{Radzen.TooltipService},Radzen.TooltipOptions)">Open(ElementReference, RenderFragment&lt;TooltipService&gt;, TooltipOptions?)</h4>
+  <div class="markdown level1 summary"><p>Opens a tooltip with custom HTML content near the specified element.
+The tooltip will be positioned according to the options and can contain any Blazor markup.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void Open(ElementReference element, RenderFragment&lt;TooltipService&gt; childContent, TooltipOptions? options = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><span class="parametername">element</span></td>
+        <td><p>The HTML element reference near which the tooltip will be displayed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;<a class="xref" href="Radzen.TooltipService.html">TooltipService</a>&gt;</td>
+        <td><span class="parametername">childContent</span></td>
+        <td><p>A render fragment that defines the custom HTML content of the tooltip. Receives the TooltipService as context.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.TooltipOptions.html">TooltipOptions</a></td>
+        <td><span class="parametername">options</span></td>
+        <td><p>Optional tooltip configuration including position, duration, delay, and styling. If null, default options are used.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_TooltipService_Open_" data-uid="Radzen.TooltipService.Open*"></a>
+  <h4 id="Radzen_TooltipService_Open_Microsoft_AspNetCore_Components_ElementReference_System_String_Radzen_TooltipOptions_" data-uid="Radzen.TooltipService.Open(Microsoft.AspNetCore.Components.ElementReference,System.String,Radzen.TooltipOptions)">Open(ElementReference, string, TooltipOptions?)</h4>
+  <div class="markdown level1 summary"><p>Opens a tooltip with simple text content near the specified element.
+This is the most common way to show basic informational tooltips.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void Open(ElementReference element, string text, TooltipOptions? options = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><span class="parametername">element</span></td>
+        <td><p>The HTML element reference near which the tooltip will be displayed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The text content to display in the tooltip.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.TooltipOptions.html">TooltipOptions</a></td>
+        <td><span class="parametername">options</span></td>
+        <td><p>Optional tooltip configuration including position, duration, delay, and styling. If null, default options are used.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_TooltipService_OpenOnTheBottom_" data-uid="Radzen.TooltipService.OpenOnTheBottom*"></a>
+  <h4 id="Radzen_TooltipService_OpenOnTheBottom_Microsoft_AspNetCore_Components_ElementReference_System_String_Radzen_TooltipOptions_" data-uid="Radzen.TooltipService.OpenOnTheBottom(Microsoft.AspNetCore.Components.ElementReference,System.String,Radzen.TooltipOptions)">OpenOnTheBottom(ElementReference, string, TooltipOptions?)</h4>
+  <div class="markdown level1 summary"><p>Opens the specified element on the bottom position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void OpenOnTheBottom(ElementReference element, string text, TooltipOptions? o = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><span class="parametername">element</span></td>
+        <td><p>The element.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The text.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.TooltipOptions.html">TooltipOptions</a></td>
+        <td><span class="parametername">o</span></td>
+        <td><p>The o.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_TooltipService_OpenOnTheLeft_" data-uid="Radzen.TooltipService.OpenOnTheLeft*"></a>
+  <h4 id="Radzen_TooltipService_OpenOnTheLeft_Microsoft_AspNetCore_Components_ElementReference_System_String_Radzen_TooltipOptions_" data-uid="Radzen.TooltipService.OpenOnTheLeft(Microsoft.AspNetCore.Components.ElementReference,System.String,Radzen.TooltipOptions)">OpenOnTheLeft(ElementReference, string, TooltipOptions?)</h4>
+  <div class="markdown level1 summary"><p>Opens the specified element on the left position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void OpenOnTheLeft(ElementReference element, string text, TooltipOptions? o = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><span class="parametername">element</span></td>
+        <td><p>The element.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The text.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.TooltipOptions.html">TooltipOptions</a></td>
+        <td><span class="parametername">o</span></td>
+        <td><p>The o.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_TooltipService_OpenOnTheRight_" data-uid="Radzen.TooltipService.OpenOnTheRight*"></a>
+  <h4 id="Radzen_TooltipService_OpenOnTheRight_Microsoft_AspNetCore_Components_ElementReference_System_String_Radzen_TooltipOptions_" data-uid="Radzen.TooltipService.OpenOnTheRight(Microsoft.AspNetCore.Components.ElementReference,System.String,Radzen.TooltipOptions)">OpenOnTheRight(ElementReference, string, TooltipOptions?)</h4>
+  <div class="markdown level1 summary"><p>Opens the specified element on the right position.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void OpenOnTheRight(ElementReference element, string text, TooltipOptions? o = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><span class="parametername">element</span></td>
+        <td><p>The element.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The text.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.TooltipOptions.html">TooltipOptions</a></td>
+        <td><span class="parametername">o</span></td>
+        <td><p>The o.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_TooltipService_OpenOnTheTop_" data-uid="Radzen.TooltipService.OpenOnTheTop*"></a>
+  <h4 id="Radzen_TooltipService_OpenOnTheTop_Microsoft_AspNetCore_Components_ElementReference_System_String_Radzen_TooltipOptions_" data-uid="Radzen.TooltipService.OpenOnTheTop(Microsoft.AspNetCore.Components.ElementReference,System.String,Radzen.TooltipOptions)">OpenOnTheTop(ElementReference, string, TooltipOptions?)</h4>
+  <div class="markdown level1 summary"><p>Opens a tooltip with text content positioned above the specified element.
+This is a convenience method equivalent to calling Open() with TooltipPosition.Top.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void OpenOnTheTop(ElementReference element, string text, TooltipOptions? options = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><span class="parametername">element</span></td>
+        <td><p>The HTML element reference above which the tooltip will be displayed.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">text</span></td>
+        <td><p>The text content to display in the tooltip.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.TooltipOptions.html">TooltipOptions</a></td>
+        <td><span class="parametername">options</span></td>
+        <td><p>Optional additional tooltip configuration. The Position will be set to Top regardless of the value in options.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="events">Events
+</h3>
+
+
+  <h4 id="Radzen_TooltipService_OnClose" data-uid="Radzen.TooltipService.OnClose">OnClose</h4>
+  <div class="markdown level1 summary"><p>Raises the Close event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public event Action? OnClose</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action">Action</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h4 id="Radzen_TooltipService_OnNavigate" data-uid="Radzen.TooltipService.OnNavigate">OnNavigate</h4>
+  <div class="markdown level1 summary"><p>Occurs when [on navigate].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public event Action? OnNavigate</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action">Action</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h4 id="Radzen_TooltipService_OnOpen" data-uid="Radzen.TooltipService.OnOpen">OnOpen</h4>
+  <div class="markdown level1 summary"><p>Occurs when [on open].</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public event Action&lt;ElementReference, Type, TooltipOptions&gt;? OnOpen</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-3">Action</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>, <a class="xref" href="Radzen.TooltipOptions.html">TooltipOptions</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

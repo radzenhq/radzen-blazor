@@ -234,8 +234,14 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-grid-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
 
   th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     background-color: var(--rz-grid-header-background-color);
     padding: 0;
     white-space: nowrap;
@@ -1097,18 +1103,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   padding: var(--rz-grid-cell-padding);
 }
 
-.rz-grid-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-
-  th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-}
-
 .rz-grid-table-fixed {
   table-layout: fixed;
 
@@ -1153,7 +1147,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-grid-table tfoot, .rz-grid-table tfoot td {
   position: sticky;
   bottom: 0;
-  z-index: 1;
+  z-index: 3;
 }
 
 .rz-grid-table {

@@ -91,6 +91,21 @@ namespace Radzen.Blazor
         public EventCallback<int> Change { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the user can reorder tabs by dragging and dropping.
+        /// When enabled, tab headers become draggable and can be rearranged by the user.
+        /// </summary>
+        /// <value><c>true</c> if tab reordering is allowed; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool AllowReorder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked when tabs are reordered via drag and drop.
+        /// Provides a <see cref="TabsReorderEventArgs"/> with the old and new index of the moved tab.
+        /// </summary>
+        [Parameter]
+        public EventCallback<TabsReorderEventArgs> Reorder { get; set; }
+
+        /// <summary>
         /// Gets or sets the render fragment containing RadzenTabsItem components that define the tabs.
         /// Each RadzenTabsItem represents one tab with its header and content.
         /// </summary>
@@ -359,6 +374,73 @@ namespace Radzen.Blazor
         internal bool HasInvisibleBefore(RadzenTabsItem item)
         {
             return tabs.Take(tabs.IndexOf(item)).Any(t => !t.Visible);
+        }
+
+        internal RadzenTabsItem? draggedTab;
+        internal RadzenTabsItem? dragOverTab;
+
+        internal void OnTabDragStart(RadzenTabsItem tab)
+        {
+            draggedTab = tab;
+        }
+
+        internal void OnTabDragOver(RadzenTabsItem tab)
+        {
+            dragOverTab = tab;
+        }
+
+        internal void OnTabDragEnd()
+        {
+            draggedTab = null;
+            dragOverTab = null;
+        }
+
+        internal async Task OnTabDrop(RadzenTabsItem tab)
+        {
+            if (draggedTab == null || draggedTab == tab)
+            {
+                return;
+            }
+
+            var oldIndex = tabs.IndexOf(draggedTab);
+            var newIndex = tabs.IndexOf(tab);
+
+            if (oldIndex < 0 || newIndex < 0)
+            {
+                return;
+            }
+
+            tabs.RemoveAt(oldIndex);
+            tabs.Insert(newIndex, draggedTab);
+
+            // Adjust selectedIndex to follow the selected tab
+            if (selectedIndex == oldIndex)
+            {
+                selectedIndex = newIndex;
+            }
+            else if (oldIndex < selectedIndex && newIndex >= selectedIndex)
+            {
+                selectedIndex--;
+            }
+            else if (oldIndex > selectedIndex && newIndex <= selectedIndex)
+            {
+                selectedIndex++;
+            }
+
+            SetFocusedIndex();
+
+            await Reorder.InvokeAsync(new TabsReorderEventArgs { OldIndex = oldIndex, NewIndex = newIndex });
+            await SelectedIndexChanged.InvokeAsync(selectedIndex);
+
+            draggedTab = null;
+            dragOverTab = null;
+
+            StateHasChanged();
+        }
+
+        internal bool IsDragOver(RadzenTabsItem tab)
+        {
+            return dragOverTab == tab && draggedTab != tab;
         }
     }
 }

@@ -179,6 +179,20 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the empty text shown when Data is empty.
+        /// </summary>
+        /// <value>The empty text.</value>
+        [Parameter]
+        public string EmptyText { get; set; } = "No records to display.";
+
+        /// <summary>
+        /// Gets or sets the empty template shown when Data is empty.
+        /// </summary>
+        /// <value>The empty template.</value>
+        [Parameter]
+        public RenderFragment? EmptyTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether is read only.
         /// </summary>
         /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>

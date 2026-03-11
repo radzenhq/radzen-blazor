@@ -1139,6 +1139,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Empty PickList",
+                    Path = "/picklist-empty",
+                    Title = "Blazor PickList - Empty PickList | Free UI Components by Radzen",
+                    Description = "This example demonstrates Blazor PickList with empty text and empty template.",
+                    Icon = "\ue0b8",
+                    Tags = new[] { "picklist", "empty", "list", "listbox" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Scheduler",
                     Path = "scheduler",
@@ -1146,6 +1155,104 @@ namespace RadzenBlazorDemos
                     Description = "Blazor Scheduler component with daily, weekly and monthly views.",
                     Icon = "\ue616",
                     Tags = new[] { "scheduler", "calendar", "event", "appointment" }
+                },
+                new Example
+                {
+                    Name = "Gantt",
+                    New = true,
+                    Icon = "\ueb85",
+                    Tags = new[] { "gantt", "timeline", "project", "task", "schedule" },
+                    Children = new[]
+                    {
+                        new Example
+                        {
+                            Name = "Overview",
+                            Path = "gantt",
+                            Title = "Blazor Gantt Component | Free UI Components by Radzen",
+                            Description = "Blazor Gantt component with a hierarchical task list and a timeline view.",
+                            Tags = new[] { "gantt", "timeline", "project", "task", "schedule" }
+                        },
+                        new Example
+                        {
+                            Name = "Tooltips",
+                            Path = "gantt-tooltips",
+                            Title = "Blazor Gantt Tooltips | Free UI Components by Radzen",
+                            Description = "Show tooltips when hovering over Gantt task bars using TaskMouseEnter and TaskMouseLeave events.",
+                            Tags = new[] { "gantt", "tooltip", "hover", "task", "mouse" }
+                        },
+                        new Example
+                        {
+                            Name = "Filtering",
+                            Path = "gantt-filtering",
+                            Title = "Blazor Gantt Filtering | Free UI Components by Radzen",
+                            Description = "Filter Gantt tasks using Simple, SimpleWithMenu, or Advanced filter modes.",
+                            Tags = new[] { "gantt", "filter", "filtermode", "simple", "advanced" }
+                        },
+                        new Example
+                        {
+                            Name = "InLine Editing",
+                            Path = "gantt-inline-edit",
+                            Title = "Blazor Gantt Inline Editing | Free UI Components by Radzen",
+                            Description = "Edit Gantt tasks inline with add, edit, and save actions.",
+                            Tags = new[] { "gantt", "edit", "inline", "row", "tasks" }
+                        },
+                        new Example
+                        {
+                            Name = "In-Cell Editing",
+                            Path = "gantt-incell-edit",
+                            Title = "Blazor Gantt In-Cell Editing | Free UI Components by Radzen",
+                            Description = "Edit Gantt task fields in-cell with inline editors per column.",
+                            Tags = new[] { "gantt", "edit", "incell", "cell", "tasks" }
+                        },
+                        new Example
+                        {
+                            Name = "Drag & Resize",
+                            Path = "gantt-drag-resize",
+                            Title = "Blazor Gantt Drag & Resize | Free UI Components by Radzen",
+                            Description = "Drag task bars to move them and drag their edges to resize. Zero-duration tasks render as milestone diamonds.",
+                            Tags = new[] { "gantt", "drag", "resize", "move", "milestone", "diamond", "interactive" }
+                        },
+                        new Example
+                        {
+                            Name = "Dependency Types",
+                            Path = "gantt-dependency-types",
+                            Title = "Blazor Gantt Dependency Types | Free UI Components by Radzen",
+                            Description = "All four dependency types: Finish-to-Start, Start-to-Start, Finish-to-Finish, and Start-to-Finish.",
+                            Tags = new[] { "gantt", "dependency", "link", "finish-to-start", "start-to-start", "finish-to-finish", "start-to-finish" }
+                        },
+                        new Example
+                        {
+                            Name = "Dependency Data",
+                            Path = "gantt-dependency-data",
+                            Title = "Blazor Gantt Dependency Data Binding | Free UI Components by Radzen",
+                            Description = "Bind dependencies using a separate POCO collection with ID-based references — ideal for relational databases.",
+                            Tags = new[] { "gantt", "dependency", "data", "binding", "database", "id", "predecessor", "successor" }
+                        },
+                        new Example
+                        {
+                            Name = "Critical Path",
+                            Path = "gantt-critical-path",
+                            Title = "Blazor Gantt Critical Path | Free UI Components by Radzen",
+                            Description = "Highlight the longest chain of dependent tasks that determines the project end date.",
+                            Tags = new[] { "gantt", "critical", "path", "highlight", "schedule", "dependency" }
+                        },
+                        new Example
+                        {
+                            Name = "Baselines",
+                            Path = "gantt-baselines",
+                            Title = "Blazor Gantt Baselines | Free UI Components by Radzen",
+                            Description = "Show planned vs. actual schedule side by side using baseline bars.",
+                            Tags = new[] { "gantt", "baseline", "planned", "actual", "schedule", "comparison" }
+                        },
+                        new Example
+                        {
+                            Name = "Customization",
+                            Path = "gantt-customization",
+                            Title = "Blazor Gantt Customization | Free UI Components by Radzen",
+                            Description = "Customize the Gantt with a today line, weekend shading, vertical markers, per-bar styling via TaskRender, and custom bar templates.",
+                            Tags = new[] { "gantt", "today", "marker", "weekend", "taskrender", "template", "customize" }
+                        }
+                    }
                 },
                 new Example
                 {
@@ -1788,6 +1895,26 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Chip Style", Anchor = "#chip-style" }, new () { Text = "Variant", Anchor = "#variant" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Icons", Anchor = "#icons" }, new () { Text = "Selected", Anchor = "#selected" }, new () { Text = "Disabled", Anchor = "#disabled" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Add / Remove", Anchor = "#add-remove" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Chip",
+                    Path = "chip",
+                    Updated = true,
+                    Description = "Demonstration and configuration of the Radzen Blazor Chip component.",
+                    Icon = "\uf852",
+                    Tags = new [] { "chip", "tag", "label", "status" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Templates", Anchor = "#templates" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "ChipList",
+                    Path = "chiplist",
+                    New = true,
+                    Description = "Demonstration and configuration of the Radzen Blazor ChipList component.",
+                    Icon = "\uf852",
+                    Tags = new [] { "chip", "chiplist", "tag", "form", "edit", "selection" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Get and Set the value of SelectBar", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of SelectBar using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Populate SelectBar items from data", Anchor = "#populate-from-data" }, new () { Text = "Statically declared and populated SelectBar items from data", Anchor = "#populate-items-statically" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "SelectBar with icons", Anchor = "#icons" }, new () { Text = "SelectBar with images", Anchor = "#images" }, new () { Text = "SelectBar with template", Anchor = "#template" }, new () { Text = "SelectBar Size", Anchor = "#size" }, new () { Text = "SelectBar Orientation", Anchor = "#orientation" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "SelectBar",
                     Path = "selectbar",
@@ -1950,6 +2077,20 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Scatter Chart",
+                            Path = "scatter-chart",
+                            Description = "Radzen Blazor Chart with scatter series for plotting numeric X/Y data points.",
+                            Tags = new [] { "chart", "graph", "scatter", "point", "xy" }
+                        },
+                        new Example
+                        {
+                            Name = "Bubble Chart",
+                            Path = "bubble-chart",
+                            Description = "Radzen Blazor Chart with bubble series for visualizing three dimensions of data.",
+                            Tags = new [] { "chart", "graph", "bubble", "scatter", "size" }
+                        },
+                        new Example
+                        {
                             Name = "Stacked Area Chart",
                             Path = "stacked-area-chart",
                             Description = "Radzen Blazor Chart with stacked area series.",
@@ -2065,6 +2206,25 @@ namespace RadzenBlazorDemos
                     Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",
                     Icon = "\ue9e4",
                     Tags = new [] { "gauge", "graph", "arc", "progress" }
+                },
+                new Example
+                {
+                    Name = "Linear Gauge",
+                    New = true,
+                    Path = "linear-gauge",
+                    Description = "Display values on a linear scale with configurable ticks, ranges, and pointer orientation.",
+                    Icon = "\ue260",
+                    Tags = new [] { "gauge", "graph", "linear", "scale", "bar" },
+                    Toc =
+                    [
+                        new () { Text = "Basic Usage", Anchor = "#basic-usage" },
+                        new () { Text = "Ranges and Value Display", Anchor = "#ranges" },
+                        new () { Text = "Rounded Ranges", Anchor = "#rounded-ranges" },
+                        new () { Text = "Reversed Scale", Anchor = "#reversed" },
+                        new () { Text = "Draggable Pointer", Anchor = "#draggable" },
+                        new () { Text = "Vertical Orientation", Anchor = "#vertical" },
+                        new () { Text = "Multiple Scales", Anchor = "#multiple-scales" },
+                    ]
                 },
                 new Example
                 {

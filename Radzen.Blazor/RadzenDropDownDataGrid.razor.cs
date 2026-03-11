@@ -1083,6 +1083,18 @@ namespace Radzen.Blazor
             await DebounceFilter();
         }
 
+        async Task ClearSearchText()
+        {
+            searchText = null;
+            _view = null;
+            await SearchTextChanged.InvokeAsync(searchText);
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, "");
+            }
+            await DebounceFilter();
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether this instance loading indicator is shown.
         /// </summary>

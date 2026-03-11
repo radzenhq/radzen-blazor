@@ -28,10 +28,15 @@ namespace Radzen.Blazor
             };
         }
 
-        void OnDragStart()
+        async Task OnDragStart()
         {
             dragCssClass = "rz-dragging";
             EnsurePayload();
+
+            if (Container != null)
+            {
+                await Container.DragStart.InvokeAsync(Container.Payload);
+            }
         }
 
         void OnDragOver(DragEventArgs args)
@@ -58,9 +63,14 @@ namespace Radzen.Blazor
             cssClass = "";
         }
 
-        void OnDragEnd(DragEventArgs args)
+        async Task OnDragEnd(DragEventArgs args)
         {
             dragCssClass = "";
+
+            if (Container != null)
+            {
+                await Container.DragEnd.InvokeAsync(Container.Payload);
+            }
         }
 
         async Task OnDrop(DragEventArgs args)

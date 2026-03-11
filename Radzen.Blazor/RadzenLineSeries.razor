@@ -15,10 +15,13 @@
 
     var pathGenerator = GetPathGenerator();
 
+    var valueNullable = IsValueNullable();
+    var rawValueGetter = valueNullable ? GetRawValueGetter() : null;
+
     var data = Items.Select(item =>
     {
       var x = category(item);
-      var y = value(item);
+      var y = valueNullable && rawValueGetter!(item) == null ? double.NaN : value(item);
 
       return new Point<TItem> { X = x, Y = y, Data = item };
     }).ToList();

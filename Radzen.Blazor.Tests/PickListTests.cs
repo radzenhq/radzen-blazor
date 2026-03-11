@@ -215,6 +215,106 @@ namespace Radzen.Blazor.Tests
             var selected = component.Instance.GetSelectedSources().Select(i => i.Id).OrderBy(i => i).ToArray();
             Assert.Equal(new[] { 1, 3 }, selected);
         }
+
+        [Fact]
+        public void PickList_Renders_DefaultEmptyText_WhenNoData()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenPickList<Item>>();
+
+            Assert.Contains("rz-listbox-empty-message", component.Markup);
+            Assert.Contains("No records to display.", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_Renders_CustomEmptyText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.EmptyText, "No items");
+            });
+
+            Assert.Contains("No items", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_Renders_SourceEmptyText_OverridesEmptyText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.EmptyText, "No items");
+                parameters.Add(p => p.SourceEmptyText, "No source items");
+            });
+
+            Assert.Contains("No source items", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_Renders_TargetEmptyText_OverridesEmptyText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.EmptyText, "No items");
+                parameters.Add(p => p.TargetEmptyText, "No target items");
+            });
+
+            Assert.Contains("No target items", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_Renders_EmptyTemplate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.EmptyTemplate, builder => builder.AddContent(0, "Custom empty"));
+            });
+
+            Assert.Contains("Custom empty", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_Renders_SourceEmptyTemplate_OverridesEmptyTemplate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.EmptyTemplate, builder => builder.AddContent(0, "Shared empty"));
+                parameters.Add(p => p.SourceEmptyTemplate, builder => builder.AddContent(0, "Source custom empty"));
+            });
+
+            Assert.Contains("Source custom empty", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_DoesNotRender_EmptyText_WhenDataExists()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Item>
+            {
+                new Item { Id = 1, Name = "Item 1" }
+            };
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.Source, data);
+                parameters.Add(p => p.TextProperty, "Name");
+            });
+
+            // Source list has data, so its listbox shouldn't show empty message
+            var sourceWrapper = component.Find(".rz-picklist-source-wrapper");
+            Assert.DoesNotContain("rz-listbox-empty-message", sourceWrapper.InnerHtml);
+        }
     }
 }
 

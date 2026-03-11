@@ -1,0 +1,79 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showTrendLine" Name="trendLine"></RadzenCheckBox>
+                <RadzenLabel Text="Show Trend Line" Component="trendLine" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenScatterSeries Data="@classA" CategoryProperty="Height" ValueProperty="Weight" Title="Class A" Stroke="rgb(97,142,247)" Fill="rgb(97,142,247)">
+            <RadzenMarkers MarkerType="MarkerType.Circle" Size="6" />
+            <RadzenSeriesTrendLine Visible="@showTrendLine" Stroke="rgb(97,142,247)" LineType="LineType.Dashed" StrokeWidth="1" />
+        </RadzenScatterSeries>
+        <RadzenScatterSeries Data="@classB" CategoryProperty="Height" ValueProperty="Weight" Title="Class B" Stroke="rgb(255,99,132)" Fill="rgb(255,99,132)">
+            <RadzenMarkers MarkerType="MarkerType.Triangle" Size="6" />
+            <RadzenSeriesTrendLine Visible="@showTrendLine" Stroke="rgb(255,99,132)" LineType="LineType.Dashed" StrokeWidth="1" />
+        </RadzenScatterSeries>
+        <RadzenCategoryAxis>
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Height (cm)" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis>
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Weight (kg)" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    bool showTrendLine = false;
+
+    class DataItem
+    {
+        public double Height { get; set; }
+        public double Weight { get; set; }
+    }
+
+    DataItem[] classA = new DataItem[]
+    {
+        new DataItem { Height = 158, Weight = 52 },
+        new DataItem { Height = 162, Weight = 55 },
+        new DataItem { Height = 165, Weight = 60 },
+        new DataItem { Height = 168, Weight = 58 },
+        new DataItem { Height = 170, Weight = 63 },
+        new DataItem { Height = 172, Weight = 65 },
+        new DataItem { Height = 175, Weight = 70 },
+        new DataItem { Height = 178, Weight = 72 },
+        new DataItem { Height = 180, Weight = 75 },
+        new DataItem { Height = 183, Weight = 78 },
+        new DataItem { Height = 160, Weight = 54 },
+        new DataItem { Height = 167, Weight = 62 },
+        new DataItem { Height = 174, Weight = 68 },
+        new DataItem { Height = 176, Weight = 71 },
+        new DataItem { Height = 181, Weight = 76 },
+    };
+
+    DataItem[] classB = new DataItem[]
+    {
+        new DataItem { Height = 155, Weight = 48 },
+        new DataItem { Height = 160, Weight = 50 },
+        new DataItem { Height = 163, Weight = 56 },
+        new DataItem { Height = 166, Weight = 59 },
+        new DataItem { Height = 169, Weight = 61 },
+        new DataItem { Height = 171, Weight = 64 },
+        new DataItem { Height = 173, Weight = 66 },
+        new DataItem { Height = 177, Weight = 73 },
+        new DataItem { Height = 179, Weight = 74 },
+        new DataItem { Height = 182, Weight = 80 },
+        new DataItem { Height = 157, Weight = 51 },
+        new DataItem { Height = 164, Weight = 57 },
+        new DataItem { Height = 170, Weight = 67 },
+        new DataItem { Height = 175, Weight = 69 },
+        new DataItem { Height = 185, Weight = 82 },
+    };
+}

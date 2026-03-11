@@ -164,5 +164,32 @@ namespace Radzen.Blazor.Tests
         {
             int Id { get; set; }
         }
+
+        interface ISubInterface
+        {
+        }
+
+        class SubModel : ISubInterface
+        {
+            public bool SubModelProperty { get; set; }
+        }
+
+        class ModelWithInterfaceProperty
+        {
+            public ISubInterface SubModelInstance { get; set; }
+        }
+
+        [Fact]
+        public void GetValue_Resolves_Property_Through_Interface()
+        {
+            var model = new ModelWithInterfaceProperty
+            {
+                SubModelInstance = new SubModel { SubModelProperty = true }
+            };
+
+            var value = PropertyAccess.GetValue(model, "SubModelInstance.SubModelProperty");
+
+            Assert.Equal(true, value);
+        }
     }
 }

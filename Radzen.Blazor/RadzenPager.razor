@@ -20,13 +20,13 @@
         }
         <ul class="rz-pager-pages" role="list">
             <li class="rz-pager-item">
-                <button id="@(GetId() + "fp")" type="button" class="rz-pager-first rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -2 ? "rz-state-focused": "")"
+                <button id="@(GetId() + "fp")" type="button" tabindex="-1" class="rz-pager-first rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -2 ? "rz-state-focused": "")"
                         @onclick="@(() => OnFirstPageClick())" aria-label="@FirstPageAriaLabel" title="@FirstPageTitle" disabled="@(CurrentPage <= 0)" aria-disabled="@(CurrentPage <= 0 ? "true" : "false")">
                     <span class="notranslate rz-pager-icon rzi rzi-step-backward"></span>
                 </button>
             </li>
             <li class="rz-pager-item">
-                <button id="@(GetId() + "pp")" type="button" class="rz-pager-prev rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -1 ? "rz-state-focused": "")"
+                <button id="@(GetId() + "pp")" type="button" tabindex="-1" class="rz-pager-prev rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -1 ? "rz-state-focused": "")"
                         @onclick="@(() => OnPrevPageClick())" aria-label="@PrevPageAriaLabel" title="@PrevPageTitle" disabled="@(CurrentPage <= 0)" aria-disabled="@(CurrentPage <= 0 ? "true" : "false")">
                     <span class="notranslate rz-pager-icon rzi rzi-caret-left"></span>
                     @if (PrevPageLabel != null)
@@ -38,13 +38,13 @@
             @foreach (var i in Enumerable.Range(startPage, Math.Min(endPage + 1, PageNumbersCount)))
             {
                 <li class="rz-pager-item">
-                    <button id="@(GetId() + i.ToString() + "p")" type="button" class="rz-pager-page rz-pager-element @(i == CurrentPage ? "rz-state-active" : "") @(startPage + focusedIndex == i ? "rz-state-focused": "")"
+                    <button id="@(GetId() + i.ToString() + "p")" type="button" tabindex="-1" class="rz-pager-page rz-pager-element @(i == CurrentPage ? "rz-state-active" : "") @(startPage + focusedIndex == i ? "rz-state-focused": "")"
                             @onclick="@(() => OnPageClick(i, startPage))" aria-current="@(i == CurrentPage ? "page" : null)" aria-label="@string.Format(PageAriaLabelFormat, (i + 1).ToString())"
                             title="@string.Format(PageTitleFormat, (i + 1).ToString())">@(i + 1)</button>
                 </li>
             }
             <li class="rz-pager-item">
-                <button id="@(GetId() + "np")" type="button" class="rz-pager-next rz-pager-element @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled") @(focusedIndex == Math.Min(endPage + 1, PageNumbersCount)? "rz-state-focused": "")"
+                <button id="@(GetId() + "np")" type="button" tabindex="-1" class="rz-pager-next rz-pager-element @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled") @(focusedIndex == Math.Min(endPage + 1, PageNumbersCount)? "rz-state-focused": "")"
                         @onclick="@(() => OnNextPageClick(endPage))" aria-label="@NextPageAriaLabel" title="@NextPageTitle" disabled="@(CurrentPage >= (numberOfPages - 1))" aria-disabled="@(CurrentPage >= (numberOfPages - 1) ? "true" : "false")">
                     @if (NextPageLabel != null)
                     {
@@ -54,7 +54,7 @@
                 </button>
             </li>
             <li class="rz-pager-item">
-                <button id="@(GetId() + "lp")" type="button" class="rz-pager-last rz-pager-element  @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled") @(focusedIndex == Math.Min(endPage + 1, PageNumbersCount) + 1 ? "rz-state-focused": "")"
+                <button id="@(GetId() + "lp")" type="button" tabindex="-1" class="rz-pager-last rz-pager-element  @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled") @(focusedIndex == Math.Min(endPage + 1, PageNumbersCount) + 1 ? "rz-state-focused": "")"
                         @onclick="@(() => OnLastPageClick(endPage))" aria-label="@LastPageAriaLabel" title="@LastPageTitle" disabled="@(CurrentPage >= (numberOfPages - 1))" aria-disabled="@(CurrentPage >= (numberOfPages - 1) ? "true" : "false")">
                     <span class="notranslate rz-pager-icon rzi rzi-step-forward"></span>
                 </button>

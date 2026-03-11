@@ -225,7 +225,7 @@ namespace Radzen
         public Task<dynamic> OpenSideAsync<T>(string title, Dictionary<string, object?>? parameters = null, SideDialogOptions? options = null)
             where T : ComponentBase
         {
-            CloseSide();
+            CloseSideSilently();
             sideDialogResultTask = new TaskCompletionSource<dynamic>();
             if (options == null)
             {
@@ -253,7 +253,7 @@ namespace Radzen
                 throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
             }
 
-            CloseSide();
+            CloseSideSilently();
             sideDialogResultTask = new TaskCompletionSource<dynamic>();
 
             if (options == null)
@@ -278,7 +278,7 @@ namespace Radzen
         public void OpenSide<T>(string title, Dictionary<string, object?>? parameters = null, SideDialogOptions? options = null)
             where T : ComponentBase
         {
-            CloseSide();
+            CloseSideSilently();
 
             if (options == null)
             {
@@ -304,7 +304,7 @@ namespace Radzen
                 throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
             }
 
-            CloseSide();
+            CloseSideSilently();
 
             if (options == null)
             {
@@ -315,6 +315,14 @@ namespace Radzen
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object?>(), options);
         }
 
+
+        private void CloseSideSilently()
+        {
+            if (sideDialogResultTask?.Task.IsCompleted == false)
+            {
+                sideDialogResultTask.TrySetResult(null!);
+            }
+        }
 
         /// <summary>
         /// Closes the side dialog

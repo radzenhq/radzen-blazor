@@ -441,8 +441,6 @@ namespace Radzen
                         selectedItem = null;
                         selectedItems.Clear();
                     }
-
-                    InvokeAsync(OnDataChanged);
                 }
             }
         }

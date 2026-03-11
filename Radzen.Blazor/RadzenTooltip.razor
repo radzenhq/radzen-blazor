@@ -4,7 +4,7 @@
 
 @foreach (var tooltip in tooltips)
 {
-    <div id="@UniqueID" class="rz-tooltip @tooltip.Options.CssClass" style="display: none; top: 0px; left: 0px; z-index: 1001; position: absolute;">
+    <div id="@UniqueID" class="rz-tooltip @tooltip.Options.CssClass" style="display: none; top: 0px; left: 0px; z-index: 1001; position: absolute;" role="tooltip">
         <div class="rz-tooltip-content @getCssClass(tooltip)" style="@tooltip.Options.Style">
             @if (!string.IsNullOrEmpty(tooltip.Options.Text))
             {
@@ -61,7 +61,9 @@
                 (enumName ?? tooltip.Options.Position.ToString()).ToLowerInvariant(),
                 tooltip.Options.CloseTooltipOnDocumentClick,
                 Reference,
-                "RadzenTooltip.CloseTooltip");
+                "RadzenTooltip.CloseTooltip",
+                tooltip.Options.ClientX,
+                tooltip.Options.ClientY);
         }
     }
 

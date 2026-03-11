@@ -86,6 +86,29 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Returns true if the ValueProperty type is nullable.
+        /// </summary>
+        protected bool IsValueNullable()
+        {
+            if (string.IsNullOrEmpty(ValueProperty))
+            {
+                return false;
+            }
+
+            var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), ValueProperty);
+            return propertyType != null && Nullable.GetUnderlyingType(propertyType) != null;
+        }
+
+        /// <summary>
+        /// Creates a function that returns the raw object value of the ValueProperty (before conversion to double).
+        /// Used to detect null values in nullable numeric properties.
+        /// </summary>
+        protected Func<TItem, object?> GetRawValueGetter()
+        {
+            return PropertyAccess.Getter<TItem, object?>(ValueProperty!);
+        }
+
+        /// <summary>
         /// Determines whether the property with the specified name is <see cref="DateTime" />
         /// </summary>
         /// <param name="propertyName">Name of the property.</param>
@@ -346,9 +369,17 @@ namespace Radzen.Blazor
 
             if (Items != null)
             {
-                if (Items.Any())
+                IEnumerable<TItem> items = Items;
+
+                if (IsValueNullable())
                 {
-                    scale.Input.MergeWidth(ScaleRange.From(Items, Value));
+                    var rawGetter = GetRawValueGetter();
+                    items = items.Where(item => rawGetter(item) != null);
+                }
+
+                if (items.Any())
+                {
+                    scale.Input.MergeWidth(ScaleRange.From(items, Value));
                 }
             }
 

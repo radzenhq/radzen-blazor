@@ -1,0 +1,92 @@
+<rect class="rz-linear-gauge-range"
+      x="@X.ToInvariantString()"
+      y="@Y.ToInvariantString()"
+      width="@Width.ToInvariantString()"
+      height="@Height.ToInvariantString()"
+      rx="@BorderRadius.ToInvariantString()"
+      ry="@BorderRadius.ToInvariantString()"
+      stroke="@Stroke"
+      fill="@Fill"
+      stroke-width="@StrokeWidth.ToInvariantString()" />
+
+@code {
+    [Parameter]
+    public Point Start { get; set; } = new Point();
+
+    [Parameter]
+    public Point End { get; set; } = new Point();
+
+    [Parameter]
+    public global::Radzen.Orientation Orientation { get; set; }
+
+    [Parameter]
+    public double Min { get; set; }
+
+    [Parameter]
+    public double Max { get; set; }
+
+    [Parameter]
+    public double From { get; set; }
+
+    [Parameter]
+    public double To { get; set; }
+
+    [Parameter]
+    public string Stroke { get; set; } = "none";
+
+    [Parameter]
+    public string Fill { get; set; } = string.Empty;
+
+    [Parameter]
+    public double StrokeWidth { get; set; }
+
+    [Parameter]
+    public double Size { get; set; } = 5;
+
+    [Parameter]
+    public double BorderRadius { get; set; }
+
+    private double X { get; set; }
+    private double Y { get; set; }
+    private double Width { get; set; }
+    private double Height { get; set; }
+
+    double Clip(double value) => Math.Max(Min, Math.Min(value, Max));
+
+    double Position(double value)
+    {
+        if (Max <= Min)
+        {
+            return 0;
+        }
+
+        return (Clip(value) - Min) / (Max - Min);
+    }
+
+    protected override void OnParametersSet()
+    {
+        var fromRatio = Position(From);
+        var toRatio = Position(To);
+
+        if (Orientation == global::Radzen.Orientation.Vertical)
+        {
+            var y1 = Start.Y + (End.Y - Start.Y) * fromRatio;
+            var y2 = Start.Y + (End.Y - Start.Y) * toRatio;
+
+            X = Start.X - Size / 2;
+            Y = Math.Min(y1, y2);
+            Width = Size;
+            Height = Math.Abs(y2 - y1);
+        }
+        else
+        {
+            var x1 = Start.X + (End.X - Start.X) * fromRatio;
+            var x2 = Start.X + (End.X - Start.X) * toRatio;
+
+            X = Math.Min(x1, x2);
+            Y = Start.Y - Size / 2;
+            Width = Math.Abs(x2 - x1);
+            Height = Size;
+        }
+    }
+}

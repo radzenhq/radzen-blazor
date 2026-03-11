@@ -58,12 +58,13 @@
                 <div id="@(Grid.getColumnUniqueId(ColumnIndex) + "-resizer")" style="cursor:col-resize;float:right;"
                 @onclick:preventDefault="true" @onclick:stopPropagation="true" class="rz-column-resizer"
                 @onmousedown:preventDefault="true"
-                @onmousedown=@StartColumnResize @onmouseup=@StopColumnResize>&nbsp;</div>
+                @onmousedown=@StartColumnResize @onmouseup=@StopColumnResize
+                @ontouchstart=@StartColumnResizeTouch @ontouchend=@StopColumnResize>&nbsp;</div>
             }
             @{var filterMode = Column.FilterMode ?? Grid.FilterMode;}
             @if (Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Advanced || filterMode == FilterMode.CheckBoxList))
             {
-                <button type="button" @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
+                <button type="button" tabindex="-1" @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
                         class="@getFilterIconCss(Column)" onclick=@getFilterOpen() @onclick:preventDefault="true"
                         aria-haspopup="dialog" aria-controls="@Column.GetColumnPopupID()" aria-expanded="false"
                         aria-label="@Grid.FilterToggleAriaLabel">
@@ -161,7 +162,7 @@
                                     {
                                         <RadzenProgressBarCircular Style="position:absolute;width:100%;" Visible="@isLoading" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
                                         <RadzenListBox AllowVirtualization="@Column.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
-                                        TValue="IEnumerable" Value=@(Column.GetFilterValue() as IEnumerable) Change="@ListBoxChange" 
+                                        TValue="IEnumerable" Value=@(hasPendingCheckBoxFilter ? pendingCheckBoxFilterValue as IEnumerable : Column.GetFilterValue() as IEnumerable) Change="@ListBoxChange"
                                         Data=@filterValues Count=@filterValuesCount LoadData="@LoadFilterValues" 
                                         AllowFiltering="@(!string.IsNullOrEmpty(Column.GetFilterProperty()))"
                                         Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
@@ -216,6 +217,8 @@ else
     internal IEnumerable? filterValues;
     string loadDataArgsString = string.Empty;
     bool isLoading = false;
+    bool hasPendingCheckBoxFilter;
+    object? pendingCheckBoxFilterValue;
 
     async Task LoadFilterValues(LoadDataArgs loadDataArgs)
     {
@@ -326,9 +329,11 @@ else
 
     void ListBoxChange(object args)
     {
+        hasPendingCheckBoxFilter = true;
+
         if (args is not IEnumerable enumerable)
         {
-            Column.SetFilterValue(null);
+            pendingCheckBoxFilterValue = null;
             return;
         }
 
@@ -356,9 +361,9 @@ else
             propertyType = Column.FilterPropertyType;
         }
 
-        Column.SetFilterValue(enumerable.Cast<object>().Any()
+        pendingCheckBoxFilterValue = enumerable.Cast<object>().Any()
             ? propertyType != null ? enumerable.AsQueryable().Cast(propertyType) : enumerable
-            : null);
+            : null;
     }
 
     string getFilterOpen()
@@ -383,6 +388,9 @@ else
 
     async Task ClearFilter()
     {
+        hasPendingCheckBoxFilter = false;
+        pendingCheckBoxFilterValue = null;
+
         if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand && popup != null)
         {
             await popup.CloseAsync();
@@ -432,6 +440,13 @@ else
                     Column.SetFilterValue(!string.IsNullOrEmpty(secondInputValue) ? Convert.ChangeType(secondInputValue, targetType) : null, false);
                 }
             }
+        }
+
+        if (hasPendingCheckBoxFilter)
+        {
+            Column.SetFilterValue(pendingCheckBoxFilterValue);
+            hasPendingCheckBoxFilter = false;
+            pendingCheckBoxFilterValue = null;
         }
 
         if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand && popup != null)
@@ -523,18 +538,27 @@ else
 
     async Task StartColumnResize(MouseEventArgs args)
     {
-        if(args.Button == 0) 
-        { 
+        if(args.Button == 0)
+        {
             await Grid.StartColumnResize(args, ColumnIndex);
         }
     }
 
-    async Task StopColumnResize(MouseEventArgs args)
+    async Task StartColumnResizeTouch(TouchEventArgs args)
     {
-        if (args.Button == 0)
+        if (args.ChangedTouches != null && args.ChangedTouches.Length > 0)
         {
-            await Grid.StopColumnResize(args, ColumnIndex);
+            await Grid.StartColumnResize(args.ChangedTouches[0].ClientX, ColumnIndex);
         }
+    }
+
+    async Task StopColumnResize(EventArgs args)
+    {
+        if (args is MouseEventArgs mouseArgs && mouseArgs.Button != 0)
+        {
+            return;
+        }
+        await Grid.StopColumnResize(ColumnIndex);
     }
 
     internal async Task OpenFilter()

@@ -1,0 +1,42 @@
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.RadzenScatterSeries<TItem>
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+  public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+  {
+    var category = ComposeCategory(categoryScale);
+    var value = ComposeValue(valueScale);
+
+    var chart = RequireChart();
+    var index = chart.Series.IndexOf(this);
+    var className = $"rz-bubble-series rz-series-{index}";
+    var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+    var sizeValues = Items.Select(item => Math.Abs(Size(item))).ToList();
+    var minValue = sizeValues.Any() ? sizeValues.Min() : 0;
+    var maxValue = sizeValues.Any() ? sizeValues.Max() : 1;
+
+    var bubbles = Items.Select(item =>
+    {
+      var x = category(item);
+      var y = value(item);
+      var radius = GetBubbleRadius(item, minValue, maxValue);
+      return new { X = x, Y = y, Radius = radius, Item = item };
+    }).OrderByDescending(b => b.Radius).ToList();
+
+    var fill = Fill ?? Stroke;
+
+    return
+    @<g class="@className" style="@style">
+      @foreach (var bubble in bubbles)
+      {
+        <circle cx="@bubble.X.ToInvariantString()" cy="@bubble.Y.ToInvariantString()" r="@bubble.Radius.ToInvariantString()"
+                fill="@fill" stroke="@(Stroke ?? Fill)" stroke-width="@StrokeWidth.ToInvariantString()"
+                @onclick="@(async () => { if (chart.SeriesClick.HasDelegate) { await InvokeClick(chart.SeriesClick, bubble.Item!); } })" />
+      }
+    </g>;
+  }
+}

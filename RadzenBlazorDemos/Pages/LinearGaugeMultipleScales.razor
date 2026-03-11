@@ -1,0 +1,25 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Value" Component="valueSlider" />
+                <RadzenSlider Name="valueSlider" Min="0" Max="200" @bind-Value=@value Style="width: 200px;" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenLinearGauge Style="width: 100%; height: 200px;">
+        <RadzenLinearGaugeScale Step="40" Min="0" Max="200" MinorStep="0"
+                                TickPosition="GaugeTickPosition.Outside" LinePosition="0.3">
+            <RadzenLinearGaugeScalePointer Value=@value Fill="var(--rz-primary)" />
+        </RadzenLinearGaugeScale>
+        <RadzenLinearGaugeScale Step="40" Min="0" Max="200" MinorStep="0"
+                                TickPosition="GaugeTickPosition.Inside" LinePosition="0.7" ShowTickLabels="false">
+            <RadzenLinearGaugeScalePointer Value=@(200 - value) Fill="var(--rz-secondary)" />
+        </RadzenLinearGaugeScale>
+    </RadzenLinearGauge>
+</RadzenStack>
+
+@code {
+    double value = 80;
+}

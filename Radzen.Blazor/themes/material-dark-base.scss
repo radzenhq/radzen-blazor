@@ -411,8 +411,6 @@ $button-sizes: (
 $badge-font-weight: 500 !default;
 
 // Chip
-$chip-padding-block: 0.125rem !default;
-$chip-padding-inline: 0.75rem 0.125rem !default;
 $chip-background-color: var(--rz-base-600);
 $chip-border-radius: calc(4 * var(--rz-border-radius)) !default;
 
@@ -1104,6 +1102,11 @@ $column-draggable-shadow: var(--rz-shadow-4) !default;
 .rz-grid-table-composite {
   --rz-grid-right-cell-border: #{$grid-cell-border};
   --rz-grid-header-cell-border: #{$grid-cell-border};
+}
+
+// Gantt
+.rz-gantt .rz-data-grid {
+  --rz-grid-cell-padding: 0 1rem;
 }
 
 // Pager

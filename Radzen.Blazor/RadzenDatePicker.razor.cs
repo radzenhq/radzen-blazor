@@ -759,6 +759,7 @@ namespace Radzen.Blazor
                 if (_currentDate == default(DateTime))
                 {
                     _currentDate = HasValue ? DateTimeValue!.Value : InitialViewDate ?? DateTime.Today;
+                    FocusedDate = _currentDate;
                 }
                 return _currentDate;
             }

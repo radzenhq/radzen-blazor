@@ -253,6 +253,23 @@
   --rz-chip-gap: #{$chip-gap};
   --rz-chip-border-radius: #{$chip-border-radius};
   --rz-chip-font-size: #{$chip-font-size};
+  --rz-chip-icon-size: #{$chip-icon-size};
+  --rz-chip-font-weight: #{$chip-font-weight};
+  --rz-chip-border-width: #{$chip-border-width};
+  --rz-chip-selected-outline: #{$chip-selected-outline};
+  --rz-chip-selected-outline-offset: #{$chip-selected-outline-offset};
+  --rz-chip-sm-gap: #{$chip-sm-gap};
+  --rz-chip-sm-font-size: #{$chip-sm-font-size};
+  --rz-chip-sm-icon-size: #{$chip-sm-icon-size};
+  --rz-chip-sm-padding-block: #{$chip-sm-padding-block};
+  --rz-chip-sm-padding-inline: #{$chip-sm-padding-inline};
+  --rz-chip-xs-gap: #{$chip-xs-gap};
+  --rz-chip-xs-font-size: #{$chip-xs-font-size};
+  --rz-chip-xs-icon-size: #{$chip-xs-icon-size};
+  --rz-chip-xs-padding-block: #{$chip-xs-padding-block};
+  --rz-chip-xs-padding-inline: #{$chip-xs-padding-inline};
+  --rz-chip-list-gap: #{$chip-list-gap};
+  --rz-chip-disabled-opacity: #{$chip-disabled-opacity};
 
   /* ColorPicker */
   --rz-colorpicker-panel-border: #{$colorpicker-panel-border};
@@ -646,6 +663,13 @@
   --rz-column-drag-handle-hover-color: #{$column-drag-handle-hover-color};
   --rz-column-drag-handle-margin-inline: #{$column-drag-handle-margin-inline};
   --rz-column-draggable-shadow: #{$column-draggable-shadow};
+
+  /* Gantt */
+  --rz-gantt-row-height: #{$gantt-row-height};
+  --rz-gantt-border: #{$gantt-border};
+  --rz-gantt-border-radius: #{$gantt-border-radius};
+  --rz-gantt-background-color: #{$gantt-background-color};
+  --rz-gantt-event-border-radius: #{$gantt-event-border-radius};
 
   /* Header */
   --rz-header-background-color: #{$header-background-color};

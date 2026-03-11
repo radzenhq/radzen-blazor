@@ -190,6 +190,73 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("aria-label=\"Search items\"", component.Markup);
         }
+
+        [Fact]
+        public void ListBox_Renders_DefaultEmptyText_WhenNoData()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenListBox<int>>();
+
+            Assert.Contains("rz-listbox-empty-message", component.Markup);
+            Assert.Contains("No records to display.", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Renders_CustomEmptyText_WhenNoData()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenListBox<int>>(parameters =>
+            {
+                parameters.Add(p => p.EmptyText, "Nothing here");
+            });
+
+            Assert.Contains("rz-listbox-empty-message", component.Markup);
+            Assert.Contains("Nothing here", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Renders_EmptyTemplate_WhenNoData()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenListBox<int>>(parameters =>
+            {
+                parameters.Add(p => p.EmptyTemplate, builder => builder.AddContent(0, "Custom empty content"));
+            });
+
+            Assert.Contains("rz-listbox-empty-message", component.Markup);
+            Assert.Contains("Custom empty content", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Renders_EmptyText_WhenDataIsEmptyList()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenListBox<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string>());
+                parameters.Add(p => p.EmptyText, "List is empty");
+            });
+
+            Assert.Contains("rz-listbox-empty-message", component.Markup);
+            Assert.Contains("List is empty", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_DoesNotRender_EmptyMessage_WhenDataExists()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenListBox<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string> { "Item1" });
+            });
+
+            Assert.DoesNotContain("rz-listbox-empty-message", component.Markup);
+        }
     }
 }
 

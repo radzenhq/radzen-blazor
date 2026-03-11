@@ -1,0 +1,16 @@
+@using Radzen.Blazor.Rendering
+
+<LinearGaugeBand
+    From=@From
+    To=@To
+    Fill=@Fill
+    Stroke=@Stroke
+    StrokeWidth=@StrokeWidth
+    Start=@(Scale?.CurrentStart ?? new Point())
+    End=@(Scale?.CurrentEnd ?? new Point())
+    Orientation=@(Scale?.Orientation ?? global::Radzen.Orientation.Horizontal)
+    Min=@(Scale?.Min ?? 0)
+    Max=@(Scale?.Max ?? 0)
+    Size=@Height
+    BorderRadius=@BorderRadius
+/>

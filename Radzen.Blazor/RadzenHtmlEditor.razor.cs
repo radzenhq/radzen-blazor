@@ -85,6 +85,15 @@ namespace Radzen.Blazor
         public IDictionary<string, string>? UploadHeaders { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the source editor should update the value on every keystroke.
+        /// When <c>true</c>, typing in the HTML source textarea invokes change immediately instead of on blur.
+        /// Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> for immediate updates; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Immediate { get; set; }
+
+        /// <summary>
         /// Gets or sets the input.
         /// </summary>
         /// <value>The input.</value>

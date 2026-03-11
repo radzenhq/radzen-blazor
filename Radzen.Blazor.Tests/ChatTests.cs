@@ -16,6 +16,7 @@ namespace Radzen.Blazor.Tests
         public void RadzenChat_ShouldRenderWithTitle()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -30,6 +31,7 @@ namespace Radzen.Blazor.Tests
         public void RadzenChat_ShouldShowEmptyMessageWhenNoMessages()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -57,6 +59,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -78,6 +81,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -105,6 +109,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -120,6 +125,7 @@ namespace Radzen.Blazor.Tests
         public void RadzenChat_ShouldShowClearButtonWhenEnabled()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -136,6 +142,7 @@ namespace Radzen.Blazor.Tests
         public void RadzenChat_ShouldNotShowClearButtonWhenDisabled()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -162,6 +169,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -189,6 +197,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -215,6 +224,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -235,6 +245,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -255,6 +266,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -272,6 +284,7 @@ namespace Radzen.Blazor.Tests
         public void RadzenChat_ShouldBeDisabledWhenDisabled()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -288,6 +301,7 @@ namespace Radzen.Blazor.Tests
         public void RadzenChat_ShouldBeReadOnlyWhenReadOnly()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -304,6 +318,7 @@ namespace Radzen.Blazor.Tests
         public void RadzenChat_ShouldShowCustomPlaceholder()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -330,6 +345,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")
@@ -356,6 +372,7 @@ namespace Radzen.Blazor.Tests
             };
 
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
                 .Add(p => p.Title, "Test Chat")
                 .Add(p => p.CurrentUserId, "user1")

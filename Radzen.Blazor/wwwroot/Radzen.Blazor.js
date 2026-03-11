@@ -21,7 +21,6 @@ var rejectCallbacks = [];
 var radzenRecognition;
 
 window.Radzen = {
-    selectedNavigationSelector: undefined,
     isRTL: function (el) {
         return el && getComputedStyle(el).direction == 'rtl';
     },
@@ -160,6 +159,446 @@ window.Radzen = {
             'px'
           : 'margin-left:0px;';
     }
+  },
+  ganttSyncScroll: function (ganttId) {
+    if (!ganttId) {
+      return;
+    }
+
+    var root = document.getElementById(ganttId);
+    if (!root) {
+      return;
+    }
+
+    var grid = root.querySelector('.rz-data-grid-data');
+    var timeline = root.querySelector('.rz-gantt-timeline-scroll');
+    if (!grid || !timeline) {
+      return;
+    }
+
+    var header = root.querySelector('.rz-gantt-table thead');
+    if (header) {
+      root.style.setProperty('--rz-gantt-header-height', header.getBoundingClientRect().height + 'px');
+    }
+
+    // Measure timeline group header and set CSS variable so the grid's
+    // thead::before pseudo-row matches it. Also sync overall header height.
+    function syncHeaderHeights() {
+      var gridThead = grid.querySelector('thead');
+      var timelineThead = timeline.querySelector('thead');
+      if (!gridThead || !timelineThead) return;
+
+      var groupRow = timelineThead.querySelector('.rz-gantt-header-group-row');
+      if (groupRow) {
+        root.style.setProperty('--rz-gantt-header-group-height', groupRow.offsetHeight + 'px');
+      } else {
+        root.style.setProperty('--rz-gantt-header-group-height', '0px');
+      }
+
+      var maxH = Math.max(gridThead.offsetHeight, timelineThead.offsetHeight);
+      root.style.setProperty('--rz-gantt-header-height', maxH + 'px');
+    }
+
+    function runSyncAfterLayout() {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(syncHeaderHeights);
+      });
+    }
+
+    runSyncAfterLayout();
+
+    var key = ganttId + '_ganttScrollSync';
+    var state = Radzen[key];
+
+    if (state && state.grid === grid && state.timeline === timeline) {
+      return;
+    }
+
+    if (state) {
+      if (state.grid && state.onGrid) {
+        state.grid.removeEventListener('scroll', state.onGrid);
+      }
+      if (state.timeline && state.onTimeline) {
+        state.timeline.removeEventListener('scroll', state.onTimeline);
+      }
+      if (state.grid && state.onGridWheel) {
+        state.grid.removeEventListener('wheel', state.onGridWheel);
+      }
+    }
+
+    var syncing = false;
+    var onGrid = function () {
+      if (syncing) {
+        return;
+      }
+      syncing = true;
+      timeline.scrollTop = grid.scrollTop;
+      syncing = false;
+    };
+    var onTimeline = function () {
+      if (syncing) {
+        return;
+      }
+      syncing = true;
+      grid.scrollTop = timeline.scrollTop;
+      syncing = false;
+    };
+
+    // The grid has overflow-y: hidden (no native vertical scrollbar).
+    // Forward vertical mouse-wheel events to the timeline so the user
+    // can still scroll vertically while hovering over the grid.
+    var onGridWheel = function (e) {
+      if (e.deltaY) {
+        timeline.scrollTop += e.deltaY;
+        e.preventDefault();
+      }
+    };
+
+    grid.addEventListener('scroll', onGrid);
+    timeline.addEventListener('scroll', onTimeline);
+    grid.addEventListener('wheel', onGridWheel, { passive: false });
+
+    var resizeObserver = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(runSyncAfterLayout);
+      resizeObserver.observe(root);
+    }
+
+    Radzen[key] = {
+      grid: grid,
+      timeline: timeline,
+      onGrid: onGrid,
+      onTimeline: onTimeline,
+      onGridWheel: onGridWheel,
+      resizeObserver: resizeObserver
+    };
+
+    timeline.scrollTop = grid.scrollTop;
+  },
+  ganttScrollToFirstEvent: function (ganttId) {
+    if (!ganttId) return false;
+    var root = document.getElementById(ganttId);
+    if (!root) return false;
+    var timeline = root.querySelector('.rz-gantt-timeline-scroll');
+    if (!timeline) return false;
+    var events = timeline.querySelectorAll('.rz-event');
+    if (!events.length) return false;
+
+    var timelineRect = timeline.getBoundingClientRect();
+    var thead = timeline.querySelector('thead');
+    var headerHeight = thead ? thead.offsetHeight : 0;
+
+    var bestTop = Infinity;
+    var bestLeft = Infinity;
+    for (var i = 0; i < events.length; i++) {
+      var rect = events[i].getBoundingClientRect();
+      if (rect.width <= 0) continue;
+      var contentTop = rect.top - timelineRect.top + timeline.scrollTop;
+      var contentLeft = rect.left - timelineRect.left + timeline.scrollLeft;
+      if (contentTop < bestTop || (contentTop === bestTop && contentLeft < bestLeft)) {
+        bestTop = contentTop;
+        bestLeft = contentLeft;
+      }
+    }
+    if (bestTop === Infinity) return false;
+
+    timeline.scrollTop = Math.max(0, bestTop - headerHeight - 4);
+    timeline.scrollLeft = Math.max(0, bestLeft - 40);
+    return true;
+  },
+  ganttSyncScrollDispose: function (ganttId) {
+    if (!ganttId) {
+      return;
+    }
+
+    var key = ganttId + '_ganttScrollSync';
+    var state = Radzen[key];
+    if (!state) {
+      return;
+    }
+
+    if (state.grid && state.onGrid) {
+      state.grid.removeEventListener('scroll', state.onGrid);
+    }
+    if (state.timeline && state.onTimeline) {
+      state.timeline.removeEventListener('scroll', state.onTimeline);
+    }
+    if (state.grid && state.onGridWheel) {
+      state.grid.removeEventListener('wheel', state.onGridWheel);
+    }
+    if (state.resizeObserver) {
+      state.resizeObserver.disconnect();
+    }
+
+    delete Radzen[key];
+  },
+  ganttInitDragResize: function (containerId, dotnetRef, timelineRangeMs, allowDrag, allowResize, rowHeightPx) {
+    var key = containerId + '_ganttDragResize';
+
+    if (Radzen[key]) {
+      Radzen[key].dotnetRef = dotnetRef;
+      Radzen[key].timelineRangeMs = timelineRangeMs;
+      Radzen[key].allowDrag = allowDrag;
+      Radzen[key].allowResize = allowResize;
+      Radzen[key].rowHeightPx = rowHeightPx || 36;
+      return;
+    }
+
+    var root = document.getElementById(containerId);
+    if (!root) return;
+
+    var container = root.querySelector('.rz-gantt-timeline-scroll');
+    if (!container) return;
+
+    var resizeThreshold = 6;
+    var dragThreshold = 3;
+    var drag = null;
+    var justDragged = false;
+
+    function getConfig() {
+      return Radzen[key];
+    }
+
+    function buildLinkPath(x1, x2, y1, y2, rh, linkType) {
+      var offset = 12;
+      var halfRow = rh * 0.5;
+      var exitRight = linkType === 0 || linkType === 2;
+      var enterRight = linkType === 2 || linkType === 3;
+      var exitDir = exitRight ? 1 : -1;
+      var enterDir = enterRight ? 1 : -1;
+      var exitX = x1 + offset * exitDir;
+      var enterX = x2 + offset * enterDir;
+      var canGoStraight = exitRight !== enterRight
+        ? (exitRight ? x2 - x1 > offset * 2 : x1 - x2 > offset * 2)
+        : (exitRight ? exitX < enterX : exitX > enterX);
+
+      if (canGoStraight && y1 !== y2) {
+        var midX = (exitX + enterX) / 2;
+        return 'M' + x1 + ',' + y1 + ' L' + midX + ',' + y1 + ' L' + midX + ',' + y2 + ' L' + x2 + ',' + y2;
+      }
+      var midY = y2 > y1 ? y1 + halfRow : (y2 < y1 ? y1 - halfRow : y1 + halfRow);
+      return 'M' + x1 + ',' + y1 + ' L' + exitX + ',' + y1 + ' L' + exitX + ',' + midY + ' L' + enterX + ',' + midY + ' L' + enterX + ',' + y2 + ' L' + x2 + ',' + y2;
+    }
+
+    function updateConnectedPaths() {
+      if (!drag) return;
+      var svg = container.querySelector('.rz-gantt-links');
+      if (!svg) return;
+
+      var config = getConfig();
+      var rh = config.rowHeightPx;
+      var svgWidth = svg.getBoundingClientRect().width;
+      var idx = drag.index;
+
+      var paths = svg.querySelectorAll('path[data-from-index="' + idx + '"], path[data-to-index="' + idx + '"]');
+      for (var i = 0; i < paths.length; i++) {
+        var path = paths[i];
+        var fromIdx = path.dataset.fromIndex;
+        var toIdx = path.dataset.toIndex;
+        var linkType = parseInt(path.dataset.linkType, 10) || 0;
+
+        var fromBar = container.querySelector('[data-index="' + fromIdx + '"]');
+        var toBar = container.querySelector('[data-index="' + toIdx + '"]');
+        if (!fromBar || !toBar) continue;
+
+        var fromRow = parseInt(fromBar.dataset.row, 10);
+        var toRow = parseInt(toBar.dataset.row, 10);
+
+        var fromLeft = parseFloat(fromBar.style.getPropertyValue('inset-inline-start')) || 0;
+        var fromWidth = parseFloat(fromBar.style.width) || 0;
+        var toLeft = parseFloat(toBar.style.getPropertyValue('inset-inline-start')) || 0;
+        var toWidth = parseFloat(toBar.style.width) || 0;
+        var fromIsMilestone = fromBar.classList.contains('rz-gantt-milestone');
+        var toIsMilestone = toBar.classList.contains('rz-gantt-milestone');
+
+        var x1, x2;
+        if (linkType === 1) { x1 = fromLeft; x2 = toLeft; }
+        else if (linkType === 2) { x1 = fromIsMilestone ? fromLeft : fromLeft + fromWidth; x2 = toIsMilestone ? toLeft : toLeft + toWidth; }
+        else if (linkType === 3) { x1 = fromLeft; x2 = toIsMilestone ? toLeft : toLeft + toWidth; }
+        else { x1 = fromIsMilestone ? fromLeft : fromLeft + fromWidth; x2 = toLeft; }
+
+        var x1px = (x1 / 100) * svgWidth;
+        var x2px = (x2 / 100) * svgWidth;
+        var y1 = (fromRow + 0.5) * rh;
+        var y2 = (toRow + 0.5) * rh;
+
+        path.setAttribute('d', buildLinkPath(x1px, x2px, y1, y2, rh, linkType));
+      }
+    }
+
+    function onMouseDown(e) {
+      var config = getConfig();
+      if (!config) return;
+
+      var bar = e.target.closest('.rz-gantt-bar, .rz-gantt-milestone');
+      if (!bar || e.button !== 0 || !bar.dataset.index) return;
+
+      var isMilestone = bar.classList.contains('rz-gantt-milestone');
+      var barRect = bar.getBoundingClientRect();
+      var offsetX = e.clientX - barRect.left;
+
+      var mode;
+      if (isMilestone) {
+        if (!config.allowDrag) return;
+        mode = 'move';
+      } else if (config.allowResize && offsetX <= resizeThreshold) {
+        mode = 'resize-start';
+      } else if (config.allowResize && barRect.width - offsetX <= resizeThreshold) {
+        mode = 'resize-end';
+      } else if (config.allowDrag) {
+        mode = 'move';
+      } else {
+        return;
+      }
+
+      e.preventDefault();
+
+      var containerEl = bar.closest('.rz-gantt-row-container');
+      var containerWidth = containerEl ? containerEl.getBoundingClientRect().width : 1;
+
+      drag = {
+        bar: bar,
+        mode: mode,
+        startClientX: e.clientX,
+        containerWidth: containerWidth,
+        originalLeft: parseFloat(bar.style.getPropertyValue('inset-inline-start')) || 0,
+        originalWidth: parseFloat(bar.style.width) || 0,
+        offsetStart: parseFloat(bar.dataset.offsetStart) || 0,
+        offsetEnd: parseFloat(bar.dataset.offsetEnd) || 0,
+        index: parseInt(bar.dataset.index, 10),
+        isMilestone: isMilestone,
+        hasMoved: false
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseMove(e) {
+      if (!drag) return;
+
+      var deltaX = e.clientX - drag.startClientX;
+      if (!drag.hasMoved && Math.abs(deltaX) < dragThreshold) return;
+      drag.hasMoved = true;
+
+      var percentDelta = (deltaX / drag.containerWidth) * 100;
+
+      if (drag.mode === 'move') {
+        drag.bar.style.setProperty('inset-inline-start', (drag.originalLeft + percentDelta) + '%');
+      } else if (drag.mode === 'resize-start') {
+        var newWidth = drag.originalWidth - percentDelta;
+        if (newWidth > 0.1) {
+          drag.bar.style.setProperty('inset-inline-start', (drag.originalLeft + percentDelta) + '%');
+          drag.bar.style.width = newWidth + '%';
+        }
+      } else if (drag.mode === 'resize-end') {
+        var newWidth = drag.originalWidth + percentDelta;
+        if (newWidth > 0.1) {
+          drag.bar.style.width = newWidth + '%';
+        }
+      }
+
+      drag.bar.style.zIndex = '10';
+      drag.bar.style.opacity = '0.85';
+      document.body.style.cursor = drag.mode === 'move' ? 'grabbing' : 'ew-resize';
+
+      updateConnectedPaths();
+    }
+
+    function onMouseUp(e) {
+      if (!drag) return;
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      drag.bar.style.zIndex = '';
+      drag.bar.style.opacity = '';
+      document.body.style.cursor = '';
+
+      if (drag.hasMoved) {
+        justDragged = true;
+
+        var deltaX = e.clientX - drag.startClientX;
+        var percentDelta = (deltaX / drag.containerWidth) * 100;
+        var config = getConfig();
+        var msPerPercent = config.timelineRangeMs / 100;
+        var deltaMs = percentDelta * msPerPercent;
+
+        var newStartMs, newEndMs;
+        if (drag.mode === 'move') {
+          newStartMs = drag.offsetStart + deltaMs;
+          newEndMs = drag.offsetEnd + deltaMs;
+        } else if (drag.mode === 'resize-start') {
+          newStartMs = drag.offsetStart + deltaMs;
+          newEndMs = drag.offsetEnd;
+        } else {
+          newStartMs = drag.offsetStart;
+          newEndMs = drag.offsetEnd + deltaMs;
+        }
+
+        var eventType = drag.mode === 'move' ? 'move' : 'resize';
+        config.dotnetRef.invokeMethodAsync('OnGanttBarInteractionEnd', drag.index, eventType, newStartMs, newEndMs);
+      }
+
+      drag = null;
+    }
+
+    function onMouseMoveHover(e) {
+      if (drag) return;
+      var config = getConfig();
+      if (!config) return;
+
+      var bar = e.target.closest('.rz-gantt-bar, .rz-gantt-milestone');
+      if (!bar || !bar.dataset.index) return;
+
+      if (bar.classList.contains('rz-gantt-milestone')) {
+        bar.style.cursor = config.allowDrag ? 'grab' : '';
+        return;
+      }
+
+      var barRect = bar.getBoundingClientRect();
+      var offsetX = e.clientX - barRect.left;
+
+      if (config.allowResize && (offsetX <= resizeThreshold || barRect.width - offsetX <= resizeThreshold)) {
+        bar.style.cursor = 'ew-resize';
+      } else if (config.allowDrag) {
+        bar.style.cursor = 'grab';
+      }
+    }
+
+    function onClickCapture(e) {
+      if (justDragged) {
+        e.stopPropagation();
+        e.preventDefault();
+        justDragged = false;
+      }
+    }
+
+    container.addEventListener('mousedown', onMouseDown);
+    container.addEventListener('mousemove', onMouseMoveHover);
+    container.addEventListener('click', onClickCapture, true);
+
+    Radzen[key] = {
+      container: container,
+      dotnetRef: dotnetRef,
+      timelineRangeMs: timelineRangeMs,
+      allowDrag: allowDrag,
+      allowResize: allowResize,
+      rowHeightPx: rowHeightPx || 36,
+      onMouseDown: onMouseDown,
+      onMouseMoveHover: onMouseMoveHover,
+      onClickCapture: onClickCapture
+    };
+  },
+  ganttDisposeDragResize: function (containerId) {
+    var key = containerId + '_ganttDragResize';
+    var config = Radzen[key];
+    if (!config) return;
+
+    config.container.removeEventListener('mousedown', config.onMouseDown);
+    config.container.removeEventListener('mousemove', config.onMouseMoveHover);
+    config.container.removeEventListener('click', config.onClickCapture, true);
+    delete Radzen[key];
   },
   preventDefaultAndStopPropagation: function (e) {
     e.preventDefault();
@@ -629,8 +1068,38 @@ window.Radzen = {
       }
     }
   },
-  scrollCarouselItem: function (el) {
-    el.parentElement.scroll(el.offsetLeft, 0);
+  scrollCarouselItem: function (el, duration) {
+    var container = el.parentElement;
+    var target = el.offsetLeft;
+    if (duration == null || duration < 0) {
+        container.scroll(target, 0);
+        return;
+    }
+    if (duration === 0) {
+        container.style.scrollBehavior = 'auto';
+        container.scroll(target, 0);
+        container.style.scrollBehavior = '';
+        return;
+    }
+    container.style.scrollBehavior = 'auto';
+    container.style.scrollSnapType = 'none';
+    var start = container.scrollLeft;
+    var distance = target - start;
+    var startTime = null;
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var elapsed = timestamp - startTime;
+        var progress = Math.min(elapsed / duration, 1);
+        var ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        container.scrollLeft = start + distance * ease;
+        if (elapsed < duration) {
+            requestAnimationFrame(step);
+        } else {
+            container.style.scrollBehavior = '';
+            container.style.scrollSnapType = '';
+        }
+    }
+    requestAnimationFrame(step);
   },
   scrollIntoViewIfNeeded: function (ref, selector) {
     var el = selector ? ref.getElementsByClassName(selector)[0] : ref;
@@ -736,12 +1205,12 @@ window.Radzen = {
                 }
             }
         }
-        if (key == 'ArrowUp' || key == 'ArrowDown' || key == 'PageUp' || key == 'PageDown') {
+        if (key == 'PageUp' || key == 'PageDown') {
             var rowHeight = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
-            var factor = key == 'PageUp' || key == 'PageDown' ? 10 : 1;
-            table.parentNode.scrollTop = table.parentNode.scrollTop + (factor * (key == 'ArrowDown' || key == 'PageDown' ? rowHeight : -rowHeight));
+            var factor = 10;
+            table.parentNode.scrollTop = table.parentNode.scrollTop + (factor * (key == 'PageDown' ? rowHeight : -rowHeight));
         }
-        else {
+        else if (key == 'Home' || key == 'End') {
             table.parentNode.scrollTop = key == 'Home' ? 0 : table.parentNode.scrollHeight;
         }
     }
@@ -777,6 +1246,19 @@ window.Radzen = {
         table.nextSelectedIndex = rows.length - 1;
     } else if (isVirtual && (key == 'PageUp' || key == 'Home')) {
         table.nextSelectedIndex = 1;
+    }
+
+    if (isVirtual && (key == 'ArrowDown' || key == 'ArrowUp')) {
+        var minIndex = cellIndex != null ? 0 : 1;
+        if (key == 'ArrowDown' && table.nextSelectedIndex >= rows.length - 1) {
+            var rh = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
+            table.parentNode.scrollTop += rh;
+            table.nextSelectedIndex = rows.length - 1;
+        } else if (key == 'ArrowUp' && table.nextSelectedIndex <= minIndex) {
+            var rh = rows[rows.length - 1] ? rows[rows.length - 1].offsetHeight : 40;
+            table.parentNode.scrollTop -= rh;
+            table.nextSelectedIndex = minIndex;
+        }
     }
 
     if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && cellIndex != null && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
@@ -1113,13 +1595,26 @@ window.Radzen = {
         }
     }, 500);
   },
-  openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback) {
+  openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback, clientX, clientY) {
     Radzen.closeTooltip(id);
 
+    if (clientX != null && clientY != null) {
+        position = null;
+        disableSmartPosition = true;
+    }
+    else {
+        disableSmartPosition = false;
+    }
+
+    if (target) {
+        target.setAttribute('aria-describedby', id);
+        Radzen[id + 'target'] = target;
+    }
+
     if (delay) {
-        Radzen[id + 'delay'] = setTimeout(Radzen.openPopup, delay, target, id, false, position, null, null, instance, callback, closeTooltipOnDocumentClick);
+        Radzen[id + 'delay'] = setTimeout(Radzen.openPopup, delay, target, id, false, position, clientX, clientY, instance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
     } else {
-        Radzen.openPopup(target, id, false, position, null, null, instance, callback, closeTooltipOnDocumentClick);
+        Radzen.openPopup(target, id, false, position, clientX, clientY, instance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
     }
 
     if (duration) {
@@ -1128,6 +1623,13 @@ window.Radzen = {
   },
   closeTooltip(id) {
     Radzen.activeElement = null;
+
+    var target = Radzen[id + 'target'];
+    if (target) {
+        target.removeAttribute('aria-describedby');
+        Radzen[id + 'target'] = null;
+    }
+
     Radzen.closePopup(id);
 
     if (Radzen[id + 'delay']) {
@@ -1254,8 +1756,8 @@ window.Radzen = {
     }
 
     popup.style.display = 'block';
+    popup.style.visibility = 'hidden';
     popup.onanimationend = null;
-    popup.classList.add("rz-open");
     popup.classList.remove("rz-close");
     Radzen.setPopupAriaExpanded(parent, id, true);
 
@@ -1265,7 +1767,7 @@ window.Radzen = {
 
     var isRTL = Radzen.isRTL(popup);
 
-    if (isRTL && (position == 'bottom' || position == 'top')) {
+    if (isRTL && (!position || position == 'bottom' || position == 'top')) {
       left = parentRect.right - rect.width;
     }
 
@@ -1348,6 +1850,24 @@ window.Radzen = {
       left = isRTL ? parentRect.right - rect.width : parentRect.left;
     }
 
+    if (disableSmartPosition && x != null && y != null) {
+        left = x + 10;
+        top = y + 10;
+        var tooltipContent = popup.children[0];
+        var tooltipContentClassName = 'rz-bottom-tooltip-content';
+        if (tooltipContent.classList.contains(tooltipContentClassName)) {
+            tooltipContent.classList.remove(tooltipContentClassName);
+        }
+
+        if (left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
+            top = parentRect.top - rect.height;
+        }
+
+        if (left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
+            left = window.innerWidth - rect.width;
+        }
+    }
+
     popup.style.zIndex = 2000;
     popup.style.left = left + scrollLeft + 'px';
     popup.style.top = top + scrollTop + 'px';
@@ -1400,6 +1920,20 @@ window.Radzen = {
     Radzen.popups.push({ id, instance, callback, parent });
 
     document.body.appendChild(popup);
+
+    if (!position) {
+        var popupRect = popup.getBoundingClientRect();
+        if (popupRect.right > window.innerWidth && popupRect.width < window.innerWidth) {
+            popup.style.left = (window.innerWidth - popupRect.width + scrollLeft) + 'px';
+        }
+        if (popupRect.bottom > window.innerHeight && popupRect.height < window.innerHeight) {
+            popup.style.top = (window.innerHeight - popupRect.height + scrollTop) + 'px';
+        }
+    }
+
+    popup.style.visibility = '';
+    popup.classList.add("rz-open");
+
     document.removeEventListener('mousedown', Radzen[id]);
     document.addEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
@@ -2021,6 +2555,10 @@ window.Radzen = {
     this.destroyResizable(ref);
   },
   destroyGauge: function (ref) {
+    if (ref._gaugeRTLObserver) {
+      ref._gaugeRTLObserver.disconnect();
+      delete ref._gaugeRTLObserver;
+    }
     this.destroyResizable(ref);
   },
   destroyResizable: function (ref) {
@@ -2088,25 +2626,13 @@ window.Radzen = {
     return this.createResizable(ref, instance);
   },
   createGauge: function (ref, instance) {
-    return this.createResizable(ref, instance);
-  },
-  destroyScheduler: function (ref) {
-    if (ref && ref.resizeHandler) {
-      window.removeEventListener('resize', ref.resizeHandler);
-      delete ref.resizeHandler;
-    }
-  },
-  createScheduler: function (ref, instance) {
-    ref.resizeHandler = function () {
-      var rect = ref.getBoundingClientRect();
-
-      try { instance.invokeMethodAsync('Resize', rect.width, rect.height); } catch { }
-    };
-
-    window.addEventListener('resize', ref.resizeHandler);
-
-    var rect = ref.getBoundingClientRect();
-    return {width: rect.width, height: rect.height};
+    var result = this.createResizable(ref, instance);
+    ref._gaugeRTLObserver = new MutationObserver(function () {
+      try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+    });
+    ref._gaugeRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
+    try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+    return result;
   },
   innerHTML: function (ref, value) {
     if (value != undefined) {
@@ -2519,12 +3045,48 @@ window.Radzen = {
         Radzen[el] = null;
     }
   },
+  updateFrozenColumnPositions: function(gridElement) {
+      if (!gridElement) return;
+      // Get frozen cell positions from the header row first, then apply to all rows
+      var headerRow = gridElement.querySelector('thead tr');
+      if (!headerRow) return;
+      var leftHeaderCells = headerRow.querySelectorAll('.rz-frozen-cell-left, .rz-frozen-cell-left-end, .rz-frozen-cell-left-inner');
+      var rightHeaderCells = headerRow.querySelectorAll('.rz-frozen-cell-right, .rz-frozen-cell-right-end, .rz-frozen-cell-right-inner');
+      // Calculate offsets from header widths
+      var leftOffsets = [];
+      var offset = 0;
+      for (var i = 0; i < leftHeaderCells.length; i++) {
+          leftOffsets.push(offset);
+          offset += leftHeaderCells[i].getBoundingClientRect().width;
+      }
+      var rightOffsets = [];
+      offset = 0;
+      for (var i = rightHeaderCells.length - 1; i >= 0; i--) {
+          rightOffsets[i] = offset;
+          offset += rightHeaderCells[i].getBoundingClientRect().width;
+      }
+      // Apply offsets to all rows
+      var rows = gridElement.querySelectorAll('tr');
+      for (var r = 0; r < rows.length; r++) {
+          var row = rows[r];
+          var leftCells = row.querySelectorAll('.rz-frozen-cell-left, .rz-frozen-cell-left-end, .rz-frozen-cell-left-inner');
+          for (var i = 0; i < leftCells.length && i < leftOffsets.length; i++) {
+              leftCells[i].style.setProperty('inset-inline-start', leftOffsets[i] + 'px');
+          }
+          var rightCells = row.querySelectorAll('.rz-frozen-cell-right, .rz-frozen-cell-right-end, .rz-frozen-cell-right-inner');
+          for (var i = 0; i < rightCells.length && i < rightOffsets.length; i++) {
+              rightCells[i].style.setProperty('inset-inline-end', rightOffsets[i] + 'px');
+          }
+      }
+  },
   startColumnResize: function(id, grid, columnIndex, clientX) {
       var el = document.getElementById(id + '-resizer');
       var cell = el.parentNode.parentNode;
       var col = document.getElementById(id + '-col');
       var dataCol = document.getElementById(id + '-data-col');
       var footerCol = document.getElementById(id + '-footer-col');
+      var isFrozen = cell.classList.contains('rz-frozen-cell');
+      var gridElement = isFrozen ? cell.closest('.rz-data-grid') : null;
       Radzen[el] = {
           clientX: clientX,
           width: cell.getBoundingClientRect().width,
@@ -2571,10 +3133,15 @@ window.Radzen = {
                   if (footerCol) {
                       footerCol.style.width = width;
                   }
+
+                  if (gridElement) {
+                      Radzen.updateFrozenColumnPositions(gridElement);
+                  }
               }
           },
           touchMoveHandler: function (e) {
               if (e.targetTouches[0]) {
+                  e.preventDefault();
                   Radzen[el].mouseMoveHandler(e.targetTouches[0]);
               }
           }
@@ -2582,8 +3149,8 @@ window.Radzen = {
       el.style.width = "100%";
       document.addEventListener('mousemove', Radzen[el].mouseMoveHandler);
       document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
-      document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true })
-      document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
+      document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: false })
+      document.addEventListener('touchend', Radzen[el].mouseUpHandler);
   },
       startSplitterResize: function(id,
         splitter,
@@ -2830,94 +3397,73 @@ window.Radzen = {
         tooltipContent.classList.remove('rz-bottom-chart-tooltip');
         tooltipContent.classList.add(tooltipContentClassName);
     },
-    navigateTo: function (selector, scroll) {
-      if (selector.startsWith('#')) {
-        history.replaceState(null, '', location.pathname + location.search + selector);
-      }
-
-      if (scroll) {
-        const target = document.querySelector(selector);
-          if (target) {
-            this.selectedNavigationSelector = selector;
-            target.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
-        }
-      }
-    },
-    registerScrollListener: function (element, ref, selectors, selector) {
+    createScrollListener: function (ref, selectors, selector) {
         let currentSelector;
         const container = selector ? document.querySelector(selector) : document.documentElement;
         const elements = selectors.map(document.querySelector, document);
 
-        this.unregisterScrollListener(element);
+        let rafId = null;
 
-        // helper to get current scroll position of container
-        const getScrollPosition = () => container && container.tagName === 'HTML' ? (window.scrollY || document.documentElement.scrollTop) : (container ? container.scrollTop : 0);
-        // store last scroll position on the element so we can determine direction
-        let lastScrollPosition = getScrollPosition();
+        const scrollHandler = () => {
+            if (rafId !== null) {
+                return;
+            }
 
-        let timeoutId = null;
-        const debounce = (callback, wait) => {
-            return () => {
-                window.clearTimeout(timeoutId);
-                timeoutId = window.setTimeout(() => {
-                    callback();
-                }, wait);
-            };
-        }
+            rafId = requestAnimationFrame(() => {
+                rafId = null;
 
-        element.scrollHandler = () => {
-            const containerRect = container && container.tagName === 'HTML'
-                ? { top: 0, bottom: window.innerHeight, height: window.innerHeight, clientHeight: window.innerHeight }
-                : container.getBoundingClientRect();
+                const isHtml = !selector || container.tagName === 'HTML';
+                const threshold = isHtml ? 10 : container.getBoundingClientRect().top + 10;
+                const atBottom = isHtml
+                    ? window.scrollY > 0 && (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 2
+                    : container.scrollTop > 0 && (container.scrollTop + container.clientHeight) >= container.scrollHeight - 2;
 
-            const scrollTop = getScrollPosition();
-            //When loading the page or when no scrolling has been execute -> always look at the top of the container
-            const isDown = lastScrollPosition != 0 && scrollTop > lastScrollPosition;
-            // determine threshold based on scroll direction with a small offset
-            const threshold = isDown ? containerRect.bottom - 5 : containerRect.top + 5;
-            lastScrollPosition = scrollTop;
-            let min = Number.MAX_SAFE_INTEGER;
-            let match;
-            for (let i = 0; i < elements.length; i++) {
-                const elm = elements[i];
-                if (!elm) continue;
+                let match;
 
-                const rect = elm.getBoundingClientRect();
-                const diff = Math.abs(rect.top - threshold);
+                if (atBottom) {
+                    for (let i = selectors.length - 1; i >= 0; i--) {
+                        if (elements[i]) {
+                            match = selectors[i];
+                            break;
+                        }
+                    }
+                } else {
+                    for (let i = elements.length - 1; i >= 0; i--) {
+                        const element = elements[i];
 
-                if (!match && rect.top < threshold) {
-                    match = selectors[i];
-                    min = diff;
-                    continue;
+                        if (!element) {
+                            continue;
+                        }
+
+                        if (element.getBoundingClientRect().top <= threshold) {
+                            match = selectors[i];
+                            break;
+                        }
+                    }
                 }
 
-                if (match && rect.top > threshold) continue;
-
-                if (diff < min) {
-                    match = selectors[i];
-                    min = diff;
-                }                
-            }
-
-            if (match && match !== currentSelector) {
-                currentSelector = match;
-                if (!this.selectedNavigationSelector || (match === this.selectedNavigationSelector)) {
-                    this.navigateTo(currentSelector, false);
-                    try { ref.invokeMethodAsync('ScrollIntoView', currentSelector); } catch { }
+                if (match !== currentSelector) {
+                    currentSelector = match;
+                    try {
+                        ref.invokeMethodAsync('ScrollIntoView', currentSelector);
+                    } catch {
+                    }
                 }
-            }
-            // clear selected navigation selector after scroll completes
-            if (this.selectedNavigationSelector && match === this.selectedNavigationSelector) {
-                debounce(() => { this.selectedNavigationSelector = undefined; }, 100)();
-            }
+            });
         };
 
-        document.addEventListener('scroll', element.scrollHandler, true);
-        window.addEventListener('resize', element.scrollHandler, true);
-    },
-    unregisterScrollListener: function (element) {
-      document.removeEventListener('scroll', element.scrollHandler, true);
-      window.removeEventListener('resize', element.scrollHandler, true);
+        const scrollTarget = selector ? container : window;
+        scrollTarget.addEventListener('scroll', scrollHandler, { passive: true });
+        window.addEventListener('resize', scrollHandler, { passive: true });
+
+        scrollHandler();
+
+        return {
+            dispose() {
+                scrollTarget.removeEventListener('scroll', scrollHandler);
+                window.removeEventListener('resize', scrollHandler);
+            }
+        };
     },
     setTheme: function (href, wcagHref) {
       const theme = document.getElementById('radzen-theme-link');
@@ -2978,4 +3524,12 @@ Radzen.unregisterFabMenu = function(element){
     document.removeEventListener('click', handler);
     delete element.__rzOutsideClickHandler;
   }
+};
+Radzen.chatIsNearBottom = function(container, threshold) {
+  if (!container) return true;
+  return container.scrollHeight - container.scrollTop - container.clientHeight <= (threshold || 50);
+};
+Radzen.chatScrollToBottom = function(container) {
+  if (!container) return;
+  container.scrollTop = container.scrollHeight;
 };

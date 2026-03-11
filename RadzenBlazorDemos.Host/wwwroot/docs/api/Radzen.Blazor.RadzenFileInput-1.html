@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class RadzenFileInput&lt;TValue&gt;
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class RadzenFileInput&lt;TValue&gt;
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.RadzenFileInput`1">
+
+
+  <h1 id="Radzen_Blazor_RadzenFileInput_1" data-uid="Radzen.Blazor.RadzenFileInput`1" class="text-break">Class RadzenFileInput&lt;TValue&gt;
+</h1>
+  <div class="markdown level0 summary"><p>A file input component that reads selected files and binds their content as base64 strings or byte arrays.
+RadzenFileInput provides client-side file reading without server upload, ideal for form fields or immediate file processing.
+Unlike RadzenUpload which sends files to a server, FileInput reads files on the client and binds the content to a property.
+Useful for form integration (including file content in form models without separate upload), client-side processing (processing files in browser for image preview, parsing, etc.),
+embedded storage (storing file content in database as base64 or binary), and avoiding server-side upload endpoints when file content is part of form data.
+Reads the selected file and binds it as TValue = string for base64-encoded data URL (e.g., &quot;data:image/png;base64,iVBORw0K...&quot;) or TValue = byte[] for raw binary file content.
+For image files, automatically shows a preview. Use MaxFileSize to limit file size.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.RadzenComponent.html">RadzenComponent</a></div>
+    <div class="level3"><a class="xref" href="Radzen.FormComponent-1.html">FormComponent</a>&lt;TValue&gt;</div>
+    <div class="level4"><span class="xref">RadzenFileInput&lt;TValue&gt;</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    <div><a class="xref" href="Radzen.IRadzenFormComponent.html">IRadzenFormComponent</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1__value">FormComponent&lt;TValue&gt;._value</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Dispose">FormComponent&lt;TValue&gt;.Dispose()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_GetValue">FormComponent&lt;TValue&gt;.GetValue()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_OnContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">FormComponent&lt;TValue&gt;.OnContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_GetClassList_System_String_">FormComponent&lt;TValue&gt;.GetClassList(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_FocusAsync">FormComponent&lt;TValue&gt;.FocusAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Name">FormComponent&lt;TValue&gt;.Name</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_TabIndex">FormComponent&lt;TValue&gt;.TabIndex</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Placeholder">FormComponent&lt;TValue&gt;.Placeholder</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Disabled">FormComponent&lt;TValue&gt;.Disabled</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_EditContext">FormComponent&lt;TValue&gt;.EditContext</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Form">FormComponent&lt;TValue&gt;.Form</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_ValueChanged">FormComponent&lt;TValue&gt;.ValueChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_HasValue">FormComponent&lt;TValue&gt;.HasValue</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_IsBound">FormComponent&lt;TValue&gt;.IsBound</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Value">FormComponent&lt;TValue&gt;.Value</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_Change">FormComponent&lt;TValue&gt;.Change</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_FieldIdentifier">FormComponent&lt;TValue&gt;.FieldIdentifier</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_ValueExpression">FormComponent&lt;TValue&gt;.ValueExpression</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_FormFieldContext">FormComponent&lt;TValue&gt;.FormFieldContext</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_CurrentPlaceholder">FormComponent&lt;TValue&gt;.CurrentPlaceholder</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseEnter">RadzenComponent.OnMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnMouseLeave">RadzenComponent.OnMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetCssClass">RadzenComponent.GetCssClass()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetId">RadzenComponent.GetId()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Debounce_System_Func_System_Threading_Tasks_Task__System_Int32_">RadzenComponent.Debounce(Func&lt;Task&gt;, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnInitialized">RadzenComponent.OnInitialized()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseContextMenu_Microsoft_AspNetCore_Components_Web_MouseEventArgs_">RadzenComponent.RaiseContextMenu(MouseEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseEnter">RadzenComponent.RaiseMouseEnter()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_AddContextMenu">RadzenComponent.AddContextMenu()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_RaiseMouseLeave">RadzenComponent.RaiseMouseLeave()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Attributes">RadzenComponent.Attributes</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Element">RadzenComponent.Element</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseEnter">RadzenComponent.MouseEnter</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_MouseLeave">RadzenComponent.MouseLeave</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_ContextMenu">RadzenComponent.ContextMenu</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Culture">RadzenComponent.Culture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_DefaultCulture">RadzenComponent.DefaultCulture</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Style">RadzenComponent.Style</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Visible">RadzenComponent.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_UniqueID">RadzenComponent.UniqueID</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_JSRuntime">RadzenComponent.JSRuntime</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_IsJSRuntimeAvailable">RadzenComponent.IsJSRuntimeAvailable</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_Reference">RadzenComponent.Reference</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_CurrentStyle">RadzenComponent.CurrentStyle</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_RadzenFileInput_1_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public class RadzenFileInput&lt;TValue&gt; : FormComponent&lt;TValue&gt;, IComponent, IHandleEvent, IHandleAfterRender, IDisposable, IRadzenFormComponent</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TValue</span></td>
+        <td><p>The type of the bound value. Use string for base64-encoded content or byte[] for binary data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Radzen_Blazor_RadzenFileInput_1_examples"><strong>Examples</strong></h5>
+  <p>File input binding to string (base64):</p>
+<pre><code class="lang-csharp">&lt;RadzenFileInput @bind-Value=@model.PhotoData TValue="string" /&gt;
+@code {
+    class Employee
+    {
+        public string PhotoData { get; set; } // Contains base64 image data
+    }
+    Employee model = new Employee();
+}</code></pre>
+<p>File input binding to byte array:</p>
+<pre><code class="lang-csharp">&lt;RadzenFileInput @bind-Value=@fileContent TValue="byte[]" Accept="image/*" MaxFileSize="2000000" /&gt;
+@code {
+    byte[] fileContent;
+}</code></pre>
+
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1__ctor_" data-uid="Radzen.Blazor.RadzenFileInput`1.#ctor*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1__ctor" data-uid="Radzen.Blazor.RadzenFileInput`1.#ctor">RadzenFileInput()</h4>
+  <div class="markdown level1 summary"><p>A file input component that reads selected files and binds their content as base64 strings or byte arrays.
+RadzenFileInput provides client-side file reading without server upload, ideal for form fields or immediate file processing.
+Unlike RadzenUpload which sends files to a server, FileInput reads files on the client and binds the content to a property.
+Useful for form integration (including file content in form models without separate upload), client-side processing (processing files in browser for image preview, parsing, etc.),
+embedded storage (storing file content in database as base64 or binary), and avoiding server-side upload endpoints when file content is part of form data.
+Reads the selected file and binds it as TValue = string for base64-encoded data URL (e.g., &quot;data:image/png;base64,iVBORw0K...&quot;) or TValue = byte[] for raw binary file content.
+For image files, automatically shows a preview. Use MaxFileSize to limit file size.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenFileInput()</code></pre>
+  </div>
+  <h5 id="Radzen_Blazor_RadzenFileInput_1__ctor_examples">Examples</h5>
+  <p>File input binding to string (base64):</p>
+<pre><code class="lang-csharp">&lt;RadzenFileInput @bind-Value=@model.PhotoData TValue="string" /&gt;
+@code {
+    class Employee
+    {
+        public string PhotoData { get; set; } // Contains base64 image data
+    }
+    Employee model = new Employee();
+}</code></pre>
+<p>File input binding to byte array:</p>
+<pre><code class="lang-csharp">&lt;RadzenFileInput @bind-Value=@fileContent TValue="byte[]" Accept="image/*" MaxFileSize="2000000" /&gt;
+@code {
+    byte[] fileContent;
+}</code></pre>
+
+  <h3 id="fields">Fields
+</h3>
+
+
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_fileUpload" data-uid="Radzen.Blazor.RadzenFileInput`1.fileUpload">fileUpload</h4>
+  <div class="markdown level1 summary"><p>Gets file input reference.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected ElementReference fileUpload</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_Accept_" data-uid="Radzen.Blazor.RadzenFileInput`1.Accept*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_Accept" data-uid="Radzen.Blazor.RadzenFileInput`1.Accept">Accept</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the comma-separated accepted MIME types.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string Accept { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The comma-separated accepted MIME types.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_ChooseText_" data-uid="Radzen.Blazor.RadzenFileInput`1.ChooseText*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_ChooseText" data-uid="Radzen.Blazor.RadzenFileInput`1.ChooseText">ChooseText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the choose button text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ChooseText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The choose button text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_DeleteText_" data-uid="Radzen.Blazor.RadzenFileInput`1.DeleteText*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_DeleteText" data-uid="Radzen.Blazor.RadzenFileInput`1.DeleteText">DeleteText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the delete button text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string DeleteText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The delete button text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_Error_" data-uid="Radzen.Blazor.RadzenFileInput`1.Error*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_Error" data-uid="Radzen.Blazor.RadzenFileInput`1.Error">Error</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the error callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;UploadErrorEventArgs&gt; Error { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.UploadErrorEventArgs.html">UploadErrorEventArgs</a>&gt;</td>
+        <td><p>The error callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_FileName_" data-uid="Radzen.Blazor.RadzenFileInput`1.FileName*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_FileName" data-uid="Radzen.Blazor.RadzenFileInput`1.FileName">FileName</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the image file name.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? FileName { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The image file name.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_FileNameChanged_" data-uid="Radzen.Blazor.RadzenFileInput`1.FileNameChanged*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_FileNameChanged" data-uid="Radzen.Blazor.RadzenFileInput`1.FileNameChanged">FileNameChanged</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the FileName changed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;string&gt; FileNameChanged { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><p>The FileName changed.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_FileSize_" data-uid="Radzen.Blazor.RadzenFileInput`1.FileSize*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_FileSize" data-uid="Radzen.Blazor.RadzenFileInput`1.FileSize">FileSize</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the image file size.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public long? FileSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</td>
+        <td><p>The image file size.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_FileSizeChanged_" data-uid="Radzen.Blazor.RadzenFileInput`1.FileSizeChanged*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_FileSizeChanged" data-uid="Radzen.Blazor.RadzenFileInput`1.FileSizeChanged">FileSizeChanged</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the FileSize changed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;long?&gt; FileSizeChanged { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?&gt;</td>
+        <td><p>The FileSize changed.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_ImageAlternateText_" data-uid="Radzen.Blazor.RadzenFileInput`1.ImageAlternateText*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_ImageAlternateText" data-uid="Radzen.Blazor.RadzenFileInput`1.ImageAlternateText">ImageAlternateText</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the text.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ImageAlternateText { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The text.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_ImageClick_" data-uid="Radzen.Blazor.RadzenFileInput`1.ImageClick*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_ImageClick" data-uid="Radzen.Blazor.RadzenFileInput`1.ImageClick">ImageClick</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the image click callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public EventCallback&lt;MouseEventArgs&gt; ImageClick { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a>&gt;</td>
+        <td><p>The image click callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_ImageStyle_" data-uid="Radzen.Blazor.RadzenFileInput`1.ImageStyle*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_ImageStyle" data-uid="Radzen.Blazor.RadzenFileInput`1.ImageStyle">ImageStyle</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the image style.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string ImageStyle { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The image style.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_InputAttributes_" data-uid="Radzen.Blazor.RadzenFileInput`1.InputAttributes*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_InputAttributes" data-uid="Radzen.Blazor.RadzenFileInput`1.InputAttributes">InputAttributes</h4>
+  <div class="markdown level1 summary"><p>Specifies additional custom attributes that will be rendered by the input.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IReadOnlyDictionary&lt;string, object&gt;? InputAttributes { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>The attributes.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_MaxFileSize_" data-uid="Radzen.Blazor.RadzenFileInput`1.MaxFileSize*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_MaxFileSize" data-uid="Radzen.Blazor.RadzenFileInput`1.MaxFileSize">MaxFileSize</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the maximum size of the file.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int MaxFileSize { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The maximum size of the file.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_MaxHeight_" data-uid="Radzen.Blazor.RadzenFileInput`1.MaxHeight*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_MaxHeight" data-uid="Radzen.Blazor.RadzenFileInput`1.MaxHeight">MaxHeight</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the maximum height of the file, keeping aspect ratio.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int MaxHeight { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The maximum height of the file.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_MaxWidth_" data-uid="Radzen.Blazor.RadzenFileInput`1.MaxWidth*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_MaxWidth" data-uid="Radzen.Blazor.RadzenFileInput`1.MaxWidth">MaxWidth</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the maximum width of the file, keeping aspect ratio.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int MaxWidth { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The maximum width of the file.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_Title_" data-uid="Radzen.Blazor.RadzenFileInput`1.Title*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_Title" data-uid="Radzen.Blazor.RadzenFileInput`1.Title">Title</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the title.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? Title { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The title.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_BuildRenderTree_" data-uid="Radzen.Blazor.RadzenFileInput`1.BuildRenderTree*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_BuildRenderTree_Microsoft_AspNetCore_Components_Rendering_RenderTreeBuilder_" data-uid="Radzen.Blazor.RadzenFileInput`1.BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder)">BuildRenderTree(RenderTreeBuilder)</h4>
+  <div class="markdown level1 summary"><p>Renders the component to the supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void BuildRenderTree(RenderTreeBuilder __builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.rendering.rendertreebuilder">RenderTreeBuilder</a></td>
+        <td><span class="parametername">__builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_GetComponentCssClass_" data-uid="Radzen.Blazor.RadzenFileInput`1.GetComponentCssClass*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_GetComponentCssClass" data-uid="Radzen.Blazor.RadzenFileInput`1.GetComponentCssClass">GetComponentCssClass()</h4>
+  <div class="markdown level1 summary"><p>Gets the component CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override string GetComponentCssClass()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_GetComponentCssClass">RadzenComponent.GetComponentCssClass()</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_OnAfterRenderAsync_" data-uid="Radzen.Blazor.RadzenFileInput`1.OnAfterRenderAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_OnAfterRenderAsync_System_Boolean_" data-uid="Radzen.Blazor.RadzenFileInput`1.OnAfterRenderAsync(System.Boolean)">OnAfterRenderAsync(bool)</h4>
+  <div class="markdown level1 summary"><p>Called by the Blazor runtime.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override Task OnAfterRenderAsync(bool firstRender)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">firstRender</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.RadzenComponent.html#Radzen_RadzenComponent_OnAfterRenderAsync_System_Boolean_">RadzenComponent.OnAfterRenderAsync(bool)</a></div>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_OnChange_" data-uid="Radzen.Blazor.RadzenFileInput`1.OnChange*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_OnChange_System_Collections_Generic_IEnumerable_Radzen_PreviewFileInfo__" data-uid="Radzen.Blazor.RadzenFileInput`1.OnChange(System.Collections.Generic.IEnumerable{Radzen.PreviewFileInfo})">OnChange(IEnumerable&lt;PreviewFileInfo&gt;)</h4>
+  <div class="markdown level1 summary"><p>Called on file change.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[JSInvokable(&quot;RadzenUpload.OnChange&quot;)]
+public Task OnChange(IEnumerable&lt;PreviewFileInfo&gt; files)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.PreviewFileInfo.html">PreviewFileInfo</a>&gt;</td>
+        <td><span class="parametername">files</span></td>
+        <td><p>The file.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_OnImageClick_" data-uid="Radzen.Blazor.RadzenFileInput`1.OnImageClick*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_OnImageClick_Microsoft_AspNetCore_Components_Web_MouseEventArgs_" data-uid="Radzen.Blazor.RadzenFileInput`1.OnImageClick(Microsoft.AspNetCore.Components.Web.MouseEventArgs)">OnImageClick(MouseEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Handles the image click event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task OnImageClick(MouseEventArgs args)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a></td>
+        <td><span class="parametername">args</span></td>
+        <td><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.web.mouseeventargs">MouseEventArgs</a> instance containing the event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_RadzenFileInput_1_SetParametersAsync_" data-uid="Radzen.Blazor.RadzenFileInput`1.SetParametersAsync*"></a>
+  <h4 id="Radzen_Blazor_RadzenFileInput_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.Blazor.RadzenFileInput`1.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Sets the parameters asynchronous.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>Task.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.FormComponent-1.html#Radzen_FormComponent_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">FormComponent&lt;TValue&gt;.SetParametersAsync(ParameterView)</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+  <div>
+      <a class="xref" href="Radzen.IRadzenFormComponent.html">IRadzenFormComponent</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

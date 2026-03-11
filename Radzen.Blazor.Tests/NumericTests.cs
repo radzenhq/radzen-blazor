@@ -620,6 +620,52 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Numeric_Format_WithOptionalDecimals_PreservesValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<float>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<float>.Format), "0.##"),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<float>.Culture), System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            object newValue = null;
+            component.SetParametersAndRender(parameters =>
+                parameters.Add(p => p.Change, args => { newValue = args; }));
+
+            component.Find("input").Change("10.55");
+
+            Assert.NotNull(newValue);
+            Assert.Equal(10.55f, (float)newValue, 2);
+        }
+
+        [Fact]
+        public void Numeric_Format_WithOptionalDecimals_PreservesValue_CommaCulture()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var culture = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+
+            var component = ctx.RenderComponent<RadzenNumeric<float>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<float>.Format), "0.##"),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<float>.Culture), culture)
+            );
+
+            object newValue = null;
+            component.SetParametersAndRender(parameters =>
+                parameters.Add(p => p.Change, args => { newValue = args; }));
+
+            component.Find("input").Change("10,55");
+
+            Assert.NotNull(newValue);
+            Assert.Equal(10.55f, (float)newValue, 2);
+        }
+
+        [Fact]
         public void Numeric_Supports_IFormattable()
         {
             using var ctx = new TestContext();
