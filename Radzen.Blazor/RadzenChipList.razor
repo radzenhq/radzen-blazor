@@ -44,7 +44,6 @@
                                 Selected="@selected"
                                 Disabled="@(Disabled || item.Disabled)"
                                 RemoveChipTitle="@RemoveChipTitle"
-                                Click="@(args => SelectItem(item))"
                                 Close="@GetRemoveCallback(item)">
                         @if (item.Template != null)
                         {
@@ -68,7 +67,6 @@
                                 Selected="@selected"
                                 Disabled="@(Disabled || item.Disabled)"
                                 RemoveChipTitle="@RemoveChipTitle"
-                                Click="@(args => SelectItem(item))"
                                 Close="@GetRemoveCallback(item)" />
                 }
             </div>
