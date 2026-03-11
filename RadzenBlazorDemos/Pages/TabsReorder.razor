@@ -1,0 +1,28 @@
+<RadzenTabs AllowReorder="true" @bind-SelectedIndex=@selectedIndex Reorder=@OnReorder>
+    <Tabs>
+        <RadzenTabsItem Text="Customers" Icon="account_circle">
+            Customers
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Orders" Icon="shopping_cart">
+            Orders
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Order Details" Icon="receipt">
+            Order Details
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Products" Icon="inventory_2">
+            Products
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    int selectedIndex = 0;
+
+    void OnReorder(TabsReorderEventArgs args)
+    {
+        console.Log($"Tab moved from index {args.OldIndex} to index {args.NewIndex}.");
+    }
+}

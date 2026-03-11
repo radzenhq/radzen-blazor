@@ -2,7 +2,10 @@
 @implements IDisposable
 @if ((Tabs?.RenderMode == TabRenderMode.Server ? Visible : true))
 {
-    <li role="presentation" style=@getStyle() class=@Class>
+    <li role="presentation" style=@getStyle() class=@Class
+        draggable="@(Tabs?.AllowReorder == true ? "true" : null)"
+        @ondragstart="OnDragStart" @ondragover="OnDragOver" @ondragover:preventDefault
+        @ondrop="OnDrop" @ondragend="OnDragEnd" @ondragleave="OnDragLeave">
     <button type="button" role="tab" @attributes=@Attributes @onclick=@OnClick
        id="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}-label")"
        aria-selected="@(IsSelected ? "true" : "false")"

@@ -83,6 +83,8 @@ namespace Radzen.Blazor
                                  .Add("rz-tabview-selected", IsSelected)
                                  .Add("rz-state-focused", Tabs?.IsFocused(this) == true)
                                  .AddDisabled(Disabled)
+                                 .Add("rz-tabview-dragging", Tabs?.draggedTab == this)
+                                 .Add("rz-tabview-drag-over", Tabs?.IsDragOver(this) == true)
                                  .Add(Attributes)
                                  .ToString();
 
@@ -199,7 +201,39 @@ namespace Radzen.Blazor
 
         string getStyle()
         {
-            return $"{(!Visible ? $"display:none;" : null)}{(!string.IsNullOrEmpty(Style) ? Style : null)}";
+            var order = Tabs?.AllowReorder == true ? $"order:{Index};" : null;
+            return $"{order}{(!Visible ? $"display:none;" : null)}{(!string.IsNullOrEmpty(Style) ? Style : null)}";
+        }
+
+        void OnDragStart()
+        {
+            Tabs?.OnTabDragStart(this);
+        }
+
+        void OnDragOver()
+        {
+            Tabs?.OnTabDragOver(this);
+        }
+
+        async Task OnDrop()
+        {
+            if (Tabs != null)
+            {
+                await Tabs.OnTabDrop(this);
+            }
+        }
+
+        void OnDragEnd()
+        {
+            Tabs?.OnTabDragEnd();
+        }
+
+        void OnDragLeave()
+        {
+            if (Tabs?.dragOverTab == this)
+            {
+                Tabs.dragOverTab = null;
+            }
         }
     }
 }
