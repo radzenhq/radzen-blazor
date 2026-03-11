@@ -664,6 +664,12 @@
   --rz-column-drag-handle-margin-inline: #{$column-drag-handle-margin-inline};
   --rz-column-draggable-shadow: #{$column-draggable-shadow};
 
+  /* Gantt */
+  --rz-gantt-row-height: #{$gantt-row-height};
+  --rz-gantt-border: #{$gantt-border};
+  --rz-gantt-border-radius: #{$gantt-border-radius};
+  --rz-gantt-background-color: #{$gantt-background-color};
+
   /* Header */
   --rz-header-background-color: #{$header-background-color};
   --rz-header-min-height: #{$header-min-height};

@@ -295,6 +295,10 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       text-transform: var(--rz-scheduler-today-button-text-transform);
     }
 
+    &.rz-zoom-to-fit {
+      margin-inline-start: var(--rz-scheduler-today-button-margin-inline-start);
+    }
+
     &.rz-prev {
       border-start-start-radius: var(--rz-scheduler-prev-button-border-start-start-radius);
       border-start-end-radius: var(--rz-scheduler-prev-button-border-start-end-radius);
