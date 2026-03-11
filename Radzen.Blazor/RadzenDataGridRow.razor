@@ -58,18 +58,23 @@
 
             object? colspan = null;
             cellAttr?.TryGetValue("colspan", out colspan);
-
-            if (colspan != null)
-            {
-                j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
-            }
+            int colspanValue = colspan != null ? (int)Convert.ChangeType(colspan, TypeCode.Int32) : 1;
 
             object? rowspan = null;
             cellAttr?.TryGetValue("rowspan", out rowspan);
 
             if (rowspan != null && Grid != null)
             {
-                Grid.rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
+                int rowspanValue = (int)Convert.ChangeType(rowspan, TypeCode.Int32);
+                for (int c = j; c < j + colspanValue; c++)
+                {
+                    Grid.rowSpans[c] = rowspanValue;
+                }
+            }
+
+            if (colspan != null)
+            {
+                j = j + colspanValue - 1;
             }
 
             @if (Grid != null && cellAttr != null && rowArgs != null)
