@@ -64,7 +64,7 @@
             @{var filterMode = Column.FilterMode ?? Grid.FilterMode;}
             @if (Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Advanced || filterMode == FilterMode.CheckBoxList))
             {
-                <button type="button" @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
+                <button type="button" tabindex="-1" @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
                         class="@getFilterIconCss(Column)" onclick=@getFilterOpen() @onclick:preventDefault="true"
                         aria-haspopup="dialog" aria-controls="@Column.GetColumnPopupID()" aria-expanded="false"
                         aria-label="@Grid.FilterToggleAriaLabel">

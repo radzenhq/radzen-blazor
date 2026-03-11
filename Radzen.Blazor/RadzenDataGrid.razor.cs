@@ -643,7 +643,7 @@ namespace Radzen.Blazor
                 preventKeyDown = true;
                 stopKeydownPropagation = true;
 
-                if (focusedIndex == 0 && AllowFiltering && FilterMode == FilterMode.Advanced && key == "ArrowDown" && args.AltKey)
+                if (focusedIndex == 0 && AllowFiltering && (FilterMode == FilterMode.Advanced || FilterMode == FilterMode.CheckBoxList) && key == "ArrowDown" && args.AltKey)
                 {
                     var column = ColumnsCollection.Where(c => c.GetVisible()).ElementAtOrDefault(focusedCellIndex);
                     if (column != null && column.headerCell != null && column.Filterable)
@@ -652,7 +652,7 @@ namespace Radzen.Blazor
                     }
                     return;
                 }
-                else if (Template != null && (key == "ArrowLeft" || key == "ArrowRight"))
+                else if ((Template != null || LoadChildData.HasDelegate) && (key == "ArrowLeft" || key == "ArrowRight"))
                 {
                     var pagedViewIndex = focusedIndex - 1;
                     if (FilterRowActive)

@@ -135,7 +135,8 @@
 
         if (arrow && !currentAppointments.Any())
         {
-            CurrentDate = CurrentDate.AddDays(leftup ? -1 : 1);
+            var days = leftright ? 1 : 7;
+            CurrentDate = CurrentDate.AddDays(leftup ? -days : days);
             currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1));
 
             if(CurrentDate < StartDate)

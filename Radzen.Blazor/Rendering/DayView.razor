@@ -98,7 +98,7 @@
     IDictionary<string, object> Attributes(DateTime date)
     {
         var attributes = Scheduler?.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot), () => AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot))) ?? new Dictionary<string, object>();
-        attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add(attributes).ToString();
+        attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add("rz-state-focused", date == CurrentDate && !currentAppointments.Any()).Add(attributes).ToString();
         attributes["dropzone"] = "move";
         return attributes;
     }
@@ -120,11 +120,19 @@
         var dayEnd = CurrentDate.Date.Add(EndTime);
         currentAppointments = AppointmentsInSlot(dayStart, dayEnd);
 
-        if (arrow && currentAppointments.Any())
+        if (updown && currentAppointments.Any())
         {
-            if (updown || leftright)
+            currentAppointment = Math.Clamp(currentAppointment + (key == "ArrowUp" ? -1 : 1), 0, currentAppointments.Count() - 1);
+
+            preventKeyPress = true;
+            stopKeydownPropagation = true;
+        }
+        else if (updown && !currentAppointments.Any())
+        {
+            var newDate = CurrentDate.AddMinutes(key == "ArrowUp" ? -MinutesPerSlot : MinutesPerSlot);
+            if (newDate >= CurrentDate.Date.Add(StartTime) && newDate < CurrentDate.Date.Add(EndTime))
             {
-                currentAppointment = Math.Clamp(currentAppointment + (key == "ArrowUp" || key == "ArrowLeft" ? -1 : 1), 0, currentAppointments.Count() - 1);
+                CurrentDate = newDate;
             }
 
             preventKeyPress = true;

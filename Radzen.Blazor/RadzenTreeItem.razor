@@ -10,7 +10,7 @@
          @onclick="@Select" @onkeydown="OnKeyDown">
         @if (ChildContent != null || HasChildren)
         {
-            <span class=@IconClass role="button" tabindex="0" aria-label="@Text" @onclick="@Toggle" @onclick:stopPropagation @onkeydown="OnToggleKeyDown"></span>
+            <span class=@IconClass role="button" tabindex="-1" aria-label="@Text" @onclick="@Toggle" @onclick:stopPropagation @onkeydown="OnToggleKeyDown"></span>
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {

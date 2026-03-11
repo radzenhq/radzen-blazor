@@ -35,7 +35,7 @@
                             {
                                 <div class="rz-group-header-item">
                                     <span class="rz-group-header-item-title">@gd.GetTitle()</span>
-                                    <button type="button" id="@(GetId() + "rg")" aria-label="@RemoveGroupAriaLabel" @onclick=@(args => RemoveGroupAsync(gd)) class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                                    <button type="button" tabindex="-1" id="@(GetId() + "rg")" aria-label="@RemoveGroupAriaLabel" @onclick=@(args => RemoveGroupAsync(gd)) class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
                                         <span class="notranslate rzi rzi-times"></span>
                                     </button>
                                 </div>
@@ -123,7 +123,7 @@
                                         <span class="rz-column-title">
                                             @if(ShowExpandAll && ExpandMode == DataGridExpandMode.Multiple)
                                             {
-                                                <button type="button" title=@TitleAttribute() aria-label="@TitleAttribute()"
+                                                <button type="button" tabindex="-1" title=@TitleAttribute() aria-label="@TitleAttribute()"
                                                         aria-expanded="@(allRowsExpanded.ToString().ToLowerInvariant())"
                                                         class="rz-button rz-button-sm rz-button-icon-only rz-variant-text rz-base rz-shade-default"
                                                         @onclick="_ => this.ToggleAllRowsExpand()" @onclick:stopPropagation="true">
@@ -332,7 +332,7 @@
                                     {
                                         if (filterMode == FilterMode.Simple)
                                         {
-                                            <button type="button" aria-label="@FilterToggleAriaLabel" aria-controls="@($"{PopupID}{column.GetFilterProperty()}")"
+                                            <button type="button" tabindex="-1" aria-label="@FilterToggleAriaLabel" aria-controls="@($"{PopupID}{column.GetFilterProperty()}")"
                                                     aria-haspopup="dialog" aria-expanded="false"
                                                     class="rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-base rz-shade-default @(column.HasActiveFilter() ? "rz-grid-filter-active" : "")"
                                                     onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
@@ -344,12 +344,12 @@
                                             @if (filterValue != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                             {
                                                 <span class="rz-current-filter">@string.Format("{0:" + getFilterDateFormat(column) + "}", filterValue)</span>
-                                                <button type="button" class="notranslate rzi rz-cell-filter-clear" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
+                                                <button type="button" tabindex="-1" class="notranslate rzi rz-cell-filter-clear" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
                                             }
                                             else if ((filterOperator == FilterOperator.IsNull || filterOperator == FilterOperator.IsNotNull) && filters.Any(d => d.Property == column.GetFilterProperty()))
                                             {
                                                 <span class="rz-current-filter">@column.GetFilterOperatorText(filterOperator)</span>
-                                                <button type="button" class="notranslate rzi rz-cell-filter-clear" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
+                                                <button type="button" tabindex="-1" class="notranslate rzi rz-cell-filter-clear" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
                                             }
                                             </span>
                                             <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel rz-grid-date-filter"
@@ -530,7 +530,7 @@
                                             <input autocomplete="off" aria-label=@(column.Title + FilterValueAriaLabel + column.GetFilterValue()) disabled=@(!column.CanSetFilterValue()) id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.Property && $"{d.FilterProperty}" == $"{column.FilterProperty}"))
                                             {
-                                                <button type="button" class="notranslate rzi rz-cell-filter-clear" style="position:absolute;inset-inline-end:10px;" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
+                                                <button type="button" tabindex="-1" class="notranslate rzi rz-cell-filter-clear" style="position:absolute;inset-inline-end:10px;" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
                                             }
                                         }
                                     }
@@ -633,7 +633,7 @@
                     @if (this.LoadChildData.HasDelegate && this.ShowExpandColumn && this.allColumns.IndexOf(column) == 0)
                     {
                         <span class="rz-cell-toggle">
-                            <button type="button" id="@(GetId() + "exp")" aria-label="@ExpandChildItemAriaLabel"
+                            <button type="button" tabindex="-1" id="@(GetId() + "exp")" aria-label="@ExpandChildItemAriaLabel"
                                     class="rz-button rz-button-sm rz-button-icon-only rz-variant-text rz-base rz-shade-default"
                                     style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))"
                                     @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation="true">

@@ -38,7 +38,7 @@
             else
             {
                 <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")"
-                     role="button" tabindex="0" aria-expanded="@expanded.ToString().ToLowerInvariant()"
+                     role="button" tabindex="-1" aria-expanded="@expanded.ToString().ToLowerInvariant()"
                      aria-controls="@(ChildContent != null ? $"{GetId()}-submenu" : null)"
                      aria-haspopup="@(ChildContent != null ? "menu" : null)"
                      @onclick="@Toggle" @onkeydown="OnToggleKeyDown">

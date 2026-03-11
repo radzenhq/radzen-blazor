@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
- <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()" onclick="@($"Radzen.togglePopup(this.parentNode, '{filterId}')")"
+ <button tabindex="-1" title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()" onclick="@($"Radzen.togglePopup(this.parentNode, '{filterId}')")"
          aria-haspopup="menu" aria-controls="@filterId" aria-expanded="false">
      <i class="notranslate rzi">@Grid.FilterIcon</i>
     @if (Column.GetFilterOperator() == FilterOperator.DoesNotContain)
