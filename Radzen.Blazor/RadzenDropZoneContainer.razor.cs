@@ -52,6 +52,20 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<RadzenDropZoneItemEventArgs<TItem>> Drop { get; set; }
 
+        /// <summary>
+        /// The event callback raised when an item drag starts.
+        /// </summary>
+        /// <value>The event callback raised when an item drag starts.</value>
+        [Parameter]
+        public EventCallback<RadzenDropZoneItemEventArgs<TItem>> DragStart { get; set; }
+
+        /// <summary>
+        /// The event callback raised when an item drag ends.
+        /// </summary>
+        /// <value>The event callback raised when an item drag ends.</value>
+        [Parameter]
+        public EventCallback<RadzenDropZoneItemEventArgs<TItem>> DragEnd { get; set; }
+
         internal RadzenDropZoneItemEventArgs<TItem>? Payload { get; set; }
 
         /// <inheritdoc />
