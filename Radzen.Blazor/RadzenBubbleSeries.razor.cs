@@ -101,6 +101,45 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
+        public override (object, Point) DataAt(double x, double y)
+        {
+            var chart = Chart;
+            if (chart == null || !Items.Any())
+            {
+                return (default!, new Point());
+            }
+
+            var category = ComposeCategory(chart.CategoryScale);
+            var value = ComposeValue(chart.ValueScale);
+            var sizeValues = Items.Select(item => Math.Abs(Size(item))).ToList();
+            var minValue = sizeValues.Min();
+            var maxValue = sizeValues.Max();
+
+            // Find the bubble whose center is closest to the mouse
+            var result = Items.Select(item =>
+            {
+                var px = category(item);
+                var py = value(item);
+                var radius = GetBubbleRadius(item, minValue, maxValue);
+                var dx = px - x;
+                var dy = py - y;
+                var distance = Math.Sqrt(dx * dx + dy * dy);
+                return new { Item = item, Distance = distance, Radius = radius, Point = new Point { X = px, Y = py } };
+            }).Aggregate((a, b) => a.Distance < b.Distance ? a : b);
+
+            if (result.Distance <= result.Radius)
+            {
+                // Mouse is inside the bubble - return the mouse position so the
+                // chart's tolerance check is satisfied regardless of bubble size.
+                // The actual tooltip placement uses GetTooltipPosition independently.
+                return (result.Item!, new Point { X = x, Y = y });
+            }
+
+            // Fall back to scatter behavior: return the actual point position
+            return (result.Item!, result.Point);
+        }
+
+        /// <inheritdoc />
         protected override string TooltipValue(TItem item)
         {
             var yValue = base.TooltipValue(item);
