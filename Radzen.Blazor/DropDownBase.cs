@@ -672,6 +672,7 @@ namespace Radzen
         }
 
         internal bool preventKeydown;
+        internal bool preventFilterKeydown;
 
         /// <summary>
         /// Handles the key press.
@@ -784,6 +785,18 @@ namespace Radzen
                         {
                             await OnSelectItem(itemToSelect, true);
                         }
+
+                        if (Multiple && list != null)
+                        {
+                            if (useVirtualization)
+                            {
+                                await JSRuntime.InvokeVoidAsync("Radzen.focusVirtualListItem", list, selectedIndex, effectiveCount);
+                            }
+                            else
+                            {
+                                await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
+                            }
+                        }
                     }
 
                     var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
@@ -831,7 +844,7 @@ namespace Radzen
                     Debounce(DebounceFilter, FilterDelay);
                 }
             }
-            else if (AllowFiltering && isFilter && FilterAsYouType)
+            else if (AllowFiltering && isFilter && FilterAsYouType && !(Multiple && key == "Space" && selectedIndex >= 0))
             {
                 preventKeydown = true;
 
@@ -840,7 +853,7 @@ namespace Radzen
                     selectedIndex = -1;
                 }
             }
-            else if (args.Key.Length == 1 && !args.CtrlKey && !args.AltKey && !args.ShiftKey)
+            else if (args.Key.Length == 1 && !args.CtrlKey && !args.AltKey && !args.ShiftKey && !(Multiple && isFilter && key == "Space" && selectedIndex >= 0))
             {
                 // searching for element
                 if (Query == null)
@@ -924,6 +937,11 @@ namespace Radzen
         /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
         protected virtual async System.Threading.Tasks.Task OnFilterKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
+
+            var key = args.Code != null ? args.Code : args.Key;
+            preventFilterKeydown = Multiple && key == "Space" && selectedIndex >= 0;
+
             await HandleKeyPress(args, true);
         }
 

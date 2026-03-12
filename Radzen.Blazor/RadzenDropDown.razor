@@ -129,7 +129,7 @@
                 {
                     <div class="rz-dropdown-filter-container">
                         <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@(FilterPlaceholder ?? string.Empty)" class="rz-dropdown-filter rz-inputtext" autocomplete="@FilterAutoCompleteType" aria-autocomplete="none" type="text"
-                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@(searchText ?? string.Empty)"
+                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" @onkeydown:preventDefault="@preventFilterKeydown" value="@(searchText ?? string.Empty)"
                                @oninput="@OnFilterInput" />
                         <span class="notranslate rz-dropdown-filter-icon rzi rzi-search"></span>
                     </div>
@@ -169,7 +169,7 @@
                             <input id="@SearchID" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-inputtext" role="textbox" type="text"
                                    onclick="Radzen.preventDefaultAndStopPropagation(event)" aria-label="@SearchAriaLabel"
                                    @ref="@search" @oninput="@OnFilterInput"
-                                   @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@(searchText ?? string.Empty)" autocomplete="@FilterAutoCompleteType" />
+                                   @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" @onkeydown:preventDefault="@preventFilterKeydown" value="@(searchText ?? string.Empty)" autocomplete="@FilterAutoCompleteType" />
                             <span class="notranslate rz-multiselect-filter-icon rzi rzi-search"></span>
                         </div>
                     }
