@@ -1973,6 +1973,9 @@ window.Radzen = {
         if (e.key === 'Escape' || e.key === 'Esc') {
             Radzen.closePopup(id, instance, callback, e);
         }
+        if (e.key === 'Tab' && parent) {
+            e.preventDefault();
+        }
     };
     popup.addEventListener('keydown', popup.__escapeHandler, true);
   },
