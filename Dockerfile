@@ -12,16 +12,19 @@ COPY RadzenBlazorDemos/*.csproj RadzenBlazorDemos/
 COPY RadzenBlazorDemos.Host/*.csproj RadzenBlazorDemos.Host/
 COPY RadzenBlazorDemos.Tools/*.csproj RadzenBlazorDemos.Tools/
 
-# Restore dependencies (Host + Tools for llms.txt generation)
+# Restore dependencies (Host + Tools + API page generator)
 RUN dotnet restore RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj \
- && dotnet restore RadzenBlazorDemos.Tools/RadzenBlazorDemos.Tools.csproj
+ && dotnet restore RadzenBlazorDemos.Tools/RadzenBlazorDemos.Tools.csproj \
+ && dotnet restore Radzen.Blazor.Api.Generator/Radzen.Blazor.Api.Generator.csproj
 
 # Copy full source after restore layer
 COPY . .
 
 # Publish the Blazor host app (API reference pages are generated at build time via MSBuild target)
 WORKDIR /src/RadzenBlazorDemos.Host
-RUN dotnet publish -c Release -o /app/out
+RUN dotnet publish -c Release -o /app/out \
+ && test -f /app/out/Radzen.Blazor.Api.dll \
+ && echo "API reference assembly found in publish output"
 
 
 # =============================
