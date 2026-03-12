@@ -90,7 +90,7 @@ private DotNetObjectReference<RadzenTooltip>? reference;
     /// Closes this instance.
     /// </summary>
     [JSInvokable("RadzenTooltip.CloseTooltip")]
-    public async Task CloseTooltip(string? position = null)
+    public Task CloseTooltip(string? position = null)
     {
         if (position == null)
         {
@@ -102,10 +102,11 @@ private DotNetObjectReference<RadzenTooltip>? reference;
 
             if (tooltip != null)
             {
-                tooltip.Options.Position = (TooltipPosition)Enum.Parse(typeof(TooltipPosition), position, true);
-                await InvokeAsync(() => { StateHasChanged(); });
+                 tooltip.Options.Position = (TooltipPosition)Enum.Parse(typeof(TooltipPosition), position, true);
             }
         }
+
+        return Task.CompletedTask;
     }
 
     public async Task Close()
