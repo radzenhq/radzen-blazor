@@ -206,6 +206,8 @@ namespace Radzen.Blazor
                 await Change.InvokeAsync(selectedIndex);
 
                 await SelectedIndexChanged.InvokeAsync(selectedIndex);
+
+                await Element.FocusAsync(preventScroll: true);
             }
 
             StateHasChanged();
@@ -309,6 +311,8 @@ namespace Radzen.Blazor
                 await Change.InvokeAsync(selectedIndex);
                 await SelectedIndexChanged.InvokeAsync(selectedIndex);
                 shouldRender = true;
+
+                await Element.FocusAsync(preventScroll: true);
             }
         }
 
