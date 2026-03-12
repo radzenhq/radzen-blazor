@@ -20,11 +20,16 @@ RUN dotnet restore RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj \
 # Copy full source after restore layer
 COPY . .
 
-# Publish the Blazor host app (API reference pages are generated at build time via MSBuild target)
+# Pre-generate API reference pages (must exist on disk before publish evaluates globs)
+RUN dotnet build Radzen.Blazor/Radzen.Blazor.csproj -c Release \
+ && dotnet run --project Radzen.Blazor.Api.Generator -- \
+      Radzen.Blazor/bin/Release/net10.0/Radzen.Blazor.dll \
+      Radzen.Blazor/bin/Release/net10.0/Radzen.Blazor.xml \
+      Radzen.Blazor.Api/Generated/Pages
+
+# Publish the Blazor host app (generated pages are now on disk for the SDK to discover)
 WORKDIR /src/RadzenBlazorDemos.Host
-RUN dotnet publish -c Release -o /app/out \
- && test -f /app/out/Radzen.Blazor.Api.dll \
- && echo "API reference assembly found in publish output"
+RUN dotnet publish -c Release -o /app/out
 
 
 # =============================
