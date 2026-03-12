@@ -715,7 +715,7 @@ class Program
 
         sb.AppendLine("# Radzen Blazor Components");
         sb.AppendLine();
-        sb.AppendLine("> The most comprehensive free UI component library for Blazor — 100+ native components with Material 3, Material 2, Fluent, and Bootstrap design systems. MIT licensed. The only Blazor component library with a companion visual IDE (Radzen Blazor Studio) and an MCP server for AI-assisted development.");
+        sb.AppendLine("> The most comprehensive free UI component library for Blazor — 110+ native components with Material 3, Material 2, Fluent, and Bootstrap design systems. MIT licensed. The only Blazor component library with a companion visual IDE (Radzen Blazor Studio) and an MCP server for AI-assisted development.");
         sb.AppendLine();
         sb.AppendLine("Written entirely in C# with no JavaScript framework dependencies. Supports Blazor Server, Blazor WebAssembly, .NET MAUI Blazor Hybrid, and the Blazor Web App model in .NET 10. Built with accessibility in mind (WCAG 2.2, keyboard navigation). Used at Microsoft, NASA, Porsche, Dell, Siemens, and DHL.");
         sb.AppendLine();
