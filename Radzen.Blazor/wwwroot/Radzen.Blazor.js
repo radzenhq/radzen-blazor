@@ -1173,6 +1173,69 @@ window.Radzen = {
 
     return ul.nextSelectedIndex;
   },
+  focusVirtualListItem: function (ul, absoluteIndex, totalCount) {
+    if (!ul) return;
+
+    var childNodes = ul.getElementsByTagName('LI');
+    if (!childNodes || childNodes.length == 0) return;
+
+    var itemHeight = childNodes[0].offsetHeight;
+    if (itemHeight <= 0) return;
+
+    var wrapper = ul.parentElement;
+    if (!wrapper) return;
+
+    // Scroll to make the item at absoluteIndex visible
+    if (absoluteIndex >= 0 && absoluteIndex < totalCount) {
+      var targetTop = absoluteIndex * itemHeight;
+      var targetBottom = targetTop + itemHeight;
+      var viewTop = wrapper.scrollTop;
+      var viewBottom = viewTop + wrapper.clientHeight;
+
+      if (targetBottom > viewBottom) {
+        wrapper.scrollTop = targetBottom - wrapper.clientHeight;
+      } else if (targetTop < viewTop) {
+        wrapper.scrollTop = targetTop;
+      }
+    }
+
+    // Highlight the correct item after scroll
+    function highlightItem() {
+      var lis = ul.getElementsByTagName('LI');
+      if (!lis || lis.length == 0) return;
+
+      var highlighted = ul.querySelectorAll('.rz-state-highlight');
+      for (var i = 0; i < highlighted.length; i++) {
+        highlighted[i].classList.remove('rz-state-highlight');
+      }
+
+      // Determine the start index of rendered items from the top spacer
+      var startIndex = 0;
+      var spacer = ul.firstElementChild;
+      if (spacer && spacer.tagName !== 'LI' && spacer.style && spacer.style.height) {
+        startIndex = Math.round(parseFloat(spacer.style.height) / itemHeight);
+      }
+
+      var relativeIndex = absoluteIndex - startIndex;
+      if (relativeIndex >= 0 && relativeIndex < lis.length) {
+        lis[relativeIndex].classList.add('rz-state-highlight');
+        lis[relativeIndex].scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    // Use MutationObserver to wait for Virtualize to re-render after scroll
+    var observer = new MutationObserver(function () {
+      observer.disconnect();
+      highlightItem();
+    });
+    observer.observe(ul, { childList: true, subtree: true });
+
+    // Also highlight immediately in case no DOM change is needed
+    highlightItem();
+
+    // Disconnect observer after a timeout to avoid memory leaks
+    setTimeout(function () { observer.disconnect(); }, 500);
+  },
   clearFocusedHeaderCell: function (gridId) {
     var grid = document.getElementById(gridId);
     if (!grid) return;
