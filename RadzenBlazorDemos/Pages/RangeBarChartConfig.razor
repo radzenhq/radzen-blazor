@@ -1,0 +1,34 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart>
+                <RadzenRangeBarSeries Data="@projectData" CategoryProperty="Task"
+                    MinProperty="Start" MaxProperty="End" Title="Project Timeline" Fill="rgba(38,166,154,0.7)" Stroke="rgb(38,166,154)" StrokeWidth="1" />
+                <RadzenCategoryAxis />
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Week" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Task { get; set; }
+        public double Start { get; set; }
+        public double End { get; set; }
+    }
+
+    DataItem[] projectData = new DataItem[]
+    {
+        new DataItem { Task = "Research", Start = 1, End = 3 },
+        new DataItem { Task = "Design", Start = 2, End = 5 },
+        new DataItem { Task = "Development", Start = 4, End = 10 },
+        new DataItem { Task = "Testing", Start = 8, End = 12 },
+        new DataItem { Task = "Deployment", Start = 11, End = 13 },
+        new DataItem { Task = "Review", Start = 12, End = 14 },
+    };
+}
