@@ -745,12 +745,12 @@ namespace Radzen
 
                         if (!Multiple && !popupOpened && shouldSelectOnChange != false)
                         {
-                            var itemToSelect = useVirtualization
+                            object? selectedItemToChange = useVirtualization
                                 ? View?.Cast<object>().AsQueryable().Skip(selectedIndex).FirstOrDefault()
                                 : items.ElementAtOrDefault(selectedIndex);
-                            if (itemToSelect != null)
+                            if (selectedItemToChange != null)
                             {
-                                await OnSelectItem(itemToSelect, true);
+                                await OnSelectItem(selectedItemToChange, true);
                             }
                         }
                     }
@@ -775,7 +775,7 @@ namespace Radzen
                 {
                     if (selectedIndex >= 0 && selectedIndex <= effectiveCount - 1)
                     {
-                        var itemToSelect = useVirtualization
+                        object? itemToSelect = useVirtualization
                             ? View?.Cast<object>().AsQueryable().Skip(selectedIndex).FirstOrDefault()
                             : items.ElementAtOrDefault(selectedIndex);
 
@@ -878,17 +878,17 @@ namespace Radzen
                 }
 
                 itemIndex = itemIndex + 1 >= filteredItems.Count ? 0 : itemIndex + 1;
-                var itemToSelect = filteredItems.ElementAtOrDefault(itemIndex);
+                var matchingItem = filteredItems.ElementAtOrDefault(itemIndex);
 
-                if (itemToSelect is not null)
+                if (matchingItem is not null)
                 {
                     if (!Multiple)
                     {
-                        await SelectItem(itemToSelect);
+                        await SelectItem(matchingItem);
                     }
 
                     var searchItems = useVirtualization ? Items : items;
-                    var result = searchItems.Select((x, i) => new { Item = x, Index = i }).FirstOrDefault(itemWithIndex => object.Equals(itemWithIndex.Item, itemToSelect));
+                    var result = searchItems.Select((x, i) => new { Item = x, Index = i }).FirstOrDefault(itemWithIndex => object.Equals(itemWithIndex.Item, matchingItem));
                     if (result != null)
                     {
                         if (!Multiple)
