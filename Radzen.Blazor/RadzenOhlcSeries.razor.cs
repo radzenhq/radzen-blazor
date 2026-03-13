@@ -51,17 +51,17 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the stroke color for bullish bars (Close &gt;= Open).
+        /// When not set, the theme color scheme applies.
         /// </summary>
-        /// <value>A CSS color value. Default is <c>#26A69A</c> (green).</value>
         [Parameter]
-        public string BullStroke { get; set; } = "#26A69A";
+        public string? BullStroke { get; set; }
 
         /// <summary>
         /// Gets or sets the stroke color for bearish bars (Close &lt; Open).
+        /// When not set, the theme color scheme applies.
         /// </summary>
-        /// <value>A CSS color value. Default is <c>#EF5350</c> (red).</value>
         [Parameter]
-        public string BearStroke { get; set; } = "#EF5350";
+        public string? BearStroke { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the OHLC bar lines in pixels.
@@ -89,7 +89,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override string Color => BullStroke;
+        public override string Color => BullStroke ?? string.Empty;
 
         internal Func<TItem, double> Open
         {
@@ -240,7 +240,12 @@ namespace Radzen.Blazor
             var isBull = Close(item) >= Open(item);
             var color = isBull ? BullStroke : BearStroke;
 
-            return $"{style}; border-color: {color};";
+            if (color != null)
+            {
+                return $"{style}; border-color: {color};";
+            }
+
+            return style;
         }
 
         /// <inheritdoc />
