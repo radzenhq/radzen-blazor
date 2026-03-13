@@ -2056,6 +2056,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Candlestick Chart",
+                            Path = "candlestick-chart",
+                            Description = "Radzen Blazor Chart with candlestick series for financial OHLC data.",
+                            Tags = new [] { "chart", "graph", "candlestick", "ohlc", "financial", "stock" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Radzen Blazor Chart with donut series.",
