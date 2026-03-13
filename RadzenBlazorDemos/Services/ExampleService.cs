@@ -2132,6 +2132,22 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Waterfall Chart",
+                            Path = "waterfall-chart",
+                            Description = "Radzen Blazor Chart with waterfall series showing cumulative impact of sequential values.",
+                            Tags = new [] { "chart", "graph", "waterfall", "column", "cumulative", "running total", "summary" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Horizontal Waterfall Chart",
+                            Path = "horizontal-waterfall-chart",
+                            Description = "Radzen Blazor Chart with horizontal waterfall series showing cumulative impact of sequential values.",
+                            Tags = new [] { "chart", "graph", "waterfall", "bar", "horizontal", "cumulative", "running total", "summary" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Bubble Chart",
                             Path = "bubble-chart",
                             Description = "Radzen Blazor Chart with bubble series for visualizing three dimensions of data.",
