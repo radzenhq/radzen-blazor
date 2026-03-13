@@ -1,0 +1,50 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart>
+                <RadzenFullStackedAreaSeries Smooth="true" Data="@desktopShare" CategoryProperty="Month" Title="Desktop" ValueProperty="Share" />
+                <RadzenFullStackedAreaSeries Smooth="true" Data="@mobileShare" CategoryProperty="Month" Title="Mobile" ValueProperty="Share" />
+                <RadzenFullStackedAreaSeries Smooth="true" Data="@tabletShare" CategoryProperty="Month" Title="Tablet" ValueProperty="Share" />
+                <RadzenCategoryAxis Padding="20" />
+                <RadzenValueAxis FormatString="{0}%" Min="0" Max="100" Step="25">
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Month { get; set; }
+        public double Share { get; set; }
+    }
+
+    DataItem[] desktopShare = new DataItem[] {
+        new DataItem { Month = "Jan", Share = 60 },
+        new DataItem { Month = "Feb", Share = 58 },
+        new DataItem { Month = "Mar", Share = 55 },
+        new DataItem { Month = "Apr", Share = 52 },
+        new DataItem { Month = "May", Share = 50 },
+        new DataItem { Month = "Jun", Share = 47 },
+    };
+
+    DataItem[] mobileShare = new DataItem[] {
+        new DataItem { Month = "Jan", Share = 30 },
+        new DataItem { Month = "Feb", Share = 32 },
+        new DataItem { Month = "Mar", Share = 35 },
+        new DataItem { Month = "Apr", Share = 38 },
+        new DataItem { Month = "May", Share = 40 },
+        new DataItem { Month = "Jun", Share = 43 },
+    };
+
+    DataItem[] tabletShare = new DataItem[] {
+        new DataItem { Month = "Jan", Share = 10 },
+        new DataItem { Month = "Feb", Share = 10 },
+        new DataItem { Month = "Mar", Share = 10 },
+        new DataItem { Month = "Apr", Share = 10 },
+        new DataItem { Month = "May", Share = 10 },
+        new DataItem { Month = "Jun", Share = 10 },
+    };
+}

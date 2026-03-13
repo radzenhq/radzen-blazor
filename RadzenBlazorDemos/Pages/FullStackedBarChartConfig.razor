@@ -1,0 +1,44 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart style="height: 400px">
+                <RadzenFullStackedBarSeries Data="@desktopShare" CategoryProperty="Quarter" Title="Desktop" ValueProperty="Share" />
+                <RadzenFullStackedBarSeries Data="@mobileShare" CategoryProperty="Quarter" Title="Mobile" ValueProperty="Share" />
+                <RadzenFullStackedBarSeries Data="@tabletShare" CategoryProperty="Quarter" Title="Tablet" ValueProperty="Share" />
+                <RadzenBarOptions Radius="5" />
+                <RadzenValueAxis FormatString="{0}%" Min="0" Max="100" Step="25">
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Quarter { get; set; }
+        public double Share { get; set; }
+    }
+
+    DataItem[] desktopShare = new DataItem[] {
+        new DataItem { Quarter = "Q1", Share = 58 },
+        new DataItem { Quarter = "Q2", Share = 55 },
+        new DataItem { Quarter = "Q3", Share = 50 },
+        new DataItem { Quarter = "Q4", Share = 47 },
+    };
+
+    DataItem[] mobileShare = new DataItem[] {
+        new DataItem { Quarter = "Q1", Share = 32 },
+        new DataItem { Quarter = "Q2", Share = 35 },
+        new DataItem { Quarter = "Q3", Share = 40 },
+        new DataItem { Quarter = "Q4", Share = 43 },
+    };
+
+    DataItem[] tabletShare = new DataItem[] {
+        new DataItem { Quarter = "Q1", Share = 10 },
+        new DataItem { Quarter = "Q2", Share = 10 },
+        new DataItem { Quarter = "Q3", Share = 10 },
+        new DataItem { Quarter = "Q4", Share = 10 },
+    };
+}
