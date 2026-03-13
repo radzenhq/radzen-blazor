@@ -1,0 +1,61 @@
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+@implements IChartBarSeries
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = Chart;
+        if (chart == null) { return _ => { }; }
+
+        var category = ComposeCategory(valueScale);
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+        var barSeries = VisibleBarSeries;
+        if (barSeries.Count == 0) { return _ => { }; }
+
+        var index = barSeries.IndexOf(this);
+        if (index < 0) { return _ => { }; }
+
+        var barOptions = chart.BarOptions;
+        var padding = barOptions?.Margin ?? 0;
+        var bandHeight = BandHeight;
+        var height = bandHeight / barSeries.Count - padding + padding / barSeries.Count;
+        var className = $"rz-range-bar-series rz-series-{chart.Series.IndexOf(this)}";
+        var radius = barOptions?.Radius ?? 0;
+
+        var min = Min;
+        var max = Max;
+
+        return
+        @<g class="@className">
+            @foreach (var data in Items)
+            {
+                var cy = category(data) - bandHeight / 2 + index * height + index * padding;
+                var minX = categoryScale.Scale(min(data), true);
+                var maxX = categoryScale.Scale(max(data), true);
+
+                var left = Math.Min(minX, maxX);
+                var barWidth = Math.Abs(maxX - minX);
+                if (barWidth < 1) { barWidth = 1; }
+
+                var r = radius;
+                if (r > height / 2 || r > barWidth) { r = 0; }
+
+                var rs = r.ToInvariantString();
+                var path = $"M {left.ToInvariantString()} {cy.ToInvariantString()} L {(left + barWidth - r).ToInvariantString()} {cy.ToInvariantString()} A {rs} {rs} 0 0 1 {(left + barWidth).ToInvariantString()} {(cy + r).ToInvariantString()} L {(left + barWidth).ToInvariantString()} {(cy + height - r).ToInvariantString()} A {rs} {rs} 0 0 1 {(left + barWidth - r).ToInvariantString()} {(cy + height).ToInvariantString()} L {left.ToInvariantString()} {(cy + height).ToInvariantString()} Z";
+
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+            }
+        </g>;
+    }
+}
