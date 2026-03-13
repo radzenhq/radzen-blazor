@@ -1,0 +1,114 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenGridLines
+@implements IChartSeriesOverlay
+@implements IDisposable
+
+@code {
+    public RadzenSeriesMovingAverageLine()
+    {
+        Visible = true;
+    }
+
+    /// <summary>
+    /// Gets or sets the number of data points to include in the moving average window. Set to <c>3</c> by default.
+    /// </summary>
+    [Parameter]
+    public int Period { get; set; } = 3;
+
+    IChartSeries? series;
+    /// <summary>
+    /// Gets or sets the parent series.
+    /// </summary>
+    [CascadingParameter]
+    protected IChartSeries? Series
+    {
+        get
+        {
+            return series;
+        }
+        set
+        {
+            if (value == null)
+            {
+                series = null;
+                return;
+            }
+            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            {
+                throw new ArgumentException($"Series must use Cartesian coordinate system");
+            }
+            series = value;
+            if (!series.Overlays.Contains(this))
+            {
+                series.Overlays.Add(this);
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        if (series == null || Chart == null || Period < 2)
+        {
+            return null!;
+        }
+
+        var points = series.GetScaledDataPoints();
+        if (points.Count < Period)
+        {
+            return null!;
+        }
+
+        var inverted = Chart.ShouldInvertAxes();
+        var avgPoints = new List<Point>();
+
+        for (var i = Period - 1; i < points.Count; i++)
+        {
+            double sumX = 0, sumY = 0;
+            for (var j = i - Period + 1; j <= i; j++)
+            {
+                sumX += points[j].X;
+                sumY += points[j].Y;
+            }
+            avgPoints.Add(new Point { X = sumX / Period, Y = sumY / Period });
+        }
+
+        if (avgPoints.Count < 2)
+        {
+            return null!;
+        }
+
+        var pathData = $"M{avgPoints[0].X.ToInvariantString()} {avgPoints[0].Y.ToInvariantString()}";
+        for (var i = 1; i < avgPoints.Count; i++)
+        {
+            pathData += $" L{avgPoints[i].X.ToInvariantString()} {avgPoints[i].Y.ToInvariantString()}";
+        }
+
+        return
+        @<g>
+            <Path @key="@($"ma-{Chart.Series.IndexOf(series)}")" D="@pathData" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Fill="none" />
+        </g>
+        ;
+    }
+
+    /// <inheritdoc />
+    public bool Contains(double mouseX, double mouseY, int tolerance)
+    {
+        return false;
+    }
+
+    /// <inheritdoc />
+    public RenderFragment RenderTooltip(double mouseX, double mouseY)
+    {
+        return null!;
+    }
+
+    /// <inheritdoc />
+    public Point GetTooltipPosition(double mouseX, double mouseY)
+    {
+        return new Point { X = mouseX, Y = mouseY };
+    }
+
+    /// <inheritdoc />
+    public void Dispose() => series?.Overlays.Remove(this);
+}
