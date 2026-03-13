@@ -2064,6 +2064,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "OHLC Chart",
+                            Path = "ohlc-chart",
+                            Description = "Radzen Blazor Chart with OHLC bar series for financial data.",
+                            Tags = new [] { "chart", "graph", "ohlc", "financial", "stock", "open", "high", "low", "close" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Radzen Blazor Chart with donut series.",
@@ -2089,6 +2097,14 @@ namespace RadzenBlazorDemos
                             Path = "scatter-chart",
                             Description = "Radzen Blazor Chart with scatter series for plotting numeric X/Y data points.",
                             Tags = new [] { "chart", "graph", "scatter", "point", "xy" }
+                        },
+                        new Example
+                        {
+                            Name = "Scatter Line Chart",
+                            Path = "scatter-line-chart",
+                            Description = "Radzen Blazor Chart with line series and markers for scatter line visualization.",
+                            Tags = new [] { "chart", "graph", "scatter", "line", "marker", "point" },
+                            New = true
                         },
                         new Example
                         {
