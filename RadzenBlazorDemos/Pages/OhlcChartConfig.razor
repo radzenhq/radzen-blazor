@@ -1,0 +1,58 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart>
+                <RadzenOhlcSeries Data="@stockData" CategoryProperty="Date"
+                    OpenProperty="Open" HighProperty="High" LowProperty="Low" CloseProperty="Close"
+                    Title="ACME Corp" />
+                <RadzenCategoryAxis FormatString="{0:MM/dd}" />
+                <RadzenValueAxis Formatter="@FormatAsUSD">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Price (USD)" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class StockDataItem
+    {
+        public DateTime Date { get; set; }
+        public double Open { get; set; }
+        public double High { get; set; }
+        public double Low { get; set; }
+        public double Close { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    StockDataItem[] stockData = new StockDataItem[]
+    {
+        new StockDataItem { Date = new DateTime(2024, 1, 2), Open = 170.0, High = 175.5, Low = 169.0, Close = 174.2 },
+        new StockDataItem { Date = new DateTime(2024, 1, 3), Open = 174.2, High = 176.8, Low = 172.1, Close = 173.5 },
+        new StockDataItem { Date = new DateTime(2024, 1, 4), Open = 173.5, High = 174.0, Low = 168.3, Close = 169.1 },
+        new StockDataItem { Date = new DateTime(2024, 1, 5), Open = 169.1, High = 171.2, Low = 166.5, Close = 167.8 },
+        new StockDataItem { Date = new DateTime(2024, 1, 8), Open = 168.0, High = 172.5, Low = 167.2, Close = 171.9 },
+        new StockDataItem { Date = new DateTime(2024, 1, 9), Open = 171.9, High = 175.3, Low = 171.0, Close = 174.8 },
+        new StockDataItem { Date = new DateTime(2024, 1, 10), Open = 174.8, High = 178.2, Low = 174.0, Close = 177.5 },
+        new StockDataItem { Date = new DateTime(2024, 1, 11), Open = 177.5, High = 179.0, Low = 175.3, Close = 176.1 },
+        new StockDataItem { Date = new DateTime(2024, 1, 12), Open = 176.1, High = 178.4, Low = 174.8, Close = 178.0 },
+        new StockDataItem { Date = new DateTime(2024, 1, 16), Open = 178.0, High = 180.5, Low = 176.2, Close = 179.3 },
+        new StockDataItem { Date = new DateTime(2024, 1, 17), Open = 179.3, High = 179.8, Low = 175.0, Close = 175.6 },
+        new StockDataItem { Date = new DateTime(2024, 1, 18), Open = 175.6, High = 177.4, Low = 173.9, Close = 176.8 },
+        new StockDataItem { Date = new DateTime(2024, 1, 19), Open = 176.8, High = 180.0, Low = 176.0, Close = 179.5 },
+        new StockDataItem { Date = new DateTime(2024, 1, 22), Open = 179.5, High = 183.2, Low = 179.0, Close = 182.7 },
+        new StockDataItem { Date = new DateTime(2024, 1, 23), Open = 182.7, High = 184.0, Low = 180.5, Close = 181.3 },
+        new StockDataItem { Date = new DateTime(2024, 1, 24), Open = 181.3, High = 182.8, Low = 178.6, Close = 179.0 },
+        new StockDataItem { Date = new DateTime(2024, 1, 25), Open = 179.0, High = 181.5, Low = 177.3, Close = 180.9 },
+        new StockDataItem { Date = new DateTime(2024, 1, 26), Open = 180.9, High = 185.0, Low = 180.2, Close = 184.3 },
+        new StockDataItem { Date = new DateTime(2024, 1, 29), Open = 184.3, High = 186.5, Low = 183.0, Close = 185.8 },
+        new StockDataItem { Date = new DateTime(2024, 1, 30), Open = 185.8, High = 186.2, Low = 182.4, Close = 183.1 },
+    };
+}
