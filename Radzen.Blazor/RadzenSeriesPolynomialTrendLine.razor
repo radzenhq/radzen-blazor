@@ -1,0 +1,234 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenGridLines
+@implements IChartSeriesOverlay
+@implements IDisposable
+
+@code {
+    public RadzenSeriesPolynomialTrendLine()
+    {
+        Visible = true;
+    }
+
+    /// <summary>
+    /// Gets or sets the polynomial degree. Set to <c>2</c> by default (quadratic).
+    /// </summary>
+    [Parameter]
+    public int Order { get; set; } = 2;
+
+    IChartSeries? series;
+    /// <summary>
+    /// Gets or sets the parent series.
+    /// </summary>
+    [CascadingParameter]
+    protected IChartSeries? Series
+    {
+        get
+        {
+            return series;
+        }
+        set
+        {
+            if (value == null)
+            {
+                series = null;
+                return;
+            }
+            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            {
+                throw new ArgumentException($"Series must use Cartesian coordinate system");
+            }
+            series = value;
+            if (!series.Overlays.Contains(this))
+            {
+                series.Overlays.Add(this);
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        if (series == null || Chart == null || Order < 1)
+        {
+            return null!;
+        }
+
+        var points = series.GetScaledDataPoints();
+        if (points.Count <= Order)
+        {
+            return null!;
+        }
+
+        var inverted = Chart.ShouldInvertAxes();
+        var xs = new double[points.Count];
+        var ys = new double[points.Count];
+
+        for (var i = 0; i < points.Count; i++)
+        {
+            if (inverted)
+            {
+                xs[i] = points[i].Y;
+                ys[i] = points[i].X;
+            }
+            else
+            {
+                xs[i] = points[i].X;
+                ys[i] = points[i].Y;
+            }
+        }
+
+        var coefficients = PolynomialFit(xs, ys, Order);
+        if (coefficients == null)
+        {
+            return null!;
+        }
+
+        var minX = xs[0];
+        var maxX = xs[0];
+        for (var i = 1; i < xs.Length; i++)
+        {
+            if (xs[i] < minX) minX = xs[i];
+            if (xs[i] > maxX) maxX = xs[i];
+        }
+
+        var steps = 50;
+        var step = (maxX - minX) / steps;
+        var curvePoints = new List<Point>();
+
+        for (var i = 0; i <= steps; i++)
+        {
+            var xVal = minX + i * step;
+            var yVal = EvaluatePolynomial(coefficients, xVal);
+
+            if (inverted)
+            {
+                curvePoints.Add(new Point { X = yVal, Y = xVal });
+            }
+            else
+            {
+                curvePoints.Add(new Point { X = xVal, Y = yVal });
+            }
+        }
+
+        var pathData = $"M{curvePoints[0].X.ToInvariantString()} {curvePoints[0].Y.ToInvariantString()}";
+        for (var i = 1; i < curvePoints.Count; i++)
+        {
+            pathData += $" L{curvePoints[i].X.ToInvariantString()} {curvePoints[i].Y.ToInvariantString()}";
+        }
+
+        return
+        @<g>
+            <Path @key="@($"poly-{Chart.Series.IndexOf(series)}")" D="@pathData" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Fill="none" />
+        </g>
+        ;
+    }
+
+    static double EvaluatePolynomial(double[] coefficients, double x)
+    {
+        double result = 0;
+        for (var i = 0; i < coefficients.Length; i++)
+        {
+            result += coefficients[i] * Math.Pow(x, i);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Fits a polynomial of the given order to the data using the normal equations (least squares).
+    /// </summary>
+    static double[]? PolynomialFit(double[] xs, double[] ys, int order)
+    {
+        var n = xs.Length;
+        var size = order + 1;
+
+        // Build the normal equations: (X^T * X) * c = X^T * y
+        var matrix = new double[size, size + 1];
+
+        for (var i = 0; i < size; i++)
+        {
+            for (var j = 0; j < size; j++)
+            {
+                double sum = 0;
+                for (var k = 0; k < n; k++)
+                {
+                    sum += Math.Pow(xs[k], i + j);
+                }
+                matrix[i, j] = sum;
+            }
+
+            double rhs = 0;
+            for (var k = 0; k < n; k++)
+            {
+                rhs += ys[k] * Math.Pow(xs[k], i);
+            }
+            matrix[i, size] = rhs;
+        }
+
+        // Gaussian elimination with partial pivoting
+        for (var col = 0; col < size; col++)
+        {
+            var maxRow = col;
+            for (var row = col + 1; row < size; row++)
+            {
+                if (Math.Abs(matrix[row, col]) > Math.Abs(matrix[maxRow, col]))
+                {
+                    maxRow = row;
+                }
+            }
+
+            for (var j = col; j <= size; j++)
+            {
+                (matrix[col, j], matrix[maxRow, j]) = (matrix[maxRow, j], matrix[col, j]);
+            }
+
+            if (Math.Abs(matrix[col, col]) < 1e-12)
+            {
+                return null;
+            }
+
+            for (var row = col + 1; row < size; row++)
+            {
+                var factor = matrix[row, col] / matrix[col, col];
+                for (var j = col; j <= size; j++)
+                {
+                    matrix[row, j] -= factor * matrix[col, j];
+                }
+            }
+        }
+
+        // Back substitution
+        var result = new double[size];
+        for (var i = size - 1; i >= 0; i--)
+        {
+            result[i] = matrix[i, size];
+            for (var j = i + 1; j < size; j++)
+            {
+                result[i] -= matrix[i, j] * result[j];
+            }
+            result[i] /= matrix[i, i];
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public bool Contains(double mouseX, double mouseY, int tolerance)
+    {
+        return false;
+    }
+
+    /// <inheritdoc />
+    public RenderFragment RenderTooltip(double mouseX, double mouseY)
+    {
+        return null!;
+    }
+
+    /// <inheritdoc />
+    public Point GetTooltipPosition(double mouseX, double mouseY)
+    {
+        return new Point { X = mouseX, Y = mouseY };
+    }
+
+    /// <inheritdoc />
+    public void Dispose() => series?.Overlays.Remove(this);
+}

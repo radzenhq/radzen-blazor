@@ -767,6 +767,41 @@ namespace Radzen.Blazor
             return (a, b);
         }
 
+        /// <inheritdoc />
+        public IList<Point> GetScaledDataPoints()
+        {
+            var result = new List<Point>();
+            var chart = Chart;
+            if (chart == null || Items == null || !Items.Any())
+            {
+                return result;
+            }
+
+            if (chart.ShouldInvertAxes())
+            {
+                var categoryAccessor = Category(chart.ValueScale);
+                var valueScale = chart.ValueScale;
+                foreach (var item in Items)
+                {
+                    var px = chart.CategoryScale.Scale(Value(item));
+                    var py = valueScale.Scale(categoryAccessor(item));
+                    result.Add(new Point { X = px, Y = py });
+                }
+            }
+            else
+            {
+                var categoryAccessor = Category(chart.CategoryScale);
+                foreach (var item in Items)
+                {
+                    var px = chart.CategoryScale.Scale(categoryAccessor(item));
+                    var py = chart.ValueScale.Scale(Value(item));
+                    result.Add(new Point { X = px, Y = py });
+                }
+            }
+
+            return result;
+        }
+
         private async Task OnLegendItemClick()
         {
             IsVisible = !IsVisible;
