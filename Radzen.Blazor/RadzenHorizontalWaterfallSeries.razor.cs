@@ -24,21 +24,24 @@ namespace Radzen.Blazor
     {
         /// <summary>
         /// Gets or sets the fill color for positive value bars.
+        /// When not set, the theme color scheme applies.
         /// </summary>
         [Parameter]
-        public string PositiveFill { get; set; } = "#26A69A";
+        public string? PositiveFill { get; set; }
 
         /// <summary>
         /// Gets or sets the fill color for negative value bars.
+        /// When not set, the theme color scheme applies.
         /// </summary>
         [Parameter]
-        public string NegativeFill { get; set; } = "#EF5350";
+        public string? NegativeFill { get; set; }
 
         /// <summary>
         /// Gets or sets the fill color for summary (total) bars.
+        /// When not set, the theme color scheme applies.
         /// </summary>
         [Parameter]
-        public string SummaryFill { get; set; } = "#42A5F5";
+        public string? SummaryFill { get; set; }
 
         /// <summary>
         /// Gets or sets the stroke (border) color for all bars.
@@ -65,7 +68,7 @@ namespace Radzen.Blazor
         public string? SummaryProperty { get; set; }
 
         /// <inheritdoc />
-        public override string Color => PositiveFill;
+        public override string Color => PositiveFill ?? string.Empty;
 
         int IChartBarSeries.Count => Items?.Count ?? 0;
 
@@ -203,7 +206,12 @@ namespace Radzen.Blazor
             var wf = wfItems[index];
             var color = wf.IsSummary ? SummaryFill : (wf.End >= wf.Start ? PositiveFill : NegativeFill);
 
-            return $"{style}; border-color: {color};";
+            if (color != null)
+            {
+                return $"{style}; border-color: {color};";
+            }
+
+            return style;
         }
 
         /// <inheritdoc />

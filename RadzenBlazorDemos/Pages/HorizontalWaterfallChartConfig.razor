@@ -3,7 +3,8 @@
         <RadzenColumn Size="12">
             <RadzenChart>
                 <RadzenHorizontalWaterfallSeries Data="@cashFlow" CategoryProperty="Label" ValueProperty="Amount"
-                    SummaryProperty="IsTotal" Title="Cash Flow" />
+                    SummaryProperty="IsTotal" Title="Cash Flow"
+                    PositiveFill="#26A69A" NegativeFill="#EF5350" SummaryFill="#42A5F5" />
                 <RadzenBarOptions Radius="3" />
                 <RadzenCategoryAxis>
                     <RadzenGridLines Visible="true" />
