@@ -127,6 +127,10 @@ namespace Radzen.Blazor
         /// </summary>
         (double a, double b) GetTrend();
         /// <summary>
+        /// Returns the series data as scaled (pixel) points ordered by category position.
+        /// </summary>
+        IList<Point> GetScaledDataPoints();
+        /// <summary>
         /// Series coordinate system
         /// </summary>
         CoordinateSystem CoordinateSystem { get; }
