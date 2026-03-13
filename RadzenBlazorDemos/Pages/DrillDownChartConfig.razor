@@ -1,0 +1,100 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            @if (currentLevel != null)
+            {
+                <RadzenButton Text="Back" Icon="arrow_back" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+                    Click="@GoBack" class="rz-mb-4" />
+            }
+            <RadzenChart SeriesClick="@OnSeriesClick">
+                <RadzenColumnSeries Data="@currentData" CategoryProperty="Label" ValueProperty="Value"
+                    Title="@currentTitle" Fill="@currentFill" />
+                <RadzenColumnOptions Radius="3" />
+                <RadzenCategoryAxis />
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="@currentAxisTitle" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Label { get; set; }
+        public double Value { get; set; }
+    }
+
+    string currentLevel;
+    string currentTitle = "Revenue by Region";
+    string currentAxisTitle = "Revenue ($M)";
+    string currentFill = "rgba(97,142,247,0.8)";
+
+    DataItem[] currentData;
+
+    DataItem[] regionData = new DataItem[]
+    {
+        new DataItem { Label = "North America", Value = 420 },
+        new DataItem { Label = "Europe", Value = 310 },
+        new DataItem { Label = "Asia Pacific", Value = 270 },
+        new DataItem { Label = "Latin America", Value = 130 },
+    };
+
+    Dictionary<string, DataItem[]> countryData = new()
+    {
+        ["North America"] = new DataItem[]
+        {
+            new DataItem { Label = "United States", Value = 280 },
+            new DataItem { Label = "Canada", Value = 85 },
+            new DataItem { Label = "Mexico", Value = 55 },
+        },
+        ["Europe"] = new DataItem[]
+        {
+            new DataItem { Label = "Germany", Value = 95 },
+            new DataItem { Label = "United Kingdom", Value = 80 },
+            new DataItem { Label = "France", Value = 72 },
+            new DataItem { Label = "Italy", Value = 63 },
+        },
+        ["Asia Pacific"] = new DataItem[]
+        {
+            new DataItem { Label = "China", Value = 110 },
+            new DataItem { Label = "Japan", Value = 75 },
+            new DataItem { Label = "Australia", Value = 50 },
+            new DataItem { Label = "India", Value = 35 },
+        },
+        ["Latin America"] = new DataItem[]
+        {
+            new DataItem { Label = "Brazil", Value = 65 },
+            new DataItem { Label = "Argentina", Value = 35 },
+            new DataItem { Label = "Colombia", Value = 30 },
+        },
+    };
+
+    protected override void OnInitialized()
+    {
+        currentData = regionData;
+    }
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        if (currentLevel == null && args.Data is DataItem item && countryData.ContainsKey(item.Label))
+        {
+            currentLevel = item.Label;
+            currentData = countryData[item.Label];
+            currentTitle = $"Revenue in {item.Label}";
+            currentAxisTitle = "Revenue ($M)";
+            currentFill = "rgba(38,166,154,0.8)";
+        }
+    }
+
+    void GoBack()
+    {
+        currentLevel = null;
+        currentData = regionData;
+        currentTitle = "Revenue by Region";
+        currentAxisTitle = "Revenue ($M)";
+        currentFill = "rgba(97,142,247,0.8)";
+    }
+}
