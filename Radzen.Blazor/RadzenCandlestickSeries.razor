@@ -1,0 +1,65 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var category = ComposeCategory(categoryScale);
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+        var className = $"rz-candlestick-series rz-series-{chart.Series.IndexOf(this)}";
+
+        var candleWidth = CandleWidth;
+        var halfWidth = candleWidth / 2;
+
+        var open = Open;
+        var high = High;
+        var low = Low;
+        var close = Close;
+
+        return
+        @<g class="@className">
+            @foreach (var data in Items)
+            {
+                var cx = category(data);
+
+                var openValue = open(data);
+                var highValue = high(data);
+                var lowValue = low(data);
+                var closeValue = close(data);
+
+                var openY = valueScale.Scale(openValue, true);
+                var highY = valueScale.Scale(highValue, true);
+                var lowY = valueScale.Scale(lowValue, true);
+                var closeY = valueScale.Scale(closeValue, true);
+
+                var isBull = closeValue >= openValue;
+                var fill = isBull ? BullFill : BearFill;
+                var stroke = isBull ? (BullStroke ?? BullFill) : (BearStroke ?? BearFill);
+
+                var bodyTop = Math.Min(openY, closeY);
+                var bodyHeight = Math.Abs(closeY - openY);
+                if (bodyHeight < 1)
+                {
+                    bodyHeight = 1;
+                }
+
+                var x1 = cx - halfWidth;
+
+                // Wick (high-low line)
+                var wickPath = $"M {cx.ToInvariantString()} {highY.ToInvariantString()} L {cx.ToInvariantString()} {lowY.ToInvariantString()}";
+
+                // Body (open-close rectangle)
+                var bodyPath = $"M {x1.ToInvariantString()} {bodyTop.ToInvariantString()} L {(x1 + candleWidth).ToInvariantString()} {bodyTop.ToInvariantString()} L {(x1 + candleWidth).ToInvariantString()} {(bodyTop + bodyHeight).ToInvariantString()} L {x1.ToInvariantString()} {(bodyTop + bodyHeight).ToInvariantString()} Z";
+
+                <Path @key="@($"wick-{Items.IndexOf(data)}")" D="@wickPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="none" Style="@style" />
+                <Path @key="@($"body-{Items.IndexOf(data)}")" D="@bodyPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" Style="@style" />
+            }
+        </g>;
+    }
+}
