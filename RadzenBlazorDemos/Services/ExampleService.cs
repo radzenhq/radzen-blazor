@@ -2042,6 +2042,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Range Area Chart",
+                            Path = "range-area-chart",
+                            Description = "Radzen Blazor Chart with range area series for displaying value bands.",
+                            Tags = new [] { "chart", "graph", "area", "range", "band", "min", "max" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Bar Chart",
                             Path = "bar-chart",
                             Description = "Radzen Blazor Chart with bar series.",
@@ -2049,10 +2057,26 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Range Bar Chart",
+                            Path = "range-bar-chart",
+                            Description = "Radzen Blazor Chart with range bar series for displaying horizontal value ranges.",
+                            Tags = new [] { "chart", "graph", "bar", "range", "gantt", "timeline", "min", "max" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Column Chart",
                             Path = "column-chart",
                             Description = "Radzen Blazor Chart with column series.",
                             Tags = new [] { "chart", "graph", "column", "bar" }
+                        },
+                        new Example
+                        {
+                            Name = "Range Column Chart",
+                            Path = "range-column-chart",
+                            Description = "Radzen Blazor Chart with range column series for displaying vertical value ranges.",
+                            Tags = new [] { "chart", "graph", "column", "range", "min", "max" },
+                            New = true
                         },
                         new Example
                         {
