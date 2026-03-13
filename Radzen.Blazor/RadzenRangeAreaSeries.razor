@@ -1,0 +1,55 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var category = ComposeCategory(categoryScale);
+        var pathGenerator = GetPathGenerator();
+
+        var min = Min;
+        var max = Max;
+
+        var upperData = Items.Select(item =>
+        {
+            var x = category(item);
+            var y = valueScale.Scale(max(item), true);
+            return new Point<TItem> { X = x, Y = y, Data = item };
+        });
+
+        var lowerData = Items.Select(item =>
+        {
+            var x = category(item);
+            var y = valueScale.Scale(min(item), true);
+            return new Point<TItem> { X = x, Y = y, Data = item };
+        });
+
+        var index = chart.Series.IndexOf(this);
+        var className = $"rz-range-area-series rz-series-{index}";
+
+        return
+        @<g class="@className">
+            @if (Items.Any())
+            {
+                var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+                var upperPath = pathGenerator.Path(upperData);
+                var lowerPath = pathGenerator.Path(lowerData.Reverse());
+
+                var area = $"M {upperPath} L {lowerPath} Z";
+                var upperLine = $"M {upperPath}";
+                var lowerLine = $"M {pathGenerator.Path(lowerData)}";
+
+                <path @key="@area" style="@style" d="@area" fill="@Fill" stroke="none"></path>
+                <Path @key="@upperLine" D="@upperLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+                <Path @key="@lowerLine" D="@lowerLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+            }
+        </g>;
+    }
+}
