@@ -1,0 +1,37 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart>
+                <RadzenHorizontalWaterfallSeries Data="@cashFlow" CategoryProperty="Label" ValueProperty="Amount"
+                    SummaryProperty="IsTotal" Title="Cash Flow" />
+                <RadzenBarOptions Radius="3" />
+                <RadzenCategoryAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Amount ($)" />
+                </RadzenCategoryAxis>
+                <RadzenValueAxis />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Label { get; set; }
+        public double Amount { get; set; }
+        public bool IsTotal { get; set; }
+    }
+
+    DataItem[] cashFlow = new DataItem[]
+    {
+        new DataItem { Label = "Revenue", Amount = 420 },
+        new DataItem { Label = "Services", Amount = 210 },
+        new DataItem { Label = "COGS", Amount = -170 },
+        new DataItem { Label = "Gross Profit", Amount = 0, IsTotal = true },
+        new DataItem { Label = "Salaries", Amount = -200 },
+        new DataItem { Label = "Marketing", Amount = -80 },
+        new DataItem { Label = "R&D", Amount = -50 },
+        new DataItem { Label = "Net Income", Amount = 0, IsTotal = true },
+    };
+}

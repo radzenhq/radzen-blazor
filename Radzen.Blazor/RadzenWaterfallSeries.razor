@@ -1,0 +1,54 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+@implements IChartColumnSeries
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var category = ComposeCategory(categoryScale);
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+        var columnSeries = VisibleColumnSeries;
+        var seriesIndex = columnSeries.IndexOf(this);
+        var padding = chart.ColumnOptions.Margin;
+        var bandWidth = BandWidth;
+        var width = bandWidth / columnSeries.Count - padding + padding / columnSeries.Count;
+        var className = $"rz-waterfall-series rz-series-{chart.Series.IndexOf(this)}";
+        var radius = chart.ColumnOptions.Radius;
+
+        var wfItems = ComputeWaterfallItems();
+
+        return
+        @<g class="@className">
+            @for (var i = 0; i < Items.Count; i++)
+            {
+                var data = Items[i];
+                var wf = wfItems[i];
+
+                var x = category(data) - bandWidth / 2 + seriesIndex * width + seriesIndex * padding;
+                var y1 = valueScale.Scale(wf.Start, true);
+                var y2 = valueScale.Scale(wf.End, true);
+
+                var top = Math.Min(y1, y2);
+                var bottom = Math.Max(y1, y2);
+                var height = bottom - top;
+                if (height < 1) { height = 1; }
+
+                var r = radius;
+                if (r > width / 2 || r > height) { r = 0; }
+
+                var fill = wf.IsSummary ? SummaryFill : (wf.End >= wf.Start ? PositiveFill : NegativeFill);
+
+                var path = $"M {x.ToInvariantString()} {(top + r).ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + r).ToInvariantString()} {top.ToInvariantString()} L {(x + width - r).ToInvariantString()} {top.ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(top + r).ToInvariantString()} L {(x + width).ToInvariantString()} {(bottom - r).ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + width - r).ToInvariantString()} {bottom.ToInvariantString()} L {(x + r).ToInvariantString()} {bottom.ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(bottom - r).ToInvariantString()} Z";
+
+                <Path @key="@($"wf-{i}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+            }
+        </g>;
+    }
+}
