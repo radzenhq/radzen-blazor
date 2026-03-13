@@ -60,10 +60,20 @@ namespace Radzen.Blazor
         public LineType LineType { get; set; }
 
         /// <summary>
-        /// Gets or sets whether to render smooth lines. Set to <c>false</c> by default.
+        /// Specifies whether to render smooth lines. Set to <c>false</c> by default.
         /// </summary>
         [Parameter]
-        public bool Smooth { get; set; }
+        public bool Smooth
+        {
+            get => Interpolation == Interpolation.Spline;
+            set => Interpolation = value ? Interpolation.Spline : Interpolation.Line;
+        }
+
+        /// <summary>
+        /// Specifies how to render lines between data points. Set to <see cref="Interpolation.Line"/> by default.
+        /// </summary>
+        [Parameter]
+        public Interpolation Interpolation { get; set; } = Interpolation.Line;
 
         /// <inheritdoc />
         public override string Color => Stroke ?? string.Empty;
@@ -195,7 +205,17 @@ namespace Radzen.Blazor
 
         internal IPathGenerator GetPathGenerator()
         {
-            return Smooth ? new SplineGenerator() : new LineGenerator();
+            switch (Interpolation)
+            {
+                case Interpolation.Line:
+                    return new LineGenerator();
+                case Interpolation.Spline:
+                    return new SplineGenerator();
+                case Interpolation.Step:
+                    return new StepGenerator();
+                default:
+                    throw new NotSupportedException($"Interpolation {Interpolation} is not supported yet.");
+            }
         }
     }
 }

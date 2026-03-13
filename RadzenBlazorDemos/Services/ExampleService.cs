@@ -2192,6 +2192,78 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Step Line Chart",
+                            Path = "step-line-chart",
+                            Description = "Radzen Blazor Chart with step line interpolation for discrete value changes.",
+                            Tags = new [] { "chart", "graph", "line", "step", "interpolation" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Step Area Chart",
+                            Path = "step-area-chart",
+                            Description = "Radzen Blazor Chart with step area interpolation for discrete filled areas.",
+                            Tags = new [] { "chart", "graph", "area", "step", "interpolation" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Range Step Area Chart",
+                            Path = "range-step-area-chart",
+                            Description = "Radzen Blazor Chart with range area series using step interpolation.",
+                            Tags = new [] { "chart", "graph", "area", "range", "step", "interpolation", "band" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Stacked Line Chart",
+                            Path = "stacked-line-chart",
+                            Description = "Radzen Blazor Chart with stacked line series showing cumulative values.",
+                            Tags = new [] { "chart", "graph", "line", "stack", "cumulative" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Full Stacked Column Chart",
+                            Path = "100-percent-stacked-column-chart",
+                            Description = "Radzen Blazor Chart with full (100%) stacked column series showing proportional contributions.",
+                            Tags = new [] { "chart", "graph", "column", "stack", "percent", "100", "proportional", "full" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Full Stacked Bar Chart",
+                            Path = "100-percent-stacked-bar-chart",
+                            Description = "Radzen Blazor Chart with full (100%) stacked bar series showing horizontal proportional contributions.",
+                            Tags = new [] { "chart", "graph", "bar", "stack", "percent", "100", "proportional", "horizontal", "full" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Full Stacked Area Chart",
+                            Path = "100-percent-stacked-area-chart",
+                            Description = "Radzen Blazor Chart with full (100%) stacked area series showing proportional filled areas.",
+                            Tags = new [] { "chart", "graph", "area", "stack", "percent", "100", "proportional", "full" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Full Stacked Line Chart",
+                            Path = "100-percent-stacked-line-chart",
+                            Description = "Radzen Blazor Chart with full (100%) stacked line series showing proportional trends.",
+                            Tags = new [] { "chart", "graph", "line", "stack", "percent", "100", "proportional", "full" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "High-Low Chart",
+                            Path = "highlow-chart",
+                            Description = "Radzen Blazor Chart with high-low series showing value ranges as vertical lines.",
+                            Tags = new [] { "chart", "graph", "highlow", "high", "low", "range", "temperature" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Toc = [ new () { Text = "Min, max and step", Anchor = "#min-max-and-step" }, new () { Text = "Format axis values", Anchor = "#format-axis-values" }, new () { Text = "Display grid lines", Anchor = "#display-grid-lines" }, new () { Text = "Set axis title", Anchor = "#set-axis-title" } ],
                             Name = "Axis",
                             Path = "chart-axis",
