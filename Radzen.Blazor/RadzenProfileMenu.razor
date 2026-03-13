@@ -8,7 +8,7 @@
         <li class="rz-navigation-item">
             <div class="rz-navigation-item-wrapper" role="button" tabindex="0" aria-haspopup="menu"
                  aria-label="@ToggleAriaLabel"
-                 aria-expanded="@(!Collapsed).ToString().ToLowerInvariant()" aria-controls="@($"{GetId()}-menu")"
+                 aria-expanded="@((!Collapsed).ToString().ToLowerInvariant())" aria-controls="@($"{GetId()}-menu")"
                  onclick="Radzen.toggleMenuItem(this)" @onkeydown="OnToggleKeyDown">
                 <div class="rz-navigation-item-link">
                     <div class="item-text" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">

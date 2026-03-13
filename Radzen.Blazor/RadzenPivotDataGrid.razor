@@ -302,7 +302,7 @@
                                                 <div class="rz-pivot-drill-down-header">
                                                     <span @onclick="@(() => ToggleColumnDrillDown(cell.PathKey))"
                                                         @onkeydown="@(args => OnDrillDownKeyDown(args, cell.PathKey))"
-                                                        role="button" tabindex="0" aria-expanded="@(!cell.IsCollapsed).ToString().ToLowerInvariant()"
+                                                        role="button" tabindex="0" aria-expanded="@((!cell.IsCollapsed).ToString().ToLowerInvariant())"
                                                         class="notranslate rz-tree-toggler rzi rzi-caret-@(cell.IsCollapsed ? "right" : "down")" style="margin-inline-start:0"></span>
                                                     <span class="rz-pivot-header-text">
                                                     @if (cell.HeaderTemplate != null && cell.Group != null)
