@@ -1,0 +1,38 @@
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+  public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+  {
+    var category = ComposeCategory(categoryScale);
+
+    var value = ComposeValue(valueScale);
+
+    var pathGenerator = GetPathGenerator();
+
+    var index = Chart?.Series.IndexOf(this);
+
+    var topPoints = GetTopPoints(category, value, valueScale);
+
+    var className = $"rz-stacked-line-series rz-series-{index}";
+
+    return
+    @<g class="@className">
+      @if (Items.Any())
+      {
+        var style = $"clip-path: url(#{Chart?.ClipPath}); -webkit-clip-path: url(#{Chart?.ClipPath});";
+        var topPath = pathGenerator.Path(topPoints);
+        var line = $"M {topPath}";
+        var key = $"{line}-{LineType}";
+
+        <Path @key="@key" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+      }
+      <Markers Visible="@Markers.Visible" Series="@this" Data="@topPoints" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+    </g>;
+  }
+}
