@@ -2148,6 +2148,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "DrillDown Chart",
+                            Path = "drilldown-chart",
+                            Description = "Radzen Blazor Chart with drill-down interaction to navigate from summary to detailed data on click.",
+                            Tags = new [] { "chart", "graph", "drilldown", "drill", "click", "interactive", "navigation", "hierarchy" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Bubble Chart",
                             Path = "bubble-chart",
                             Description = "Radzen Blazor Chart with bubble series for visualizing three dimensions of data.",
