@@ -2148,6 +2148,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Trendline Chart",
+                            Path = "trendline-chart",
+                            Description = "Radzen Blazor Chart with trendline overlays: linear regression, polynomial fit, and moving average.",
+                            Tags = new [] { "chart", "graph", "trendline", "trend", "regression", "polynomial", "moving average", "forecast" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "DrillDown Chart",
                             Path = "drilldown-chart",
                             Description = "Radzen Blazor Chart with drill-down interaction to navigate from summary to detailed data on click.",
