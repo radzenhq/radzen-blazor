@@ -1,0 +1,39 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var category = ComposeCategory(categoryScale);
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+        var index = chart.Series.IndexOf(this);
+        var className = $"rz-highlow-series rz-series-{index}";
+
+        var high = High;
+        var low = Low;
+
+        return
+        @<g class="@className">
+            @foreach (var data in Items)
+            {
+                var cx = category(data);
+
+                var highValue = high(data);
+                var lowValue = low(data);
+
+                var highY = valueScale.Scale(highValue, true);
+                var lowY = valueScale.Scale(lowValue, true);
+
+                var path = $"M {cx.ToInvariantString()} {highY.ToInvariantString()} L {cx.ToInvariantString()} {lowY.ToInvariantString()}";
+
+                <Path @key="@($"hl-{Items.IndexOf(data)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Fill="none" Style="@style" />
+            }
+        </g>;
+    }
+}
