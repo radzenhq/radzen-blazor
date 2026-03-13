@@ -53,17 +53,17 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the fill color for bullish candlesticks (Close &gt;= Open).
+        /// When not set, the theme color scheme applies.
         /// </summary>
-        /// <value>A CSS color value. Default is <c>#26A69A</c> (green).</value>
         [Parameter]
-        public string BullFill { get; set; } = "#26A69A";
+        public string? BullFill { get; set; }
 
         /// <summary>
         /// Gets or sets the fill color for bearish candlesticks (Close &lt; Open).
+        /// When not set, the theme color scheme applies.
         /// </summary>
-        /// <value>A CSS color value. Default is <c>#EF5350</c> (red).</value>
         [Parameter]
-        public string BearFill { get; set; } = "#EF5350";
+        public string? BearFill { get; set; }
 
         /// <summary>
         /// Gets or sets the stroke (border/wick) color for bullish candlesticks.
@@ -106,7 +106,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override string Color => BullFill;
+        public override string Color => BullFill ?? string.Empty;
 
         internal Func<TItem, double> Open
         {
@@ -257,7 +257,12 @@ namespace Radzen.Blazor
             var isBull = Close(item) >= Open(item);
             var color = isBull ? BullFill : BearFill;
 
-            return $"{style}; border-color: {color};";
+            if (color != null)
+            {
+                return $"{style}; border-color: {color};";
+            }
+
+            return style;
         }
 
         /// <inheritdoc />
