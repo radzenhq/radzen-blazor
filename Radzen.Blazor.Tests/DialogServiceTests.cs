@@ -409,5 +409,108 @@ namespace Radzen.Blazor.Tests
 				Assert.Equal("rz-dialog-wrapper wrapper-class", resultingOptions.WrapperCssClass);
 			}
 		}
+
+		public class CanCloseTests
+		{
+			[Fact(DisplayName = "TryCloseAsync closes when CanClose is null")]
+			public async Task TryCloseAsync_Closes_WhenCanCloseIsNull()
+			{
+				// Arrange
+				var dialogService = new DialogService(null, null);
+				var openTask = dialogService.OpenAsync<DialogServiceTests>("Test");
+
+				// Act
+				var closed = await dialogService.TryCloseAsync();
+
+				// Assert
+				Assert.True(closed);
+				Assert.True(openTask.IsCompleted);
+			}
+
+			[Fact(DisplayName = "TryCloseAsync closes when CanClose returns true")]
+			public async Task TryCloseAsync_Closes_WhenCanCloseReturnsTrue()
+			{
+				// Arrange
+				var dialogService = new DialogService(null, null);
+				var options = new DialogOptions { CanClose = () => Task.FromResult(true) };
+				var openTask = dialogService.OpenAsync<DialogServiceTests>("Test", options: options);
+
+				// Act
+				var closed = await dialogService.TryCloseAsync();
+
+				// Assert
+				Assert.True(closed);
+				Assert.True(openTask.IsCompleted);
+			}
+
+			[Fact(DisplayName = "TryCloseAsync blocks when CanClose returns false")]
+			public async Task TryCloseAsync_Blocks_WhenCanCloseReturnsFalse()
+			{
+				// Arrange
+				var dialogService = new DialogService(null, null);
+				var options = new DialogOptions { CanClose = () => Task.FromResult(false) };
+				var openTask = dialogService.OpenAsync<DialogServiceTests>("Test", options: options);
+
+				// Act
+				var closed = await dialogService.TryCloseAsync();
+
+				// Assert
+				Assert.False(closed);
+				Assert.False(openTask.IsCompleted);
+			}
+
+			[Fact(DisplayName = "Programmatic Close bypasses CanClose")]
+			public async Task Close_Bypasses_CanClose()
+			{
+				// Arrange
+				var dialogService = new DialogService(null, null);
+				var options = new DialogOptions { CanClose = () => Task.FromResult(false) };
+				var openTask = dialogService.OpenAsync<DialogServiceTests>("Test", options: options);
+
+				// Act
+				dialogService.Close();
+
+				// Assert
+				Assert.True(openTask.IsCompleted);
+			}
+
+			[Fact(DisplayName = "TryCloseSideAsync respects CanClose on SideDialogOptions")]
+			public async Task TryCloseSideAsync_Respects_CanClose()
+			{
+				// Arrange
+				var dialogService = new DialogService(null, null);
+				var sideOptions = new SideDialogOptions { CanClose = () => Task.FromResult(false) };
+
+				SideDialogOptions resultingOptions = null;
+				dialogService.OnSideOpen += (_, _, opts) => resultingOptions = opts;
+
+				dialogService.OpenSide<DialogServiceTests>("Test", options: sideOptions);
+
+				// Act
+				var closed = await dialogService.TryCloseSideAsync();
+
+				// Assert
+				Assert.False(closed);
+			}
+
+			[Fact(DisplayName = "TryCloseSideAsync closes when CanClose returns true")]
+			public async Task TryCloseSideAsync_Closes_WhenCanCloseReturnsTrue()
+			{
+				// Arrange
+				var dialogService = new DialogService(null, null);
+				var sideOptions = new SideDialogOptions { CanClose = () => Task.FromResult(true) };
+				bool sideClosed = false;
+				dialogService.OnSideClose += (_) => sideClosed = true;
+
+				dialogService.OpenSide<DialogServiceTests>("Test", options: sideOptions);
+
+				// Act
+				var closed = await dialogService.TryCloseSideAsync();
+
+				// Assert
+				Assert.True(closed);
+				Assert.True(sideClosed);
+			}
+		}
 	}
 }

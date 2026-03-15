@@ -2450,16 +2450,18 @@ window.Radzen = {
           var lastDialog = dialogs[dialogs.length - 1];
 
           if (lastDialog && lastDialog.options && lastDialog.options.closeDialogOnEsc) {
-              try { Radzen.dialogService.invokeMethodAsync('DialogService.Close', null); } catch { }
-
-              if (dialogs.length <= 1) {
-                  document.removeEventListener('keydown', Radzen.closePopupOrDialog);
-                  delete Radzen.dialogService;
-                  var layout = document.querySelector('.rz-layout');
-                  if (layout) {
-                      layout.removeEventListener('keydown', Radzen.disableKeydown);
-                  }
-              }
+              try {
+                  Radzen.dialogService.invokeMethodAsync('DialogService.TryClose', null).then(function(closed) {
+                      if (closed && dialogs.length <= 1) {
+                          document.removeEventListener('keydown', Radzen.closePopupOrDialog);
+                          delete Radzen.dialogService;
+                          var layout = document.querySelector('.rz-layout');
+                          if (layout) {
+                              layout.removeEventListener('keydown', Radzen.disableKeydown);
+                          }
+                      }
+                  });
+              } catch (e) { }
           }
       }
   },
