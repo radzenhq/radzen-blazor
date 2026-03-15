@@ -513,7 +513,7 @@ namespace Radzen
                 return false;
             }
 
-            await CloseSideAsync(result);
+            CloseSide(result);
             return true;
         }
 
