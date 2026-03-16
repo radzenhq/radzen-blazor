@@ -3,7 +3,7 @@
 @if (XAxis?.Visible == true)
 {
     <g class="rz-axis rz-category-axis">
-    <Line class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@(XAxis?.Stroke)" StrokeWidth="@(XAxis?.StrokeWidth ?? 0)" LineType="@(XAxis?.LineType ?? LineType.Solid)" />
+    <Line class="rz-line" X1="@Math.Min(x1, x2)" Y1="@y1" X2="@Math.Max(x1, x2)" Y2="@y1" Stroke="@(XAxis?.Stroke)" StrokeWidth="@(XAxis?.StrokeWidth ?? 0)" LineType="@(XAxis?.LineType ?? LineType.Solid)" />
     @for (var idx = start; idx <= end; idx += step)
     {
         var value = Chart?.CategoryScale?.Value((double)idx);
@@ -15,13 +15,13 @@
         {
             var context = new TickTemplateContext { Text = text, Value = value, X = x, Y = y1 } ;
 
-            <CategoryAxisTick X="@x" Y="@y1" Text="@text" Stroke="@(XAxis.Ticks.Stroke ?? XAxis.Stroke)" StrokeWidth="@XAxis.Ticks.StrokeWidth" LineType="@XAxis.Ticks.LineType">
+            <CategoryAxisTick X="@x" Y="@y1" Text="@text" Stroke="@(XAxis.Ticks.Stroke ?? XAxis.Stroke)" StrokeWidth="@XAxis.Ticks.StrokeWidth" LineType="@XAxis.Ticks.LineType" TopSide="@isTopSide">
                 @XAxis.Ticks.Template(context)
             </CategoryAxisTick>
         }
         else if (!String.IsNullOrEmpty(text))
         {
-            <CategoryAxisTick Rotate=@rotate X="@x" Y="@y1" Text="@text" Stroke="@(XAxis?.Ticks?.Stroke ?? XAxis?.Stroke)" StrokeWidth="@(XAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(XAxis?.Ticks?.LineType ?? LineType.Solid)"/>
+            <CategoryAxisTick Rotate=@rotate X="@x" Y="@y1" Text="@text" Stroke="@(XAxis?.Ticks?.Stroke ?? XAxis?.Stroke)" StrokeWidth="@(XAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(XAxis?.Ticks?.LineType ?? LineType.Solid)" TopSide="@isTopSide"/>
         }
 
         if (XAxis?.GridLines?.Visible == true && idx > start)
@@ -31,7 +31,14 @@
     }
     @if (!String.IsNullOrEmpty(XAxis?.Title?.Text))
     {
-        <CategoryAxisTitle X="@((x2 - x1)/2)" Y="@(y1 + (Chart?.CategoryAxis?.Size ?? 0) - (XAxis?.Title?.Size ?? 0))" Text="@(XAxis?.Title?.Text ?? "")" />
+        if (isTopSide)
+        {
+            <CategoryAxisTitle X="@(Math.Abs(x2 - x1)/2)" Y="@(y1 - (Chart?.CategoryAxis?.Size ?? 0) + (XAxis?.Title?.Size ?? 0))" Text="@(XAxis?.Title?.Text ?? "")" />
+        }
+        else
+        {
+            <CategoryAxisTitle X="@(Math.Abs(x2 - x1)/2)" Y="@(y1 + (Chart?.CategoryAxis?.Size ?? 0) - (XAxis?.Title?.Size ?? 0))" Text="@(XAxis?.Title?.Text ?? "")" />
+        }
     }
     </g>
 }
@@ -48,6 +55,7 @@
     private AxisBase? YAxis { get; set; }
 
     private double? rotate;
+    private bool isTopSide;
 
     protected override void OnParametersSet()
     {
@@ -77,6 +85,8 @@
         y1 = Chart.ValueScale.Scale(valueTicks.Start);
         y2 = Chart.ValueScale.Scale(valueTicks.End);
 
+        isTopSide = y1 < y2;
+
         if (XAxis?.LabelRotation != null)
         {
             rotate = XAxis.LabelRotation;
@@ -85,7 +95,7 @@
         {
             rotate = null;
 
-            var tickWidth = (x2 - x1) / ((double)end - (double)start);
+            var tickWidth = Math.Abs(x2 - x1) / ((double)end - (double)start);
 
             for (var idx = start; idx <= end; idx += step)
             {

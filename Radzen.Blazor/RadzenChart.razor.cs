@@ -374,8 +374,21 @@ namespace Radzen.Blazor
                 }
             }
 
-            CategoryScale.Output = new ScaleRange { Start = MarginLeft, End = Width != null ? Width.Value - MarginRight : 0 };
-            ValueScale.Output = new ScaleRange { Start = Height != null ? Height.Value - MarginBottom : 0, End = MarginTop };
+            var categoryStart = MarginLeft;
+            var categoryEnd = Width != null ? Width.Value - MarginRight : 0;
+            var valueStart = Height != null ? Height.Value - MarginBottom : 0;
+            var valueEnd = MarginTop;
+
+            CategoryScale.Output = new ScaleRange
+            {
+                Start = CategoryAxis.Inverted ? categoryEnd : categoryStart,
+                End = CategoryAxis.Inverted ? categoryStart : categoryEnd
+            };
+            ValueScale.Output = new ScaleRange
+            {
+                Start = ValueAxis.Inverted ? valueEnd : valueStart,
+                End = ValueAxis.Inverted ? valueStart : valueEnd
+            };
 
             ValueScale.Fit(ValueAxis.TickDistance);
             CategoryScale.Fit(CategoryAxis.TickDistance);
@@ -383,8 +396,12 @@ namespace Radzen.Blazor
             // Set output ranges and fit additional scales
             foreach (var entry in AdditionalValueScales)
             {
-                entry.Value.Output = new ScaleRange { Start = Height != null ? Height.Value - MarginBottom : 0, End = MarginTop };
                 var axis = GetValueAxis(entry.Key);
+                entry.Value.Output = new ScaleRange
+                {
+                    Start = axis.Inverted ? valueEnd : valueStart,
+                    End = axis.Inverted ? valueStart : valueEnd
+                };
                 entry.Value.Fit(axis.TickDistance);
             }
 
@@ -413,7 +430,13 @@ namespace Radzen.Blazor
                 Width = width;
                 stateHasChanged = true;
 
-                CategoryScale.Output = new ScaleRange { Start = MarginLeft, End = Width.Value - MarginRight };
+                var cs = MarginLeft;
+                var ce = Width.Value - MarginRight;
+                CategoryScale.Output = new ScaleRange
+                {
+                    Start = CategoryAxis.Inverted ? ce : cs,
+                    End = CategoryAxis.Inverted ? cs : ce
+                };
             }
 
             if (height != Height)
@@ -421,11 +444,22 @@ namespace Radzen.Blazor
                 Height = height;
                 stateHasChanged = true;
 
-                ValueScale.Output = new ScaleRange { Start = Height.Value - MarginBottom, End = MarginTop };
+                var vs = Height.Value - MarginBottom;
+                var ve = MarginTop;
+                ValueScale.Output = new ScaleRange
+                {
+                    Start = ValueAxis.Inverted ? ve : vs,
+                    End = ValueAxis.Inverted ? vs : ve
+                };
 
                 foreach (var entry in AdditionalValueScales)
                 {
-                    entry.Value.Output = new ScaleRange { Start = Height.Value - MarginBottom, End = MarginTop };
+                    var axis = GetValueAxis(entry.Key);
+                    entry.Value.Output = new ScaleRange
+                    {
+                        Start = axis.Inverted ? ve : vs,
+                        End = axis.Inverted ? vs : ve
+                    };
                 }
             }
 

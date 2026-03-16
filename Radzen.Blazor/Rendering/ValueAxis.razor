@@ -2,8 +2,8 @@
 @inherits RadzenChartComponentBase
 @if (YAxis?.Visible == true)
 {
-    <g class="rz-axis rz-value-axis @(IsRightSide ? "rz-value-axis-right" : "")">
-    <Line class="rz-line" X1="@axisX" Y1="@y1" X2="@axisX" Y2="@y2" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
+    <g class="rz-axis rz-value-axis @(RenderAsRightSide ? "rz-value-axis-right" : "")">
+    <Line class="rz-line" X1="@axisX" Y1="@Math.Min(y1, y2)" X2="@axisX" Y2="@Math.Max(y1, y2)" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
     @for (var idx = start; idx <= end; idx += step)
     {
         var value = scale?.Value(idx);
@@ -14,29 +14,29 @@
         {
             var context = new TickTemplateContext { Text = text, Value = value, X = axisX, Y = y } ;
 
-            <ValueAxisTick X="@axisX" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType" RightSide="@IsRightSide">
+            <ValueAxisTick X="@axisX" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType" RightSide="@RenderAsRightSide">
                 @YAxis.Ticks.Template(context)
             </ValueAxisTick>
         }
         else if (!String.IsNullOrEmpty(text))
         {
-            <ValueAxisTick X="@axisX" Y="@y" Text="@text" Stroke="@(YAxis?.Ticks?.Stroke ?? YAxis?.Stroke)" StrokeWidth="@(YAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(YAxis?.Ticks?.LineType ?? LineType.Solid)" RightSide="@IsRightSide" />
+            <ValueAxisTick X="@axisX" Y="@y" Text="@text" Stroke="@(YAxis?.Ticks?.Stroke ?? YAxis?.Stroke)" StrokeWidth="@(YAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(YAxis?.Ticks?.LineType ?? LineType.Solid)" RightSide="@RenderAsRightSide" />
         }
 
         if (YAxis?.GridLines?.Visible == true && idx > start)
         {
-            <Line class="rz-grid-line" X1="@x1" Y1="@y" X2="@x2" Y2="@y" Stroke="@(YAxis.GridLines.Stroke)" StrokeWidth="@(YAxis.GridLines.StrokeWidth)" LineType="@(YAxis.GridLines.LineType)" />
+            <Line class="rz-grid-line" X1="@Math.Min(x1, x2)" Y1="@y" X2="@Math.Max(x1, x2)" Y2="@y" Stroke="@(YAxis.GridLines.Stroke)" StrokeWidth="@(YAxis.GridLines.StrokeWidth)" LineType="@(YAxis.GridLines.LineType)" />
         }
     }
     @if (!String.IsNullOrEmpty(YAxis?.Title?.Text))
     {
-        if (IsRightSide)
+        if (RenderAsRightSide)
         {
-            <ValueAxisTitle X="@(axisX + (YAxis?.Size ?? 0) - (YAxis?.Title?.Size ?? 0))" Y="@((y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" RightSide="true" />
+            <ValueAxisTitle X="@(axisX + (YAxis?.Size ?? 0) - (YAxis?.Title?.Size ?? 0))" Y="@(Math.Abs(y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" RightSide="true" />
         }
         else
         {
-            <ValueAxisTitle X="@(axisX - (Chart?.ValueAxis?.Size ?? 0) + (YAxis?.Title?.Size ?? 0))" Y="@((y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" />
+            <ValueAxisTitle X="@(axisX - (Chart?.ValueAxis?.Size ?? 0) + (YAxis?.Title?.Size ?? 0))" Y="@(Math.Abs(y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" />
         }
     }
     </g>
@@ -46,6 +46,7 @@
     public string? AxisName { get; set; }
 
     bool IsRightSide => !string.IsNullOrEmpty(AxisName);
+    bool RenderAsRightSide => IsRightSide || isFlippedToRight;
 
     double start;
     double end;
@@ -56,6 +57,7 @@
     double y2;
     double axisX;
     ScaleBase? scale;
+    bool isFlippedToRight;
     private AxisBase? XAxis { get; set; }
     private AxisBase? YAxis { get; set; }
 
@@ -102,6 +104,9 @@
         x2 = Chart.CategoryScale.Scale(categoryTicks.End);
         y1 = scale.Scale(start);
         y2 = scale.Scale(end);
+
+        // Detect if the primary value axis has been flipped to the right side due to category inversion
+        isFlippedToRight = string.IsNullOrEmpty(AxisName) && x1 > x2;
 
         if (IsRightSide)
         {
