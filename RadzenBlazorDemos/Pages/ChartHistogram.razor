@@ -1,0 +1,78 @@
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-4" style="text-align: center;">Examination Result</RadzenText>
+<RadzenChart Style="width: 100%; height: 400px;">
+    <RadzenColumnSeries Data="@bins" CategoryProperty="Range" ValueProperty="Count" Title="Frequency" />
+    <RadzenLineSeries Data="@curve" CategoryProperty="Range" ValueProperty="Value" Title="Distribution" Smooth="true" />
+    <RadzenCategoryAxis>
+        <RadzenAxisTitle Text="Score of Final Examination" />
+    </RadzenCategoryAxis>
+    <RadzenValueAxis>
+        <RadzenGridLines Visible="true" />
+        <RadzenAxisTitle Text="Number of Students" />
+    </RadzenValueAxis>
+    <RadzenLegend Position="LegendPosition.Bottom" />
+</RadzenChart>
+
+@code {
+    class HistogramBin
+    {
+        public string Range { get; set; }
+        public int Count { get; set; }
+    }
+
+    class CurvePoint
+    {
+        public string Range { get; set; }
+        public double Value { get; set; }
+    }
+
+    HistogramBin[] bins;
+    CurvePoint[] curve;
+
+    protected override void OnInitialized()
+    {
+        var random = new Random(42);
+
+        // Generate normally-distributed scores centered around 50 with spread across 0-100
+        var scores = new List<double>();
+        for (int i = 0; i < 500; i++)
+        {
+            // Box-Muller transform for normal distribution
+            var u1 = random.NextDouble();
+            var u2 = random.NextDouble();
+            var z = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Cos(2.0 * Math.PI * u2);
+            var score = 50 + z * 18; // mean=50, stddev=18
+            scores.Add(Math.Clamp(score, 0, 100));
+        }
+
+        var binEdges = new[] { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+        bins = new HistogramBin[binEdges.Length - 1];
+
+        for (int i = 0; i < binEdges.Length - 1; i++)
+        {
+            var low = binEdges[i];
+            var high = binEdges[i + 1];
+            bins[i] = new HistogramBin
+            {
+                Range = $"{low}",
+                Count = scores.Count(s => s >= low && s < high)
+            };
+        }
+
+        // Normal distribution curve scaled to match histogram
+        var mean = scores.Average();
+        var stddev = Math.Sqrt(scores.Sum(s => (s - mean) * (s - mean)) / scores.Count);
+        var total = scores.Count;
+        var binWidth = 10.0;
+
+        curve = bins.Select(b =>
+        {
+            var x = double.Parse(b.Range) + binWidth / 2;
+            var normal = Math.Exp(-0.5 * Math.Pow((x - mean) / stddev, 2)) / (stddev * Math.Sqrt(2 * Math.PI));
+            return new CurvePoint
+            {
+                Range = b.Range,
+                Value = Math.Round(normal * total * binWidth, 1)
+            };
+        }).ToArray();
+    }
+}
