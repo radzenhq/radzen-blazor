@@ -5,6 +5,7 @@ namespace Radzen.Blazor.Spreadsheet;
 class CountFunction : FormulaFunction
 {
     public override string Name => "COUNT";
+    public override bool CoerceLiteralBooleans => true;
 
     public override FunctionParameter[] Parameters =>
     [
@@ -29,9 +30,7 @@ class CountFunction : FormulaFunction
                 continue;
             }
 
-            var value = argument.GetValueOrDefault<double?>();
-
-            if (value is not null)
+            if (argument.Type == CellDataType.Number || argument.Type == CellDataType.Date)
             {
                 count++;
             }

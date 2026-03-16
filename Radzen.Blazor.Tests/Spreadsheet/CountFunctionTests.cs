@@ -70,7 +70,7 @@ public class CountFunctionTests
     }
 
     [Fact]
-    public void ShouldEvaluateCountFunctionIncludingLogicalValues()
+    public void ShouldEvaluateCountFunctionExcludingLogicalValuesInCellRefs()
     {
         sheet.Cells["A1"].Value = 10;
         sheet.Cells["A2"].Value = true;
@@ -78,7 +78,7 @@ public class CountFunctionTests
         sheet.Cells["A4"].Value = 20;
         sheet.Cells["A5"].Formula = "=COUNT(A1,A2,A3,A4)";
 
-        Assert.Equal(4.0, sheet.Cells["A5"].Value);
+        Assert.Equal(2.0, sheet.Cells["A5"].Value);
     }
 
     [Fact]
