@@ -77,13 +77,13 @@
 </div>
 
 @code {
-    void OnKeyPress(KeyboardEventArgs args)
+    async Task OnKeyPress(KeyboardEventArgs args)
     {
         var key = args.Code != null ? args.Code : args.Key;
 
         if (key == "Space" || key == "Enter")
         {
-            Close();
+            await Close();
         }
     }
 
@@ -179,9 +179,12 @@
 
     object? reference;
 
-    void Close()
+    async Task Close()
     {
-        Service?.Close();
+        if (Service != null)
+        {
+            await Service.TryCloseAsync();
+        }
     }
 
     string Class => ClassList.Create("rz-dialog rz-open")

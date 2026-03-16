@@ -66,7 +66,7 @@
                 </div>
                 @if (sideOptions?.ShowClose == true)
                 {
-                    <button id="@($"rz-dialog-side-{sideOptions?.GetHashCode() ?? 0}-cl")" type="button" aria-label="@CloseSideDialogAriaLabel" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service!.CloseSide())" tabindex="@(sideOptions?.CloseTabIndex ?? 0)">
+                    <button id="@($"rz-dialog-side-{sideOptions?.GetHashCode() ?? 0}-cl")" type="button" aria-label="@CloseSideDialogAriaLabel" class="rz-dialog-side-titlebar-close" @onclick="CloseSide" tabindex="@(sideOptions?.CloseTabIndex ?? 0)">
                         <span class="notranslate rzi rzi-times"></span>
                     </button>
                 }
@@ -80,7 +80,8 @@
     {
         @if (sideOptions.CloseDialogOnOverlayClick)
         {
-            <div @onclick="@Service!.CloseSide" class="rz-dialog-mask" aria-hidden="true" tabindex="-1"></div>
+            <div @onclick="CloseSide" class="rz-dialog-mask"
+                 aria-hidden="true" tabindex="-1"></div>
         }
         else
         {
@@ -234,6 +235,14 @@
         });
         isSideDialogOpen = true;
         StateHasChanged();
+    }
+
+    private async Task CloseSide()
+    {
+        if (Service is not null)
+        {
+            await Service!.TryCloseSideAsync();
+        }
     }
 
     private bool sideDialogClosing = false;

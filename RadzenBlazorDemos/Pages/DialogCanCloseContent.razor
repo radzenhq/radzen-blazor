@@ -1,0 +1,23 @@
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem">
+    <RadzenText TextStyle="TextStyle.Body1">Try closing this side dialog while the checkbox is checked.</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenCheckBox Value="hasUnsavedChanges" ValueChanged="@OnChanged" Name="SideUnsavedChanges" TValue="bool" />
+        <RadzenLabel Text="Has unsaved changes" Component="SideUnsavedChanges" />
+    </RadzenStack>
+    <RadzenButton Text="Save and Close" Click="@(() => DialogService.CloseSide(true))" Style="width: 100%" />
+</RadzenStack>
+
+@code {
+    bool hasUnsavedChanges;
+
+    [Parameter]
+    public EventCallback<bool> HasUnsavedChangesChanged { get; set; }
+
+    async Task OnChanged(bool value)
+    {
+        hasUnsavedChanges = value;
+        await HasUnsavedChangesChanged.InvokeAsync(value);
+    }
+}

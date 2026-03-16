@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -164,6 +165,7 @@ namespace Radzen
         /// </summary>
         protected List<TaskCompletionSource<dynamic>> tasks = new List<TaskCompletionSource<dynamic>>();
         private TaskCompletionSource<dynamic>? sideDialogResultTask;
+        private SideDialogOptions? currentSideDialogOptions;
 
         /// <summary>
         /// Opens a dialog with the specified arguments.
@@ -233,6 +235,7 @@ namespace Radzen
             }
 
             options.Title = title;
+            currentSideDialogOptions = options;
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object?>(), options);
             return sideDialogResultTask.Task;
         }
@@ -262,6 +265,7 @@ namespace Radzen
             }
 
             options.Title = title;
+            currentSideDialogOptions = options;
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object?>(), options);
 
             return sideDialogResultTask.Task;
@@ -286,6 +290,7 @@ namespace Radzen
             }
 
             options.Title = title;
+            currentSideDialogOptions = options;
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object?>(), options);
         }
 
@@ -312,6 +317,7 @@ namespace Radzen
             }
 
             options.Title = title;
+            currentSideDialogOptions = options;
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object?>(), options);
         }
 
@@ -322,6 +328,7 @@ namespace Radzen
             {
                 sideDialogResultTask.TrySetResult(null!);
             }
+            currentSideDialogOptions = null;
         }
 
         /// <summary>
@@ -335,6 +342,7 @@ namespace Radzen
                 sideDialogResultTask.TrySetResult(result);
             }
 
+            currentSideDialogOptions = null;
             OnSideClose?.Invoke(result);
         }
 
@@ -430,15 +438,15 @@ namespace Radzen
         /// <summary>
         /// The dialogs
         /// </summary>
-        protected List<object> dialogs = new List<object>();
+        protected List<DialogOptions> dialogs = new List<DialogOptions>();
 
         internal void OpenDialog<T>(string? title, Dictionary<string, object?>? parameters, DialogOptions? options)
         {
-            dialogs.Add(new object());
-
             // Validate and set default values for the dialog options
             options ??= new();
             parameters ??= new Dictionary<string, object?>();
+
+            dialogs.Add(options);
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "600px";
             options.Left = !String.IsNullOrEmpty(options.Left) ? options.Left : "";
             options.Top = !String.IsNullOrEmpty(options.Top) ? options.Top : "";
@@ -473,6 +481,51 @@ namespace Radzen
                 tasks.Remove(task);
                 task.SetResult(result);
             }
+        }
+
+        /// <summary>
+        /// Attempts to close the last opened dialog. Invokes <see cref="DialogOptionsBase.CanClose"/> if set.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <returns><c>true</c> if the dialog was closed; <c>false</c> if closing was prevented by <see cref="DialogOptionsBase.CanClose"/>.</returns>
+        public virtual async Task<bool> TryCloseAsync(dynamic? result = null)
+        {
+            var dialogOptions = dialogs.LastOrDefault();
+
+            if (dialogOptions?.CanClose is { } canClose && !await canClose())
+            {
+                return false;
+            }
+
+            Close(result);
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to close the side dialog. Invokes <see cref="DialogOptionsBase.CanClose"/> if set.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <returns><c>true</c> if the side dialog was closed; <c>false</c> if closing was prevented by <see cref="DialogOptionsBase.CanClose"/>.</returns>
+        public virtual async Task<bool> TryCloseSideAsync(dynamic? result = null)
+        {
+            if (currentSideDialogOptions?.CanClose is { } canClose && !await canClose())
+            {
+                return false;
+            }
+
+            CloseSide(result);
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to close the last opened dialog. Called from JavaScript ESC handler.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <returns><c>true</c> if the dialog was closed; <c>false</c> if closing was prevented.</returns>
+        [JSInvokable("DialogService.TryClose")]
+        public virtual async Task<bool> TryCloseFromJs(dynamic? result = null)
+        {
+            return await TryCloseAsync(result);
         }
 
         /// <inheritdoc />
@@ -896,6 +949,27 @@ namespace Radzen
                 {
                     closeTabIndex = value;
                     OnPropertyChanged(nameof(CloseTabIndex));
+                }
+            }
+        }
+
+        private Func<Task<bool>>? canClose;
+
+        /// <summary>
+        /// Gets or sets a callback invoked when the user attempts to close the dialog
+        /// (via X button, overlay click, or ESC key). Return <c>false</c> to prevent closing.
+        /// Not invoked when <see cref="DialogService.Close"/> is called programmatically.
+        /// </summary>
+        [JsonIgnore]
+        public Func<Task<bool>>? CanClose
+        {
+            get => canClose;
+            set
+            {
+                if (canClose != value)
+                {
+                    canClose = value;
+                    OnPropertyChanged(nameof(CanClose));
                 }
             }
         }

@@ -1,0 +1,62 @@
+@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
+        <RadzenButton Text="Dialog with CanClose" ButtonStyle="ButtonStyle.Secondary" Click=@OpenDialog />
+        <RadzenButton Text="Side dialog with CanClose" ButtonStyle="ButtonStyle.Light" Click=@OpenSideDialog />
+    </RadzenStack>
+</div>
+
+@code {
+    async Task OpenDialog()
+    {
+        bool hasUnsavedChanges = false;
+
+        await DialogService.OpenAsync("Unsaved Changes Guard", ds =>
+    @<div>
+        <RadzenStack Gap="1rem">
+            <RadzenText TextStyle="TextStyle.Body1">Try closing this dialog with the X button, ESC key, or overlay click while the checkbox is checked.</RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenCheckBox @bind-Value="hasUnsavedChanges" Name="UnsavedChanges" />
+                <RadzenLabel Text="Has unsaved changes" Component="UnsavedChanges" />
+            </RadzenStack>
+            <RadzenButton Text="Save and Close" Click="() => ds.Close(true)" Style="width: 100%" />
+        </RadzenStack>
+    </div>, new DialogOptions()
+            {
+                CloseDialogOnOverlayClick = true,
+                CanClose = async () =>
+                {
+                    if (!hasUnsavedChanges)
+                        return true;
+
+                    return await DialogService.Confirm("You have unsaved changes. Discard?", "Confirm",
+                        new ConfirmOptions() { OkButtonText = "Discard", CancelButtonText = "Cancel" }) == true;
+                }
+            });
+    }
+
+    async Task OpenSideDialog()
+    {
+        bool hasUnsavedChanges = false;
+
+        await DialogService.OpenSideAsync<DialogCanCloseContent>("Edit Panel",
+            new Dictionary<string, object>
+            {
+                { nameof(DialogCanCloseContent.HasUnsavedChangesChanged), EventCallback.Factory.Create<bool>(this, (value) => hasUnsavedChanges = value) }
+            },
+            new SideDialogOptions()
+            {
+                CloseDialogOnOverlayClick = true,
+                ShowMask = true,
+                CanClose = async () =>
+                {
+                    if (!hasUnsavedChanges)
+                        return true;
+
+                    return await DialogService.Confirm("You have unsaved changes. Discard?", "Confirm",
+                        new ConfirmOptions() { OkButtonText = "Discard", CancelButtonText = "Cancel" }) == true;
+                }
+            });
+    }
+}
