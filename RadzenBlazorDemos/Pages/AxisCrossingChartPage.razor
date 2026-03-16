@@ -1,0 +1,15 @@
+@page "/axis-crossing-chart"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart with axis crossing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>CrossesAt</code> on <code>RadzenValueAxis</code> or <code>RadzenCategoryAxis</code> to position the axis
+    at a specific value on the perpendicular axis. For example, setting <code>CrossesAt="0"</code> on both axes
+    creates a standard mathematical coordinate system where axes intersect at the origin.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="AxisCrossingChartConfig"
+    DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <AxisCrossingChartConfig />
+</RadzenExample>
