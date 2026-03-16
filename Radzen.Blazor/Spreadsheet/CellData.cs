@@ -130,14 +130,14 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        if (double.TryParse(value, out var valNum))
+        if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var valNum))
         {
             converted = valNum;
             valueType = CellDataType.Number;
             return true;
         }
 
-        if (DateTime.TryParse(value, out var valDate))
+        if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var valDate))
         {
             valueType = CellDataType.Date;
             converted = valDate;
