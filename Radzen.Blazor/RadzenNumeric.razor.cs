@@ -599,7 +599,7 @@ namespace Radzen.Blazor
 
                 preventKeyPress = false;
             }
-            else if (Immediate && args.Key.Length == 1 && char.IsDigit(args.Key[0]) && !args.CtrlKey && !args.AltKey && !args.ShiftKey)
+            else if (Immediate && (key == "Backspace" || key == "Delete" || (args.Key.Length == 1 && char.IsDigit(args.Key[0]) && !args.CtrlKey && !args.AltKey && !args.ShiftKey)))
             {
                 stopKeydownPropagation = true;
                 preventKeyPress = true;
