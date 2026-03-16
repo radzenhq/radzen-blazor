@@ -1,7 +1,7 @@
 @inherits RadzenChartComponentBase
 
 <g class="rz-axis-title">
-    <text x="@X.ToInvariantString()" y="@Y.ToInvariantString()" transform="rotate(270, @X.ToInvariantString(), @Y.ToInvariantString())">@Text</text>
+    <text x="@X.ToInvariantString()" y="@Y.ToInvariantString()" transform="rotate(@Rotation.ToInvariantString(), @X.ToInvariantString(), @Y.ToInvariantString())">@Text</text>
 </g>
 
 @code {
@@ -13,4 +13,9 @@
 
     [Parameter]
     public string? Text { get; set; }
+
+    [Parameter]
+    public bool RightSide { get; set; }
+
+    double Rotation => RightSide ? 90 : 270;
 }

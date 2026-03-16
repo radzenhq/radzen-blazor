@@ -113,7 +113,7 @@ namespace Radzen.Blazor
         {
             var chart = RequireChart();
             var category = ComposeCategory(chart.CategoryScale);
-            var value = ComposeValue(chart.ValueScale);
+            var value = ComposeValue(chart.GetValueScale(ValueAxisName));
 
             var points = Items.Select(item => new Point { X = category(item), Y = value(item) }).ToArray();
 

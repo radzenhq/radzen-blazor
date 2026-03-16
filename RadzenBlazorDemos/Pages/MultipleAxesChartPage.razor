@@ -1,0 +1,15 @@
+@page "/multiple-axes-chart"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart with multiple value axes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Combine series with different scales on separate value axes. The primary axis (without <code>Name</code>) renders on the left.
+    Additional named axes render on the right. Use <code>ValueAxisName</code> on a series to bind it to a named axis.
+    A chart can have unlimited value axes however two or three are recommended for readability.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="MultipleAxesChartConfig"
+    DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <MultipleAxesChartConfig />
+</RadzenExample>

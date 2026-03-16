@@ -19,14 +19,19 @@
                 @if(ShouldRenderAxes())
                 {
                     <ValueAxis />
+                    @foreach (var entry in AdditionalValueAxes)
+                    {
+                        <ValueAxis AxisName="@entry.Key" />
+                    }
                     <CategoryAxis />
                 }
                 @foreach (var series in Series.OrderBy(s => s.RenderingOrder))
                 {
                     @if (series.Visible)
                     {
-                        @series.Render(CategoryScale, ValueScale);
-                        @series.RenderOverlays(CategoryScale, ValueScale);
+                        var vs = series is IChartValueAxisSeries named ? GetValueScale(named.ValueAxisName) : ValueScale;
+                        @series.Render(CategoryScale, vs);
+                        @series.RenderOverlays(CategoryScale, vs);
                     }
                 }
             </g>
