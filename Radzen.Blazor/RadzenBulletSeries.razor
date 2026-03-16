@@ -1,0 +1,88 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = Chart;
+        if (chart == null)
+        {
+            return _ => { };
+        }
+
+        // Swap scales for horizontal rendering (like RadzenBarSeries)
+        var value = ComposeValue(categoryScale);
+        var category = ComposeCategory(valueScale);
+        var ticks = chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance);
+        var x0 = chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+        var className = $"rz-bullet-series rz-series-{chart.Series.IndexOf(this)}";
+
+        var barHeight = BarHeight;
+        var halfHeight = barHeight / 2;
+
+        var target = Target;
+        var max = Max;
+
+        var fill = Fill ?? "var(--rz-text-color)";
+        var stroke = Stroke;
+        var targetStroke = TargetStroke ?? "var(--rz-text-title-color)";
+
+        var rangeColors = GetRangeColors();
+        var rangeThresholds = GetRangeThresholds();
+
+        return
+        @<g class="@className">
+            @foreach (var data in Items)
+            {
+                var cy = category(data);
+                var y1 = cy - halfHeight;
+
+                var maxValue = max(data);
+                var valueVal = Value(data);
+                var targetVal = target(data);
+
+                var index = Items.IndexOf(data);
+
+                // Qualitative range bands (background)
+                var prevX = x0;
+                @for (var r = 0; r < rangeThresholds.Count; r++)
+                {
+                    var threshold = rangeThresholds[r];
+                    var rangeVal = maxValue * threshold;
+                    var rangeX = chart.CategoryScale.Scale(rangeVal, true);
+                    var rx1 = Math.Min(prevX, rangeX);
+                    var rw = Math.Abs(rangeX - prevX);
+                    var rangeColor = r < rangeColors.Count ? rangeColors[r] : "#eee";
+                    var rangePath = $"M {rx1.ToInvariantString()} {y1.ToInvariantString()} L {(rx1 + rw).ToInvariantString()} {y1.ToInvariantString()} L {(rx1 + rw).ToInvariantString()} {(y1 + barHeight).ToInvariantString()} L {rx1.ToInvariantString()} {(y1 + barHeight).ToInvariantString()} Z";
+
+                    <Path @key="@($"range-{index}-{r}")" D="@rangePath" Fill="@rangeColor" Stroke="none" StrokeWidth="0" Style="@style" />
+                    prevX = rangeX;
+                }
+
+                // Primary measure bar (narrower than the range bands)
+                var measureHeight = barHeight * 0.4;
+                var measureY = cy - measureHeight / 2;
+                var valueX = chart.CategoryScale.Scale(valueVal, true);
+                var mx1 = Math.Min(x0, valueX);
+                var mw = Math.Abs(valueX - x0);
+                var measurePath = $"M {mx1.ToInvariantString()} {measureY.ToInvariantString()} L {(mx1 + mw).ToInvariantString()} {measureY.ToInvariantString()} L {(mx1 + mw).ToInvariantString()} {(measureY + measureHeight).ToInvariantString()} L {mx1.ToInvariantString()} {(measureY + measureHeight).ToInvariantString()} Z";
+
+                <Path @key="@($"measure-{index}")" D="@measurePath" Fill="@fill" Stroke="@stroke" StrokeWidth="@StrokeWidth" Style="@style" />
+
+                // Target marker line
+                var targetX = chart.CategoryScale.Scale(targetVal, true);
+                var markerHeight = barHeight * 0.7;
+                var markerY = cy - markerHeight / 2;
+                var targetPath = $"M {targetX.ToInvariantString()} {markerY.ToInvariantString()} L {targetX.ToInvariantString()} {(markerY + markerHeight).ToInvariantString()}";
+
+                <Path @key="@($"target-{index}")" D="@targetPath" Fill="none" Stroke="@targetStroke" StrokeWidth="@TargetWidth" Style="@style" />
+            }
+        </g>;
+    }
+}
