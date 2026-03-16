@@ -1,0 +1,41 @@
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+
+@code {
+    public override CoordinateSystem CoordinateSystem => CoordinateSystem.Polar;
+
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var className = $"rz-funnel-series rz-series-{chart.Series.IndexOf(this)}";
+        var items = Items;
+        var count = items.Count;
+
+        return
+        @<g class="@className">
+            @if (items.Any())
+            {
+                var maxValue = items.Max(Value);
+
+                @for (var i = 0; i < count; i++)
+                {
+                    var data = items[i];
+                    var index = i;
+                    var d = GetSegmentPath(index, count, maxValue);
+                    var fill = PickColor(index, Fills);
+                    var stroke = PickColor(index, Strokes);
+                    var arcClassName = $"rz-series-item-{index}";
+
+                    <g class="@arcClassName">
+                        <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
+                    </g>
+                }
+            }
+        </g>;
+    }
+}

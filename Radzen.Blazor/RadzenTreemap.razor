@@ -1,0 +1,39 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenComponent
+
+<div @ref="@Element" style="@Style" @attributes="@Attributes" class="@GetCssClass()">
+@if (Width.HasValue && Height.HasValue && Data != null)
+{
+    ComputeLayout();
+
+    <svg style="width: 100%; height: 100%;" viewBox="@($"0 0 {Width.Value.ToInvariantString()} {Height.Value.ToInvariantString()}")">
+        @foreach (var item in LayoutItems)
+        {
+            var rx = item.X + Padding;
+            var ry = item.Y + Padding;
+            var rw = Math.Max(0, item.Width - 2 * Padding);
+            var rh = Math.Max(0, item.Height - 2 * Padding);
+            var color = PickColor(item.Index);
+
+            <g class="rz-treemap-item" @onclick="@(async () => { if (ItemClick.HasDelegate) await ItemClick.InvokeAsync(new TreemapClickEventArgs { Data = item.Data, Text = item.Text, Value = item.Value }); })">
+                <rect x="@(rx.ToInvariantString())" y="@(ry.ToInvariantString())"
+                      width="@(rw.ToInvariantString())" height="@(rh.ToInvariantString())"
+                      fill="@color" rx="3" ry="3" class="rz-treemap-rect" />
+
+                @if (ShowLabels && rw > 30 && rh > 20)
+                {
+                    var tx = rx + rw / 2;
+                    var ty = ShowValues ? ry + rh / 2 - 7 : ry + rh / 2;
+                    @RenderSvgText(tx, ty, "middle", "middle", "fill: white; font-size: 13px; font-weight: 600; pointer-events: none;", item.Text)
+                }
+                @if (ShowValues && rw > 30 && rh > 35)
+                {
+                    var tx = rx + rw / 2;
+                    var ty = ry + rh / 2 + 10;
+                    @RenderSvgText(tx, ty, "middle", "middle", "fill: rgba(255,255,255,0.8); font-size: 11px; pointer-events: none;", item.Value.ToString("N0", System.Globalization.CultureInfo.InvariantCulture))
+                }
+            </g>
+        }
+    </svg>
+}
+</div>
