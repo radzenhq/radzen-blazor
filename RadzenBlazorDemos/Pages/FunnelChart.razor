@@ -1,7 +1,6 @@
 <RadzenChart Style="width: 100%; height: 400px;">
     <RadzenFunnelSeries Data="@stages" CategoryProperty="Stage" ValueProperty="Count"
-                        Fills="@(new[] { "var(--rz-series-1)", "var(--rz-series-2)", "var(--rz-series-3)", "var(--rz-series-4)", "var(--rz-series-5)" })"
-                        StrokeWidth="1" Strokes="@(new[] { "white", "white", "white", "white", "white" })">
+                        StrokeWidth="1" Strokes="@(new[] { "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)" })">
         <RadzenSeriesDataLabels Visible="true" />
     </RadzenFunnelSeries>
     <RadzenLegend Position="LegendPosition.Bottom" />
