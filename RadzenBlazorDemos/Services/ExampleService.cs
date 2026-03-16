@@ -2231,6 +2231,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Live Chart",
+                    Path = "live-chart",
+                    Icon = "\ue1e0",
+                    Description = "Radzen Blazor live updating chart with real-time data using ObservableCollection and timer.",
+                    Tags = new [] { "chart", "graph", "live", "real-time", "update", "timer", "observable" },
+                    New = true
+                },
+                new Example
+                {
                     Name = "Specialized",
                     Icon = "\ue6df",
                     Children = new [] {
