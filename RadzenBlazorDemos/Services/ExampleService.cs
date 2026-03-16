@@ -2112,6 +2112,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Pyramid Chart",
+                            Path = "pyramid-chart",
+                            Description = "Radzen Blazor Chart with pyramid series for hierarchical data visualization.",
+                            Tags = new [] { "chart", "graph", "pyramid", "hierarchy", "triangle" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Radzen Blazor Chart with donut series.",
