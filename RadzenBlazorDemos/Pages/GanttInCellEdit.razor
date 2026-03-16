@@ -141,7 +141,6 @@
 
         if (tasksToUpdate.Any())
         {
-            editedFields.Add(new(tasksToUpdate.First().Id, columnEditing));
             await Update();
         }
 
@@ -169,6 +168,7 @@
 
         if (tasksToUpdate.Any())
         {
+            editedFields.Add(new(tasksToUpdate.First().Id, columnEditing));
             await gantt.UpdateRow(tasksToUpdate.First());
         }
     }
