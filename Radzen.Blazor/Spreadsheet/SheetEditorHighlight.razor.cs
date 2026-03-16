@@ -68,8 +68,8 @@ public partial class SheetEditorHighlight : ComponentBase
             FormulaTokenType.CellIdentifier => "rz-cell-highlight",
             FormulaTokenType.Identifier => "rz-function-highlight",
             FormulaTokenType.Plus or FormulaTokenType.Minus or FormulaTokenType.Star or FormulaTokenType.Slash
-                or FormulaTokenType.Equals or FormulaTokenType.EqualsGreaterThan or FormulaTokenType.LessThan
-                or FormulaTokenType.LessThanOrEqual or FormulaTokenType.GreaterThan or FormulaTokenType.GreaterThanOrEqual
+                or FormulaTokenType.Equals or FormulaTokenType.EqualsGreaterThan or FormulaTokenType.LessThanGreaterThan
+                or FormulaTokenType.LessThan or FormulaTokenType.LessThanOrEqual or FormulaTokenType.GreaterThan or FormulaTokenType.GreaterThanOrEqual
                 or FormulaTokenType.OpenParen or FormulaTokenType.CloseParen or FormulaTokenType.Comma or FormulaTokenType.Colon => "rz-operator-highlight",
             _ => "rz-default-highlight"
         };
