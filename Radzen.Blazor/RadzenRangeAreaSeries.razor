@@ -16,19 +16,19 @@
         var min = Min;
         var max = Max;
 
-        var upperData = Items.Select(item =>
+        var upperList = Items.Select(item =>
         {
             var x = category(item);
             var y = valueScale.Scale(max(item), true);
             return new Point<TItem> { X = x, Y = y, Data = item };
-        });
+        }).ToList();
 
-        var lowerData = Items.Select(item =>
+        var lowerList = Items.Select(item =>
         {
             var x = category(item);
             var y = valueScale.Scale(min(item), true);
             return new Point<TItem> { X = x, Y = y, Data = item };
-        });
+        }).ToList();
 
         var index = chart.Series.IndexOf(this);
         var className = $"rz-range-area-series rz-series-{index}";
@@ -39,12 +39,61 @@
             {
                 var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
-                var upperPath = pathGenerator.Path(upperData);
-                var lowerPath = pathGenerator.Path(lowerData.Reverse());
+                string area;
+                string upperLine;
+                string lowerLine;
 
-                var area = $"M {upperPath} L {lowerPath} Z";
-                var upperLine = $"M {upperPath}";
-                var lowerLine = $"M {pathGenerator.Path(lowerData)}";
+                if (Interpolation == Interpolation.Step)
+                {
+                    // Build the fill as independent rectangles per step interval.
+                    // A single polygon creates a fold at the last X where the connector
+                    // and return path cancel under SVG's nonzero winding rule.
+                    var areaPath = new System.Text.StringBuilder();
+
+                    for (var i = 0; i < upperList.Count - 1; i++)
+                    {
+                        areaPath.Append($"M {upperList[i].X.ToInvariantString()} {upperList[i].Y.ToInvariantString()} ");
+                        areaPath.Append($"H {upperList[i + 1].X.ToInvariantString()} ");
+                        areaPath.Append($"V {lowerList[i].Y.ToInvariantString()} ");
+                        areaPath.Append($"H {upperList[i].X.ToInvariantString()} Z ");
+                    }
+
+                    area = areaPath.ToString();
+
+                    // Build stroke paths matching the fill: H-V for intermediate
+                    // transitions, H only for the last point (no vertical drop that
+                    // would extend past the fill at the right edge).
+                    var upperStroke = new System.Text.StringBuilder();
+                    var lowerStroke = new System.Text.StringBuilder();
+
+                    upperStroke.Append($"M {upperList[0].X.ToInvariantString()} {upperList[0].Y.ToInvariantString()}");
+                    lowerStroke.Append($"M {lowerList[0].X.ToInvariantString()} {lowerList[0].Y.ToInvariantString()}");
+
+                    for (var i = 1; i < upperList.Count - 1; i++)
+                    {
+                        upperStroke.Append($" H {upperList[i].X.ToInvariantString()} V {upperList[i].Y.ToInvariantString()}");
+                        lowerStroke.Append($" H {lowerList[i].X.ToInvariantString()} V {lowerList[i].Y.ToInvariantString()}");
+                    }
+
+                    if (upperList.Count > 1)
+                    {
+                        var last = upperList.Count - 1;
+                        upperStroke.Append($" H {upperList[last].X.ToInvariantString()}");
+                        lowerStroke.Append($" H {lowerList[last].X.ToInvariantString()}");
+                    }
+
+                    upperLine = upperStroke.ToString();
+                    lowerLine = lowerStroke.ToString();
+                }
+                else
+                {
+                    var upperPath = pathGenerator.Path(upperList);
+                    var lowerPathForward = pathGenerator.Path(lowerList);
+                    var lowerPathReversed = pathGenerator.Path(lowerList.AsEnumerable().Reverse());
+                    area = $"M {upperPath} L {lowerPathReversed} Z";
+                    upperLine = $"M {upperPath}";
+                    lowerLine = $"M {lowerPathForward}";
+                }
 
                 <path @key="@area" style="@style" d="@area" fill="@Fill" stroke="none"></path>
                 <Path @key="@upperLine" D="@upperLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
