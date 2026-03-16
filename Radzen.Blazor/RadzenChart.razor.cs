@@ -211,7 +211,9 @@ namespace Radzen.Blazor
             var categoryScale = CategoryScale;
 
             CategoryScale = new LinearScale { Output = CategoryScale.Output };
-            ValueScale = new LinearScale { Output = ValueScale.Output };
+            ValueScale = ValueAxis.Logarithmic
+                ? new LogarithmicScale { Base = ValueAxis.LogarithmicBase, Output = ValueScale.Output }
+                : new LinearScale { Output = ValueScale.Output };
 
             var visibleSeries = Series.Where(series => series.Visible).ToList();
             var invisibleSeries = Series.Where(series => series.Visible == false).ToList();
@@ -259,13 +261,29 @@ namespace Radzen.Blazor
             foreach (var entry in namedAxisSeries)
             {
                 var axisName = entry.Key;
-                if (!AdditionalValueScales.TryGetValue(axisName, out var additionalScale))
+                var axis = GetValueAxis(axisName);
+
+                ScaleBase CreateAdditionalScale(ScaleRange? output = null)
                 {
-                    additionalScale = new LinearScale();
+                    if (axis.Logarithmic)
+                    {
+                        var s = new LogarithmicScale { Base = axis.LogarithmicBase };
+                        if (output != null) s.Output = output;
+                        return s;
+                    }
+                    var ls = new LinearScale();
+                    if (output != null) ls.Output = output;
+                    return ls;
+                }
+
+                ScaleBase additionalScale;
+                if (!AdditionalValueScales.TryGetValue(axisName, out var existingScale))
+                {
+                    additionalScale = CreateAdditionalScale();
                 }
                 else
                 {
-                    additionalScale = new LinearScale { Output = additionalScale.Output };
+                    additionalScale = CreateAdditionalScale(existingScale.Output);
                 }
 
                 foreach (var series in entry.Value)
