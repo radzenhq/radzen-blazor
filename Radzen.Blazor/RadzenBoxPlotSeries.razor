@@ -1,0 +1,88 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var category = ComposeCategory(categoryScale);
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+        var className = $"rz-box-plot-series rz-series-{chart.Series.IndexOf(this)}";
+
+        var boxWidth = BoxWidth;
+        var halfBox = boxWidth / 2;
+        var capWidth = CapWidth;
+        var halfCap = capWidth / 2;
+
+        var lw = LowerWhisker;
+        var lq = LowerQuartile;
+        var med = Median;
+        var uq = UpperQuartile;
+        var uw = UpperWhisker;
+        var mean = Mean;
+
+        var stroke = Stroke;
+        var fill = Fill;
+        var medianStroke = MedianStroke ?? stroke;
+        var meanFill = MeanFill ?? medianStroke;
+
+        return
+        @<g class="@className">
+            @foreach (var data in Items)
+            {
+                var cx = category(data);
+
+                var lwY = valueScale.Scale(lw(data), true);
+                var lqY = valueScale.Scale(lq(data), true);
+                var medY = valueScale.Scale(med(data), true);
+                var uqY = valueScale.Scale(uq(data), true);
+                var uwY = valueScale.Scale(uw(data), true);
+
+                var x1 = cx - halfBox;
+
+                // Whisker line (upper to lower)
+                var whiskerPath = $"M {cx.ToInvariantString()} {uwY.ToInvariantString()} L {cx.ToInvariantString()} {lwY.ToInvariantString()}";
+
+                // Upper cap
+                var upperCapPath = $"M {(cx - halfCap).ToInvariantString()} {uwY.ToInvariantString()} L {(cx + halfCap).ToInvariantString()} {uwY.ToInvariantString()}";
+
+                // Lower cap
+                var lowerCapPath = $"M {(cx - halfCap).ToInvariantString()} {lwY.ToInvariantString()} L {(cx + halfCap).ToInvariantString()} {lwY.ToInvariantString()}";
+
+                // Box (Q1 to Q3)
+                var boxTop = Math.Min(lqY, uqY);
+                var boxBottom = Math.Max(lqY, uqY);
+                var boxHeight = Math.Abs(uqY - lqY);
+                if (boxHeight < 1)
+                {
+                    boxHeight = 1;
+                }
+                var boxPath = $"M {x1.ToInvariantString()} {boxTop.ToInvariantString()} L {(x1 + boxWidth).ToInvariantString()} {boxTop.ToInvariantString()} L {(x1 + boxWidth).ToInvariantString()} {(boxTop + boxHeight).ToInvariantString()} L {x1.ToInvariantString()} {(boxTop + boxHeight).ToInvariantString()} Z";
+
+                // Median line
+                var medianPath = $"M {x1.ToInvariantString()} {medY.ToInvariantString()} L {(x1 + boxWidth).ToInvariantString()} {medY.ToInvariantString()}";
+
+                var index = Items.IndexOf(data);
+
+                <Path @key="@($"whisker-{index}")" D="@whiskerPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="none" Style="@style" />
+                <Path @key="@($"upper-cap-{index}")" D="@upperCapPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="none" Style="@style" />
+                <Path @key="@($"lower-cap-{index}")" D="@lowerCapPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="none" Style="@style" />
+                <Path @key="@($"box-{index}")" D="@boxPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" Style="@style" />
+                <Path @key="@($"median-{index}")" D="@medianPath" Stroke="@medianStroke" StrokeWidth="@(StrokeWidth + 1)" Fill="none" Style="@style" />
+
+                @if (ShowMean && mean != null)
+                {
+                    var meanY = valueScale.Scale(mean(data), true);
+                    var ms = 4.0;
+                    var meanPath = $"M {cx.ToInvariantString()} {(meanY - ms).ToInvariantString()} L {(cx + ms).ToInvariantString()} {meanY.ToInvariantString()} L {cx.ToInvariantString()} {(meanY + ms).ToInvariantString()} L {(cx - ms).ToInvariantString()} {meanY.ToInvariantString()} Z";
+                    <Path @key="@($"mean-{index}")" D="@meanPath" Stroke="@medianStroke" StrokeWidth="@StrokeWidth" Fill="@meanFill" Style="@style" />
+                }
+            }
+        </g>;
+    }
+}
