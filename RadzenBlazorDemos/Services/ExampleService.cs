@@ -2288,6 +2288,30 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Funnel Chart",
+                            Path = "funnel-chart",
+                            Description = "Radzen Blazor Chart with funnel series for visualizing stages in a process.",
+                            Tags = new [] { "chart", "graph", "funnel", "conversion", "pipeline", "sales" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Heatmap",
+                            Path = "heatmap-chart",
+                            Description = "Radzen Blazor Heatmap component for displaying data intensity as a color-coded grid.",
+                            Tags = new [] { "chart", "heatmap", "grid", "matrix", "color", "intensity" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Treemap",
+                            Path = "treemap-chart",
+                            Description = "Radzen Blazor Treemap component for displaying hierarchical data as proportionally-sized rectangles.",
+                            Tags = new [] { "chart", "treemap", "hierarchy", "rectangle", "proportion", "area" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Toc = [ new () { Text = "Min, max and step", Anchor = "#min-max-and-step" }, new () { Text = "Format axis values", Anchor = "#format-axis-values" }, new () { Text = "Display grid lines", Anchor = "#display-grid-lines" }, new () { Text = "Set axis title", Anchor = "#set-axis-title" } ],
                             Name = "Axis",
                             Path = "chart-axis",
