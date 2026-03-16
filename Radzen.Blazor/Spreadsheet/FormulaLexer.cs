@@ -43,6 +43,7 @@ internal enum FormulaTokenType
     Dot,
     LessThan,
     LessThanOrEqual,
+    LessThanGreaterThan,
     GreaterThan,
     GreaterThanOrEqual,
     Colon,
@@ -279,6 +280,11 @@ internal class FormulaLexer(string expression, bool strict = true)
                 {
                     Advance(1);
                     return new FormulaToken(FormulaTokenType.LessThanOrEqual, "<=");
+                }
+                if (TryAdvance('>'))
+                {
+                    Advance(1);
+                    return new FormulaToken(FormulaTokenType.LessThanGreaterThan, "<>");
                 }
                 Advance(1);
                 return new FormulaToken(FormulaTokenType.LessThan, "<");
