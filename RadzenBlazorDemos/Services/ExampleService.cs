@@ -2373,6 +2373,22 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Logarithmic Axis",
+                            Path = "logarithmic-axis-chart",
+                            Description = "Radzen Blazor Chart with logarithmic value axis for data spanning several orders of magnitude.",
+                            Tags = new [] { "chart", "graph", "logarithmic", "log", "axis", "scale" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Indexed Category Axis",
+                            Path = "indexed-category-axis-chart",
+                            Description = "Radzen Blazor Chart with indexed category axis where series are aligned by index rather than category value.",
+                            Tags = new [] { "chart", "graph", "indexed", "category", "axis" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Toc = [ new () { Text = "Legend position", Anchor = "#legend-position" }, new () { Text = "Hide the legend", Anchor = "#hide-the-legend" } ],
                             Name = "Legend",
                             Path = "chart-legend",

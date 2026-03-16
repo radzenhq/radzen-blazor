@@ -1,0 +1,61 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart Style="height: 520px">
+                <RadzenColumnSeries Data="@gdp2021" CategoryProperty="Index" ValueProperty="GdpGrowth" Title="2021">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnSeries Data="@gdp2022" CategoryProperty="Index" ValueProperty="GdpGrowth" Title="2022">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenCategoryAxis Formatter="@FormatCategory" Min="0" Max="4" Step="1" LabelAutoRotation="45" />
+                <RadzenValueAxis FormatString="{0}%">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="GDP Growth %" />
+                </RadzenValueAxis>
+                <RadzenChartTooltipOptions Shared="true" />
+                <RadzenLegend Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class GdpDataItem
+    {
+        public int Index { get; set; }
+        public string Country { get; set; }
+        public double GdpGrowth { get; set; }
+    }
+
+    string FormatCategory(object value)
+    {
+        if (value is double d)
+        {
+            var index = (int)d;
+            if (index >= 0 && index < gdp2021.Length && d == index)
+            {
+                return $"{gdp2021[index].Country}, {gdp2022[index].Country}";
+            }
+        }
+        return "";
+    }
+
+    GdpDataItem[] gdp2021 = new GdpDataItem[]
+    {
+        new GdpDataItem { Index = 0, Country = "India", GdpGrowth = 9.05 },
+        new GdpDataItem { Index = 1, Country = "Nepal", GdpGrowth = 4.84 },
+        new GdpDataItem { Index = 2, Country = "Bangladesh", GdpGrowth = 6.94 },
+        new GdpDataItem { Index = 3, Country = "Cambodia", GdpGrowth = 3.03 },
+        new GdpDataItem { Index = 4, Country = "China", GdpGrowth = 8.45 },
+    };
+
+    GdpDataItem[] gdp2022 = new GdpDataItem[]
+    {
+        new GdpDataItem { Index = 0, Country = "Australia", GdpGrowth = 4.27 },
+        new GdpDataItem { Index = 1, Country = "Poland", GdpGrowth = 5.26 },
+        new GdpDataItem { Index = 2, Country = "Singapore", GdpGrowth = 3.65 },
+        new GdpDataItem { Index = 3, Country = "Canada", GdpGrowth = 3.82 },
+        new GdpDataItem { Index = 4, Country = "Germany", GdpGrowth = 1.81 },
+    };
+}
