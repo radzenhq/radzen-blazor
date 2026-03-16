@@ -4,7 +4,8 @@
     // Build the QR matrix
     bool[,] modules = RadzenQREncoder.EncodeUtf8(Value, Ecc);
     int n = modules.GetLength(0);
-    int vb = n + 8; // quiet zone
+    int qz = Math.Max(0, QuietZone);
+    int vb = n + 2 * qz; // quiet zone
 
     var backgroundFill = GetSvgFillParts(Background);
 
@@ -39,9 +40,9 @@
     @if (modules is not null)
     {
         <!-- finder patterns / eyes -->
-        @DrawEye(4, 4, EyeShapeTopLeft ?? EyeShape, EyeColorTopLeft ?? EyeColor ?? Foreground, $"{GetId()}-eye-0")
-        @DrawEye(vb - 11, 4, EyeShapeTopRight ?? EyeShape, EyeColorTopRight ?? EyeColor ?? Foreground, $"{GetId()}-eye-1")
-        @DrawEye(4, vb - 11, EyeShapeBottomLeft ?? EyeShape, EyeColorBottomLeft ?? EyeColor ?? Foreground, $"{GetId()}-eye-2")
+        @DrawEye(qz, qz, EyeShapeTopLeft ?? EyeShape, EyeColorTopLeft ?? EyeColor ?? Foreground, $"{GetId()}-eye-0")
+        @DrawEye(vb - 7 - qz, qz, EyeShapeTopRight ?? EyeShape, EyeColorTopRight ?? EyeColor ?? Foreground, $"{GetId()}-eye-1")
+        @DrawEye(qz, vb - 7 - qz, EyeShapeBottomLeft ?? EyeShape, EyeColorBottomLeft ?? EyeColor ?? Foreground, $"{GetId()}-eye-2")
 
         <!-- data modules (skip eye regions) -->
         @for (var r = 0; r < n; r++)
@@ -51,8 +52,8 @@
                 if (!modules[r, c]) continue;
                 if (IsFinderCell(r, c, n)) continue; // don't overdraw eyes
 
-                var x = c + 4; // quiet zone offset
-                var y = r + 4;
+                var x = c + qz; // quiet zone offset
+                var y = r + qz;
 
                 if (ModuleShape == QRCodeModuleShape.Circle)
                 {

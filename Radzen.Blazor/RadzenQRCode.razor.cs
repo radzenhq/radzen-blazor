@@ -153,6 +153,14 @@ namespace Radzen.Blazor
         [Parameter] public double ImageBackgroundOpacity { get; set; } = 1.0;
 
         /// <summary>
+        /// Gets or sets the quiet zone (margin) size in QR code modules around the QR code.
+        /// The quiet zone helps scanners detect the QR code boundaries. The QR standard recommends 4 modules.
+        /// Set to 0 to remove the margin entirely.
+        /// </summary>
+        /// <value>The quiet zone size in modules. Default is 4.</value>
+        [Parameter] public int QuietZone { get; set; } = 4;
+
+        /// <summary>
         /// Gets the component CSS class.
         /// </summary>
         protected override string GetComponentCssClass() => "rz-qrcode";
