@@ -5,6 +5,7 @@ namespace Radzen.Blazor.Spreadsheet;
 class AverageFunction : FormulaFunction
 {
     public override string Name => "AVERAGE";
+    public override bool CoerceLiteralBooleans => true;
 
     public override FunctionParameter[] Parameters =>
     [
