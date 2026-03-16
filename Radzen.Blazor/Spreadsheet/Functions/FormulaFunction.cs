@@ -16,6 +16,13 @@ public abstract class FormulaFunction
     public virtual bool CanHandleErrors => false;
 
     /// <summary>
+    /// Gets a value indicating whether literal boolean arguments in sequences should be
+    /// coerced to numbers (TRUE→1, FALSE→0) before evaluation. Excel coerces direct boolean
+    /// constants (e.g. SUM(TRUE,1)→2) but skips booleans from cell references (e.g. SUM(A1)→0 when A1=TRUE).
+    /// </summary>
+    public virtual bool CoerceLiteralBooleans => false;
+
+    /// <summary>
     /// Gets the parameter definitions for this function.
     /// </summary>
     /// <returns>An array of parameter definitions describing the function's parameters.</returns>

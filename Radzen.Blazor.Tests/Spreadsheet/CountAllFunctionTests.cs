@@ -121,7 +121,8 @@ public class CountAllFunctionTests
         sheet.Cells["B1"].Formula = "=COUNT(A1,A2,A3,A4,A5)";
         sheet.Cells["B2"].Formula = "=COUNTA(A1,A2,A3,A4,A5)";
 
-        Assert.Equal(3.0, sheet.Cells["B1"].Value);
+        // COUNT skips booleans in cell references (Excel behavior)
+        Assert.Equal(2.0, sheet.Cells["B1"].Value);
         Assert.Equal(5.0, sheet.Cells["B2"].Value);
     }
 
