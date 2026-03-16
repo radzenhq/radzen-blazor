@@ -153,12 +153,13 @@ namespace Radzen.Blazor
             var pieType = typeof(RadzenPieSeries<>);
             var donutType = typeof(RadzenDonutSeries<>);
             var funnelType = typeof(RadzenFunnelSeries<>);
+            var pyramidType = typeof(RadzenPyramidSeries<>);
 
             return !Series.All(series =>
             {
                 var type = series.GetType().GetGenericTypeDefinition();
 
-                return type == pieType || type == donutType || type == funnelType;
+                return type == pieType || type == donutType || type == funnelType || type == pyramidType;
             });
         }
 
