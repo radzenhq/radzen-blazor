@@ -2096,6 +2096,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Box Plot Chart",
+                            Path = "box-plot-chart",
+                            Description = "Radzen Blazor Chart with box-and-whisker series for statistical distributions.",
+                            Tags = new [] { "chart", "graph", "box", "plot", "whisker", "quartile", "statistics", "distribution" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Radzen Blazor Chart with donut series.",
