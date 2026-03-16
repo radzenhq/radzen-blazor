@@ -40,17 +40,32 @@ public enum CellDataType
 
 static class TypeExtensions
 {
+    // Excel serial date system: serial 1 = Jan 1, 1900.
+    // Serial 60 = Feb 29, 1900 (a phantom date from the Lotus 1-2-3 bug; 1900 was not a leap year).
+    // Dates from Mar 1, 1900 onward are offset by 2 to account for this phantom day.
+    private static readonly DateTime Epoch = new(1900, 1, 1);
+    private static readonly DateTime LotusLeapDayCutoff = new(1900, 3, 1);
+
     public static double ToNumber(this DateTime date)
     {
-        var epoch = new DateTime(1900, 1, 1);
-        var span = date - epoch;
-        return span.TotalDays; // include fractional day for time
+        var days = (date - Epoch).TotalDays;
+        return days + (date >= LotusLeapDayCutoff ? 2 : 1);
     }
 
     public static DateTime ToDate(this double number)
     {
-        var epoch = new DateTime(1900, 1, 1);
-        return epoch.AddDays(number);
+        if (number >= 61) // Mar 1, 1900 onward (after phantom Feb 29)
+        {
+            return Epoch.AddDays(number - 2);
+        }
+
+        if (number >= 1) // Jan 1, 1900 through Feb 28, 1900
+        {
+            return Epoch.AddDays(number - 1);
+        }
+
+        // Serials < 1 are pure time values; preserve fractional part
+        return Epoch.AddDays(number);
     }
 
     public static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
