@@ -25,18 +25,18 @@
 
         if (YAxis?.GridLines?.Visible == true && idx > start)
         {
-            <Line class="rz-grid-line" X1="@Math.Min(x1, x2)" Y1="@y" X2="@Math.Max(x1, x2)" Y2="@y" Stroke="@(YAxis.GridLines.Stroke)" StrokeWidth="@(YAxis.GridLines.StrokeWidth)" LineType="@(YAxis.GridLines.LineType)" />
+            <Line class="rz-grid-line" X1="@Math.Min(gridX1, gridX2)" Y1="@y" X2="@Math.Max(gridX1, gridX2)" Y2="@y" Stroke="@(YAxis.GridLines.Stroke)" StrokeWidth="@(YAxis.GridLines.StrokeWidth)" LineType="@(YAxis.GridLines.LineType)" />
         }
     }
     @if (!String.IsNullOrEmpty(YAxis?.Title?.Text))
     {
         if (RenderAsRightSide)
         {
-            <ValueAxisTitle X="@(axisX + (YAxis?.Size ?? 0) - (YAxis?.Title?.Size ?? 0))" Y="@(Math.Abs(y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" RightSide="true" />
+            <ValueAxisTitle X="@(titleX + (YAxis?.Size ?? 0) - (YAxis?.Title?.Size ?? 0))" Y="@(Math.Abs(y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" RightSide="true" />
         }
         else
         {
-            <ValueAxisTitle X="@(axisX - (Chart?.ValueAxis?.Size ?? 0) + (YAxis?.Title?.Size ?? 0))" Y="@(Math.Abs(y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" />
+            <ValueAxisTitle X="@(titleX - (Chart?.ValueAxis?.Size ?? 0) + (YAxis?.Title?.Size ?? 0))" Y="@(Math.Abs(y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" />
         }
     }
     </g>
@@ -56,6 +56,9 @@
     double y1;
     double y2;
     double axisX;
+    double gridX1;
+    double gridX2;
+    double titleX;
     ScaleBase? scale;
     bool isFlippedToRight;
     private AxisBase? XAxis { get; set; }
@@ -105,6 +108,9 @@
         y1 = scale.Scale(start);
         y2 = scale.Scale(end);
 
+        gridX1 = x1;
+        gridX2 = x2;
+
         // Detect if the primary value axis has been flipped to the right side due to category inversion
         isFlippedToRight = string.IsNullOrEmpty(AxisName) && x1 > x2;
 
@@ -121,6 +127,16 @@
         else
         {
             axisX = x1;
+
+            var crossesAt = YAxis?.GetCrossesAtValue();
+            if (crossesAt.HasValue)
+            {
+                var clampedValue = Math.Max(Math.Min(crossesAt.Value, categoryTicks.End), categoryTicks.Start);
+                axisX = Chart.CategoryScale.Scale(clampedValue);
+            }
         }
+
+        // Title stays at the chart edge, not the crossing position
+        titleX = IsRightSide ? axisX : (YAxis?.GetCrossesAtValue() != null ? x1 : axisX);
     }
 }
