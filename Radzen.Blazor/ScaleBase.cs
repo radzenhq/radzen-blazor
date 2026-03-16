@@ -49,6 +49,12 @@ namespace Radzen.Blazor
         abstract public double Scale(double value, bool padding = false);
 
         /// <summary>
+        /// Gets a value indicating whether this scale uses logarithmic tick stepping.
+        /// When true, the tick loop uses multiplicative stepping (idx *= step) instead of additive (idx += step).
+        /// </summary>
+        public virtual bool IsLogarithmic => false;
+
+        /// <summary>
         /// Composes the specified selector.
         /// </summary>
         /// <typeparam name="TItem">The type of the t item.</typeparam>

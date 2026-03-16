@@ -112,6 +112,21 @@ namespace Radzen.Blazor
         public bool Inverted { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this axis uses a logarithmic scale.
+        /// When <c>true</c>, the axis displays values on a logarithmic scale (base 10 by default).
+        /// Only positive values are supported. Set <see cref="LogarithmicBase"/> to change the base.
+        /// </summary>
+        [Parameter]
+        public bool Logarithmic { get; set; }
+
+        /// <summary>
+        /// Gets or sets the base of the logarithmic scale. Default is 10.
+        /// Only used when <see cref="Logarithmic"/> is <c>true</c>.
+        /// </summary>
+        [Parameter]
+        public double LogarithmicBase { get; set; } = 10;
+
+        /// <summary>
         /// Specifies the value on the perpendicular axis where this axis should cross.
         /// When set, the axis line and ticks are positioned at the corresponding location
         /// instead of the chart edge. For example, setting <c>CrossesAt="0"</c> on the category axis
@@ -142,6 +157,8 @@ namespace Radzen.Blazor
                    DidParameterChange(parameters, nameof(LabelAutoRotation), LabelAutoRotation) ||
                    DidParameterChange(parameters, nameof(Inverted), Inverted) ||
                    DidParameterChange(parameters, nameof(CrossesAt), CrossesAt) ||
+                   DidParameterChange(parameters, nameof(Logarithmic), Logarithmic) ||
+                   DidParameterChange(parameters, nameof(LogarithmicBase), LogarithmicBase) ||
                    DidParameterChange(parameters, nameof(Step), Step);
         }
 

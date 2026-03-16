@@ -4,7 +4,7 @@
 {
     <g class="rz-axis rz-value-axis @(RenderAsRightSide ? "rz-value-axis-right" : "")">
     <Line class="rz-line" X1="@axisX" Y1="@Math.Min(y1, y2)" X2="@axisX" Y2="@Math.Max(y1, y2)" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
-    @for (var idx = start; idx <= end; idx += step)
+    @for (var idx = start; idx <= end; idx = isLogarithmic ? idx * step : idx + step)
     {
         var value = scale?.Value(idx);
         var y = scale?.Scale(idx) ?? 0;
@@ -60,6 +60,7 @@
     double gridX2;
     double titleX;
     ScaleBase? scale;
+    bool isLogarithmic;
     bool isFlippedToRight;
     private AxisBase? XAxis { get; set; }
     private AxisBase? YAxis { get; set; }
@@ -97,7 +98,9 @@
             XAxis = Chart.CategoryAxis;
         }
 
-        var ticks = scale!.Ticks(YAxis?.TickDistance ?? 0);
+        isLogarithmic = scale!.IsLogarithmic;
+
+        var ticks = scale.Ticks(YAxis?.TickDistance ?? 0);
         start = ticks.Start;
         end = ticks.End;
         step = ticks.Step;
