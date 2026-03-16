@@ -1,6 +1,31 @@
 @inherits Tick
 
 <g class="rz-tick">
+@if (TopSide)
+{
+<Line class="rz-tick-line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" X1="@X" Y1="@Y" X2="@X" Y2="@(Y-6)" />
+@if (ChildContent == null)
+{
+  @if (Rotate != null)
+  {
+  <text>
+    <text class="rz-tick-text" x="@x" text-anchor=@textAnchor y="@topY" transform="rotate(@angle, @x, @topY)">@Text</text>
+  </text>
+  }
+  else
+  {
+    <text>
+      <text class="rz-tick-text" text-anchor=@textAnchor x="@x" y="@topY">@Text</text>
+    </text>
+  }
+}
+else
+{
+  @ChildContent
+}
+}
+else
+{
 <Line class="rz-tick-line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" X1="@X" Y1="@Y" X2="@X" Y2="@(Y+6)" />
 @if (ChildContent == null)
 {
@@ -21,14 +46,19 @@ else
 {
   @ChildContent
 }
+}
 </g>
 
 @code {
   [Parameter]
   public double? Rotate { get; set; }
 
+  [Parameter]
+  public bool TopSide { get; set; }
+
   string x => X.ToInvariantString();
   string y => (Y + 6).ToInvariantString();
+  string topY => (Y - 6).ToInvariantString();
 
   string? angle => Rotate?.ToInvariantString();
 

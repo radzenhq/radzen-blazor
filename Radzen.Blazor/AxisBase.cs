@@ -101,6 +101,14 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Visible { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this axis is inverted.
+        /// When <c>true</c>, the axis direction is reversed: values increase in the opposite visual direction
+        /// and categories are displayed in reverse order.
+        /// </summary>
+        [Parameter]
+        public bool Inverted { get; set; }
     /// <summary>
         /// Specifies the label rotation angle in degrees. Set to <c>null</c> by default which means no rotation is applied. Has higher precedence than <see cref="LabelAutoRotation"/>.
         /// </summary>
@@ -121,6 +129,7 @@ namespace Radzen.Blazor
                    DidParameterChange(parameters, nameof(Visible), Visible) ||
                    DidParameterChange(parameters, nameof(LabelRotation), LabelRotation) ||
                    DidParameterChange(parameters, nameof(LabelAutoRotation), LabelAutoRotation) ||
+                   DidParameterChange(parameters, nameof(Inverted), Inverted) ||
                    DidParameterChange(parameters, nameof(Step), Step);
         }
 
