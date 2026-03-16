@@ -1,0 +1,15 @@
+@page "/live-chart"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Live Chart
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    This example demonstrates a live updating chart displaying simulated real-time CPU usage.
+    The chart updates every 500 milliseconds using <code>ObservableCollection</code> and a timer.
+    Call <code>Reload()</code> on the chart to refresh when data changes.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="LiveChartConfig"
+    DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <LiveChartConfig />
+</RadzenExample>
