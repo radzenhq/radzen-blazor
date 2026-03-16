@@ -4,6 +4,7 @@ namespace Radzen.Blazor.Spreadsheet;
 
 abstract class MinMaxBase : FormulaFunction
 {
+    public override bool CoerceLiteralBooleans => true;
     protected abstract CellData Compute(System.Collections.Generic.List<double> numbers);
 
     public override FunctionParameter[] Parameters =>
