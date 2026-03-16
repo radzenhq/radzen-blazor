@@ -1,10 +1,14 @@
 @using Radzen.Blazor.Rendering
+@implements IDisposable
 
 @inherits AxisBase
 <CascadingValue Value="@this">
   @ChildContent
 </CascadingValue>
 @code {
+    [Parameter]
+    public string? Name { get; set; }
+
     internal double Measure(RadzenChart chart)
     {
         if (chart.ShouldInvertAxes())
@@ -21,6 +25,16 @@
         }
     }
 
+    internal double Measure(RadzenChart chart, ScaleBase scale)
+    {
+        if (Visible == false)
+        {
+            return 0;
+        }
+
+        return AxisMeasurer.YAxis(scale, this, Title);
+    }
+
     internal override double Size
     {
         get
@@ -33,7 +47,22 @@
     {
         if (Chart != null)
         {
-            Chart.ValueAxis = this;
+            if (string.IsNullOrEmpty(Name))
+            {
+                Chart.ValueAxis = this;
+            }
+            else
+            {
+                Chart.AddValueAxis(Name, this);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        if (Chart != null && !string.IsNullOrEmpty(Name))
+        {
+            Chart.RemoveValueAxis(Name);
         }
     }
 }

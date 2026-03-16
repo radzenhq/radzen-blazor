@@ -119,13 +119,46 @@ namespace Radzen.Blazor
 
         internal ScaleBase CategoryScale { get; set; } = new LinearScale();
         internal ScaleBase ValueScale { get; set; } = new LinearScale();
+        internal Dictionary<string, ScaleBase> AdditionalValueScales { get; set; } = new Dictionary<string, ScaleBase>();
         internal IList<IChartSeries> Series { get; set; } = new List<IChartSeries>();
         internal RadzenColumnOptions ColumnOptions { get; set; } = new RadzenColumnOptions();
         internal RadzenBarOptions BarOptions { get; set; } = new RadzenBarOptions();
         internal RadzenLegend Legend { get; set; } = new RadzenLegend();
         internal RadzenCategoryAxis CategoryAxis { get; set; } = new RadzenCategoryAxis();
         internal RadzenValueAxis ValueAxis { get; set; } = new RadzenValueAxis();
+        internal Dictionary<string, RadzenValueAxis> AdditionalValueAxes { get; set; } = new Dictionary<string, RadzenValueAxis>();
         internal RadzenChartTooltipOptions Tooltip { get; set; } = new RadzenChartTooltipOptions();
+
+        internal void AddValueAxis(string name, RadzenValueAxis axis)
+        {
+            AdditionalValueAxes[name] = axis;
+        }
+
+        internal void RemoveValueAxis(string name)
+        {
+            AdditionalValueAxes.Remove(name);
+            AdditionalValueScales.Remove(name);
+        }
+
+        internal ScaleBase GetValueScale(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return ValueScale;
+            }
+
+            return AdditionalValueScales.TryGetValue(name, out var scale) ? scale : ValueScale;
+        }
+
+        internal RadzenValueAxis GetValueAxis(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return ValueAxis;
+            }
+
+            return AdditionalValueAxes.TryGetValue(name, out var axis) ? axis : ValueAxis;
+        }
         internal void AddSeries(IChartSeries series)
         {
             if (!Series.Contains(series))
@@ -188,10 +221,68 @@ namespace Radzen.Blazor
                 visibleSeries.Add(invisibleSeries.Last());
             }
 
+            // Partition series: primary axis vs named axes
+            var primarySeries = new List<IChartSeries>();
+            var namedAxisSeries = new Dictionary<string, List<IChartSeries>>();
+
+            foreach (var series in visibleSeries)
+            {
+                var axisName = (series is IChartValueAxisSeries named) ? named.ValueAxisName : null;
+                if (string.IsNullOrEmpty(axisName))
+                {
+                    primarySeries.Add(series);
+                }
+                else
+                {
+                    if (!namedAxisSeries.TryGetValue(axisName, out var list))
+                    {
+                        list = new List<IChartSeries>();
+                        namedAxisSeries[axisName] = list;
+                    }
+                    list.Add(series);
+                }
+            }
+
+            // All series contribute to category scale
             foreach (var series in visibleSeries)
             {
                 CategoryScale = series.TransformCategoryScale(CategoryScale);
+            }
+
+            // Primary series contribute to primary value scale
+            foreach (var series in primarySeries)
+            {
                 ValueScale = series.TransformValueScale(ValueScale);
+            }
+
+            // Named-axis series contribute to their own scales
+            foreach (var entry in namedAxisSeries)
+            {
+                var axisName = entry.Key;
+                if (!AdditionalValueScales.TryGetValue(axisName, out var additionalScale))
+                {
+                    additionalScale = new LinearScale();
+                }
+                else
+                {
+                    additionalScale = new LinearScale { Output = additionalScale.Output };
+                }
+
+                foreach (var series in entry.Value)
+                {
+                    additionalScale = series.TransformValueScale(additionalScale);
+                }
+
+                AdditionalValueScales[axisName] = additionalScale;
+            }
+
+            // Remove scales for axes that no longer have series
+            foreach (var key in AdditionalValueScales.Keys.ToList())
+            {
+                if (!namedAxisSeries.ContainsKey(key))
+                {
+                    AdditionalValueScales.Remove(key);
+                }
             }
 
             AxisBase xAxis = CategoryAxis;
@@ -223,16 +314,37 @@ namespace Radzen.Blazor
                 ValueScale.Round = false;
             }
 
+            // Resize additional value scales
+            foreach (var entry in AdditionalValueScales)
+            {
+                var axis = GetValueAxis(entry.Key);
+                entry.Value.Resize(axis.Min!, axis.Max!);
+                if (axis.Step != null)
+                {
+                    entry.Value.Step = axis.Step;
+                    entry.Value.Round = false;
+                }
+            }
+
             var legendSize = Legend.Measure(this);
             var valueAxisSize = ValueAxis.Measure(this);
             var categoryAxisSize = CategoryAxis.Measure(this);
 
+            // Measure additional axes for right margin
+            double additionalAxesWidth = 0;
+            foreach (var entry in AdditionalValueAxes)
+            {
+                additionalAxesWidth += entry.Value.Measure(this, GetValueScale(entry.Key));
+            }
+
             if (!ShouldRenderAxes())
             {
                 valueAxisSize = categoryAxisSize = 0;
+                additionalAxesWidth = 0;
             }
 
-            MarginTop = MarginRight = 32;
+            MarginTop = 32;
+            MarginRight = 32 + additionalAxesWidth;
             MarginLeft = valueAxisSize;
             MarginBottom = Math.Max(32, categoryAxisSize);
 
@@ -242,7 +354,7 @@ namespace Radzen.Blazor
                 {
                     if (Legend.Position == LegendPosition.Right)
                     {
-                        MarginRight = legendSize + 16;
+                        MarginRight = legendSize + 16 + additionalAxesWidth;
                     }
                     else
                     {
@@ -267,6 +379,14 @@ namespace Radzen.Blazor
 
             ValueScale.Fit(ValueAxis.TickDistance);
             CategoryScale.Fit(CategoryAxis.TickDistance);
+
+            // Set output ranges and fit additional scales
+            foreach (var entry in AdditionalValueScales)
+            {
+                entry.Value.Output = new ScaleRange { Start = Height != null ? Height.Value - MarginBottom : 0, End = MarginTop };
+                var axis = GetValueAxis(entry.Key);
+                entry.Value.Fit(axis.TickDistance);
+            }
 
             var stateHasChanged = !ValueScale.IsEqualTo(valueScale);
 
@@ -302,6 +422,11 @@ namespace Radzen.Blazor
                 stateHasChanged = true;
 
                 ValueScale.Output = new ScaleRange { Start = Height.Value - MarginBottom, End = MarginTop };
+
+                foreach (var entry in AdditionalValueScales)
+                {
+                    entry.Value.Output = new ScaleRange { Start = Height.Value - MarginBottom, End = MarginTop };
+                }
             }
 
             if (stateHasChanged)

@@ -2120,6 +2120,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Multiple Axes",
+                            Path = "multiple-axes-chart",
+                            Description = "Radzen Blazor Chart with multiple value axes for combining series with different scales.",
+                            Tags = new [] { "chart", "graph", "multiple", "axes", "axis", "dual", "secondary" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Radzen Blazor Chart with donut series.",

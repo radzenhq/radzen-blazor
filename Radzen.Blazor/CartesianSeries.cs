@@ -13,7 +13,7 @@ namespace Radzen.Blazor
     /// Base class of <see cref="RadzenChart" /> series.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data.</typeparam>
-    public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IDisposable
+    public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IDisposable
     {
         /// <summary>
         /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on
@@ -157,6 +157,13 @@ namespace Radzen.Blazor
 
             return PropertyAccess.IsNumeric(property);
         }
+
+        /// <summary>
+        /// Gets or sets the name of the value axis this series is bound to.
+        /// When null or empty, the series uses the primary (default) axis.
+        /// </summary>
+        [Parameter]
+        public string? ValueAxisName { get; set; }
 
         /// <inheritdoc />
         [Parameter]
@@ -732,18 +739,18 @@ namespace Radzen.Blazor
             {
                 Func<TItem, double> X;
                 Func<TItem, double> Y;
+                var vs = chart.GetValueScale(ValueAxisName);
                 if (chart.ShouldInvertAxes())
                 {
-                    var valueScale = chart.ValueScale;
-                    var categoryAccessor = Category(chart.ValueScale);
+                    var categoryAccessor = Category(vs);
                     X = e => chart.CategoryScale.Scale(Value(e));
-                    Y = e => valueScale.Scale(categoryAccessor(e));
+                    Y = e => vs.Scale(categoryAccessor(e));
                 }
                 else
                 {
                     var categoryAccessor = Category(chart.CategoryScale);
                     X = e => chart.CategoryScale.Scale(categoryAccessor(e));
-                    Y = e => chart.ValueScale.Scale(Value(e));
+                    Y = e => vs.Scale(Value(e));
                 }
 
                 var data = Items.ToList();
@@ -777,14 +784,14 @@ namespace Radzen.Blazor
                 return result;
             }
 
+            var vs = chart.GetValueScale(ValueAxisName);
             if (chart.ShouldInvertAxes())
             {
-                var categoryAccessor = Category(chart.ValueScale);
-                var valueScale = chart.ValueScale;
+                var categoryAccessor = Category(vs);
                 foreach (var item in Items)
                 {
                     var px = chart.CategoryScale.Scale(Value(item));
-                    var py = valueScale.Scale(categoryAccessor(item));
+                    var py = vs.Scale(categoryAccessor(item));
                     result.Add(new Point { X = px, Y = py });
                 }
             }
@@ -794,7 +801,7 @@ namespace Radzen.Blazor
                 foreach (var item in Items)
                 {
                     var px = chart.CategoryScale.Scale(categoryAccessor(item));
-                    var py = chart.ValueScale.Scale(Value(item));
+                    var py = vs.Scale(Value(item));
                     result.Add(new Point { X = px, Y = py });
                 }
             }
@@ -869,7 +876,9 @@ namespace Radzen.Blazor
         protected virtual string TooltipValue(TItem item)
         {
             var chart = RequireChart();
-            return chart.ValueAxis.Format(chart.ValueScale, chart.ValueScale.Value(Value(item)));
+            var valueAxis = chart.GetValueAxis(ValueAxisName);
+            var valueScale = chart.GetValueScale(ValueAxisName);
+            return valueAxis.Format(valueScale, valueScale.Value(Value(item)));
         }
 
         /// <summary>
@@ -890,7 +899,7 @@ namespace Radzen.Blazor
         internal virtual double TooltipY(TItem item)
         {
             var chart = RequireChart();
-            return chart.ValueScale.Scale(Value(item), true);
+            return chart.GetValueScale(ValueAxisName).Scale(Value(item), true);
         }
 
         /// <inheritdoc />
@@ -923,7 +932,7 @@ namespace Radzen.Blazor
                 {
                     Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
                     TextAnchor = "middle",
-                    Text = chart.ValueAxis.Format(chart.ValueScale, Value(d))
+                    Text = chart.GetValueAxis(ValueAxisName).Format(chart.GetValueScale(ValueAxisName), Value(d))
                 });
             }
 
