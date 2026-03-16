@@ -64,6 +64,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Set Dokku config
+        uses: dokku/github-action@master
+        with:
+          git_remote_url: ${{ secrets.DOKKU_REPO }}
+          ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+          command: config:set --no-restart GoogleMaps__ApiKey=${{ secrets.GOOGLE_MAPS_API_KEY }}
+
       - name: Push to dokku
         uses: dokku/github-action@master
         with:
