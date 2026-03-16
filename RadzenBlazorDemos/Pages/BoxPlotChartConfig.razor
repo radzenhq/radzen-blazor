@@ -1,0 +1,50 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart>
+                <RadzenBoxPlotSeries Data="@data" CategoryProperty="Month"
+                    LowerWhiskerProperty="Min" LowerQuartileProperty="Q1"
+                    MedianProperty="Median" UpperQuartileProperty="Q3"
+                    UpperWhiskerProperty="Max" MeanProperty="Mean"
+                    Title="Temperature" ShowMean="true"
+                    Fill="var(--rz-series-1)" Stroke="var(--rz-series-1)" MedianStroke="#fff" MeanFill="#fff" />
+                <RadzenCategoryAxis>
+                    <RadzenGridLines Visible="true" />
+                </RadzenCategoryAxis>
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Temperature (°C)" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class TemperatureStats
+    {
+        public string Month { get; set; } = "";
+        public double Min { get; set; }
+        public double Q1 { get; set; }
+        public double Median { get; set; }
+        public double Q3 { get; set; }
+        public double Max { get; set; }
+        public double Mean { get; set; }
+    }
+
+    TemperatureStats[] data = new TemperatureStats[]
+    {
+        new TemperatureStats { Month = "Jan", Min = -5, Q1 = -1, Median = 2, Q3 = 5, Max = 10, Mean = 2.3 },
+        new TemperatureStats { Month = "Feb", Min = -3, Q1 = 0, Median = 3, Q3 = 7, Max = 12, Mean = 3.5 },
+        new TemperatureStats { Month = "Mar", Min = 1, Q1 = 5, Median = 9, Q3 = 13, Max = 18, Mean = 9.2 },
+        new TemperatureStats { Month = "Apr", Min = 5, Q1 = 9, Median = 13, Q3 = 17, Max = 22, Mean = 13.1 },
+        new TemperatureStats { Month = "May", Min = 10, Q1 = 14, Median = 18, Q3 = 22, Max = 28, Mean = 18.4 },
+        new TemperatureStats { Month = "Jun", Min = 15, Q1 = 19, Median = 23, Q3 = 27, Max = 33, Mean = 23.2 },
+        new TemperatureStats { Month = "Jul", Min = 18, Q1 = 22, Median = 26, Q3 = 30, Max = 36, Mean = 26.1 },
+        new TemperatureStats { Month = "Aug", Min = 17, Q1 = 21, Median = 25, Q3 = 29, Max = 35, Mean = 25.3 },
+        new TemperatureStats { Month = "Sep", Min = 12, Q1 = 16, Median = 20, Q3 = 24, Max = 30, Mean = 20.5 },
+        new TemperatureStats { Month = "Oct", Min = 6, Q1 = 10, Median = 14, Q3 = 18, Max = 23, Mean = 14.0 },
+        new TemperatureStats { Month = "Nov", Min = 1, Q1 = 4, Median = 8, Q3 = 12, Max = 17, Mean = 8.1 },
+        new TemperatureStats { Month = "Dec", Min = -4, Q1 = 0, Median = 3, Q3 = 6, Max = 11, Mean = 3.0 },
+    };
+}
