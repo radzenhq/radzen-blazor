@@ -158,7 +158,8 @@ static class FormulaTokenTypeExtensions
             FormulaTokenType.Star => BinaryOperator.Multiply,
             FormulaTokenType.Slash => BinaryOperator.Divide,
             FormulaTokenType.Equals => BinaryOperator.Equals,
-            FormulaTokenType.EqualsGreaterThan => BinaryOperator.NotEquals,
+            FormulaTokenType.EqualsGreaterThan => BinaryOperator.GreaterThanOrEqual,
+            FormulaTokenType.LessThanGreaterThan => BinaryOperator.NotEquals,
             FormulaTokenType.LessThan => BinaryOperator.LessThan,
             FormulaTokenType.LessThanOrEqual => BinaryOperator.LessThanOrEqual,
             FormulaTokenType.GreaterThan => BinaryOperator.GreaterThan,
@@ -346,6 +347,7 @@ internal class FormulaParser
         var left = ParseArithmetic();
 
         while (Peek().Type is FormulaTokenType.Equals or FormulaTokenType.EqualsGreaterThan or
+               FormulaTokenType.LessThanGreaterThan or
                FormulaTokenType.LessThan or FormulaTokenType.LessThanOrEqual or
                FormulaTokenType.GreaterThan or FormulaTokenType.GreaterThanOrEqual)
         {

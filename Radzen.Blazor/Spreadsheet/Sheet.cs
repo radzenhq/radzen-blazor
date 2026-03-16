@@ -829,6 +829,7 @@ public partial class Sheet
                 FormulaTokenType.LessThan => "<",
                 FormulaTokenType.LessThanOrEqual => "<=",
                 FormulaTokenType.EqualsGreaterThan => ">=",
+                FormulaTokenType.LessThanGreaterThan => "<>",
                 _ => throw new InvalidOperationException($"Unsupported operator token: {token.Type}")
             };
         }
