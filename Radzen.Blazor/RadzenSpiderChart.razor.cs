@@ -59,6 +59,45 @@ namespace Radzen.Blazor
         public bool ShowTooltip { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets whether numeric axis values are shown along the first radial axis.
+        /// </summary>
+        [Parameter]
+        public bool ShowAxisValues { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start angle in degrees (0 = top/north, clockwise). Default is 0.
+        /// </summary>
+        [Parameter]
+        public double StartAngle { get; set; } = 0;
+
+        /// <summary>
+        /// Gets or sets the end angle in degrees (0 = top/north, clockwise). Default is 360 (full circle).
+        /// </summary>
+        [Parameter]
+        public double EndAngle { get; set; } = 360;
+
+        /// <summary>
+        /// Gets the effective sweep in degrees, handling wrap-around and negative values
+        /// (e.g. 270° to 90° = 180°, 180° to -270° = 90°).
+        /// </summary>
+        private double SweepDegrees
+        {
+            get
+            {
+                var sweep = EndAngle - StartAngle;
+                // Normalize to (0, 360]
+                sweep = sweep % 360;
+                if (sweep <= 0) sweep += 360;
+                return sweep;
+            }
+        }
+
+        /// <summary>
+        /// Whether the chart displays a partial angular range.
+        /// </summary>
+        private bool IsPartial => SweepDegrees < 359.99;
+
+        /// <summary>
         /// Event callback for when a series (or a marker) is clicked. Matches <see cref="RadzenChart.SeriesClick" /> behavior.
         /// </summary>
         [Parameter]
@@ -163,20 +202,63 @@ namespace Radzen.Blazor
         private string FormatValue(IRadzenSpiderSeries series, double value) => series.FormatValue(value);
 
         /// <summary>
+        /// Gets the angle in radians for a category at the given index.
+        /// </summary>
+        private double GetAngle(int index)
+        {
+            var categories = GetAllCategories();
+            if (categories.Count == 0) return -Math.PI / 2;
+
+            var startRad = StartAngle * Math.PI / 180 - Math.PI / 2;
+            var sweepRad = SweepDegrees * Math.PI / 180;
+
+            // For partial range, distribute categories at both endpoints
+            // For full circle, distribute evenly without doubling the start
+            var divisor = IsPartial ? Math.Max(categories.Count - 1, 1) : categories.Count;
+            return startRad + index * sweepRad / divisor;
+        }
+
+        /// <summary>
         /// Gets the grid path for a specific scale.
         /// </summary>
         private string GetGridPath(double scale)
         {
             var categories = GetAllCategories();
             var points = new List<string>();
-            
+
             for (int i = 0; i < categories.Count; i++)
             {
                 var (x, y) = GetPoint(i, MaxValue * scale);
                 points.Add($"{x.ToString("F2", CultureInfo.InvariantCulture)},{y.ToString("F2", CultureInfo.InvariantCulture)}");
             }
-            
-            return $"M{string.Join(" L", points)} Z";
+
+            return IsPartial
+                ? $"M{string.Join(" L", points)}"
+                : $"M{string.Join(" L", points)} Z";
+        }
+
+        /// <summary>
+        /// Gets an SVG arc path for a circular grid at a specific scale (used for partial ranges).
+        /// </summary>
+        private string GetArcPath(double scale)
+        {
+            if (!Width.HasValue || !Height.HasValue) return "";
+
+            var centerX = Width.Value / 2;
+            var centerY = Height.Value / 2;
+            var radius = Math.Min(centerX, centerY) * 0.8 * scale;
+
+            var startRad = StartAngle * Math.PI / 180 - Math.PI / 2;
+            var sweepRad = SweepDegrees * Math.PI / 180;
+            var endRad = startRad + sweepRad;
+            var largeArc = sweepRad > Math.PI ? 1 : 0;
+
+            var x1 = centerX + radius * Math.Cos(startRad);
+            var y1 = centerY + radius * Math.Sin(startRad);
+            var x2 = centerX + radius * Math.Cos(endRad);
+            var y2 = centerY + radius * Math.Sin(endRad);
+
+            return $"M{x1.ToString("F2", CultureInfo.InvariantCulture)},{y1.ToString("F2", CultureInfo.InvariantCulture)} A{radius.ToString("F2", CultureInfo.InvariantCulture)},{radius.ToString("F2", CultureInfo.InvariantCulture)} 0 {largeArc} 1 {x2.ToString("F2", CultureInfo.InvariantCulture)},{y2.ToString("F2", CultureInfo.InvariantCulture)}";
         }
 
         /// <summary>
@@ -186,7 +268,7 @@ namespace Radzen.Blazor
         {
             var categories = GetAllCategories();
             var points = new List<string>();
-            
+
             foreach (var category in categories)
             {
                 var value = GetSeriesValue(series, category);
@@ -194,8 +276,12 @@ namespace Radzen.Blazor
                 var (x, y) = GetPoint(index, value);
                 points.Add($"{x.ToString("F2", CultureInfo.InvariantCulture)},{y.ToString("F2", CultureInfo.InvariantCulture)}");
             }
-            
-            return points.Count > 0 ? $"M{string.Join(" L", points)} Z" : "";
+
+            if (points.Count == 0) return "";
+
+            return IsPartial
+                ? $"M{string.Join(" L", points)}"
+                : $"M{string.Join(" L", points)} Z";
         }
 
         /// <summary>
@@ -214,14 +300,13 @@ namespace Radzen.Blazor
                 return (Width.Value / 2, Height.Value / 2);
             }
 
-            var angleStep = 2 * Math.PI / categories.Count;
-            var angle = index * angleStep - Math.PI / 2;
+            var angle = GetAngle(index);
             var normalizedValue = (value - MinValue) / (MaxValue - MinValue);
             var centerX = Width.Value / 2;
             var centerY = Height.Value / 2;
             var maxRadius = Math.Min(centerX, centerY) * 0.8;
             var radius = maxRadius * normalizedValue;
-            
+
             return (centerX + radius * Math.Cos(angle), centerY + radius * Math.Sin(angle));
         }
 
@@ -241,13 +326,12 @@ namespace Radzen.Blazor
                 return (Width.Value / 2, Height.Value / 2);
             }
 
-            var angleStep = 2 * Math.PI / categories.Count;
-            var angle = index * angleStep - Math.PI / 2;
+            var angle = GetAngle(index);
             var centerX = Width.Value / 2;
             var centerY = Height.Value / 2;
             var maxRadius = Math.Min(centerX, centerY) * 0.8;
-            var labelRadius = maxRadius * 1.15; // Back to original distance
-            
+            var labelRadius = maxRadius * 1.15;
+
             return (centerX + labelRadius * Math.Cos(angle), centerY + labelRadius * Math.Sin(angle));
         }
 
@@ -258,25 +342,18 @@ namespace Radzen.Blazor
         {
             var categories = GetAllCategories();
             if (categories.Count == 0) return "middle";
-            
-            var angleStep = 2 * Math.PI / categories.Count;
-            var angle = index * angleStep - Math.PI / 2;
-            
-            // More precise anchoring based on position
+
+            var angle = GetAngle(index);
             var x = Math.Cos(angle);
-            var y = Math.Sin(angle);
-            
-            // Top and bottom positions
+
             if (Math.Abs(x) < 0.1)
             {
                 return "middle";
             }
-            // Right side
             else if (x > 0.1)
             {
                 return "start";
             }
-            // Left side
             else
             {
                 return "end";
@@ -290,23 +367,18 @@ namespace Radzen.Blazor
         {
             var categories = GetAllCategories();
             if (categories.Count == 0) return "middle";
-            
-            var angleStep = 2 * Math.PI / categories.Count;
-            var angle = index * angleStep - Math.PI / 2;
-            
+
+            var angle = GetAngle(index);
             var y = Math.Sin(angle);
-            
-            // Top position
+
             if (y < -0.7)
             {
                 return "auto";
             }
-            // Bottom position
             else if (y > 0.7)
             {
                 return "hanging";
             }
-            // Sides
             else
             {
                 return "middle";
@@ -314,32 +386,146 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Renders the category labels.
+        /// Computes the minimum angular spacing (in degrees) between adjacent categories.
+        /// </summary>
+        private double AngularSpacingDegrees
+        {
+            get
+            {
+                var categories = GetAllCategories();
+                if (categories.Count <= 1) return SweepDegrees;
+                var divisor = IsPartial ? Math.Max(categories.Count - 1, 1) : categories.Count;
+                return SweepDegrees / divisor;
+            }
+        }
+
+        /// <summary>
+        /// Renders the category labels, rotating them along their radial direction when there are many categories.
+        /// Skips labels when the angular spacing is too small to prevent overlapping.
         /// </summary>
         private RenderFragment RenderLabels() => builder =>
         {
             var categories = GetAllCategories();
-            
+            var rotate = categories.Count > 8;
+
+            // Calculate how many labels to skip to avoid overlap
+            var spacing = AngularSpacingDegrees;
+            var step = 1;
+            if (spacing < 10) step = 4;
+            else if (spacing < 15) step = 3;
+            else if (spacing < 20) step = 2;
+
             for (int i = 0; i < categories.Count; i++)
             {
+                // Always show first and last labels for partial charts; skip intermediate ones based on step
+                var isEndpoint = IsPartial && (i == 0 || i == categories.Count - 1);
+                if (!isEndpoint && step > 1 && i % step != 0) continue;
+
                 var (x, y) = GetLabelPoint(i);
                 var category = categories[i];
-                var anchor = GetLabelAnchor(i);
-                var baseline = GetLabelBaseline(i);
-                var xStr = x.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-                var yStr = y.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-                
+                var xStr = x.ToString("F2", CultureInfo.InvariantCulture);
+                var yStr = y.ToString("F2", CultureInfo.InvariantCulture);
+
+                builder.OpenElement(0, "text");
+                builder.AddAttribute(1, "x", xStr);
+                builder.AddAttribute(2, "y", yStr);
+
+                if (rotate)
+                {
+                    var angle = GetAngle(i);
+                    var angleDeg = angle * 180 / Math.PI + 90; // Convert so 0° = radial outward
+                    var cos = Math.Cos(angle);
+
+                    // Flip labels on the left side so text always reads left-to-right
+                    if (cos < -0.01)
+                    {
+                        angleDeg += 180;
+                        builder.AddAttribute(3, "text-anchor", "end");
+                    }
+                    else
+                    {
+                        builder.AddAttribute(3, "text-anchor", "start");
+                    }
+
+                    builder.AddAttribute(4, "dominant-baseline", "middle");
+                    builder.AddAttribute(7, "transform", $"rotate({angleDeg.ToString("F1", CultureInfo.InvariantCulture)},{xStr},{yStr})");
+                }
+                else
+                {
+                    builder.AddAttribute(3, "text-anchor", GetLabelAnchor(i));
+                    builder.AddAttribute(4, "dominant-baseline", GetLabelBaseline(i));
+                }
+
+                builder.AddAttribute(5, "fill", "var(--rz-text-color)");
+                builder.AddAttribute(6, "class", "rz-spider-chart-label");
+                builder.AddContent(8, category);
+                builder.CloseElement();
+            }
+        };
+
+        /// <summary>
+        /// Renders the axis value labels. For partial charts, uses the last radial axis;
+        /// for full charts, uses the first radial axis. Labels are offset to the outside of the sweep area.
+        /// </summary>
+        private RenderFragment RenderAxisValues() => builder =>
+        {
+            if (!Width.HasValue || !Height.HasValue) return;
+
+            var categories = GetAllCategories();
+            if (categories.Count == 0) return;
+
+            // For partial charts, render along the last axis; for full charts, along the first
+            var axisIndex = IsPartial ? categories.Count - 1 : 0;
+            var axisAngle = GetAngle(axisIndex);
+            var midAngle = GetAngle(categories.Count / 2);
+            var perp1 = axisAngle + Math.PI / 2;
+            var perp2 = axisAngle - Math.PI / 2;
+
+            // Pick the perpendicular that points away from the mid-sweep direction
+            var diff1 = Math.Abs(AngleDiff(perp1, midAngle));
+            var diff2 = Math.Abs(AngleDiff(perp2, midAngle));
+            var perpAngle = diff1 > diff2 ? perp1 : perp2;
+
+            var offsetX = Math.Cos(perpAngle) * 8;
+            var offsetY = Math.Sin(perpAngle) * 8;
+
+            // Determine text-anchor based on offset direction
+            var cosPerp = Math.Cos(perpAngle);
+            string anchor;
+            if (Math.Abs(cosPerp) < 0.3) anchor = "middle";
+            else if (cosPerp > 0) anchor = "start";
+            else anchor = "end";
+
+            for (int i = 1; i <= 5; i++)
+            {
+                var value = MinValue + (MaxValue - MinValue) * (i / 5.0);
+                var (x, y) = GetPoint(axisIndex, value);
+                var xStr = (x + offsetX).ToString("F2", CultureInfo.InvariantCulture);
+                var yStr = (y + offsetY).ToString("F2", CultureInfo.InvariantCulture);
+
                 builder.OpenElement(0, "text");
                 builder.AddAttribute(1, "x", xStr);
                 builder.AddAttribute(2, "y", yStr);
                 builder.AddAttribute(3, "text-anchor", anchor);
-                builder.AddAttribute(4, "dominant-baseline", baseline);
-                builder.AddAttribute(5, "fill", "var(--rz-text-color)");
-                builder.AddAttribute(6, "class", "rz-spider-chart-label");
-                builder.AddContent(7, category);
+                builder.AddAttribute(4, "dominant-baseline", "middle");
+                builder.AddAttribute(5, "fill", "var(--rz-text-tertiary-color)");
+                builder.AddAttribute(6, "class", "rz-spider-chart-axis-value");
+                builder.AddAttribute(7, "font-size", "11");
+                builder.AddContent(8, value.ToString("F0", CultureInfo.InvariantCulture));
                 builder.CloseElement();
             }
         };
+
+        /// <summary>
+        /// Returns the signed angular difference normalized to [-PI, PI].
+        /// </summary>
+        private static double AngleDiff(double a, double b)
+        {
+            var d = a - b;
+            while (d > Math.PI) d -= 2 * Math.PI;
+            while (d < -Math.PI) d += 2 * Math.PI;
+            return d;
+        }
 
         /// <summary>
         /// Handles series click events.

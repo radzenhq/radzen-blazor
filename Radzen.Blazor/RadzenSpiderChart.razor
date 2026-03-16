@@ -34,10 +34,17 @@
                         {
                             @if (GridShape == SpiderChartGridShape.Circular)
                             {
-                                var centerX = Width.Value / 2;
-                                var centerY = Height.Value / 2;
-                                var radius = Math.Min(centerX, centerY) * 0.8 * (i / 5.0);
-                                <circle cx="@centerX.ToInvariantString()" cy="@centerY.ToInvariantString()" r="@radius.ToInvariantString()" class="rz-spider-chart-grid-circle" />
+                                @if (IsPartial)
+                                {
+                                    <path d="@GetArcPath(i / 5.0)" class="rz-spider-chart-grid-circle" fill="none" />
+                                }
+                                else
+                                {
+                                    var centerX = Width.Value / 2;
+                                    var centerY = Height.Value / 2;
+                                    var radius = Math.Min(centerX, centerY) * 0.8 * (i / 5.0);
+                                    <circle cx="@centerX.ToInvariantString()" cy="@centerY.ToInvariantString()" r="@radius.ToInvariantString()" class="rz-spider-chart-grid-circle" />
+                                }
                             }
                             else
                             {
@@ -118,6 +125,13 @@
                     <g class="rz-spider-chart-labels">
                         @RenderLabels()
                     </g>
+
+                    @if (ShowAxisValues)
+                    {
+                        <g class="rz-spider-chart-axis-values">
+                            @RenderAxisValues()
+                        </g>
+                    }
                 </svg>
             @if (Legend?.Visible == true)
             {
