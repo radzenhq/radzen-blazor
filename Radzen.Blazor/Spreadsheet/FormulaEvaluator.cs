@@ -118,7 +118,7 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
             BinaryOperator.LessThan or BinaryOperator.LessThanOrEqual or
             BinaryOperator.GreaterThan or BinaryOperator.GreaterThanOrEqual;
 
-        // Coerce Date to Number for arithmetic operations (Excel semantics: dates are serials)
+        // Coerce Date and Boolean to Number for arithmetic operations (Excel semantics)
         if (!isComparisonOperator)
         {
             if (left.Type == CellDataType.Date)
@@ -130,6 +130,14 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
             {
                 var rn = right.GetValueOrDefault<DateTime>().ToNumber();
                 right = CellData.FromNumber(rn);
+            }
+            if (left.Type == CellDataType.Boolean)
+            {
+                left = CellData.FromNumber(left.GetValueOrDefault<bool>() ? 1d : 0d);
+            }
+            if (right.Type == CellDataType.Boolean)
+            {
+                right = CellData.FromNumber(right.GetValueOrDefault<bool>() ? 1d : 0d);
             }
         }
 
