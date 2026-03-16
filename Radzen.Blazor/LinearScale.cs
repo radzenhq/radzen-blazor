@@ -19,6 +19,12 @@ namespace Radzen.Blazor
                 return String.Empty;
             }
 
+            // Normalize negative zero to zero
+            if (value is double d && d == 0)
+            {
+                value = 0.0;
+            }
+
             if (String.IsNullOrEmpty(format))
             {
                 return value.ToString() ?? String.Empty;
