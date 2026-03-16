@@ -65,11 +65,12 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Set Dokku config
-        uses: dokku/github-action@master
-        with:
-          git_remote_url: ${{ secrets.DOKKU_REPO }}
-          ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
-          command: config:set --no-restart GoogleMaps__ApiKey=${{ secrets.GOOGLE_MAPS_API_KEY }}
+        run: |
+          eval "$(ssh-agent -s)"
+          echo "${{ secrets.DOKKU_SSH_PRIVATE_KEY }}" | ssh-add -
+          APP_NAME=$(echo "${{ secrets.DOKKU_REPO }}" | sed 's/.*\///')
+          HOST=$(echo "${{ secrets.DOKKU_REPO }}" | sed 's/dokku@//;s/:.*//')
+          ssh -o StrictHostKeyChecking=no dokku@$HOST config:set --no-restart $APP_NAME GoogleMaps__ApiKey=${{ secrets.GOOGLE_MAPS_API_KEY }}
 
       - name: Push to dokku
         uses: dokku/github-action@master
