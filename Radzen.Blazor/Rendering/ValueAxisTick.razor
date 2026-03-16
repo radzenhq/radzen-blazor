@@ -1,15 +1,37 @@
 @inherits Tick
 
 <g class="rz-tick">
-<Line class="rz-tick-line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" X1="@X" Y1="@Y" X2="@(X-6)" Y2="@Y" />
-@if (ChildContent == null)
+@if (RightSide)
 {
-  <g>
-    <text class="rz-tick-text" x="@((X-9).ToInvariantString())" dy=".3em" y="@Y.ToInvariantString()">@Text</text>
-  </g>
+    <Line class="rz-tick-line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" X1="@X" Y1="@Y" X2="@(X+6)" Y2="@Y" />
+    @if (ChildContent == null)
+    {
+      <g>
+        <text class="rz-tick-text" x="@((X+9).ToInvariantString())" dy=".3em" y="@Y.ToInvariantString()" style="text-anchor: start">@Text</text>
+      </g>
+    }
+    else
+    {
+      @ChildContent
+    }
 }
 else
 {
-  @ChildContent
+    <Line class="rz-tick-line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" X1="@X" Y1="@Y" X2="@(X-6)" Y2="@Y" />
+    @if (ChildContent == null)
+    {
+      <g>
+        <text class="rz-tick-text" x="@((X-9).ToInvariantString())" dy=".3em" y="@Y.ToInvariantString()">@Text</text>
+      </g>
+    }
+    else
+    {
+      @ChildContent
+    }
 }
 </g>
+
+@code {
+    [Parameter]
+    public bool RightSide { get; set; }
+}

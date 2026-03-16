@@ -1,0 +1,42 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart Style="height: 400px">
+                <RadzenColumnSeries Data="@data" CategoryProperty="Month" ValueProperty="Revenue" Title="Revenue ($)"
+                    Fill="var(--rz-series-0)" Stroke="var(--rz-series-0)" />
+                <RadzenLineSeries Data="@data" CategoryProperty="Month" ValueProperty="Orders" Title="Orders" ValueAxisName="orders"
+                    Stroke="var(--rz-series-4)">
+                    <RadzenMarkers MarkerType="MarkerType.Triangle" Fill="var(--rz-series-4)" Stroke="var(--rz-series-4)" />
+                </RadzenLineSeries>
+                <RadzenCategoryAxis />
+                <RadzenValueAxis>
+                    <RadzenAxisTitle Text="Revenue ($)" />
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+                <RadzenValueAxis Name="orders">
+                    <RadzenAxisTitle Text="Order Count" />
+                </RadzenValueAxis>
+                <RadzenLegend Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class MultiAxisData
+    {
+        public string Month { get; set; } = "";
+        public double Revenue { get; set; }
+        public double Orders { get; set; }
+    }
+
+    MultiAxisData[] data = new MultiAxisData[]
+    {
+        new MultiAxisData { Month = "Jan", Revenue = 234000, Orders = 42 },
+        new MultiAxisData { Month = "Feb", Revenue = 284000, Orders = 55 },
+        new MultiAxisData { Month = "Mar", Revenue = 274000, Orders = 48 },
+        new MultiAxisData { Month = "Apr", Revenue = 310000, Orders = 63 },
+        new MultiAxisData { Month = "May", Revenue = 298000, Orders = 59 },
+        new MultiAxisData { Month = "Jun", Revenue = 356000, Orders = 71 },
+    };
+}
