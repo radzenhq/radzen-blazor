@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
@@ -109,6 +110,16 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public bool Inverted { get; set; }
+
+        /// <summary>
+        /// Specifies the value on the perpendicular axis where this axis should cross.
+        /// When set, the axis line and ticks are positioned at the corresponding location
+        /// instead of the chart edge. For example, setting <c>CrossesAt="0"</c> on the category axis
+        /// positions it where 0 is on the value axis.
+        /// </summary>
+        [Parameter]
+        public object? CrossesAt { get; set; }
+
     /// <summary>
         /// Specifies the label rotation angle in degrees. Set to <c>null</c> by default which means no rotation is applied. Has higher precedence than <see cref="LabelAutoRotation"/>.
         /// </summary>
@@ -130,6 +141,7 @@ namespace Radzen.Blazor
                    DidParameterChange(parameters, nameof(LabelRotation), LabelRotation) ||
                    DidParameterChange(parameters, nameof(LabelAutoRotation), LabelAutoRotation) ||
                    DidParameterChange(parameters, nameof(Inverted), Inverted) ||
+                   DidParameterChange(parameters, nameof(CrossesAt), CrossesAt) ||
                    DidParameterChange(parameters, nameof(Step), Step);
         }
 
@@ -150,6 +162,12 @@ namespace Radzen.Blazor
             {
                 return scale.FormatTick(FormatString ?? string.Empty, value);
             }
+        }
+
+        internal double? GetCrossesAtValue()
+        {
+            if (CrossesAt == null) return null;
+            return Convert.ToDouble(CrossesAt, CultureInfo.InvariantCulture);
         }
 
         internal abstract double Size { get; }
