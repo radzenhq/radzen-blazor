@@ -2264,6 +2264,30 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Spline Chart",
+                            Path = "chart-spline",
+                            Description = "Radzen Blazor Chart with smooth spline interpolation for line and area series.",
+                            Tags = new [] { "chart", "graph", "spline", "smooth", "interpolation" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Histogram",
+                            Path = "chart-histogram",
+                            Description = "Radzen Blazor Chart displaying frequency distributions as a histogram using column series.",
+                            Tags = new [] { "chart", "graph", "histogram", "frequency", "distribution", "bin" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Pareto Chart",
+                            Path = "chart-pareto",
+                            Description = "Radzen Blazor Chart combining column and line series to create a Pareto chart with cumulative percentages.",
+                            Tags = new [] { "chart", "graph", "pareto", "cumulative", "quality" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Toc = [ new () { Text = "Min, max and step", Anchor = "#min-max-and-step" }, new () { Text = "Format axis values", Anchor = "#format-axis-values" }, new () { Text = "Display grid lines", Anchor = "#display-grid-lines" }, new () { Text = "Set axis title", Anchor = "#set-axis-title" } ],
                             Name = "Axis",
                             Path = "chart-axis",
