@@ -62,6 +62,23 @@ public class BooleanArithmeticTests
 
         Assert.Equal(2d, sheet.Cells["A2"].Value);
     }
+
+    [Fact]
+    public void UnaryPlusShouldNotCoerceBoolean()
+    {
+        sheet.Cells["A1"].Formula = "=+TRUE";
+
+        Assert.Equal(true, sheet.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void UnaryPlusShouldNotCoerceBooleanCellRef()
+    {
+        sheet.Cells["A1"].Value = true;
+        sheet.Cells["A2"].Formula = "=+A1";
+
+        Assert.Equal(true, sheet.Cells["A2"].Value);
+    }
 }
 
 public class BooleanSumTests
@@ -285,6 +302,47 @@ public class BooleanComparisonTests
         sheet.Cells["A1"].Formula = "=TRUE<>FALSE";
 
         Assert.Equal(true, sheet.Cells["A1"].Value);
+    }
+}
+
+public class BooleanMinMaxTests
+{
+    readonly Sheet sheet = new(5, 5);
+
+    [Fact]
+    public void MinWithDirectBooleanConstantsShouldCoerceToNumbers()
+    {
+        sheet.Cells["A1"].Formula = "=MIN(TRUE,2,3)";
+
+        Assert.Equal(1d, sheet.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void MinWithBooleanCellRefsShouldSkipBooleans()
+    {
+        sheet.Cells["A1"].Value = true;
+        sheet.Cells["A2"].Value = false;
+        sheet.Cells["A3"].Formula = "=MIN(A1,A2)";
+
+        Assert.Equal(0d, sheet.Cells["A3"].Value);
+    }
+
+    [Fact]
+    public void MaxWithDirectBooleanConstantsShouldCoerceToNumbers()
+    {
+        sheet.Cells["A1"].Formula = "=MAX(TRUE,FALSE,0)";
+
+        Assert.Equal(1d, sheet.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void MaxWithBooleanCellRefsShouldSkipBooleans()
+    {
+        sheet.Cells["A1"].Value = true;
+        sheet.Cells["A2"].Value = false;
+        sheet.Cells["A3"].Formula = "=MAX(A1,A2)";
+
+        Assert.Equal(0d, sheet.Cells["A3"].Value);
     }
 }
 
