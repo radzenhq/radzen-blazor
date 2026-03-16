@@ -2104,6 +2104,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Bullet Chart",
+                            Path = "bullet-chart",
+                            Description = "Radzen Blazor Chart with bullet series for comparing a measure against a target.",
+                            Tags = new [] { "chart", "graph", "bullet", "gauge", "target", "kpi", "performance" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Radzen Blazor Chart with donut series.",
