@@ -219,7 +219,23 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
             operand = CellData.FromNumber(0d);
         }
 
-        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate || unaryExpressionSyntaxNode.Operator == UnaryOperator.Plus)
+        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Plus)
+        {
+            // Excel: unary plus is a no-op for booleans (=+TRUE returns TRUE)
+            if (operand.Type == CellDataType.Boolean)
+            {
+                return;
+            }
+
+            if (operand.Type != CellDataType.Number)
+            {
+                value = CellData.FromError(CellError.Value);
+                return;
+            }
+            return;
+        }
+
+        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate)
         {
             if (operand.Type == CellDataType.Boolean)
             {
@@ -231,10 +247,7 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
                 value = CellData.FromError(CellError.Value);
                 return;
             }
-            var n = operand.GetValueOrDefault<double>();
-            value = unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate
-                ? CellData.FromNumber(-n)
-                : CellData.FromNumber(+n);
+            value = CellData.FromNumber(-operand.GetValueOrDefault<double>());
             return;
         }
     }
