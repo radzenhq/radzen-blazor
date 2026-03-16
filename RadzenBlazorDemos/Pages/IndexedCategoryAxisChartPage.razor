@@ -1,0 +1,15 @@
+@page "/indexed-category-axis-chart"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart with indexed category axis
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Use a numeric <code>CategoryProperty</code> to align multiple series by index rather than
+    by matching category values. Each series can have different category labels at the same index.
+    Use a <code>Formatter</code> on <code>RadzenCategoryAxis</code> to display custom labels.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="IndexedCategoryAxisChartConfig"
+    DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <IndexedCategoryAxisChartConfig />
+</RadzenExample>
