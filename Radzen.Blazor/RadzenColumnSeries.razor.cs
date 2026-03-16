@@ -209,10 +209,12 @@ namespace Radzen.Blazor
         public override (object, Point) DataAt(double x, double y)
         {
             var chart = RequireChart();
+            var vs = chart.GetValueScale(ValueAxisName);
+            var va = chart.GetValueAxis(ValueAxisName);
             var category = ComposeCategory(chart.CategoryScale);
-            var value = ComposeValue(chart.ValueScale);
-            var ticks = chart.ValueScale.Ticks(chart.ValueAxis.TickDistance);
-            var y0 = chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+            var value = ComposeValue(vs);
+            var ticks = vs.Ticks(va.TickDistance);
+            var y0 = vs.Scale(Math.Max(0, ticks.Start));
 
             var columnSeries = VisibleColumnSeries;
             var index = columnSeries.IndexOf(this);
@@ -255,7 +257,7 @@ namespace Radzen.Blazor
                     {
                         Position = new Point() { X = TooltipX(d) + offsetX, Y = TooltipY(d) - offsetY - (16 * sign) },
                         TextAnchor = "middle",
-                        Text = chart.ValueAxis.Format(chart.ValueScale, Value(d))
+                        Text = chart.GetValueAxis(ValueAxisName).Format(chart.GetValueScale(ValueAxisName), Value(d))
                     });
                 }
             }
