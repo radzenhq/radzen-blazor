@@ -1,0 +1,55 @@
+<RadzenChart Style="width: 100%; height: 400px;">
+    <RadzenLineSeries Data="@data" CategoryProperty="Month" ValueProperty="Temperature" Title="2024" Smooth="true">
+        <RadzenMarkers MarkerType="MarkerType.Circle" />
+    </RadzenLineSeries>
+    <RadzenLineSeries Data="@data2" CategoryProperty="Month" ValueProperty="Temperature" Title="2023" Smooth="true" LineType="LineType.Dashed">
+        <RadzenMarkers MarkerType="MarkerType.Square" />
+    </RadzenLineSeries>
+    <RadzenAreaSeries Data="@data" CategoryProperty="Month" ValueProperty="Rainfall" Title="Rainfall 2024" Smooth="true" />
+    <RadzenCategoryAxis />
+    <RadzenValueAxis>
+        <RadzenGridLines Visible="true" />
+    </RadzenValueAxis>
+    <RadzenLegend Position="LegendPosition.Bottom" />
+</RadzenChart>
+
+@code {
+    class WeatherData
+    {
+        public string Month { get; set; }
+        public double Temperature { get; set; }
+        public double Rainfall { get; set; }
+    }
+
+    WeatherData[] data = new[]
+    {
+        new WeatherData { Month = "Jan", Temperature = 2, Rainfall = 45 },
+        new WeatherData { Month = "Feb", Temperature = 4, Rainfall = 38 },
+        new WeatherData { Month = "Mar", Temperature = 9, Rainfall = 42 },
+        new WeatherData { Month = "Apr", Temperature = 14, Rainfall = 50 },
+        new WeatherData { Month = "May", Temperature = 19, Rainfall = 55 },
+        new WeatherData { Month = "Jun", Temperature = 23, Rainfall = 48 },
+        new WeatherData { Month = "Jul", Temperature = 26, Rainfall = 35 },
+        new WeatherData { Month = "Aug", Temperature = 25, Rainfall = 40 },
+        new WeatherData { Month = "Sep", Temperature = 20, Rainfall = 52 },
+        new WeatherData { Month = "Oct", Temperature = 14, Rainfall = 60 },
+        new WeatherData { Month = "Nov", Temperature = 8, Rainfall = 55 },
+        new WeatherData { Month = "Dec", Temperature = 3, Rainfall = 48 },
+    };
+
+    WeatherData[] data2 = new[]
+    {
+        new WeatherData { Month = "Jan", Temperature = 1, Rainfall = 50 },
+        new WeatherData { Month = "Feb", Temperature = 3, Rainfall = 42 },
+        new WeatherData { Month = "Mar", Temperature = 8, Rainfall = 45 },
+        new WeatherData { Month = "Apr", Temperature = 13, Rainfall = 48 },
+        new WeatherData { Month = "May", Temperature = 18, Rainfall = 52 },
+        new WeatherData { Month = "Jun", Temperature = 22, Rainfall = 45 },
+        new WeatherData { Month = "Jul", Temperature = 25, Rainfall = 32 },
+        new WeatherData { Month = "Aug", Temperature = 24, Rainfall = 38 },
+        new WeatherData { Month = "Sep", Temperature = 19, Rainfall = 50 },
+        new WeatherData { Month = "Oct", Temperature = 13, Rainfall = 58 },
+        new WeatherData { Month = "Nov", Temperature = 7, Rainfall = 52 },
+        new WeatherData { Month = "Dec", Temperature = 2, Rainfall = 46 },
+    };
+}
