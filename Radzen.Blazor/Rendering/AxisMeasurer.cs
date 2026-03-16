@@ -26,7 +26,9 @@ namespace Radzen.Blazor.Rendering
 
             double length = 0;
 
-            for (var y = ticks.Start; y <= ticks.End; y += ticks.Step)
+            var isLog = scale.IsLogarithmic;
+
+            for (var y = ticks.Start; y <= ticks.End; y = isLog ? y * ticks.Step : y + ticks.Step)
             {
                 var text = axis.Format(scale, y);
 
@@ -63,10 +65,11 @@ namespace Radzen.Blazor.Rendering
             if (angle != null)
             {
                 var ticks = scale.Ticks(axis.TickDistance);
+                var isLogX = scale.IsLogarithmic;
 
                 double length = 0;
 
-                for (var y = ticks.Start; y <= ticks.End; y += ticks.Step)
+                for (var y = ticks.Start; y <= ticks.End; y = isLogX ? y * ticks.Step : y + ticks.Step)
                 {
                     var text = axis.Format(scale, y);
 
