@@ -1,0 +1,102 @@
+@using System.Timers
+@implements IDisposable
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart @ref="chart" Style="height: 480px">
+                <RadzenLineSeries Data="@data" CategoryProperty="Time" ValueProperty="Value" Title="CPU Usage"
+                    Stroke="var(--rz-warning)" StrokeWidth="2">
+                </RadzenLineSeries>
+                <RadzenCategoryAxis FormatString="{0:mm:ss}">
+                    <RadzenAxisTitle Text="Time (s)" />
+                </RadzenCategoryAxis>
+                <RadzenValueAxis Min="0" Max="100" FormatString="{0}%">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="CPU Usage" />
+                </RadzenValueAxis>
+                <RadzenChartTooltipOptions Visible="false" />
+                <RadzenLegend Visible="false" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    RadzenChart chart;
+    System.Timers.Timer timer;
+    ElapsedEventHandler timerElapsedHandler;
+    Random random = new Random();
+    double currentValue = 50;
+    const int MaxPoints = 40;
+
+    class CpuDataItem
+    {
+        public DateTime Time { get; set; }
+        public double Value { get; set; }
+    }
+
+    List<CpuDataItem> items = new List<CpuDataItem>();
+    IList<CpuDataItem> data;
+
+    protected override void OnInitialized()
+    {
+        var now = DateTime.Now;
+
+        for (int i = MaxPoints; i > 0; i--)
+        {
+            currentValue = NextValue();
+            items.Add(new CpuDataItem
+            {
+                Time = now.AddMilliseconds(-i * 500),
+                Value = currentValue
+            });
+        }
+
+        data = items;
+
+        timer = new System.Timers.Timer(500);
+        timerElapsedHandler = async (s, e) => await InvokeAsync(() => UpdateChart());
+        timer.Elapsed += timerElapsedHandler;
+        timer.Start();
+    }
+
+    double NextValue()
+    {
+        var change = (random.NextDouble() - 0.5) * 20;
+        currentValue = Math.Clamp(currentValue + change, 5, 95);
+        return Math.Round(currentValue, 1);
+    }
+
+    void UpdateChart()
+    {
+        items.Add(new CpuDataItem
+        {
+            Time = DateTime.Now,
+            Value = NextValue()
+        });
+
+        if (items.Count > MaxPoints)
+        {
+            items.RemoveAt(0);
+        }
+
+        // Assign a new list reference to trigger the series parameter change detection
+        data = new List<CpuDataItem>(items);
+
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (timer != null && timerElapsedHandler != null)
+        {
+            timer.Elapsed -= timerElapsedHandler;
+            timerElapsedHandler = null;
+        }
+
+        timer?.Stop();
+        timer?.Dispose();
+        timer = null;
+    }
+}
