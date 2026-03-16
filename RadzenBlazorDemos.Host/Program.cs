@@ -178,4 +178,6 @@ app.MapRazorComponents<RadzenBlazorDemos.Host.App>()
        }
    });
 app.MapControllers();
+app.MapGet("/api/config/googlemaps", (IConfiguration config) =>
+    Results.Ok(new { ApiKey = config["GoogleMaps:ApiKey"] ?? "" }));
 app.Run();

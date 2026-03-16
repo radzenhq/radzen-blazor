@@ -1,7 +1,8 @@
 ﻿@using Microsoft.JSInterop
-@using Microsoft.Extensions.Configuration
+@using System.Net.Http.Json
+@using System.Text.Json
 @inject IJSRuntime JSRuntime
-@inject IConfiguration Configuration
+@inject HttpClient Http
 
 <RadzenCard Variant="Variant.Outlined" class="rz-my-4">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
@@ -10,7 +11,9 @@
     </RadzenStack>
 </RadzenCard>
 
-<RadzenGoogleMap ApiKey="@Configuration["GoogleMaps:ApiKey"]" MapId="854792de47144ec6496c14d8" @ref=map Style="height: 400px" Options=@(new Dictionary<string, object> { { "disableDoubleClickZoom", true } })
+@if (!string.IsNullOrEmpty(apiKey))
+{
+<RadzenGoogleMap ApiKey="@apiKey" MapId="854792de47144ec6496c14d8" @ref=map Style="height: 400px" Options=@(new Dictionary<string, object> { { "disableDoubleClickZoom", true } })
         Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 42.6977, Lng = 23.3219 }) MapClick=@OnMapClick MarkerClick=@OnMarkerClick>
     <Markers>
         <RadzenGoogleMapMarker Title="London" Position=@(new GoogleMapPosition() { Lat = 51.5074, Lng = 0.1278 }) />
@@ -21,6 +24,7 @@
         }
     </Markers>
 </RadzenGoogleMap>
+}
 
 <EventConsole @ref=@console />
 
@@ -29,6 +33,13 @@
     bool showMadridMarker;
     EventConsole console;
     RadzenGoogleMap map;
+    string apiKey;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Http.GetFromJsonAsync<JsonElement>("/api/config/googlemaps");
+        apiKey = result.GetProperty("apiKey").GetString();
+    }
 
     void OnMapClick(GoogleMapClickEventArgs args)
     {
