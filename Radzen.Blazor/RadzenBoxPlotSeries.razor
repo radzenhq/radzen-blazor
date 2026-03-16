@@ -28,8 +28,8 @@
 
         var stroke = Stroke;
         var fill = Fill;
-        var medianStroke = MedianStroke ?? stroke;
-        var meanFill = MeanFill ?? medianStroke;
+        var medianStroke = MedianStroke ?? stroke ?? "var(--rz-base-background-color)";
+        var meanFill = MeanFill ?? "var(--rz-base-background-color)";
 
         return
         @<g class="@className">
