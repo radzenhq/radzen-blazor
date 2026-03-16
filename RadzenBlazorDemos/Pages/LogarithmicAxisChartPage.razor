@@ -1,0 +1,15 @@
+@page "/logarithmic-axis-chart"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart with logarithmic axis
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>Logarithmic</code> on <code>RadzenValueAxis</code> to use a logarithmic scale.
+    This is useful when data spans several orders of magnitude.
+    The default base is 10. Use <code>LogarithmicBase</code> to change it.
+</RadzenText>
+
+<RadzenExample ComponentName="Chart" Example="LogarithmicAxisChartConfig"
+    DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <LogarithmicAxisChartConfig />
+</RadzenExample>
