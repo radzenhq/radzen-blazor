@@ -221,6 +221,11 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
 
         if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate || unaryExpressionSyntaxNode.Operator == UnaryOperator.Plus)
         {
+            if (operand.Type == CellDataType.Boolean)
+            {
+                operand = CellData.FromNumber(operand.GetValueOrDefault<bool>() ? 1d : 0d);
+            }
+
             if (operand.Type != CellDataType.Number)
             {
                 value = CellData.FromError(CellError.Value);
@@ -345,11 +350,26 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
                 var allArguments = new List<CellData>();
                 while (argumentIndex < argumentNodes.Count)
                 {
-                    var argument = ProcessArgument(argumentNodes[argumentIndex], function);
+                    var argumentNode = argumentNodes[argumentIndex];
+                    var argument = ProcessArgument(argumentNode, function);
                     if (argument == null)
                     {
                         return null; // Error already set
                     }
+
+                    // Excel coerces literal boolean constants to numbers in aggregate functions
+                    // (e.g. SUM(TRUE,1)→2) but skips booleans from cell references.
+                    if (function.CoerceLiteralBooleans && argumentNode is BooleanLiteralSyntaxNode)
+                    {
+                        for (int i = 0; i < argument.Count; i++)
+                        {
+                            if (argument[i].Type == CellDataType.Boolean)
+                            {
+                                argument[i] = CellData.FromNumber(argument[i].GetValueOrDefault<bool>() ? 1d : 0d);
+                            }
+                        }
+                    }
+
                     allArguments.AddRange(argument);
                     argumentIndex++;
                 }
