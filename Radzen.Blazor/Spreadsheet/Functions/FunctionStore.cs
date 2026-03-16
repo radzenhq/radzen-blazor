@@ -86,6 +86,11 @@ public class FunctionStore
         Add<SecondFunction>();
         Add<WeekdayFunction>();
         Add<WeeknumFunction>();
+        Add<DateFunction>();
+        Add<EdateFunction>();
+        Add<EomonthFunction>();
+        Add<DatedifFunction>();
+        Add<TimeFunction>();
     }
 
     /// <summary>
