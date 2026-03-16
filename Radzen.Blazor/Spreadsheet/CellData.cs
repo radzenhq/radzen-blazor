@@ -365,6 +365,11 @@ public class CellData : IComparable, IComparable<CellData>
     /// <inheritdoc />
     public override string ToString()
     {
+        if (Type == CellDataType.Boolean && Value is bool b)
+        {
+            return b ? "TRUE" : "FALSE";
+        }
+
         return Value?.ToString() ?? string.Empty;
     }
 
