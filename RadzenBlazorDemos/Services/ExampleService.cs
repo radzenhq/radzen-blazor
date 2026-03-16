@@ -2365,6 +2365,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Axis Crossing",
+                            Path = "axis-crossing-chart",
+                            Description = "Radzen Blazor Chart with axis crossing to position axes at specific values instead of chart edges.",
+                            Tags = new [] { "chart", "graph", "axis", "crossing", "origin", "intersect" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Toc = [ new () { Text = "Legend position", Anchor = "#legend-position" }, new () { Text = "Hide the legend", Anchor = "#hide-the-legend" } ],
                             Name = "Legend",
                             Path = "chart-legend",
