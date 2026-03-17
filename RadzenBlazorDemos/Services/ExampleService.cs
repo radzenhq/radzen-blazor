@@ -2021,8 +2021,18 @@ namespace RadzenBlazorDemos
             Children = new [] {
                 new Example
                 {
-                    Name = "Basic Series",
-                    Icon = "\ue6c4",
+                    Name = "Chart Gallery",
+                    Path = "chart-gallery",
+                    Title = "Blazor Chart Gallery | Free UI Components by Radzen",
+                    Description = "Visual gallery of all chart types and data visualization components available in Radzen Blazor.",
+                    Icon = "\ue3b6",
+                    Tags = new [] { "chart", "gallery", "overview", "visualization" },
+                    New = true
+                },
+                new Example
+                {
+                    Name="Chart",
+                    Icon = "\ue922",
                     Children = new [] {
                         new Example
                         {
