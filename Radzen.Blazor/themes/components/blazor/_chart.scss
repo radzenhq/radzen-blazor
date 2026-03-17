@@ -82,6 +82,90 @@ $chart-color-schemes: (
   fill-opacity: 0.8;
 }
 
+// Series hover styles (scoped to AllowSeriesHover=true via .rz-chart-series-hover)
+.rz-chart-series-hover {
+  .rz-line-series,
+  .rz-area-series,
+  .rz-column-series,
+  .rz-bar-series,
+  .rz-scatter-series,
+  .rz-candlestick-series,
+  .rz-waterfall-series,
+  .rz-bullet-series {
+    transition: opacity 0.2s, filter 0.2s;
+    cursor: pointer;
+
+    &:hover,
+    &.rz-state-hover {
+      filter: brightness(1.1) drop-shadow(0 0 3px rgba(0, 0, 0, 0.2));
+    }
+  }
+
+  // When any series is hovered, dim the others
+  svg:has(> g > .rz-state-hover),
+  svg:has(> g > :hover) {
+    .rz-line-series,
+    .rz-area-series,
+    .rz-column-series,
+    .rz-bar-series,
+    .rz-scatter-series,
+    .rz-candlestick-series,
+    .rz-waterfall-series,
+    .rz-bullet-series {
+      opacity: 0.4;
+
+      &:hover,
+      &.rz-state-hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  // Pie, donut, funnel, pyramid - item-level hover
+  .rz-pie-series,
+  .rz-donut-series,
+  .rz-funnel-series,
+  .rz-pyramid-series {
+    > g {
+      transition: opacity 0.2s, filter 0.2s;
+      cursor: pointer;
+
+      &:hover,
+      &.rz-state-hover {
+        filter: brightness(1.1) drop-shadow(0 0 3px rgba(0, 0, 0, 0.2));
+      }
+    }
+  }
+
+  .rz-pie-series:has(> .rz-state-hover),
+  .rz-donut-series:has(> .rz-state-hover),
+  .rz-funnel-series:has(> .rz-state-hover),
+  .rz-pyramid-series:has(> .rz-state-hover),
+  .rz-pie-series:has(> :hover),
+  .rz-donut-series:has(> :hover),
+  .rz-funnel-series:has(> :hover),
+  .rz-pyramid-series:has(> :hover) {
+    > g {
+      opacity: 0.4;
+
+      &:hover,
+      &.rz-state-hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  // Legend item hover highlight
+  .rz-legend-item {
+    transition: background-color 0.2s;
+    border-radius: var(--rz-border-radius);
+
+    &:hover {
+      background-color: var(--rz-base-200);
+    }
+  }
+}
+
 @each $scheme, $colors in $chart-color-schemes {
   @each $color in $colors {
     $index: index($colors, $color);
