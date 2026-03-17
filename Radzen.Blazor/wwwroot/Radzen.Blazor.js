@@ -2863,6 +2863,234 @@ window.Radzen = {
     }
     this.destroyResizable(ref);
   },
+  createRangeNavigator: function (ref, instance) {
+    if (!ref) return [0, 0];
+
+    var width = ref.offsetWidth;
+    var height = ref.offsetHeight;
+
+    var dragging = null;
+    var dragStartX = 0;
+    var dragStartStart = 0;
+    var dragStartEnd = 0;
+    var currentStart = 0;
+    var currentEnd = 1;
+    var minRange = 0.01;
+    function isRTL() {
+      return document.documentElement.dir === 'rtl';
+    }
+
+    function getPositionFromEvent(e) {
+      var rect = ref.getBoundingClientRect();
+      var x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      if (isRTL()) x = rect.width - x;
+      return Math.max(0, Math.min(1, x / rect.width));
+    }
+
+    function readPositionFromDOM() {
+      var w = ref.querySelector('.rz-range-navigator-window');
+      if (w) {
+        var wRect = w.getBoundingClientRect();
+        var rRect = ref.getBoundingClientRect();
+        if (rRect.width > 0) {
+          if (isRTL()) {
+            currentStart = (rRect.right - wRect.right) / rRect.width;
+            currentEnd = (rRect.right - wRect.left) / rRect.width;
+          } else {
+            currentStart = (wRect.left - rRect.left) / rRect.width;
+            currentEnd = (wRect.right - rRect.left) / rRect.width;
+          }
+        }
+      }
+    }
+
+    var snapThreshold = 0.01;
+    function snap(v) { return v < snapThreshold ? 0 : v > 1 - snapThreshold ? 1 : v; }
+
+    // Label state — set by Radzen.updateRangeNavigatorLabels
+    ref.navLabelIsDate = false;
+    ref.navLabelInputStart = 0;
+    ref.navLabelInputEnd = 0;
+
+    function formatLabel(fraction) {
+      var inputStart = ref.navLabelInputStart;
+      var inputEnd = ref.navLabelInputEnd;
+      if (inputStart === inputEnd) return '';
+      var value = inputStart + fraction * (inputEnd - inputStart);
+      if (ref.navLabelIsDate) {
+        // .NET ticks to JS Date: ticks are 100ns intervals from 0001-01-01
+        var ticksToMs = value / 10000 - 62135596800000;
+        var d = new Date(ticksToMs);
+        var m = d.getMonth() + 1;
+        var day = d.getDate();
+        var y = d.getFullYear();
+        return (m < 10 ? '0' : '') + m + '/' + (day < 10 ? '0' : '') + day + '/' + y;
+      }
+      return Math.round(value).toString();
+    }
+
+    function updateLabels(start, end) {
+      if (!ref.navLabelInputEnd) return;
+      var labels = ref.querySelectorAll('.rz-range-navigator-label');
+      if (labels.length >= 2) {
+        labels[0].textContent = formatLabel(start);
+        labels[1].textContent = formatLabel(end);
+        // Flip label direction when near edges
+        labels[0].className = 'rz-range-navigator-label ' + (start < 0.1 ? 'rz-range-navigator-label-right' : 'rz-range-navigator-label-left');
+        labels[1].className = 'rz-range-navigator-label ' + (end > 0.9 ? 'rz-range-navigator-label-left' : 'rz-range-navigator-label-right');
+      }
+    }
+
+    function updateDOM(start, end) {
+      currentStart = snap(start);
+      currentEnd = snap(end);
+      start = currentStart;
+      end = currentEnd;
+      var win = ref.querySelector('.rz-range-navigator-window');
+      var shadeLeft = ref.querySelector('.rz-range-navigator-shade-left');
+      var shadeRight = ref.querySelector('.rz-range-navigator-shade-right');
+      if (win) {
+        win.style.left = (start * 100) + '%';
+        win.style.width = ((end - start) * 100) + '%';
+      }
+      if (shadeLeft) shadeLeft.style.width = (start * 100) + '%';
+      if (shadeRight) shadeRight.style.width = ((1 - end) * 100) + '%';
+      updateLabels(start, end);
+    }
+
+    function notifyBlazor(start, end) {
+      instance.invokeMethodAsync('OnNavigatorDrag', snap(start), snap(end)).catch(function (ex) {
+        console.error('RangeNav invoke error:', ex);
+      });
+    }
+
+    readPositionFromDOM();
+
+    ref.navMouseDown = function (e) {
+      // Always read fresh position from DOM on mousedown
+      readPositionFromDOM();
+
+      var pos = getPositionFromEvent(e);
+      var handleZone = 12 / (ref.offsetWidth || 1);
+      var winRange = currentEnd - currentStart;
+
+      if (pos >= currentStart - handleZone && pos <= currentEnd + handleZone) {
+        var distToLeft = Math.abs(pos - currentStart);
+        var distToRight = Math.abs(pos - currentEnd);
+
+        if (winRange < handleZone * 3) {
+          dragging = distToLeft <= distToRight ? 'left' : 'right';
+        } else if (distToLeft <= handleZone) {
+          dragging = 'left';
+        } else if (distToRight <= handleZone) {
+          dragging = 'right';
+        } else {
+          dragging = 'pan';
+        }
+      } else {
+        // Click on shade: center selection at click position
+        var halfRange = winRange / 2;
+        var newStart = Math.max(0, Math.min(1 - winRange, pos - halfRange));
+        var newEnd = newStart + winRange;
+        updateDOM(newStart, newEnd);
+        notifyBlazor(newStart, newEnd);
+        return;
+      }
+
+      if (dragging) {
+        e.preventDefault();
+        dragStartX = (e.touches ? e.touches[0].clientX : e.clientX);
+        dragStartStart = currentStart;
+        dragStartEnd = currentEnd;
+      }
+    };
+
+    ref.navMouseMove = function (e) {
+      if (!dragging) return;
+      e.preventDefault();
+      var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      var dx = clientX - dragStartX;
+      if (isRTL()) dx = -dx;
+      var refWidth = ref.offsetWidth;
+      if (refWidth <= 0) return;
+      var delta = dx / refWidth;
+
+      var newStart = dragStartStart;
+      var newEnd = dragStartEnd;
+
+      if (dragging === 'left') {
+        newStart = Math.max(0, Math.min(dragStartEnd - minRange, dragStartStart + delta));
+      } else if (dragging === 'right') {
+        newEnd = Math.max(dragStartStart + minRange, Math.min(1, dragStartEnd + delta));
+      } else if (dragging === 'pan') {
+        var range = dragStartEnd - dragStartStart;
+        newStart = dragStartStart + delta;
+        newEnd = newStart + range;
+        if (newStart < 0) { newStart = 0; newEnd = range; }
+        if (newEnd > 1) { newEnd = 1; newStart = 1 - range; }
+      }
+
+      updateDOM(newStart, newEnd);
+    };
+
+    ref.navMouseUp = function () {
+      if (dragging) {
+        notifyBlazor(currentStart, currentEnd);
+      }
+      dragging = null;
+    };
+
+    ref.addEventListener('mousedown', ref.navMouseDown);
+    ref.addEventListener('touchstart', ref.navMouseDown, { passive: false });
+    document.addEventListener('mousemove', ref.navMouseMove);
+    document.addEventListener('touchmove', ref.navMouseMove, { passive: false });
+    document.addEventListener('mouseup', ref.navMouseUp);
+    document.addEventListener('touchend', ref.navMouseUp);
+
+    ref.navResizeObserver = new ResizeObserver(function (entries) {
+      for (var entry of entries) {
+        var w = entry.contentRect.width;
+        var h = entry.contentRect.height;
+        if (w > 0) {
+          try { instance.invokeMethodAsync('OnResize', w, h); } catch (ex) {}
+        }
+      }
+    });
+    ref.navResizeObserver.observe(ref);
+
+    return [width, height];
+  },
+
+  destroyRangeNavigator: function (ref) {
+    if (!ref) return;
+    if (ref.navMouseDown) {
+      ref.removeEventListener('mousedown', ref.navMouseDown);
+      ref.removeEventListener('touchstart', ref.navMouseDown);
+      delete ref.navMouseDown;
+    }
+    if (ref.navMouseMove) {
+      document.removeEventListener('mousemove', ref.navMouseMove);
+      document.removeEventListener('touchmove', ref.navMouseMove);
+      delete ref.navMouseMove;
+    }
+    if (ref.navMouseUp) {
+      document.removeEventListener('mouseup', ref.navMouseUp);
+      document.removeEventListener('touchend', ref.navMouseUp);
+      delete ref.navMouseUp;
+    }
+    if (ref.navResizeObserver) {
+      ref.navResizeObserver.disconnect();
+      delete ref.navResizeObserver;
+    }
+  },
+
+  updateRangeNavigatorLabels: function (ref, isDate, inputStart, inputEnd) {
+    if (!ref) return;
+    ref.navLabelIsDate = isDate;
+    ref.navLabelInputStart = inputStart;
+    ref.navLabelInputEnd = inputEnd;
+  },
+
   destroyGauge: function (ref) {
     if (ref._gaugeRTLObserver) {
       ref._gaugeRTLObserver.disconnect();

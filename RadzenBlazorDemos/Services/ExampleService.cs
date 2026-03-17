@@ -2569,6 +2569,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Range Navigator",
+                    Path = "range-navigator",
+                    Description = "Radzen Blazor Range Navigator with mini-chart and draggable selection for controlling chart visible range.",
+                    Tags = new [] { "chart", "range", "navigator", "selector", "zoom", "pan", "interactive" },
+                    Icon = "\ue8ff",
+                    New = true
+                },
+                new Example
+                {
                     Name = "Arc Gauge",
                     Path = "arc-gauge",
                     Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",

@@ -1,0 +1,33 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenComponent
+
+<CascadingValue Value="@this">
+    @ChildContent
+</CascadingValue>
+@if (Visible)
+{
+<div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+    <svg style="width: 100%; height: 100%;">
+        @foreach (var series in NavigatorSeries)
+        {
+            @series.Render(CategoryScale, ValueScale)
+        }
+    </svg>
+    <div class="rz-range-navigator-shade rz-range-navigator-shade-left" style="width: @((Start * 100).ToInvariantString())%"></div>
+    <div class="rz-range-navigator-window" style="left: @((Start * 100).ToInvariantString())%; width: @(((End - Start) * 100).ToInvariantString())%">
+        <div class="rz-range-navigator-handle rz-range-navigator-handle-left">
+            @if (ShowHandleLabels && Width > 0)
+            {
+                <div class="rz-range-navigator-label @(Start < 0.1 ? "rz-range-navigator-label-right" : "rz-range-navigator-label-left")">@GetHandleLabel(Start)</div>
+            }
+        </div>
+        <div class="rz-range-navigator-handle rz-range-navigator-handle-right">
+            @if (ShowHandleLabels && Width > 0)
+            {
+                <div class="rz-range-navigator-label @(End > 0.9 ? "rz-range-navigator-label-left" : "rz-range-navigator-label-right")">@GetHandleLabel(End)</div>
+            }
+        </div>
+    </div>
+    <div class="rz-range-navigator-shade rz-range-navigator-shade-right" style="width: @(((1 - End) * 100).ToInvariantString())%"></div>
+</div>
+}
