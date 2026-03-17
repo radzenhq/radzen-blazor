@@ -2,28 +2,19 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart>
-                <RadzenColumnSeries Data="@usa" CategoryProperty="Year" ValueProperty="Total" Title="USA Total Medals">
+                <RadzenColumnSeries Data="@apples" CategoryProperty="Region" ValueProperty="Production" Title="Apples">
                     <RadzenSeriesDataLabels Visible="true" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@usa" CategoryProperty="Year" ValueProperty="Gold" Title="USA Gold Medals">
+                <RadzenColumnSeries Data="@oranges" CategoryProperty="Region" ValueProperty="Production" Title="Oranges">
                     <RadzenSeriesDataLabels Visible="true" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@uk" CategoryProperty="Year" ValueProperty="Total" Title="UK Total Medals">
+                <RadzenColumnSeries Data="@bananas" CategoryProperty="Region" ValueProperty="Production" Title="Bananas">
                     <RadzenSeriesDataLabels Visible="true" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@uk" CategoryProperty="Year" ValueProperty="Gold" Title="UK Gold Medals">
-                    <RadzenSeriesDataLabels Visible="true" />
-                </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@china" CategoryProperty="Year" ValueProperty="Total" Title="China Total Medals">
-                    <RadzenSeriesDataLabels Visible="true" />
-                </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@china" CategoryProperty="Year" ValueProperty="Gold" Title="China Gold Medals">
-                    <RadzenSeriesDataLabels Visible="true" />
-                </RadzenColumnSeries>
-                <RadzenColumnOptions Radius="0" />
+                <RadzenColumnOptions Radius="3" />
                 <RadzenValueAxis>
                     <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="Number of Medals Won" />
+                    <RadzenAxisTitle Text="Production (thousand tonnes)" />
                 </RadzenValueAxis>
                 <RadzenLegend Position="LegendPosition.Bottom" />
             </RadzenChart>
@@ -32,31 +23,33 @@
 </RadzenStack>
 
 @code {
-    class MedalData
+    class FruitData
     {
-        public string Year { get; set; }
-        public double Total { get; set; }
-        public double Gold { get; set; }
+        public string Region { get; set; }
+        public double Production { get; set; }
     }
 
-    MedalData[] usa = new[]
+    FruitData[] apples = new[]
     {
-        new MedalData { Year = "2016", Total = 121, Gold = 46 },
-        new MedalData { Year = "2020", Total = 113, Gold = 39 },
-        new MedalData { Year = "2024", Total = 126, Gold = 40 },
+        new FruitData { Region = "North", Production = 52 },
+        new FruitData { Region = "South", Production = 38 },
+        new FruitData { Region = "East", Production = 44 },
+        new FruitData { Region = "West", Production = 61 },
     };
 
-    MedalData[] uk = new[]
+    FruitData[] oranges = new[]
     {
-        new MedalData { Year = "2016", Total = 67, Gold = 27 },
-        new MedalData { Year = "2020", Total = 65, Gold = 22 },
-        new MedalData { Year = "2024", Total = 65, Gold = 14 },
+        new FruitData { Region = "North", Production = 18 },
+        new FruitData { Region = "South", Production = 67 },
+        new FruitData { Region = "East", Production = 33 },
+        new FruitData { Region = "West", Production = 42 },
     };
 
-    MedalData[] china = new[]
+    FruitData[] bananas = new[]
     {
-        new MedalData { Year = "2016", Total = 70, Gold = 26 },
-        new MedalData { Year = "2020", Total = 89, Gold = 38 },
-        new MedalData { Year = "2024", Total = 91, Gold = 40 },
+        new FruitData { Region = "North", Production = 9 },
+        new FruitData { Region = "South", Production = 85 },
+        new FruitData { Region = "East", Production = 56 },
+        new FruitData { Region = "West", Production = 29 },
     };
 }
