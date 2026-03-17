@@ -236,11 +236,6 @@ $chart-color-schemes: (
 
 .rz-value-axis .rz-tick-text {
   text-anchor: end;
-
-  /* Right-to-left anchor */
-  *[dir="rtl"] & {
-    text-anchor: start;
-  }
 }
 
 .rz-axis .rz-axis-title {

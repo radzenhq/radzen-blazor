@@ -21,7 +21,7 @@ else
     @if (ChildContent == null)
     {
       <g>
-        <text class="rz-tick-text" x="@((X-9).ToInvariantString())" dy=".3em" y="@Y.ToInvariantString()">@Text</text>
+        <text class="rz-tick-text" x="@((X-9).ToInvariantString())" dy=".3em" y="@Y.ToInvariantString()" style="text-anchor: end">@Text</text>
       </g>
     }
     else
