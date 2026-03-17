@@ -38,6 +38,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowLabels { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to invert the funnel so the narrow end is at the top.
+        /// When <c>false</c> (default), the wide end is at the top. When <c>true</c>, the wide end is at the bottom.
+        /// </summary>
+        [Parameter]
+        public bool Inverted { get; set; }
+
         /// <inheritdoc />
         public override string Color => "#000";
 
@@ -148,20 +155,22 @@ namespace Radzen.Blazor
         {
             if (!Contains(x, y, 0)) return (default!, new Point());
 
-            var count = Items.Count;
+            var orderedItems = GetOrderedItems();
+            var count = orderedItems.Count;
             if (count == 0) return (default!, new Point());
 
             var segHeight = AvailableHeight / count;
             var index = (int)((y - TopY) / segHeight);
             index = Math.Clamp(index, 0, count - 1);
 
-            return (Items[index]!, new Point { X = x, Y = y });
+            return (orderedItems[index]!, new Point { X = x, Y = y });
         }
 
         /// <inheritdoc />
         protected override string TooltipClass(TItem item)
         {
-            return $"{base.TooltipClass(item)} rz-funnel-tooltip rz-series-item-{Items.IndexOf(item)}";
+            var index = Items.IndexOf(item);
+            return $"{base.TooltipClass(item)} rz-funnel-tooltip rz-series-item-{index}";
         }
 
         /// <inheritdoc />
@@ -189,8 +198,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
-            var index = Items.IndexOf(item);
-            var count = Items.Count;
+            var orderedItems = GetOrderedItems();
+            var index = orderedItems.IndexOf(item);
+            var count = orderedItems.Count;
             var segHeight = AvailableHeight / count;
             return TopY + index * segHeight + segHeight / 2;
         }
@@ -202,13 +212,14 @@ namespace Radzen.Blazor
 
             if (Data == null || !Items.Any()) return list;
 
-            var count = Items.Count;
-            var maxValue = Items.Max(Value);
+            var orderedItems = GetOrderedItems();
+            var count = orderedItems.Count;
+            var maxValue = orderedItems.Max(Value);
             var segHeight = AvailableHeight / count;
 
             for (int i = 0; i < count; i++)
             {
-                var item = Items[i];
+                var item = orderedItems[i];
                 var value = Value(item);
                 var topWidth = AvailableWidth * (value / maxValue);
                 var y = TopY + i * segHeight + segHeight / 2;
@@ -228,23 +239,42 @@ namespace Radzen.Blazor
             return list;
         }
 
-        internal string GetSegmentPath(int index, int count, double maxValue)
+        private IList<TItem> GetOrderedItems()
+        {
+            // Polar coordinate system inverts Y: index 0 renders at the visual bottom.
+            // Default funnel: wide at top, narrow at bottom → reverse so largest value is at highest index (visual top).
+            // Inverted funnel: wide at bottom, narrow at top → keep original order so largest value is at index 0 (visual bottom).
+            return Inverted ? (IList<TItem>)Items : Items.Reverse().ToList();
+        }
+
+        internal string GetSegmentPath(int index, int count, double maxValue, IList<TItem> orderedItems)
         {
             var segHeight = AvailableHeight / count;
             var cx = CenterX;
 
-            var value = Value(Items[index]);
-            var topWidth = AvailableWidth * (value / maxValue);
+            var value = Value(orderedItems[index]);
+            var valueWidth = AvailableWidth * (value / maxValue);
 
+            double topWidth;
             double bottomWidth;
-            if (index < count - 1)
+
+            if (Inverted)
             {
-                var nextValue = Value(Items[index + 1]);
-                bottomWidth = AvailableWidth * (nextValue / maxValue);
+                // Inverted: wide at visual bottom, narrow at visual top.
+                // In polar coords, last index = visual top → narrow the last segment's "bottom" (visual top edge).
+                topWidth = valueWidth;
+                bottomWidth = index < count - 1
+                    ? AvailableWidth * (Value(orderedItems[index + 1]) / maxValue)
+                    : AvailableWidth * 0.15;
             }
             else
             {
-                bottomWidth = AvailableWidth * 0.15;
+                // Default: wide at visual top, narrow at visual bottom.
+                // In polar coords, index 0 = visual bottom → narrow the first segment's "top" (visual bottom edge).
+                topWidth = index == 0 ? AvailableWidth * 0.15 : valueWidth;
+                bottomWidth = index < count - 1
+                    ? AvailableWidth * (Value(orderedItems[index + 1]) / maxValue)
+                    : valueWidth;
             }
 
             var topY = this.TopY + index * segHeight;
