@@ -2550,6 +2550,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Zoom and Pan",
+                    Path = "zoom-pan-chart",
+                    Description = "Radzen Blazor Chart with mouse wheel zoom and scrollbar pan for exploring large datasets.",
+                    Tags = new [] { "chart", "zoom", "pan", "scroll", "interactive", "mouse", "wheel" },
+                    Icon = "\ue8ff",
+                    New = true
+                },
+                new Example
+                {
                     Name = "Arc Gauge",
                     Path = "arc-gauge",
                     Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",
