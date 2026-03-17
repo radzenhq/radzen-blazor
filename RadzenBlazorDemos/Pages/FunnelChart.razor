@@ -1,12 +1,19 @@
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-mb-4">
+    <RadzenCheckBox @bind-Value="inverted" Name="inverted" />
+    <RadzenLabel Text="Inverted" Component="inverted" />
+</RadzenStack>
+
 <RadzenChart Style="width: 100%; height: 400px;">
-    <RadzenFunnelSeries Data="@stages" CategoryProperty="Stage" ValueProperty="Count"
+    <RadzenFunnelSeries Data="@stages" CategoryProperty="Stage" ValueProperty="Count" Inverted="@inverted"
                         StrokeWidth="1" Strokes="@(new[] { "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)" })">
         <RadzenSeriesDataLabels Visible="true" />
     </RadzenFunnelSeries>
-    <RadzenLegend Position="LegendPosition.Bottom" />
+    <RadzenLegend Position="LegendPosition.Right" />
 </RadzenChart>
 
 @code {
+    bool inverted;
+
     class FunnelData
     {
         public string Stage { get; set; }
