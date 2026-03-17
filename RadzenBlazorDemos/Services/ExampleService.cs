@@ -2047,6 +2047,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Grouped Column Chart",
+                            Path = "grouped-column-chart",
+                            Description = "Radzen Blazor Chart with grouped column series comparing multiple data series side by side.",
+                            Tags = new [] { "chart", "graph", "column", "grouped", "bar", "comparison" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Bar Chart",
                             Path = "bar-chart",
                             Description = "Radzen Blazor Chart with bar series.",
