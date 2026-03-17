@@ -43,6 +43,8 @@
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
         date = realstart.StartOfMonth().StartOfWeek(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture);
         var startMonth = realstart;
+        var excessCounts = new Dictionary<DateTime, int>();
+        var dayAppointments = new Dictionary<DateTime, AppointmentData[]>();
 
         <div class="rz-month @(month == CurrentMonth ? "rz-state-focused" : "")">
             <div class="rz-events">
@@ -89,12 +91,8 @@
 
                         @if (excessCount > 0)
                         {
-                            var slotIndex = start.Subtract(date).Days;
-                            var slotWidth = (SLOT_WIDTH / CALENDAR_WIDTH) * 100;
-                            var left = ((slotIndex + 1) * slotWidth) + (100.0 / 85.0);
-                            var top = ((MaxAppointmentsInSlot + 1) * 1.5) + 1.7;
-                            var listDate = start;
-                            <button type="button" class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; inset-inline-start: @(left.ToInvariantString())%" @onclick=@(args => { if (appointments != null && MoreText != null) _ = OnListClick(listDate, appointments); })>@(MoreText != null ? String.Format(MoreText, excessCount) : "")</button>
+                            excessCounts[start] = excessCount;
+                            dayAppointments[start] = appointments;
                         }
                     }
                 }
@@ -121,6 +119,12 @@
                         <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
                             <div class="rz-slot-title">
                                 @dayOfWeek.Day
+                                @if (excessCounts.TryGetValue(dayOfWeek, out var excess))
+                                {
+                                    var listDate = dayOfWeek;
+                                    var apps = dayAppointments[listDate];
+                                    <button type="button" class="rz-event-list-btn" @onclick=@(args => { if (apps != null && MoreText != null) _ = OnListClick(listDate, apps); }) @onclick:stopPropagation>@(MoreText != null ? String.Format(MoreText, excess) : "")</button>
+                                }
                             </div>
                         </div>
                     }

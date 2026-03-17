@@ -86,8 +86,6 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   background-clip: border-box;
 
   .rz-event-list-btn {
-    position: absolute;
-    padding-inline-start: 0.25rem;
     color: var(--rz-scheduler-event-list-button-color);
     font-size: var(--rz-scheduler-event-list-button-font-size);
     background: none;
@@ -95,9 +93,9 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     padding: 0;
     cursor: pointer;
     font: inherit;
+    margin-inline-start: auto;
 
     &:hover {
-      cursor: pointer;
       color: var(--rz-scheduler-event-list-button-color);
       text-decoration: underline;
     }
@@ -478,11 +476,6 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     flex: 1;
   }
 
-  .rz-event-list-btn {
-    position: static;
-    margin-inline-start: auto;
-    font-size: var(--rz-scheduler-event-list-button-font-size);
-  }
 }
 
 // Planner View
@@ -552,6 +545,13 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       }
     }
   }
+
+  .rz-slot-title {
+    display: flex;
+    align-items: baseline;
+    flex: 1;
+  }
+
 }
 
 // Timeline View
@@ -616,6 +616,13 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       }
     }
   }
+
+  .rz-slot-title {
+    display: flex;
+    align-items: baseline;
+    flex: 1;
+  }
+
 }
 
 // Year View
