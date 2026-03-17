@@ -192,6 +192,34 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the start of the visible range as a fraction (0-1) of the full category range.
+        /// Supports two-way binding with <c>@bind-ViewStart</c>.
+        /// </summary>
+        [Parameter]
+        public double ViewStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the visible range start changes due to user interaction.
+        /// Used for two-way binding with <c>@bind-ViewStart</c>.
+        /// </summary>
+        [Parameter]
+        public EventCallback<double> ViewStartChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end of the visible range as a fraction (0-1) of the full category range.
+        /// Supports two-way binding with <c>@bind-ViewEnd</c>.
+        /// </summary>
+        [Parameter]
+        public double ViewEnd { get; set; } = 1;
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the visible range end changes due to user interaction.
+        /// Used for two-way binding with <c>@bind-ViewEnd</c>.
+        /// </summary>
+        [Parameter]
+        public EventCallback<double> ViewEndChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start of the visible range as a fraction (0-1) of the full category range.
         /// </summary>
         internal double ZoomStart { get; set; }
 
@@ -199,6 +227,13 @@ namespace Radzen.Blazor
         /// Gets or sets the end of the visible range as a fraction (0-1) of the full category range.
         /// </summary>
         internal double ZoomEnd { get; set; } = 1;
+
+        /// <summary>
+        /// True while the chart itself is processing a zoom/pan operation.
+        /// Prevents SetParametersAsync from overwriting ZoomStart/ZoomEnd
+        /// with stale values from the parent during sequential callbacks.
+        /// </summary>
+        private bool isInternalZoom;
 
         /// <summary>
         /// The full category scale input range before zoom is applied.
@@ -221,7 +256,11 @@ namespace Radzen.Blazor
             var range = ZoomEnd - ZoomStart;
             var newZoom = range > 0 ? Math.Round(100.0 / range) : 100;
             Zoom = newZoom;
+            ViewStart = ZoomStart;
+            ViewEnd = ZoomEnd;
             await ZoomChanged.InvokeAsync(newZoom);
+            await ViewStartChanged.InvokeAsync(ZoomStart);
+            await ViewEndChanged.InvokeAsync(ZoomEnd);
             await ViewChange.InvokeAsync(new ChartViewChangeEventArgs
             {
                 Zoom = newZoom,
@@ -748,8 +787,16 @@ namespace Radzen.Blazor
             ZoomStart = Math.Max(0, newStart);
             ZoomEnd = Math.Min(1, newEnd);
 
-            await NotifyZoomChanged();
-            await Refresh();
+            isInternalZoom = true;
+            try
+            {
+                await NotifyZoomChanged();
+                await Refresh();
+            }
+            finally
+            {
+                isInternalZoom = false;
+            }
         }
 
         /// <summary>
@@ -765,8 +812,16 @@ namespace Radzen.Blazor
             ZoomStart = Math.Clamp(position, 0, 1 - range);
             ZoomEnd = ZoomStart + range;
 
-            await NotifyZoomChanged();
-            await Refresh();
+            isInternalZoom = true;
+            try
+            {
+                await NotifyZoomChanged();
+                await Refresh();
+            }
+            finally
+            {
+                isInternalZoom = false;
+            }
         }
 
         internal async Task DisplayTooltip()
@@ -921,7 +976,15 @@ namespace Radzen.Blazor
             CategoryAxis.Chart = this;
             ValueAxis.Chart = this;
 
-            ApplyZoomLevel();
+            if (ViewStart != 0 || ViewEnd != 1)
+            {
+                ZoomStart = ViewStart;
+                ZoomEnd = ViewEnd;
+            }
+            else
+            {
+                ApplyZoomLevel();
+            }
 
             Initialize();
         }
@@ -967,12 +1030,24 @@ namespace Radzen.Blazor
         {
             bool shouldRefresh = parameters.DidParameterChange(nameof(Style), Style);
             bool zoomChanged = parameters.DidParameterChange(nameof(Zoom), Zoom);
+            bool viewStartChanged = parameters.DidParameterChange(nameof(ViewStart), ViewStart);
+            bool viewEndChanged = parameters.DidParameterChange(nameof(ViewEnd), ViewEnd);
 
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
             await base.SetParametersAsync(parameters);
 
-            if (zoomChanged)
+            if ((viewStartChanged || viewEndChanged) && !isInternalZoom)
+            {
+                ZoomStart = ViewStart;
+                ZoomEnd = ViewEnd;
+
+                if (widthAndHeightAreSet)
+                {
+                    UpdateScales();
+                }
+            }
+            else if (zoomChanged)
             {
                 ApplyZoomLevel();
             }
@@ -1021,8 +1096,17 @@ namespace Radzen.Blazor
         {
             ZoomStart = 0;
             ZoomEnd = 1;
-            await NotifyZoomChanged();
-            await Refresh(true);
+
+            isInternalZoom = true;
+            try
+            {
+                await NotifyZoomChanged();
+                await Refresh(true);
+            }
+            finally
+            {
+                isInternalZoom = false;
+            }
         }
 
         /// <inheritdoc />
