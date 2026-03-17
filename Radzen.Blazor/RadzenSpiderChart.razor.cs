@@ -285,6 +285,56 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets the SVG path for a single radial column bar at the given category index.
+        /// The bar is a trapezoid/wedge shape centered on the radial axis.
+        /// </summary>
+        internal string GetColumnPath(int categoryIndex, double value, double halfAngle)
+        {
+            if (!Width.HasValue || !Height.HasValue) return "";
+
+            var centerX = Width.Value / 2;
+            var centerY = Height.Value / 2;
+            var maxRadius = Math.Min(centerX, centerY) * 0.8;
+
+            var normalizedValue = (value - MinValue) / (MaxValue - MinValue);
+            var radius = maxRadius * normalizedValue;
+
+            var angle = GetAngle(categoryIndex);
+            var leftAngle = angle - halfAngle;
+            var rightAngle = angle + halfAngle;
+
+            // Inner edge at center
+            var ix1 = centerX + 0 * Math.Cos(leftAngle);
+            var iy1 = centerY + 0 * Math.Sin(leftAngle);
+            var ix2 = centerX + 0 * Math.Cos(rightAngle);
+            var iy2 = centerY + 0 * Math.Sin(rightAngle);
+
+            // Outer edge at value radius
+            var ox1 = centerX + radius * Math.Cos(leftAngle);
+            var oy1 = centerY + radius * Math.Sin(leftAngle);
+            var ox2 = centerX + radius * Math.Cos(rightAngle);
+            var oy2 = centerY + radius * Math.Sin(rightAngle);
+
+            return $"M{centerX.ToInvariantString()},{centerY.ToInvariantString()} L{ox1.ToInvariantString()},{oy1.ToInvariantString()} L{ox2.ToInvariantString()},{oy2.ToInvariantString()} Z";
+        }
+
+        /// <summary>
+        /// Gets the angular half-width for column bars, accounting for the number of column series.
+        /// </summary>
+        internal double GetColumnHalfAngle()
+        {
+            var categories = GetAllCategories();
+            if (categories.Count == 0) return 0;
+
+            var sweepRad = SweepDegrees * Math.PI / 180;
+            var divisor = IsPartial ? Math.Max(categories.Count - 1, 1) : categories.Count;
+            var categoryAngleStep = sweepRad / divisor;
+
+            // Use 40% of the category angle for each column bar
+            return categoryAngleStep * 0.4;
+        }
+
+        /// <summary>
         /// Calculates the point position for a given index and value.
         /// </summary>
         private (double x, double y) GetPoint(int index, double value)
@@ -486,8 +536,8 @@ namespace Radzen.Blazor
             var diff2 = Math.Abs(AngleDiff(perp2, midAngle));
             var perpAngle = diff1 > diff2 ? perp1 : perp2;
 
-            var offsetX = Math.Cos(perpAngle) * 8;
-            var offsetY = Math.Sin(perpAngle) * 8;
+            var offsetX = Math.Cos(perpAngle) * 12;
+            var offsetY = Math.Sin(perpAngle) * 12;
 
             // Determine text-anchor based on offset direction
             var cosPerp = Math.Cos(perpAngle);
