@@ -2648,6 +2648,36 @@ window.Radzen = {
     delete ref.mouseMoveHandler;
     ref.removeEventListener('click', ref.clickHandler);
     delete ref.clickHandler;
+    ref.removeEventListener('wheel', ref.wheelHandler);
+    delete ref.wheelHandler;
+    if (ref.scrollbarMoveHandler) {
+      document.removeEventListener('mousemove', ref.scrollbarMoveHandler);
+      delete ref.scrollbarMoveHandler;
+    }
+    if (ref.scrollbarUpHandler) {
+      document.removeEventListener('mouseup', ref.scrollbarUpHandler);
+      delete ref.scrollbarUpHandler;
+    }
+    if (ref.scrollbarTouchMoveHandler) {
+      document.removeEventListener('touchmove', ref.scrollbarTouchMoveHandler);
+      delete ref.scrollbarTouchMoveHandler;
+    }
+    if (ref.scrollbarTouchEndHandler) {
+      document.removeEventListener('touchend', ref.scrollbarTouchEndHandler);
+      delete ref.scrollbarTouchEndHandler;
+    }
+    if (ref.touchStartHandler) {
+      ref.removeEventListener('touchstart', ref.touchStartHandler);
+      delete ref.touchStartHandler;
+    }
+    if (ref.touchMoveHandler) {
+      ref.removeEventListener('touchmove', ref.touchMoveHandler);
+      delete ref.touchMoveHandler;
+    }
+    if (ref.touchEndHandler) {
+      ref.removeEventListener('touchend', ref.touchEndHandler);
+      delete ref.touchEndHandler;
+    }
     this.destroyResizable(ref);
   },
   destroyGauge: function (ref) {
@@ -2714,10 +2744,143 @@ window.Radzen = {
       }
     };
 
+    ref.wheelHandler = function (e) {
+      if (!inside) return;
+      e.preventDefault();
+      var rect = ref.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var delta = e.deltaY > 0 ? 1 : -1;
+      try { instance.invokeMethodAsync('OnWheel', x, delta); } catch {}
+    };
+
     ref.addEventListener('mouseenter', ref.mouseEnterHandler);
     ref.addEventListener('mouseleave', ref.mouseLeaveHandler);
     ref.addEventListener('mousemove', ref.mouseMoveHandler);
     ref.addEventListener('click', ref.clickHandler);
+    ref.addEventListener('wheel', ref.wheelHandler, { passive: false });
+
+    // Scrollbar drag handling via event delegation (survives Blazor re-renders)
+    var dragging = false;
+    var dragStartX = 0;
+    var dragStartLeft = 0;
+
+    ref.addEventListener('mousedown', function (e) {
+      var thumb = e.target.closest('.rz-chart-scrollbar-thumb');
+      if (!thumb) return;
+      dragging = true;
+      dragStartX = e.clientX;
+      dragStartLeft = parseFloat(thumb.style.left) || 0;
+      e.preventDefault();
+    });
+
+    ref.scrollbarMoveHandler = function (e) {
+      if (!dragging) return;
+      var track = ref.querySelector('.rz-chart-scrollbar-track');
+      var thumb = ref.querySelector('.rz-chart-scrollbar-thumb');
+      if (!track || !thumb) return;
+      var trackWidth = track.offsetWidth;
+      if (trackWidth <= 0) return;
+      var dx = e.clientX - dragStartX;
+      var deltaPercent = (dx / trackWidth) * 100;
+      var newLeft = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartLeft + deltaPercent));
+      thumb.style.left = newLeft + '%';
+      var position = newLeft / 100;
+      try { instance.invokeMethodAsync('OnPan', position); } catch {}
+    };
+    document.addEventListener('mousemove', ref.scrollbarMoveHandler);
+
+    ref.scrollbarUpHandler = function () {
+      dragging = false;
+    };
+    document.addEventListener('mouseup', ref.scrollbarUpHandler);
+
+    ref.addEventListener('click', function (e) {
+      var track = e.target.closest('.rz-chart-scrollbar-track');
+      if (!track || e.target.closest('.rz-chart-scrollbar-thumb')) return;
+      var thumb = track.querySelector('.rz-chart-scrollbar-thumb');
+      if (!thumb) return;
+      var trackRect = track.getBoundingClientRect();
+      var clickX = e.clientX - trackRect.left;
+      var thumbWidth = thumb.offsetWidth;
+      var position = Math.max(0, Math.min(1 - thumbWidth / track.offsetWidth, (clickX - thumbWidth / 2) / track.offsetWidth));
+      try { instance.invokeMethodAsync('OnPan', position); } catch {}
+    });
+
+    // Touch support for scrollbar drag
+    ref.addEventListener('touchstart', function (e) {
+      var thumb = e.target.closest('.rz-chart-scrollbar-thumb');
+      if (!thumb) return;
+      dragging = true;
+      dragStartX = e.touches[0].clientX;
+      dragStartLeft = parseFloat(thumb.style.left) || 0;
+      e.preventDefault();
+    }, { passive: false });
+
+    ref.scrollbarTouchMoveHandler = function (e) {
+      if (!dragging) return;
+      var track = ref.querySelector('.rz-chart-scrollbar-track');
+      var thumb = ref.querySelector('.rz-chart-scrollbar-thumb');
+      if (!track || !thumb) return;
+      var trackWidth = track.offsetWidth;
+      if (trackWidth <= 0) return;
+      var dx = e.touches[0].clientX - dragStartX;
+      var deltaPercent = (dx / trackWidth) * 100;
+      var newLeft = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartLeft + deltaPercent));
+      thumb.style.left = newLeft + '%';
+      var position = newLeft / 100;
+      try { instance.invokeMethodAsync('OnPan', position); } catch {}
+      e.preventDefault();
+    };
+    document.addEventListener('touchmove', ref.scrollbarTouchMoveHandler, { passive: false });
+
+    ref.scrollbarTouchEndHandler = function () {
+      dragging = false;
+    };
+    document.addEventListener('touchend', ref.scrollbarTouchEndHandler);
+
+    // Pinch-to-zoom support
+    var pinchStartDistance = 0;
+    var pinchActive = false;
+
+    ref.touchStartHandler = function (e) {
+      if (e.touches.length === 2) {
+        pinchActive = true;
+        var dx = e.touches[0].clientX - e.touches[1].clientX;
+        var dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchStartDistance = Math.sqrt(dx * dx + dy * dy);
+        e.preventDefault();
+      }
+    };
+    ref.addEventListener('touchstart', ref.touchStartHandler, { passive: false });
+
+    ref.touchMoveHandler = function (e) {
+      if (!pinchActive || e.touches.length !== 2) return;
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      var currentDistance = Math.sqrt(dx * dx + dy * dy);
+      if (pinchStartDistance <= 0) return;
+      var midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      var rect = ref.getBoundingClientRect();
+      var x = midX - rect.left;
+      // Pinch out (spread) = zoom in (delta -1), pinch in (squeeze) = zoom out (delta 1)
+      var ratio = currentDistance / pinchStartDistance;
+      if (ratio > 1.05) {
+        try { instance.invokeMethodAsync('OnWheel', x, -1); } catch {}
+        pinchStartDistance = currentDistance;
+      } else if (ratio < 0.95) {
+        try { instance.invokeMethodAsync('OnWheel', x, 1); } catch {}
+        pinchStartDistance = currentDistance;
+      }
+      e.preventDefault();
+    };
+    ref.addEventListener('touchmove', ref.touchMoveHandler, { passive: false });
+
+    ref.touchEndHandler = function (e) {
+      if (e.touches.length < 2) {
+        pinchActive = false;
+      }
+    };
+    ref.addEventListener('touchend', ref.touchEndHandler);
 
     return this.createResizable(ref, instance);
   },
