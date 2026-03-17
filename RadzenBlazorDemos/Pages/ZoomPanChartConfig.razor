@@ -1,0 +1,66 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Style="margin: 0;">Use the mouse wheel or pinch to zoom in/out and drag the scrollbar to pan.</RadzenText>
+            <RadzenButton Text="Reset Zoom" Click="@(() => chart.ResetZoom())" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenText TextStyle="TextStyle.Body2" Style="margin: 0;">Zoom: @zoom%</RadzenText>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart @ref="chart" AllowZoom="true" AllowPan="true" @bind-Zoom="@zoom" ViewChange="@OnViewChange">
+        <RadzenLineSeries Data="@temperatureData" CategoryProperty="Day" ValueProperty="Temperature" Title="Temperature (°C)" Smooth="true">
+            <RadzenMarkers Visible="false" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Data="@temperatureData" CategoryProperty="Day" ValueProperty="Humidity" Title="Humidity (%)" Smooth="true">
+            <RadzenMarkers Visible="false" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" FormatString="{0:MMM dd}" />
+        <RadzenValueAxis>
+            <RadzenGridLines Visible="true" />
+        </RadzenValueAxis>
+        <RadzenLegend Position="LegendPosition.Bottom" />
+    </RadzenChart>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    class WeatherDataItem
+    {
+        public DateTime Day { get; set; }
+        public double Temperature { get; set; }
+        public double Humidity { get; set; }
+    }
+
+    RadzenChart chart;
+    EventConsole console;
+    double zoom = 200;
+    List<WeatherDataItem> temperatureData = new();
+
+    void OnViewChange(ChartViewChangeEventArgs args)
+    {
+        console.Log($"ViewChange: Zoom = {args.Zoom}%, Start = {args.ViewStart:F2}, End = {args.ViewEnd:F2}");
+    }
+
+    protected override void OnInitialized()
+    {
+        var random = new Random(42);
+        var start = new DateTime(2025, 1, 1);
+
+        for (int i = 0; i < 120; i++)
+        {
+            var day = start.AddDays(i);
+            var seasonalTemp = 8 + 12 * Math.Sin((i - 30) * Math.PI / 180);
+            var seasonalHumidity = 55 + 15 * Math.Cos((i - 10) * Math.PI / 180);
+
+            temperatureData.Add(new WeatherDataItem
+            {
+                Day = day,
+                Temperature = Math.Round(seasonalTemp + random.NextDouble() * 6 - 3, 1),
+                Humidity = Math.Round(seasonalHumidity + random.NextDouble() * 10 - 5, 1)
+            });
+        }
+    }
+}
