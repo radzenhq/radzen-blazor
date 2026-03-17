@@ -464,6 +464,8 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   .rz-slot {
     flex: 1;
     height: 100%;
+    cursor: pointer;
+    align-items: flex-start;
 
     &:first-child {
       border-inline-start: none;
@@ -475,7 +477,6 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     align-items: baseline;
     flex: 1;
   }
-
 }
 
 // Planner View
