@@ -2686,6 +2686,10 @@ window.Radzen = {
       ref.removeEventListener('touchend', ref.touchEndHandler);
       delete ref.touchEndHandler;
     }
+    if (ref._chartRTLObserver) {
+      ref._chartRTLObserver.disconnect();
+      delete ref._chartRTLObserver;
+    }
     this.destroyResizable(ref);
   },
   destroyGauge: function (ref) {
@@ -2798,14 +2802,32 @@ window.Radzen = {
     // Scrollbar drag handling via event delegation (survives Blazor re-renders)
     var dragging = false;
     var dragStartX = 0;
-    var dragStartLeft = 0;
+    var dragStartPos = 0;
+
+    function isChartRTL() {
+      return document.documentElement.dir === 'rtl';
+    }
+
+    function getThumbPos(thumb) {
+      return parseFloat(isChartRTL() ? thumb.style.right : thumb.style.left) || 0;
+    }
+
+    function setThumbPos(thumb, pos) {
+      if (isChartRTL()) {
+        thumb.style.right = pos + '%';
+        thumb.style.left = '';
+      } else {
+        thumb.style.left = pos + '%';
+        thumb.style.right = '';
+      }
+    }
 
     ref.addEventListener('mousedown', function (e) {
       var thumb = e.target.closest('.rz-chart-scrollbar-thumb');
       if (!thumb) return;
       dragging = true;
       dragStartX = e.clientX;
-      dragStartLeft = parseFloat(thumb.style.left) || 0;
+      dragStartPos = getThumbPos(thumb);
       e.preventDefault();
     });
 
@@ -2817,10 +2839,10 @@ window.Radzen = {
       var trackWidth = track.offsetWidth;
       if (trackWidth <= 0) return;
       var dx = e.clientX - dragStartX;
-      var deltaPercent = (dx / trackWidth) * 100;
-      var newLeft = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartLeft + deltaPercent));
-      thumb.style.left = newLeft + '%';
-      var position = newLeft / 100;
+      var deltaPercent = (isChartRTL() ? -dx : dx) / trackWidth * 100;
+      var newPos = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartPos + deltaPercent));
+      setThumbPos(thumb, newPos);
+      var position = newPos / 100;
       try { instance.invokeMethodAsync('OnPan', position); } catch {}
     };
     document.addEventListener('mousemove', ref.scrollbarMoveHandler);
@@ -2836,7 +2858,7 @@ window.Radzen = {
       var thumb = track.querySelector('.rz-chart-scrollbar-thumb');
       if (!thumb) return;
       var trackRect = track.getBoundingClientRect();
-      var clickX = e.clientX - trackRect.left;
+      var clickX = isChartRTL() ? trackRect.right - e.clientX : e.clientX - trackRect.left;
       var thumbWidth = thumb.offsetWidth;
       var position = Math.max(0, Math.min(1 - thumbWidth / track.offsetWidth, (clickX - thumbWidth / 2) / track.offsetWidth));
       try { instance.invokeMethodAsync('OnPan', position); } catch {}
@@ -2848,7 +2870,7 @@ window.Radzen = {
       if (!thumb) return;
       dragging = true;
       dragStartX = e.touches[0].clientX;
-      dragStartLeft = parseFloat(thumb.style.left) || 0;
+      dragStartPos = getThumbPos(thumb);
       e.preventDefault();
     }, { passive: false });
 
@@ -2860,10 +2882,10 @@ window.Radzen = {
       var trackWidth = track.offsetWidth;
       if (trackWidth <= 0) return;
       var dx = e.touches[0].clientX - dragStartX;
-      var deltaPercent = (dx / trackWidth) * 100;
-      var newLeft = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartLeft + deltaPercent));
-      thumb.style.left = newLeft + '%';
-      var position = newLeft / 100;
+      var deltaPercent = (isChartRTL() ? -dx : dx) / trackWidth * 100;
+      var newPos = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartPos + deltaPercent));
+      setThumbPos(thumb, newPos);
+      var position = newPos / 100;
       try { instance.invokeMethodAsync('OnPan', position); } catch {}
       e.preventDefault();
     };
@@ -2925,11 +2947,11 @@ window.Radzen = {
         var thumb = ref.querySelector('.rz-chart-scrollbar-thumb');
         if (!thumb) return;
         var thumbWidth = parseFloat(thumb.style.width) || 50;
-        var currentLeft = parseFloat(thumb.style.left) || 0;
-        // Swipe right = move view left (decrease position), swipe left = move view right
-        var deltaPercent = -(dx / chartWidth) * 100;
-        var newLeft = Math.max(0, Math.min(100 - thumbWidth, currentLeft + deltaPercent));
-        var position = newLeft / 100;
+        var currentPos = getThumbPos(thumb);
+        // Swipe in reading direction = move view backward, swipe against = move view forward
+        var deltaPercent = (isChartRTL() ? dx : -dx) / chartWidth * 100;
+        var newPos = Math.max(0, Math.min(100 - thumbWidth, currentPos + deltaPercent));
+        var position = newPos / 100;
         try { instance.invokeMethodAsync('OnPan', position); } catch {}
         touchPanStartX = e.touches[0].clientX;
         e.preventDefault();
@@ -2946,6 +2968,13 @@ window.Radzen = {
       }
     };
     ref.addEventListener('touchend', ref.touchEndHandler);
+
+    // RTL detection
+    ref._chartRTLObserver = new MutationObserver(function () {
+      try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+    });
+    ref._chartRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
+    try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
 
     return this.createResizable(ref, instance);
   },

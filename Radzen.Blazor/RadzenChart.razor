@@ -13,7 +13,7 @@
 {
     <CascadingValue Value="@this">
         <Legend />
-        <svg style="width: 100%; height: 100%; overflow: visible;">
+        <svg style="width: 100%; height: 100%; overflow: visible;@(IsRTL ? " direction: ltr;" : "")">
             <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
                 <ClipPath />
                 @if(ShouldRenderAxes())
@@ -40,7 +40,14 @@
         {
             <div class="rz-chart-scrollbar" style="bottom: @(scrollbarBottom.ToInvariantString())px; left: @(MarginLeft.ToInvariantString())px; right: @(MarginRight.ToInvariantString())px;">
                 <div class="rz-chart-scrollbar-track">
-                    <div class="rz-chart-scrollbar-thumb" style="left: @((ZoomStart * 100).ToInvariantString())%; width: @(((ZoomEnd - ZoomStart) * 100).ToInvariantString())%;"></div>
+                    @if (IsRTL)
+                    {
+                        <div class="rz-chart-scrollbar-thumb" style="right: @((ZoomStart * 100).ToInvariantString())%; width: @(((ZoomEnd - ZoomStart) * 100).ToInvariantString())%;"></div>
+                    }
+                    else
+                    {
+                        <div class="rz-chart-scrollbar-thumb" style="left: @((ZoomStart * 100).ToInvariantString())%; width: @(((ZoomEnd - ZoomStart) * 100).ToInvariantString())%;"></div>
+                    }
                 </div>
             </div>
         }
