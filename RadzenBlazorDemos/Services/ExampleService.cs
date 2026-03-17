@@ -2055,6 +2055,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Column Negative Points",
+                            Path = "negative-column-chart",
+                            Description = "Radzen Blazor Chart with column series displaying positive and negative values with color-coded fill ranges.",
+                            Tags = new [] { "chart", "graph", "column", "negative", "positive", "loss", "profit" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Bar Chart",
                             Path = "bar-chart",
                             Description = "Radzen Blazor Chart with bar series.",
