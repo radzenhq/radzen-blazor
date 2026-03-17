@@ -163,8 +163,8 @@ namespace Radzen
         /// <summary>
         /// The tasks
         /// </summary>
-        protected List<TaskCompletionSource<dynamic>> tasks = new List<TaskCompletionSource<dynamic>>();
-        private TaskCompletionSource<dynamic>? sideDialogResultTask;
+        protected List<TaskCompletionSource<dynamic?>> tasks = new List<TaskCompletionSource<dynamic?>>();
+        private TaskCompletionSource<dynamic?>? sideDialogResultTask;
         private SideDialogOptions? currentSideDialogOptions;
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Radzen
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
         public virtual Task<dynamic?> OpenAsync<T>(string title, Dictionary<string, object?>? parameters = null, DialogOptions? options = null) where T : ComponentBase
         {
-            var task = new TaskCompletionSource<dynamic>();
+            var task = new TaskCompletionSource<dynamic?>();
             tasks.Add(task);
 
             OpenDialog<T>(title, parameters, options);
@@ -201,7 +201,7 @@ namespace Radzen
                 throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
             }
 
-            var task = new TaskCompletionSource<dynamic>();
+            var task = new TaskCompletionSource<dynamic?>();
             tasks.Add(task);
 
             var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.NonPublic);
@@ -228,7 +228,7 @@ namespace Radzen
             where T : ComponentBase
         {
             CloseSideSilently();
-            sideDialogResultTask = new TaskCompletionSource<dynamic>();
+            sideDialogResultTask = new TaskCompletionSource<dynamic?>();
             if (options == null)
             {
                 options = new SideDialogOptions();
@@ -257,7 +257,7 @@ namespace Radzen
             }
 
             CloseSideSilently();
-            sideDialogResultTask = new TaskCompletionSource<dynamic>();
+            sideDialogResultTask = new TaskCompletionSource<dynamic?>();
 
             if (options == null)
             {
@@ -377,7 +377,7 @@ namespace Radzen
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
         public virtual Task<dynamic?> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions? options = null, CancellationToken? cancellationToken = null)
         {
-            var task = new TaskCompletionSource<dynamic>();
+            var task = new TaskCompletionSource<dynamic?>();
 
             // register the cancellation token
             if (cancellationToken.HasValue)
@@ -403,7 +403,7 @@ namespace Radzen
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
         public virtual Task<dynamic?> OpenAsync(RenderFragment<DialogService> titleContent, RenderFragment<DialogService> childContent, DialogOptions? options = null, CancellationToken? cancellationToken = null)
         {
-            var task = new TaskCompletionSource<dynamic>();
+            var task = new TaskCompletionSource<dynamic?>();
 
             // register the cancellation token
             if (cancellationToken.HasValue)
