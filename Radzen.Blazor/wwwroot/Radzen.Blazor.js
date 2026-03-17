@@ -4376,6 +4376,7 @@ class Spreadsheet {
     this.element.addEventListener('keydown', this.onKeyDown);
     this.element.addEventListener('pointerdown', this.onPointerDown);
     this.element.addEventListener('dblclick', this.onDoubleClick);
+    this.element.addEventListener('contextmenu', this.onContextMenu);
     addEventListener('paste', this.onPaste);
     addEventListener('copy', this.onCopy);
   }
@@ -4453,6 +4454,23 @@ class Spreadsheet {
       }
       e.preventDefault();
       e.stopPropagation();
+    }
+  }
+
+  onContextMenu = (e) => {
+    if (e.target.matches('.rz-spreadsheet-cell')) {
+      e.preventDefault();
+      const row = +e.target.dataset.row;
+      const column = +e.target.dataset.column;
+      this.dotNetRef.invokeMethodAsync('OnCellContextMenuAsync', { row, column, pointer: this.toEventArgs(e) });
+    } else if (e.target.matches('.rz-spreadsheet-row-header')) {
+      e.preventDefault();
+      const row = +e.target.dataset.row;
+      this.dotNetRef.invokeMethodAsync('OnRowContextMenuAsync', { row, pointer: this.toEventArgs(e) });
+    } else if (e.target.matches('.rz-spreadsheet-column-header')) {
+      e.preventDefault();
+      const column = +e.target.dataset.column;
+      this.dotNetRef.invokeMethodAsync('OnColumnContextMenuAsync', { column, pointer: this.toEventArgs(e) });
     }
   }
 
@@ -4548,6 +4566,7 @@ class Spreadsheet {
     this.element.removeEventListener('keydown', this.onKeyDown);
     this.element.removeEventListener('pointerdown', this.onPointerDown);
     this.element.removeEventListener('dblclick', this.onDoubleClick);
+    this.element.removeEventListener('contextmenu', this.onContextMenu);
     removeEventListener('paste', this.onPaste);
     removeEventListener('copy', this.onCopy);
   }
