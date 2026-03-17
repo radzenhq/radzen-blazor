@@ -47,13 +47,13 @@
     /// Gets or sets the stroke width for this series.
     /// </summary>
     [Parameter]
-    public double StrokeWidth { get; set; } = 2;
+    public double StrokeWidth { get; set; } = 1;
 
     /// <summary>
     /// Gets or sets whether markers are visible for this series.
     /// </summary>
     [Parameter]
-    public bool MarkersVisible { get; set; } = true;
+    public bool MarkersVisible { get; set; }
 
     /// <summary>
     /// Gets or sets the marker size for this series.
@@ -70,7 +70,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        
+
         if (Chart != null && !_registered)
         {
             _registered = true;
@@ -107,7 +107,7 @@
     bool IRadzenSpiderSeries.MarkersVisible => MarkersVisible;
     double IRadzenSpiderSeries.MarkerSize => MarkerSize;
     double IRadzenSpiderSeries.StrokeWidth => StrokeWidth;
-    SpiderSeriesType IRadzenSpiderSeries.SeriesType => SpiderSeriesType.Area;
+    SpiderSeriesType IRadzenSpiderSeries.SeriesType => SpiderSeriesType.Column;
 
     /// <summary>
     /// Measures the legend text width for this series.
@@ -212,7 +212,7 @@
 
         builder.OpenComponent<LegendItem>(0);
         builder.AddAttribute(1, nameof(LegendItem.Index), Index);
-        builder.AddAttribute(2, nameof(LegendItem.MarkerType), MarkerType.Circle);
+        builder.AddAttribute(2, nameof(LegendItem.MarkerType), MarkerType.Square);
         builder.AddAttribute(3, nameof(LegendItem.Style), string.Join(";", style));
         builder.AddAttribute(4, nameof(LegendItem.MarkerSize), MarkerSize);
         builder.AddAttribute(5, nameof(LegendItem.Text), Title);
@@ -233,7 +233,6 @@
         }
     }
 
-
     /// <summary>
     /// Forces the series to update its display.
     /// </summary>
@@ -241,5 +240,4 @@
     {
         StateHasChanged();
     }
-
 }

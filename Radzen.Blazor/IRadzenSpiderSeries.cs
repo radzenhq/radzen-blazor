@@ -14,6 +14,7 @@ namespace Radzen.Blazor
         bool MarkersVisible { get; }
         double MarkerSize { get; }
         double StrokeWidth { get; }
+        SpiderSeriesType SeriesType { get; }
 
         IEnumerable<string> GetCategories();
         IEnumerable<double> GetValues();

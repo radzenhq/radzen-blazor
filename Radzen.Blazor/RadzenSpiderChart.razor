@@ -56,17 +56,40 @@
                     <g class="rz-spider-chart-areas">
                         @foreach (var series in VisibleSeries)
                         {
-                            var path = GetSeriesPath(series);
                             var isHovered = HoveredSeries == series;
                             var shouldShow = !IsLegendHover || HoveredSeries == null || HoveredSeries == series;
                             var localSeries = series;
-                            
-                            <path d="@path" 
-                                  class="rz-spider-chart-area rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
-                                  data-stroke-width="@series.StrokeWidth.ToInvariantString()"
-                                  @onclick="@(args => InvokeSeriesClick(localSeries))"
-                                  @onmouseenter="@(args => { OnAreaMouseEnter((MouseEventArgs)args, localSeries); })"
-                                  @onmouseleave="OnAreaMouseLeave" />
+
+                            @if (series.SeriesType == SpiderSeriesType.Column)
+                            {
+                                var halfAngle = GetColumnHalfAngle();
+                                @foreach (var category in GetAllCategories())
+                                {
+                                    var catIndex = GetCategoryIndex(category);
+                                    var value = GetSeriesValue(series, category);
+                                    var columnPath = GetColumnPath(catIndex, value, halfAngle);
+                                    var localCategory = category;
+                                    var localValue = value;
+
+                                    <path d="@columnPath"
+                                          class="rz-spider-chart-column rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
+                                          data-stroke-width="@series.StrokeWidth.ToInvariantString()"
+                                          @onclick="@(args => InvokeSeriesClick(localSeries, localCategory, localValue, localSeries.GetData(localCategory)))"
+                                          @onmouseenter="@(args => OnMarkerMouseEnter((MouseEventArgs)args, localSeries, localCategory, localValue))"
+                                          @onmouseleave="OnMarkerMouseLeave" />
+                                }
+                            }
+                            else
+                            {
+                                var path = GetSeriesPath(series);
+
+                                <path d="@path"
+                                      class="rz-spider-chart-area rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
+                                      data-stroke-width="@series.StrokeWidth.ToInvariantString()"
+                                      @onclick="@(args => InvokeSeriesClick(localSeries))"
+                                      @onmouseenter="@(args => { OnAreaMouseEnter((MouseEventArgs)args, localSeries); })"
+                                      @onmouseleave="OnAreaMouseLeave" />
+                            }
                         }
                     </g>
 
