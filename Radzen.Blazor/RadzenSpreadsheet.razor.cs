@@ -446,12 +446,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             new() { Text = "Copy", Value = "copy", Icon = "content_copy" },
             new() { Text = "Paste", Value = "paste", Icon = "content_paste" },
             new() { Text = "Clear Contents", Value = "clear", Icon = "clear" },
-            new() { Text = "Insert Row Above", Value = "insert-row-before", Icon = "north" },
-            new() { Text = "Insert Row Below", Value = "insert-row-after", Icon = "south" },
-            new() { Text = "Insert Column Before", Value = "insert-column-before", Icon = "west" },
-            new() { Text = "Insert Column After", Value = "insert-column-after", Icon = "east" },
-            new() { Text = "Delete Row", Value = "delete-row", Icon = "delete" },
-            new() { Text = "Delete Column", Value = "delete-column", Icon = "delete" },
             new() { Text = "Sort Ascending", Value = "sort-ascending", Icon = "arrow_upward" },
             new() { Text = "Sort Descending", Value = "sort-descending", Icon = "arrow_downward" },
         }, menuArgs => OnContextMenuItemClick(menuArgs, row, column));
@@ -542,25 +536,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 // Paste requires JS interop to read clipboard, handled via keyboard shortcut
                 break;
             case "clear":
-                ClearSelectedContents();
-                break;
-            case "insert-row-before":
-                Sheet.Commands.Execute(new InsertRowBeforeCommand(Sheet, row));
-                break;
-            case "insert-row-after":
-                Sheet.Commands.Execute(new InsertRowAfterCommand(Sheet, row));
-                break;
-            case "insert-column-before":
-                Sheet.Commands.Execute(new InsertColumnBeforeCommand(Sheet, column));
-                break;
-            case "insert-column-after":
-                Sheet.Commands.Execute(new InsertColumnAfterCommand(Sheet, column));
-                break;
-            case "delete-row":
-                Sheet.Commands.Execute(new DeleteRowsCommand(Sheet, row, row));
-                break;
-            case "delete-column":
-                Sheet.Commands.Execute(new DeleteColumnsCommand(Sheet, column, column));
+                Sheet.Commands.Execute(new ClearContentsCommand(Sheet, Sheet.Selection.Range));
                 break;
             case "sort-ascending":
                 Sheet.Commands.Execute(new SortCommand(Sheet, new RangeRef(new CellRef(0, 0), new CellRef(Sheet.RowCount - 1, Sheet.ColumnCount - 1)), SortOrder.Ascending, column));
@@ -649,28 +625,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         StateHasChanged();
-    }
-
-    private void ClearSelectedContents()
-    {
-        if (Sheet is null)
-        {
-            return;
-        }
-
-        var range = Sheet.Selection.Range;
-
-        for (var row = range.Start.Row; row <= range.End.Row; row++)
-        {
-            for (var column = range.Start.Column; column <= range.End.Column; column++)
-            {
-                if (Sheet.Cells.TryGet(row, column, out var cell))
-                {
-                    cell.Formula = null;
-                    cell.Value = null;
-                }
-            }
-        }
     }
 
     private IJSObjectReference? jsRef;
