@@ -114,14 +114,14 @@
         gridX1 = x1;
         gridX2 = x2;
 
-        // Detect if the primary value axis has been flipped to the right side due to category inversion
+        // Detect if the primary value axis has been flipped to the right side (due to category inversion or RTL)
         isFlippedToRight = string.IsNullOrEmpty(AxisName) && x1 > x2;
 
         if (IsRightSide)
         {
             // Calculate right-side X position: after the category axis end, offset by preceding additional axes
             axisX = x2;
-            foreach (var entry in Chart.AdditionalValueAxes)
+            foreach (var entry in Chart!.AdditionalValueAxes)
             {
                 if (entry.Key == AxisName) break;
                 axisX += entry.Value.Measure(Chart, Chart.GetValueScale(entry.Key));
@@ -135,7 +135,7 @@
             if (crossesAt.HasValue)
             {
                 var clampedValue = Math.Max(Math.Min(crossesAt.Value, categoryTicks.End), categoryTicks.Start);
-                axisX = Chart.CategoryScale.Scale(clampedValue);
+                axisX = Chart!.CategoryScale.Scale(clampedValue);
             }
         }
 
