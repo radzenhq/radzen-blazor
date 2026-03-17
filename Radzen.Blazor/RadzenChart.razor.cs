@@ -70,6 +70,25 @@ namespace Radzen.Blazor
         public bool AllowSeriesHover { get; set; } = true;
 
         /// <summary>
+        /// Gets whether the chart is currently rendered in a right-to-left context.
+        /// When <c>true</c>, the category axis direction is reversed and the value axis renders on the right side.
+        /// </summary>
+        internal bool IsRTL { get; private set; }
+
+        /// <summary>
+        /// Called from JavaScript when the document direction changes.
+        /// </summary>
+        [JSInvokable]
+        public async Task SetRTL(bool isRTL)
+        {
+            if (IsRTL != isRTL)
+            {
+                IsRTL = isRTL;
+                await Refresh();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the callback invoked when a user clicks on a data point or segment in a chart series.
         /// Provides information about the clicked series, data item, and value in the event arguments.
         /// </summary>
@@ -449,21 +468,33 @@ namespace Radzen.Blazor
             }
 
             MarginTop = 32;
-            MarginRight = 32 + additionalAxesWidth;
-            MarginLeft = valueAxisSize;
+
+            if (IsRTL && !ShouldInvertAxes())
+            {
+                // RTL (non-bar charts): value axis on the right, additional axes on the left
+                MarginRight = valueAxisSize;
+                MarginLeft = 32 + additionalAxesWidth;
+            }
+            else
+            {
+                MarginRight = 32 + additionalAxesWidth;
+                MarginLeft = valueAxisSize;
+            }
+
             MarginBottom = Math.Max(32, categoryAxisSize);
 
             if (Legend.Visible)
             {
                 if (Legend.Position == LegendPosition.Right || Legend.Position == LegendPosition.Left)
                 {
+                    var rtlNonBar = IsRTL && !ShouldInvertAxes();
                     if (Legend.Position == LegendPosition.Right)
                     {
-                        MarginRight = legendSize + 16 + additionalAxesWidth;
+                        MarginRight = legendSize + 16 + (rtlNonBar ? valueAxisSize : additionalAxesWidth);
                     }
                     else
                     {
-                        MarginLeft = legendSize + 16 + valueAxisSize;
+                        MarginLeft = legendSize + 16 + (rtlNonBar ? additionalAxesWidth : valueAxisSize);
                     }
                 }
                 else if (Legend.Position == LegendPosition.Top || Legend.Position == LegendPosition.Bottom)
@@ -495,15 +526,21 @@ namespace Radzen.Blazor
             var valueStart = Height != null ? Height.Value - MarginBottom : 0;
             var valueEnd = MarginTop;
 
+            // RTL flips the horizontal axis direction.
+            // For normal charts, horizontal = category axis. For bar charts (inverted), horizontal = value axis.
+            var invertedAxes = ShouldInvertAxes();
+            var categoryReversed = CategoryAxis.Inverted != (IsRTL && !invertedAxes);
+            var valueReversed = ValueAxis.Inverted != (IsRTL && invertedAxes);
+
             CategoryScale.Output = new ScaleRange
             {
-                Start = CategoryAxis.Inverted ? categoryEnd : categoryStart,
-                End = CategoryAxis.Inverted ? categoryStart : categoryEnd
+                Start = categoryReversed ? categoryEnd : categoryStart,
+                End = categoryReversed ? categoryStart : categoryEnd
             };
             ValueScale.Output = new ScaleRange
             {
-                Start = ValueAxis.Inverted ? valueEnd : valueStart,
-                End = ValueAxis.Inverted ? valueStart : valueEnd
+                Start = valueReversed ? valueEnd : valueStart,
+                End = valueReversed ? valueStart : valueEnd
             };
 
             ValueScale.Fit(ValueAxis.TickDistance);
@@ -572,10 +609,11 @@ namespace Radzen.Blazor
 
                 var cs = MarginLeft;
                 var ce = Width.Value - MarginRight;
+                var catReversed = CategoryAxis.Inverted != (IsRTL && !ShouldInvertAxes());
                 CategoryScale.Output = new ScaleRange
                 {
-                    Start = CategoryAxis.Inverted ? ce : cs,
-                    End = CategoryAxis.Inverted ? cs : ce
+                    Start = catReversed ? ce : cs,
+                    End = catReversed ? cs : ce
                 };
             }
 
@@ -586,10 +624,11 @@ namespace Radzen.Blazor
 
                 var vs = Height.Value - MarginBottom;
                 var ve = MarginTop;
+                var valReversed = ValueAxis.Inverted != (IsRTL && ShouldInvertAxes());
                 ValueScale.Output = new ScaleRange
                 {
-                    Start = ValueAxis.Inverted ? ve : vs,
-                    End = ValueAxis.Inverted ? vs : ve
+                    Start = valReversed ? ve : vs,
+                    End = valReversed ? vs : ve
                 };
 
                 foreach (var entry in AdditionalValueScales)
