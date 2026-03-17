@@ -1,0 +1,46 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart>
+                <RadzenColumnSeries Data="@data" CategoryProperty="Month" ValueProperty="Value" Title="Monthly Profit and Loss"
+                    FillRange="@fillRange">
+                </RadzenColumnSeries>
+                <RadzenColumnOptions Radius="0" />
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+                <RadzenLegend Visible="false" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class ProfitLossData
+    {
+        public string Month { get; set; }
+        public double Value { get; set; }
+    }
+
+    ProfitLossData[] data = new[]
+    {
+        new ProfitLossData { Month = "Jan", Value = 200 },
+        new ProfitLossData { Month = "Feb", Value = -800 },
+        new ProfitLossData { Month = "Mar", Value = -1200 },
+        new ProfitLossData { Month = "Apr", Value = -2500 },
+        new ProfitLossData { Month = "May", Value = -300 },
+        new ProfitLossData { Month = "Jun", Value = 600 },
+        new ProfitLossData { Month = "Jul", Value = 3800 },
+        new ProfitLossData { Month = "Aug", Value = 3200 },
+        new ProfitLossData { Month = "Sep", Value = 2800 },
+        new ProfitLossData { Month = "Oct", Value = 3500 },
+        new ProfitLossData { Month = "Nov", Value = 3000 },
+        new ProfitLossData { Month = "Dec", Value = 3600 },
+    };
+
+    List<SeriesColorRange> fillRange = new()
+    {
+        new SeriesColorRange { Min = -10000, Max = 0, Color = "var(--rz-danger)" },
+        new SeriesColorRange { Min = 0, Max = 10000, Color = "var(--rz-success)" },
+    };
+}
