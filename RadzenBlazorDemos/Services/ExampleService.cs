@@ -2158,6 +2158,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Negative Stacked Bar Chart",
+                            Path = "negative-stacked-bar-chart",
+                            Description = "Radzen Blazor Chart with stacked bar series displaying population pyramid with negative and positive values.",
+                            Tags = new [] { "chart", "graph", "bar", "stack", "negative", "population", "pyramid", "demographic" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Full Stacked Area Chart",
                             Path = "100-percent-stacked-area-chart",
                             Description = "Radzen Blazor Chart with full (100%) stacked area series showing proportional filled areas.",
