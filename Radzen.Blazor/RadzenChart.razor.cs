@@ -129,6 +129,85 @@ namespace Radzen.Blazor
         internal Dictionary<string, RadzenValueAxis> AdditionalValueAxes { get; set; } = new Dictionary<string, RadzenValueAxis>();
         internal RadzenChartTooltipOptions Tooltip { get; set; } = new RadzenChartTooltipOptions();
 
+        /// <summary>
+        /// Gets or sets whether mouse wheel zoom is enabled.
+        /// </summary>
+        [Parameter]
+        public bool AllowZoom { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether pan via scrollbar is enabled.
+        /// </summary>
+        [Parameter]
+        public bool AllowPan { get; set; }
+
+        /// <summary>
+        /// Gets or sets the zoom level as a percentage. A value of 100 means no zoom (full range visible).
+        /// Higher values zoom in (e.g., 200 shows half the range, 400 shows a quarter).
+        /// Set to 100 to reset zoom. Supports two-way binding with <c>@bind-Zoom</c>.
+        /// </summary>
+        [Parameter]
+        public double Zoom { get; set; } = 100;
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the zoom level changes due to user interaction (mouse wheel or pan).
+        /// Used for two-way binding with <c>@bind-Zoom</c>.
+        /// </summary>
+        [Parameter]
+        public EventCallback<double> ZoomChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the visible range changes due to zoom or pan.
+        /// Provides the current zoom level and visible range fractions.
+        /// </summary>
+        [Parameter]
+        public EventCallback<ChartViewChangeEventArgs> ViewChange { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start of the visible range as a fraction (0-1) of the full category range.
+        /// </summary>
+        internal double ZoomStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end of the visible range as a fraction (0-1) of the full category range.
+        /// </summary>
+        internal double ZoomEnd { get; set; } = 1;
+
+        /// <summary>
+        /// The full category scale input range before zoom is applied.
+        /// </summary>
+        private double fullCategoryStart;
+        private double fullCategoryEnd;
+
+        private void ApplyZoomLevel()
+        {
+            var zoomLevel = Math.Max(100, Zoom) / 100.0;
+            var range = 1.0 / zoomLevel;
+            var center = (ZoomStart + ZoomEnd) / 2;
+            ZoomStart = Math.Max(0, center - range / 2);
+            ZoomEnd = Math.Min(1, ZoomStart + range);
+            if (ZoomStart < 0) { ZoomStart = 0; ZoomEnd = range; }
+        }
+
+        private async Task NotifyZoomChanged()
+        {
+            var range = ZoomEnd - ZoomStart;
+            var newZoom = range > 0 ? Math.Round(100.0 / range) : 100;
+            Zoom = newZoom;
+            await ZoomChanged.InvokeAsync(newZoom);
+            await ViewChange.InvokeAsync(new ChartViewChangeEventArgs
+            {
+                Zoom = newZoom,
+                ViewStart = ZoomStart,
+                ViewEnd = ZoomEnd
+            });
+        }
+
+        /// <summary>
+        /// The bottom offset for the scrollbar, to position it above the legend.
+        /// </summary>
+        private double scrollbarBottom;
+
         internal void AddValueAxis(string name, RadzenValueAxis axis)
         {
             AdditionalValueAxes[name] = axis;
@@ -392,6 +471,17 @@ namespace Radzen.Blazor
                 }
             }
 
+            if (AllowZoom || AllowPan)
+            {
+                MarginBottom += 20;
+
+                scrollbarBottom = 0;
+                if (Legend.Visible && Legend.Position == LegendPosition.Bottom)
+                {
+                    scrollbarBottom = legendSize + 16;
+                }
+            }
+
             var categoryStart = MarginLeft;
             var categoryEnd = Width != null ? Width.Value - MarginRight : 0;
             var valueStart = Height != null ? Height.Value - MarginBottom : 0;
@@ -410,6 +500,30 @@ namespace Radzen.Blazor
 
             ValueScale.Fit(ValueAxis.TickDistance);
             CategoryScale.Fit(CategoryAxis.TickDistance);
+
+            // Apply zoom to category scale
+            if ((AllowZoom || AllowPan) && (ZoomStart > 0 || ZoomEnd < 1))
+            {
+                fullCategoryStart = CategoryScale.Input.Start;
+                fullCategoryEnd = CategoryScale.Input.End;
+
+                var fullRange = fullCategoryEnd - fullCategoryStart;
+                CategoryScale.Input = new ScaleRange
+                {
+                    Start = fullCategoryStart + fullRange * ZoomStart,
+                    End = fullCategoryStart + fullRange * ZoomEnd
+                };
+                CategoryScale.Round = false;
+
+                // Recalculate step for zoomed range
+                var zoomedTicks = CategoryScale.Ticks(CategoryAxis.TickDistance);
+                CategoryScale.Step = zoomedTicks.Step;
+            }
+            else
+            {
+                fullCategoryStart = CategoryScale.Input.Start;
+                fullCategoryEnd = CategoryScale.Input.End;
+            }
 
             // Set output ranges and fit additional scales
             foreach (var entry in AdditionalValueScales)
@@ -559,6 +673,55 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Invoked via interop when the user scrolls the mouse wheel over the chart. Zooms in or out.
+        /// </summary>
+        /// <param name="x">The mouse X position relative to the chart element.</param>
+        /// <param name="delta">Positive to zoom out, negative to zoom in.</param>
+        [JSInvokable]
+        public async Task OnWheel(double x, int delta)
+        {
+            if (!AllowZoom) return;
+
+            var plotWidth = (Width ?? 0) - MarginLeft - MarginRight;
+            if (plotWidth <= 0) return;
+
+            var fraction = Math.Clamp((x - MarginLeft) / plotWidth, 0, 1);
+            var zoomFactor = delta < 0 ? 0.8 : 1.25;
+            var range = ZoomEnd - ZoomStart;
+            var newRange = Math.Clamp(range * zoomFactor, 0.01, 1.0);
+
+            var center = ZoomStart + fraction * range;
+            var newStart = center - newRange * fraction;
+            var newEnd = newStart + newRange;
+
+            if (newEnd > 1) { newEnd = 1; newStart = 1 - newRange; }
+            if (newStart < 0) { newStart = 0; newEnd = newRange; }
+
+            ZoomStart = Math.Max(0, newStart);
+            ZoomEnd = Math.Min(1, newEnd);
+
+            await NotifyZoomChanged();
+            await Refresh();
+        }
+
+        /// <summary>
+        /// Invoked via interop when the user drags the scrollbar thumb.
+        /// </summary>
+        /// <param name="position">The new start position as a fraction (0-1).</param>
+        [JSInvokable]
+        public async Task OnPan(double position)
+        {
+            if (!AllowPan && !AllowZoom) return;
+
+            var range = ZoomEnd - ZoomStart;
+            ZoomStart = Math.Clamp(position, 0, 1 - range);
+            ZoomEnd = ZoomStart + range;
+
+            await NotifyZoomChanged();
+            await Refresh();
+        }
+
         internal async Task DisplayTooltip()
         {
             if (Tooltip.Visible)
@@ -697,6 +860,7 @@ namespace Radzen.Blazor
                     }
                 }
             }
+
         }
 
         internal string? ClipPath { get; set; }
@@ -709,6 +873,8 @@ namespace Radzen.Blazor
             ClipPath = $"clipPath{UniqueID}";
             CategoryAxis.Chart = this;
             ValueAxis.Chart = this;
+
+            ApplyZoomLevel();
 
             Initialize();
         }
@@ -753,10 +919,16 @@ namespace Radzen.Blazor
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             bool shouldRefresh = parameters.DidParameterChange(nameof(Style), Style);
+            bool zoomChanged = parameters.DidParameterChange(nameof(Zoom), Zoom);
 
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
             await base.SetParametersAsync(parameters);
+
+            if (zoomChanged)
+            {
+                ApplyZoomLevel();
+            }
 
             if (shouldRefresh)
             {
@@ -792,6 +964,17 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Reload()
         {
+            await Refresh(true);
+        }
+
+        /// <summary>
+        /// Resets zoom and pan to show the full data range.
+        /// </summary>
+        public async Task ResetZoom()
+        {
+            ZoomStart = 0;
+            ZoomEnd = 1;
+            await NotifyZoomChanged();
             await Refresh(true);
         }
 
