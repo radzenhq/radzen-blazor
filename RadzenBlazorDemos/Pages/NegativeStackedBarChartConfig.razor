@@ -1,0 +1,78 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart Style="height: 600px">
+                <RadzenStackedBarSeries Data="@female" CategoryProperty="AgeGroup" ValueProperty="Percentage" Title="Female" />
+                <RadzenStackedBarSeries Data="@male" CategoryProperty="AgeGroup" ValueProperty="Percentage" Title="Male" />
+                <RadzenBarOptions Radius="0" />
+                <RadzenValueAxis Formatter="@FormatPercentage" Min="-6" Max="6" Step="3">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Share of Total Population (%)" />
+                </RadzenValueAxis>
+                <RadzenCategoryAxis>
+                    <RadzenAxisTitle Text="Population by Age Range" />
+                </RadzenCategoryAxis>
+                <RadzenLegend Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    string FormatPercentage(object value)
+    {
+        return $"{Math.Abs((double)value)}%";
+    }
+
+    class PopulationData
+    {
+        public string AgeGroup { get; set; }
+        public double Percentage { get; set; }
+    }
+
+    PopulationData[] female = new[]
+    {
+        new PopulationData { AgeGroup = "00 - 04", Percentage = -4.15 },
+        new PopulationData { AgeGroup = "05 - 09", Percentage = -4.54 },
+        new PopulationData { AgeGroup = "10 - 14", Percentage = -4.28 },
+        new PopulationData { AgeGroup = "15 - 19", Percentage = -4.54 },
+        new PopulationData { AgeGroup = "20 - 24", Percentage = -4.72 },
+        new PopulationData { AgeGroup = "25 - 29", Percentage = -4.61 },
+        new PopulationData { AgeGroup = "30 - 34", Percentage = -4.32 },
+        new PopulationData { AgeGroup = "35 - 39", Percentage = -3.84 },
+        new PopulationData { AgeGroup = "40 - 44", Percentage = -3.29 },
+        new PopulationData { AgeGroup = "45 - 49", Percentage = -2.78 },
+        new PopulationData { AgeGroup = "50 - 54", Percentage = -2.42 },
+        new PopulationData { AgeGroup = "55 - 59", Percentage = -1.91 },
+        new PopulationData { AgeGroup = "60 - 64", Percentage = -1.53 },
+        new PopulationData { AgeGroup = "65 - 69", Percentage = -1.08 },
+        new PopulationData { AgeGroup = "70 - 74", Percentage = -0.72 },
+        new PopulationData { AgeGroup = "75 - 79", Percentage = -0.42 },
+        new PopulationData { AgeGroup = "80 - 84", Percentage = -0.23 },
+        new PopulationData { AgeGroup = "85 - 89", Percentage = -0.11 },
+        new PopulationData { AgeGroup = "90 - 94", Percentage = -0.04 },
+    };
+
+    PopulationData[] male = new[]
+    {
+        new PopulationData { AgeGroup = "00 - 04", Percentage = 4.36 },
+        new PopulationData { AgeGroup = "05 - 09", Percentage = 4.76 },
+        new PopulationData { AgeGroup = "10 - 14", Percentage = 4.48 },
+        new PopulationData { AgeGroup = "15 - 19", Percentage = 4.71 },
+        new PopulationData { AgeGroup = "20 - 24", Percentage = 4.9 },
+        new PopulationData { AgeGroup = "25 - 29", Percentage = 4.8 },
+        new PopulationData { AgeGroup = "30 - 34", Percentage = 4.51 },
+        new PopulationData { AgeGroup = "35 - 39", Percentage = 3.91 },
+        new PopulationData { AgeGroup = "40 - 44", Percentage = 3.25 },
+        new PopulationData { AgeGroup = "45 - 49", Percentage = 2.72 },
+        new PopulationData { AgeGroup = "50 - 54", Percentage = 2.31 },
+        new PopulationData { AgeGroup = "55 - 59", Percentage = 1.86 },
+        new PopulationData { AgeGroup = "60 - 64", Percentage = 1.48 },
+        new PopulationData { AgeGroup = "65 - 69", Percentage = 1.02 },
+        new PopulationData { AgeGroup = "70 - 74", Percentage = 0.66 },
+        new PopulationData { AgeGroup = "75 - 79", Percentage = 0.39 },
+        new PopulationData { AgeGroup = "80 - 84", Percentage = 0.21 },
+        new PopulationData { AgeGroup = "85 - 89", Percentage = 0.1 },
+        new PopulationData { AgeGroup = "90 - 94", Percentage = 0.03 },
+    };
+}
