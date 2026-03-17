@@ -1,0 +1,62 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart>
+                <RadzenColumnSeries Data="@usa" CategoryProperty="Year" ValueProperty="Total" Title="USA Total Medals">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnSeries Data="@usa" CategoryProperty="Year" ValueProperty="Gold" Title="USA Gold Medals">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnSeries Data="@uk" CategoryProperty="Year" ValueProperty="Total" Title="UK Total Medals">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnSeries Data="@uk" CategoryProperty="Year" ValueProperty="Gold" Title="UK Gold Medals">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnSeries Data="@china" CategoryProperty="Year" ValueProperty="Total" Title="China Total Medals">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnSeries Data="@china" CategoryProperty="Year" ValueProperty="Gold" Title="China Gold Medals">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnOptions Radius="0" />
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Number of Medals Won" />
+                </RadzenValueAxis>
+                <RadzenLegend Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class MedalData
+    {
+        public string Year { get; set; }
+        public double Total { get; set; }
+        public double Gold { get; set; }
+    }
+
+    MedalData[] usa = new[]
+    {
+        new MedalData { Year = "2016", Total = 121, Gold = 46 },
+        new MedalData { Year = "2020", Total = 113, Gold = 39 },
+        new MedalData { Year = "2024", Total = 126, Gold = 40 },
+    };
+
+    MedalData[] uk = new[]
+    {
+        new MedalData { Year = "2016", Total = 67, Gold = 27 },
+        new MedalData { Year = "2020", Total = 65, Gold = 22 },
+        new MedalData { Year = "2024", Total = 65, Gold = 14 },
+    };
+
+    MedalData[] china = new[]
+    {
+        new MedalData { Year = "2016", Total = 70, Gold = 26 },
+        new MedalData { Year = "2020", Total = 89, Gold = 38 },
+        new MedalData { Year = "2024", Total = 91, Gold = 40 },
+    };
+}
