@@ -1,0 +1,128 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Style="margin: 0;">ACME Corp (ACME) — Daily Stock Price</RadzenText>
+            <RadzenButton Text="Reset Zoom" Click="@ResetRange" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenButton Text="Last 3 Months" Click="@LastThreeMonths" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenButton Text="Last 6 Months" Click="@LastSixMonths" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart AllowZoom="true" AllowPan="true" @bind-ViewStart="@start" @bind-ViewEnd="@end" Style="height: 400px;">
+        <RadzenCandlestickSeries Data="@stockData" CategoryProperty="Date"
+            OpenProperty="Open" HighProperty="High" LowProperty="Low" CloseProperty="Close"
+            Title="ACME Corp" BullFill="#26A69A" BearFill="#EF5350" />
+        <RadzenLineSeries Data="@stockData" CategoryProperty="Date" ValueProperty="SMA20" Title="SMA 20" Stroke="#FF9800" StrokeWidth="1.5">
+            <RadzenMarkers Visible="false" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" FormatString="{0:MMM dd}" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Price (USD)" />
+        </RadzenValueAxis>
+        <RadzenLegend Position="LegendPosition.Bottom" />
+    </RadzenChart>
+
+    <RadzenRangeNavigator @bind-Start="@start" @bind-End="@end" Style="height: 80px; margin-top: 16px;" ShowHandleLabels="true" HandleLabelFormatString="{0:MMM dd, yyyy}">
+        <RadzenRangeNavigatorLineSeries Data="@stockData" CategoryProperty="Date" ValueProperty="Close" Stroke="#1E88E5" />
+    </RadzenRangeNavigator>
+</RadzenStack>
+
+@code {
+    class StockDataItem
+    {
+        public DateTime Date { get; set; }
+        public double Open { get; set; }
+        public double High { get; set; }
+        public double Low { get; set; }
+        public double Close { get; set; }
+        public double Volume { get; set; }
+        public double SMA20 { get; set; }
+    }
+
+    double start = 0;
+    double end = 1;
+    List<StockDataItem> stockData = new();
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    void ResetRange()
+    {
+        start = 0;
+        end = 1;
+    }
+
+    void LastThreeMonths()
+    {
+        start = 0.75;
+        end = 1;
+    }
+
+    void LastSixMonths()
+    {
+        start = 0.5;
+        end = 1;
+    }
+
+    protected override void OnInitialized()
+    {
+        var random = new Random(123);
+        var startDate = new DateTime(2024, 1, 2);
+        double price = 150.0;
+
+        // Generate ~1 year of daily stock data (trading days only)
+        for (int i = 0; i < 252; i++)
+        {
+            var date = startDate.AddDays(i);
+
+            // Skip weekends
+            if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
+            {
+                continue;
+            }
+
+            // Random walk with slight upward drift
+            var dailyReturn = (random.NextDouble() - 0.48) * 4.0;
+            var open = price;
+            var close = Math.Round(open + dailyReturn, 2);
+            var high = Math.Round(Math.Max(open, close) + random.NextDouble() * 3.0, 2);
+            var low = Math.Round(Math.Min(open, close) - random.NextDouble() * 3.0, 2);
+            var volume = Math.Round(2_000_000 + random.NextDouble() * 8_000_000);
+
+            stockData.Add(new StockDataItem
+            {
+                Date = date,
+                Open = open,
+                High = high,
+                Low = low,
+                Close = close,
+                Volume = volume
+            });
+
+            price = close;
+        }
+
+        // Calculate 20-day Simple Moving Average
+        for (int i = 0; i < stockData.Count; i++)
+        {
+            if (i >= 19)
+            {
+                var sum = 0.0;
+                for (int j = i - 19; j <= i; j++)
+                {
+                    sum += stockData[j].Close;
+                }
+                stockData[i].SMA20 = Math.Round(sum / 20, 2);
+            }
+            else
+            {
+                stockData[i].SMA20 = stockData[i].Close;
+            }
+        }
+    }
+}
