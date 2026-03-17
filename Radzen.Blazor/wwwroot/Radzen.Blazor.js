@@ -2650,6 +2650,14 @@ window.Radzen = {
     delete ref.clickHandler;
     ref.removeEventListener('wheel', ref.wheelHandler);
     delete ref.wheelHandler;
+    if (ref.legendEnterHandler) {
+      ref.removeEventListener('mouseenter', ref.legendEnterHandler, true);
+      delete ref.legendEnterHandler;
+    }
+    if (ref.legendLeaveHandler) {
+      ref.removeEventListener('mouseleave', ref.legendLeaveHandler, true);
+      delete ref.legendLeaveHandler;
+    }
     if (ref.scrollbarMoveHandler) {
       document.removeEventListener('mousemove', ref.scrollbarMoveHandler);
       delete ref.scrollbarMoveHandler;
@@ -2758,6 +2766,34 @@ window.Radzen = {
     ref.addEventListener('mousemove', ref.mouseMoveHandler);
     ref.addEventListener('click', ref.clickHandler);
     ref.addEventListener('wheel', ref.wheelHandler, { passive: false });
+
+    // Legend hover → series highlight (only when AllowSeriesHover is enabled)
+    ref.legendEnterHandler = function (e) {
+      if (!ref.classList.contains('rz-chart-series-hover')) return;
+      var legendItem = e.target.closest('.rz-legend-item');
+      if (!legendItem) return;
+      var g = legendItem.querySelector('g[class]');
+      if (!g) return;
+      var classes = g.className.baseVal || g.getAttribute('class') || '';
+      var match = classes.match(/rz-series-item-\d+|rz-series-\d+/);
+      if (!match) return;
+      var selector = '.' + match[0];
+      var svg = ref.querySelector('svg');
+      if (!svg) return;
+      var targets = svg.querySelectorAll(selector);
+      targets.forEach(function (t) { t.classList.add('rz-state-hover'); });
+    };
+    ref.legendLeaveHandler = function (e) {
+      if (!ref.classList.contains('rz-chart-series-hover')) return;
+      var legendItem = e.target.closest('.rz-legend-item');
+      if (!legendItem) return;
+      var svg = ref.querySelector('svg');
+      if (!svg) return;
+      var hovered = svg.querySelectorAll('.rz-state-hover');
+      hovered.forEach(function (t) { t.classList.remove('rz-state-hover'); });
+    };
+    ref.addEventListener('mouseenter', ref.legendEnterHandler, true);
+    ref.addEventListener('mouseleave', ref.legendLeaveHandler, true);
 
     // Scrollbar drag handling via event delegation (survives Blazor re-renders)
     var dragging = false;
