@@ -352,3 +352,36 @@ $chart-color-schemes: (
   }
 
 }
+
+.rz-chart-scrollbar {
+  height: 16px;
+  padding: 4px 0;
+  position: absolute;
+}
+
+.rz-chart-scrollbar-track {
+  position: relative;
+  height: 8px;
+  background: var(--rz-base-200, #e5e7eb);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.rz-chart-scrollbar-thumb {
+  position: absolute;
+  height: 100%;
+  background: var(--rz-base-400, #9ca3af);
+  border-radius: 4px;
+  cursor: grab;
+  min-width: 20px;
+  transition: background 0.15s;
+
+  &:hover,
+  &:active {
+    background: var(--rz-base-500, #6b7280);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
