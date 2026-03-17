@@ -2838,46 +2838,75 @@ window.Radzen = {
     };
     document.addEventListener('touchend', ref.scrollbarTouchEndHandler);
 
-    // Pinch-to-zoom support
+    // Touch pan and pinch-to-zoom support
     var pinchStartDistance = 0;
     var pinchActive = false;
+    var touchPanning = false;
+    var touchPanStartX = 0;
 
     ref.touchStartHandler = function (e) {
       if (e.touches.length === 2) {
+        // Two-finger: pinch-to-zoom
         pinchActive = true;
+        touchPanning = false;
         var dx = e.touches[0].clientX - e.touches[1].clientX;
         var dy = e.touches[0].clientY - e.touches[1].clientY;
         pinchStartDistance = Math.sqrt(dx * dx + dy * dy);
         e.preventDefault();
+      } else if (e.touches.length === 1 && !e.target.closest('.rz-chart-scrollbar')) {
+        // Single-finger on chart area: pan
+        touchPanning = true;
+        touchPanStartX = e.touches[0].clientX;
       }
     };
     ref.addEventListener('touchstart', ref.touchStartHandler, { passive: false });
 
     ref.touchMoveHandler = function (e) {
-      if (!pinchActive || e.touches.length !== 2) return;
-      var dx = e.touches[0].clientX - e.touches[1].clientX;
-      var dy = e.touches[0].clientY - e.touches[1].clientY;
-      var currentDistance = Math.sqrt(dx * dx + dy * dy);
-      if (pinchStartDistance <= 0) return;
-      var midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-      var rect = ref.getBoundingClientRect();
-      var x = midX - rect.left;
-      // Pinch out (spread) = zoom in (delta -1), pinch in (squeeze) = zoom out (delta 1)
-      var ratio = currentDistance / pinchStartDistance;
-      if (ratio > 1.05) {
-        try { instance.invokeMethodAsync('OnWheel', x, -1); } catch {}
-        pinchStartDistance = currentDistance;
-      } else if (ratio < 0.95) {
-        try { instance.invokeMethodAsync('OnWheel', x, 1); } catch {}
-        pinchStartDistance = currentDistance;
+      if (pinchActive && e.touches.length === 2) {
+        // Pinch-to-zoom
+        var dx = e.touches[0].clientX - e.touches[1].clientX;
+        var dy = e.touches[0].clientY - e.touches[1].clientY;
+        var currentDistance = Math.sqrt(dx * dx + dy * dy);
+        if (pinchStartDistance <= 0) return;
+        var midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        var rect = ref.getBoundingClientRect();
+        var x = midX - rect.left;
+        var ratio = currentDistance / pinchStartDistance;
+        if (ratio > 1.05) {
+          try { instance.invokeMethodAsync('OnWheel', x, -1); } catch {}
+          pinchStartDistance = currentDistance;
+        } else if (ratio < 0.95) {
+          try { instance.invokeMethodAsync('OnWheel', x, 1); } catch {}
+          pinchStartDistance = currentDistance;
+        }
+        e.preventDefault();
+      } else if (touchPanning && e.touches.length === 1) {
+        // Single-finger pan
+        var rect = ref.getBoundingClientRect();
+        var chartWidth = rect.width;
+        if (chartWidth <= 0) return;
+        var dx = e.touches[0].clientX - touchPanStartX;
+        var thumb = ref.querySelector('.rz-chart-scrollbar-thumb');
+        if (!thumb) return;
+        var thumbWidth = parseFloat(thumb.style.width) || 50;
+        var currentLeft = parseFloat(thumb.style.left) || 0;
+        // Swipe right = move view left (decrease position), swipe left = move view right
+        var deltaPercent = -(dx / chartWidth) * 100;
+        var newLeft = Math.max(0, Math.min(100 - thumbWidth, currentLeft + deltaPercent));
+        var position = newLeft / 100;
+        try { instance.invokeMethodAsync('OnPan', position); } catch {}
+        touchPanStartX = e.touches[0].clientX;
+        e.preventDefault();
       }
-      e.preventDefault();
     };
     ref.addEventListener('touchmove', ref.touchMoveHandler, { passive: false });
 
     ref.touchEndHandler = function (e) {
       if (e.touches.length < 2) {
         pinchActive = false;
+      }
+      if (e.touches.length === 0) {
+        touchPanning = false;
       }
     };
     ref.addEventListener('touchend', ref.touchEndHandler);
