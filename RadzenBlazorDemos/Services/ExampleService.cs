@@ -2280,7 +2280,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Parameters", Anchor = "#parameters" }, new () { Text = "Proxy", Anchor = "#proxy" }, new () { Text = "Provide credentials", Anchor = "#credentials" } ],
+                    Toc = [ new () { Text = "Parameters", Anchor = "#parameters" }, new () { Text = "Proxy", Anchor = "#proxy" }, new () { Text = "Provide Credentials", Anchor = "#credentials" }, new () { Text = "Issues Providing Credentials", Anchor = "#credentialsIssues" } ],
                     Name = "SSRS Viewer",
                     Path = "ssrsviewer",
                     Description = "Demonstration and configuration of Radzen SSRS Viewer Radzen Blazor Arc Gauge component.",

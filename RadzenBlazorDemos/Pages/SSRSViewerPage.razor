@@ -300,7 +300,7 @@ public namespace YourAppNamespace.Controllers
         </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>
-<RadzenText Anchor="ssrsviewer#credentials" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">Provide credentials</RadzenText>
+<RadzenText Anchor="ssrsviewer#credentials" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">Provide Credentials</RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
     To provide user credentials when making the proxy requests you can implement the OnHttpClientHandlerCreate partial method of ReportController.
 </RadzenText>
@@ -354,10 +354,51 @@ private HttpClient CreateHttpClient()
 }
 </code>
 </pre>
+
+<RadzenText Anchor="ssrsviewer#credentialsIssues" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">Issues Providing Credentials</RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    In some setups authenticating the request like this could fail with exceptions such as:
+    In some setups, authenticating the request as described above could fail with exceptions such as:
 </RadzenText>
 <ul>
     <li><code>HttpRequestException: Authentication failed because the connection could not be reused.</code>. If this happens check <a href="https://forum.radzen.com/t/radzenssrsviewer-authentication-failed-because-the-connection-could-not-be-reused/3065/4">this forum thread</a></li>
     <li><code>System.ComponentModel.Win32Exception (0x80090302): The function requested is not supported</code>. If this happens check <a href="https://forum.radzen.com/t/passing-authentication-to-ssrs-report-viewer-net-5/6148/8">this forum thread</a></li>
 </ul>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    In some setups, authenticating the request as described above could cause inconsistent "401 Unauthorized" responses from the report server.
+    <ul>
+        <li>These 401 responses can be seen in the browser network tab and error console, and cause an empty or garbled view of the report on the page.</li>
+        <li>Happens especially during the requests for RendererResources, stylesheets, javascript, etc.</li>
+        <li>Some server setups can start refusing connections when too many are being requested at once.</li>
+        <li>So, since the above approach does not reuse a singular HttpClientHandler and must re-authenticate for many of the requests, some are refused.</li>
+    </ul>
+    Alternative way to provide credentials:
+    <ol>
+        <li>
+            <p>Move creation of the HttpClientHandler to <code>Program.cs</code></p>
+<pre>
+<code>
+builder.Services.AddHttpClient("SSRS").ConfigurePrimaryHttpMessageHandler(sp =>
+{
+    var handler = new HttpClientHandler();
+
+    handler.AllowAutoRedirect = true;
+    handler.UseDefaultCredentials = true;
+
+    // Set the credentials
+    handler.Credentials = new NetworkCredential("username", "password", "domain");
+
+    if (handler.SupportsAutomaticDecompression)
+    {
+        handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+    }
+
+    return handler;
+});
+</code>
+</pre>
+        </li>
+        <li>Add the HttpClientFactory to the controller via DI: <code>public partial class ReportController(IHttpClientFactory httpClientFactory) : Controller</code></li>
+        <li>Remove all mentions/uses of the OnHttpClientHandlerCreate method</li>
+        <li>Change the CreateHttpClient method to use the HttpClientFactory: <code>private HttpClient CreateHttpClient() => httpClientFactory.CreateClient("SSRS");</code></li>
+    </ol>
+</RadzenText>
