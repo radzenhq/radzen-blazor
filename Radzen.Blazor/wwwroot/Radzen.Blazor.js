@@ -3632,12 +3632,18 @@ class Spreadsheet {
   }
 
   copyToClipboard = async (text) => {
-    if (window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        console.error('Failed to copy text to clipboard:', err);
-      }
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Clipboard API failed (e.g. user activation expired)
+    }
+  }
+
+  readClipboardText = async () => {
+    try {
+      return await navigator.clipboard.readText();
+    } catch {
+      return null;
     }
   }
 
@@ -3854,6 +3860,7 @@ class SheetEditor {
 
   onSelectionChange = (e) => {
     const selection = getSelection();
+    if (!selection.focusNode) return;
     const inside = selection.focusNode.parentElement == this.element || selection.focusNode == this.element;
     let caretPosition = -1;
 
