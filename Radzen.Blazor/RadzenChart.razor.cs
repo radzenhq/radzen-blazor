@@ -62,6 +62,14 @@ namespace Radzen.Blazor
         public ColorScheme ColorScheme { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether series highlight on hover is enabled.
+        /// When <c>true</c>, hovering over a series or its legend item highlights the series and dims the others.
+        /// </summary>
+        /// <value><c>true</c> if series hover is allowed; otherwise, <c>false</c>. Default is <c>true</c>.</value>
+        [Parameter]
+        public bool AllowSeriesHover { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the callback invoked when a user clicks on a data point or segment in a chart series.
         /// Provides information about the clicked series, data item, and value in the event arguments.
         /// </summary>
@@ -994,7 +1002,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-chart rz-scheme-{ColorScheme.ToString().ToLowerInvariant()}";
+            var css = $"rz-chart rz-scheme-{ColorScheme.ToString().ToLowerInvariant()}";
+
+            if (AllowSeriesHover)
+            {
+                css += " rz-chart-series-hover";
+            }
+
+            return css;
         }
     }
 }
