@@ -13,20 +13,20 @@
     {
         var chart = RequireChart();
         var className = $"rz-funnel-series rz-series-{chart.Series.IndexOf(this)}";
-        var items = Items;
-        var count = items.Count;
+        var orderedItems = GetOrderedItems();
+        var count = orderedItems.Count;
 
         return
         @<g class="@className">
-            @if (items.Any())
+            @if (orderedItems.Any())
             {
-                var maxValue = items.Max(Value);
+                var maxValue = orderedItems.Max(Value);
 
                 @for (var i = 0; i < count; i++)
                 {
-                    var data = items[i];
-                    var index = i;
-                    var d = GetSegmentPath(index, count, maxValue);
+                    var data = orderedItems[i];
+                    var index = Items.IndexOf(data);
+                    var d = GetSegmentPath(i, count, maxValue, orderedItems);
                     var fill = PickColor(index, Fills);
                     var stroke = PickColor(index, Strokes);
                     var arcClassName = $"rz-series-item-{index}";
