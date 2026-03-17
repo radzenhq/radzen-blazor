@@ -420,6 +420,259 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Invoked by JS interop when a cell is right-clicked.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnCellContextMenuAsync(CellEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        if (Sheet is null)
+        {
+            return;
+        }
+
+        await AcceptAsync();
+
+        Sheet.Selection.Select(new CellRef(args.Row, args.Column));
+
+        var row = args.Row;
+        var column = args.Column;
+
+        ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
+        {
+            new() { Text = "Cut", Value = "cut", Icon = "content_cut" },
+            new() { Text = "Copy", Value = "copy", Icon = "content_copy" },
+            new() { Text = "Paste", Value = "paste", Icon = "content_paste" },
+            new() { Text = "Clear Contents", Value = "clear", Icon = "clear" },
+            new() { Text = "Insert Row Above", Value = "insert-row-before", Icon = "north" },
+            new() { Text = "Insert Row Below", Value = "insert-row-after", Icon = "south" },
+            new() { Text = "Insert Column Before", Value = "insert-column-before", Icon = "west" },
+            new() { Text = "Insert Column After", Value = "insert-column-after", Icon = "east" },
+            new() { Text = "Delete Row", Value = "delete-row", Icon = "delete" },
+            new() { Text = "Delete Column", Value = "delete-column", Icon = "delete" },
+            new() { Text = "Sort Ascending", Value = "sort-ascending", Icon = "arrow_upward" },
+            new() { Text = "Sort Descending", Value = "sort-descending", Icon = "arrow_downward" },
+        }, menuArgs => OnContextMenuItemClick(menuArgs, row, column));
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when a row header is right-clicked.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnRowContextMenuAsync(CellEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        if (Sheet is null)
+        {
+            return;
+        }
+
+        await AcceptAsync();
+
+        Sheet.Selection.Select(new RowRef(args.Row));
+
+        var row = args.Row;
+
+        ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
+        {
+            new() { Text = "Cut", Value = "cut", Icon = "content_cut" },
+            new() { Text = "Copy", Value = "copy", Icon = "content_copy" },
+            new() { Text = "Paste", Value = "paste", Icon = "content_paste" },
+            new() { Text = "Insert Row Above", Value = "insert-row-before", Icon = "north" },
+            new() { Text = "Insert Row Below", Value = "insert-row-after", Icon = "south" },
+            new() { Text = "Delete Row", Value = "delete-row", Icon = "delete" },
+            new() { Text = "Hide Row", Value = "hide-row", Icon = "visibility_off" },
+            new() { Text = "Unhide Row", Value = "unhide-row", Icon = "visibility" },
+        }, menuArgs => OnRowContextMenuItemClick(menuArgs, row));
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when a column header is right-clicked.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnColumnContextMenuAsync(CellEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        if (Sheet is null)
+        {
+            return;
+        }
+
+        await AcceptAsync();
+
+        Sheet.Selection.Select(new ColumnRef(args.Column));
+
+        var column = args.Column;
+
+        ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
+        {
+            new() { Text = "Cut", Value = "cut", Icon = "content_cut" },
+            new() { Text = "Copy", Value = "copy", Icon = "content_copy" },
+            new() { Text = "Paste", Value = "paste", Icon = "content_paste" },
+            new() { Text = "Insert Column Before", Value = "insert-column-before", Icon = "west" },
+            new() { Text = "Insert Column After", Value = "insert-column-after", Icon = "east" },
+            new() { Text = "Delete Column", Value = "delete-column", Icon = "delete" },
+            new() { Text = "Hide Column", Value = "hide-column", Icon = "visibility_off" },
+            new() { Text = "Unhide Column", Value = "unhide-column", Icon = "visibility" },
+        }, menuArgs => OnColumnContextMenuItemClick(menuArgs, column));
+    }
+
+    private void OnContextMenuItemClick(MenuItemEventArgs args, int row, int column)
+    {
+        if (Sheet is null)
+        {
+            return;
+        }
+
+        ContextMenuService.Close();
+
+        switch (args.Value?.ToString())
+        {
+            case "cut":
+                _ = CutSelectionAsync();
+                break;
+            case "copy":
+                _ = CopySelectionAsync();
+                break;
+            case "paste":
+                // Paste requires JS interop to read clipboard, handled via keyboard shortcut
+                break;
+            case "clear":
+                ClearSelectedContents();
+                break;
+            case "insert-row-before":
+                Sheet.Commands.Execute(new InsertRowBeforeCommand(Sheet, row));
+                break;
+            case "insert-row-after":
+                Sheet.Commands.Execute(new InsertRowAfterCommand(Sheet, row));
+                break;
+            case "insert-column-before":
+                Sheet.Commands.Execute(new InsertColumnBeforeCommand(Sheet, column));
+                break;
+            case "insert-column-after":
+                Sheet.Commands.Execute(new InsertColumnAfterCommand(Sheet, column));
+                break;
+            case "delete-row":
+                Sheet.Commands.Execute(new DeleteRowsCommand(Sheet, row, row));
+                break;
+            case "delete-column":
+                Sheet.Commands.Execute(new DeleteColumnsCommand(Sheet, column, column));
+                break;
+            case "sort-ascending":
+                Sheet.Commands.Execute(new SortCommand(Sheet, new RangeRef(new CellRef(0, 0), new CellRef(Sheet.RowCount - 1, Sheet.ColumnCount - 1)), SortOrder.Ascending, column));
+                break;
+            case "sort-descending":
+                Sheet.Commands.Execute(new SortCommand(Sheet, new RangeRef(new CellRef(0, 0), new CellRef(Sheet.RowCount - 1, Sheet.ColumnCount - 1)), SortOrder.Descending, column));
+                break;
+        }
+
+        StateHasChanged();
+    }
+
+    private void OnRowContextMenuItemClick(MenuItemEventArgs args, int row)
+    {
+        if (Sheet is null)
+        {
+            return;
+        }
+
+        ContextMenuService.Close();
+
+        switch (args.Value?.ToString())
+        {
+            case "cut":
+                _ = CutSelectionAsync();
+                break;
+            case "copy":
+                _ = CopySelectionAsync();
+                break;
+            case "paste":
+                break;
+            case "insert-row-before":
+                Sheet.Commands.Execute(new InsertRowBeforeCommand(Sheet, row));
+                break;
+            case "insert-row-after":
+                Sheet.Commands.Execute(new InsertRowAfterCommand(Sheet, row));
+                break;
+            case "delete-row":
+                Sheet.Commands.Execute(new DeleteRowsCommand(Sheet, row, row));
+                break;
+            case "hide-row":
+                Sheet.Rows.Hide(row);
+                break;
+            case "unhide-row":
+                Sheet.Rows.Show(row);
+                break;
+        }
+
+        StateHasChanged();
+    }
+
+    private void OnColumnContextMenuItemClick(MenuItemEventArgs args, int column)
+    {
+        if (Sheet is null)
+        {
+            return;
+        }
+
+        ContextMenuService.Close();
+
+        switch (args.Value?.ToString())
+        {
+            case "cut":
+                _ = CutSelectionAsync();
+                break;
+            case "copy":
+                _ = CopySelectionAsync();
+                break;
+            case "paste":
+                break;
+            case "insert-column-before":
+                Sheet.Commands.Execute(new InsertColumnBeforeCommand(Sheet, column));
+                break;
+            case "insert-column-after":
+                Sheet.Commands.Execute(new InsertColumnAfterCommand(Sheet, column));
+                break;
+            case "delete-column":
+                Sheet.Commands.Execute(new DeleteColumnsCommand(Sheet, column, column));
+                break;
+            case "hide-column":
+                Sheet.Columns.Hide(column);
+                break;
+            case "unhide-column":
+                Sheet.Columns.Show(column);
+                break;
+        }
+
+        StateHasChanged();
+    }
+
+    private void ClearSelectedContents()
+    {
+        if (Sheet is null)
+        {
+            return;
+        }
+
+        var range = Sheet.Selection.Range;
+
+        for (var row = range.Start.Row; row <= range.End.Row; row++)
+        {
+            for (var column = range.Start.Column; column <= range.End.Column; column++)
+            {
+                if (Sheet.Cells.TryGet(row, column, out var cell))
+                {
+                    cell.Formula = null;
+                    cell.Value = null;
+                }
+            }
+        }
+    }
+
     private IJSObjectReference? jsRef;
     private DotNetObjectReference<RadzenSpreadsheet>? dotNetRef;
 
