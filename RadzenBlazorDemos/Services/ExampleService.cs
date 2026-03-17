@@ -2541,6 +2541,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Radar Column Chart",
+                    Path = "radar-column-chart",
+                    Description = "Radzen Blazor Spider Chart with radial column bars for displaying categorical data.",
+                    Tags = new [] { "spider", "radar", "column", "chart", "radial", "bar" },
+                    Icon = "\ueb39",
+                    New = true
+                },
+                new Example
+                {
                     Name = "Arc Gauge",
                     Path = "arc-gauge",
                     Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",
