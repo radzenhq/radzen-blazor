@@ -380,22 +380,29 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task CopySelectionAsync()
     {
-        if (Sheet is not null && jsRef is not null)
+        if (Sheet is not null)
         {
             var text = Sheet.GetDelimitedString(Sheet.Selection.Range);
-
-            await jsRef.InvokeVoidAsync("copyToClipboard", text);
             clipboard.Copy(Sheet);
+
+            if (jsRef is not null)
+            {
+                await jsRef.InvokeVoidAsync("copyToClipboard", text);
+            }
         }
     }
 
     private async Task CutSelectionAsync()
     {
-        if (Sheet is not null && jsRef is not null)
+        if (Sheet is not null)
         {
             var text = Sheet.GetDelimitedString(Sheet.Selection.Range);
-            await jsRef.InvokeVoidAsync("copyToClipboard", text);
             clipboard.Cut(Sheet);
+
+            if (jsRef is not null)
+            {
+                await jsRef.InvokeVoidAsync("copyToClipboard", text);
+            }
         }
     }
 
@@ -533,7 +540,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = CopySelectionAsync();
                 break;
             case "paste":
-                // Paste requires JS interop to read clipboard, handled via keyboard shortcut
+                _ = PasteFromClipboardAsync();
                 break;
             case "clear":
                 Sheet.Commands.Execute(new ClearContentsCommand(Sheet, Sheet.Selection.Range));
@@ -567,6 +574,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = CopySelectionAsync();
                 break;
             case "paste":
+                _ = PasteFromClipboardAsync();
                 break;
             case "insert-row-before":
                 Sheet.Commands.Execute(new InsertRowBeforeCommand(Sheet, row));
@@ -606,6 +614,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = CopySelectionAsync();
                 break;
             case "paste":
+                _ = PasteFromClipboardAsync();
                 break;
             case "insert-column-before":
                 Sheet.Commands.Execute(new InsertColumnBeforeCommand(Sheet, column));
@@ -625,6 +634,30 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         StateHasChanged();
+    }
+
+    private async Task PasteFromClipboardAsync()
+    {
+        if (Sheet is null)
+        {
+            return;
+        }
+
+        string? text = null;
+
+        if (jsRef is not null)
+        {
+            text = await jsRef.InvokeAsync<string?>("readClipboardText");
+        }
+
+        if (!string.IsNullOrEmpty(text))
+        {
+            clipboard.Paste(Sheet, Sheet.Selection.Cell, text);
+        }
+        else
+        {
+            clipboard.Paste(Sheet, Sheet.Selection.Cell);
+        }
     }
 
     private IJSObjectReference? jsRef;
