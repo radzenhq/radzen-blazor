@@ -2184,8 +2184,8 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Negative Stacked Bar Chart",
                             Path = "negative-stacked-bar-chart",
-                            Description = "Radzen Blazor Chart with stacked bar series displaying population pyramid with negative and positive values.",
-                            Tags = new [] { "chart", "graph", "bar", "stack", "negative", "population", "pyramid", "demographic" },
+                            Description = "Radzen Blazor Chart with stacked bar series displaying revenue and expenses with negative values.",
+                            Tags = new [] { "chart", "graph", "bar", "stack", "negative", "revenue", "expenses" },
                             New = true
                         },
                         new Example
@@ -2217,6 +2217,14 @@ namespace RadzenBlazorDemos
                             Path = "range-area-chart",
                             Description = "Radzen Blazor Chart with range area series for displaying value bands.",
                             Tags = new [] { "chart", "graph", "area", "range", "band", "min", "max" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Area Negative Points",
+                            Path = "negative-area-chart",
+                            Description = "Radzen Blazor Chart with area series displaying both positive and negative values.",
+                            Tags = new [] { "chart", "graph", "area", "negative", "gdp", "growth" },
                             New = true
                         },
                         new Example

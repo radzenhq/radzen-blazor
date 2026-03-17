@@ -1,0 +1,71 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart>
+                <RadzenAreaSeries Data="@alpha" CategoryProperty="Month" ValueProperty="Return" Title="Alpha Fund" />
+                <RadzenAreaSeries Data="@beta" CategoryProperty="Month" ValueProperty="Return" Title="Beta Fund" />
+                <RadzenAreaSeries Data="@gamma" CategoryProperty="Month" ValueProperty="Return" Title="Gamma Fund" />
+                <RadzenValueAxis FormatString="{0}%">
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+                <RadzenLegend Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class FundData
+    {
+        public string Month { get; set; }
+        public double Return { get; set; }
+    }
+
+    FundData[] alpha = new[]
+    {
+        new FundData { Month = "Jan", Return = 2.1 },
+        new FundData { Month = "Feb", Return = -0.8 },
+        new FundData { Month = "Mar", Return = 3.5 },
+        new FundData { Month = "Apr", Return = 1.2 },
+        new FundData { Month = "May", Return = -2.4 },
+        new FundData { Month = "Jun", Return = 4.1 },
+        new FundData { Month = "Jul", Return = 0.6 },
+        new FundData { Month = "Aug", Return = -1.3 },
+        new FundData { Month = "Sep", Return = 2.8 },
+        new FundData { Month = "Oct", Return = -0.5 },
+        new FundData { Month = "Nov", Return = 3.2 },
+        new FundData { Month = "Dec", Return = 1.9 },
+    };
+
+    FundData[] beta = new[]
+    {
+        new FundData { Month = "Jan", Return = -1.5 },
+        new FundData { Month = "Feb", Return = 2.3 },
+        new FundData { Month = "Mar", Return = -0.4 },
+        new FundData { Month = "Apr", Return = 3.8 },
+        new FundData { Month = "May", Return = 1.6 },
+        new FundData { Month = "Jun", Return = -3.1 },
+        new FundData { Month = "Jul", Return = 2.9 },
+        new FundData { Month = "Aug", Return = 0.7 },
+        new FundData { Month = "Sep", Return = -1.8 },
+        new FundData { Month = "Oct", Return = 4.2 },
+        new FundData { Month = "Nov", Return = -0.9 },
+        new FundData { Month = "Dec", Return = 2.5 },
+    };
+
+    FundData[] gamma = new[]
+    {
+        new FundData { Month = "Jan", Return = 0.8 },
+        new FundData { Month = "Feb", Return = 1.4 },
+        new FundData { Month = "Mar", Return = -2.1 },
+        new FundData { Month = "Apr", Return = -0.6 },
+        new FundData { Month = "May", Return = 3.3 },
+        new FundData { Month = "Jun", Return = -1.7 },
+        new FundData { Month = "Jul", Return = 4.5 },
+        new FundData { Month = "Aug", Return = -2.8 },
+        new FundData { Month = "Sep", Return = 1.1 },
+        new FundData { Month = "Oct", Return = 2.6 },
+        new FundData { Month = "Nov", Return = -0.3 },
+        new FundData { Month = "Dec", Return = 3.7 },
+    };
+}
