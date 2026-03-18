@@ -62,6 +62,23 @@ namespace Radzen.Blazor
         public double? Radius { get; set; }
 
         /// <summary>
+        /// Gets or sets the name of the property that provides a per-item radius value.
+        /// When set, each pie/donut segment can have a different outer radius, allowing visual differentiation by size.
+        /// The property should return a numeric value that is used to scale the radius relative to the maximum value.
+        /// </summary>
+        /// <value>The property name on <typeparamref name="TItem"/> that provides the radius value, or null to use a uniform radius.</value>
+        [Parameter]
+        public string? RadiusProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the distance in pixels that a segment moves outward from the center when hovered.
+        /// Set to a value greater than 0 to enable the explode-on-hover effect.
+        /// </summary>
+        /// <value>The explode offset in pixels. Default is 0 (disabled).</value>
+        [Parameter]
+        public double ExplodeOffset { get; set; }
+
+        /// <summary>
         /// Gets or sets a collection of fill colors applied to individual pie segments in sequence.
         /// Each segment gets the color at its index position. If fewer colors than segments, colors are reused cyclically.
         /// If not set, uses the chart's color scheme.
@@ -123,6 +140,39 @@ namespace Radzen.Blazor
                 }
                 return Radius ?? 0;
             }
+        }
+
+        /// <summary>
+        /// Returns the radius for a specific data item. If <see cref="RadiusProperty"/> is set,
+        /// the radius is scaled proportionally between a minimum (65% of max) and the max radius.
+        /// </summary>
+        internal double GetItemRadius(TItem item, double maxRadius)
+        {
+            if (string.IsNullOrEmpty(RadiusProperty))
+            {
+                return maxRadius;
+            }
+
+            var getter = PropertyAccess.Getter<TItem, double>(RadiusProperty);
+            var items = PositiveItems;
+
+            if (!items.Any())
+            {
+                return maxRadius;
+            }
+
+            var maxValue = items.Max(getter);
+            var minValue = items.Min(getter);
+
+            if (maxValue == minValue)
+            {
+                return maxRadius;
+            }
+
+            var value = getter(item);
+            var minRadius = maxRadius * 0.65;
+
+            return minRadius + (value - minValue) / (maxValue - minValue) * (maxRadius - minRadius);
         }
 
         /// <summary>
@@ -262,6 +312,14 @@ namespace Radzen.Blazor
             return false;
         }
 
+        /// <summary>
+        /// Returns the radius for a specific item for tooltip positioning.
+        /// </summary>
+        private double TooltipRadius(TItem item)
+        {
+            return GetItemRadius(item, CurrentRadius);
+        }
+
         /// <inheritdoc />
         public override (object, Point) DataAt(double x, double y)
         {
@@ -366,7 +424,7 @@ namespace Radzen.Blazor
         {
             var angle = TooltipAngle(item);
 
-            return CenterX + CurrentRadius * Math.Cos(DegToRad(angle));
+            return CenterX + TooltipRadius(item) * Math.Cos(DegToRad(angle));
         }
 
         /// <inheritdoc />
@@ -374,7 +432,7 @@ namespace Radzen.Blazor
         {
             var angle = TooltipAngle(item);
 
-            return CenterY - CurrentRadius * Math.Sin(DegToRad(angle));
+            return CenterY - TooltipRadius(item) * Math.Sin(DegToRad(angle));
         }
 
         /// <summary>
