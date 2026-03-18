@@ -918,7 +918,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   inset: 0;
   background-color: var(--rz-grid-loading-indicator-background-color);
   opacity: var(--rz-grid-loading-indicator-background-opacity);
-  z-index: 2;
+  z-index: 4;
 }
 
 .rz-datatable-loading-content {
@@ -927,7 +927,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   top: 50%;
   transform: translate(-50%, -50%);
   color: var(--rz-grid-loading-indicator-color);
-  z-index: 2;
+  z-index: 4;
 
   .rzi-circle-o-notch {
     @extend %rzi;
