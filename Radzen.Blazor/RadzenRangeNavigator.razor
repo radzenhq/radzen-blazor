@@ -32,5 +32,17 @@
         </div>
     </div>
     <div class="rz-range-navigator-shade rz-range-navigator-shade-right" style="width: @(((1 - End) * 100).ToInvariantString())%"></div>
+    @if (ShowAxis && Width > 0)
+    {
+        <div class="rz-range-navigator-axis">
+            @foreach (var tick in GetAxisTicks())
+            {
+                <div class="rz-range-navigator-tick @tick.CssClass" style="left: @((tick.Position * 100).ToInvariantString())%">
+                    <div class="rz-range-navigator-tick-mark"></div>
+                    <div class="rz-range-navigator-tick-label">@tick.Label</div>
+                </div>
+            }
+        </div>
+    }
 </div>
 }
