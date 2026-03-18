@@ -2569,6 +2569,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "With Series", Anchor = "#with-series" }, new () { Text = "Compact", Anchor = "#compact" } ],
                     Name = "Range Navigator",
                     Path = "range-navigator",
                     Description = "Radzen Blazor Range Navigator with mini-chart and draggable selection for controlling chart visible range.",
