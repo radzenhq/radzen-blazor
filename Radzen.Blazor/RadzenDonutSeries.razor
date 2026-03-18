@@ -52,16 +52,23 @@
                         var sweepAngle = (value / sum) * TotalAngle;
                         var endAngle = startAngle - sweepAngle;
 
-                        var d = Segment(x, y, radius, innerRadius, startAngle, endAngle);
+                        var itemRadius = GetItemRadius(data, radius);
+                        var d = Segment(x, y, itemRadius, innerRadius, startAngle, endAngle);
 
+                        var midAngle = startAngle - sweepAngle / 2;
                         startAngle = endAngle;
 
                         var index = Items.IndexOf(data);
                         var arcClassName = $"rz-series-item-{index}";
                         var fill = PickColor(index, Fills);
                         var stroke = PickColor(index, Strokes);
+                        var explodeStyle = ExplodeOffset > 0 ? $"--rz-explode-x: {(ExplodeOffset * Math.Cos(DegToRad(midAngle))).ToInvariantString()}px; --rz-explode-y: {(-ExplodeOffset * Math.Sin(DegToRad(midAngle))).ToInvariantString()}px" : "";
 
-                        <g class="@arcClassName">
+                        <g class="@arcClassName" style="@explodeStyle">
+                            @if (ExplodeOffset > 0)
+                            {
+                                <path class="rz-hit-area" d="@d" style="fill: transparent; stroke: none; pointer-events: fill" />
+                            }
                             <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
                         </g>
                     }
