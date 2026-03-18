@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -53,6 +54,34 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string? HandleLabelFormatString { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether an axis with tick labels is displayed below the navigator.
+        /// </summary>
+        [Parameter]
+        public bool ShowAxis { get; set; }
+
+        /// <summary>
+        /// Gets or sets the format string for axis tick labels.
+        /// Use standard .NET format strings, e.g. <c>"{0:MMM yyyy}"</c> for dates or <c>"{0:N0}"</c> for numbers.
+        /// When not set, defaults to a short representation based on the data type.
+        /// </summary>
+        [Parameter]
+        public string? AxisFormatString { get; set; }
+
+        /// <summary>
+        /// Gets or sets the minimum value for the axis. Use when there are no child series to define the range.
+        /// Supports <see cref="DateTime"/> and numeric types.
+        /// </summary>
+        [Parameter]
+        public object? Min { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum value for the axis. Use when there are no child series to define the range.
+        /// Supports <see cref="DateTime"/> and numeric types.
+        /// </summary>
+        [Parameter]
+        public object? Max { get; set; }
 
         /// <summary>
         /// Gets or sets the child content (navigator series).
@@ -110,6 +139,16 @@ namespace Radzen.Blazor
                 ValueScale = series.TransformValueScale(ValueScale);
             }
 
+            if (NavigatorSeries.Count == 0 && Min != null && Max != null)
+            {
+                if (Min is DateTime)
+                {
+                    CategoryScale = new DateScale();
+                }
+
+                CategoryScale.Resize(Min, Max);
+            }
+
             CategoryScale.Output = new ScaleRange { Start = 0, End = Width };
             ValueScale.Output = new ScaleRange { Start = Height, End = 0 };
 
@@ -117,6 +156,73 @@ namespace Radzen.Blazor
             ValueScale.Fit(10);
 
             UpdateJSLabelConfig();
+        }
+
+        internal IList<AxisTick> GetAxisTicks()
+        {
+            var ticks = new List<AxisTick>();
+
+            if (CategoryScale?.Input == null || Width <= 0)
+            {
+                return ticks;
+            }
+
+            var inputStart = CategoryScale.Input.Start;
+            var inputEnd = CategoryScale.Input.End;
+
+            if (inputStart == inputEnd)
+            {
+                return ticks;
+            }
+
+            var tickDistance = Math.Max(80, (int)(Width / 8));
+            CategoryScale.Step = null;
+            var tickInfo = CategoryScale.Ticks(tickDistance);
+            var step = tickInfo.Step;
+
+            if (step <= 0)
+            {
+                return ticks;
+            }
+
+            for (var value = tickInfo.Start; value <= tickInfo.End; value += step)
+            {
+                var fraction = (value - inputStart) / (inputEnd - inputStart);
+
+                if (fraction < -0.01 || fraction > 1.01)
+                {
+                    continue;
+                }
+
+                var tickValue = CategoryScale.Value(value);
+                string label;
+
+                if (!string.IsNullOrEmpty(AxisFormatString))
+                {
+                    label = CategoryScale.FormatTick(AxisFormatString, tickValue);
+                }
+                else
+                {
+                    label = CategoryScale.FormatTick("", tickValue);
+                }
+
+                ticks.Add(new AxisTick { Position = Math.Clamp(fraction, 0, 1), Label = label });
+            }
+
+            if (ticks.Count > 0)
+            {
+                ticks[0].CssClass = "rz-range-navigator-tick-first";
+                ticks[ticks.Count - 1].CssClass = "rz-range-navigator-tick-last";
+            }
+
+            return ticks;
+        }
+
+        internal class AxisTick
+        {
+            public double Position { get; set; }
+            public string Label { get; set; } = "";
+            public string CssClass { get; set; } = "";
         }
 
         /// <summary>
@@ -217,7 +323,19 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return IsCompact ? "rz-range-navigator rz-range-navigator-compact" : "rz-range-navigator";
+            var css = "rz-range-navigator";
+
+            if (IsCompact)
+            {
+                css += " rz-range-navigator-compact";
+            }
+
+            if (ShowAxis)
+            {
+                css += " rz-range-navigator-has-axis";
+            }
+
+            return css;
         }
 
         /// <inheritdoc />
