@@ -1,0 +1,30 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenStack Style="width: 100%; max-width: 600px;">
+        <RadzenChart>
+            <RadzenDonutSeries Data="@data" CategoryProperty="Label" ValueProperty="Value" RadiusProperty="Radius">
+                <ChildContent>
+                    <RadzenSeriesDataLabels Visible="true" />
+                </ChildContent>
+            </RadzenDonutSeries>
+            <RadzenLegend Position="LegendPosition.Bottom" />
+        </RadzenChart>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Label { get; set; }
+        public double Value { get; set; }
+        public double Radius { get; set; }
+    }
+
+    DataItem[] data = new DataItem[]
+    {
+        new DataItem { Label = "Organic", Value = 32, Radius = 90 },
+        new DataItem { Label = "Direct", Value = 24, Radius = 70 },
+        new DataItem { Label = "Social", Value = 26, Radius = 80 },
+        new DataItem { Label = "Referral", Value = 10, Radius = 50 },
+        new DataItem { Label = "Email", Value = 8, Radius = 60 },
+    };
+}
