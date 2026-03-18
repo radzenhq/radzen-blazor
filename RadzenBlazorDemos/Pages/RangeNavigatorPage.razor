@@ -4,9 +4,26 @@
     Radzen Blazor Range Navigator
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Drag the navigator handles or window below the chart to select the visible data range. Use the mouse wheel to zoom in and out.
+    The <code>RadzenRangeNavigator</code> displays a mini-chart with a draggable selection window for controlling the visible data range of a <code>RadzenChart</code>.
+    Connect them via two-way binding on <code>Start</code>/<code>End</code> and the chart's <code>ViewStart</code>/<code>ViewEnd</code>.
 </RadzenText>
 
-<RadzenExample ComponentName="Chart" Example="RangeNavigatorConfig">
+<RadzenText Anchor="range-navigator#with-series" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    With Series
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>RadzenRangeNavigatorLineSeries</code> as child content to display a mini-chart preview of the full data range inside the navigator.
+</RadzenText>
+<RadzenExample ComponentName="RangeNavigator" Example="RangeNavigatorConfig">
     <RangeNavigatorConfig />
+</RadzenExample>
+
+<RadzenText Anchor="range-navigator#compact" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Compact
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>RadzenRangeNavigator</code> without child content for a compact range selector. The component automatically renders as a compact track bar.
+</RadzenText>
+<RadzenExample ComponentName="RangeNavigator" Example="RangeNavigatorCompact">
+    <RangeNavigatorCompact />
 </RadzenExample>
