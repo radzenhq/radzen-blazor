@@ -1,0 +1,29 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenStack Style="width: 100%; max-width: 600px;">
+        <RadzenChart>
+            <RadzenPieSeries Data="@data" CategoryProperty="Country" ValueProperty="Area" RadiusProperty="Density" StrokeWidth="1">
+                <RadzenSeriesDataLabels Visible="true" />
+            </RadzenPieSeries>
+            <RadzenLegend Position="LegendPosition.Bottom" />
+        </RadzenChart>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Country { get; set; }
+        public double Area { get; set; }
+        public double Density { get; set; }
+    }
+
+    DataItem[] data = new DataItem[]
+    {
+        new DataItem { Country = "India", Area = 3287263, Density = 431 },
+        new DataItem { Country = "China", Area = 9596961, Density = 153 },
+        new DataItem { Country = "USA", Area = 9833520, Density = 37 },
+        new DataItem { Country = "Brazil", Area = 8515767, Density = 25 },
+        new DataItem { Country = "Australia", Area = 7692024, Density = 3 },
+        new DataItem { Country = "Russia", Area = 17098242, Density = 9 },
+    };
+}
