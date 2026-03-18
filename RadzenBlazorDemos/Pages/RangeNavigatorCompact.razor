@@ -1,0 +1,75 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+            <RadzenText TextStyle="TextStyle.Subtitle2" Style="margin: 0;">Selected: @GetDateLabel(start) — @GetDateLabel(end)</RadzenText>
+            <RadzenButton Text="Full Year" Click="@(() => { start = 0; end = 1; })" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenButton Text="Q1" Click="@(() => { start = 0; end = 0.25; })" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenButton Text="Q2" Click="@(() => { start = 0.25; end = 0.5; })" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+            <RadzenButton Text="H2" Click="@(() => { start = 0.5; end = 1; })" Variant="Variant.Outlined" Size="ButtonSize.Small" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart AllowZoom="true" AllowPan="true" @bind-ViewStart="@start" @bind-ViewEnd="@end">
+        <RadzenLineSeries Data="@data" CategoryProperty="Date" ValueProperty="Revenue" Title="Revenue" Smooth="true" Stroke="#1E88E5">
+            <RadzenMarkers Visible="false" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Data="@data" CategoryProperty="Date" ValueProperty="Expenses" Title="Expenses" Smooth="true" Stroke="#EF5350">
+            <RadzenMarkers Visible="false" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" FormatString="{0:MMM dd}" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+        </RadzenValueAxis>
+        <RadzenLegend Position="LegendPosition.Bottom" />
+    </RadzenChart>
+
+    <RadzenRangeNavigator @bind-Start="@start" @bind-End="@end" Style="margin-top: 16px;" />
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public DateTime Date { get; set; }
+        public double Revenue { get; set; }
+        public double Expenses { get; set; }
+    }
+
+    double start = 0;
+    double end = 1;
+    DateTime rangeStart = new(2025, 1, 1);
+    DateTime rangeEnd = new(2025, 12, 31);
+    List<DataItem> data = new();
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    string GetDateLabel(double fraction)
+    {
+        var totalDays = (rangeEnd - rangeStart).TotalDays;
+        var date = rangeStart.AddDays(fraction * totalDays);
+        return date.ToString("MMM dd, yyyy");
+    }
+
+    protected override void OnInitialized()
+    {
+        var random = new Random(77);
+
+        for (int i = 0; i < 365; i++)
+        {
+            var date = rangeStart.AddDays(i);
+            var seasonalRevenue = 50000 + 15000 * Math.Sin((i - 60) * Math.PI / 182.5);
+            var seasonalExpenses = 35000 + 8000 * Math.Sin((i - 90) * Math.PI / 182.5);
+
+            data.Add(new DataItem
+            {
+                Date = date,
+                Revenue = Math.Round(seasonalRevenue + random.NextDouble() * 10000 - 5000),
+                Expenses = Math.Round(seasonalExpenses + random.NextDouble() * 6000 - 3000)
+            });
+        }
+    }
+}
