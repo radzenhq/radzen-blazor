@@ -1,5 +1,0 @@
-apiRules:
-- exclude:
-    uidRegex: ^Radzen\.Blazor\.Rendering
-- exclude:
-    uidRegex: ^Radzen\.Blazor\.RadzenHtmlEditor.*Base
