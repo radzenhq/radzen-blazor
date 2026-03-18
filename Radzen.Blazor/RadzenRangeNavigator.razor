@@ -7,12 +7,15 @@
 @if (Visible)
 {
 <div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
-    <svg style="width: 100%; height: 100%;">
-        @foreach (var series in NavigatorSeries)
-        {
-            @series.Render(CategoryScale, ValueScale)
-        }
-    </svg>
+    @if (NavigatorSeries.Count > 0)
+    {
+        <svg style="width: 100%; height: 100%;">
+            @foreach (var series in NavigatorSeries)
+            {
+                @series.Render(CategoryScale, ValueScale)
+            }
+        </svg>
+    }
     <div class="rz-range-navigator-shade rz-range-navigator-shade-left" style="width: @((Start * 100).ToInvariantString())%"></div>
     <div class="rz-range-navigator-window" style="left: @((Start * 100).ToInvariantString())%; width: @(((End - Start) * 100).ToInvariantString())%">
         <div class="rz-range-navigator-handle rz-range-navigator-handle-left">

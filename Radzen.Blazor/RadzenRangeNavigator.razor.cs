@@ -212,10 +212,12 @@ namespace Radzen.Blazor
             return string.Format(CultureInfo.InvariantCulture, format2, value);
         }
 
+        internal bool IsCompact => NavigatorSeries.Count == 0;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-range-navigator";
+            return IsCompact ? "rz-range-navigator rz-range-navigator-compact" : "rz-range-navigator";
         }
 
         /// <inheritdoc />
