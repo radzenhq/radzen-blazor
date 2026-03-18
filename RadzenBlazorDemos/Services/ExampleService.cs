@@ -2016,9 +2016,9 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Name="Chart",
-            Icon = "\ue922",
-            Children = new [] {
+            Name = "Data Visualization",
+            Icon = "\ue4fb",
+            Children = new[] {
                 new Example
                 {
                     Name = "Chart Gallery",
@@ -2031,16 +2031,9 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name="Chart",
-                    Icon = "\ue922",
+                    Name = "Area Chart",
+                    Icon = "\ue770",
                     Children = new [] {
-                        new Example
-                        {
-                            Name = "Line Chart",
-                            Path = "line-chart",
-                            Description = "Radzen Blazor Chart with line series.",
-                            Tags = new [] { "chart", "graph", "line" }
-                        },
                         new Example
                         {
                             Name = "Area Chart",
@@ -2048,6 +2041,105 @@ namespace RadzenBlazorDemos
                             Description = "Radzen Blazor Chart with area series.",
                             Tags = new [] { "chart", "graph", "area" }
                         },
+                        new Example
+                        {
+                            Name = "Range Area Chart",
+                            Path = "range-area-chart",
+                            Description = "Radzen Blazor Chart with range area series for displaying value bands.",
+                            Tags = new [] { "chart", "graph", "area", "range", "band", "min", "max" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Area Negative Points",
+                            Path = "negative-area-chart",
+                            Description = "Radzen Blazor Chart with area series displaying both positive and negative values.",
+                            Tags = new [] { "chart", "graph", "area", "negative", "gdp", "growth" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Step Area Chart",
+                            Path = "step-area-chart",
+                            Description = "Radzen Blazor Chart with step area interpolation for discrete filled areas.",
+                            Tags = new [] { "chart", "graph", "area", "step", "interpolation" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Range Step Area Chart",
+                            Path = "range-step-area-chart",
+                            Description = "Radzen Blazor Chart with range area series using step interpolation.",
+                            Tags = new [] { "chart", "graph", "area", "range", "step", "interpolation", "band" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Stacked Area Chart",
+                            Path = "stacked-area-chart",
+                            Description = "Radzen Blazor Chart with stacked area series.",
+                            Tags = new [] { "chart", "stack", "graph", "area" }
+                        },
+                        new Example
+                        {
+                            Name = "Full Stacked Area Chart",
+                            Path = "100-percent-stacked-area-chart",
+                            Description = "Radzen Blazor Chart with full (100%) stacked area series showing proportional filled areas.",
+                            Tags = new [] { "chart", "graph", "area", "stack", "percent", "100", "proportional", "full" },
+                            New = true
+                        },
+                    }
+                },
+                new Example
+                {
+                    Name = "Bar Chart",
+                    Icon = "\ue00d",
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Bar Chart",
+                            Path = "bar-chart",
+                            Description = "Radzen Blazor Chart with bar series.",
+                            Tags = new [] { "chart", "graph", "column", "bar" }
+                        },
+                        new Example
+                        {
+                            Name = "Range Bar Chart",
+                            Path = "range-bar-chart",
+                            Description = "Radzen Blazor Chart with range bar series for displaying horizontal value ranges.",
+                            Tags = new [] { "chart", "graph", "bar", "range", "gantt", "timeline", "min", "max" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Stacked Bar Chart",
+                            Path = "stacked-bar-chart",
+                            Description = "Radzen Blazor Chart with stacked bar series.",
+                            Tags = new [] { "chart", "stack", "graph", "column", "bar" }
+                        },
+                        new Example
+                        {
+                            Name = "Full Stacked Bar Chart",
+                            Path = "100-percent-stacked-bar-chart",
+                            Description = "Radzen Blazor Chart with full (100%) stacked bar series showing horizontal proportional contributions.",
+                            Tags = new [] { "chart", "graph", "bar", "stack", "percent", "100", "proportional", "horizontal", "full" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Negative Stacked Bar Chart",
+                            Path = "negative-stacked-bar-chart",
+                            Description = "Radzen Blazor Chart with stacked bar series displaying revenue and expenses with negative values.",
+                            Tags = new [] { "chart", "graph", "bar", "stack", "negative", "revenue", "expenses" },
+                            New = true
+                        },
+                    }
+                },
+                new Example
+                {
+                    Name = "Column Chart",
+                    Icon = "\ue015",
+                    Children = new [] {
                         new Example
                         {
                             Name = "Column Chart",
@@ -2073,11 +2165,119 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Bar Chart",
-                            Path = "bar-chart",
-                            Description = "Radzen Blazor Chart with bar series.",
-                            Tags = new [] { "chart", "graph", "column", "bar" }
+                            Name = "Range Column Chart",
+                            Path = "range-column-chart",
+                            Description = "Radzen Blazor Chart with range column series for displaying vertical value ranges.",
+                            Tags = new [] { "chart", "graph", "column", "range", "min", "max" },
+                            New = true
                         },
+                        new Example
+                        {
+                            Name = "Stacked Column Chart",
+                            Path = "stacked-column-chart",
+                            Description = "Radzen Blazor Chart with stacked column series.",
+                            Tags = new [] { "chart", "stack", "graph", "column", "bar" }
+                        },
+                        new Example
+                        {
+                            Name = "Full Stacked Column Chart",
+                            Path = "100-percent-stacked-column-chart",
+                            Description = "Radzen Blazor Chart with full (100%) stacked column series showing proportional contributions.",
+                            Tags = new [] { "chart", "graph", "column", "stack", "percent", "100", "proportional", "full" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Histogram",
+                            Path = "chart-histogram",
+                            Description = "Radzen Blazor Chart displaying frequency distributions as a histogram using column series.",
+                            Tags = new [] { "chart", "graph", "histogram", "frequency", "distribution", "bin" },
+                            New = true
+                        },
+                    }
+                },
+                new Example
+                {
+                    Name = "Line Chart",
+                    Icon = "\ue922",
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Line Chart",
+                            Path = "line-chart",
+                            Description = "Radzen Blazor Chart with line series.",
+                            Tags = new [] { "chart", "graph", "line" }
+                        },
+                        new Example
+                        {
+                            Name = "Spline Chart",
+                            Path = "chart-spline",
+                            Description = "Radzen Blazor Chart with smooth spline interpolation for line and area series.",
+                            Tags = new [] { "chart", "graph", "spline", "smooth", "interpolation" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Step Line Chart",
+                            Path = "step-line-chart",
+                            Description = "Radzen Blazor Chart with step line interpolation for discrete value changes.",
+                            Tags = new [] { "chart", "graph", "line", "step", "interpolation" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Scatter Line Chart",
+                            Path = "scatter-line-chart",
+                            Description = "Radzen Blazor Chart with line series and markers for scatter line visualization.",
+                            Tags = new [] { "chart", "graph", "scatter", "line", "marker", "point" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Stacked Line Chart",
+                            Path = "stacked-line-chart",
+                            Description = "Radzen Blazor Chart with stacked line series showing cumulative values.",
+                            Tags = new [] { "chart", "graph", "line", "stack", "cumulative" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Full Stacked Line Chart",
+                            Path = "100-percent-stacked-line-chart",
+                            Description = "Radzen Blazor Chart with full (100%) stacked line series showing proportional trends.",
+                            Tags = new [] { "chart", "graph", "line", "stack", "percent", "100", "proportional", "full" },
+                            New = true
+                        },
+                    }
+                },
+                new Example
+                {
+                    Name = "Waterfall Chart",
+                    Icon = "\uea00",
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Waterfall Chart",
+                            Path = "waterfall-chart",
+                            Description = "Radzen Blazor Chart with waterfall series showing cumulative impact of sequential values.",
+                            Tags = new [] { "chart", "graph", "waterfall", "column", "cumulative", "running total", "summary" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Horizontal Waterfall Chart",
+                            Path = "horizontal-waterfall-chart",
+                            Description = "Radzen Blazor Chart with horizontal waterfall series showing cumulative impact of sequential values.",
+                            Tags = new [] { "chart", "graph", "waterfall", "bar", "horizontal", "cumulative", "running total", "summary" },
+                            New = true
+                        },
+                    }
+                },
+                new Example
+                {
+                    Name = "Pie & Donut",
+                    Icon = "\uf724",
+                    Children = new [] {
                         new Example
                         {
                             Name = "Pie Chart",
@@ -2094,18 +2294,33 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Funnel Chart",
+                            Path = "funnel-chart",
+                            Description = "Radzen Blazor Chart with funnel series for visualizing stages in a process.",
+                            Tags = new [] { "chart", "graph", "funnel", "conversion", "pipeline", "sales" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Pyramid Chart",
+                            Path = "pyramid-chart",
+                            Description = "Radzen Blazor Chart with pyramid series for hierarchical data visualization.",
+                            Tags = new [] { "chart", "graph", "pyramid", "hierarchy", "triangle" },
+                            New = true
+                        },
+                    }
+                },
+                new Example
+                {
+                    Name = "Scatter & Bubble",
+                    Icon = "\ue268",
+                    Children = new [] {
+                        new Example
+                        {
                             Name = "Scatter Chart",
                             Path = "scatter-chart",
                             Description = "Radzen Blazor Chart with scatter series for plotting numeric X/Y data points.",
                             Tags = new [] { "chart", "graph", "scatter", "point", "xy" }
-                        },
-                        new Example
-                        {
-                            Name = "Scatter Line Chart",
-                            Path = "scatter-line-chart",
-                            Description = "Radzen Blazor Chart with line series and markers for scatter line visualization.",
-                            Tags = new [] { "chart", "graph", "scatter", "line", "marker", "point" },
-                            New = true
                         },
                         new Example
                         {
@@ -2118,123 +2333,23 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Stacked Series",
-                    Icon = "\ue8de",
+                    Name = "Financial",
+                    Icon = "\uef92",
                     Children = new [] {
                         new Example
                         {
-                            Name = "Stacked Column Chart",
-                            Path = "stacked-column-chart",
-                            Description = "Radzen Blazor Chart with stacked column series.",
-                            Tags = new [] { "chart", "stack", "graph", "column", "bar" }
-                        },
-                        new Example
-                        {
-                            Name = "Stacked Bar Chart",
-                            Path = "stacked-bar-chart",
-                            Description = "Radzen Blazor Chart with stacked bar series.",
-                            Tags = new [] { "chart", "stack", "graph", "column", "bar" }
-                        },
-                        new Example
-                        {
-                            Name = "Stacked Area Chart",
-                            Path = "stacked-area-chart",
-                            Description = "Radzen Blazor Chart with stacked area series.",
-                            Tags = new [] { "chart", "stack", "graph", "area" }
-                        },
-                        new Example
-                        {
-                            Name = "Stacked Line Chart",
-                            Path = "stacked-line-chart",
-                            Description = "Radzen Blazor Chart with stacked line series showing cumulative values.",
-                            Tags = new [] { "chart", "graph", "line", "stack", "cumulative" },
+                            Name = "Candlestick Chart",
+                            Path = "candlestick-chart",
+                            Description = "Radzen Blazor Chart with candlestick series for financial OHLC data.",
+                            Tags = new [] { "chart", "graph", "candlestick", "ohlc", "financial", "stock" },
                             New = true
                         },
                         new Example
                         {
-                            Name = "Full Stacked Column Chart",
-                            Path = "100-percent-stacked-column-chart",
-                            Description = "Radzen Blazor Chart with full (100%) stacked column series showing proportional contributions.",
-                            Tags = new [] { "chart", "graph", "column", "stack", "percent", "100", "proportional", "full" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Full Stacked Bar Chart",
-                            Path = "100-percent-stacked-bar-chart",
-                            Description = "Radzen Blazor Chart with full (100%) stacked bar series showing horizontal proportional contributions.",
-                            Tags = new [] { "chart", "graph", "bar", "stack", "percent", "100", "proportional", "horizontal", "full" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Negative Stacked Bar Chart",
-                            Path = "negative-stacked-bar-chart",
-                            Description = "Radzen Blazor Chart with stacked bar series displaying revenue and expenses with negative values.",
-                            Tags = new [] { "chart", "graph", "bar", "stack", "negative", "revenue", "expenses" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Full Stacked Area Chart",
-                            Path = "100-percent-stacked-area-chart",
-                            Description = "Radzen Blazor Chart with full (100%) stacked area series showing proportional filled areas.",
-                            Tags = new [] { "chart", "graph", "area", "stack", "percent", "100", "proportional", "full" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Full Stacked Line Chart",
-                            Path = "100-percent-stacked-line-chart",
-                            Description = "Radzen Blazor Chart with full (100%) stacked line series showing proportional trends.",
-                            Tags = new [] { "chart", "graph", "line", "stack", "percent", "100", "proportional", "full" },
-                            New = true
-                        },
-                    }
-                },
-                new Example
-                {
-                    Name = "Range & Statistical",
-                    Icon = "\ue8e5",
-                    Children = new [] {
-                        new Example
-                        {
-                            Name = "Range Area Chart",
-                            Path = "range-area-chart",
-                            Description = "Radzen Blazor Chart with range area series for displaying value bands.",
-                            Tags = new [] { "chart", "graph", "area", "range", "band", "min", "max" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Area Negative Points",
-                            Path = "negative-area-chart",
-                            Description = "Radzen Blazor Chart with area series displaying both positive and negative values.",
-                            Tags = new [] { "chart", "graph", "area", "negative", "gdp", "growth" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Range Column Chart",
-                            Path = "range-column-chart",
-                            Description = "Radzen Blazor Chart with range column series for displaying vertical value ranges.",
-                            Tags = new [] { "chart", "graph", "column", "range", "min", "max" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Range Bar Chart",
-                            Path = "range-bar-chart",
-                            Description = "Radzen Blazor Chart with range bar series for displaying horizontal value ranges.",
-                            Tags = new [] { "chart", "graph", "bar", "range", "gantt", "timeline", "min", "max" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Range Step Area Chart",
-                            Path = "range-step-area-chart",
-                            Description = "Radzen Blazor Chart with range area series using step interpolation.",
-                            Tags = new [] { "chart", "graph", "area", "range", "step", "interpolation", "band" },
+                            Name = "OHLC Chart",
+                            Path = "ohlc-chart",
+                            Description = "Radzen Blazor Chart with OHLC bar series for financial data.",
+                            Tags = new [] { "chart", "graph", "ohlc", "financial", "stock", "open", "high", "low", "close" },
                             New = true
                         },
                         new Example
@@ -2253,84 +2368,19 @@ namespace RadzenBlazorDemos
                             Tags = new [] { "chart", "graph", "box", "plot", "whisker", "quartile", "statistics", "distribution" },
                             New = true
                         },
-                        new Example
-                        {
-                            Name = "Candlestick Chart",
-                            Path = "candlestick-chart",
-                            Description = "Radzen Blazor Chart with candlestick series for financial OHLC data.",
-                            Tags = new [] { "chart", "graph", "candlestick", "ohlc", "financial", "stock" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "OHLC Chart",
-                            Path = "ohlc-chart",
-                            Description = "Radzen Blazor Chart with OHLC bar series for financial data.",
-                            Tags = new [] { "chart", "graph", "ohlc", "financial", "stock", "open", "high", "low", "close" },
-                            New = true
-                        },
                     }
                 },
                 new Example
                 {
-                    Name = "Live Chart",
-                    Path = "live-chart",
-                    Icon = "\ue1e0",
-                    Description = "Radzen Blazor live updating chart with real-time data using ObservableCollection and timer.",
-                    Tags = new [] { "chart", "graph", "live", "real-time", "update", "timer", "observable" },
-                    New = true
-                },
-                new Example
-                {
-                    Name = "Specialized",
-                    Icon = "\ue6df",
+                    Name = "Statistical & Interactive",
+                    Icon = "\uf866",
                     Children = new [] {
                         new Example
                         {
-                            Name = "Waterfall Chart",
-                            Path = "waterfall-chart",
-                            Description = "Radzen Blazor Chart with waterfall series showing cumulative impact of sequential values.",
-                            Tags = new [] { "chart", "graph", "waterfall", "column", "cumulative", "running total", "summary" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Horizontal Waterfall Chart",
-                            Path = "horizontal-waterfall-chart",
-                            Description = "Radzen Blazor Chart with horizontal waterfall series showing cumulative impact of sequential values.",
-                            Tags = new [] { "chart", "graph", "waterfall", "bar", "horizontal", "cumulative", "running total", "summary" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Bullet Chart",
-                            Path = "bullet-chart",
-                            Description = "Radzen Blazor Chart with bullet series for comparing a measure against a target.",
-                            Tags = new [] { "chart", "graph", "bullet", "gauge", "target", "kpi", "performance" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Funnel Chart",
-                            Path = "funnel-chart",
-                            Description = "Radzen Blazor Chart with funnel series for visualizing stages in a process.",
-                            Tags = new [] { "chart", "graph", "funnel", "conversion", "pipeline", "sales" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Pyramid Chart",
-                            Path = "pyramid-chart",
-                            Description = "Radzen Blazor Chart with pyramid series for hierarchical data visualization.",
-                            Tags = new [] { "chart", "graph", "pyramid", "hierarchy", "triangle" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Histogram",
-                            Path = "chart-histogram",
-                            Description = "Radzen Blazor Chart displaying frequency distributions as a histogram using column series.",
-                            Tags = new [] { "chart", "graph", "histogram", "frequency", "distribution", "bin" },
+                            Name = "Trendline Chart",
+                            Path = "trendline-chart",
+                            Description = "Radzen Blazor Chart with trendline overlays: linear regression, polynomial fit, and moving average.",
+                            Tags = new [] { "chart", "graph", "trendline", "trend", "regression", "polynomial", "moving average", "forecast" },
                             New = true
                         },
                         new Example
@@ -2343,14 +2393,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Trendline Chart",
-                            Path = "trendline-chart",
-                            Description = "Radzen Blazor Chart with trendline overlays: linear regression, polynomial fit, and moving average.",
-                            Tags = new [] { "chart", "graph", "trendline", "trend", "regression", "polynomial", "moving average", "forecast" },
-                            New = true
-                        },
-                        new Example
-                        {
                             Name = "DrillDown Chart",
                             Path = "drilldown-chart",
                             Description = "Radzen Blazor Chart with drill-down interaction to navigate from summary to detailed data on click.",
@@ -2359,18 +2401,95 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Heatmap",
-                            Path = "heatmap-chart",
-                            Description = "Radzen Blazor Heatmap component for displaying data intensity as a color-coded grid.",
-                            Tags = new [] { "chart", "heatmap", "grid", "matrix", "color", "intensity" },
+                            Name = "Bullet Chart",
+                            Path = "bullet-chart",
+                            Description = "Radzen Blazor Chart with bullet series for comparing a measure against a target.",
+                            Tags = new [] { "chart", "graph", "bullet", "gauge", "target", "kpi", "performance" },
                             New = true
                         },
                         new Example
                         {
-                            Name = "Treemap",
-                            Path = "treemap-chart",
-                            Description = "Radzen Blazor Treemap component for displaying hierarchical data as proportionally-sized rectangles.",
-                            Tags = new [] { "chart", "treemap", "hierarchy", "rectangle", "proportion", "area" },
+                            Name = "Live Chart",
+                            Path = "live-chart",
+                            Description = "Radzen Blazor live updating chart with real-time data using ObservableCollection and timer.",
+                            Tags = new [] { "chart", "graph", "live", "real-time", "update", "timer", "observable" },
+                            New = true
+                        },
+                    }
+                },
+                new Example
+                {
+                    Name = "Gauges",
+                    Icon = "\ue9e4",
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Arc Gauge",
+                            Path = "arc-gauge",
+                            Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",
+                            Icon = "\ue9e4",
+                            Tags = new [] { "gauge", "graph", "arc", "progress" }
+                        },
+                        new Example
+                        {
+                            Name = "Linear Gauge",
+                            New = true,
+                            Path = "linear-gauge",
+                            Description = "Display values on a linear scale with configurable ticks, ranges, and pointer orientation.",
+                            Icon = "\ue260",
+                            Tags = new [] { "gauge", "graph", "linear", "scale", "bar" },
+                            Toc =
+                            [
+                                new () { Text = "Basic Usage", Anchor = "#basic-usage" },
+                                new () { Text = "Ranges and Value Display", Anchor = "#ranges" },
+                                new () { Text = "Rounded Ranges", Anchor = "#rounded-ranges" },
+                                new () { Text = "Reversed Scale", Anchor = "#reversed" },
+                                new () { Text = "Draggable Pointer", Anchor = "#draggable" },
+                                new () { Text = "Vertical Orientation", Anchor = "#vertical" },
+                                new () { Text = "Multiple Scales", Anchor = "#multiple-scales" },
+                            ]
+                        },
+                        new Example
+                        {
+                            Name = "Radial Gauge",
+                            Path = "radial-gauge",
+                            Description = "Demonstration and configuration of Radzen Blazor Radial Gauge component.",
+                            Icon = "\ue01b",
+                            Tags = new [] { "gauge", "graph", "radial", "circle" }
+                        },
+                        new Example
+                        {
+                            Name = "Styling Gauge",
+                            Path = "styling-gauge",
+                            Title = "Blazor Gauge - Styling | Free UI Components by Radzen",
+                            Description = "This example demonstrates multiple pointers with RadzenRadialGauge and multiple scales with RadzenArcGauge component.",
+                            Icon = "\ue41d",
+                            Tags = new [] { "gauge", "graph", "styling" }
+                        },
+                    }
+                },
+                new Example
+                {
+                    Name = "Zoom & Navigation",
+                    Icon = "\ue8ff",
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Zoom and Pan",
+                            Path = "zoom-pan-chart",
+                            Description = "Radzen Blazor Chart with mouse wheel zoom and scrollbar pan for exploring large datasets.",
+                            Tags = new [] { "chart", "zoom", "pan", "scroll", "interactive", "mouse", "wheel" },
+                            Icon = "\ue8ff",
+                            New = true
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "With Series", Anchor = "#with-series" }, new () { Text = "Compact", Anchor = "#compact" } ],
+                            Name = "Range Navigator",
+                            Path = "range-navigator",
+                            Description = "Radzen Blazor Range Navigator with mini-chart and draggable selection for controlling chart visible range.",
+                            Tags = new [] { "chart", "range", "navigator", "selector", "zoom", "pan", "interactive" },
+                            Icon = "\ue8ff",
                             New = true
                         },
                     }
@@ -2475,30 +2594,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Spline Chart",
-                            Path = "chart-spline",
-                            Description = "Radzen Blazor Chart with smooth spline interpolation for line and area series.",
-                            Tags = new [] { "chart", "graph", "spline", "smooth", "interpolation" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Step Line Chart",
-                            Path = "step-line-chart",
-                            Description = "Radzen Blazor Chart with step line interpolation for discrete value changes.",
-                            Tags = new [] { "chart", "graph", "line", "step", "interpolation" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Step Area Chart",
-                            Path = "step-area-chart",
-                            Description = "Radzen Blazor Chart with step area interpolation for discrete filled areas.",
-                            Tags = new [] { "chart", "graph", "area", "step", "interpolation" },
-                            New = true
-                        },
-                        new Example
-                        {
                             Name = "Trends",
                             Path = "chart-trends",
                             Title = "Blazor Chart - Trends | Free UI Components by Radzen",
@@ -2523,13 +2618,24 @@ namespace RadzenBlazorDemos
                         },
                     }
                 },
-            }
-        },
-        new Example
-        {
-            Name = "Data Visualization",
-            Icon = "\ue4fb",
-            Children = new[] {
+                new Example
+                {
+                    Name = "Heatmap",
+                    Path = "heatmap-chart",
+                    Description = "Radzen Blazor Heatmap component for displaying data intensity as a color-coded grid.",
+                    Tags = new [] { "chart", "heatmap", "grid", "matrix", "color", "intensity" },
+                    Icon = "\ue8f0",
+                    New = true
+                },
+                new Example
+                {
+                    Name = "Treemap",
+                    Path = "treemap-chart",
+                    Description = "Radzen Blazor Treemap component for displaying hierarchical data as proportionally-sized rectangles.",
+                    Tags = new [] { "chart", "treemap", "hierarchy", "rectangle", "proportion", "area" },
+                    Icon= "\ue8f1",
+                    New = true
+                },
                 new Example
                 {
                     Name = "Sparkline",
@@ -2560,66 +2666,21 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Zoom and Pan",
-                    Path = "zoom-pan-chart",
-                    Description = "Radzen Blazor Chart with mouse wheel zoom and scrollbar pan for exploring large datasets.",
-                    Tags = new [] { "chart", "zoom", "pan", "scroll", "interactive", "mouse", "wheel" },
-                    Icon = "\ue8ff",
-                    New = true
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Color Scheme", Anchor = "#color-scheme" }, new () { Text = "Node Properties", Anchor = "#node-properties" }, new () { Text = "Custom Colors", Anchor = "#custom-colors" }, new () { Text = "Custom Tooltips", Anchor = "#custom-tooltips" }, new () { Text = "Animation", Anchor = "#animation" } ],
+                    Name = "Sankey Diagram",
+                    Path = "sankey-diagram",
+                    Description = "Radzen Blazor Sankey Diagram for visualizing flow and relationships between nodes.",
+                    Icon = "\uf38d",
+                    Tags = new [] { "sankey", "flow", "diagram", "visualization", "relationships" }
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "With Series", Anchor = "#with-series" }, new () { Text = "Compact", Anchor = "#compact" } ],
-                    Name = "Range Navigator",
-                    Path = "range-navigator",
-                    Description = "Radzen Blazor Range Navigator with mini-chart and draggable selection for controlling chart visible range.",
-                    Tags = new [] { "chart", "range", "navigator", "selector", "zoom", "pan", "interactive" },
-                    Icon = "\ue8ff",
-                    New = true
-                },
-                new Example
-                {
-                    Name = "Arc Gauge",
-                    Path = "arc-gauge",
-                    Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",
-                    Icon = "\ue9e4",
-                    Tags = new [] { "gauge", "graph", "arc", "progress" }
-                },
-                new Example
-                {
-                    Name = "Linear Gauge",
-                    New = true,
-                    Path = "linear-gauge",
-                    Description = "Display values on a linear scale with configurable ticks, ranges, and pointer orientation.",
-                    Icon = "\ue260",
-                    Tags = new [] { "gauge", "graph", "linear", "scale", "bar" },
-                    Toc =
-                    [
-                        new () { Text = "Basic Usage", Anchor = "#basic-usage" },
-                        new () { Text = "Ranges and Value Display", Anchor = "#ranges" },
-                        new () { Text = "Rounded Ranges", Anchor = "#rounded-ranges" },
-                        new () { Text = "Reversed Scale", Anchor = "#reversed" },
-                        new () { Text = "Draggable Pointer", Anchor = "#draggable" },
-                        new () { Text = "Vertical Orientation", Anchor = "#vertical" },
-                        new () { Text = "Multiple Scales", Anchor = "#multiple-scales" },
-                    ]
-                },
-                new Example
-                {
-                    Name = "Radial Gauge",
-                    Path = "radial-gauge",
-                    Description = "Demonstration and configuration of Radzen Blazor Radial Gauge component.",
-                    Icon = "\ue01b",
-                    Tags = new [] { "gauge", "graph", "radial", "circle" }
-                },
-                new Example
-                {
-                    Name = "Styling Gauge",
-                    Path = "styling-gauge",
-                    Title = "Blazor Gauge - Styling | Free UI Components by Radzen",
-                    Description = "This example demonstrates multiple pointers with RadzenRadialGauge and multiple scales with RadzenArcGauge component.",
-                    Icon = "\ue41d",
-                    Tags = new [] { "gauge", "graph", "styling" }
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Orientation and Position", Anchor = "#orientation-and-position" }, new () { Text = "Align Items", Anchor = "#align-items" }, new () { Text = "Styling", Anchor = "#line-width" }, new () { Text = "Point Size", Anchor = "#point-size" }, new () { Text = "Point Style", Anchor = "#point-style" }, new () { Text = "Point Variant", Anchor = "#point-variant" }, new () { Text = "Point Shadow", Anchor = "#point-shadow" }, new () { Text = "Point Content", Anchor = "#point-content" } ],
+                    Name = "Timeline",
+                    Path = "timeline",
+                    Description = "Blazor Timeline component for displaying a chronological sequence of events with flexible orientation and styling.",
+                    Icon = "\ue00d",
+                    Tags = new [] { "timeline", "time", "line" }
                 },
                 new Example
                 {
@@ -2642,15 +2703,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Orientation and Position", Anchor = "#orientation-and-position" }, new () { Text = "Align Items", Anchor = "#align-items" }, new () { Text = "Styling", Anchor = "#line-width" }, new () { Text = "Point Size", Anchor = "#point-size" }, new () { Text = "Point Style", Anchor = "#point-style" }, new () { Text = "Point Variant", Anchor = "#point-variant" }, new () { Text = "Point Shadow", Anchor = "#point-shadow" }, new () { Text = "Point Content", Anchor = "#point-content" } ],
-                    Name = "Timeline",
-                    Path = "timeline",
-                    Description = "Blazor Timeline component for displaying a chronological sequence of events with flexible orientation and styling.",
-                    Icon = "\ue00d",
-                    Tags = new [] { "timeline", "time", "line" }
-                },
-                new Example
-                {
                     Name = "GoogleMap",
                     Path = "googlemap",
                     Description = "Demonstration and configuration of Radzen Blazor Google Map component.",
@@ -2664,15 +2716,6 @@ namespace RadzenBlazorDemos
                     Description = "Demonstration and configuration of Radzen SSRS Viewer Radzen Blazor Arc Gauge component.",
                     Icon = "\ue9e4",
                     Tags = new [] { "report", "ssrs" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Color Scheme", Anchor = "#color-scheme" }, new () { Text = "Node Properties", Anchor = "#node-properties" }, new () { Text = "Custom Colors", Anchor = "#custom-colors" }, new () { Text = "Custom Tooltips", Anchor = "#custom-tooltips" }, new () { Text = "Animation", Anchor = "#animation" } ],
-                    Name = "Sankey Diagram",
-                    Path = "sankey-diagram",
-                    Description = "Radzen Blazor Sankey Diagram for visualizing flow and relationships between nodes.",
-                    Icon = "\uf38d",
-                    Tags = new [] { "sankey", "flow", "diagram", "visualization", "relationships" }
                 },
             }
         },
