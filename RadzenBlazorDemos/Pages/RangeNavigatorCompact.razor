@@ -25,7 +25,8 @@
         <RadzenLegend Position="LegendPosition.Bottom" />
     </RadzenChart>
 
-    <RadzenRangeNavigator @bind-Start="@start" @bind-End="@end" Style="margin-top: 16px;" />
+    <RadzenRangeNavigator @bind-Start="@start" @bind-End="@end" Style="margin-top: 16px;"
+        ShowAxis="true" Min="@rangeStart" Max="@rangeEnd" AxisFormatString="{0:MMM}" />
 </RadzenStack>
 
 @code {
