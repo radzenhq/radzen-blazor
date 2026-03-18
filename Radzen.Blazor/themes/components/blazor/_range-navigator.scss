@@ -13,6 +13,7 @@
 
 .rz-range-navigator-compact {
   height: 16px;
+  margin-bottom: 0;
   border: none;
   background: var(--rz-base-200, #e5e7eb);
   border-radius: 8px;
@@ -149,5 +150,74 @@
     &::after {
       left: 4px;
     }
+  }
+}
+
+.rz-range-navigator-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rz-range-navigator-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+
+  &-first {
+    transform: none;
+  }
+
+  &-last {
+    transform: translateX(-100%);
+  }
+}
+
+.rz-range-navigator-tick-mark {
+  width: 1px;
+  height: 6px;
+  background: var(--rz-base-300, #d1d5db);
+  margin: 0 auto;
+}
+
+.rz-range-navigator-tick-label {
+  font-size: 0.625rem;
+  line-height: 1.2;
+  color: var(--rz-text-secondary-color, #6b7280);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.rz-range-navigator-has-axis {
+  padding-bottom: 24px;
+
+  .rz-range-navigator-shade {
+    bottom: 24px;
+  }
+
+  .rz-range-navigator-window {
+    bottom: 24px;
+  }
+}
+
+.rz-range-navigator-compact.rz-range-navigator-has-axis {
+  padding-bottom: 0;
+  margin-bottom: 24px;
+
+  .rz-range-navigator-shade {
+    bottom: 0;
+  }
+
+  .rz-range-navigator-window {
+    bottom: 0;
+  }
+
+  .rz-range-navigator-axis {
+    top: 100%;
+    bottom: auto;
   }
 }
