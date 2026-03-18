@@ -127,12 +127,22 @@ $chart-color-schemes: (
   .rz-funnel-series,
   .rz-pyramid-series {
     > g {
-      transition: opacity 0.2s, filter 0.2s;
+      transition: opacity var(--rz-transition), filter var(--rz-transition);
       cursor: pointer;
+
+      > path:not(.rz-hit-area),
+      > .rz-path {
+        transition: transform var(--rz-transition);
+      }
 
       &:hover,
       &.rz-state-hover {
         filter: brightness(1.1) drop-shadow(0 0 3px rgba(0, 0, 0, 0.2));
+
+        > path:not(.rz-hit-area),
+        > .rz-path {
+          transform: translate(var(--rz-explode-x, 0), var(--rz-explode-y, 0));
+        }
       }
     }
   }
@@ -326,6 +336,7 @@ $chart-color-schemes: (
   position: absolute;
   top: 0;
   left: 0;
+  pointer-events: none;
 }
 
 .rz-top-chart-tooltip  {
