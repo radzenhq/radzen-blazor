@@ -112,11 +112,13 @@ public class Workbook
     {
         public Dictionary<(string? Color, bool Bold, bool Italic, bool Underline), int> FontStyles { get; } = new();
         public Dictionary<string, int> FillStyles { get; } = new();
-        public Dictionary<(int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign), int> CellStyles { get; } = new();
+        public Dictionary<(int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId), int> CellStyles { get; } = new();
+        public Dictionary<string, int> NumberFormats { get; } = new(StringComparer.OrdinalIgnoreCase);
         public XDocument StylesDocument { get; set; } = null!;
         public XElement FontsElement { get; set; } = null!;
         public XElement FillsElement { get; set; } = null!;
         public XElement CellXfsElement { get; set; } = null!;
+        public XElement? NumFmtsElement { get; set; }
     }
 
     private static void SaveContentTypes(ZipArchive archive)
@@ -454,21 +456,24 @@ public class Workbook
                cell.Format.Italic ||
                cell.Format.Underline ||
                cell.Format.TextAlign != TextAlign.Left ||
-               cell.Format.VerticalAlign != VerticalAlign.Top;
+               cell.Format.VerticalAlign != VerticalAlign.Top ||
+               !string.IsNullOrEmpty(cell.Format.NumberFormat) ||
+               cell.ValueType == CellDataType.Date;
     }
 
     private int GetOrCreateCellStyle(Cell cell, StyleTracker styleTracker)
     {
         var fontId = GetOrCreateFontStyle(cell, styleTracker);
         var fillId = GetOrCreateFillStyle(cell, styleTracker);
+        var numFmtId = GetOrCreateNumberFormat(cell, styleTracker);
 
-        var styleKey = (fontId, fillId, cell.Format.TextAlign, cell.Format.VerticalAlign);
+        var styleKey = (fontId, fillId, cell.Format.TextAlign, cell.Format.VerticalAlign, numFmtId);
 
         if (!styleTracker.CellStyles.TryGetValue(styleKey, out int styleId))
         {
             styleId = styleTracker.CellStyles.Count + 1;
             styleTracker.CellStyles[styleKey] = styleId;
-            CreateCellStyleElement(cell, fontId, fillId, styleId, styleTracker);
+            CreateCellStyleElement(cell, fontId, fillId, numFmtId, styleTracker);
         }
 
         return styleId;
@@ -503,6 +508,56 @@ public class Workbook
         }
 
         return fillId;
+    }
+
+    private static int GetOrCreateNumberFormat(Cell cell, StyleTracker styleTracker)
+    {
+        var formatCode = cell.Format.NumberFormat;
+
+        // Auto-apply default date format for date values without explicit format
+        if (string.IsNullOrEmpty(formatCode) && cell.ValueType == CellDataType.Date)
+        {
+            return 14; // mm/dd/yyyy
+        }
+
+        if (string.IsNullOrEmpty(formatCode) ||
+            string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
+        {
+            return 0;
+        }
+
+        // Check built-in formats first
+        var builtInId = NumberFormatPresets.GetNumFmtId(formatCode);
+        if (builtInId >= 0)
+        {
+            return builtInId;
+        }
+
+        // Custom format - check if already tracked
+        if (styleTracker.NumberFormats.TryGetValue(formatCode, out var existingId))
+        {
+            return existingId;
+        }
+
+        // Assign new custom ID (164+)
+        var newId = 164 + styleTracker.NumberFormats.Count;
+        styleTracker.NumberFormats[formatCode] = newId;
+
+        // Create numFmt element
+        if (styleTracker.NumFmtsElement == null)
+        {
+            styleTracker.NumFmtsElement = new XElement(XName.Get("numFmts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("count", "0"));
+            // Insert before fonts element
+            styleTracker.FontsElement.AddBeforeSelf(styleTracker.NumFmtsElement);
+        }
+
+        styleTracker.NumFmtsElement.Add(new XElement(XName.Get("numFmt", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("numFmtId", newId.ToString(CultureInfo.InvariantCulture)),
+            new XAttribute("formatCode", formatCode)));
+        styleTracker.NumFmtsElement.Attribute("count")!.Value = styleTracker.NumberFormats.Count.ToString(CultureInfo.InvariantCulture);
+
+        return newId;
     }
 
     private void CreateFontElement(Cell cell, int fontId, StyleTracker styleTracker)
@@ -552,16 +607,17 @@ public class Workbook
     /// <summary>
     /// Creates a cell style element in the styles document.
     /// </summary>
-    private void CreateCellStyleElement(Cell cell, int fontId, int fillId, int styleId, StyleTracker styleTracker)
+    private void CreateCellStyleElement(Cell cell, int fontId, int fillId, int numFmtId, StyleTracker styleTracker)
     {
         var xfElement = new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            new XAttribute("numFmtId", "0"),
+            new XAttribute("numFmtId", numFmtId.ToString(CultureInfo.InvariantCulture)),
             new XAttribute("fontId", fontId.ToString(CultureInfo.InvariantCulture)),
             new XAttribute("fillId", fillId.ToString(CultureInfo.InvariantCulture)),
             new XAttribute("borderId", "0"),
             new XAttribute("xfId", "0"),
             new XAttribute("applyFont", fontId > 0 ? "1" : "0"),
-            new XAttribute("applyFill", fillId > 0 ? "1" : "0"));
+            new XAttribute("applyFill", fillId > 0 ? "1" : "0"),
+            new XAttribute("applyNumberFormat", numFmtId > 0 ? "1" : "0"));
 
         // Add alignment if not default
         if (cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top)
@@ -608,6 +664,23 @@ public class Workbook
         return alignmentElement;
     }
 
+    private static string FormatValueInvariant(object? value)
+    {
+        if (value == null)
+        {
+            return string.Empty;
+        }
+
+        return value switch
+        {
+            double d => d.ToString(CultureInfo.InvariantCulture),
+            float f => f.ToString(CultureInfo.InvariantCulture),
+            decimal m => m.ToString(CultureInfo.InvariantCulture),
+            IFormattable fmt => fmt.ToString(null, CultureInfo.InvariantCulture),
+            _ => value.ToString() ?? string.Empty
+        };
+    }
+
     private static void AddCellValue(XElement cellElement, Cell cell, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
         if (!string.IsNullOrEmpty(cell.Formula))
@@ -615,7 +688,7 @@ public class Workbook
             cellElement.Add(new XAttribute("t", "str"));
             var formulaValue = cell.Formula.StartsWith('=') ? cell.Formula[1..] : cell.Formula;
             cellElement.Add(new XElement(XName.Get("f", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), formulaValue));
-            cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), cell.GetValue()));
+            cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), FormatValueInvariant(cell.Value)));
         }
         else
         {
@@ -623,7 +696,7 @@ public class Workbook
             {
                 case CellDataType.Number:
                     cellElement.Add(new XAttribute("t", "n"));
-                    cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), cell.GetValue()));
+                    cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), FormatValueInvariant(cell.Value)));
                     break;
 
                 case CellDataType.String:
@@ -639,6 +712,15 @@ public class Workbook
 
                     cellElement.Add(new XAttribute("t", "s"));
                     cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), index));
+                    break;
+
+                case CellDataType.Date:
+                    if (cell.Value is DateTime dateValue)
+                    {
+                        cellElement.Add(new XAttribute("t", "n"));
+                        cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                            dateValue.ToNumber().ToString(CultureInfo.InvariantCulture)));
+                    }
                     break;
 
                 case CellDataType.Error:
@@ -887,7 +969,8 @@ public class Workbook
     {
         var fontStyles = new Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)>();
         var fillColors = new Dictionary<int, string>();
-        var cellStyles = new Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)>(0);
+        var cellStyles = new Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId)>(0);
+        var numberFormats = new Dictionary<int, string>();
 
         var stylesEntry = archive.GetEntry("xl/styles.xml");
         if (stylesEntry != null)
@@ -898,10 +981,11 @@ public class Workbook
 
             ParseFonts(stylesDoc, stylesNs, fontStyles);
             ParseFills(stylesDoc, stylesNs, fillColors);
-            ParseCellStyles(stylesDoc, stylesNs, fontStyles, fillColors, cellStyles);
+            ParseNumberFormats(stylesDoc, stylesNs, numberFormats);
+            ParseCellStyles(stylesDoc, stylesNs, fontStyles, fillColors, numberFormats, cellStyles);
         }
 
-        return new StyleInfo(fontStyles, fillColors, cellStyles);
+        return new StyleInfo(fontStyles, fillColors, cellStyles, numberFormats);
     }
 
     private static void ParseFonts(XDocument stylesDoc, XNamespace stylesNs, Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles)
@@ -935,10 +1019,25 @@ public class Workbook
         }
     }
 
-    private static void ParseCellStyles(XDocument stylesDoc, XNamespace stylesNs, 
+    private static void ParseNumberFormats(XDocument stylesDoc, XNamespace stylesNs, Dictionary<int, string> numberFormats)
+    {
+        var numFmts = stylesDoc.Descendants(stylesNs + "numFmt").ToList();
+        foreach (var numFmt in numFmts)
+        {
+            var numFmtId = numFmt.Attribute("numFmtId")?.Value;
+            var formatCode = numFmt.Attribute("formatCode")?.Value;
+            if (numFmtId != null && formatCode != null)
+            {
+                numberFormats[int.Parse(numFmtId, CultureInfo.InvariantCulture)] = formatCode;
+            }
+        }
+    }
+
+    private static void ParseCellStyles(XDocument stylesDoc, XNamespace stylesNs,
         Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles,
         Dictionary<int, string> fillColors,
-        Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)> cellStyles)
+        Dictionary<int, string> numberFormats,
+        Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId)> cellStyles)
     {
         var cellXfs = stylesDoc.Descendants(stylesNs + "cellXfs").FirstOrDefault()?.Elements(stylesNs + "xf").ToList() ?? [];
         for (var i = 0; i < cellXfs.Count; i++)
@@ -948,6 +1047,8 @@ public class Workbook
             var applyFont = cellXfs[i].Attribute("applyFont")?.Value;
             var applyFill = cellXfs[i].Attribute("applyFill")?.Value;
             var applyAlignment = cellXfs[i].Attribute("applyAlignment")?.Value;
+            var numFmtIdAttr = cellXfs[i].Attribute("numFmtId")?.Value;
+            var numFmtId = numFmtIdAttr != null ? int.Parse(numFmtIdAttr, CultureInfo.InvariantCulture) : 0;
 
             if (fontId != null && fillId != null)
             {
@@ -958,9 +1059,10 @@ public class Workbook
                 var (textAlign, verticalAlign) = ParseAlignment(cellXfs[i], stylesNs, applyAlignment);
 
                 if (applyFont == "1" && fontStyles.ContainsKey(fontIdValue) ||
-                    applyFill == "1" && fillColors.ContainsKey(fillIdValue))
+                    applyFill == "1" && fillColors.ContainsKey(fillIdValue) ||
+                    numFmtId > 0)
                 {
-                    cellStyles[i] = (fontIdValue, fillIdValue, textAlign, verticalAlign);
+                    cellStyles[i] = (fontIdValue, fillIdValue, textAlign, verticalAlign, numFmtId);
                 }
             }
         }
@@ -1262,6 +1364,18 @@ public class Workbook
             {
                 sheet.Cells[address.Row, address.Column].Format.BackgroundColor = fillColor;
             }
+            if (style.NumFmtId > 0)
+            {
+                // Try custom number formats first, then built-in
+                var formatCode = styleInfo.NumberFormats.TryGetValue(style.NumFmtId, out var custom)
+                    ? custom
+                    : NumberFormatPresets.GetFormatCode(style.NumFmtId);
+
+                if (formatCode != null && !string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
+                {
+                    sheet.Cells[address.Row, address.Column].Format.NumberFormat = formatCode;
+                }
+            }
         }
     }
 
@@ -1334,16 +1448,19 @@ public class Workbook
     {
         public Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> FontStyles { get; }
         public Dictionary<int, string> FillColors { get; }
-        public Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)> CellStyles { get; }
+        public Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId)> CellStyles { get; }
+        public Dictionary<int, string> NumberFormats { get; }
 
         public StyleInfo(
             Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles,
             Dictionary<int, string> fillColors,
-            Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)> cellStyles)
+            Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId)> cellStyles,
+            Dictionary<int, string> numberFormats)
         {
             FontStyles = fontStyles;
             FillColors = fillColors;
             CellStyles = cellStyles;
+            NumberFormats = numberFormats;
         }
     }
 

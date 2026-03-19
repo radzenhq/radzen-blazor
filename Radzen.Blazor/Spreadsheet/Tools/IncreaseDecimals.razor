@@ -1,0 +1,54 @@
+@using Radzen.Blazor.Spreadsheet
+@implements IDisposable
+
+<RadzenButton Text=".0+" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Click=@OnClick title="Increase decimal places" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private void OnClick()
+    {
+        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        {
+            if (Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+            {
+                var newFormat = NumberFormat.AdjustDecimals(cell.Format.NumberFormat, 1);
+                var command = new FormatCommand(Sheet, Sheet.Selection.Range, cell.Format.WithNumberFormat(newFormat));
+                Sheet.Commands.Execute(command);
+            }
+        }
+    }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+}
