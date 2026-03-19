@@ -243,6 +243,30 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
+    private async Task OnFormatCellsAsync()
+    {
+        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid &&
+            Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+        {
+            var parameters = new Dictionary<string, object?>
+            {
+                { nameof(FormatCellsDialog.CurrentFormat), cell.Format.NumberFormat },
+                { nameof(FormatCellsDialog.SampleValue), cell.Value ?? 1234.5 },
+                { nameof(FormatCellsDialog.ValueType), cell.ValueType }
+            };
+
+            var result = await DialogService.OpenAsync<FormatCellsDialog>(
+                "Format Cells", parameters, new DialogOptions { Width = "600px", Height = "480px" });
+
+            if (result is string formatCode)
+            {
+                var format = string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase) ? null : formatCode;
+                var command = new FormatCommand(Sheet, Sheet.Selection.Range, cell.Format.WithNumberFormat(format));
+                Sheet.Commands.Execute(command);
+            }
+        }
+    }
+
     private async Task MoveSelectionAsync(int rowOffset, int columnOffset)
     {
         if (Sheet is not null)
