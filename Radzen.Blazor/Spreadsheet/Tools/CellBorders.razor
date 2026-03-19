@@ -1,0 +1,81 @@
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenSplitButton Click=@OnClick Icon="border_all" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+    <ChildContent>
+        <RadzenSplitButtonItem Text="All Borders" Value="all" />
+        <RadzenSplitButtonItem Text="Outside Borders" Value="outside" />
+        <RadzenSplitButtonItem Text="Top Border" Value="top" />
+        <RadzenSplitButtonItem Text="Bottom Border" Value="bottom" />
+        <RadzenSplitButtonItem Text="Left Border" Value="left" />
+        <RadzenSplitButtonItem Text="Right Border" Value="right" />
+        <RadzenSplitButtonItem Text="No Border" Value="none" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    private void OnClick(RadzenSplitButtonItem? item)
+    {
+        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var value = item?.Value;
+        var range = Sheet.Selection.Range;
+        var border = new BorderStyle();
+
+        switch (value)
+        {
+            case "all":
+            case null:
+            {
+                var command = new AllBordersCommand(Sheet, range, border);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+            case "outside":
+            {
+                var command = new BorderCommand(Sheet, range, border, border, border, border);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+            case "top":
+            {
+                var command = new BorderCommand(Sheet, range, top: border, right: null, bottom: null, left: null);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+            case "bottom":
+            {
+                var command = new BorderCommand(Sheet, range, top: null, right: null, bottom: border, left: null);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+            case "left":
+            {
+                var command = new BorderCommand(Sheet, range, top: null, right: null, bottom: null, left: border);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+            case "right":
+            {
+                var command = new BorderCommand(Sheet, range, top: null, right: border, bottom: null, left: null);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+            case "none":
+            {
+                var command = new NoBordersCommand(Sheet, range);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+        }
+    }
+}
