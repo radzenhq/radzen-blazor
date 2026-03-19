@@ -44,6 +44,37 @@
         sheet.Cells["F4"].Value = 5;
         sheet.Selection.Select(RangeRef.Parse("A1:B2"));
         sheet.Validation.Add(RangeRef.Parse("E1:E10"), new NumberValidator());
+
+        // Data validation: whole number between 1 and 100
+        sheet.Cells["H1"].Value = "Number (1-100)";
+        sheet.Validation.Add(RangeRef.Parse("H4:H10"), new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.Between,
+            Formula1 = "1",
+            Formula2 = "100",
+            Error = "Please enter a whole number between 1 and 100.",
+            ShowErrorMessage = true
+        });
+
+        // Data validation: list dropdown
+        sheet.Cells["I1"].Value = "Status";
+        sheet.Validation.Add(RangeRef.Parse("I4:I10"), new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "Yes,No,Maybe",
+            Error = "Please select from the list.",
+            ShowErrorMessage = true
+        });
+
+        // Put an invalid value in H4 to demonstrate error indicator
+        sheet.Cells["H4"].Value = 200;
+        sheet.Cells["H4"].Validate();
+
+        // Put a valid value in H5
+        sheet.Cells["H5"].Value = 50;
+        sheet.Cells["H5"].Validate();
+
         sheet.ConditionalFormats.Add(RangeRef.Parse("A1:F10"), new MyFormat());
         sheet.EndUpdate();
     }
