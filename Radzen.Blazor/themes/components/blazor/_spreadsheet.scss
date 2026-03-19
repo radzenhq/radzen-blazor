@@ -405,8 +405,6 @@
 }
 
 .rz-spreadsheet-cell-invalid {
-    position: relative;
-
     &::after {
         content: '';
         position: absolute;
