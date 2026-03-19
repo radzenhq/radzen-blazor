@@ -20,7 +20,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Barcode_Renders_SvgElement()
+        public void Barcode_Renders_SvgWithViewBox()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -30,7 +30,10 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Value, "TEST");
             });
 
-            Assert.Contains("<svg", component.Markup);
+            Assert.Contains("viewBox=", component.Markup);
+            Assert.Contains("shape-rendering=\"crispEdges\"", component.Markup);
+            Assert.Contains(@"width=""100%""", component.Markup);
+            Assert.Contains(@"height=""80px""", component.Markup);
         }
 
         [Fact]
@@ -138,7 +141,9 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Type, RadzenBarcodeType.Code39);
             });
 
-            Assert.Contains("<svg", component.Markup);
+            // Code39 renders bars as rect elements
+            Assert.Contains("<rect", component.Markup);
+            Assert.Contains("rz-barcode", component.Markup);
         }
     }
 }

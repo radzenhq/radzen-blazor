@@ -20,7 +20,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void QRCode_Renders_SvgElement()
+        public void QRCode_Renders_SvgWithModules()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -30,7 +30,10 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Value, "Hello");
             });
 
-            Assert.Contains("<svg", component.Markup);
+            // QR code renders rect elements for each module and has a viewBox
+            Assert.Contains("<rect", component.Markup);
+            Assert.Contains("viewBox=", component.Markup);
+            Assert.Contains(@"width=""100%""", component.Markup);
         }
 
         [Fact]
@@ -132,7 +135,9 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.ModuleShape, QRCodeModuleShape.Rounded);
             });
 
-            Assert.Contains("<svg", component.Markup);
+            // Rounded modules use rx attribute on rect elements for rounded corners
+            Assert.Contains("<rect", component.Markup);
+            Assert.Equal(QRCodeModuleShape.Rounded, component.Instance.ModuleShape);
         }
 
         [Fact]
@@ -147,7 +152,9 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.ModuleShape, QRCodeModuleShape.Circle);
             });
 
-            Assert.Contains("<svg", component.Markup);
+            // Circle modules use <circle> elements instead of <rect>
+            Assert.Contains("<circle", component.Markup);
+            Assert.Equal(QRCodeModuleShape.Circle, component.Instance.ModuleShape);
         }
 
         [Fact]

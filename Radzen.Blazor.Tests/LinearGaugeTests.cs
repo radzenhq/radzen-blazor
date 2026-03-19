@@ -27,7 +27,8 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
                 parameters.Add(p => p.Style, "width:300px;height:150px"));
 
-            Assert.Contains("<svg", component.Markup);
+            Assert.Contains("rz-linear-gauge", component.Markup);
+            Assert.Contains("width:300px;height:150px", component.Markup);
         }
 
         [Fact]

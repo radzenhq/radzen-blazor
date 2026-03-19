@@ -20,8 +20,9 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
             var component = ctx.RenderComponent<RadzenProgressBarCircular>();
 
-            Assert.Contains("<svg", component.Markup);
-            Assert.Contains("<circle", component.Markup);
+            Assert.Contains("rz-progressbar-circular-viewbox", component.Markup);
+            Assert.Contains("rz-progressbar-circular-background", component.Markup);
+            Assert.Contains("rz-progressbar-circular-value", component.Markup);
         }
 
         [Fact]
