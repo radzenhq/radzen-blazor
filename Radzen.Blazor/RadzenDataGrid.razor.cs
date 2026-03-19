@@ -730,7 +730,10 @@ namespace Radzen.Blazor
         /// <param name="column">The column.</param>
         protected virtual void OnFilterKeyPress(EventArgs args, RadzenDataGridColumn<TItem> column)
         {
-            Debounce(() => DebounceFilter(column), FilterDelay);
+            if (FilterAsYouType)
+            {
+                Debounce(() => DebounceFilter(column), FilterDelay);
+            }
         }
 
         async Task DebounceFilter(RadzenDataGridColumn<TItem> column)
@@ -1506,6 +1509,14 @@ namespace Radzen.Blazor
         /// <value>The filter delay.</value>
         [Parameter]
         public int FilterDelay { get; set; } = 500;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether filtering is performed as you type. Set to <c>true</c> by default.
+        /// When set to <c>false</c>, the filter is only applied when the user presses Enter or leaves the filter input.
+        /// </summary>
+        /// <value><c>true</c> if filtering as you type is enabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool FilterAsYouType { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the filter date format.
