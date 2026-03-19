@@ -16,8 +16,12 @@ public enum NumberFormatCategory
     Number,
     /// <summary>Currency formats (e.g. $#,##0.00).</summary>
     Currency,
+    /// <summary>Accounting formats (e.g. _($* #,##0.00_)).</summary>
+    Accounting,
     /// <summary>Percentage formats (e.g. 0%, 0.00%).</summary>
     Percentage,
+    /// <summary>Scientific formats (e.g. 0.00E+00).</summary>
+    Scientific,
     /// <summary>Date formats (e.g. mm/dd/yyyy).</summary>
     Date,
     /// <summary>Time formats (e.g. h:mm AM/PM).</summary>
@@ -54,6 +58,7 @@ public static class NumberFormatPresets
         [38] = "#,##0;[Red](#,##0)",
         [39] = "#,##0.00;(#,##0.00)",
         [40] = "#,##0.00;[Red](#,##0.00)",
+        [44] = "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)",
         [49] = "@"
     };
 
@@ -109,24 +114,33 @@ public static class NumberFormatPresets
             return NumberFormatCategory.Percentage;
         }
 
+        if (NumberFormat.IsDateFormat(formatCode))
+        {
+            var hasDate = formatCode.Contains('y', StringComparison.OrdinalIgnoreCase) ||
+                          formatCode.Contains('d', StringComparison.OrdinalIgnoreCase);
+
+            return hasDate ? NumberFormatCategory.Date : NumberFormatCategory.Time;
+        }
+
+        // Scientific: contains E+/E-/e+/e- pattern
+        for (var i = 0; i < formatCode.Length - 1; i++)
+        {
+            if (formatCode[i] is 'E' or 'e' && formatCode[i + 1] is '+' or '-')
+            {
+                return NumberFormatCategory.Scientific;
+            }
+        }
+
+        // Accounting: contains _( pattern (underscore followed by open paren)
+        if (formatCode.Contains("_(", StringComparison.Ordinal))
+        {
+            return NumberFormatCategory.Accounting;
+        }
+
         if (formatCode.Contains('$', StringComparison.Ordinal) || formatCode.Contains('\u20AC', StringComparison.Ordinal) ||
             formatCode.Contains('\u00A3', StringComparison.Ordinal) || formatCode.Contains('\u00A5', StringComparison.Ordinal))
         {
             return NumberFormatCategory.Currency;
-        }
-
-        if (NumberFormat.IsDateFormat(formatCode))
-        {
-            // Distinguish date from time
-            var hasDate = formatCode.Contains('y', StringComparison.OrdinalIgnoreCase) ||
-                          formatCode.Contains('d', StringComparison.OrdinalIgnoreCase);
-
-            if (!hasDate)
-            {
-                return NumberFormatCategory.Time;
-            }
-
-            return NumberFormatCategory.Date;
         }
 
         return NumberFormatCategory.Number;
@@ -152,10 +166,19 @@ public static class NumberFormatPresets
                 ("$#,##0", "$#,##0"),
                 ("$#,##0.00", "$#,##0.00")
             ],
+            NumberFormatCategory.Accounting =>
+            [
+                ("$ 0.00", "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)"),
+                ("$ 0", "_($* #,##0_);_($* (#,##0);_($* \"-\"_);_(@_)")
+            ],
             NumberFormatCategory.Percentage =>
             [
                 ("0%", "0%"),
                 ("0.00%", "0.00%")
+            ],
+            NumberFormatCategory.Scientific =>
+            [
+                ("0.00E+00", "0.00E+00")
             ],
             NumberFormatCategory.Date =>
             [

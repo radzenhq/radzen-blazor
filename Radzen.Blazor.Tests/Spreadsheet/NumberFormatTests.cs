@@ -261,4 +261,102 @@ public class NumberFormatTests
     {
         Assert.Equal("0.0", NumberFormat.AdjustDecimals(null, 1));
     }
+
+    // Scientific format tests
+
+    [Fact]
+    public void Format_Scientific_Basic()
+    {
+        Assert.Equal("1.23E+04", NumberFormat.Apply("0.00E+00", 12345.0, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Scientific_SmallNumber()
+    {
+        Assert.Equal("5.00E-04", NumberFormat.Apply("0.00E+00", 0.0005, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Scientific_Negative()
+    {
+        Assert.Equal("-1.23E+04", NumberFormat.Apply("0.00E+00", -12345.0, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Scientific_Zero()
+    {
+        Assert.Equal("0.00E+00", NumberFormat.Apply("0.00E+00", 0.0, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Scientific_OneDecimal()
+    {
+        Assert.Equal("1.2E+04", NumberFormat.Apply("0.0E+00", 12345.0, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Scientific_NoDecimals()
+    {
+        Assert.Equal("1E+04", NumberFormat.Apply("0E+00", 12345.0, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Scientific_MinimalExponent()
+    {
+        Assert.Equal("1.23E+4", NumberFormat.Apply("0.00E+0", 12345.0, CellDataType.Number));
+    }
+
+    // AdjustDecimals scientific tests
+
+    [Fact]
+    public void AdjustDecimals_Scientific()
+    {
+        Assert.Equal("0.000E+00", NumberFormat.AdjustDecimals("0.00E+00", 1));
+    }
+
+    [Fact]
+    public void AdjustDecimals_Scientific_Decrease()
+    {
+        Assert.Equal("0.0E+00", NumberFormat.AdjustDecimals("0.00E+00", -1));
+    }
+
+    // Underscore/Asterisk/QuestionMark tests
+
+    [Fact]
+    public void Format_Underscore_ProducesSpace()
+    {
+        Assert.Equal(" 5", NumberFormat.Apply("_)0", 5.0, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Asterisk_Ignored()
+    {
+        Assert.Equal("5", NumberFormat.Apply("*-0", 5.0, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_QuestionMark_PadsWithSpaces()
+    {
+        Assert.Equal("1.5 ", NumberFormat.Apply("0.??", 1.5, CellDataType.Number));
+    }
+
+    // Accounting format tests
+
+    [Fact]
+    public void Format_Accounting_Positive()
+    {
+        Assert.Equal(" $1,234.50 ", NumberFormat.Apply("_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)", 1234.5, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Accounting_Negative()
+    {
+        Assert.Equal(" $(1,234.50)", NumberFormat.Apply("_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)", -1234.5, CellDataType.Number));
+    }
+
+    [Fact]
+    public void Format_Accounting_Zero()
+    {
+        Assert.Equal(" $- ", NumberFormat.Apply("_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)", 0.0, CellDataType.Number));
+    }
 }
