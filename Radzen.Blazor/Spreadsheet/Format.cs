@@ -23,6 +23,7 @@ public class Format
 {
     private string? color;
     private string? background;
+    private string? numberFormat;
 
     /// <summary>
     /// Gets or sets whether the text in the format should be bold.
@@ -76,6 +77,22 @@ public class Format
             if (background != value)
             {
                 background = value;
+                Changed?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the number format code (e.g. "#,##0.00", "0%", "yyyy-mm-dd").
+    /// </summary>
+    public string? NumberFormat
+    {
+        get => numberFormat;
+        set
+        {
+            if (numberFormat != value)
+            {
+                numberFormat = value;
                 Changed?.Invoke();
             }
         }
@@ -201,6 +218,11 @@ public class Format
             merged.VerticalAlign = format.VerticalAlign;
         }
 
+        if (format.NumberFormat != null)
+        {
+            merged.NumberFormat = format.NumberFormat;
+        }
+
         return merged;
     }
 
@@ -275,6 +297,16 @@ public class Format
     }
 
     /// <summary>
+    /// This method is used to create a copy of the current format with a new number format code.
+    /// </summary>
+    public Format WithNumberFormat(string? numberFormat)
+    {
+        var clone = Clone();
+        clone.NumberFormat = numberFormat;
+        return clone;
+    }
+
+    /// <summary>
     /// Creates a new instance of the Format class that is a copy of the current instance.
     /// </summary>
     public Format Clone()
@@ -287,7 +319,8 @@ public class Format
             Italic = Italic,
             Underline = Underline,
             TextAlign = TextAlign,
-            VerticalAlign = VerticalAlign
+            VerticalAlign = VerticalAlign,
+            NumberFormat = NumberFormat
         };
     }
 }
