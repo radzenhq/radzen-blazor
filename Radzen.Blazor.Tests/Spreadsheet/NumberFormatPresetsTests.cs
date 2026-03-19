@@ -101,4 +101,28 @@ public class NumberFormatPresetsTests
     {
         Assert.Equal(NumberFormatCategory.Text, NumberFormatPresets.GetCategory("@"));
     }
+
+    [Fact]
+    public void GetCategory_Scientific()
+    {
+        Assert.Equal(NumberFormatCategory.Scientific, NumberFormatPresets.GetCategory("0.00E+00"));
+    }
+
+    [Fact]
+    public void GetCategory_Accounting()
+    {
+        Assert.Equal(NumberFormatCategory.Accounting, NumberFormatPresets.GetCategory("_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)"));
+    }
+
+    [Fact]
+    public void GetPresets_Scientific_ReturnsFormats()
+    {
+        Assert.NotEmpty(NumberFormatPresets.GetPresets(NumberFormatCategory.Scientific));
+    }
+
+    [Fact]
+    public void GetPresets_Accounting_ReturnsFormats()
+    {
+        Assert.NotEmpty(NumberFormatPresets.GetPresets(NumberFormatCategory.Accounting));
+    }
 }
