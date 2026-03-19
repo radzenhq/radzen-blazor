@@ -587,6 +587,411 @@ public class DataValidationTests
         Assert.Equal("Blue", items[2]);
     }
 
+    // Custom formula validation tests
+
+    [Fact]
+    public void Custom_FormulaGreaterThanZero_Valid()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = 5;
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>0" };
+        Assert.True(rule.Validate(sheet.Cells[0, 0]));
+    }
+
+    [Fact]
+    public void Custom_FormulaGreaterThanZero_Invalid()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = -1;
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>0" };
+        Assert.False(rule.Validate(sheet.Cells[0, 0]));
+    }
+
+    [Fact]
+    public void Custom_FormulaReturningNumber_Valid()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = 5;
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1" };
+        Assert.True(rule.Validate(sheet.Cells[0, 0])); // non-zero = valid
+    }
+
+    [Fact]
+    public void Custom_FormulaReturningNumber_Zero_Invalid()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = 0;
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1" };
+        Assert.False(rule.Validate(sheet.Cells[0, 0])); // zero = invalid
+    }
+
+    [Fact]
+    public void Custom_EmptyFormula_ReturnsTrue()
+    {
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "" };
+        Assert.True(rule.Validate(CreateCell(5)));
+    }
+
+    [Fact]
+    public void Custom_InvalidFormula_ReturnsFalse()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = 5;
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=NONEXISTENTFUNCTION()" };
+        Assert.False(rule.Validate(sheet.Cells[0, 0]));
+    }
+
+    // Error style tests for ValidationStore
+
+    [Fact]
+    public void GetErrorStyleForCell_Stop()
+    {
+        var store = new ValidationStore();
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 5));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "5",
+            ErrorStyle = DataValidationErrorStyle.Stop
+        };
+        store.Add(range, rule);
+
+        Assert.Equal(DataValidationErrorStyle.Stop, store.GetErrorStyleForCell(new CellRef(0, 0)));
+    }
+
+    [Fact]
+    public void GetErrorStyleForCell_Warning()
+    {
+        var store = new ValidationStore();
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 5));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "5",
+            ErrorStyle = DataValidationErrorStyle.Warning
+        };
+        store.Add(range, rule);
+
+        Assert.Equal(DataValidationErrorStyle.Warning, store.GetErrorStyleForCell(new CellRef(0, 0)));
+    }
+
+    [Fact]
+    public void GetErrorStyleForCell_Information()
+    {
+        var store = new ValidationStore();
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 5));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "5",
+            ErrorStyle = DataValidationErrorStyle.Information
+        };
+        store.Add(range, rule);
+
+        Assert.Equal(DataValidationErrorStyle.Information, store.GetErrorStyleForCell(new CellRef(0, 0)));
+    }
+
+    [Fact]
+    public void GetErrorStyleForCell_MixedStyles_StrictestWins()
+    {
+        var store = new ValidationStore();
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 5));
+        var infoRule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "5",
+            ErrorStyle = DataValidationErrorStyle.Information
+        };
+        var warningRule = new DataValidationRule
+        {
+            Type = DataValidationType.Decimal,
+            Operator = DataValidationOperator.LessThan,
+            Formula1 = "100",
+            ErrorStyle = DataValidationErrorStyle.Warning
+        };
+        store.Add(range, infoRule);
+        store.Add(range, warningRule);
+
+        Assert.Equal(DataValidationErrorStyle.Warning, store.GetErrorStyleForCell(new CellRef(0, 0)));
+    }
+
+    [Fact]
+    public void GetErrorStyleForCell_PlainValidator_DefaultsToStop()
+    {
+        var store = new ValidationStore();
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 5));
+        store.Add(range, new NumberValidator());
+
+        Assert.Equal(DataValidationErrorStyle.Stop, store.GetErrorStyleForCell(new CellRef(0, 0)));
+    }
+
+    [Fact]
+    public void ShowInputMessage_FoundViaGetValidatorsForCell()
+    {
+        var sheet = new Sheet(40, 40);
+        var range = RangeRef.Parse("J4:J10");
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "0",
+            ShowInputMessage = true,
+            PromptTitle = "Test Title",
+            Prompt = "Test Prompt"
+        };
+        sheet.Validation.Add(range, rule);
+
+        // J4 = CellRef(3, 9)
+        var validators = sheet.Validation.GetValidatorsForCell(new CellRef(3, 9));
+        Assert.Single(validators);
+        var found = Assert.IsType<DataValidationRule>(validators[0]);
+        Assert.True(found.ShowInputMessage);
+        Assert.Equal("Test Title", found.PromptTitle);
+        Assert.Equal("Test Prompt", found.Prompt);
+    }
+
+    // Custom formula with cross-cell reference
+
+    [Fact]
+    public void Custom_FormulaCrossCell_Valid()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = 100; // A1
+        sheet.Cells[0, 1].Value = 50;  // B1
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>B1" };
+        Assert.True(rule.Validate(sheet.Cells[0, 0])); // 100 > 50 = true
+    }
+
+    [Fact]
+    public void Custom_FormulaCrossCell_Invalid()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = 10;  // A1
+        sheet.Cells[0, 1].Value = 50;  // B1
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>B1" };
+        Assert.False(rule.Validate(sheet.Cells[0, 0])); // 10 > 50 = false
+    }
+
+    [Fact]
+    public void Custom_AllowBlank_True()
+    {
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>0", AllowBlank = true };
+        Assert.True(rule.Validate(CreateCell(null)));
+    }
+
+    [Fact]
+    public void Custom_AllowBlank_False()
+    {
+        var sheet = new Sheet(10, 10);
+        // Cell with no value and AllowBlank = false
+        var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>0", AllowBlank = false };
+        Assert.False(rule.Validate(sheet.Cells[0, 0]));
+    }
+
+    // ClearValidationErrors
+
+    [Fact]
+    public void ClearValidationErrors_RemovesErrors()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = 3;
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
+        sheet.Validation.Add(range, new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "5"
+        });
+        sheet.Cells[0, 0].Validate();
+        Assert.True(sheet.Cells[0, 0].HasValidationErrors);
+
+        sheet.Cells[0, 0].ClearValidationErrors();
+        Assert.False(sheet.Cells[0, 0].HasValidationErrors);
+    }
+
+    // XLSX round-trip for Custom type
+
+    [Fact]
+    public void Xlsx_RoundTrip_Custom()
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 0));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.Custom,
+            Formula1 = "=A1>0"
+        };
+        sheet.Validation.Add(range, rule);
+
+        var loaded = SaveAndLoad(workbook);
+        var loadedSheet = loaded.Sheets[0];
+
+        var validators = loadedSheet.Validation.GetValidators(range);
+        Assert.Single(validators);
+        var loadedRule = Assert.IsType<DataValidationRule>(validators[0]);
+        Assert.Equal(DataValidationType.Custom, loadedRule.Type);
+        Assert.Equal("=A1>0", loadedRule.Formula1);
+    }
+
+    // XLSX round-trip preserves input prompt fields
+
+    [Fact]
+    public void Xlsx_RoundTrip_InputPromptFields()
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 0));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "0",
+            ShowInputMessage = true,
+            PromptTitle = "Enter a number",
+            Prompt = "Please enter a positive number"
+        };
+        sheet.Validation.Add(range, rule);
+
+        var loaded = SaveAndLoad(workbook);
+        var loadedSheet = loaded.Sheets[0];
+
+        var validators = loadedSheet.Validation.GetValidators(range);
+        var loadedRule = Assert.IsType<DataValidationRule>(validators[0]);
+        Assert.True(loadedRule.ShowInputMessage);
+        Assert.Equal("Enter a number", loadedRule.PromptTitle);
+        Assert.Equal("Please enter a positive number", loadedRule.Prompt);
+    }
+
+    // Custom formula relative reference tests
+
+    [Fact]
+    public void Custom_RelativeRef_ShiftsPerCell()
+    {
+        var sheet = new Sheet(10, 15);
+        // H4 = 200, H5 = 50
+        sheet.Cells[3, 7].Value = 200;  // H4
+        sheet.Cells[4, 7].Value = 50;   // H5
+        sheet.Cells[3, 11].Value = 100; // L4
+        sheet.Cells[4, 11].Value = 100; // L5
+
+        var range = RangeRef.Parse("L4:L10");
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.Custom,
+            Formula1 = "=L4>H4"
+        };
+        sheet.Validation.Add(range, rule);
+
+        // L4: =L4>H4 → 100>200 = false
+        sheet.Cells[3, 11].Validate();
+        Assert.True(sheet.Cells[3, 11].HasValidationErrors);
+
+        // L5: =L5>H5 → 100>50 = true (formula shifts!)
+        sheet.Cells[4, 11].Validate();
+        Assert.False(sheet.Cells[4, 11].HasValidationErrors);
+    }
+
+    [Fact]
+    public void Custom_AbsoluteRef_DoesNotShift()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = 100;  // A1
+        sheet.Cells[0, 1].Value = 50;   // B1 (threshold)
+        sheet.Cells[1, 0].Value = 30;   // A2
+
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 0));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.Custom,
+            Formula1 = "=A1>$B$1"  // B1 is absolute
+        };
+        sheet.Validation.Add(range, rule);
+
+        // A1: =A1>$B$1 → 100>50 = true
+        Assert.True(rule.Validate(sheet.Cells[0, 0], range.Start));
+
+        // A2: =A2>$B$1 → 30>50 = false (A shifts, $B$1 stays)
+        Assert.False(rule.Validate(sheet.Cells[1, 0], range.Start));
+    }
+
+    // List from cell range tests
+
+    [Fact]
+    public void List_FromCellRange_Valid()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = "Red";
+        sheet.Cells[1, 0].Value = "Green";
+        sheet.Cells[2, 0].Value = "Blue";
+
+        var range = new RangeRef(new CellRef(0, 1), new CellRef(5, 1));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "=$A$1:$A$3"
+        };
+        sheet.Validation.Add(range, rule);
+
+        sheet.Cells[0, 1].Value = "Red";
+        Assert.True(rule.Validate(sheet.Cells[0, 1]));
+
+        sheet.Cells[1, 1].Value = "Yellow";
+        Assert.False(rule.Validate(sheet.Cells[1, 1]));
+    }
+
+    [Fact]
+    public void List_GetListItems_FromCellRange()
+    {
+        var sheet = new Sheet(10, 10);
+        sheet.Cells[0, 0].Value = "Apple";
+        sheet.Cells[1, 0].Value = "Banana";
+        sheet.Cells[2, 0].Value = "Cherry";
+
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "=$A$1:$A$3"
+        };
+
+        var items = rule.GetListItems(sheet);
+        Assert.Equal(3, items.Count);
+        Assert.Equal("Apple", items[0]);
+        Assert.Equal("Banana", items[1]);
+        Assert.Equal("Cherry", items[2]);
+    }
+
+    [Fact]
+    public void List_GetListItems_CommaSeparated_Unchanged()
+    {
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "Yes,No,Maybe"
+        };
+
+        var items = rule.GetListItems(null);
+        Assert.Equal(3, items.Count);
+        Assert.Equal("Yes", items[0]);
+    }
+
+    [Fact]
+    public void List_ListItems_ReturnsEmpty_ForRangeFormula()
+    {
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "=$A$1:$A$3"
+        };
+
+        // ListItems property returns empty for range formulas (no sheet context)
+        Assert.Empty(rule.ListItems);
+    }
+
     private static Workbook SaveAndLoad(Workbook workbook)
     {
         using var stream = new System.IO.MemoryStream();

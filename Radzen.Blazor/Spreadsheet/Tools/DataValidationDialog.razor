@@ -5,14 +5,20 @@
         <RadzenDropDown @bind-Value=@ValidationType Data=@ValidationTypes TextProperty="Name" ValueProperty="Value" Style="width: 100%" Change=@OnTypeChanged />
     </RadzenFormField>
 
-    @if (ValidationType != "list")
+    @if (ValidationType != "list" && ValidationType != "custom")
     {
         <RadzenFormField Text="Operator">
             <RadzenDropDown @bind-Value=@Operator Data=@Operators TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
         </RadzenFormField>
     }
 
-    @if (ValidationType == "list")
+    @if (ValidationType == "custom")
+    {
+        <RadzenFormField Text="Formula">
+            <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
+        </RadzenFormField>
+    }
+    else if (ValidationType == "list")
     {
         <RadzenFormField Text="Values (comma separated)">
             <RadzenTextArea @bind-Value=@Formula1 Rows="3" Style="width: 100%" />
@@ -20,18 +26,54 @@
     }
     else if (Operator == "between" || Operator == "notBetween")
     {
-        <RadzenFormField Text="Minimum">
-            <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
-        </RadzenFormField>
-        <RadzenFormField Text="Maximum">
-            <RadzenTextBox @bind-Value=@Formula2 Style="width: 100%" />
-        </RadzenFormField>
+        @if (ValidationType == "date")
+        {
+            <RadzenFormField Text="Minimum">
+                <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
+            </RadzenFormField>
+            <RadzenFormField Text="Maximum">
+                <RadzenDatePicker @bind-Value=@Formula2Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
+            </RadzenFormField>
+        }
+        else if (ValidationType == "time")
+        {
+            <RadzenFormField Text="Minimum">
+                <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
+            </RadzenFormField>
+            <RadzenFormField Text="Maximum">
+                <RadzenDatePicker @bind-Value=@Formula2Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
+            </RadzenFormField>
+        }
+        else
+        {
+            <RadzenFormField Text="Minimum">
+                <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
+            </RadzenFormField>
+            <RadzenFormField Text="Maximum">
+                <RadzenTextBox @bind-Value=@Formula2 Style="width: 100%" />
+            </RadzenFormField>
+        }
     }
     else
     {
-        <RadzenFormField Text="Value">
-            <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
-        </RadzenFormField>
+        @if (ValidationType == "date")
+        {
+            <RadzenFormField Text="Value">
+                <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
+            </RadzenFormField>
+        }
+        else if (ValidationType == "time")
+        {
+            <RadzenFormField Text="Value">
+                <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
+            </RadzenFormField>
+        }
+        else
+        {
+            <RadzenFormField Text="Value">
+                <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
+            </RadzenFormField>
+        }
     }
 
     <RadzenCheckBox @bind-Value=@AllowBlank TValue="bool" />
@@ -39,11 +81,29 @@
 
     <RadzenFieldset Text="Error Alert">
         <RadzenStack Gap="0.5rem">
+            <RadzenFormField Text="Style">
+                <RadzenDropDown @bind-Value=@ErrorStyle Data=@ErrorStyles TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
+            </RadzenFormField>
             <RadzenFormField Text="Title">
                 <RadzenTextBox @bind-Value=@ErrorTitle Style="width: 100%" />
             </RadzenFormField>
             <RadzenFormField Text="Message">
                 <RadzenTextArea @bind-Value=@ErrorMessage Rows="2" Style="width: 100%" />
+            </RadzenFormField>
+        </RadzenStack>
+    </RadzenFieldset>
+
+    <RadzenFieldset Text="Input Prompt">
+        <RadzenStack Gap="0.5rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                <RadzenCheckBox @bind-Value=@ShowInputMessage TValue="bool" />
+                <RadzenLabel Text="Show input message when cell is selected" />
+            </RadzenStack>
+            <RadzenFormField Text="Title">
+                <RadzenTextBox @bind-Value=@PromptTitle Style="width: 100%" />
+            </RadzenFormField>
+            <RadzenFormField Text="Message">
+                <RadzenTextArea @bind-Value=@PromptMessage Rows="2" Style="width: 100%" />
             </RadzenFormField>
         </RadzenStack>
     </RadzenFieldset>
@@ -64,8 +124,14 @@
     private string Formula1 { get; set; } = "";
     private string Formula2 { get; set; } = "";
     private bool AllowBlank { get; set; } = true;
+    private string ErrorStyle { get; set; } = "stop";
     private string ErrorTitle { get; set; } = "";
     private string ErrorMessage { get; set; } = "The value you entered is not valid.";
+    private bool ShowInputMessage { get; set; }
+    private string PromptTitle { get; set; } = "";
+    private string PromptMessage { get; set; } = "";
+    private DateTime? Formula1Date { get; set; }
+    private DateTime? Formula2Date { get; set; }
 
     private static readonly List<OptionItem> ValidationTypes =
     [
@@ -74,7 +140,8 @@
         new("List", "list"),
         new("Date", "date"),
         new("Time", "time"),
-        new("Text Length", "textLength")
+        new("Text Length", "textLength"),
+        new("Custom", "custom")
     ];
 
     private static readonly List<OptionItem> AllOperators =
@@ -87,6 +154,13 @@
         new("Less Than", "lessThan"),
         new("Greater Than or Equal", "greaterThanOrEqual"),
         new("Less Than or Equal", "lessThanOrEqual")
+    ];
+
+    private static readonly List<OptionItem> ErrorStyles =
+    [
+        new("Stop", "stop"),
+        new("Warning", "warning"),
+        new("Information", "information")
     ];
 
     private List<OptionItem> Operators => AllOperators;
@@ -109,6 +183,7 @@
             "date" => DataValidationType.Date,
             "time" => DataValidationType.Time,
             "textLength" => DataValidationType.TextLength,
+            "custom" => DataValidationType.Custom,
             _ => DataValidationType.WholeNumber
         };
 
@@ -125,16 +200,53 @@
             _ => DataValidationOperator.Between
         };
 
+        var errorStyle = ErrorStyle switch
+        {
+            "warning" => DataValidationErrorStyle.Warning,
+            "information" => DataValidationErrorStyle.Information,
+            _ => DataValidationErrorStyle.Stop
+        };
+
+        var formula1 = Formula1;
+        var formula2 = Formula2;
+
+        if (ValidationType == "date")
+        {
+            if (Formula1Date.HasValue)
+            {
+                formula1 = Formula1Date.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            }
+            if (Formula2Date.HasValue)
+            {
+                formula2 = Formula2Date.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+        else if (ValidationType == "time")
+        {
+            if (Formula1Date.HasValue)
+            {
+                formula1 = (Formula1Date.Value.TimeOfDay.TotalDays).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+            if (Formula2Date.HasValue)
+            {
+                formula2 = (Formula2Date.Value.TimeOfDay.TotalDays).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+        }
+
         var rule = new DataValidationRule
         {
             Type = type,
             Operator = op,
-            Formula1 = Formula1,
-            Formula2 = Formula2,
+            Formula1 = formula1,
+            Formula2 = formula2,
             AllowBlank = AllowBlank,
+            ErrorStyle = errorStyle,
             ErrorTitle = string.IsNullOrEmpty(ErrorTitle) ? null : ErrorTitle,
             Error = string.IsNullOrEmpty(ErrorMessage) ? "The value you entered is not valid." : ErrorMessage,
-            ShowErrorMessage = true
+            ShowErrorMessage = true,
+            ShowInputMessage = ShowInputMessage,
+            PromptTitle = string.IsNullOrEmpty(PromptTitle) ? null : PromptTitle,
+            Prompt = string.IsNullOrEmpty(PromptMessage) ? null : PromptMessage
         };
 
         DialogService.Close(rule);

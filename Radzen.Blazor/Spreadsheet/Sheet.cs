@@ -419,7 +419,7 @@ public partial class Sheet
     }
 
 
-    private static string AdjustFormulaForCopy(string formula, int rowDelta, int colDelta)
+    internal static string AdjustFormulaForCopy(string formula, int rowDelta, int colDelta)
     {
         // Expect formula starts with '='; lexer scans tokens including '=' and cells
         var tokens = FormulaLexer.Scan(formula, false);

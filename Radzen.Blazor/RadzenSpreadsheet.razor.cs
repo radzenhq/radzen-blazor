@@ -60,11 +60,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private VirtualGrid? grid;
     private Popup? cellMenuPopup;
     private Popup? validationListPopup;
+    private bool inputPromptVisible;
     private int cellMenuRow = -1;
     private int cellMenuColumn = -1;
     private int validationListRow = -1;
     private int validationListColumn = -1;
     private IReadOnlyList<string> validationListItems = [];
+    private string? inputPromptTitle;
+    private string? inputPromptMessage;
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -104,7 +107,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 {
                     validationListRow = args.Row;
                     validationListColumn = args.Column;
-                    validationListItems = rule.ListItems;
+                    validationListItems = rule.GetListItems(Sheet);
                     if (validationListPopup != null)
                     {
                         await validationListPopup.ToggleAsync(args.Element);
@@ -134,6 +137,36 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (validationListPopup != null)
         {
             await validationListPopup.CloseAsync();
+        }
+    }
+
+    private void ShowInputPrompt(CellRef address)
+    {
+        var wasVisible = inputPromptVisible;
+
+        inputPromptVisible = false;
+        inputPromptTitle = null;
+        inputPromptMessage = null;
+
+        if (Sheet != null)
+        {
+            var validators = Sheet.Validation.GetValidatorsForCell(address);
+
+            foreach (var v in validators)
+            {
+                if (v is Spreadsheet.DataValidationRule rule && rule.ShowInputMessage)
+                {
+                    inputPromptTitle = rule.PromptTitle;
+                    inputPromptMessage = rule.Prompt;
+                    inputPromptVisible = true;
+                    break;
+                }
+            }
+        }
+
+        if (inputPromptVisible != wasVisible || inputPromptVisible)
+        {
+            StateHasChanged();
         }
     }
 
@@ -312,7 +345,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Sheet is not null)
         {
             var address = Sheet.Selection.Move(rowOffset, columnOffset);
-
+            ShowInputPrompt(address);
             await ScrollToAsync(address);
         }
     }
@@ -344,14 +377,40 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 if (!valid && Sheet.Editor.Cell is not null)
                 {
                     var error = string.Join(Environment.NewLine, Sheet.Editor.Cell.ValidationErrors);
+                    var errorStyle = Sheet.Validation.GetErrorStyleForCell(Sheet.Editor.Cell.Address);
 
-                    await DialogService.Alert(error, "Invalid Value");
+                    switch (errorStyle)
+                    {
+                        case Spreadsheet.DataValidationErrorStyle.Information:
+                            await DialogService.Alert(error, "Information");
+                            // Accept the value despite validation failure
+                            Sheet.Editor.Cell.ClearValidationErrors();
+                            break;
 
-                    command.Unexecute();
+                        case Spreadsheet.DataValidationErrorStyle.Warning:
+                            var confirmed = await DialogService.Confirm(
+                                error + Environment.NewLine + Environment.NewLine + "Do you want to continue?",
+                                "Warning");
 
-                    Sheet.Editor.Cancel();
+                            if (confirmed == true)
+                            {
+                                Sheet.Editor.Cell.ClearValidationErrors();
+                            }
+                            else
+                            {
+                                command.Unexecute();
+                                Sheet.Editor.Cancel();
+                                result = false;
+                            }
+                            break;
 
-                    result = false;
+                        default: // Stop
+                            await DialogService.Alert(error, "Invalid Value");
+                            command.Unexecute();
+                            Sheet.Editor.Cancel();
+                            result = false;
+                            break;
+                    }
                 }
                 else
                 {
@@ -378,6 +437,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 var address = Sheet.Selection.Cycle(rowOffset, columnOffset);
 
                 await ScrollToAsync(address);
+                ShowInputPrompt(address);
             }
         }
     }
@@ -760,6 +820,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             }
 
+            ShowInputPrompt(address);
+
             if (grid is not null)
             {
                 var capture = new PointerCapture
@@ -985,6 +1047,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 await ScrollToAsync(address);
 
+                inputPromptVisible = false;
+
                 Sheet.Editor.StartEdit(address, cell.GetValue());
             }
         }
@@ -1051,6 +1115,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (char.IsLetterOrDigit(ch) || char.IsPunctuation(ch) || char.IsSymbol(ch) || char.IsSeparator(ch))
         {
+            inputPromptVisible = false;
             Sheet?.Editor.StartEdit(Sheet.Selection.Cell, ch.ToString());
         }
     }

@@ -225,6 +225,14 @@ public class Cell
     /// </summary>
     public IReadOnlyList<string> ValidationErrors { get; private set; } = [];
 
+    /// <summary>
+    /// Clears the validation errors for the cell.
+    /// </summary>
+    public void ClearValidationErrors()
+    {
+        ValidationErrors = [];
+    }
+
     internal Cell(Sheet sheet, CellRef address)
     {
         Address = address;
