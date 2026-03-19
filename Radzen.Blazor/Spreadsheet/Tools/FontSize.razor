@@ -1,0 +1,71 @@
+@using Radzen.Blazor.Spreadsheet
+@implements IDisposable
+
+<RadzenDropDown @bind-Value=@CurrentFontSize Data=@FontSizes
+    Disabled=@IsDisabled Style="width: 65px" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private static readonly List<double> FontSizes =
+    [
+        8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 36, 48, 72
+    ];
+
+    private double CurrentFontSize
+    {
+        get
+        {
+            if (Sheet?.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.FontSize ?? 11;
+            }
+            return 11;
+        }
+        set
+        {
+            if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+            {
+                if (Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+                {
+                    double? fontSize = value == 11 ? null : value;
+                    var command = new FormatCommand(Sheet, Sheet.Selection.Range, cell.Format.WithFontSize(fontSize));
+                    Sheet.Commands.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+}
