@@ -4758,6 +4758,13 @@ class Spreadsheet {
       e.preventDefault();
     }
 
+    // Prevent default for printable characters when not already editing.
+    // Without this, the character gets inserted twice: once by StartEdit and
+    // once by the browser's default insertText when the editor receives focus.
+    if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1 && e.target === this.element) {
+      e.preventDefault();
+    }
+
     this.invokeAsync('OnKeyDownAsync', e);
   }
 
