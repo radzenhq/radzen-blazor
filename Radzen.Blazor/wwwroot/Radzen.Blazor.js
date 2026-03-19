@@ -2938,6 +2938,7 @@ window.Radzen = {
     document.execCommand('styleWithCSS', false, true);
   },
   saveSelection: function (ref) {
+    if (!ref) return;
     if (document.activeElement == ref) {
       var selection = getSelection();
       if (selection.rangeCount > 0) {
@@ -2946,6 +2947,7 @@ window.Radzen = {
     }
   },
   restoreSelection: function (ref) {
+    if (!ref) return;
     var range = ref.range;
     if (range) {
       delete ref.range;
