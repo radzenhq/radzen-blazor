@@ -85,6 +85,7 @@ public partial class CellView : CellBase, IDisposable
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
                                      .Add("rz-spreadsheet-frozen-column", FrozenState.HasFlag(FrozenState.Column))
                                      .Add($"rz-spreadsheet-cell-{cell.ValueType.ToString().ToLowerInvariant()}", cell != null)
+                                     .Add("rz-spreadsheet-cell-invalid", cell?.HasValidationErrors == true)
                                      .ToString();
 
     private Cell cell = default!;
@@ -96,6 +97,31 @@ public partial class CellView : CellBase, IDisposable
         var (formatted, color) = NumberFormat.ApplyWithColor(cell.Format?.NumberFormat, cell.Value, cell.ValueType);
         numberFormatColor = color;
         return formatted ?? cell.Value?.ToString();
+    }
+
+    private string? GetValidationTooltip()
+    {
+        if (cell?.HasValidationErrors != true)
+        {
+            return null;
+        }
+
+        return string.Join("\n", cell.ValidationErrors);
+    }
+
+    private bool HasListValidation()
+    {
+        if (Sheet == null) return false;
+
+        var validators = Sheet.Validation.GetValidatorsForCell(new CellRef(Row, Column));
+        foreach (var v in validators)
+        {
+            if (v is DataValidationRule rule && rule.Type == DataValidationType.List)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private bool ShouldShowCellMenu()
@@ -124,6 +150,11 @@ public partial class CellView : CellBase, IDisposable
                     return ShouldShowMenuForMergedCell();
                 }
             }
+        }
+
+        if (HasListValidation())
+        {
+            return true;
         }
 
         return false;
