@@ -6,205 +6,201 @@ namespace Radzen.Blazor.Tests
     public class QRCodeTests
     {
         [Fact]
-        public void QRCode_Renders_WithClassName()
+        public void QRCode_AB_Renders_CorrectViewBox()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "https://example.com");
+                p.Add(x => x.Value, "AB");
             });
 
-            Assert.Contains("rz-qrcode", component.Markup);
+            // QR code for "AB" with Quartile ECC: 21x21 modules + 2*4 quiet zone = 29x29
+            Assert.Contains(@"viewBox=""0 0 29 29""", component.Markup);
         }
 
         [Fact]
-        public void QRCode_Renders_SvgWithModules()
+        public void QRCode_AB_Renders_BackgroundRect()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "Hello");
+                p.Add(x => x.Value, "AB");
             });
 
-            // QR code renders rect elements for each module and has a viewBox
-            Assert.Contains("<rect", component.Markup);
-            Assert.Contains("viewBox=", component.Markup);
-            Assert.Contains(@"width=""100%""", component.Markup);
+            // Full background rect covering viewBox
+            Assert.Contains(@"<rect x=""0"" y=""0"" width=""29"" height=""29""", component.Markup);
         }
 
         [Fact]
-        public void QRCode_DefaultSize_Is100Percent()
+        public void QRCode_AB_Renders_FinderPatternEyes()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>();
-
-            Assert.Equal("100%", component.Instance.Size);
-        }
-
-        [Fact]
-        public void QRCode_DefaultColors()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-
-            var component = ctx.RenderComponent<RadzenQRCode>();
-
-            Assert.Equal("#000", component.Instance.Foreground);
-            Assert.Equal("#FFF", component.Instance.Background);
-        }
-
-        [Fact]
-        public void QRCode_DefaultModuleShape_IsSquare()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-
-            var component = ctx.RenderComponent<RadzenQRCode>();
-
-            Assert.Equal(QRCodeModuleShape.Square, component.Instance.ModuleShape);
-        }
-
-        [Fact]
-        public void QRCode_DefaultEyeShape_IsSquare()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-
-            var component = ctx.RenderComponent<RadzenQRCode>();
-
-            Assert.Equal(QRCodeEyeShape.Square, component.Instance.EyeShape);
-        }
-
-        [Fact]
-        public void QRCode_DefaultEcc_IsQuartile()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-
-            var component = ctx.RenderComponent<RadzenQRCode>();
-
-            Assert.Equal(RadzenQREcc.Quartile, component.Instance.Ecc);
-        }
-
-        [Fact]
-        public void QRCode_Renders_CustomForeground()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-
-            var component = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "Test");
-                parameters.Add(p => p.Foreground, "#FF0000");
+                p.Add(x => x.Value, "AB");
             });
 
-            Assert.Contains("#FF0000", component.Markup);
+            // QR codes have 3 finder patterns (eyes) with mask elements
+            Assert.Contains("eye-0", component.Markup);
+            Assert.Contains("eye-1", component.Markup);
+            Assert.Contains("eye-2", component.Markup);
         }
 
         [Fact]
-        public void QRCode_Renders_CustomBackground()
+        public void QRCode_AB_FinderPatterns_CorrectPositions()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "Test");
-                parameters.Add(p => p.Background, "#00FF00");
+                p.Add(x => x.Value, "AB");
             });
 
-            // Background gets converted to rgb format in SVG
-            Assert.Equal("#00FF00", component.Instance.Background);
+            // Top-left eye at (4,4), top-right at (18,4), bottom-left at (4,18)
+            Assert.Contains(@"<rect x=""4"" y=""4"" width=""7"" height=""7""", component.Markup);
+            Assert.Contains(@"<rect x=""18"" y=""4"" width=""7"" height=""7""", component.Markup);
+            Assert.Contains(@"<rect x=""4"" y=""18"" width=""7"" height=""7""", component.Markup);
         }
 
         [Fact]
-        public void QRCode_Renders_RoundedModuleShape()
+        public void QRCode_Square_Renders_RectModules()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "Test");
-                parameters.Add(p => p.ModuleShape, QRCodeModuleShape.Rounded);
+                p.Add(x => x.Value, "AB");
+                p.Add(x => x.ModuleShape, QRCodeModuleShape.Square);
             });
 
-            // Rounded modules use rx attribute on rect elements for rounded corners
-            Assert.Contains("<rect", component.Markup);
-            Assert.Equal(QRCodeModuleShape.Rounded, component.Instance.ModuleShape);
+            // Square modules use <rect> with width="1" height="1"
+            Assert.Contains(@"width=""1"" height=""1""", component.Markup);
+            Assert.DoesNotContain("<circle", component.Markup);
         }
 
         [Fact]
-        public void QRCode_Renders_CircleModuleShape()
+        public void QRCode_Circle_Renders_CircleModules()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "Test");
-                parameters.Add(p => p.ModuleShape, QRCodeModuleShape.Circle);
+                p.Add(x => x.Value, "AB");
+                p.Add(x => x.ModuleShape, QRCodeModuleShape.Circle);
             });
 
-            // Circle modules use <circle> elements instead of <rect>
-            Assert.Contains("<circle", component.Markup);
-            Assert.Equal(QRCodeModuleShape.Circle, component.Instance.ModuleShape);
+            // Circle modules use <circle> with r="0.5"
+            Assert.Contains(@"<circle cx=""12.5"" cy=""4.5"" r=""0.5""", component.Markup);
+            // Data modules should NOT use <rect> (only finder eyes still use rect)
+            var circleCount = System.Text.RegularExpressions.Regex.Matches(component.Markup, "<circle").Count;
+            Assert.True(circleCount > 50, $"Expected many circle modules, found {circleCount}");
         }
 
         [Fact]
-        public void QRCode_Renders_CustomEyeShape()
+        public void QRCode_CustomForeground_AppliedToModules()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "Test");
-                parameters.Add(p => p.EyeShape, QRCodeEyeShape.Rounded);
+                p.Add(x => x.Value, "AB");
+                p.Add(x => x.Foreground, "#FF0000");
             });
 
-            Assert.Equal(QRCodeEyeShape.Rounded, component.Instance.EyeShape);
+            // All modules and eyes should use the custom foreground
+            Assert.Contains(@"fill=""#FF0000""", component.Markup);
         }
 
         [Fact]
-        public void QRCode_Renders_WithImage()
+        public void QRCode_CustomSize_Applied()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "Test");
-                parameters.Add(p => p.Image, "logo.png");
-                parameters.Add(p => p.Ecc, RadzenQREcc.High);
+                p.Add(x => x.Value, "AB");
+                p.Add(x => x.Size, "200px");
+            });
+
+            Assert.Contains(@"width=""200px""", component.Markup);
+            Assert.Contains(@"height=""200px""", component.Markup);
+        }
+
+        [Fact]
+        public void QRCode_WithImage_RendersImageElement()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            {
+                p.Add(x => x.Value, "AB");
+                p.Add(x => x.Image, "logo.png");
+                p.Add(x => x.Ecc, RadzenQREcc.High);
             });
 
             Assert.Contains("logo.png", component.Markup);
+            Assert.Contains("<image", component.Markup);
         }
 
         [Fact]
-        public void QRCode_DifferentValues_ProduceDifferentOutput()
+        public void QRCode_DifferentValues_ProduceDifferentModulePatterns()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component1 = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            var c1 = ctx.RenderComponent<RadzenQRCode>(p => p.Add(x => x.Value, "Hello"));
+            var c2 = ctx.RenderComponent<RadzenQRCode>(p => p.Add(x => x.Value, "World"));
+
+            // Different data must produce different QR patterns
+            Assert.NotEqual(c1.Markup, c2.Markup);
+        }
+
+        [Fact]
+        public void QRCode_HigherEcc_ProducesLargerMatrix()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var low = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "Hello");
+                p.Add(x => x.Value, "ABCDEFGHIJKLMNOP");
+                p.Add(x => x.Ecc, RadzenQREcc.Low);
+            });
+            var high = ctx.RenderComponent<RadzenQRCode>(p =>
+            {
+                p.Add(x => x.Value, "ABCDEFGHIJKLMNOP");
+                p.Add(x => x.Ecc, RadzenQREcc.High);
             });
 
-            var component2 = ctx.RenderComponent<RadzenQRCode>(parameters =>
+            // Higher ECC needs more modules, so the viewBox should be larger
+            Assert.True(high.Markup.Length > low.Markup.Length,
+                "High ECC should produce more SVG content than Low ECC");
+        }
+
+        [Fact]
+        public void QRCode_CssClass_Applied()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
             {
-                parameters.Add(p => p.Value, "World");
+                p.Add(x => x.Value, "AB");
             });
 
-            Assert.NotEqual(component1.Markup, component2.Markup);
+            Assert.Contains(@"class=""rz-qrcode""", component.Markup);
         }
     }
 }

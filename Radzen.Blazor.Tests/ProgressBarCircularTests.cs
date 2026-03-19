@@ -15,14 +15,56 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ProgressBarCircular_Renders_SvgElement()
+        public void ProgressBarCircular_Renders_SvgCirclesWithCorrectRadius()
         {
             using var ctx = new TestContext();
             var component = ctx.RenderComponent<RadzenProgressBarCircular>();
 
-            Assert.Contains("rz-progressbar-circular-viewbox", component.Markup);
-            Assert.Contains("rz-progressbar-circular-background", component.Markup);
-            Assert.Contains("rz-progressbar-circular-value", component.Markup);
+            // SVG contains viewBox, background circle, and value circle with correct radius
+            Assert.Contains(@"viewBox=""-19 -19 38 38""", component.Markup);
+            Assert.Contains(@"class=""rz-progressbar-circular-background"" r=""15.91549""", component.Markup);
+            Assert.Contains(@"class=""rz-progressbar-circular-value"" r=""15.91549""", component.Markup);
+        }
+
+        [Fact]
+        public void ProgressBarCircular_75Percent_Renders_CorrectDashoffset()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            {
+                p.Add(x => x.Value, 75);
+                p.Add(x => x.ShowValue, true);
+            });
+
+            // At 75%, normalized = 0.75, dashoffset = (1 - 0.75) * 100 = 25
+            Assert.Contains(@"stroke-dashoffset=""25""", component.Markup);
+            Assert.Contains("75%", component.Markup);
+        }
+
+        [Fact]
+        public void ProgressBarCircular_0Percent_Renders_FullDashoffset()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            {
+                p.Add(x => x.Value, 0);
+            });
+
+            // At 0%, dashoffset = (1 - 0) * 100 = 100
+            Assert.Contains(@"stroke-dashoffset=""100""", component.Markup);
+        }
+
+        [Fact]
+        public void ProgressBarCircular_100Percent_Renders_ZeroDashoffset()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenProgressBarCircular>(p =>
+            {
+                p.Add(x => x.Value, 100);
+            });
+
+            // At 100%, dashoffset = (1 - 1) * 100 = 0
+            Assert.Contains(@"stroke-dashoffset=""0""", component.Markup);
         }
 
         [Fact]
