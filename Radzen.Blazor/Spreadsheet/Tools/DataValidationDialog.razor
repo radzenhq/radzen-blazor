@@ -1,0 +1,153 @@
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenStack Gap="1rem" Style="padding: 1rem; min-width: 400px">
+    <RadzenFormField Text="Validation Type">
+        <RadzenDropDown @bind-Value=@ValidationType Data=@ValidationTypes TextProperty="Name" ValueProperty="Value" Style="width: 100%" Change=@OnTypeChanged />
+    </RadzenFormField>
+
+    @if (ValidationType != "list")
+    {
+        <RadzenFormField Text="Operator">
+            <RadzenDropDown @bind-Value=@Operator Data=@Operators TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
+        </RadzenFormField>
+    }
+
+    @if (ValidationType == "list")
+    {
+        <RadzenFormField Text="Values (comma separated)">
+            <RadzenTextArea @bind-Value=@Formula1 Rows="3" Style="width: 100%" />
+        </RadzenFormField>
+    }
+    else if (Operator == "between" || Operator == "notBetween")
+    {
+        <RadzenFormField Text="Minimum">
+            <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
+        </RadzenFormField>
+        <RadzenFormField Text="Maximum">
+            <RadzenTextBox @bind-Value=@Formula2 Style="width: 100%" />
+        </RadzenFormField>
+    }
+    else
+    {
+        <RadzenFormField Text="Value">
+            <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
+        </RadzenFormField>
+    }
+
+    <RadzenCheckBox @bind-Value=@AllowBlank TValue="bool" />
+    <RadzenLabel Text="Allow blank" Component="AllowBlank" Style="margin-left: 0.5rem" />
+
+    <RadzenFieldset Text="Error Alert">
+        <RadzenStack Gap="0.5rem">
+            <RadzenFormField Text="Title">
+                <RadzenTextBox @bind-Value=@ErrorTitle Style="width: 100%" />
+            </RadzenFormField>
+            <RadzenFormField Text="Message">
+                <RadzenTextArea @bind-Value=@ErrorMessage Rows="2" Style="width: 100%" />
+            </RadzenFormField>
+        </RadzenStack>
+    </RadzenFieldset>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+        <RadzenButton Text="OK" Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Text="Cancel" Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+    [Inject]
+    public DialogService DialogService { get; set; } = default!;
+
+    private string ValidationType { get; set; } = "wholeNumber";
+    private string Operator { get; set; } = "between";
+    private string Formula1 { get; set; } = "";
+    private string Formula2 { get; set; } = "";
+    private bool AllowBlank { get; set; } = true;
+    private string ErrorTitle { get; set; } = "";
+    private string ErrorMessage { get; set; } = "The value you entered is not valid.";
+
+    private static readonly List<OptionItem> ValidationTypes =
+    [
+        new("Whole Number", "wholeNumber"),
+        new("Decimal", "decimal"),
+        new("List", "list"),
+        new("Date", "date"),
+        new("Time", "time"),
+        new("Text Length", "textLength")
+    ];
+
+    private static readonly List<OptionItem> AllOperators =
+    [
+        new("Between", "between"),
+        new("Not Between", "notBetween"),
+        new("Equal To", "equal"),
+        new("Not Equal To", "notEqual"),
+        new("Greater Than", "greaterThan"),
+        new("Less Than", "lessThan"),
+        new("Greater Than or Equal", "greaterThanOrEqual"),
+        new("Less Than or Equal", "lessThanOrEqual")
+    ];
+
+    private List<OptionItem> Operators => AllOperators;
+
+    private void OnTypeChanged()
+    {
+        if (ValidationType == "list")
+        {
+            Operator = "equal";
+        }
+    }
+
+    private void OnOk()
+    {
+        var type = ValidationType switch
+        {
+            "wholeNumber" => DataValidationType.WholeNumber,
+            "decimal" => DataValidationType.Decimal,
+            "list" => DataValidationType.List,
+            "date" => DataValidationType.Date,
+            "time" => DataValidationType.Time,
+            "textLength" => DataValidationType.TextLength,
+            _ => DataValidationType.WholeNumber
+        };
+
+        var op = Operator switch
+        {
+            "between" => DataValidationOperator.Between,
+            "notBetween" => DataValidationOperator.NotBetween,
+            "equal" => DataValidationOperator.Equal,
+            "notEqual" => DataValidationOperator.NotEqual,
+            "greaterThan" => DataValidationOperator.GreaterThan,
+            "lessThan" => DataValidationOperator.LessThan,
+            "greaterThanOrEqual" => DataValidationOperator.GreaterThanOrEqual,
+            "lessThanOrEqual" => DataValidationOperator.LessThanOrEqual,
+            _ => DataValidationOperator.Between
+        };
+
+        var rule = new DataValidationRule
+        {
+            Type = type,
+            Operator = op,
+            Formula1 = Formula1,
+            Formula2 = Formula2,
+            AllowBlank = AllowBlank,
+            ErrorTitle = string.IsNullOrEmpty(ErrorTitle) ? null : ErrorTitle,
+            Error = string.IsNullOrEmpty(ErrorMessage) ? "The value you entered is not valid." : ErrorMessage,
+            ShowErrorMessage = true
+        };
+
+        DialogService.Close(rule);
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close(null);
+    }
+
+    private sealed class OptionItem(string name, string value)
+    {
+        public string Name { get; } = name;
+        public string Value { get; } = value;
+    }
+}

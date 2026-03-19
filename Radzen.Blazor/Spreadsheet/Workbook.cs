@@ -323,6 +323,9 @@ public class Workbook
         // Add auto filter
         AddAutoFilter(sheet, sheetDoc);
 
+        // Add data validations
+        AddDataValidations(sheet, sheetDoc);
+
         // Add hyperlinks
         var hyperlinkRels = AddHyperlinks(sheet, sheetDoc);
 
@@ -931,6 +934,228 @@ public class Workbook
         }
     }
 
+    private static void AddDataValidations(Sheet sheet, XDocument sheetDoc)
+    {
+        var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+        XElement? dataValidationsElement = null;
+
+        foreach (var range in sheet.Validation.Ranges)
+        {
+            foreach (var validator in sheet.Validation.GetValidators(range))
+            {
+                if (validator is DataValidationRule rule)
+                {
+                    dataValidationsElement ??= new XElement(XName.Get("dataValidations", ns));
+
+                    var typeStr = rule.Type switch
+                    {
+                        DataValidationType.WholeNumber => "whole",
+                        DataValidationType.Decimal => "decimal",
+                        DataValidationType.List => "list",
+                        DataValidationType.Date => "date",
+                        DataValidationType.Time => "time",
+                        DataValidationType.TextLength => "textLength",
+                        DataValidationType.Custom => "custom",
+                        _ => "whole"
+                    };
+
+                    var element = new XElement(XName.Get("dataValidation", ns),
+                        new XAttribute("type", typeStr),
+                        new XAttribute("sqref", range.ToString()),
+                        new XAttribute("allowBlank", rule.AllowBlank ? "1" : "0"));
+
+                    if (rule.Type != DataValidationType.List)
+                    {
+                        var operatorStr = rule.Operator switch
+                        {
+                            DataValidationOperator.Between => "between",
+                            DataValidationOperator.NotBetween => "notBetween",
+                            DataValidationOperator.Equal => "equal",
+                            DataValidationOperator.NotEqual => "notEqual",
+                            DataValidationOperator.GreaterThan => "greaterThan",
+                            DataValidationOperator.LessThan => "lessThan",
+                            DataValidationOperator.GreaterThanOrEqual => "greaterThanOrEqual",
+                            DataValidationOperator.LessThanOrEqual => "lessThanOrEqual",
+                            _ => "between"
+                        };
+                        element.Add(new XAttribute("operator", operatorStr));
+                    }
+
+                    if (rule.ShowErrorMessage)
+                    {
+                        element.Add(new XAttribute("showErrorMessage", "1"));
+                    }
+
+                    if (rule.ShowInputMessage)
+                    {
+                        element.Add(new XAttribute("showInputMessage", "1"));
+                    }
+
+                    if (!string.IsNullOrEmpty(rule.ErrorTitle))
+                    {
+                        element.Add(new XAttribute("errorTitle", rule.ErrorTitle));
+                    }
+
+                    if (!string.IsNullOrEmpty(rule.Error))
+                    {
+                        element.Add(new XAttribute("error", rule.Error));
+                    }
+
+                    if (!string.IsNullOrEmpty(rule.PromptTitle))
+                    {
+                        element.Add(new XAttribute("promptTitle", rule.PromptTitle));
+                    }
+
+                    if (!string.IsNullOrEmpty(rule.Prompt))
+                    {
+                        element.Add(new XAttribute("prompt", rule.Prompt));
+                    }
+
+                    var errorStyleStr = rule.ErrorStyle switch
+                    {
+                        DataValidationErrorStyle.Warning => "warning",
+                        DataValidationErrorStyle.Information => "information",
+                        _ => (string?)null // "stop" is the default, omit it
+                    };
+
+                    if (errorStyleStr != null)
+                    {
+                        element.Add(new XAttribute("errorStyle", errorStyleStr));
+                    }
+
+                    if (!string.IsNullOrEmpty(rule.Formula1))
+                    {
+                        if (rule.Type == DataValidationType.List)
+                        {
+                            // Excel format: each item quoted individually, e.g. "Yes","No","Maybe"
+                            var items = rule.Formula1.Split(',');
+                            var quoted = string.Join(",", items.Select(i => $"\"{i.Trim()}\""));
+                            element.Add(new XElement(XName.Get("formula1", ns), quoted));
+                        }
+                        else
+                        {
+                            element.Add(new XElement(XName.Get("formula1", ns), rule.Formula1));
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(rule.Formula2))
+                    {
+                        element.Add(new XElement(XName.Get("formula2", ns), rule.Formula2));
+                    }
+
+                    dataValidationsElement.Add(element);
+                }
+            }
+        }
+
+        if (dataValidationsElement != null)
+        {
+            var count = dataValidationsElement.Elements().Count();
+            dataValidationsElement.Add(new XAttribute("count", count.ToString(CultureInfo.InvariantCulture)));
+            sheetDoc.Root!.Add(dataValidationsElement);
+        }
+    }
+
+    private static void ParseDataValidations(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    {
+        var dataValidationsElement = sheetDoc.Descendants(sNs + "dataValidations").FirstOrDefault();
+        if (dataValidationsElement == null)
+        {
+            return;
+        }
+
+        foreach (var dvElement in dataValidationsElement.Elements(sNs + "dataValidation"))
+        {
+            var typeAttr = dvElement.Attribute("type")?.Value;
+            var operatorAttr = dvElement.Attribute("operator")?.Value;
+            var sqrefAttr = dvElement.Attribute("sqref")?.Value;
+            var allowBlankAttr = dvElement.Attribute("allowBlank")?.Value;
+            var errorAttr = dvElement.Attribute("error")?.Value;
+            var errorTitleAttr = dvElement.Attribute("errorTitle")?.Value;
+            var promptAttr = dvElement.Attribute("prompt")?.Value;
+            var promptTitleAttr = dvElement.Attribute("promptTitle")?.Value;
+            var showErrorMessageAttr = dvElement.Attribute("showErrorMessage")?.Value;
+            var showInputMessageAttr = dvElement.Attribute("showInputMessage")?.Value;
+            var errorStyleAttr = dvElement.Attribute("errorStyle")?.Value;
+
+            if (string.IsNullOrEmpty(sqrefAttr))
+            {
+                continue;
+            }
+
+            var type = typeAttr switch
+            {
+                "whole" => DataValidationType.WholeNumber,
+                "decimal" => DataValidationType.Decimal,
+                "list" => DataValidationType.List,
+                "date" => DataValidationType.Date,
+                "time" => DataValidationType.Time,
+                "textLength" => DataValidationType.TextLength,
+                "custom" => DataValidationType.Custom,
+                _ => DataValidationType.WholeNumber
+            };
+
+            var op = operatorAttr switch
+            {
+                "between" => DataValidationOperator.Between,
+                "notBetween" => DataValidationOperator.NotBetween,
+                "equal" => DataValidationOperator.Equal,
+                "notEqual" => DataValidationOperator.NotEqual,
+                "greaterThan" => DataValidationOperator.GreaterThan,
+                "lessThan" => DataValidationOperator.LessThan,
+                "greaterThanOrEqual" => DataValidationOperator.GreaterThanOrEqual,
+                "lessThanOrEqual" => DataValidationOperator.LessThanOrEqual,
+                _ => DataValidationOperator.Between
+            };
+
+            var errorStyle = errorStyleAttr switch
+            {
+                "warning" => DataValidationErrorStyle.Warning,
+                "information" => DataValidationErrorStyle.Information,
+                _ => DataValidationErrorStyle.Stop
+            };
+
+            var formula1 = dvElement.Element(sNs + "formula1")?.Value;
+            var formula2 = dvElement.Element(sNs + "formula2")?.Value;
+
+            // For list type, formula1 contains individually quoted items: "Yes","No","Maybe"
+            // Or may be wrapped as a single string: "Yes,No,Maybe"
+            if (type == DataValidationType.List && formula1 != null)
+            {
+                // Remove surrounding quotes from each item and rejoin with commas
+                var parts = formula1.Split(',');
+                formula1 = string.Join(",", parts.Select(p => p.Trim().Trim('"')));
+            }
+
+            var rule = new DataValidationRule
+            {
+                Type = type,
+                Operator = op,
+                Formula1 = formula1,
+                Formula2 = formula2,
+                AllowBlank = allowBlankAttr != "0",
+                Error = errorAttr ?? "The value you entered is not valid.",
+                ErrorTitle = errorTitleAttr,
+                Prompt = promptAttr,
+                PromptTitle = promptTitleAttr,
+                ShowErrorMessage = showErrorMessageAttr == "1",
+                ShowInputMessage = showInputMessageAttr == "1",
+                ErrorStyle = errorStyle
+            };
+
+            // Handle multiple sqref ranges (space-separated)
+            var sqrefs = sqrefAttr.Split(' ');
+            foreach (var sqref in sqrefs)
+            {
+                if (!string.IsNullOrEmpty(sqref))
+                {
+                    var range = RangeRef.Parse(sqref);
+                    sheet.Validation.Add(range, rule);
+                }
+            }
+        }
+    }
+
     private static XElement? CreateFilterColumn(SheetFilter filter, RangeRef autoFilterRange)
     {
         if (filter.Criterion is FilterCriterionLeaf leaf)
@@ -1402,6 +1627,9 @@ public class Workbook
 
         // Parse auto filter
         ParseAutoFilter(sheetDoc, sNs, sheet);
+
+        // Parse data validations
+        ParseDataValidations(sheetDoc, sNs, sheet);
 
         // Parse hyperlinks
         ParseHyperlinks(archive, sheetInfo, sheetDoc, sNs, sheet);

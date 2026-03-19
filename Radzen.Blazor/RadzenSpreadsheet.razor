@@ -82,6 +82,7 @@
                 <RadzenTabsItem Text="Data">
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <AutoFilter Sheet=@Sheet />
+                        <DataValidation Sheet=@Sheet />
                     </RadzenStack>
                 </RadzenTabsItem>
             </Tabs>
@@ -125,9 +126,15 @@
         <Popup @ref=@cellMenuPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
             @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
             {
-                <CellMenu Sheet=@Sheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync 
-                         SortAscending=@OnCellMenuSortAscendingAsync SortDescending=@OnCellMenuSortDescendingAsync Clear=@OnCellMenuClearAsync 
+                <CellMenu Sheet=@Sheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync
+                         SortAscending=@OnCellMenuSortAscendingAsync SortDescending=@OnCellMenuSortDescendingAsync Clear=@OnCellMenuClearAsync
                          CustomFilter=@OnCellMenuCustomFilterAsync />
+            }
+        </Popup>
+        <Popup @ref=@validationListPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
+            @if (validationListItems.Count > 0)
+            {
+                <ValidationListPopup Items=@validationListItems ValueSelected=@OnValidationListValueSelectedAsync />
             }
         </Popup>
 }
