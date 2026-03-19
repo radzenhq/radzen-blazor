@@ -1,0 +1,104 @@
+using Xunit;
+
+namespace Radzen.Blazor.Spreadsheet.Tests;
+
+public class NumberFormatPresetsTests
+{
+    [Theory]
+    [InlineData(0, "General")]
+    [InlineData(1, "0")]
+    [InlineData(2, "0.00")]
+    [InlineData(3, "#,##0")]
+    [InlineData(4, "#,##0.00")]
+    [InlineData(9, "0%")]
+    [InlineData(10, "0.00%")]
+    [InlineData(14, "mm/dd/yyyy")]
+    [InlineData(22, "m/d/yy h:mm")]
+    [InlineData(49, "@")]
+    public void GetFormatCode_BuiltInIds(int id, string expectedCode)
+    {
+        Assert.Equal(expectedCode, NumberFormatPresets.GetFormatCode(id));
+    }
+
+    [Fact]
+    public void GetFormatCode_Unknown_ReturnsNull()
+    {
+        Assert.Null(NumberFormatPresets.GetFormatCode(999));
+    }
+
+    [Theory]
+    [InlineData("General", 0)]
+    [InlineData("0", 1)]
+    [InlineData("0.00", 2)]
+    [InlineData("#,##0", 3)]
+    [InlineData("#,##0.00", 4)]
+    [InlineData("0%", 9)]
+    [InlineData("0.00%", 10)]
+    [InlineData("mm/dd/yyyy", 14)]
+    [InlineData("@", 49)]
+    public void GetNumFmtId_KnownFormats(string code, int expectedId)
+    {
+        Assert.Equal(expectedId, NumberFormatPresets.GetNumFmtId(code));
+    }
+
+    [Fact]
+    public void GetNumFmtId_Unknown_ReturnsMinusOne()
+    {
+        Assert.Equal(-1, NumberFormatPresets.GetNumFmtId("xyz"));
+    }
+
+    [Theory]
+    [InlineData("0", NumberFormatCategory.Number)]
+    [InlineData("0.00", NumberFormatCategory.Number)]
+    [InlineData("#,##0", NumberFormatCategory.Number)]
+    [InlineData("#,##0.00", NumberFormatCategory.Number)]
+    public void GetCategory_NumberFormats(string code, NumberFormatCategory expected)
+    {
+        Assert.Equal(expected, NumberFormatPresets.GetCategory(code));
+    }
+
+    [Theory]
+    [InlineData("mm/dd/yyyy", NumberFormatCategory.Date)]
+    [InlineData("yyyy-mm-dd", NumberFormatCategory.Date)]
+    [InlineData("d-mmm-yy", NumberFormatCategory.Date)]
+    public void GetCategory_DateFormats(string code, NumberFormatCategory expected)
+    {
+        Assert.Equal(expected, NumberFormatPresets.GetCategory(code));
+    }
+
+    [Theory]
+    [InlineData("0%", NumberFormatCategory.Percentage)]
+    [InlineData("0.00%", NumberFormatCategory.Percentage)]
+    public void GetCategory_PercentageFormats(string code, NumberFormatCategory expected)
+    {
+        Assert.Equal(expected, NumberFormatPresets.GetCategory(code));
+    }
+
+    [Theory]
+    [InlineData(null, NumberFormatCategory.General)]
+    [InlineData("", NumberFormatCategory.General)]
+    [InlineData("General", NumberFormatCategory.General)]
+    public void GetCategory_NullOrGeneral_ReturnsGeneral(string? code, NumberFormatCategory expected)
+    {
+        Assert.Equal(expected, NumberFormatPresets.GetCategory(code));
+    }
+
+    [Fact]
+    public void GetCategory_Currency()
+    {
+        Assert.Equal(NumberFormatCategory.Currency, NumberFormatPresets.GetCategory("$#,##0.00"));
+    }
+
+    [Fact]
+    public void GetCategory_Time()
+    {
+        Assert.Equal(NumberFormatCategory.Time, NumberFormatPresets.GetCategory("h:mm AM/PM"));
+        Assert.Equal(NumberFormatCategory.Time, NumberFormatPresets.GetCategory("h:mm:ss"));
+    }
+
+    [Fact]
+    public void GetCategory_Text()
+    {
+        Assert.Equal(NumberFormatCategory.Text, NumberFormatPresets.GetCategory("@"));
+    }
+}

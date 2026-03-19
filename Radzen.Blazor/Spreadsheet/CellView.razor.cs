@@ -89,6 +89,13 @@ public partial class CellView : CellBase, IDisposable
 
     private Cell cell = default!;
 
+    private string? GetDisplayValue()
+    {
+        if (cell == null) return null;
+        var formatted = NumberFormat.Apply(cell.Format?.NumberFormat, cell.Value, cell.ValueType);
+        return formatted ?? cell.Value?.ToString();
+    }
+
     private bool ShouldShowCellMenu()
     {
         if (Sheet?.Tables != null)
