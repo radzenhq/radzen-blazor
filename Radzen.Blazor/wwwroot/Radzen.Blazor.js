@@ -2939,10 +2939,11 @@ window.Radzen = {
   },
   saveSelection: function (ref) {
     if (!ref) return;
-    if (document.activeElement == ref) {
-      var selection = getSelection();
-      if (selection.rangeCount > 0) {
-        ref.range = selection.getRangeAt(0);
+    var selection = getSelection();
+    if (selection.rangeCount > 0) {
+      var range = selection.getRangeAt(0);
+      if (ref.contains(range.commonAncestorContainer)) {
+        ref.range = range;
       }
     }
   },
