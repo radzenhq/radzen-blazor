@@ -404,6 +404,22 @@
     }
 }
 
+.rz-spreadsheet-cell-invalid {
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 6px 6px 0;
+        border-color: transparent var(--rz-form-error-color, #f44336) transparent transparent;
+    }
+}
+
 .rz-spreadsheet-cell-number {
     text-align: right;
 }

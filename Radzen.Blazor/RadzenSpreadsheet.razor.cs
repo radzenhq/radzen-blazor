@@ -59,8 +59,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private VirtualGrid? grid;
     private Popup? cellMenuPopup;
+    private Popup? validationListPopup;
     private int cellMenuRow = -1;
     private int cellMenuColumn = -1;
+    private int validationListRow = -1;
+    private int validationListColumn = -1;
+    private IReadOnlyList<string> validationListItems = [];
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -89,11 +93,47 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private async Task OnCellToggleAsync(CellMenuToggleEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
+
+        // Check if this cell has list validation
+        if (Sheet != null)
+        {
+            var validators = Sheet.Validation.GetValidatorsForCell(new Spreadsheet.CellRef(args.Row, args.Column));
+            foreach (var v in validators)
+            {
+                if (v is Spreadsheet.DataValidationRule rule && rule.Type == Spreadsheet.DataValidationType.List)
+                {
+                    validationListRow = args.Row;
+                    validationListColumn = args.Column;
+                    validationListItems = rule.ListItems;
+                    if (validationListPopup != null)
+                    {
+                        await validationListPopup.ToggleAsync(args.Element);
+                    }
+                    return;
+                }
+            }
+        }
+
         if (cellMenuPopup != null)
         {
             cellMenuRow = args.Row;
             cellMenuColumn = args.Column;
             await cellMenuPopup.ToggleAsync(args.Element);
+        }
+    }
+
+    private async Task OnValidationListValueSelectedAsync(string value)
+    {
+        if (Sheet != null && validationListRow >= 0 && validationListColumn >= 0)
+        {
+            var address = new Spreadsheet.CellRef(validationListRow, validationListColumn);
+            Sheet.Editor.StartEdit(address, value);
+            await AcceptAsync();
+        }
+
+        if (validationListPopup != null)
+        {
+            await validationListPopup.CloseAsync();
         }
     }
 
