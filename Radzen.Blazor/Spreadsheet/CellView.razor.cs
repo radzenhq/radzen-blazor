@@ -88,11 +88,13 @@ public partial class CellView : CellBase, IDisposable
                                      .ToString();
 
     private Cell cell = default!;
+    private string? numberFormatColor;
 
     private string? GetDisplayValue()
     {
         if (cell == null) return null;
-        var formatted = NumberFormat.Apply(cell.Format?.NumberFormat, cell.Value, cell.ValueType);
+        var (formatted, color) = NumberFormat.ApplyWithColor(cell.Format?.NumberFormat, cell.Value, cell.ValueType);
+        numberFormatColor = color;
         return formatted ?? cell.Value?.ToString();
     }
 
@@ -155,6 +157,13 @@ public partial class CellView : CellBase, IDisposable
     {
         base.AppendStyle(sb);
         cell.ApplyFormat(sb);
+
+        if (numberFormatColor != null)
+        {
+            sb.Append("color: ");
+            sb.Append(numberFormatColor);
+            sb.Append(';');
+        }
     }
 
     private async Task OnToggleAsync()

@@ -1,0 +1,51 @@
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenSplitButton Click=@OnClick Icon="merge_type" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+    <ChildContent>
+        <RadzenSplitButtonItem Text="Merge && Center" Value="merge-center" />
+        <RadzenSplitButtonItem Text="Merge Cells" Value="merge" />
+        <RadzenSplitButtonItem Text="Unmerge Cells" Value="unmerge" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    private void OnClick(RadzenSplitButtonItem? item)
+    {
+        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var value = item?.Value;
+
+        switch (value)
+        {
+            case "merge-center":
+            case null:
+            {
+                var command = new MergeCellsCommand(Sheet, Sheet.Selection.Range, center: true);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+            case "merge":
+            {
+                var command = new MergeCellsCommand(Sheet, Sheet.Selection.Range);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+            case "unmerge":
+            {
+                var command = new UnmergeCellsCommand(Sheet, Sheet.Selection.Cell);
+                Sheet.Commands.Execute(command);
+                break;
+            }
+        }
+    }
+}
