@@ -1,5 +1,16 @@
-﻿<div class="rz-p-sm-12" style="margin-bottom: 200px;">
-        <RadzenMenu Click="OnParentClicked">
+﻿<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-mb-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenCheckBox @bind-Value=@flyout Name="FlyoutCheckBox" TValue="bool" />
+        <RadzenLabel Text="Flyout nested submenus" Component="FlyoutCheckBox" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenCheckBox @bind-Value=@clickToOpen Name="ClickToOpenCheckBox" TValue="bool" />
+        <RadzenLabel Text="Click to open" Component="ClickToOpenCheckBox" />
+    </RadzenStack>
+</RadzenStack>
+
+<div class="rz-p-sm-12" style="margin-bottom: 200px;">
+        <RadzenMenu Click="OnParentClicked" Flyout="@flyout" ClickToOpen="@clickToOpen">
             <RadzenMenuItem Text="General" Icon="home">
                 <RadzenMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenMenuItem>
                 <RadzenMenuItem Text="Menu" Path="menu" Icon="line_weight" Disabled="true"></RadzenMenuItem>
@@ -45,6 +56,8 @@
 <EventConsole @ref=@console />
 
 @code {
+    bool flyout;
+    bool clickToOpen = true;
     EventConsole console;
 
     void OnParentClicked(MenuItemEventArgs args)

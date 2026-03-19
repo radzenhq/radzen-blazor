@@ -2572,6 +2572,34 @@ window.Radzen = {
           children.style.display = '';
           children.classList.add('rz-open');
           children.classList.remove('rz-close');
+
+          if (children.hasAttribute('data-flyout')) {
+            children.removeAttribute('data-flyout-flip');
+            var childWidth = children.offsetWidth || 0;
+            var itemRect = item.getBoundingClientRect();
+            var isRtl = getComputedStyle(item).direction === 'rtl';
+            var el = item.parentElement;
+            var scrollParent = null;
+            while (el && el !== document.body) {
+              var s = getComputedStyle(el);
+              if (s.overflowX === 'auto' || s.overflowX === 'scroll' || s.overflowX === 'hidden') {
+                scrollParent = el;
+                break;
+              }
+              el = el.parentElement;
+            }
+            if (isRtl) {
+              var leftBoundary = scrollParent ? scrollParent.getBoundingClientRect().left : 0;
+              if (itemRect.left - childWidth < leftBoundary) {
+                children.setAttribute('data-flyout-flip', '');
+              }
+            } else {
+              var rightBoundary = scrollParent ? scrollParent.getBoundingClientRect().right : document.documentElement.clientWidth;
+              if (itemRect.right + childWidth > rightBoundary) {
+                children.setAttribute('data-flyout-flip', '');
+              }
+            }
+          }
         } else {
           children.onanimationend = function () {
             children.style.display = 'none';
