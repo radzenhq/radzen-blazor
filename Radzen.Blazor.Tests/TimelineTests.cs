@@ -66,6 +66,66 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("rz-timeline-reverse", component.Markup);
         }
+
+        [Fact]
+        public void Timeline_DoesNotRender_Reverse_WhenFalse()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimeline>();
+
+            Assert.DoesNotContain("rz-timeline-reverse", component.Markup);
+        }
+
+        [Fact]
+        public void Timeline_Renders_Items()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimeline>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenTimelineItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenTimelineItem.Text), "Event 1");
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Contains("Event 1", component.Markup);
+            Assert.Contains("rz-timeline-item", component.Markup);
+        }
+
+        [Fact]
+        public void Timeline_NotVisible_DoesNotRender()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimeline>(parameters =>
+            {
+                parameters.Add(p => p.Visible, false);
+            });
+
+            Assert.DoesNotContain("rz-timeline", component.Markup);
+        }
+
+        [Fact]
+        public void Timeline_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimeline>(parameters =>
+            {
+                parameters.Add(p => p.Style, "margin:2rem");
+            });
+
+            Assert.Contains("margin:2rem", component.Markup);
+        }
+
+        [Fact]
+        public void Timeline_DefaultOrientation_IsVertical()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTimeline>();
+
+            Assert.Contains("rz-timeline-column", component.Markup);
+        }
     }
 }
 

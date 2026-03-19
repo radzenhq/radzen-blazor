@@ -60,6 +60,55 @@ namespace Radzen.Blazor.Tests
             Assert.True(changeInvoked);
             Assert.True(matchResult);
         }
+
+        [Fact]
+        public void MediaQuery_OnChange_FalseValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            bool matchResult = true;
+
+            var component = ctx.RenderComponent<RadzenMediaQuery>(parameters =>
+            {
+                parameters.Add(p => p.Query, "(max-width: 768px)");
+                parameters.Add(p => p.Change, EventCallback.Factory.Create<bool>(this, (matches) =>
+                {
+                    matchResult = matches;
+                }));
+            });
+
+            component.Instance.OnChange(false);
+
+            Assert.False(matchResult);
+        }
+
+        [Fact]
+        public void MediaQuery_WithoutQuery_Renders()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenMediaQuery>();
+
+            Assert.NotNull(component.Instance);
+            Assert.Null(component.Instance.Query);
+        }
+
+        [Fact]
+        public void MediaQuery_WithoutChangeHandler_DoesNotThrow()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenMediaQuery>(parameters =>
+            {
+                parameters.Add(p => p.Query, "(min-width: 1024px)");
+            });
+
+            // Should not throw even without a Change handler
+            component.Instance.OnChange(true);
+        }
     }
 }
 

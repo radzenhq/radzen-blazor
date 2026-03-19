@@ -73,5 +73,81 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(">add</i>", component.Markup);
             Assert.Contains("<a href=\"/badge", component.Markup);
         }
+
+        [Fact]
+        public void BreadCrumb_Renders_WithClassName()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenBreadCrumb>();
+
+            Assert.Contains("rz-breadcrumb", component.Markup);
+        }
+
+        [Fact]
+        public void BreadCrumb_Renders_MultipleItems()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(c => c.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenBreadCrumbItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Home");
+                    builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Path), "/");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenBreadCrumbItem>(3);
+                    builder.AddAttribute(4, nameof(RadzenBreadCrumbItem.Text), "Products");
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Contains(">Home</", component.Markup);
+            Assert.Contains(">Products</", component.Markup);
+        }
+
+        [Fact]
+        public void BreadCrumb_NotVisible_DoesNotRender()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(p => p.Visible, false);
+            });
+
+            Assert.DoesNotContain("rz-breadcrumb", component.Markup);
+        }
+
+        [Fact]
+        public void BreadCrumb_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(p => p.Style, "margin:1rem");
+            });
+
+            Assert.Contains("margin:1rem", component.Markup);
+        }
+
+        [Fact]
+        public void BreadCrumb_Item_WithoutPath_DoesNotRenderLink()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(c => c.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenBreadCrumbItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Current Page");
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Contains(">Current Page</", component.Markup);
+            Assert.DoesNotContain("<a href", component.Markup);
+        }
     }
 }

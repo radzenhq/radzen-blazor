@@ -93,5 +93,61 @@ namespace Radzen.Blazor.Tests
 
             Assert.DoesNotContain(@$"color:", component.Markup);
         }
+
+        [Fact]
+        public void Icon_Renders_ITag()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenIcon>();
+
+            Assert.Contains("<i", component.Markup);
+        }
+
+        [Fact]
+        public void Icon_Renders_NotranslateClass()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenIcon>();
+
+            Assert.Contains("notranslate", component.Markup);
+        }
+
+        [Fact]
+        public void Icon_Renders_SecondaryIconStyle()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenIcon>(parameters =>
+            {
+                parameters.Add(p => p.IconStyle, Radzen.IconStyle.Secondary);
+            });
+
+            Assert.Contains("rzi-secondary", component.Markup);
+        }
+
+        [Fact]
+        public void Icon_Renders_SuccessIconStyle()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenIcon>(parameters =>
+            {
+                parameters.Add(p => p.IconStyle, Radzen.IconStyle.Success);
+            });
+
+            Assert.Contains("rzi-success", component.Markup);
+        }
+
+        [Fact]
+        public void Icon_Renders_CombinedColorAndStyle()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenIcon>(parameters =>
+            {
+                parameters.Add(p => p.IconColor, "#FF0000");
+                parameters.Add(p => p.Style, "font-size:2rem");
+            });
+
+            Assert.Contains("color:#FF0000", component.Markup);
+            Assert.Contains("font-size:2rem", component.Markup);
+        }
     }
 }

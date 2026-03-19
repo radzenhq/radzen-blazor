@@ -58,5 +58,47 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
+
+        [Fact]
+        public void Label_Renders_WithClassName()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenLabel>();
+
+            Assert.Contains("rz-label", component.Markup);
+        }
+
+        [Fact]
+        public void Label_Renders_LabelTag()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenLabel>();
+
+            Assert.Contains("<label", component.Markup);
+        }
+
+        [Fact]
+        public void Label_Renders_ChildContent()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenLabel>(parameters =>
+            {
+                parameters.AddChildContent("<strong>Required</strong>");
+            });
+
+            Assert.Contains("<strong>Required</strong>", component.Markup);
+        }
+
+        [Fact]
+        public void Label_NotVisible_DoesNotRender()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenLabel>(parameters =>
+            {
+                parameters.Add(p => p.Visible, false);
+            });
+
+            Assert.DoesNotContain("<label", component.Markup);
+        }
     }
 }

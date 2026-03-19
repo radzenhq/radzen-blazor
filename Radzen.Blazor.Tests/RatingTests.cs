@@ -77,6 +77,39 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("rz-state-disabled", component.Markup);
         }
+
+        [Fact]
+        public void Rating_NotVisible_DoesNotRender()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenRating>(parameters =>
+            {
+                parameters.Add(p => p.Visible, false);
+            });
+
+            Assert.DoesNotContain("rz-rating", component.Markup);
+        }
+
+        [Fact]
+        public void Rating_DefaultStars_IsFive()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenRating>();
+
+            Assert.Equal(5, component.Instance.Stars);
+        }
+
+        [Fact]
+        public void Rating_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenRating>(parameters =>
+            {
+                parameters.Add(p => p.Style, "font-size:2rem");
+            });
+
+            Assert.Contains("font-size:2rem", component.Markup);
+        }
     }
 }
 

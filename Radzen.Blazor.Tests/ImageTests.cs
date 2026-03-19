@@ -60,5 +60,47 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(clicked);
         }
+
+        [Fact]
+        public void Image_Renders_DefaultAlternateText()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenImage>();
+
+            Assert.Contains(@"alt=""image""", component.Markup);
+        }
+
+        [Fact]
+        public void Image_Renders_CustomAlternateText()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenImage>(parameters =>
+            {
+                parameters.Add(p => p.AlternateText, "Product Photo");
+            });
+
+            Assert.Contains("Product Photo", component.Markup);
+        }
+
+        [Fact]
+        public void Image_NotVisible_DoesNotRender()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenImage>(parameters =>
+            {
+                parameters.Add(p => p.Visible, false);
+            });
+
+            Assert.DoesNotContain("<img", component.Markup);
+        }
+
+        [Fact]
+        public void Image_Renders_ImgTag()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenImage>();
+
+            Assert.Contains("<img", component.Markup);
+        }
     }
 }

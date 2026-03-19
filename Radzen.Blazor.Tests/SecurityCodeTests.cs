@@ -40,6 +40,57 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("disabled", component.Markup);
         }
+
+        [Fact]
+        public void SecurityCode_DefaultCount_IsFour()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenSecurityCode>();
+
+            // Default count is 4, so 4 inputs + 1 hidden = 5
+            var inputCount = System.Text.RegularExpressions.Regex.Matches(component.Markup, "<input").Count;
+            Assert.Equal(5, inputCount);
+        }
+
+        [Fact]
+        public void SecurityCode_NotVisible_DoesNotRender()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenSecurityCode>(parameters =>
+            {
+                parameters.Add(p => p.Visible, false);
+            });
+
+            Assert.DoesNotContain("rz-security-code", component.Markup);
+        }
+
+        [Fact]
+        public void SecurityCode_Renders_Gap()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenSecurityCode>(parameters =>
+            {
+                parameters.Add(p => p.Gap, "1rem");
+            });
+
+            Assert.Contains("1rem", component.Markup);
+        }
+
+        [Fact]
+        public void SecurityCode_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenSecurityCode>(parameters =>
+            {
+                parameters.Add(p => p.Style, "margin:2rem");
+            });
+
+            Assert.Contains("margin:2rem", component.Markup);
+        }
     }
 }
 
