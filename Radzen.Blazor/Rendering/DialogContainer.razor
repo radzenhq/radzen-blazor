@@ -149,7 +149,9 @@
     [Parameter]
     public bool ShowMask { get; set; } = true;
 
-    RenderFragment ChildContent => new RenderFragment(builder =>
+    private RenderFragment? childContent;
+
+    RenderFragment ChildContent => childContent ??= new RenderFragment(builder =>
     {
         // Wrap the Dialog component in a CascadingValue
 
