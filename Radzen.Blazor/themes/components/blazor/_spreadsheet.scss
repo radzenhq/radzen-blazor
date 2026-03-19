@@ -54,7 +54,7 @@
     font-size: 0.8rem;
     padding: 0.2rem 0.2rem;
     box-sizing: border-box;
-    white-space: pre-wrap;
+    white-space: nowrap;
     overflow: hidden;
     background: #fff;
     user-select: none;
@@ -387,6 +387,21 @@
     overflow-y: auto;
     padding-block: var(--rz-menu-item-padding-block);
     padding-inline: var(--rz-menu-item-padding-inline);
+}
+
+.rz-spreadsheet-cell-hyperlink {
+    color: #0563C1;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+        color: #0563C1;
+        text-decoration: underline;
+    }
+
+    &:visited {
+        color: #954F72;
+    }
 }
 
 .rz-spreadsheet-cell-number {

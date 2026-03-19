@@ -30,6 +30,15 @@ public class MergedCellStore(Sheet sheet)
     }
 
     /// <summary>
+    /// Removes a merged cell range from the store.
+    /// </summary>
+    /// <param name="range"></param>
+    public bool Remove(RangeRef range)
+    {
+        return data.Remove(range);
+    }
+
+    /// <summary>
     /// Checks if the store contains a merged range that includes the specified cell address.
     /// </summary>
     public bool Contains(CellRef address) => GetMergedRange(address) != RangeRef.Invalid;
