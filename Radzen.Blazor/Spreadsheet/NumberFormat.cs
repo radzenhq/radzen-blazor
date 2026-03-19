@@ -73,6 +73,18 @@ public static class NumberFormat
         var hasPercent = formatCode.Contains('%', StringComparison.Ordinal);
         var core = hasPercent ? formatCode.Replace("%", "", StringComparison.Ordinal) : formatCode;
 
+        // Split off scientific exponent suffix (E+00, E-00, etc.)
+        var exponentSuffix = "";
+        for (var idx = 0; idx < core.Length; idx++)
+        {
+            if ((core[idx] is 'E' or 'e') && idx + 1 < core.Length && core[idx + 1] is '+' or '-')
+            {
+                exponentSuffix = core[idx..];
+                core = core[..idx];
+                break;
+            }
+        }
+
         var dotIndex = core.IndexOf('.', StringComparison.Ordinal);
         int currentDecimals;
         string integerPart;
@@ -100,6 +112,8 @@ public static class NumberFormat
         {
             result = integerPart + "." + new string('0', newDecimals);
         }
+
+        result += exponentSuffix;
 
         if (hasPercent)
         {
@@ -320,6 +334,11 @@ public static class NumberFormat
             return section.Prefix + section.Suffix;
         }
 
+        if (section.IsScientific)
+        {
+            return FormatScientific(section, value);
+        }
+
         var absValue = Math.Abs(value);
         var isNegative = value < 0;
 
@@ -418,25 +437,35 @@ public static class NumberFormat
             }
 
             // Strip trailing zeros for hash (#) decimal placeholders
-            // Keep at least DecimalZeros digits (from 0 placeholders)
+            // Keep at least DecimalZeros + DecimalSpacePlaceholders digits
             var decimalZeros = section.DecimalZeros;
-            if (decimalZeros < decimalPlaces)
+            var spacePlaceholders = section.DecimalSpacePlaceholders;
+            var keepLen = decimalZeros + spacePlaceholders;
+
+            if (keepLen < decimalPlaces)
             {
-                var minLen = decimalZeros;
-                while (fracStr.Length > minLen && fracStr[^1] == '0')
+                while (fracStr.Length > keepLen && fracStr[^1] == '0')
                 {
                     fracStr = fracStr[..^1];
                 }
+            }
 
-                // If all decimal digits stripped, remove the dot too
-                if (fracStr.Length == 0)
+            // Replace trailing zeros with spaces for question mark (?) placeholders
+            if (spacePlaceholders > 0)
+            {
+                var chars = fracStr.ToCharArray();
+                for (var j = chars.Length - 1; j >= decimalZeros; j--)
                 {
-                    sb.Length--; // remove the '.'
+                    if (chars[j] == '0') chars[j] = ' ';
+                    else break;
                 }
-                else
-                {
-                    sb.Append(fracStr);
-                }
+                fracStr = new string(chars);
+            }
+
+            // If all decimal digits stripped, remove the dot too
+            if (fracStr.Length == 0)
+            {
+                sb.Length--; // remove the '.'
             }
             else
             {
@@ -445,6 +474,85 @@ public static class NumberFormat
         }
 
         // Suffix (%, etc.)
+        sb.Append(section.Suffix);
+
+        return sb.ToString();
+    }
+
+    private static string FormatScientific(FormatSection section, double value)
+    {
+        var sb = new StringBuilder();
+        sb.Append(section.Prefix);
+
+        var isNegative = value < 0;
+        var absValue = Math.Abs(value);
+
+        if (isNegative)
+        {
+            sb.Append('-');
+        }
+
+        int exponent;
+        double mantissa;
+
+        if (absValue == 0)
+        {
+            exponent = 0;
+            mantissa = 0;
+        }
+        else
+        {
+            exponent = (int)Math.Floor(Math.Log10(absValue));
+            var intDigits = Math.Max(section.IntegerZeros, 1);
+            exponent -= (intDigits - 1);
+            mantissa = absValue / Math.Pow(10, exponent);
+        }
+
+        // Round mantissa to DecimalPlaces
+        mantissa = Math.Round(mantissa, section.DecimalPlaces, MidpointRounding.AwayFromZero);
+
+        // Check if rounding carried over (e.g., 9.995 → 10.00)
+        if (mantissa != 0)
+        {
+            var intDigits = Math.Max(section.IntegerZeros, 1);
+            var mantissaIntPart = (long)Math.Truncate(mantissa);
+            var mantissaIntDigits = mantissaIntPart == 0 ? 1 : (int)Math.Floor(Math.Log10(mantissaIntPart)) + 1;
+            if (mantissaIntDigits > intDigits)
+            {
+                exponent += (mantissaIntDigits - intDigits);
+                mantissa /= Math.Pow(10, mantissaIntDigits - intDigits);
+                mantissa = Math.Round(mantissa, section.DecimalPlaces, MidpointRounding.AwayFromZero);
+            }
+        }
+
+        // Format mantissa
+        if (section.DecimalPlaces > 0)
+        {
+            sb.Append(mantissa.ToString("F" + section.DecimalPlaces, CultureInfo.InvariantCulture));
+        }
+        else
+        {
+            sb.Append(((long)Math.Round(mantissa)).ToString(CultureInfo.InvariantCulture));
+        }
+
+        // Format exponent part (e.g. "E+00")
+        var expFormat = section.ExponentFormat;
+        var expChar = expFormat[0]; // E or e
+        var expSign = expFormat[1]; // + or -
+        var expDigits = expFormat.Length - 2; // number of 0/# after sign
+
+        sb.Append(expChar);
+
+        if (exponent >= 0)
+        {
+            if (expSign == '+') sb.Append('+');
+        }
+        else
+        {
+            sb.Append('-');
+        }
+
+        sb.Append(Math.Abs(exponent).ToString(CultureInfo.InvariantCulture).PadLeft(expDigits, '0'));
         sb.Append(section.Suffix);
 
         return sb.ToString();
@@ -518,12 +626,15 @@ public static class NumberFormat
         var tokens = Tokenize(section);
         var isDate = false;
         var isPercentage = false;
+        var isScientific = false;
+        var exponentFormat = "";
         var hasThousands = false;
         var thousandsScale = 0;
         var integerZeros = 0;
         var integerHashes = 0;
         var decimalPlaces = 0;
         var decimalZeros = 0;
+        var decimalSpacePlaceholders = 0;
         var inDecimal = false;
         var is12Hour = false;
         var hasParens = false;
@@ -564,20 +675,35 @@ public static class NumberFormat
                         if (inDecimal) decimalPlaces += token.Text.Length;
                         else integerHashes += token.Text.Length;
                         break;
+                    case TokenType.QuestionMark:
+                        seenDigit = true;
+                        hasDigitPlaceholders = true;
+                        if (inDecimal) { decimalPlaces += token.Text.Length; decimalSpacePlaceholders += token.Text.Length; }
+                        else integerHashes += token.Text.Length;
+                        break;
                     case TokenType.Decimal:
                         inDecimal = true;
                         break;
                     case TokenType.Comma:
                         if (seenDigit && !inDecimal)
                         {
-                            // Look ahead: if next non-comma token is a digit placeholder, it's thousands separator
-                            // Otherwise it's scaling
                             hasThousands = true;
                         }
                         break;
                     case TokenType.Percent:
                         isPercentage = true;
                         afterDigits = seenDigit;
+                        break;
+                    case TokenType.Exponent:
+                        isScientific = true;
+                        exponentFormat = token.Text;
+                        break;
+                    case TokenType.Underscore:
+                        if (!seenDigit) prefix.Append(' ');
+                        else suffix.Append(' ');
+                        break;
+                    case TokenType.Asterisk:
+                        // Fill-repeat not applicable in HTML — skip
                         break;
                     case TokenType.Literal:
                         if (!seenDigit) prefix.Append(token.Text);
@@ -594,7 +720,6 @@ public static class NumberFormat
             }
 
             // Check for trailing commas (scaling)
-            // In Excel, commas after the last digit placeholder scale down by 1000 each
             var trimmed = section.TrimEnd();
             var trailingCommas = 0;
             for (var i = trimmed.Length - 1; i >= 0; i--)
@@ -611,7 +736,8 @@ public static class NumberFormat
         return new FormatSection(
             tokens, index, isDate, isPercentage, hasThousands, thousandsScale,
             integerZeros, integerHashes, decimalPlaces, decimalZeros, is12Hour, hasParens,
-            hasDigitPlaceholders, prefix.ToString(), isPercentage ? "%" : suffix.ToString());
+            hasDigitPlaceholders, prefix.ToString(), isPercentage ? "%" : suffix.ToString(),
+            isScientific, exponentFormat, decimalSpacePlaceholders);
     }
 
     private static List<FormatToken> Tokenize(string section)
@@ -803,6 +929,44 @@ public static class NumberFormat
                 continue;
             }
 
+            // Scientific notation: E+00, E-00, e+00, e-00
+            if (c is 'E' or 'e' && i + 1 < section.Length && section[i + 1] is '+' or '-')
+            {
+                var start = i;
+                i += 2; // skip E and sign
+                while (i < section.Length && section[i] is '0' or '#')
+                {
+                    i++;
+                }
+                tokens.Add(new FormatToken(TokenType.Exponent, section[start..i]));
+                continue;
+            }
+
+            // Underscore: _X produces a space with the width of X
+            if (c == '_' && i + 1 < section.Length)
+            {
+                tokens.Add(new FormatToken(TokenType.Underscore, section[i + 1].ToString()));
+                i += 2;
+                continue;
+            }
+
+            // Asterisk: *X repeats character X to fill (ignored in HTML)
+            if (c == '*' && i + 1 < section.Length)
+            {
+                tokens.Add(new FormatToken(TokenType.Asterisk, section[i + 1].ToString()));
+                i += 2;
+                continue;
+            }
+
+            // Question mark: digit placeholder that pads with spaces
+            if (c == '?')
+            {
+                var len = ConsumeRun(section, i, '?');
+                tokens.Add(new FormatToken(TokenType.QuestionMark, section.Substring(i, len)));
+                i += len;
+                continue;
+            }
+
             // Skip unknown
             i++;
         }
@@ -832,7 +996,8 @@ public static class NumberFormat
     {
         Literal, Zero, Hash, Decimal, Comma, Percent,
         Year, Month, Day, Hour, Minute, Second, AmPm,
-        OpenParen, CloseParen
+        OpenParen, CloseParen,
+        Exponent, Underscore, Asterisk, QuestionMark
     }
 
     private sealed class FormatToken
@@ -859,11 +1024,15 @@ public static class NumberFormat
         public bool HasDigitPlaceholders { get; }
         public string Prefix { get; }
         public string Suffix { get; }
+        public bool IsScientific { get; }
+        public string ExponentFormat { get; }
+        public int DecimalSpacePlaceholders { get; }
 
         public FormatSection(List<FormatToken> tokens, int index, bool isDate, bool isPercentage,
             bool hasThousandsSeparator, int thousandsScale, int integerZeros, int integerHashes,
             int decimalPlaces, int decimalZeros, bool is12Hour, bool hasParens,
-            bool hasDigitPlaceholders, string prefix, string suffix)
+            bool hasDigitPlaceholders, string prefix, string suffix,
+            bool isScientific, string exponentFormat, int decimalSpacePlaceholders)
         {
             Tokens = tokens;
             Index = index;
@@ -880,6 +1049,9 @@ public static class NumberFormat
             HasDigitPlaceholders = hasDigitPlaceholders;
             Prefix = prefix;
             Suffix = suffix;
+            IsScientific = isScientific;
+            ExponentFormat = exponentFormat;
+            DecimalSpacePlaceholders = decimalSpacePlaceholders;
         }
     }
 

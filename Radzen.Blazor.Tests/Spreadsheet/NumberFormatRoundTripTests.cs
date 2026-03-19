@@ -93,6 +93,38 @@ public class NumberFormatRoundTripTests
         Assert.True(sheet.Cells[0, 0].Format.Bold);
     }
 
+    [Fact]
+    public void RoundTrip_ScientificFormat_Preserved()
+    {
+        var workbook = CreateWorkbookWithFormats();
+        var reimported = ExportAndReimport(workbook);
+
+        var sheet = reimported.Sheets[0];
+        Assert.Equal("0.00E+00", sheet.Cells[4, 0].Format.NumberFormat);
+    }
+
+    [Fact]
+    public void RoundTrip_ScientificValue_DisplaysCorrectly()
+    {
+        var workbook = CreateWorkbookWithFormats();
+        var reimported = ExportAndReimport(workbook);
+
+        var sheet = reimported.Sheets[0];
+        var cell = sheet.Cells[4, 0];
+        var display = NumberFormat.Apply(cell.Format.NumberFormat, cell.Value, CellDataType.Number);
+        Assert.Equal("1.23E+04", display);
+    }
+
+    [Fact]
+    public void RoundTrip_AccountingFormat_Preserved()
+    {
+        var workbook = CreateWorkbookWithFormats();
+        var reimported = ExportAndReimport(workbook);
+
+        var sheet = reimported.Sheets[0];
+        Assert.Equal("_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)", sheet.Cells[5, 0].Format.NumberFormat);
+    }
+
     private static Workbook CreateWorkbookWithFormats()
     {
         var workbook = new Workbook();
@@ -115,6 +147,14 @@ public class NumberFormatRoundTripTests
         // Date (serial number for 2024-03-19)
         sheet.Cells[3, 0].Value = 45370.0;
         sheet.Cells[3, 0].Format.NumberFormat = "mm/dd/yyyy";
+
+        // Scientific
+        sheet.Cells[4, 0].Value = 12345.0;
+        sheet.Cells[4, 0].Format.NumberFormat = "0.00E+00";
+
+        // Accounting
+        sheet.Cells[5, 0].Value = 1234.5;
+        sheet.Cells[5, 0].Format.NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)";
 
         return workbook;
     }
