@@ -1,0 +1,43 @@
+@using Radzen.Blazor.Spreadsheet
+@inject DialogService DialogService
+
+<RadzenSplitButton Click=@OnClickAsync Icon="format_color_fill" Text="Conditional" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+    <ChildContent>
+        <RadzenSplitButtonItem Text="Greater Than..." Value="greater" />
+        <RadzenSplitButtonItem Text="Less Than..." Value="less" />
+        <RadzenSplitButtonItem Text="Between..." Value="between" />
+        <RadzenSplitButtonItem Text="Equal To..." Value="equal" />
+        <RadzenSplitButtonItem Text="Text Contains..." Value="text" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    private async Task OnClickAsync(RadzenSplitButtonItem? item)
+    {
+        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var ruleType = item?.Value ?? "greater";
+
+        var result = await DialogService.OpenAsync<ConditionalFormatDialog>("Conditional Formatting",
+            new Dictionary<string, object?>
+            {
+                { "RuleType", ruleType }
+            });
+
+        if (result is ConditionalFormatBase rule)
+        {
+            var command = new ConditionalFormatCommand(Sheet, Sheet.Selection.Range, rule);
+            Sheet.Commands.Execute(command);
+        }
+    }
+}

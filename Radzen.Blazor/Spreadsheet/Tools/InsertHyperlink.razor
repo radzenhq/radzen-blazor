@@ -1,0 +1,41 @@
+@using Radzen.Blazor.Spreadsheet
+@inject DialogService DialogService
+
+<RadzenButton Icon="link" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Click=@OnClickAsync Size="ButtonSize.Small" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    private async Task OnClickAsync()
+    {
+        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var address = Sheet.Selection.Cell;
+        Sheet.Cells.TryGet(address.Row, address.Column, out var cell);
+
+        var existing = cell?.Hyperlink;
+        var url = existing?.Url ?? "";
+        var displayText = existing?.DisplayText ?? cell?.Value?.ToString() ?? "";
+
+        var result = await DialogService.OpenAsync<HyperlinkDialog>("Insert Hyperlink",
+            new Dictionary<string, object?>
+            {
+                { "Url", url },
+                { "DisplayText", displayText }
+            });
+
+        if (result is Hyperlink hyperlink)
+        {
+            var command = new HyperlinkCommand(Sheet, address, hyperlink);
+            Sheet.Commands.Execute(command);
+        }
+    }
+}

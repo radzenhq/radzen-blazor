@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -50,6 +51,37 @@ public class ConditionalFormatStore
 
         list.Add(rule);
     }
+
+    /// <summary>
+    /// Removes a conditional formatting rule from a specific range.
+    /// </summary>
+    public bool Remove(RangeRef range, ConditionalFormatBase rule)
+    {
+        ArgumentNullException.ThrowIfNull(rule);
+        if (formats.TryGetValue(range, out var list))
+        {
+            var removed = list.Remove(rule);
+            if (list.Count == 0)
+            {
+                formats.Remove(range);
+            }
+            return removed;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Gets all rules for a specific range.
+    /// </summary>
+    public IReadOnlyList<ConditionalFormatBase> GetRules(RangeRef range)
+    {
+        return formats.TryGetValue(range, out var list) ? list : [];
+    }
+
+    /// <summary>
+    /// Gets all ranges that have conditional formatting rules.
+    /// </summary>
+    public IEnumerable<RangeRef> Ranges => formats.Keys;
 
     /// <summary>
     /// Calculates the merged conditional overlay format for a cell from all matching rules.

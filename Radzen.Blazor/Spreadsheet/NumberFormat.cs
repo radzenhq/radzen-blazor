@@ -59,6 +59,50 @@ public static class NumberFormat
     }
 
     /// <summary>
+    /// Applies a format code to a value and returns the formatted string and optional color.
+    /// The color is determined by color codes in the format string (e.g., [Red], [Green]).
+    /// </summary>
+    public static (string? Text, string? Color) ApplyWithColor(string? formatCode, object? value, CellDataType type)
+    {
+        if (value == null || string.IsNullOrEmpty(formatCode) ||
+            string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
+        {
+            return (null, null);
+        }
+
+        if (formatCode == "@")
+        {
+            return (value.ToString(), null);
+        }
+
+        if (type == CellDataType.String && value is string s)
+        {
+            return (s, null);
+        }
+
+        var parsed = Cache.GetOrAdd(formatCode, static code => ParseFormatCode(code));
+
+        if (!TryGetNumber(value, type, out var number))
+        {
+            return (value.ToString(), null);
+        }
+
+        var section = SelectSection(parsed, number);
+        string? text;
+
+        if (section.IsDate)
+        {
+            text = FormatDate(section, value, type, number);
+        }
+        else
+        {
+            text = FormatNumber(section, number);
+        }
+
+        return (text, section.Color);
+    }
+
+    /// <summary>
     /// Adjusts the number of decimal places in a format code.
     /// </summary>
     public static string AdjustDecimals(string? formatCode, int delta)
@@ -641,6 +685,17 @@ public static class NumberFormat
         var hasDigitPlaceholders = false;
         var prefix = new StringBuilder();
         var suffix = new StringBuilder();
+        string? sectionColor = null;
+
+        // Extract color code from tokens
+        foreach (var token in tokens)
+        {
+            if (token.Type == TokenType.ColorCode)
+            {
+                sectionColor = token.Text;
+                break;
+            }
+        }
 
         // Check for AM/PM and date tokens
         foreach (var token in tokens)
@@ -737,7 +792,7 @@ public static class NumberFormat
             tokens, index, isDate, isPercentage, hasThousands, thousandsScale,
             integerZeros, integerHashes, decimalPlaces, decimalZeros, is12Hour, hasParens,
             hasDigitPlaceholders, prefix.ToString(), isPercentage ? "%" : suffix.ToString(),
-            isScientific, exponentFormat, decimalSpacePlaceholders);
+            isScientific, exponentFormat, decimalSpacePlaceholders, sectionColor);
     }
 
     private static List<FormatToken> Tokenize(string section)
@@ -774,12 +829,18 @@ public static class NumberFormat
                 continue;
             }
 
-            // Bracket (color codes, conditions) — skip
+            // Bracket (color codes, conditions)
             if (c == '[')
             {
                 var end = section.IndexOf(']', i + 1);
                 if (end > i)
                 {
+                    var bracketContent = section[(i + 1)..end];
+                    var colorCss = MapColorCode(bracketContent);
+                    if (colorCss != null)
+                    {
+                        tokens.Add(new FormatToken(TokenType.ColorCode, colorCss));
+                    }
                     i = end + 1;
                 }
                 else
@@ -997,7 +1058,8 @@ public static class NumberFormat
         Literal, Zero, Hash, Decimal, Comma, Percent,
         Year, Month, Day, Hour, Minute, Second, AmPm,
         OpenParen, CloseParen,
-        Exponent, Underscore, Asterisk, QuestionMark
+        Exponent, Underscore, Asterisk, QuestionMark,
+        ColorCode
     }
 
     private sealed class FormatToken
@@ -1027,12 +1089,14 @@ public static class NumberFormat
         public bool IsScientific { get; }
         public string ExponentFormat { get; }
         public int DecimalSpacePlaceholders { get; }
+        public string? Color { get; }
 
         public FormatSection(List<FormatToken> tokens, int index, bool isDate, bool isPercentage,
             bool hasThousandsSeparator, int thousandsScale, int integerZeros, int integerHashes,
             int decimalPlaces, int decimalZeros, bool is12Hour, bool hasParens,
             bool hasDigitPlaceholders, string prefix, string suffix,
-            bool isScientific, string exponentFormat, int decimalSpacePlaceholders)
+            bool isScientific, string exponentFormat, int decimalSpacePlaceholders,
+            string? color)
         {
             Tokens = tokens;
             Index = index;
@@ -1052,7 +1116,24 @@ public static class NumberFormat
             IsScientific = isScientific;
             ExponentFormat = exponentFormat;
             DecimalSpacePlaceholders = decimalSpacePlaceholders;
+            Color = color;
         }
+    }
+
+    private static string? MapColorCode(string code)
+    {
+        return code.ToUpperInvariant() switch
+        {
+            "RED" => "red",
+            "GREEN" => "green",
+            "BLUE" => "blue",
+            "YELLOW" => "#CCCC00",
+            "CYAN" => "cyan",
+            "MAGENTA" => "magenta",
+            "WHITE" => "white",
+            "BLACK" => "black",
+            _ => null
+        };
     }
 
     #endregion

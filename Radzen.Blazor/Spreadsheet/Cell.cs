@@ -58,7 +58,8 @@ public class Cell
     public Cell Clone() => new(Sheet, Address)
     {
         Data = new CellData(Value),
-        Formula = Formula
+        Formula = Formula,
+        Hyperlink = Hyperlink?.Clone()
     };
 
     /// <summary>
@@ -70,6 +71,7 @@ public class Cell
         Data = other.Data;
         Formula = other.Formula;
         format = other.format;
+        Hyperlink = other.Hyperlink?.Clone();
 
         Changed?.Invoke(this);
     }
@@ -93,6 +95,11 @@ public class Cell
     {
         Changed?.Invoke(this);
     }
+
+    /// <summary>
+    /// Gets or sets the hyperlink associated with this cell.
+    /// </summary>
+    public Hyperlink? Hyperlink { get; set; }
 
     /// <summary>
     /// Gets the current value and its type as a CellData object.

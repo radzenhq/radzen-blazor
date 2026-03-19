@@ -17,6 +17,96 @@ internal static class FormatColorExtensions
 }
 
 /// <summary>
+/// Represents the line style for a cell border.
+/// </summary>
+public enum BorderLineStyle
+{
+    /// <summary>No border.</summary>
+    None,
+    /// <summary>Thin border.</summary>
+    Thin,
+    /// <summary>Medium border.</summary>
+    Medium,
+    /// <summary>Thick border.</summary>
+    Thick,
+    /// <summary>Dashed border.</summary>
+    Dashed,
+    /// <summary>Dotted border.</summary>
+    Dotted,
+    /// <summary>Double border.</summary>
+    Double
+}
+
+/// <summary>
+/// Represents a border style with color and line style.
+/// </summary>
+public class BorderStyle
+{
+    /// <summary>
+    /// Gets or sets the border color.
+    /// </summary>
+    public string Color { get; set; } = "#000000";
+
+    /// <summary>
+    /// Gets or sets the border line style.
+    /// </summary>
+    public BorderLineStyle LineStyle { get; set; } = BorderLineStyle.Thin;
+
+    /// <summary>
+    /// Creates a copy of this border style.
+    /// </summary>
+    public BorderStyle Clone() => new() { Color = Color, LineStyle = LineStyle };
+
+    internal void AppendCss(StringBuilder sb, string side)
+    {
+        if (LineStyle == BorderLineStyle.None)
+        {
+            return;
+        }
+
+        sb.Append("border-");
+        sb.Append(side);
+        sb.Append(": ");
+        sb.Append(LineStyle switch
+        {
+            BorderLineStyle.Thin => "1px solid ",
+            BorderLineStyle.Medium => "2px solid ",
+            BorderLineStyle.Thick => "3px solid ",
+            BorderLineStyle.Dashed => "1px dashed ",
+            BorderLineStyle.Dotted => "1px dotted ",
+            BorderLineStyle.Double => "3px double ",
+            _ => "1px solid "
+        });
+        sb.Append(Color);
+        sb.Append(';');
+    }
+
+    internal string ToXlsxStyle() => LineStyle switch
+    {
+        BorderLineStyle.Thin => "thin",
+        BorderLineStyle.Medium => "medium",
+        BorderLineStyle.Thick => "thick",
+        BorderLineStyle.Dashed => "dashed",
+        BorderLineStyle.Dotted => "dotted",
+        BorderLineStyle.Double => "double",
+        _ => "thin"
+    };
+
+    internal static BorderLineStyle FromXlsxStyle(string? style) => style switch
+    {
+        "thin" => BorderLineStyle.Thin,
+        "medium" => BorderLineStyle.Medium,
+        "thick" => BorderLineStyle.Thick,
+        "dashed" => BorderLineStyle.Dashed,
+        "dotted" => BorderLineStyle.Dotted,
+        "double" => BorderLineStyle.Double,
+        "hair" => BorderLineStyle.Dotted,
+        "mediumDashed" => BorderLineStyle.Dashed,
+        _ => BorderLineStyle.None
+    };
+}
+
+/// <summary>
 /// Represents a format that can be applied to cells in a spreadsheet.
 /// </summary>
 public class Format
@@ -24,6 +114,8 @@ public class Format
     private string? color;
     private string? background;
     private string? numberFormat;
+    private string? fontFamily;
+    private double? fontSize;
 
     /// <summary>
     /// Gets or sets whether the text in the format should be bold.
@@ -41,6 +133,16 @@ public class Format
     public bool Underline { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the text in the format should have a strikethrough.
+    /// </summary>
+    public bool Strikethrough { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether text should wrap within the cell.
+    /// </summary>
+    public bool WrapText { get; set; }
+
+    /// <summary>
     /// Gets or sets the text alignment in the format.
     /// </summary>
     public TextAlign TextAlign { get; set; } = TextAlign.Left;
@@ -49,6 +151,58 @@ public class Format
     /// Gets or sets the vertical alignment in the format.
     /// </summary>
     public VerticalAlign VerticalAlign { get; set; } = VerticalAlign.Top;
+
+    /// <summary>
+    /// Gets or sets the font family.
+    /// </summary>
+    public string? FontFamily
+    {
+        get => fontFamily;
+        set
+        {
+            if (fontFamily != value)
+            {
+                fontFamily = value;
+                Changed?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the font size in points.
+    /// </summary>
+    public double? FontSize
+    {
+        get => fontSize;
+        set
+        {
+            if (fontSize != value)
+            {
+                fontSize = value;
+                Changed?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the top border style.
+    /// </summary>
+    public BorderStyle? BorderTop { get; set; }
+
+    /// <summary>
+    /// Gets or sets the right border style.
+    /// </summary>
+    public BorderStyle? BorderRight { get; set; }
+
+    /// <summary>
+    /// Gets or sets the bottom border style.
+    /// </summary>
+    public BorderStyle? BorderBottom { get; set; }
+
+    /// <summary>
+    /// Gets or sets the left border style.
+    /// </summary>
+    public BorderStyle? BorderLeft { get; set; }
 
     /// <summary>
     /// Gets or sets the color of the text in the format.
@@ -134,15 +288,51 @@ public class Format
             sb.Append("font-style: italic;");
         }
 
-        if (Underline)
+        if (Underline && Strikethrough)
+        {
+            sb.Append("text-decoration: underline line-through;");
+        }
+        else if (Underline)
         {
             sb.Append("text-decoration: underline;");
         }
+        else if (Strikethrough)
+        {
+            sb.Append("text-decoration: line-through;");
+        }
+
+        if (FontFamily != null)
+        {
+            sb.Append("font-family: ");
+            sb.Append(FontFamily);
+            sb.Append(';');
+        }
+
+        if (FontSize != null)
+        {
+            sb.Append("font-size: ");
+            sb.Append(FontSize.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            sb.Append("pt;");
+        }
+
+        if (WrapText)
+        {
+            sb.Append("white-space: pre-wrap; word-wrap: break-word;");
+        }
+        else
+        {
+            sb.Append("white-space: nowrap; overflow: hidden;");
+        }
+
+        BorderTop?.AppendCss(sb, "top");
+        BorderRight?.AppendCss(sb, "right");
+        BorderBottom?.AppendCss(sb, "bottom");
+        BorderLeft?.AppendCss(sb, "left");
 
         if (VerticalAlign != VerticalAlign.Top || TextAlign != TextAlign.Left)
         {
             sb.Append("display: flex;");
-            
+
             // Handle vertical alignment with align-items
             if (VerticalAlign != VerticalAlign.Top)
             {
@@ -156,7 +346,7 @@ public class Format
                 });
                 sb.Append(';');
             }
-            
+
             // Handle horizontal alignment with justify-content
             if (TextAlign != TextAlign.Left)
             {
@@ -208,6 +398,16 @@ public class Format
             merged.Underline = true;
         }
 
+        if (format.Strikethrough)
+        {
+            merged.Strikethrough = true;
+        }
+
+        if (format.WrapText)
+        {
+            merged.WrapText = true;
+        }
+
         if (format.TextAlign != TextAlign.Left)
         {
             merged.TextAlign = format.TextAlign;
@@ -221,6 +421,36 @@ public class Format
         if (format.NumberFormat != null)
         {
             merged.NumberFormat = format.NumberFormat;
+        }
+
+        if (format.FontFamily != null)
+        {
+            merged.FontFamily = format.FontFamily;
+        }
+
+        if (format.FontSize != null)
+        {
+            merged.FontSize = format.FontSize;
+        }
+
+        if (format.BorderTop != null)
+        {
+            merged.BorderTop = format.BorderTop.Clone();
+        }
+
+        if (format.BorderRight != null)
+        {
+            merged.BorderRight = format.BorderRight.Clone();
+        }
+
+        if (format.BorderBottom != null)
+        {
+            merged.BorderBottom = format.BorderBottom.Clone();
+        }
+
+        if (format.BorderLeft != null)
+        {
+            merged.BorderLeft = format.BorderLeft.Clone();
         }
 
         return merged;
@@ -307,6 +537,59 @@ public class Format
     }
 
     /// <summary>
+    /// This method is used to create a copy of the current format with a new strikethrough setting.
+    /// </summary>
+    public Format WithStrikethrough(bool strikethrough)
+    {
+        var clone = Clone();
+        clone.Strikethrough = strikethrough;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new font family.
+    /// </summary>
+    public Format WithFontFamily(string? fontFamily)
+    {
+        var clone = Clone();
+        clone.FontFamily = fontFamily;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new font size.
+    /// </summary>
+    public Format WithFontSize(double? fontSize)
+    {
+        var clone = Clone();
+        clone.FontSize = fontSize;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new wrap text setting.
+    /// </summary>
+    public Format WithWrapText(bool wrapText)
+    {
+        var clone = Clone();
+        clone.WrapText = wrapText;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with new border styles.
+    /// </summary>
+    public Format WithBorders(BorderStyle? top, BorderStyle? right, BorderStyle? bottom, BorderStyle? left)
+    {
+        var clone = Clone();
+        clone.BorderTop = top?.Clone();
+        clone.BorderRight = right?.Clone();
+        clone.BorderBottom = bottom?.Clone();
+        clone.BorderLeft = left?.Clone();
+        return clone;
+    }
+
+    /// <summary>
     /// Creates a new instance of the Format class that is a copy of the current instance.
     /// </summary>
     public Format Clone()
@@ -318,9 +601,17 @@ public class Format
             Bold = Bold,
             Italic = Italic,
             Underline = Underline,
+            Strikethrough = Strikethrough,
+            WrapText = WrapText,
             TextAlign = TextAlign,
             VerticalAlign = VerticalAlign,
-            NumberFormat = NumberFormat
+            NumberFormat = NumberFormat,
+            FontFamily = FontFamily,
+            FontSize = FontSize,
+            BorderTop = BorderTop?.Clone(),
+            BorderRight = BorderRight?.Clone(),
+            BorderBottom = BorderBottom?.Clone(),
+            BorderLeft = BorderLeft?.Clone()
         };
     }
 }

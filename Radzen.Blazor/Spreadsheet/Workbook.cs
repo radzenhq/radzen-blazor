@@ -110,14 +110,16 @@ public class Workbook
 
     private class StyleTracker
     {
-        public Dictionary<(string? Color, bool Bold, bool Italic, bool Underline), int> FontStyles { get; } = new();
+        public Dictionary<(string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize), int> FontStyles { get; } = new();
         public Dictionary<string, int> FillStyles { get; } = new();
-        public Dictionary<(int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId), int> CellStyles { get; } = new();
+        public Dictionary<(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId), int> CellStyles { get; } = new();
         public Dictionary<string, int> NumberFormats { get; } = new(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<(string? TopStyle, string? TopColor, string? RightStyle, string? RightColor, string? BottomStyle, string? BottomColor, string? LeftStyle, string? LeftColor), int> BorderStyles { get; } = new();
         public XDocument StylesDocument { get; set; } = null!;
         public XElement FontsElement { get; set; } = null!;
         public XElement FillsElement { get; set; } = null!;
         public XElement CellXfsElement { get; set; } = null!;
+        public XElement BordersElement { get; set; } = null!;
         public XElement? NumFmtsElement { get; set; }
     }
 
@@ -189,6 +191,7 @@ public class Workbook
         styleTracker.FontsElement = stylesDoc.Root!.Element(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
         styleTracker.FillsElement = stylesDoc.Root!.Element(XName.Get("fills", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
         styleTracker.CellXfsElement = stylesDoc.Root!.Element(XName.Get("cellXfs", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
+        styleTracker.BordersElement = stylesDoc.Root!.Element(XName.Get("borders", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
 
         return styleTracker;
     }
@@ -320,9 +323,82 @@ public class Workbook
         // Add auto filter
         AddAutoFilter(sheet, sheetDoc);
 
+        // Add hyperlinks
+        var hyperlinkRels = AddHyperlinks(sheet, sheetDoc);
+
         // Save sheet in xl/worksheets/ subdirectory
-        using var entry = archive.CreateEntry($"xl/worksheets/{sheetName}").Open();
-        sheetDoc.Save(entry);
+        using (var entry = archive.CreateEntry($"xl/worksheets/{sheetName}").Open())
+        {
+            sheetDoc.Save(entry);
+        }
+
+        // Save sheet relationships for hyperlinks
+        if (hyperlinkRels.Count > 0)
+        {
+            SaveSheetRelationships(archive, sheetName, hyperlinkRels);
+        }
+    }
+
+    private static List<(string Id, string Url)> AddHyperlinks(Sheet sheet, XDocument sheetDoc)
+    {
+        var rels = new List<(string Id, string Url)>();
+        var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+        XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+        var relIndex = 1;
+
+        XElement? hyperlinksElement = null;
+
+        for (var row = 0; row < sheet.RowCount; row++)
+        {
+            for (var col = 0; col < sheet.ColumnCount; col++)
+            {
+                var cell = sheet.Cells[row, col];
+                if (cell.Hyperlink != null)
+                {
+                    hyperlinksElement ??= new XElement(XName.Get("hyperlinks", ns));
+
+                    var relId = $"rId{relIndex++}";
+                    var cellRef = new CellRef(row, col).ToString();
+
+                    var hyperlinkElement = new XElement(XName.Get("hyperlink", ns),
+                        new XAttribute("ref", cellRef),
+                        new XAttribute(rNs + "id", relId));
+
+                    if (cell.Hyperlink.DisplayText != null)
+                    {
+                        hyperlinkElement.Add(new XAttribute("display", cell.Hyperlink.DisplayText));
+                    }
+
+                    hyperlinksElement.Add(hyperlinkElement);
+                    rels.Add((relId, cell.Hyperlink.Url));
+                }
+            }
+        }
+
+        if (hyperlinksElement != null)
+        {
+            sheetDoc.Root!.Add(hyperlinksElement);
+        }
+
+        return rels;
+    }
+
+    private static void SaveSheetRelationships(ZipArchive archive, string sheetName, List<(string Id, string Url)> rels)
+    {
+        var relsDoc = new XDocument(
+            new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships")));
+
+        foreach (var (id, url) in rels)
+        {
+            relsDoc.Root!.Add(new XElement(XName.Get("Relationship", "http://schemas.openxmlformats.org/package/2006/relationships"),
+                new XAttribute("Id", id),
+                new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"),
+                new XAttribute("Target", url),
+                new XAttribute("TargetMode", "External")));
+        }
+
+        using var entry = archive.CreateEntry($"xl/worksheets/_rels/{sheetName}.rels").Open();
+        relsDoc.Save(entry);
     }
 
     private static XDocument CreateSheetDocument(Sheet sheet, int sheetId, string relId)
@@ -455,6 +531,14 @@ public class Workbook
                cell.Format.Bold ||
                cell.Format.Italic ||
                cell.Format.Underline ||
+               cell.Format.Strikethrough ||
+               cell.Format.WrapText ||
+               cell.Format.FontFamily != null ||
+               cell.Format.FontSize != null ||
+               cell.Format.BorderTop != null ||
+               cell.Format.BorderRight != null ||
+               cell.Format.BorderBottom != null ||
+               cell.Format.BorderLeft != null ||
                cell.Format.TextAlign != TextAlign.Left ||
                cell.Format.VerticalAlign != VerticalAlign.Top ||
                !string.IsNullOrEmpty(cell.Format.NumberFormat) ||
@@ -466,14 +550,15 @@ public class Workbook
         var fontId = GetOrCreateFontStyle(cell, styleTracker);
         var fillId = GetOrCreateFillStyle(cell, styleTracker);
         var numFmtId = GetOrCreateNumberFormat(cell, styleTracker);
+        var borderId = GetOrCreateBorderStyle(cell, styleTracker);
 
-        var styleKey = (fontId, fillId, cell.Format.TextAlign, cell.Format.VerticalAlign, numFmtId);
+        var styleKey = (fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId);
 
         if (!styleTracker.CellStyles.TryGetValue(styleKey, out int styleId))
         {
             styleId = styleTracker.CellStyles.Count + 1;
             styleTracker.CellStyles[styleKey] = styleId;
-            CreateCellStyleElement(cell, fontId, fillId, numFmtId, styleTracker);
+            CreateCellStyleElement(cell, fontId, fillId, borderId, numFmtId, styleTracker);
         }
 
         return styleId;
@@ -481,7 +566,7 @@ public class Workbook
 
     private int GetOrCreateFontStyle(Cell cell, StyleTracker styleTracker)
     {
-        var fontKey = (cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline);
+        var fontKey = (cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline, cell.Format.Strikethrough, cell.Format.FontFamily, cell.Format.FontSize);
 
         if (!styleTracker.FontStyles.TryGetValue(fontKey, out int fontId))
         {
@@ -508,6 +593,65 @@ public class Workbook
         }
 
         return fillId;
+    }
+
+    private int GetOrCreateBorderStyle(Cell cell, StyleTracker styleTracker)
+    {
+        var bt = cell.Format.BorderTop;
+        var br = cell.Format.BorderRight;
+        var bb = cell.Format.BorderBottom;
+        var bl = cell.Format.BorderLeft;
+
+        if (bt == null && br == null && bb == null && bl == null)
+        {
+            return 0;
+        }
+
+        var borderKey = (
+            bt?.ToXlsxStyle(), bt?.Color,
+            br?.ToXlsxStyle(), br?.Color,
+            bb?.ToXlsxStyle(), bb?.Color,
+            bl?.ToXlsxStyle(), bl?.Color
+        );
+
+        if (!styleTracker.BorderStyles.TryGetValue(borderKey, out int borderId))
+        {
+            borderId = styleTracker.BorderStyles.Count + 1;
+            styleTracker.BorderStyles[borderKey] = borderId;
+            CreateBorderElement(cell, styleTracker);
+        }
+
+        return borderId;
+    }
+
+    private static void CreateBorderElement(Cell cell, StyleTracker styleTracker)
+    {
+        var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+
+        var borderElement = new XElement(XName.Get("border", ns));
+
+        AddBorderSide(borderElement, "left", cell.Format.BorderLeft, ns);
+        AddBorderSide(borderElement, "right", cell.Format.BorderRight, ns);
+        AddBorderSide(borderElement, "top", cell.Format.BorderTop, ns);
+        AddBorderSide(borderElement, "bottom", cell.Format.BorderBottom, ns);
+        borderElement.Add(new XElement(XName.Get("diagonal", ns)));
+
+        styleTracker.BordersElement.Add(borderElement);
+        styleTracker.BordersElement.Attribute("count")!.Value = (styleTracker.BorderStyles.Count + 1).ToString(CultureInfo.InvariantCulture);
+    }
+
+    private static void AddBorderSide(XElement borderElement, string side, BorderStyle? style, string ns)
+    {
+        var sideElement = new XElement(XName.Get(side, ns));
+
+        if (style != null && style.LineStyle != BorderLineStyle.None)
+        {
+            sideElement.Add(new XAttribute("style", style.ToXlsxStyle()));
+            sideElement.Add(new XElement(XName.Get("color", ns),
+                new XAttribute("rgb", style.Color.ToXLSXColor())));
+        }
+
+        borderElement.Add(sideElement);
     }
 
     private static int GetOrCreateNumberFormat(Cell cell, StyleTracker styleTracker)
@@ -562,11 +706,14 @@ public class Workbook
 
     private void CreateFontElement(Cell cell, int fontId, StyleTracker styleTracker)
     {
+        var fontSize = cell.Format.FontSize ?? 11;
+        var fontName = cell.Format.FontFamily ?? "Aptos Narrow";
+
         var fontElement = new XElement(XName.Get("font", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XElement(XName.Get("sz", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("val", "11")),
+                new XAttribute("val", fontSize.ToString(CultureInfo.InvariantCulture))),
             new XElement(XName.Get("name", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("val", "Aptos Narrow")));
+                new XAttribute("val", fontName)));
 
         if (cell.Format.Color != null)
         {
@@ -584,6 +731,10 @@ public class Workbook
         if (cell.Format.Underline)
         {
             fontElement.Add(new XElement(XName.Get("u", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
+        }
+        if (cell.Format.Strikethrough)
+        {
+            fontElement.Add(new XElement(XName.Get("strike", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
         }
 
         styleTracker.FontsElement.Add(fontElement);
@@ -607,20 +758,21 @@ public class Workbook
     /// <summary>
     /// Creates a cell style element in the styles document.
     /// </summary>
-    private void CreateCellStyleElement(Cell cell, int fontId, int fillId, int numFmtId, StyleTracker styleTracker)
+    private void CreateCellStyleElement(Cell cell, int fontId, int fillId, int borderId, int numFmtId, StyleTracker styleTracker)
     {
         var xfElement = new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XAttribute("numFmtId", numFmtId.ToString(CultureInfo.InvariantCulture)),
             new XAttribute("fontId", fontId.ToString(CultureInfo.InvariantCulture)),
             new XAttribute("fillId", fillId.ToString(CultureInfo.InvariantCulture)),
-            new XAttribute("borderId", "0"),
+            new XAttribute("borderId", borderId.ToString(CultureInfo.InvariantCulture)),
             new XAttribute("xfId", "0"),
             new XAttribute("applyFont", fontId > 0 ? "1" : "0"),
             new XAttribute("applyFill", fillId > 0 ? "1" : "0"),
-            new XAttribute("applyNumberFormat", numFmtId > 0 ? "1" : "0"));
+            new XAttribute("applyNumberFormat", numFmtId > 0 ? "1" : "0"),
+            new XAttribute("applyBorder", borderId > 0 ? "1" : "0"));
 
         // Add alignment if not default
-        if (cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top)
+        if (cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top || cell.Format.WrapText)
         {
             var alignmentElement = CreateAlignmentElement(cell);
             xfElement.Add(alignmentElement);
@@ -659,6 +811,11 @@ public class Workbook
                 _ => "top"
             };
             alignmentElement.Add(new XAttribute("vertical", verticalAlign));
+        }
+
+        if (cell.Format.WrapText)
+        {
+            alignmentElement.Add(new XAttribute("wrapText", "1"));
         }
 
         return alignmentElement;
@@ -967,10 +1124,11 @@ public class Workbook
 
     private static StyleInfo ParseStyles(ZipArchive archive)
     {
-        var fontStyles = new Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)>();
+        var fontStyles = new Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)>();
         var fillColors = new Dictionary<int, string>();
-        var cellStyles = new Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId)>(0);
+        var cellStyles = new Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId)>(0);
         var numberFormats = new Dictionary<int, string>();
+        var borderStyles = new Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)>();
 
         var stylesEntry = archive.GetEntry("xl/styles.xml");
         if (stylesEntry != null)
@@ -982,13 +1140,14 @@ public class Workbook
             ParseFonts(stylesDoc, stylesNs, fontStyles);
             ParseFills(stylesDoc, stylesNs, fillColors);
             ParseNumberFormats(stylesDoc, stylesNs, numberFormats);
-            ParseCellStyles(stylesDoc, stylesNs, fontStyles, fillColors, numberFormats, cellStyles);
+            ParseBorders(stylesDoc, stylesNs, borderStyles);
+            ParseCellStyles(stylesDoc, stylesNs, fontStyles, fillColors, numberFormats, borderStyles, cellStyles);
         }
 
-        return new StyleInfo(fontStyles, fillColors, cellStyles, numberFormats);
+        return new StyleInfo(fontStyles, fillColors, cellStyles, numberFormats, borderStyles);
     }
 
-    private static void ParseFonts(XDocument stylesDoc, XNamespace stylesNs, Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles)
+    private static void ParseFonts(XDocument stylesDoc, XNamespace stylesNs, Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)> fontStyles)
     {
         var fonts = stylesDoc.Descendants(stylesNs + "font").ToList();
         for (var i = 0; i < fonts.Count; i++)
@@ -1002,8 +1161,63 @@ public class Workbook
             bool bold = fonts[i].Element(stylesNs + "b") != null;
             bool italic = fonts[i].Element(stylesNs + "i") != null;
             bool underline = fonts[i].Element(stylesNs + "u") != null;
-            fontStyles[i] = (colorValue, bold, italic, underline);
+            bool strikethrough = fonts[i].Element(stylesNs + "strike") != null;
+
+            var fontName = fonts[i].Element(stylesNs + "name")?.Attribute("val")?.Value;
+            string? fontFamily = fontName != null && fontName != "Aptos Narrow" ? fontName : null;
+
+            var szValue = fonts[i].Element(stylesNs + "sz")?.Attribute("val")?.Value;
+            double? fontSize = null;
+            if (szValue != null && double.TryParse(szValue, System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture, out var sz) && sz != 11)
+            {
+                fontSize = sz;
+            }
+
+            fontStyles[i] = (colorValue, bold, italic, underline, strikethrough, fontFamily, fontSize);
         }
+    }
+
+    private static void ParseBorders(XDocument stylesDoc, XNamespace stylesNs, Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> borderStyles)
+    {
+        var borders = stylesDoc.Descendants(stylesNs + "border").ToList();
+        for (var i = 0; i < borders.Count; i++)
+        {
+            var top = ParseBorderSide(borders[i].Element(stylesNs + "top"), stylesNs);
+            var right = ParseBorderSide(borders[i].Element(stylesNs + "right"), stylesNs);
+            var bottom = ParseBorderSide(borders[i].Element(stylesNs + "bottom"), stylesNs);
+            var left = ParseBorderSide(borders[i].Element(stylesNs + "left"), stylesNs);
+
+            if (top != null || right != null || bottom != null || left != null)
+            {
+                borderStyles[i] = (top, right, bottom, left);
+            }
+        }
+    }
+
+    private static BorderStyle? ParseBorderSide(XElement? element, XNamespace ns)
+    {
+        if (element == null)
+        {
+            return null;
+        }
+
+        var styleAttr = element.Attribute("style")?.Value;
+        if (string.IsNullOrEmpty(styleAttr))
+        {
+            return null;
+        }
+
+        var lineStyle = BorderStyle.FromXlsxStyle(styleAttr);
+        if (lineStyle == BorderLineStyle.None)
+        {
+            return null;
+        }
+
+        var colorElement = element.Element(ns + "color");
+        var rgbColor = colorElement?.Attribute("rgb")?.Value;
+        var color = rgbColor != null ? "#" + rgbColor[2..] : "#000000";
+
+        return new BorderStyle { LineStyle = lineStyle, Color = color };
     }
 
     private static void ParseFills(XDocument stylesDoc, XNamespace stylesNs, Dictionary<int, string> fillColors)
@@ -1034,45 +1248,51 @@ public class Workbook
     }
 
     private static void ParseCellStyles(XDocument stylesDoc, XNamespace stylesNs,
-        Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles,
+        Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)> fontStyles,
         Dictionary<int, string> fillColors,
         Dictionary<int, string> numberFormats,
-        Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId)> cellStyles)
+        Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> borderStyles,
+        Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId)> cellStyles)
     {
         var cellXfs = stylesDoc.Descendants(stylesNs + "cellXfs").FirstOrDefault()?.Elements(stylesNs + "xf").ToList() ?? [];
         for (var i = 0; i < cellXfs.Count; i++)
         {
             var fontId = cellXfs[i].Attribute("fontId")?.Value;
             var fillId = cellXfs[i].Attribute("fillId")?.Value;
+            var borderId = cellXfs[i].Attribute("borderId")?.Value;
             var applyFont = cellXfs[i].Attribute("applyFont")?.Value;
             var applyFill = cellXfs[i].Attribute("applyFill")?.Value;
+            var applyBorder = cellXfs[i].Attribute("applyBorder")?.Value;
             var applyAlignment = cellXfs[i].Attribute("applyAlignment")?.Value;
             var numFmtIdAttr = cellXfs[i].Attribute("numFmtId")?.Value;
             var numFmtId = numFmtIdAttr != null ? int.Parse(numFmtIdAttr, CultureInfo.InvariantCulture) : 0;
 
             if (fontId != null && fillId != null)
             {
-                // Only include styles that are actually applied
                 var fontIdValue = int.Parse(fontId, CultureInfo.InvariantCulture);
                 var fillIdValue = int.Parse(fillId, CultureInfo.InvariantCulture);
+                var borderIdValue = borderId != null ? int.Parse(borderId, CultureInfo.InvariantCulture) : 0;
 
-                var (textAlign, verticalAlign) = ParseAlignment(cellXfs[i], stylesNs, applyAlignment);
+                var (textAlign, verticalAlign, wrapText) = ParseAlignment(cellXfs[i], stylesNs, applyAlignment);
 
                 if (applyFont == "1" && fontStyles.ContainsKey(fontIdValue) ||
                     applyFill == "1" && fillColors.ContainsKey(fillIdValue) ||
+                    applyBorder == "1" && borderStyles.ContainsKey(borderIdValue) ||
+                    applyAlignment == "1" ||
                     numFmtId > 0)
                 {
-                    cellStyles[i] = (fontIdValue, fillIdValue, textAlign, verticalAlign, numFmtId);
+                    cellStyles[i] = (fontIdValue, fillIdValue, borderIdValue, textAlign, verticalAlign, wrapText, numFmtId);
                 }
             }
         }
     }
 
-    private static (TextAlign TextAlign, VerticalAlign VerticalAlign) ParseAlignment(XElement cellXf, XNamespace stylesNs, string? applyAlignment)
+    private static (TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText) ParseAlignment(XElement cellXf, XNamespace stylesNs, string? applyAlignment)
     {
         var textAlign = TextAlign.Left;
         var verticalAlign = VerticalAlign.Top;
-        
+        var wrapText = false;
+
         if (applyAlignment == "1")
         {
             var alignment = cellXf.Element(stylesNs + "alignment");
@@ -1093,10 +1313,11 @@ public class Workbook
                     "bottom" => VerticalAlign.Bottom,
                     _ => VerticalAlign.Top
                 };
+                wrapText = alignment.Attribute("wrapText")?.Value == "1";
             }
         }
 
-        return (textAlign, verticalAlign);
+        return (textAlign, verticalAlign, wrapText);
     }
 
     private static List<string> ParseSharedStrings(ZipArchive archive)
@@ -1181,6 +1402,9 @@ public class Workbook
 
         // Parse auto filter
         ParseAutoFilter(sheetDoc, sNs, sheet);
+
+        // Parse hyperlinks
+        ParseHyperlinks(archive, sheetInfo, sheetDoc, sNs, sheet);
 
         sheet.Name = sheetInfo.Name;
         return sheet;
@@ -1348,32 +1572,50 @@ public class Workbook
         if (styleId != null &&
             styleInfo.CellStyles.TryGetValue(int.Parse(styleId, CultureInfo.InvariantCulture), out var style))
         {
+            var fmt = sheet.Cells[address.Row, address.Column].Format;
+
             if (styleInfo.FontStyles.TryGetValue(style.FontId, out var fontStyle))
             {
                 if (fontStyle.Color != null)
                 {
-                    sheet.Cells[address.Row, address.Column].Format.Color = fontStyle.Color;
+                    fmt.Color = fontStyle.Color;
                 }
-                sheet.Cells[address.Row, address.Column].Format.Bold = fontStyle.Bold;
-                sheet.Cells[address.Row, address.Column].Format.Italic = fontStyle.Italic;
-                sheet.Cells[address.Row, address.Column].Format.Underline = fontStyle.Underline;
+                fmt.Bold = fontStyle.Bold;
+                fmt.Italic = fontStyle.Italic;
+                fmt.Underline = fontStyle.Underline;
+                fmt.Strikethrough = fontStyle.Strikethrough;
+                if (fontStyle.FontFamily != null)
+                {
+                    fmt.FontFamily = fontStyle.FontFamily;
+                }
+                if (fontStyle.FontSize != null)
+                {
+                    fmt.FontSize = fontStyle.FontSize;
+                }
             }
-            sheet.Cells[address.Row, address.Column].Format.TextAlign = style.TextAlign;
-            sheet.Cells[address.Row, address.Column].Format.VerticalAlign = style.VerticalAlign;
+            fmt.TextAlign = style.TextAlign;
+            fmt.VerticalAlign = style.VerticalAlign;
+            fmt.WrapText = style.WrapText;
             if (styleInfo.FillColors.TryGetValue(style.FillId, out var fillColor))
             {
-                sheet.Cells[address.Row, address.Column].Format.BackgroundColor = fillColor;
+                fmt.BackgroundColor = fillColor;
+            }
+            if (styleInfo.BorderStyles.TryGetValue(style.BorderId, out var borderStyle))
+            {
+                fmt.BorderTop = borderStyle.Top?.Clone();
+                fmt.BorderRight = borderStyle.Right?.Clone();
+                fmt.BorderBottom = borderStyle.Bottom?.Clone();
+                fmt.BorderLeft = borderStyle.Left?.Clone();
             }
             if (style.NumFmtId > 0)
             {
-                // Try custom number formats first, then built-in
                 var formatCode = styleInfo.NumberFormats.TryGetValue(style.NumFmtId, out var custom)
                     ? custom
                     : NumberFormatPresets.GetFormatCode(style.NumFmtId);
 
                 if (formatCode != null && !string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
                 {
-                    sheet.Cells[address.Row, address.Column].Format.NumberFormat = formatCode;
+                    fmt.NumberFormat = formatCode;
                 }
             }
         }
@@ -1444,23 +1686,78 @@ public class Workbook
         }
     }
 
+    private static void ParseHyperlinks(ZipArchive archive, SheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    {
+        var hyperlinks = sheetDoc.Descendants(sNs + "hyperlink").ToList();
+        if (hyperlinks.Count == 0)
+        {
+            return;
+        }
+
+        // Load sheet relationships
+        var relMap = new Dictionary<string, string>();
+        var sheetFileName = sheetInfo.FullPath.Split('/').Last();
+        var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
+        var relsEntry = archive.GetEntry(relsPath);
+        if (relsEntry != null)
+        {
+            using var relsStream = relsEntry.Open();
+            var relsDoc = XDocument.Load(relsStream);
+            var relsNs = XNamespace.Get("http://schemas.openxmlformats.org/package/2006/relationships");
+            foreach (var rel in relsDoc.Descendants(relsNs + "Relationship"))
+            {
+                var id = rel.Attribute("Id")?.Value;
+                var target = rel.Attribute("Target")?.Value;
+                if (id != null && target != null)
+                {
+                    relMap[id] = target;
+                }
+            }
+        }
+
+        XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+
+        foreach (var hyperlink in hyperlinks)
+        {
+            var cellRef = hyperlink.Attribute("ref")?.Value;
+            var relId = hyperlink.Attribute(rNs + "id")?.Value;
+            var display = hyperlink.Attribute("display")?.Value;
+
+            if (cellRef != null && relId != null && relMap.TryGetValue(relId, out var url))
+            {
+                var address = CellRef.Parse(cellRef);
+                if (address.Row < sheet.RowCount && address.Column < sheet.ColumnCount)
+                {
+                    sheet.Cells[address.Row, address.Column].Hyperlink = new Hyperlink
+                    {
+                        Url = url,
+                        DisplayText = display
+                    };
+                }
+            }
+        }
+    }
+
     private class StyleInfo
     {
-        public Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> FontStyles { get; }
+        public Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)> FontStyles { get; }
         public Dictionary<int, string> FillColors { get; }
-        public Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId)> CellStyles { get; }
+        public Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId)> CellStyles { get; }
         public Dictionary<int, string> NumberFormats { get; }
+        public Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> BorderStyles { get; }
 
         public StyleInfo(
-            Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles,
+            Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)> fontStyles,
             Dictionary<int, string> fillColors,
-            Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign, int NumFmtId)> cellStyles,
-            Dictionary<int, string> numberFormats)
+            Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId)> cellStyles,
+            Dictionary<int, string> numberFormats,
+            Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> borderStyles)
         {
             FontStyles = fontStyles;
             FillColors = fillColors;
             CellStyles = cellStyles;
             NumberFormats = numberFormats;
+            BorderStyles = borderStyles;
         }
     }
 

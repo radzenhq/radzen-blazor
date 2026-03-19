@@ -1,0 +1,105 @@
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenStack Gap="1rem" Style="padding: 1rem; min-width: 350px">
+    <RadzenFormField Text="Rule Type">
+        <RadzenDropDown @bind-Value=@RuleType Data=@RuleTypes TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
+    </RadzenFormField>
+
+    @if (RuleType == "greater" || RuleType == "less" || RuleType == "equal")
+    {
+        <RadzenFormField Text="Value">
+            <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
+        </RadzenFormField>
+    }
+
+    @if (RuleType == "between")
+    {
+        <RadzenFormField Text="Minimum">
+            <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
+        </RadzenFormField>
+        <RadzenFormField Text="Maximum">
+            <RadzenTextBox @bind-Value=@Value2 Style="width: 100%" />
+        </RadzenFormField>
+    }
+
+    @if (RuleType == "text")
+    {
+        <RadzenFormField Text="Text">
+            <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
+        </RadzenFormField>
+    }
+
+    <RadzenFormField Text="Background Color">
+        <RadzenColorPicker @bind-Value=@BackgroundColor Style="width: 100%" />
+    </RadzenFormField>
+
+    <RadzenFormField Text="Text Color">
+        <RadzenColorPicker @bind-Value=@TextColor Style="width: 100%" />
+    </RadzenFormField>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+        <RadzenButton Text="OK" Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Text="Cancel" Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+    [Inject]
+    public DialogService DialogService { get; set; } = default!;
+
+    [Parameter]
+    public string RuleType { get; set; } = "greater";
+
+    private string Value1 { get; set; } = "";
+    private string Value2 { get; set; } = "";
+    private string BackgroundColor { get; set; } = "#FFEB9C";
+    private string TextColor { get; set; } = "#9C5700";
+
+    private static readonly List<RuleTypeOption> RuleTypes =
+    [
+        new("Greater Than", "greater"),
+        new("Less Than", "less"),
+        new("Between", "between"),
+        new("Equal To", "equal"),
+        new("Text Contains", "text")
+    ];
+
+    private void OnOk()
+    {
+        var format = new Format { BackgroundColor = BackgroundColor, Color = TextColor };
+        ConditionalFormatBase? rule = RuleType switch
+        {
+            "greater" when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var v) =>
+                new GreaterThanRule { Value = v, Format = format },
+            "less" when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var v) =>
+                new LessThanRule { Value = v, Format = format },
+            "between" when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var min) &&
+                double.TryParse(Value2, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var max) =>
+                new BetweenRule { Minimum = min, Maximum = max, Format = format },
+            "equal" => new EqualToRule { Value = Value1, Format = format },
+            "text" => new TextContainsRule { Text = Value1, Format = format },
+            _ => null
+        };
+
+        if (rule != null)
+        {
+            DialogService.Close(rule);
+        }
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close(null);
+    }
+
+    private sealed class RuleTypeOption(string name, string value)
+    {
+        public string Name { get; } = name;
+        public string Value { get; } = value;
+    }
+}
