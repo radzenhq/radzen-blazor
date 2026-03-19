@@ -60,7 +60,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Treemap_Renders_SvgElement()
+        public void Treemap_Renders_DivContainer()
         {
             using var ctx = CreateChartContext();
 
@@ -69,7 +69,8 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Data, new List<object>());
             });
 
-            Assert.Contains("<svg", component.Markup);
+            // Treemap renders as div; SVG content appears only after JS resize callback
+            Assert.Contains("rz-treemap", component.Markup);
         }
 
         [Fact]
