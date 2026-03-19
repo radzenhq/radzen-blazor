@@ -75,6 +75,63 @@
         sheet.Cells["H5"].Value = 50;
         sheet.Cells["H5"].Validate();
 
+        // Warning-style validation in J column
+        sheet.Cells["J1"].Value = "Warning (>0)";
+        sheet.Validation.Add(RangeRef.Parse("J4:J10"), new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "0",
+            ErrorStyle = DataValidationErrorStyle.Warning,
+            Error = "Value should be greater than 0.",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Warning validation",
+            Prompt = "Enter a number greater than 0. Invalid values will show a warning."
+        });
+
+        // Information-style validation in K column
+        sheet.Cells["K1"].Value = "Info (1-50)";
+        sheet.Validation.Add(RangeRef.Parse("K4:K10"), new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.Between,
+            Formula1 = "1",
+            Formula2 = "50",
+            ErrorStyle = DataValidationErrorStyle.Information,
+            Error = "Value is outside the recommended range of 1-50.",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Information validation",
+            Prompt = "Enter a number between 1 and 50. Values outside this range are allowed."
+        });
+
+        // Custom formula validation in L column (relative refs: shifts per row)
+        sheet.Cells["L1"].Value = "Custom (>H)";
+        sheet.Validation.Add(RangeRef.Parse("L4:L10"), new DataValidationRule
+        {
+            Type = DataValidationType.Custom,
+            Formula1 = "=L4>H4",
+            Error = "Value must be greater than the corresponding H column value.",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Custom formula",
+            Prompt = "Enter a value greater than the value in column H."
+        });
+
+        // List from cell range in M column (reads items from N1:N3)
+        sheet.Cells["M1"].Value = "Color";
+        sheet.Cells["N1"].Value = "Red";
+        sheet.Cells["N2"].Value = "Green";
+        sheet.Cells["N3"].Value = "Blue";
+        sheet.Validation.Add(RangeRef.Parse("M4:M10"), new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "=$N$1:$N$3",
+            Error = "Please select a color from the list.",
+            ShowErrorMessage = true
+        });
+
         sheet.ConditionalFormats.Add(RangeRef.Parse("A1:F10"), new MyFormat());
         sheet.EndUpdate();
     }
