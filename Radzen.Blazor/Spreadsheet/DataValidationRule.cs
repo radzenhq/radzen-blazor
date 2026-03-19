@@ -141,12 +141,76 @@ public class DataValidationRule : ICellValidator
                 return [];
             }
 
+            if (Formula1.StartsWith('='))
+            {
+                return [];
+            }
+
             return Formula1.Split(',').Select(s => s.Trim().Trim('"')).ToList();
+        }
+    }
+
+    /// <summary>
+    /// Gets the list items for List type validation, resolving cell range references from the given sheet.
+    /// </summary>
+    public IReadOnlyList<string> GetListItems(Sheet? sheet)
+    {
+        if (Type != DataValidationType.List || string.IsNullOrEmpty(Formula1))
+        {
+            return [];
+        }
+
+        if (Formula1.StartsWith('=') && sheet != null)
+        {
+            return ResolveListFromRange(sheet);
+        }
+
+        return Formula1.Split(',').Select(s => s.Trim().Trim('"')).ToList();
+    }
+
+    private IReadOnlyList<string> ResolveListFromRange(Sheet sheet)
+    {
+        try
+        {
+            var rangeText = Formula1![1..]; // strip leading '='
+            var range = RangeRef.Parse(rangeText);
+
+            var items = new List<string>();
+
+            for (var row = range.Start.Row; row <= range.End.Row; row++)
+            {
+                for (var col = range.Start.Column; col <= range.End.Column; col++)
+                {
+                    if (sheet.Cells.TryGet(row, col, out var cell) && cell.Value != null)
+                    {
+                        items.Add(cell.Value.ToString() ?? "");
+                    }
+                    else
+                    {
+                        items.Add("");
+                    }
+                }
+            }
+
+            return items;
+        }
+        catch
+        {
+            return [];
         }
     }
 
     /// <inheritdoc/>
     public bool Validate(Cell cell)
+    {
+        ArgumentNullException.ThrowIfNull(cell);
+        return Validate(cell, cell.Address);
+    }
+
+    /// <summary>
+    /// Validates the specified cell, adjusting formula references relative to the given range start.
+    /// </summary>
+    public bool Validate(Cell cell, CellRef rangeStart)
     {
         ArgumentNullException.ThrowIfNull(cell);
 
@@ -163,7 +227,7 @@ public class DataValidationRule : ICellValidator
             DataValidationType.Date => ValidateDate(cell),
             DataValidationType.Time => ValidateTime(cell),
             DataValidationType.TextLength => ValidateTextLength(cell),
-            DataValidationType.Custom => true, // Custom formula validation not implemented yet
+            DataValidationType.Custom => ValidateCustom(cell, rangeStart),
             _ => true
         };
     }
@@ -198,7 +262,7 @@ public class DataValidationRule : ICellValidator
 
     private bool ValidateList(Cell cell)
     {
-        var items = ListItems;
+        var items = GetListItems(cell.Sheet);
         var cellValue = cell.Value?.ToString() ?? "";
         return items.Any(item => string.Equals(item, cellValue, StringComparison.OrdinalIgnoreCase));
     }
@@ -235,6 +299,53 @@ public class DataValidationRule : ICellValidator
     {
         var text = cell.Value?.ToString() ?? "";
         return CompareValue(text.Length);
+    }
+
+    private bool ValidateCustom(Cell cell, CellRef rangeStart)
+    {
+        if (string.IsNullOrEmpty(Formula1))
+        {
+            return true;
+        }
+
+        try
+        {
+            var formula = Formula1.StartsWith('=') ? Formula1 : "=" + Formula1;
+
+            var rowDelta = cell.Address.Row - rangeStart.Row;
+            var colDelta = cell.Address.Column - rangeStart.Column;
+
+            if (rowDelta != 0 || colDelta != 0)
+            {
+                formula = Sheet.AdjustFormulaForCopy(formula, rowDelta, colDelta);
+            }
+
+            var tree = FormulaParser.Parse(formula);
+
+            if (tree.Errors.Count > 0)
+            {
+                return false;
+            }
+
+            var evaluator = new FormulaEvaluator(cell.Sheet, cell);
+            var result = evaluator.Evaluate(tree.Root);
+
+            if (result.Value is bool boolValue)
+            {
+                return boolValue;
+            }
+
+            if (result.Type == CellDataType.Number)
+            {
+                return result.GetValueOrDefault<double>() != 0;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private bool CompareValue(double value)
