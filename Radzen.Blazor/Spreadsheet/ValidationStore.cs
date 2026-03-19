@@ -134,6 +134,40 @@ public class ValidationStore
     }
 
     /// <summary>
+    /// Gets the strictest <see cref="DataValidationErrorStyle"/> among failing validators for a cell.
+    /// Plain <see cref="ICellValidator"/> instances default to <see cref="DataValidationErrorStyle.Stop"/>.
+    /// </summary>
+    public DataValidationErrorStyle GetErrorStyleForCell(CellRef cellRef)
+    {
+        var style = DataValidationErrorStyle.Information;
+
+        foreach (var kvp in validators)
+        {
+            if (kvp.Key.Contains(cellRef))
+            {
+                foreach (var validator in kvp.Value)
+                {
+                    var validatorStyle = validator is DataValidationRule rule
+                        ? rule.ErrorStyle
+                        : DataValidationErrorStyle.Stop;
+
+                    if (validatorStyle == DataValidationErrorStyle.Stop)
+                    {
+                        return DataValidationErrorStyle.Stop;
+                    }
+
+                    if (validatorStyle == DataValidationErrorStyle.Warning && style == DataValidationErrorStyle.Information)
+                    {
+                        style = DataValidationErrorStyle.Warning;
+                    }
+                }
+            }
+        }
+
+        return style;
+    }
+
+    /// <summary>
     /// Validates the specified cell against all validation rules defined for its range in the spreadsheet.
     /// </summary>
     public IReadOnlyList<string> Validate(Cell cell)
@@ -147,7 +181,11 @@ public class ValidationStore
             {
                 foreach (var validator in kvp.Value)
                 {
-                    if (!validator.Validate(cell))
+                    var valid = validator is DataValidationRule rule
+                        ? rule.Validate(cell, kvp.Key.Start)
+                        : validator.Validate(cell);
+
+                    if (!valid)
                     {
                         errors.Add(validator.Error);
                     }
