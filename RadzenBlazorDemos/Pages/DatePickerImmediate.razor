@@ -1,0 +1,16 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Date" Component="RadzenDatePickerImmediate" />
+    <RadzenDatePicker @bind-Value=@value Immediate="true" Change="@(_ => OnChange())" Name="RadzenDatePickerImmediate" />
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    DateTime? value;
+    EventConsole console;
+
+    void OnChange()
+    {
+        console.Log($"Value changed to {value}");
+    }
+}

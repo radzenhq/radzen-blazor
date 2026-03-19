@@ -38,6 +38,16 @@ namespace Radzen.Blazor
     public partial class RadzenDatePicker<TValue> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>
+        /// Gets or sets a value indicating whether the component should update its value on every input event
+        /// rather than waiting for the input to lose focus (onchange event).
+        /// When enabled, the bound value is updated as the user types, provided the input can be parsed as a valid date.
+        /// Invalid intermediate input is ignored to avoid clearing the value while the user is still typing.
+        /// </summary>
+        /// <value><c>true</c> for immediate updates; <c>false</c> for deferred updates. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Immediate { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the calendar week number column should be displayed in the calendar popup.
         /// When enabled, each week row shows its corresponding week number according to ISO 8601.
         /// </summary>
@@ -929,6 +939,56 @@ namespace Radzen.Blazor
                 }
             }
             else if (DateTimeValue != newValue && (newValue != null || nullable))
+            {
+                DateTimeValue = newValue;
+                if ((typeof(TValue) == typeof(DateTimeOffset) || typeof(TValue) == typeof(DateTimeOffset?)) && Value != null)
+                {
+                    DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, Kind);
+                    await ValueChanged.InvokeAsync((TValue)(object)offset);
+                }
+                else if ((typeof(TValue) == typeof(DateTime) || typeof(TValue) == typeof(DateTime?)) && Value != null)
+                {
+                    await ValueChanged.InvokeAsync((TValue)(object)DateTime.SpecifyKind((DateTime)Value, Kind));
+                }
+                else
+                {
+                    await ValueChanged.InvokeAsync(Value == null ? default(TValue) : (TValue)Value);
+                }
+
+                if (FieldIdentifier.FieldName != null)
+                {
+                    EditContext?.NotifyFieldChanged(FieldIdentifier);
+                }
+
+                await Change.InvokeAsync(DateTimeValue);
+                StateHasChanged();
+            }
+        }
+
+        /// <summary>
+        /// Parses the date on input. Ignores invalid intermediate input to avoid clearing the value while the user is typing.
+        /// </summary>
+        protected async Task ParseDateImmediate()
+        {
+            if (JSRuntime == null) return;
+            var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+            bool valid = TryParseInput(inputValue, out DateTime value);
+
+            if (!valid || DateAttributes(value).Disabled)
+            {
+                return;
+            }
+
+            DateTime? newValue = TimeOnly && CurrentDate != default(DateTime)
+                ? new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, value.Hour, value.Minute, value.Second)
+                : value;
+
+            if (Multiple)
+            {
+                selectedDates = new List<DateTime>() { value.Date };
+                await UpdateValueFromSelectedDates(value.Date);
+            }
+            else if (DateTimeValue != newValue)
             {
                 DateTimeValue = newValue;
                 if ((typeof(TValue) == typeof(DateTimeOffset) || typeof(TValue) == typeof(DateTimeOffset?)) && Value != null)

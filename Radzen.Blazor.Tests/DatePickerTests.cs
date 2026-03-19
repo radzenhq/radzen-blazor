@@ -1101,5 +1101,114 @@ namespace Radzen.Blazor.Tests
             Assert.True(changeRaised);
             Assert.False(okClickRaised);
         }
+        [Fact]
+        public void DatePicker_Renders_ImmediateParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+                parameters.Add(p => p.Immediate, true));
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            Assert.Contains("oninput", inputElement.ToMarkup());
+        }
+
+        [Fact]
+        public void DatePicker_DoesNotRender_OninputWhenNotImmediate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            Assert.DoesNotContain("oninput", inputElement.ToMarkup());
+        }
+
+        [Fact]
+        public void DatePicker_Immediate_Raises_ChangeOnValidInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var raised = false;
+            object newValue = null;
+            var testDate = new DateTime(2025, 6, 15);
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>(parameters =>
+            {
+                parameters.Add(p => p.Immediate, true);
+                parameters.Add(p => p.Change, args => { raised = true; newValue = args; });
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(testDate.ToShortDateString());
+            inputElement.Input(testDate.ToShortDateString());
+
+            Assert.True(raised);
+            Assert.Equal(testDate, ((DateTime?)newValue)?.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Immediate_DoesNotUpdateOnInvalidInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var initialDate = new DateTime(2025, 6, 15);
+            var changeCount = 0;
+
+            // Use non-nullable DateTime so ParseDate does not clear the value on invalid input
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.Immediate, true);
+                parameters.Add(p => p.Value, initialDate);
+                parameters.Add(p => p.Change, args => { changeCount++; });
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            // Simulate partial/invalid input
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult("abc");
+            inputElement.Input("abc");
+
+            // ParseDateImmediate ignores invalid input; ParseDate also reverts to FormattedValue for non-nullable.
+            // Value should remain unchanged.
+            Assert.Equal(initialDate, component.Instance.Value);
+        }
+
+        [Fact]
+        public void DatePicker_Immediate_Raises_ValueChangedOnValidInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var raised = false;
+            DateTime? newValue = null;
+            var testDate = new DateTime(2025, 3, 20);
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime?>>(parameters =>
+            {
+                parameters.Add(p => p.Immediate, true);
+                parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; });
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", invocation => true).SetResult(testDate.ToShortDateString());
+            inputElement.Input(testDate.ToShortDateString());
+
+            Assert.True(raised);
+            Assert.Equal(testDate, newValue?.Date);
+        }
     }
 }
