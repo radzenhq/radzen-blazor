@@ -7,38 +7,7 @@ namespace Radzen.Blazor.Tests
     public class PieSeriesTests
     {
         [Fact]
-        public void PieSeries_Renders_PieClass()
-        {
-            using var ctx = CreateChartContext();
-
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
-                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
-                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
-                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
-                    .Add(x => x.Data, SampleData)));
-
-            Assert.Contains("rz-pie-series", chart.Markup);
-        }
-
-        [Fact]
-        public void PieSeries_Renders_ArcPerItem()
-        {
-            using var ctx = CreateChartContext();
-
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
-                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
-                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
-                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
-                    .Add(x => x.Data, SampleData)));
-
-            // Each data item gets a series-item class
-            Assert.Contains("rz-series-item-0", chart.Markup);
-            Assert.Contains("rz-series-item-1", chart.Markup);
-            Assert.Contains("rz-series-item-2", chart.Markup);
-        }
-
-        [Fact]
-        public void PieSeries_CustomFills_Applied()
+        public void PieSeries_Renders_ArcPathPerItem()
         {
             using var ctx = CreateChartContext();
 
@@ -49,13 +18,14 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.Fills, new[] { "#FF0000", "#00FF00", "#0000FF" })
                     .Add(x => x.Data, SampleData)));
 
-            Assert.Contains("#FF0000", chart.Markup);
-            Assert.Contains("#00FF00", chart.Markup);
-            Assert.Contains("#0000FF", chart.Markup);
+            Assert.Contains("rz-pie-series rz-series-0", chart.Markup);
+            Assert.Contains("rz-series-item-0", chart.Markup);
+            Assert.Contains("rz-series-item-1", chart.Markup);
+            Assert.Contains("rz-series-item-2", chart.Markup);
         }
 
         [Fact]
-        public void PieSeries_Title_AppearsInLegend()
+        public void PieSeries_CustomFills_AppliedToArcPaths()
         {
             using var ctx = CreateChartContext();
 
@@ -63,47 +33,48 @@ namespace Radzen.Blazor.Tests
                 .AddChildContent<RadzenPieSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
-                    .Add(x => x.Title, "Sales")
+                    .Add(x => x.Fills, new[] { "#FF0000", "#00FF00", "#0000FF" })
                     .Add(x => x.Data, SampleData)));
 
-            // Pie legend shows category names
-            Assert.Contains("A", chart.Markup);
-            Assert.Contains("B", chart.Markup);
-            Assert.Contains("C", chart.Markup);
+            Assert.Contains("fill: #FF0000", chart.Markup);
+            Assert.Contains("fill: #00FF00", chart.Markup);
+            Assert.Contains("fill: #0000FF", chart.Markup);
         }
 
         [Fact]
-        public void DonutSeries_Renders_PieClass()
+        public void PieSeries_ArcPaths_ContainSvgArcCommands()
         {
             using var ctx = CreateChartContext();
 
             var chart = ctx.RenderComponent<RadzenChart>(p => p
-                .AddChildContent<RadzenDonutSeries<DataItem>>(s => s
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
                     .Add(x => x.Data, SampleData)));
 
-            Assert.Contains("rz-donut-series", chart.Markup);
+            // Pie arcs use SVG A (arc) command with radius 118
+            Assert.Contains("A 118 118", chart.Markup);
         }
 
         [Fact]
-        public void DonutSeries_Renders_ArcPerItem()
+        public void PieSeries_Legend_ShowsCategoryNames()
         {
             using var ctx = CreateChartContext();
 
             var chart = ctx.RenderComponent<RadzenChart>(p => p
-                .AddChildContent<RadzenDonutSeries<DataItem>>(s => s
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
-                    .Add(x => x.InnerRadius, 50)
                     .Add(x => x.Data, SampleData)));
 
-            Assert.Contains("rz-series-item-0", chart.Markup);
-            Assert.Contains("rz-series-item-1", chart.Markup);
+            // Pie legend shows category names, not series title
+            Assert.Contains(">A</span>", chart.Markup);
+            Assert.Contains(">B</span>", chart.Markup);
+            Assert.Contains(">C</span>", chart.Markup);
         }
 
         [Fact]
-        public void PieSeries_Hidden_DoesNotRenderArcs()
+        public void PieSeries_Hidden_NoArcPathsRendered()
         {
             using var ctx = CreateChartContext();
 
@@ -115,6 +86,24 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.Data, SampleData)));
 
             Assert.DoesNotContain("rz-pie-series", chart.Markup);
+        }
+
+        [Fact]
+        public void DonutSeries_Renders_DonutClass()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenDonutSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.InnerRadius, 50)
+                    .Add(x => x.Data, SampleData)));
+
+            Assert.Contains("rz-donut-series", chart.Markup);
+            Assert.Contains("rz-series-item-0", chart.Markup);
+            // Donut arcs have both outer and inner radius in the path
+            Assert.Contains("A 118 118", chart.Markup); // outer
         }
     }
 }
