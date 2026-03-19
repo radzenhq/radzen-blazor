@@ -41,6 +41,9 @@
                         <DataFormat Sheet=@Sheet />
                         <IncreaseDecimals Sheet=@Sheet />
                         <DecreaseDecimals Sheet=@Sheet />
+                        <RadzenButton Text="Format Cells..." Click=@OnFormatCellsAsync
+                            ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+                            Disabled=@(Sheet?.Selection.Cell == CellRef.Invalid) />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Insert">
