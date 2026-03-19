@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -8,7 +9,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents a validator for cell values in a spreadsheet.
 /// </summary>
-public interface ICellVaidator
+public interface ICellValidator
 {
     /// <summary>
     /// Validates the specified cell against the validation rules defined by the validator.
@@ -26,7 +27,7 @@ public interface ICellVaidator
 /// <summary>
 /// Represents a validator that checks if the cell value is a number.
 /// </summary>
-public class NumberValidator : ICellVaidator
+public class NumberValidator : ICellValidator
 {
     /// <inheritdoc/>
     public string Error { get; } = "Value must be a number";
@@ -44,12 +45,17 @@ public class NumberValidator : ICellVaidator
 /// </summary>
 public class ValidationStore
 {
-    private readonly Dictionary<RangeRef, List<ICellVaidator>> validators = [];
+    private readonly Dictionary<RangeRef, List<ICellValidator>> validators = [];
+
+    /// <summary>
+    /// Gets all ranges that have validation rules.
+    /// </summary>
+    public IEnumerable<RangeRef> Ranges => validators.Keys;
 
     /// <summary>
     /// Adds a validation rule for a specific range of cells in the spreadsheet.
     /// </summary>
-    public void Add(RangeRef range, params ICellVaidator[] validators)
+    public void Add(RangeRef range, params ICellValidator[] validators)
     {
         ArgumentNullException.ThrowIfNull(validators);
         foreach (var validator in validators)
@@ -61,7 +67,7 @@ public class ValidationStore
     /// <summary>
     /// Adds a single validation rule for a specific range of cells in the spreadsheet.
     /// </summary>
-    public void Add(RangeRef range, ICellVaidator validator)
+    public void Add(RangeRef range, ICellValidator validator)
     {
         ArgumentNullException.ThrowIfNull(validator);
         if (!validators.TryGetValue(range, out var list))
@@ -71,6 +77,60 @@ public class ValidationStore
         }
 
         list.Add(validator);
+    }
+
+    /// <summary>
+    /// Removes a validation rule from a specific range.
+    /// </summary>
+    public bool Remove(RangeRef range, ICellValidator validator)
+    {
+        ArgumentNullException.ThrowIfNull(validator);
+        if (validators.TryGetValue(range, out var list))
+        {
+            var removed = list.Remove(validator);
+            if (list.Count == 0)
+            {
+                validators.Remove(range);
+            }
+            return removed;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Gets all validators for a specific range.
+    /// </summary>
+    public IReadOnlyList<ICellValidator> GetValidators(RangeRef range)
+    {
+        return validators.TryGetValue(range, out var list) ? list : [];
+    }
+
+    /// <summary>
+    /// Gets all validators that apply to a specific cell.
+    /// </summary>
+    public IReadOnlyList<ICellValidator> GetValidatorsForCell(CellRef cellRef)
+    {
+        var result = new List<ICellValidator>();
+        foreach (var kvp in validators)
+        {
+            if (kvp.Key.Contains(cellRef))
+            {
+                result.AddRange(kvp.Value);
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Removes all validators for a specific range and returns them.
+    /// </summary>
+    public List<ICellValidator> RemoveAll(RangeRef range)
+    {
+        if (validators.Remove(range, out var list))
+        {
+            return list;
+        }
+        return [];
     }
 
     /// <summary>

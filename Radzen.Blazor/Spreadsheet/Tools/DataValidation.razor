@@ -1,0 +1,43 @@
+@using Radzen.Blazor.Spreadsheet
+@inject DialogService DialogService
+
+<RadzenSplitButton Click=@OnClickAsync Icon="rule" Text="Validation" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+    <ChildContent>
+        <RadzenSplitButtonItem Text="Data Validation..." Value="validate" />
+        <RadzenSplitButtonItem Text="Clear Validation" Value="clear" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    private async Task OnClickAsync(RadzenSplitButtonItem? item)
+    {
+        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var action = item?.Value ?? "validate";
+
+        if (action == "clear")
+        {
+            var command = new ClearValidationCommand(Sheet, Sheet.Selection.Range);
+            Sheet.Commands.Execute(command);
+            return;
+        }
+
+        var result = await DialogService.OpenAsync<DataValidationDialog>("Data Validation");
+
+        if (result is DataValidationRule rule)
+        {
+            var command = new DataValidationCommand(Sheet, Sheet.Selection.Range, rule);
+            Sheet.Commands.Execute(command);
+        }
+    }
+}
