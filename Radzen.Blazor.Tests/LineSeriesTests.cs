@@ -7,22 +7,7 @@ namespace Radzen.Blazor.Tests
     public class LineSeriesTests
     {
         [Fact]
-        public void LineSeries_Renders_PathElement()
-        {
-            using var ctx = CreateChartContext();
-
-            var chart = ctx.RenderComponent<RadzenChart>(p => p
-                .AddChildContent<RadzenLineSeries<DataItem>>(s => s
-                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
-                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
-                    .Add(x => x.Data, SampleData)));
-
-            Assert.Contains("rz-line-series", chart.Markup);
-            Assert.Contains("M ", chart.Markup); // SVG path data
-        }
-
-        [Fact]
-        public void LineSeries_Renders_CustomStrokeColor()
+        public void LineSeries_Renders_PathWithCorrectYCoordinates()
         {
             using var ctx = CreateChartContext();
 
@@ -33,11 +18,13 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.Stroke, "#FF0000")
                     .Add(x => x.Data, SampleData)));
 
-            Assert.Contains("#FF0000", chart.Markup);
+            // Values: A=10(min=bottom,y=236), B=20(max=top,y=0), C=15(mid,y=118)
+            Assert.Contains("rz-line-series rz-series-0", chart.Markup);
+            Assert.Matches(@"M\s+[\d.]+\s+236\s+L\s+[\d.]+\s+0\s+L\s+[\d.]+\s+118", chart.Markup);
         }
 
         [Fact]
-        public void LineSeries_Smooth_SetsInterpolationToSpline()
+        public void LineSeries_StrokeColor_AppliedToPathStyle()
         {
             using var ctx = CreateChartContext();
 
@@ -45,15 +32,16 @@ namespace Radzen.Blazor.Tests
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
-                    .Add(x => x.Smooth, true)
+                    .Add(x => x.Stroke, "#FF0000")
                     .Add(x => x.Data, SampleData)));
 
-            var series = chart.FindComponent<RadzenLineSeries<DataItem>>();
-            Assert.Equal(Interpolation.Spline, series.Instance.Interpolation);
+            Assert.Contains("stroke: #FF0000", chart.Markup);
+            Assert.Contains("fill: none", chart.Markup);
+            Assert.Contains("stroke-width: 2", chart.Markup);
         }
 
         [Fact]
-        public void LineSeries_MultipleSeries_RendersMultipleGroups()
+        public void LineSeries_ValueAxis_RendersTicksForDataRange()
         {
             using var ctx = CreateChartContext();
 
@@ -61,20 +49,33 @@ namespace Radzen.Blazor.Tests
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
-                    .Add(x => x.Title, "Series 1")
-                    .Add(x => x.Data, SampleData))
-                .AddChildContent<RadzenLineSeries<DataItem>>(s => s
-                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
-                    .Add(x => x.ValueProperty, nameof(DataItem.Value2))
-                    .Add(x => x.Title, "Series 2")
                     .Add(x => x.Data, SampleData)));
 
-            Assert.Contains("rz-series-0", chart.Markup);
-            Assert.Contains("rz-series-1", chart.Markup);
+            Assert.Contains("rz-value-axis", chart.Markup);
+            Assert.Contains(">10</text>", chart.Markup);
+            Assert.Contains(">15</text>", chart.Markup);
+            Assert.Contains(">20</text>", chart.Markup);
         }
 
         [Fact]
-        public void LineSeries_Title_AppearsInLegend()
+        public void LineSeries_CategoryAxis_RendersCategoryLabels()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenLineSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Data, SampleData)));
+
+            Assert.Contains("rz-category-axis", chart.Markup);
+            Assert.Contains(">A</text>", chart.Markup);
+            Assert.Contains(">B</text>", chart.Markup);
+            Assert.Contains(">C</text>", chart.Markup);
+        }
+
+        [Fact]
+        public void LineSeries_Title_RendersInLegendItem()
         {
             using var ctx = CreateChartContext();
 
@@ -85,11 +86,12 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.Title, "Revenue")
                     .Add(x => x.Data, SampleData)));
 
-            Assert.Contains("Revenue", chart.Markup);
+            Assert.Contains(@"class=""rz-legend-item-text""", chart.Markup);
+            Assert.Contains(">Revenue</span>", chart.Markup);
         }
 
         [Fact]
-        public void LineSeries_Hidden_DoesNotRenderPath()
+        public void LineSeries_Hidden_NoSeriesGroupRendered()
         {
             using var ctx = CreateChartContext();
 
@@ -104,7 +106,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void LineSeries_Renders_CategoryAxisLabels()
+        public void LineSeries_Smooth_UsesCubicBezierInPath()
         {
             using var ctx = CreateChartContext();
 
@@ -112,16 +114,17 @@ namespace Radzen.Blazor.Tests
                 .AddChildContent<RadzenLineSeries<DataItem>>(s => s
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Smooth, true)
                     .Add(x => x.Data, SampleData)));
 
-            // Category axis should render tick labels for each category
-            Assert.Contains(">A<", chart.Markup);
-            Assert.Contains(">B<", chart.Markup);
-            Assert.Contains(">C<", chart.Markup);
+            var series = chart.FindComponent<RadzenLineSeries<DataItem>>();
+            Assert.Equal(Interpolation.Spline, series.Instance.Interpolation);
+            // Spline path uses C (cubic bezier) commands instead of L (line)
+            Assert.Contains(" C ", chart.Markup);
         }
 
         [Fact]
-        public void LineSeries_StrokeWidth_AppliedToPath()
+        public void LineSeries_CustomStrokeWidth_AppliedToSvg()
         {
             using var ctx = CreateChartContext();
 
@@ -133,6 +136,29 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.Data, SampleData)));
 
             Assert.Contains("stroke-width: 5", chart.Markup);
+        }
+
+        [Fact]
+        public void LineSeries_Multiple_RendersDistinctSeriesGroups()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenLineSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Title, "S1")
+                    .Add(x => x.Data, SampleData))
+                .AddChildContent<RadzenLineSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value2))
+                    .Add(x => x.Title, "S2")
+                    .Add(x => x.Data, SampleData)));
+
+            Assert.Contains("rz-line-series rz-series-0", chart.Markup);
+            Assert.Contains("rz-line-series rz-series-1", chart.Markup);
+            Assert.Contains(">S1</span>", chart.Markup);
+            Assert.Contains(">S2</span>", chart.Markup);
         }
     }
 }
