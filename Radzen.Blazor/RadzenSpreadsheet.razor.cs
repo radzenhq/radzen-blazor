@@ -60,14 +60,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private VirtualGrid? grid;
     private Popup? cellMenuPopup;
     private Popup? validationListPopup;
-    private bool inputPromptVisible;
+    private Spreadsheet.InputPrompt? inputPrompt;
     private int cellMenuRow = -1;
     private int cellMenuColumn = -1;
     private int validationListRow = -1;
     private int validationListColumn = -1;
     private IReadOnlyList<string> validationListItems = [];
-    private string? inputPromptTitle;
-    private string? inputPromptMessage;
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -137,36 +135,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (validationListPopup != null)
         {
             await validationListPopup.CloseAsync();
-        }
-    }
-
-    private void ShowInputPrompt(CellRef address)
-    {
-        var wasVisible = inputPromptVisible;
-
-        inputPromptVisible = false;
-        inputPromptTitle = null;
-        inputPromptMessage = null;
-
-        if (Sheet != null)
-        {
-            var validators = Sheet.Validation.GetValidatorsForCell(address);
-
-            foreach (var v in validators)
-            {
-                if (v is Spreadsheet.DataValidationRule rule && rule.ShowInputMessage)
-                {
-                    inputPromptTitle = rule.PromptTitle;
-                    inputPromptMessage = rule.Prompt;
-                    inputPromptVisible = true;
-                    break;
-                }
-            }
-        }
-
-        if (inputPromptVisible != wasVisible || inputPromptVisible)
-        {
-            StateHasChanged();
         }
     }
 
@@ -345,7 +313,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Sheet is not null)
         {
             var address = Sheet.Selection.Move(rowOffset, columnOffset);
-            ShowInputPrompt(address);
+            inputPrompt?.Show(address);
             await ScrollToAsync(address);
         }
     }
@@ -437,7 +405,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 var address = Sheet.Selection.Cycle(rowOffset, columnOffset);
 
                 await ScrollToAsync(address);
-                ShowInputPrompt(address);
+                inputPrompt?.Show(address);
             }
         }
     }
@@ -820,7 +788,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             }
 
-            ShowInputPrompt(address);
+            inputPrompt?.Show(address);
 
             if (grid is not null)
             {
@@ -1047,7 +1015,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 await ScrollToAsync(address);
 
-                inputPromptVisible = false;
+                inputPrompt?.Hide();
 
                 Sheet.Editor.StartEdit(address, cell.GetValue());
             }
@@ -1115,7 +1083,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (char.IsLetterOrDigit(ch) || char.IsPunctuation(ch) || char.IsSymbol(ch) || char.IsSeparator(ch))
         {
-            inputPromptVisible = false;
+            inputPrompt?.Hide();
             Sheet?.Editor.StartEdit(Sheet.Selection.Cell, ch.ToString());
         }
     }
