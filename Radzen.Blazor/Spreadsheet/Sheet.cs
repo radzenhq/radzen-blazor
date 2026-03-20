@@ -102,10 +102,28 @@ public partial class Sheet
     /// </summary>
     public IReadOnlyList<SheetImage> Images => images;
 
+    private SheetImage? selectedImage;
+
     /// <summary>
     /// Gets or sets the currently selected image.
     /// </summary>
-    public SheetImage? SelectedImage { get; set; }
+    public SheetImage? SelectedImage
+    {
+        get => selectedImage;
+        set
+        {
+            if (selectedImage != value)
+            {
+                selectedImage = value;
+                SelectedImageChanged?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Occurs when the selected image changes.
+    /// </summary>
+    internal event Action? SelectedImageChanged;
 
     internal void AddImage(SheetImage image) => images.Add(image);
 
