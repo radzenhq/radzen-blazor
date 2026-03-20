@@ -1221,6 +1221,26 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Invoked by JS interop when the pointer is released after resizing a column.
+    /// </summary>
+    [JSInvokable]
+    public Task OnColumnResizePointerUpAsync(PointerEventArgs args)
+    {
+        onColumnResizePointerMoveAsync = null;
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the pointer is released after resizing a row.
+    /// </summary>
+    [JSInvokable]
+    public Task OnRowResizePointerUpAsync(PointerEventArgs args)
+    {
+        onRowResizePointerMoveAsync = null;
+        return Task.CompletedTask;
+    }
+
     class ColumnResizeCapture
     {
         public double ScrollTop { get; set; }
