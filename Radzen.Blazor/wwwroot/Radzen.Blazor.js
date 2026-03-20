@@ -4662,6 +4662,16 @@ class Spreadsheet {
       if (!(await this.dotNetRef.invokeMethodAsync('OnColumnPointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
         removeEventListener('pointermove', this.onColumnPointerMove);
       }
+    } else if (e.target.matches('.rz-spreadsheet-image-resize-handle')) {
+      const direction = e.target.dataset.direction;
+      addEventListener('pointermove', this.onImageResizeMove);
+      addEventListener('pointerup', this.onImageResizeUp);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnImageResizePointerDownAsync', { direction, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onImageResizeMove);
+        removeEventListener('pointerup', this.onImageResizeUp);
+      }
+      e.preventDefault();
+      e.stopPropagation();
     } else if (e.target.closest('.rz-spreadsheet-image')) {
       // Image clicks are handled by Blazor event handlers directly
       return;
@@ -4827,6 +4837,16 @@ class Spreadsheet {
     this.invokeAsync('OnRowResizePointerUpAsync', e);
     removeEventListener('pointermove', this.onRowResizeMove);
     removeEventListener('pointerup', this.onRowResizeUp);
+  }
+
+  onImageResizeMove = (e) => {
+    this.invokeAsync('OnImageResizePointerMoveAsync', e);
+  }
+
+  onImageResizeUp = (e) => {
+    this.invokeAsync('OnImageResizePointerUpAsync', e);
+    removeEventListener('pointermove', this.onImageResizeMove);
+    removeEventListener('pointerup', this.onImageResizeUp);
   }
 }
 

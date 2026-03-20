@@ -1110,6 +1110,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Func<PointerEventArgs, Task>? onColumnResizePointerMoveAsync;
     private Func<PointerEventArgs, Task>? onRowResizePointerMoveAsync;
+    private Func<PointerEventArgs, Task>? onImageResizePointerMoveAsync;
+    private ImageResizeCapture? imageResizeCapture;
 
     /// <summary>
     /// Invoked by JS interop when the column resize handle is pressed.
@@ -1257,6 +1259,135 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         public int Row { get; set; }
         public double StartY { get; set; }
         public double StartHeight { get; set; }
+    }
+
+    class ImageResizeCapture
+    {
+        public SheetImage Image { get; set; } = default!;
+        public string Direction { get; set; } = "";
+        public double StartX { get; set; }
+        public double StartY { get; set; }
+        public long OriginalWidth { get; set; }
+        public long OriginalHeight { get; set; }
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when an image resize handle is pressed.
+    /// </summary>
+    [JSInvokable]
+    public async Task<bool> OnImageResizePointerDownAsync(ImageResizeEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+        var result = await AcceptAsync();
+
+        if (result && Sheet?.SelectedImage is SheetImage image)
+        {
+            var capture = new ImageResizeCapture
+            {
+                Image = image,
+                Direction = args.Direction,
+                StartX = args.Pointer.ClientX,
+                StartY = args.Pointer.ClientY,
+                OriginalWidth = image.Width,
+                OriginalHeight = image.Height
+            };
+
+            imageResizeCapture = capture;
+            onImageResizePointerMoveAsync = pointer => OnImageResizePointerMoveAsync(capture, pointer);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the pointer moves while resizing an image.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnImageResizePointerMoveAsync(PointerEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+        if (onImageResizePointerMoveAsync is not null)
+        {
+            await onImageResizePointerMoveAsync(args);
+        }
+    }
+
+    private const double EmuPerPixel = 9525.0;
+
+    private Task OnImageResizePointerMoveAsync(ImageResizeCapture capture, PointerEventArgs pointer)
+    {
+        var deltaX = pointer.ClientX - capture.StartX;
+        var deltaY = pointer.ClientY - capture.StartY;
+
+        long newWidth = capture.OriginalWidth;
+        long newHeight = capture.OriginalHeight;
+
+        switch (capture.Direction)
+        {
+            case "se":
+                newWidth = capture.OriginalWidth + (long)(deltaX * EmuPerPixel);
+                newHeight = capture.OriginalHeight + (long)(deltaY * EmuPerPixel);
+                break;
+            case "sw":
+                newWidth = capture.OriginalWidth - (long)(deltaX * EmuPerPixel);
+                newHeight = capture.OriginalHeight + (long)(deltaY * EmuPerPixel);
+                break;
+            case "ne":
+                newWidth = capture.OriginalWidth + (long)(deltaX * EmuPerPixel);
+                newHeight = capture.OriginalHeight - (long)(deltaY * EmuPerPixel);
+                break;
+            case "nw":
+                newWidth = capture.OriginalWidth - (long)(deltaX * EmuPerPixel);
+                newHeight = capture.OriginalHeight - (long)(deltaY * EmuPerPixel);
+                break;
+            case "n":
+                newHeight = capture.OriginalHeight - (long)(deltaY * EmuPerPixel);
+                break;
+            case "s":
+                newHeight = capture.OriginalHeight + (long)(deltaY * EmuPerPixel);
+                break;
+            case "e":
+                newWidth = capture.OriginalWidth + (long)(deltaX * EmuPerPixel);
+                break;
+            case "w":
+                newWidth = capture.OriginalWidth - (long)(deltaX * EmuPerPixel);
+                break;
+        }
+
+        const long minSize = 95250; // ~10px
+        newWidth = Math.Max(minSize, newWidth);
+        newHeight = Math.Max(minSize, newHeight);
+
+        capture.Image.Width = newWidth;
+        capture.Image.Height = newHeight;
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the pointer is released after resizing an image.
+    /// </summary>
+    [JSInvokable]
+    public Task OnImageResizePointerUpAsync(PointerEventArgs args)
+    {
+        if (imageResizeCapture is not null && Sheet is not null)
+        {
+            var capture = imageResizeCapture;
+            var finalWidth = capture.Image.Width;
+            var finalHeight = capture.Image.Height;
+
+            // Restore original dimensions so ResizeImageCommand captures correct old values
+            capture.Image.Width = capture.OriginalWidth;
+            capture.Image.Height = capture.OriginalHeight;
+
+            Sheet.Commands.Execute(new Spreadsheet.ResizeImageCommand(capture.Image, finalWidth, finalHeight));
+
+            imageResizeCapture = null;
+            onImageResizePointerMoveAsync = null;
+        }
+
+        return Task.CompletedTask;
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
