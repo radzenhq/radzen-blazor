@@ -1,12 +1,15 @@
 @page "/chart-gallery"
 
-<PageTitle>Blazor Chart Gallery | Free UI Components by Radzen</PageTitle>
+<PageTitle>Blazor Chart Components Gallery — 50+ Free Chart Types | Radzen</PageTitle>
+<HeadContent>
+    <meta name="description" content="Browse 50+ free Blazor chart types — area, bar, column, line, pie, donut, scatter, financial, gauge and more. View live demos with configuration options.">
+</HeadContent>
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
-    Chart Gallery
+    Blazor Chart Components Gallery
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Browse all data visualization components. Click any card to view its demo and configuration options.
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1200px;">
+    Explore free, open-source Blazor chart components — from area, bar, and line charts to financial, statistical, and gauge visualizations. Each supports data binding, tooltips, legends, and theming. Click any chart to view its live demo.
 </RadzenText>
 
 <style>
@@ -49,16 +52,16 @@
 </style>
 
 @* --- Area Chart --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#area-chart" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Area Chart
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Area Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/area-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Area chart thumbnail">
                         <path d="M20 93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39V112H20V93Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
 
                     </svg>
@@ -73,7 +76,7 @@
         <RadzenLink Path="/range-area-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Area chart thumbnail">
                         <path d="M180 75L164 84L148 73L132 92L116 78L100 98L84 83L68 95L52 89L36 98L20 96V93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39V75Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
@@ -87,7 +90,7 @@
         <RadzenLink Path="/step-area-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Step Area chart thumbnail">
                         <path d="M20 93H36V87H52V71H68V80H84V65H100V76H116V55H132V64H148V47H164V44.5V39H180V112H20V93Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
@@ -101,7 +104,7 @@
         <RadzenLink Path="/range-step-area-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Step Area chart thumbnail">
                         <path d="M180 84H164V73H148V92H132V78H116V98H100V83H84V95H68V89H52V98H36V96H20V93H36V87H52V71H68V80H84V65H100V76H116V55H132V64H148V47H164V39H180V84Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
@@ -115,7 +118,7 @@
         <RadzenLink Path="/stacked-area-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked Area chart thumbnail">
                         <path d="M180 75H179.984C179.823 75.0025 179.66 75.0443 179.51 75.1289L164.053 83.8223L147.819 72.6621L131.891 91.5762L115.872 77.5596L99.8936 97.5303L84.0713 82.6963L67.8389 94.8711L52.3516 89.0635L51.915 88.9004L51.5098 89.1289L35.7969 97.9668L20.124 96.0078C20.0896 96.0035 20.0554 96.0008 20.0215 96H20V93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39V75Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                         <path d="M163.947 86.1768L180 77.1465V112H20V98.0068L36.2031 100.033L36.4902 99.8711L52.083 91.0996L68.1621 97.1289L68.5996 96.7998L83.9277 85.3027L100.105 100.47L116.128 80.4404L132.108 94.4238L148.181 75.3379L163.947 86.1768Z" fill="var(--rz-series-2)" fill-opacity="0.8"/>
                     </svg>
@@ -130,7 +133,7 @@
         <RadzenLink Path="/100-percent-stacked-area-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Stacked Area chart thumbnail">
                         <path d="M163.947 86.1768L180 77.1465V112H20V98.0068L36.2031 100.033L36.4902 99.8711L52.083 91.0996L68.1621 97.1289L68.5996 96.7998L83.9277 85.3027L100.105 100.47L116.128 80.4404L132.108 94.4238L148.181 75.3379L163.947 86.1768Z" fill="var(--rz-series-3)" fill-opacity="0.8"/>
                         <path d="M180 75H179.984C179.823 75.0025 179.66 75.0443 179.51 75.1289L164.053 83.8223L147.819 72.6621L131.891 91.5762L115.872 77.5596L99.8936 97.5303L84.0713 82.6963L67.8389 94.8711L52.3516 89.0635L51.915 88.9004L51.5098 89.1289L35.7969 97.9668L20.124 96.0078C20.0896 96.0035 20.0554 96.0008 20.0215 96H20V93.999C20.1169 93.9991 20.2357 93.9799 20.3516 93.9365L36.3516 87.9365L36.5537 87.8604L52.1709 72.2422L67.5098 80.8711L68.1484 81.2314L84.0957 66.2793L100.219 77.3633L116.269 56.2979L132.191 65.2549L132.729 64.6855L148.3 48.1406L164.214 53.1143L164.631 52.7764L180 40.2881V75Z" fill="var(--rz-series-2)" fill-opacity="0.8"/>
                         <path d="M180 38C179.778 38 179.555 38.073 179.369 38.2236L163.784 50.8848L148.298 46.0459L147.701 45.8584L131.807 62.7441L115.731 53.7021L99.7812 74.6357L83.9033 63.7197L67.8506 78.7686L51.8291 69.7568L35.4463 86.1387L20 91.9307V20H180V38Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
@@ -146,7 +149,7 @@
         <RadzenLink Path="/negative-area-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Area Negative Points chart thumbnail">
                         <path d="M20 80L36 96L52 40L68 100L84 48L100 36L116 88L132 92L148 40L164 88L180 32V65H20L20 80Z" fill="var(--rz-series-1)" fill-opacity="0.8"/>
                     </svg>
                 </div>
@@ -157,16 +160,16 @@
 </RadzenRow>
 
 @* --- Bar Chart --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#bar-chart" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Bar Chart
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Bar Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/bar-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bar chart thumbnail">
                         <path d="M106 32C107.105 32 108 31.1046 108 30L108 22C108 20.8954 107.105 20 106 20L20 20L20 32L106 32Z" fill="var(--rz-series-1)"/>
                         <path d="M145 48C146.105 48 147 47.1046 147 46L147 38C147 36.8954 146.105 36 145 36L20 36L20 48L145 48Z" fill="var(--rz-series-1)"/>
                         <path d="M89 64C90.1046 64 91 63.1046 91 62L91 54C91 52.8954 90.1046 52 89 52L20 52L20 64L89 64Z" fill="var(--rz-series-1)"/>
@@ -185,7 +188,7 @@
         <RadzenLink Path="/range-bar-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Bar chart thumbnail">
                         <path d="M142 32C143.105 32 144 31.1046 144 30L144 22C144 20.8954 143.105 20 142 20L58 20C56.8954 20 56 20.8954 56 22L56 30C56 31.1046 56.8954 32 58 32L142 32Z" fill="var(--rz-series-1)"/>
                         <path d="M169 48C170.105 48 171 47.1046 171 46L171 38C171 36.8954 170.105 36 169 36L46 36C44.8954 36 44 36.8954 44 38L44 46C44 47.1046 44.8954 48 46 48L169 48Z" fill="var(--rz-series-1)"/>
                         <path d="M122 64C123.105 64 124 63.1046 124 62L124 54C124 52.8954 123.105 52 122 52L55 52C53.8954 52 53 52.8954 53 54L53 62C53 63.1046 53.8954 64 55 64L122 64Z" fill="var(--rz-series-1)"/>
@@ -204,7 +207,7 @@
         <RadzenLink Path="/stacked-bar-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked Bar chart thumbnail">
                         <path d="M85 32V20L20 20L20 32L85 32Z" fill="var(--rz-series-1)"/>
                         <path d="M106 32C107.105 32 108 31.1046 108 30V22C108 20.8954 107.105 20 106 20L85 20L85 32L106 32Z" fill="var(--rz-series-2)"/>
                         <path d="M94 48V36L20 36L20 48L94 48Z" fill="var(--rz-series-1)"/>
@@ -229,7 +232,7 @@
         <RadzenLink Path="/100-percent-stacked-bar-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Stacked Bar chart thumbnail">
                         <path d="M87 32V20L20 20L20 32L87 32Z" fill="var(--rz-series-1)"/>
                         <path d="M180 32V20L110 20L110 32L180 32Z" fill="var(--rz-series-3)"/>
                         <path d="M180 48V36L149 36L149 48L180 48Z" fill="var(--rz-series-3)"/>
@@ -260,7 +263,7 @@
         <RadzenLink Path="/negative-stacked-bar-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Negative Stacked Bar chart thumbnail">
                         <path d="M100 32V20L39 20C37.8954 20 37 20.8954 37 22L37 30C37 31.1046 37.8954 32 39 32L100 32Z" fill="var(--rz-series-1)"/>
                         <path d="M141 32C142.105 32 143 31.1046 143 30V22C143 20.8954 142.105 20 141 20L100 20L100 32L141 32Z" fill="var(--rz-series-2)"/>
                         <path d="M100 48V36L54 36C52.8954 36 52 36.8954 52 38L52 46C52 47.1046 52.8954 48 54 48L100 48Z" fill="var(--rz-series-1)"/>
@@ -282,16 +285,16 @@
 </RadzenRow>
 
 @* --- Column Chart --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#column-chart" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Column Chart
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Column Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/column-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Column chart thumbnail">
                         <path d="M156 39C156 37.8954 156.895 37 158 37H168C169.105 37 170 37.8954 170 39V112H156V39Z" fill="var(--rz-series-1)"/>
                         <path d="M138 59C138 57.8954 138.895 57 140 57H150C151.105 57 152 57.8954 152 59V112H138V59Z" fill="var(--rz-series-1)"/>
                         <path d="M120 56C120 54.8954 120.895 54 122 54H132C133.105 54 134 54.8954 134 56V112H120V56Z" fill="var(--rz-series-1)"/>
@@ -312,7 +315,7 @@
         <RadzenLink Path="/range-column-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Column chart thumbnail">
                         <rect x="156" y="29" width="14" height="75" rx="2" fill="var(--rz-series-1)"/>
                         <rect x="138" y="41" width="14" height="55" rx="2" fill="var(--rz-series-1)"/>
                         <rect x="120" y="32" width="14" height="58" rx="2" fill="var(--rz-series-1)"/>
@@ -333,7 +336,7 @@
         <RadzenLink Path="/stacked-column-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked Column chart thumbnail">
                         <path d="M30 93H44V112H30L30 93Z" fill="var(--rz-series-1)"/>
                         <path d="M48 91H62V112H48L48 91Z" fill="var(--rz-series-1)"/>
                         <path d="M84 91H98V112H84L84 91Z" fill="var(--rz-series-1)"/>
@@ -362,7 +365,7 @@
         <RadzenLink Path="/100-percent-stacked-column-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Stacked Column chart thumbnail">
                         <path d="M30 91H44V112H30V91Z" fill="var(--rz-series-1)"/>
                         <path d="M48 89H62V112H48V89Z" fill="var(--rz-series-1)"/>
                         <path d="M84 89H98V112H84V89Z" fill="var(--rz-series-1)"/>
@@ -399,7 +402,7 @@
         <RadzenLink Path="/chart-histogram">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Histogram chart thumbnail">
                         <path d="M156 91C156 89.8954 156.895 89 158 89H168C169.105 89 170 89.8954 170 91V104H156V91Z" fill="var(--rz-series-1)"/>
                         <path d="M138 79C138 77.8954 138.895 77 140 77H150C151.105 77 152 77.8954 152 79V104H138V79Z" fill="var(--rz-series-1)"/>
                         <path d="M120 60C120 58.8954 120.895 58 122 58H132C133.105 58 134 58.8954 134 60V104H120V60Z" fill="var(--rz-series-1)"/>
@@ -420,7 +423,7 @@
         <RadzenLink Path="/grouped-column-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Grouped Column chart thumbnail">
                         <path d="M168 39C168 37.8954 168.895 37 170 37H180C181.105 37 182 37.8954 182 39V112H168V39Z" fill="var(--rz-series-2)"/>
                         <path d="M150 59C150 57.8954 150.895 57 152 57H162C163.105 57 164 57.8954 164 59V112H150V59Z" fill="var(--rz-series-1)"/>
                         <path d="M124 56C124 54.8954 124.895 54 126 54H136C137.105 54 138 54.8954 138 56V112H124V56Z" fill="var(--rz-series-2)"/>
@@ -441,7 +444,7 @@
         <RadzenLink Path="/negative-column-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Column Negative Points chart thumbnail">
                         <path d="M102 56C102 54.8954 102.895 54 104 54H114C115.105 54 116 54.8954 116 56V66H102V56Z" fill="var(--rz-series-1)"/>
                         <path d="M120 49C120 47.8954 120.895 47 122 47H132C133.105 47 134 47.8954 134 49V66H120V49Z" fill="var(--rz-series-1)"/>
                         <path d="M138 37C138 35.8954 138.895 35 140 35H150C151.105 35 152 35.8954 152 37V66H138V37Z" fill="var(--rz-series-1)"/>
@@ -459,16 +462,16 @@
 </RadzenRow>
 
 @* --- Line Chart --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#line-chart" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Line Chart
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Line Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/line-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Line chart thumbnail">
                         <path d="M20 93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
@@ -482,7 +485,7 @@
         <RadzenLink Path="/chart-spline">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spline chart thumbnail">
                         <path d="M20 93C28 93 28 87 36 87C44 87 44 71 52 71C60 71 60 80 68 80C76 80 76 65 84 65C92 65 92 76 100 76C108 76 108 55 116 55C124 55 124 64 132 64C140 64 140 47 148 47C156 47 156 52 164 52C172 52 172 39 180 39" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
@@ -496,7 +499,7 @@
         <RadzenLink Path="/step-line-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Step Line chart thumbnail">
                         <path d="M20 93H36V87H52V71H68V80H84V65H100V76H116V55H132V64H148V47H164V44.5V39H180" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                 </div>
@@ -510,7 +513,7 @@
         <RadzenLink Path="/stacked-line-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked Line chart thumbnail">
                         <path d="M20 93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39" stroke="var(--rz-series-1)" stroke-width="2" stroke-linecap="round"/>
                         <path d="M20 97L36 99L52 90L68 96L84 84L100 99L116 79L132 93L148 74L164 85L180 76" stroke="var(--rz-series-2)" stroke-width="3" stroke-linecap="round"/>
                     </svg>
@@ -525,7 +528,7 @@
         <RadzenLink Path="/100-percent-stacked-line-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Stacked Line chart thumbnail">
                         <path d="M20 93L36 87L52 71L68 80L84 65L100 76L116 55L132 64L148 47L164 52L180 39" stroke="var(--rz-series-1)" stroke-width="2" stroke-linecap="round"/>
                         <path d="M20 97L36 99L52 90L68 96L84 84L100 99L116 79L132 93L148 74L164 85L180 76" stroke="var(--rz-series-2)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M20 20H180" stroke="var(--rz-series-3)" stroke-width="3" stroke-linecap="round"/>
@@ -538,16 +541,16 @@
 </RadzenRow>
 
 @* --- Waterfall Chart --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#waterfall-chart" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Waterfall Chart
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Waterfall Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/waterfall-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Waterfall chart thumbnail">
                         <rect x="166" y="38" width="12" height="50" fill="var(--rz-success)"/>
                         <rect x="150" y="77" width="12" height="11" fill="var(--rz-danger)"/>
                         <rect x="134" y="77" width="12" height="31" fill="var(--rz-series-1)"/>
@@ -570,7 +573,7 @@
         <RadzenLink Path="/horizontal-waterfall-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal Waterfall chart thumbnail">
                         <path d="M63 32V20L20 20L20 32L63 32Z" fill="var(--rz-success)"/>
                         <path d="M124 48V36L63 36L63 48L124 48Z" fill="var(--rz-success)"/>
                         <path d="M124 64V52L87 52L87 64L124 64Z" fill="var(--rz-danger)"/>
@@ -586,16 +589,16 @@
 </RadzenRow>
 
 @* --- Pie & Donut --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#part-to-whole-charts" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Part-to-Whole Charts
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Pie Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/pie-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pie chart thumbnail">
                         <path d="M145.987 67C145.455 91.9433 125.07 112 99.999 112C87.6559 112 76.4494 107.137 68.1875 99.2246L100.413 67H145.987Z" fill="var(--rz-series-2)"/>
                         <path d="M104 17.0107C128.611 17.5356 148.463 37.3891 148.988 62H104V17.0107Z" fill="var(--rz-series-1)"/>
                         <path d="M99 65.5859L66.7734 97.8115C58.8614 89.5497 54 78.3426 54 66C54 40.9291 74.0567 20.5427 99 20.0107V65.5859Z" fill="var(--rz-series-3)"/>
@@ -611,7 +614,7 @@
         <RadzenLink Path="/donut-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Donut chart thumbnail">
                         <path d="M145.987 67C145.455 91.9433 125.07 112 99.999 112C87.6559 112 76.4494 107.137 68.1875 99.2246L76.6758 90.7363C82.7638 96.4787 90.9696 100 99.999 100C118.442 100 133.454 85.3151 133.983 67H145.987Z" fill="var(--rz-series-2)"/>
                         <path d="M104 17.0107C128.611 17.5356 148.463 37.3891 148.988 62H136.984C136.465 44.017 121.983 29.5341 104 29.0146V17.0107Z" fill="var(--rz-series-1)"/>
                         <path d="M99 32.0146C80.6848 32.5437 66 47.5568 66 66C66 75.0289 69.52 83.2353 75.2617 89.3232L66.7734 97.8115C58.8614 89.5497 54 78.3426 54 66C54 40.9291 74.0567 20.5427 99 20.0107V32.0146Z" fill="var(--rz-series-3)"/>
@@ -627,7 +630,7 @@
         <RadzenLink Path="/funnel-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Funnel chart thumbnail">
                         <path d="M157.172 40C157.702 40 158.211 39.7893 158.586 39.4142L166.586 31.4146C167.846 30.1547 166.953 28.0003 165.171 28.0003L34.8285 28.0004C33.0467 28.0004 32.1544 30.1547 33.4143 31.4146L41.4142 39.4142C41.7893 39.7893 42.298 40 42.8284 40L157.172 40Z" fill="var(--rz-series-1)"/>
                         <path d="M141.172 56C141.702 56 142.211 55.7893 142.586 55.4142L150.586 47.4146C151.846 46.1546 150.953 44.0003 149.171 44.0003L50.8285 44.0004C49.0467 44.0004 48.1544 46.1547 49.4143 47.4146L57.4142 55.4142C57.7893 55.7893 58.298 56 58.8284 56L141.172 56Z" fill="var(--rz-series-2)"/>
                         <path d="M128.93 72C129.598 72 130.223 71.6658 130.594 71.1094L135.927 63.1098C136.813 61.7807 135.86 60.0003 134.263 60.0003L65.7371 60.0003C64.1397 60.0003 63.1869 61.7806 64.073 63.1098L69.4063 71.1094C69.7772 71.6658 70.4017 72 71.0704 72L128.93 72Z" fill="var(--rz-series-3)"/>
@@ -645,7 +648,7 @@
         <RadzenLink Path="/pyramid-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pyramid chart thumbnail">
                         <path d="M164.172 92C164.702 92 165.211 92.2107 165.586 92.5858L173.586 100.585C174.846 101.845 173.953 104 172.171 104L27.8285 104C26.0467 104 25.1544 101.845 26.4143 100.585L34.4142 92.5858C34.7893 92.2107 35.298 92 35.8284 92L164.172 92Z" fill="var(--rz-series-1)"/>
                         <path d="M148.172 76C148.702 76 149.211 76.2107 149.586 76.5858L157.586 84.5854C158.846 85.8454 157.953 87.9997 156.171 87.9997L43.8285 87.9996C42.0467 87.9996 41.1544 85.8453 42.4143 84.5854L50.4142 76.5858C50.7893 76.2107 51.298 76 51.8284 76L148.172 76Z" fill="var(--rz-series-2)"/>
                         <path d="M132.172 60C132.702 60 133.211 60.2107 133.586 60.5858L141.586 68.5854C142.846 69.8454 141.953 71.9997 140.171 71.9997L59.8285 71.9996C58.0467 71.9996 57.1544 69.8453 58.4143 68.5854L66.4142 60.5858C66.7893 60.2107 67.298 60 67.8284 60L132.172 60Z" fill="var(--rz-series-3)"/>
@@ -660,16 +663,16 @@
 </RadzenRow>
 
 @* --- Scatter & Bubble --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#scatter-bubble" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Scatter &amp; Bubble
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Scatter Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/scatter-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scatter chart thumbnail">
                         <circle cx="36" cy="87" r="5" fill="var(--rz-series-1)"/>
                         <circle cx="52" cy="71" r="5" fill="var(--rz-series-1)"/>
                         <circle cx="68" cy="80" r="5" fill="var(--rz-series-1)"/>
@@ -691,7 +694,7 @@
         <RadzenLink Path="/scatter-line-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scatter Line chart thumbnail">
                         <circle cx="36" cy="87" r="5" fill="var(--rz-series-1)"/>
                         <circle cx="52" cy="71" r="5" fill="var(--rz-series-1)"/>
                         <circle cx="68" cy="80" r="5" fill="var(--rz-series-1)"/>
@@ -714,7 +717,7 @@
         <RadzenLink Path="/bubble-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bubble chart thumbnail">
                         <circle cx="32" cy="90" r="12" fill="var(--rz-series-1)" opacity="0.6"/>
                         <circle cx="65" cy="52" r="26" fill="var(--rz-series-2)" opacity="0.6"/>
                         <circle cx="95.5" cy="93.5" r="14.5" fill="var(--rz-series-3)" opacity="0.6"/>
@@ -730,16 +733,16 @@
 </RadzenRow>
 
 @* --- Financial --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#financial" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Financial
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Candlestick Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/candlestick-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Candlestick chart thumbnail">
                         <rect x="21" y="84" width="12" height="18" fill="var(--rz-danger)"/>
                         <line x1="27" y1="76" x2="27" y2="106" stroke="var(--rz-danger)" stroke-width="2"/>
                         <rect x="63" y="73" width="12" height="22" fill="var(--rz-danger)"/>
@@ -768,7 +771,7 @@
         <RadzenLink Path="/ohlc-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OHLC chart thumbnail">
                         <path d="M29 106H34V108H29V112H27V92H22V90H27V76H29V106Z" fill="var(--rz-danger)"/>
                         <path d="M61 99H66V101H61V103H59V81H54V79H59V73H61V99Z" fill="var(--rz-danger)"/>
                         <path d="M109 92H114V94H109V102H107V58H102V56H107V42H109V92Z" fill="var(--rz-danger)"/>
@@ -791,7 +794,7 @@
         <RadzenLink Path="/highlow-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="High-Low chart thumbnail">
                         <rect x="170" y="29" width="4" height="75" rx="2" fill="var(--rz-series-1)"/>
                         <rect x="154" y="41" width="4" height="55" rx="2" fill="var(--rz-series-1)"/>
                         <rect x="138" y="32" width="4" height="58" rx="2" fill="var(--rz-series-1)"/>
@@ -814,7 +817,7 @@
         <RadzenLink Path="/box-plot-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Box Plot chart thumbnail">
                         <path d="M33 81C33 82.1046 32.1046 83 31 83H28V87H32C32.5523 87 33 87.4477 33 88C33 88.5523 32.5523 89 32 89H22C21.4477 89 21 88.5523 21 88C21 87.4477 21.4477 87 22 87H26V83H23C21.8954 83 21 82.1046 21 81V70H33V81Z" fill="var(--rz-series-1)"/>
                         <path d="M32 47C32.5523 47 33 47.4477 33 48C33 48.5523 32.5523 49 32 49H28V53H31C32.1046 53 33 53.8954 33 55V68H21V55C21 53.8954 21.8954 53 23 53H26V49H22C21.4477 49 21 48.5523 21 48C21 47.4477 21.4477 47 22 47H32Z" fill="var(--rz-series-1)"/>
                         <path d="M75 83C75 84.1046 74.1046 85 73 85H70V89H74C74.5523 89 75 89.4477 75 90C75 90.5523 74.5523 91 74 91H64C63.4477 91 63 90.5523 63 90C63 89.4477 63.4477 89 64 89H68V85H65C63.8954 85 63 84.1046 63 83V72H75V83Z" fill="var(--rz-series-1)"/>
@@ -840,16 +843,16 @@
 </RadzenRow>
 
 @* --- Statistical & Interactive --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#statistical-interactive" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Statistical &amp; Interactive
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Trendline Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/trendline-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trendline chart thumbnail">
                         <circle cx="36" cy="87" r="5" fill="var(--rz-series-1)"/>
                         <circle cx="52" cy="71" r="5" fill="var(--rz-series-1)"/>
                         <circle cx="68" cy="80" r="5" fill="var(--rz-series-1)"/>
@@ -872,7 +875,7 @@
         <RadzenLink Path="/chart-pareto">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pareto chart thumbnail">
                         <path d="M166 102C166 100.895 166.895 100 168 100H176C177.105 100 178 100.895 178 102V112H166V102Z" fill="var(--rz-series-1)"/>
                         <path d="M134 91C134 89.8954 134.895 89 136 89H144C145.105 89 146 89.8954 146 91V112H134V91Z" fill="var(--rz-series-1)"/>
                         <path d="M102 79C102 77.8954 102.895 77 104 77H112C113.105 77 114 77.8954 114 79V112H102V79Z" fill="var(--rz-series-1)"/>
@@ -896,7 +899,7 @@
         <RadzenLink Path="/drilldown-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DrillDown chart thumbnail">
                         <path d="M166 39C166 37.8954 166.895 37 168 37H176C177.105 37 178 37.8954 178 39V112H166V39Z" fill="var(--rz-series-1)"/>
                         <path d="M150 59C150 57.8954 150.895 57 152 57H160C161.105 57 162 57.8954 162 59V112H150V59Z" fill="var(--rz-series-1)"/>
                         <path d="M134 56C134 54.8954 134.895 54 136 54H144C145.105 54 146 54.8954 146 56V112H134V56Z" fill="var(--rz-series-1)"/>
@@ -920,7 +923,7 @@
         <RadzenLink Path="/bullet-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bullet chart thumbnail">
                         <rect opacity="0.2" width="12" height="68" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 88 112)" fill="var(--rz-series-1)"/>
                         <rect opacity="0.2" width="12" height="105" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 125 80)" fill="var(--rz-series-1)"/>
                         <rect opacity="0.2" width="12" height="127" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 147 48)" fill="var(--rz-series-1)"/>
@@ -951,7 +954,7 @@
         <RadzenLink Path="/live-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Live Chart chart thumbnail">
                         <path d="M20 73L36 87L52 63L68 96L84 57L100 80L116 39L132 72L148 47L164 84" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M180 39L164 84" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 8"/>
                     </svg>
@@ -963,17 +966,17 @@
 </RadzenRow>
 
 @* --- Specialized Charts --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#specialized-charts" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Specialized Charts
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
 
     @* Heatmap *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/heatmap-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Heatmap chart thumbnail">
                         <rect opacity="0.6" x="118" y="26" width="28" height="24" rx="2" fill="var(--rz-series-1)"/>
                         <rect opacity="0.45" x="118" y="82" width="28" height="24" rx="2" fill="var(--rz-series-1)"/>
                         <rect opacity="0.15" x="150" y="26" width="28" height="24" rx="2" fill="var(--rz-series-1)"/>
@@ -1001,7 +1004,7 @@
         <RadzenLink Path="/treemap-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Treemap chart thumbnail">
                         <rect x="24" y="26" width="88" height="52" rx="2" fill="var(--rz-series-1)"/>
                         <rect x="116" y="26" width="60" height="32" rx="2" fill="var(--rz-series-2)"/>
                         <rect x="116" y="62" width="60" height="16" rx="2" fill="var(--rz-series-3)"/>
@@ -1020,7 +1023,7 @@
         <RadzenLink Path="/sparkline">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sparkline chart thumbnail">
                         <circle cx="24.5" cy="104.5" r="2.5" fill="var(--rz-series-1)"/>
                         <circle cx="32.5" cy="96.5" r="2.5" fill="var(--rz-series-1)"/>
                         <circle cx="40.5" cy="101" r="2.5" fill="var(--rz-series-1)"/>
@@ -1057,7 +1060,7 @@
         <RadzenLink Path="/spider-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Spider chart thumbnail">
                         <path d="M150 66L50 66" stroke="var(--rz-chart-axis-color)" stroke-width="2" stroke-linecap="round"/>
                         <path d="M124.996 109.299L74.9961 22.6963" stroke="var(--rz-chart-axis-color)" stroke-width="2" stroke-linecap="round"/>
                         <path d="M74.9961 109.294L124.996 22.6914" stroke="var(--rz-chart-axis-color)" stroke-width="2" stroke-linecap="round"/>
@@ -1076,7 +1079,7 @@
         <RadzenLink Path="/sankey-diagram">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sankey Diagram chart thumbnail">
                         <path d="M166 44H176C177.105 44 178 44.8954 178 46V87C178 88.1046 177.105 89 176 89H166V44Z" fill="var(--rz-series-4)"/>
                         <path d="M166 20H176C177.105 20 178 20.8954 178 22V38C178 39.1046 177.105 40 176 40H166V20Z" fill="var(--rz-series-3)"/>
                         <path d="M166 93H176C177.105 93 178 93.8954 178 95V110C178 111.105 177.105 112 176 112H166V93Z" fill="var(--rz-series-5)"/>
@@ -1098,7 +1101,7 @@
         <RadzenLink Path="/timeline">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timeline chart thumbnail">
                         <path d="M172 66L28 66" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M57 91L57 66" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M100 66L100 41" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
@@ -1118,7 +1121,7 @@
         <RadzenLink Path="/qrcode">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QRCode chart thumbnail">
                         <rect x="56" y="22" width="24" height="24" rx="2" fill="var(--rz-series-1)"/>
                         <rect x="56" y="54" width="8" height="8" rx="2" fill="var(--rz-series-1)"/>
                         <rect x="88" y="22" width="8" height="8" rx="2" fill="var(--rz-series-1)"/>
@@ -1150,7 +1153,7 @@
         <RadzenLink Path="/barcode">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Barcode chart thumbnail">
                         <rect x="24" y="22" width="4" height="88" fill="var(--rz-series-1)"/>
                         <path d="M110 22H114V102H110L110 22Z" fill="var(--rz-series-1)"/>
                         <path d="M32 22H34V102H32V22Z" fill="var(--rz-series-1)"/>
@@ -1184,7 +1187,7 @@
         <RadzenLink Path="/googlemap">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GoogleMap chart thumbnail">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M100 34C109.941 34 118 42.0589 118 52C118 61.9411 100 98 100 98C100 98 82 61.9411 82 52C82 42.0589 90.0589 34 100 34ZM100 44C95.5817 44 92 47.5817 92 52C92 56.4183 95.5817 60 100 60C104.418 60 108 56.4183 108 52C108 47.5817 104.418 44 100 44Z" fill="var(--rz-series-1)"/>
                     </svg>
                 </div>
@@ -1198,7 +1201,7 @@
         <RadzenLink Path="/ssrsviewer">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SSRS Viewer chart thumbnail">
                         <path d="M70 106H130V26H70V106ZM134 108C134 109.036 133.213 109.887 132.204 109.989L132 110H68C66.9644 110 66.113 109.213 66.0107 108.204L66 108V24C66 22.8954 66.8954 22 68 22H132L132.204 22.0107C133.213 22.113 134 22.9644 134 24V108Z" fill="var(--rz-series-1)"/>
                         <rect x="78" y="69" width="44" height="2" rx="1" fill="var(--rz-series-1)"/>
                         <rect x="105" y="51" width="16" height="2" rx="1" fill="var(--rz-series-1)"/>
@@ -1221,7 +1224,7 @@
         <RadzenLink Path="/radar-column-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Radar Column chart thumbnail">
                         <circle cx="100" cy="66" r="42.5" stroke="var(--rz-chart-axis-color)" stroke-width="1"/>
                         <circle cx="100" cy="66" r="23.5" stroke="var(--rz-chart-axis-color)" stroke-width="1"/>
                         <path d="M150 66L50 66" stroke="var(--rz-chart-axis-color)" stroke-width="2" stroke-linecap="round"/>
@@ -1242,16 +1245,16 @@
 </RadzenRow>
 
 @* --- Gauges --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#gauges" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Gauges
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Arc Gauge *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/arc-gauge">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Arc Gauge chart thumbnail">
                         <path d="M100 26C144.183 26 180 61.8172 180 106H169C169 67.8924 138.108 37 100 37C61.8924 37 31 67.8924 31 106H20C20 61.8172 55.8172 26 100 26Z" fill="var(--rz-chart-axis-color)"/>
 <path d="M100 26C107.176 26 114.13 26.9459 120.747 28.7178L117.899 39.3447C112.191 37.8156 106.191 37 100 37C61.8924 37 31 67.8924 31 106H20C20 61.8172 55.8172 26 100 26Z" fill="var(--rz-series-1)"/>
                     </svg>
@@ -1266,7 +1269,7 @@
         <RadzenLink Path="/linear-gauge">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Linear Gauge chart thumbnail">
                         <rect width="12" height="160" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 180 72)" fill="var(--rz-chart-axis-color)"/>
                         <rect width="12" height="100" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 120 72)" fill="var(--rz-series-1)"/>
                         <path d="M124 78H116L120 73L124 78Z" fill="var(--rz-series-1)"/>
@@ -1282,7 +1285,7 @@
         <RadzenLink Path="/radial-gauge">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Radial Gauge chart thumbnail">
                         <path d="M100 20C136.451 20 166 49.5492 166 86C166 95.0983 164.158 103.766 160.828 111.652L150.678 107.406C153.46 100.827 155 93.5932 155 86C155 55.6243 130.376 31 100 31C69.6243 31 45 55.6243 45 86C45 93.4566 46.4843 100.566 49.1729 107.051L39.0225 111.296C35.787 103.505 34 94.9614 34 86C34 49.5492 63.5492 20 100 20Z" fill="var(--rz-chart-axis-color)"/>
                         <path d="M100 20C112.069 20 123.381 23.2398 133.114 28.8965L127.613 38.4248C119.498 33.7043 110.065 31 100 31C69.6243 31 45 55.6243 45 86C45 93.4566 46.4843 100.566 49.1729 107.051L39.0225 111.296C35.787 103.505 34 94.9614 34 86C34 49.5492 63.5492 20 100 20Z" fill="var(--rz-series-1)"/>
                         <path d="M123.108 47L100.014 87.0003" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
@@ -1298,7 +1301,7 @@
         <RadzenLink Path="/styling-gauge">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Styling Gauge chart thumbnail">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M100 20C125.405 20 146 40.5949 146 66C146 91.4051 125.405 112 100 112C74.5949 112 54 91.4051 54 66C54 40.5949 74.5949 20 100 20ZM100 31C80.67 31 65 46.67 65 66C65 85.33 80.67 101 100 101C119.33 101 135 85.33 135 66C135 46.67 119.33 31 100 31Z" fill="#F92063" opacity="0.4" />
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M100 31C119.33 31 135 46.67 135 66C135 85.33 119.33 101 100 101C80.67 101 65 85.33 65 66C65 46.67 80.67 31 100 31ZM100 42C86.7452 42 76 52.7452 76 66C76 79.2548 86.7452 90 100 90C113.255 90 124 79.2548 124 66C124 52.7452 113.255 42 100 42Z" fill="#CBFF00" opacity="0.4"/>
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M100 42C113.255 42 124 52.7452 124 66C124 79.2548 113.255 90 100 90C86.7452 90 76 79.2548 76 66C76 52.7452 86.7452 42 100 42ZM100 53C92.8203 53 87 58.8203 87 66C87 73.1797 92.8203 79 100 79C107.18 79 113 73.1797 113 66C113 58.8203 107.18 53 100 53Z" fill="#00FDEA" opacity="0.4"/>
@@ -1314,16 +1317,16 @@
 </RadzenRow>
 
 @* --- Zoom & Navigation --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#zoom-navigation" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Zoom &amp; Navigation
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Zoom and Pan *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/zoom-pan-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Zoom and Pan chart thumbnail">
                         <path d="M164 46C154.711 46 145 62 132 62M36 70C49 70 55 80 68 80C75.8181 80 81.1044 69.1499 86.9042 60.5" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M87 58C90.8333 58 90.8333 54 94.6667 54C98.5 54 98.5 62 102.333 62C106.167 62 106.167 49 110 49C113.833 49 113.833 68 117.667 68C121.5 68 121.5 56 125.333 56C129.167 56 129.167 62 133 62" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M110 32C123.807 32 135 43.1929 135 57C135 63.1836 132.753 68.8408 129.033 73.2051L152.284 96.4551L149.456 99.2842L126.205 76.0332C121.841 79.7526 116.184 82 110 82C96.1929 82 85 70.8071 85 57C85 43.1929 96.1929 32 110 32ZM110 36C98.402 36 89 45.402 89 57C89 68.598 98.402 78 110 78C121.598 78 131 68.598 131 57C131 45.402 121.598 36 110 36Z" fill="var(--rz-chart-axis-label-color)"/>
@@ -1339,7 +1342,7 @@
         <RadzenLink Path="/range-navigator">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Range Navigator chart thumbnail">
                         <path d="M172 36C164 36 164 41 156 41C148 41 148 36 140 36C132 36 132 49 124 49C116 49 116 40 108 40C100 40 100 57 92 57C84 57 84 46 76 46C68 46 68 57 60 57C52 57 52 48 44 48C36 48 36 64 28 64" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M44 108C48 108 48 105 52 105C56 105 56 97 60 97C64 97 64 101.5 68 101.5C72 101.5 72 94 76 94C80 94 80 99.5 84 99.5C88 99.5 88 93 92 93C96 93 96 97.5 100 97.5C104 97.5 104 93 108 93C112 93 112 95.5 116 95.5C120 95.5 120 93 124 93" stroke="var(--rz-series-1)" stroke-width="1.5" stroke-linecap="round"/>
                         <path d="M44 108C40 108 40 97 36 97C32 97 32 100 28 100C24 100 24 89.5 20 89.5" stroke="var(--rz-series-1)" stroke-width="1.5" stroke-linecap="round"/>
@@ -1359,16 +1362,16 @@
 </RadzenRow>
 
 @* --- Configuration --- *@
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
+<RadzenText Anchor="chart-gallery#configuration" TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-8 rz-pb-2">
     Configuration
 </RadzenText>
-<RadzenRow Gap="1rem" RowGap="1rem" class="chart-gallery">
+<RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Series *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
         <RadzenLink Path="/chart-series">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Series chart thumbnail">
                         <path d="M156 39C156 37.8954 156.895 37 158 37H168C169.105 37 170 37.8954 170 39V112H156V39Z" fill="var(--rz-series-8)"/>
                         <path d="M138 59C138 57.8954 138.895 57 140 57H150C151.105 57 152 57.8954 152 59V112H138V59Z" fill="var(--rz-series-7)"/>
                         <path d="M120 56C120 54.8954 120.895 54 122 54H132C133.105 54 134 54.8954 134 56V112H120V56Z" fill="var(--rz-series-6)"/>
@@ -1389,7 +1392,7 @@
         <RadzenLink Path="/chart-axis">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Axis chart thumbnail">
                         <path d="M22 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M22 112H178" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path opacity="0.3" d="M22 92H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
@@ -1409,7 +1412,7 @@
         <RadzenLink Path="/multiple-axes-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Multiple Axes chart thumbnail">
                         <path d="M22 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M164 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M174 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
@@ -1431,7 +1434,7 @@
         <RadzenLink Path="/inverted-axis-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Inverted Axis chart thumbnail">
                         <path d="M178 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M22 112H178" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path opacity="0.3" d="M22 92H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
@@ -1451,7 +1454,7 @@
         <RadzenLink Path="/axis-crossing-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Axis Crossing chart thumbnail">
                         <path d="M100 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M22 66H178" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path opacity="0.3" d="M22 106H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
@@ -1471,7 +1474,7 @@
         <RadzenLink Path="/logarithmic-axis-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logarithmic Axis chart thumbnail">
                         <path d="M22 112V21.5" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path d="M22 112H178" stroke="var(--rz-chart-axis-color)" stroke-width="3" stroke-linecap="round"/>
                         <path opacity="0.3" d="M22 73H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
@@ -1491,7 +1494,7 @@
         <RadzenLink Path="/indexed-category-axis-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Indexed Category Axis chart thumbnail">
                         <path d="M168 31C168 29.8954 168.895 29 170 29H180C181.105 29 182 29.8954 182 31V100H168L168 31Z" fill="var(--rz-series-2)"/>
                         <path d="M150 51C150 49.8954 150.895 49 152 49H162C163.105 49 164 49.8954 164 51V100H150L150 51Z" fill="var(--rz-series-1)"/>
                         <path d="M124 48C124 46.8954 124.895 46 126 46H136C137.105 46 138 46.8954 138 48V100H124L124 48Z" fill="var(--rz-series-2)"/>
@@ -1516,7 +1519,7 @@
         <RadzenLink Path="/chart-legend">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Legend chart thumbnail">
                     <path d="M20 77L36 71L52 55L68 64L84 49L100 60L116 39L132 48L148 31L164 36L180 23" stroke="var(--rz-series-1)" stroke-width="2" stroke-linecap="round"/>
                     <path d="M20 77L36 71L52 55L68 64L84 49L100 60L116 39L132 48L148 31L164 36L180 23" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     <path d="M20 81L36 83L52 74L68 80L84 68L100 83L116 63L132 77L148 58L164 69L180 60" stroke="var(--rz-series-2)" stroke-width="3" stroke-linecap="round"/>
@@ -1536,7 +1539,7 @@
         <RadzenLink Path="/chart-tooltip">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ToolTip chart thumbnail">
 <path d="M156 39C156 37.8954 156.895 37 158 37H168C169.105 37 170 37.8954 170 39V112H156V39Z" fill="var(--rz-series-1)" opacity="0.4"/>
 <path d="M138 59C138 57.8954 138.895 57 140 57H150C151.105 57 152 57.8954 152 59V112H138V59Z" fill="var(--rz-series-1)" opacity="0.4"/>
 <path d="M120 56C120 54.8954 120.895 54 122 54H132C133.105 54 134 54.8954 134 56V112H120V56Z" fill="var(--rz-series-1)" opacity="0.4"/>
@@ -1558,7 +1561,7 @@
         <RadzenLink Path="/chart-label-rotation">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Label Rotation chart thumbnail">
                         <path opacity="0.3" d="M22 87H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
                         <path opacity="0.3" d="M22 67H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
                         <path opacity="0.3" d="M22 47H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
@@ -1581,7 +1584,7 @@
         <RadzenLink Path="/chart-interpolation">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Interpolation chart thumbnail">
                         <path d="M20 101H36V95H52V79H68V88H84V73H100V84H116V63H132V72H148V55H164V52.5V47H180V112H20V101Z" fill="var(--rz-series-2)" fill-opacity="0.3"/>
                         <path d="M20 73H36V67H52V55H68V60H84V49H100V56H116V39H132V44H148V35H164V32.5V27H180" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 8"/>
                         <path d="M20 109H36V103H52M180 63H164V68.5V71H148M84 85H100V92H116V75H132" stroke="var(--rz-series-3)" stroke-width="3" stroke-linecap="round"/>
@@ -1597,7 +1600,7 @@
         <RadzenLink Path="/chart-trends">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trends chart thumbnail">
                         <path opacity="0.3" d="M22 96H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
                         <path opacity="0.3" d="M22 76H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
                         <path opacity="0.3" d="M22 56H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
@@ -1616,7 +1619,7 @@
         <RadzenLink Path="/chart-annotations">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotations chart thumbnail">
                     <path d="M20 81L36 75L52 59L68 68L84 53L100 64L116 43L132 52L148 35L164 40L180 27" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
                     <path d="M20 97L36 99L52 90L68 96L84 84L100 99L116 79L132 93L148 74L164 85L180 76" stroke="var(--rz-series-2)" stroke-width="3" stroke-linecap="round"/>
                     <circle cx="84" cy="54" r="5" fill="var(--rz-chart-axis-label-color)"/>
@@ -1633,7 +1636,7 @@
         <RadzenLink Path="/styling-chart">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Styling Chart chart thumbnail">
                         <path d="M156 42C156 40.8954 156.895 40 158 40H168C169.105 40 170 40.8954 170 42V112H156V42Z" fill="#FFA600"/>
                         <path d="M138 61C138 59.8954 138.895 59 140 59H150C151.105 59 152 59.8954 152 61V112H138V61Z" fill="#FF7C43"/>
                         <path d="M120 68C120 66.8954 120.895 66 122 66H132C133.105 66 134 66.8954 134 68V112H120V68Z" fill="#F95D6A"/>
