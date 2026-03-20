@@ -454,6 +454,20 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         shortcuts.Add("Ctrl+Z", _ => UndoAsync());
         shortcuts.Add("Ctrl+X", _ => CutSelectionAsync());
         shortcuts.Add("Ctrl+Shift+Z", _ => RedoAsync());
+        shortcuts.Add("Delete", _ => DeleteSelectedAsync());
+        shortcuts.Add("Backspace", _ => DeleteSelectedAsync());
+    }
+
+    private Task DeleteSelectedAsync()
+    {
+        if (Sheet?.SelectedImage != null)
+        {
+            var command = new Spreadsheet.DeleteImageCommand(Sheet, Sheet.SelectedImage);
+            Sheet.Commands.Execute(command);
+            return Task.CompletedTask;
+        }
+
+        return Task.CompletedTask;
     }
 
     private Task UndoAsync()
@@ -776,6 +790,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (result)
         {
+            // Clear image selection when clicking a cell
+            if (Sheet != null)
+            {
+                Sheet.SelectedImage = null;
+            }
+
             var address = new CellRef(args.Row, args.Column);
 
             if (args.Pointer.ShiftKey)
