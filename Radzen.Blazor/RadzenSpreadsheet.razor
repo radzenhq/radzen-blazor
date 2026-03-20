@@ -121,6 +121,7 @@
                 {
                     <TableFrame Sheet=@Sheet Table=@table Context=@context />
                 }
+                <InputPrompt @ref=@inputPrompt Sheet=@Sheet Context=@context />
             </ChildContent>
         </VirtualGrid>
         <Popup @ref=@cellMenuPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
@@ -137,19 +138,6 @@
                 <ValidationListPopup Items=@validationListItems ValueSelected=@OnValidationListValueSelectedAsync />
             }
         </Popup>
-        @if (inputPromptVisible && (!string.IsNullOrEmpty(inputPromptTitle) || !string.IsNullOrEmpty(inputPromptMessage)))
-        {
-            <div class="rz-spreadsheet-input-prompt" style="position: absolute; z-index: 100; background: #ffffd0; border: 1px solid #ccc; box-shadow: 2px 2px 4px rgba(0,0,0,0.15); padding: 0.5rem; max-width: 250px; font-size: 0.85rem; bottom: 0; right: 0;">
-                @if (!string.IsNullOrEmpty(inputPromptTitle))
-                {
-                    <div style="font-weight: bold; margin-bottom: 0.25rem;">@inputPromptTitle</div>
-                }
-                @if (!string.IsNullOrEmpty(inputPromptMessage))
-                {
-                    <div>@inputPromptMessage</div>
-                }
-            </div>
-        }
 }
     </CascadingValue>
 </div>
