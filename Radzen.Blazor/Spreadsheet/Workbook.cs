@@ -634,6 +634,8 @@ public class Workbook
                 CreateSheetProperties(sheet),
                 CreateDimension(sheet),
                 CreateSheetViews(sheet),
+                new XElement(XName.Get("sheetFormatPr", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("defaultRowHeight", "15")),
                 CreateColumns(sheet),
                 new XElement(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
     }
@@ -652,15 +654,34 @@ public class Workbook
 
     private static XElement CreateSheetViews(Sheet sheet)
     {
-        return new XElement(XName.Get("sheetViews", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            new XElement(XName.Get("sheetView", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("workbookViewId", "0"),
-                new XElement(XName.Get("pane", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("xSplit", sheet.Columns.Frozen),
-                    new XAttribute("ySplit", sheet.Rows.Frozen),
-                    new XAttribute("topLeftCell", new CellRef(sheet.Rows.Frozen, sheet.Columns.Frozen).ToString()),
-                    new XAttribute("activePane", "topLeft"),
-                    new XAttribute("state", "frozen"))));
+        var sheetView = new XElement(XName.Get("sheetView", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("workbookViewId", "0"));
+
+        if (sheet.Columns.Frozen > 0 || sheet.Rows.Frozen > 0)
+        {
+            var activePane = sheet.Columns.Frozen > 0 && sheet.Rows.Frozen > 0 ? "bottomRight"
+                : sheet.Rows.Frozen > 0 ? "bottomLeft"
+                : "topRight";
+
+            var pane = new XElement(XName.Get("pane", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("topLeftCell", new CellRef(sheet.Rows.Frozen, sheet.Columns.Frozen).ToString()),
+                new XAttribute("activePane", activePane),
+                new XAttribute("state", "frozen"));
+
+            if (sheet.Columns.Frozen > 0)
+            {
+                pane.Add(new XAttribute("xSplit", sheet.Columns.Frozen));
+            }
+
+            if (sheet.Rows.Frozen > 0)
+            {
+                pane.Add(new XAttribute("ySplit", sheet.Rows.Frozen));
+            }
+
+            sheetView.Add(pane);
+        }
+
+        return new XElement(XName.Get("sheetViews", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), sheetView);
     }
 
     private static XElement CreateColumns(Sheet sheet)
@@ -668,14 +689,15 @@ public class Workbook
         return new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             Enumerable.Range(0, sheet.ColumnCount).Select(col =>
             {
+                var width = Math.Round(sheet.Columns[col] / 7.0, 8);
+
                 var colElement = new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                     new XAttribute("min", col + 1),
-                    new XAttribute("max", col + 1));
+                    new XAttribute("max", col + 1),
+                    new XAttribute("width", width));
 
-                // Only persist width if it differs from the default
                 if (sheet.Columns[col] != sheet.Columns.Size)
                 {
-                    colElement.Add(new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)));
                     colElement.Add(new XAttribute("customWidth", "1"));
                 }
 
@@ -703,8 +725,11 @@ public class Workbook
                 rowElement.Add(cellElement);
             }
 
-            // Always add the row element, even if it has no cells, to preserve row height
-            sheetData.Add(rowElement);
+            // Only add the row if it has cells, custom height, or is hidden
+            if (rowElement.HasElements || sheet.Rows[row] != sheet.Rows.Size || sheet.Rows.IsHidden(row))
+            {
+                sheetData.Add(rowElement);
+            }
         }
     }
 
@@ -1245,12 +1270,11 @@ public class Workbook
 
                     if (!string.IsNullOrEmpty(rule.Formula1))
                     {
-                        if (rule.Type == DataValidationType.List)
+                        if (rule.Type == DataValidationType.List && !rule.Formula1.StartsWith('='))
                         {
-                            // Excel format: each item quoted individually, e.g. "Yes","No","Maybe"
-                            var items = rule.Formula1.Split(',');
-                            var quoted = string.Join(",", items.Select(i => $"\"{i.Trim()}\""));
-                            element.Add(new XElement(XName.Get("formula1", ns), quoted));
+                            // Excel format: single pair of quotes around comma-separated list, e.g. "Yes,No,Maybe"
+                            var items = rule.Formula1.Split(',').Select(i => i.Trim().Trim('"'));
+                            element.Add(new XElement(XName.Get("formula1", ns), $"\"{string.Join(",", items)}\""));
                         }
                         else
                         {
