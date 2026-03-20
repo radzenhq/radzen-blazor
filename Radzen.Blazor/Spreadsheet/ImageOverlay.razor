@@ -1,0 +1,8 @@
+@using Radzen.Blazor.Spreadsheet
+
+@foreach (var image in Sheet.Images)
+{
+    <div class=@GetClass(image) style=@GetStyle(image) @onpointerdown=@(e => OnImagePointerDown(e, image)) @onpointerdown:stopPropagation>
+        <img src=@GetDataUri(image) alt=@(image.Description ?? image.Name ?? "") />
+    </div>
+}

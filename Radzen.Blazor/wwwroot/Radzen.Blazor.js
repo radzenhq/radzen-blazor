@@ -49,8 +49,9 @@ window.Radzen = {
             }
         };
     },
-    downloadFile: function (fileName, data, mimeType) {
-        const blob = new Blob([data], { type: mimeType });
+    downloadFile: async function (fileName, data, mimeType) {
+        const buffer = typeof data.arrayBuffer === 'function' ? await data.arrayBuffer() : data;
+        const blob = new Blob([buffer], { type: mimeType });
         const url = URL.createObjectURL(blob);
 
         const a = document.createElement("a");
@@ -4661,6 +4662,9 @@ class Spreadsheet {
       if (!(await this.dotNetRef.invokeMethodAsync('OnColumnPointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
         removeEventListener('pointermove', this.onColumnPointerMove);
       }
+    } else if (e.target.closest('.rz-spreadsheet-image')) {
+      // Image clicks are handled by Blazor event handlers directly
+      return;
     } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
       const column = +e.target.dataset.column;
         addEventListener('pointermove', this.onColumnResizeMove);
