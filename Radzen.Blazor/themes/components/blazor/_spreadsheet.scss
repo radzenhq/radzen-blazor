@@ -287,6 +287,33 @@
     z-index: 4;
 }
 
+.rz-spreadsheet-input-prompt {
+    position: absolute;
+    z-index: 1;
+    background: var(--rz-base-background-color, #ffffd0);
+    border: 1px solid var(--rz-border-color, #e0e0e0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    padding: 0.5rem;
+    max-width: 250px;
+    font-size: 0.85rem;
+    pointer-events: none;
+    border-radius: var(--rz-border-radius, 4px);
+}
+
+.rz-spreadsheet-input-prompt-title {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.rz-spreadsheet-input-prompt.rz-spreadsheet-frozen-row,
+.rz-spreadsheet-input-prompt.rz-spreadsheet-frozen-column {
+    z-index: 3;
+}
+
+.rz-spreadsheet-input-prompt.rz-spreadsheet-frozen-row.rz-spreadsheet-frozen-column {
+    z-index: 4;
+}
+
 .rz-spreadsheet-horizontal-splitter,
 .rz-spreadsheet-vertical-splitter {
     position: absolute;
