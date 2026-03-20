@@ -82,6 +82,13 @@ public partial class CellEditor : ComponentBase, IDisposable
     {
         var address = Sheet.Selection.Cell;
 
+        if (address == CellRef.Invalid)
+        {
+            cellStyle = null;
+            className = "rz-spreadsheet-cell-editor";
+            return;
+        }
+
         var cell = Sheet.Cells[address];
 
         if (address != CellRef.Invalid)

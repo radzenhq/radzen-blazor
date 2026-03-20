@@ -29,6 +29,22 @@ public class CellEventArgs : EventArgs
 }
 
 /// <summary>
+/// Represents the event arguments for image resize events in a spreadsheet.
+/// </summary>
+public class ImageResizeEventArgs : EventArgs
+{
+    /// <summary>
+    /// Gets or sets the resize direction (nw, ne, sw, se).
+    /// </summary>
+    public string Direction { get; set; } = "";
+
+    /// <summary>
+    /// Gets or sets the pointer event arguments.
+    /// </summary>
+    public PointerEventArgs Pointer { get; set; } = default!;
+}
+
+/// <summary>
 /// Represents the event arguments for cell menu toggle events in a spreadsheet.
 /// </summary>
 public class CellMenuToggleEventArgs
