@@ -151,8 +151,8 @@ public class ImageOverlayTests : TestContext
             .Add(p => p.Sheet, sheet)
             .Add(p => p.Context, context));
 
-        var element = cut.Find(".rz-spreadsheet-image");
-        Assert.Contains("rz-spreadsheet-image-selected", element.ClassName);
+        var element = cut.Find(".rz-spreadsheet-selection-range");
+        Assert.Contains("rz-spreadsheet-selection-range", element.ClassName);
     }
 
     private static SheetImage CreateImage(int row, int column)

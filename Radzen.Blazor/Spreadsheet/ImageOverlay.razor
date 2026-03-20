@@ -3,10 +3,48 @@
 @foreach (var image in Sheet.Images)
 {
     var imageRange = GetImageRange(image);
+    var selected = Sheet.SelectedImage == image;
     @foreach (var zone in Sheet.GetRanges(imageRange))
     {
-        <div class=@GetClass(image, zone.FrozenRow, zone.FrozenColumn) style=@GetZoneStyle(image, imageRange, zone) @onpointerdown=@(e => OnImagePointerDown(e, image)) @onpointerdown:stopPropagation>
-            <img src=@GetDataUri(image) alt=@(image.Description ?? image.Name ?? "") style=@GetImgStyle(image, imageRange, zone) />
+        <div class=@GetClass(zone.FrozenRow, zone.FrozenColumn) style=@GetZoneStyle(image, imageRange, zone) @onpointerdown=@(e => OnImagePointerDown(e, image)) @onpointerdown:stopPropagation>
+            <div class="rz-spreadsheet-image-clip">
+                <div class="rz-spreadsheet-image-container" style=@GetImgStyle(image, imageRange, zone)>
+                    <img src=@GetDataUri(image) alt=@(image.Description ?? image.Name ?? "") />
+                    @if (selected)
+                    {
+                        <div class=@GetSelectionClass(zone)></div>
+                    }
+                </div>
+            </div>
+            @if (selected)
+            {
+                @if (zone.Top && zone.Left)
+                {
+                    <div class="rz-spreadsheet-image-resize-handle rz-spreadsheet-image-resize-nw" style=@GetHandleStyle(image, imageRange, zone, "nw") data-direction="nw"></div>
+                }
+                @if (zone.Top && zone.Right)
+                {
+                    <div class="rz-spreadsheet-image-resize-handle rz-spreadsheet-image-resize-n" style=@GetHandleStyle(image, imageRange, zone, "n") data-direction="n"></div>
+                    <div class="rz-spreadsheet-image-resize-handle rz-spreadsheet-image-resize-ne" style=@GetHandleStyle(image, imageRange, zone, "ne") data-direction="ne"></div>
+                }
+                @if (zone.Right && zone.Bottom)
+                {
+                    <div class="rz-spreadsheet-image-resize-handle rz-spreadsheet-image-resize-e" style=@GetHandleStyle(image, imageRange, zone, "e") data-direction="e"></div>
+                    <div class="rz-spreadsheet-image-resize-handle rz-spreadsheet-image-resize-se" style=@GetHandleStyle(image, imageRange, zone, "se") data-direction="se"></div>
+                }
+                @if (zone.Bottom && zone.Right)
+                {
+                    <div class="rz-spreadsheet-image-resize-handle rz-spreadsheet-image-resize-s" style=@GetHandleStyle(image, imageRange, zone, "s") data-direction="s"></div>
+                }
+                @if (zone.Bottom && zone.Left)
+                {
+                    <div class="rz-spreadsheet-image-resize-handle rz-spreadsheet-image-resize-sw" style=@GetHandleStyle(image, imageRange, zone, "sw") data-direction="sw"></div>
+                }
+                @if (zone.Left && zone.Bottom)
+                {
+                    <div class="rz-spreadsheet-image-resize-handle rz-spreadsheet-image-resize-w" style=@GetHandleStyle(image, imageRange, zone, "w") data-direction="w"></div>
+                }
+            }
         </div>
     }
 }
