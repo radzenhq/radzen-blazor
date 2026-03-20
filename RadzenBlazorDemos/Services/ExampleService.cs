@@ -2031,6 +2031,130 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Configuration",
+                    Icon = "\ue8b8",
+                    Children = new [] {
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Chart Series", Anchor = "#series" }, new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                            Name = "Series",
+                            Path = "chart-series",
+                            Title = "Blazor Chart - Series Config | Free UI Components by Radzen",
+                            Description = "Use the Radzen Blazor Chart component to display data in a graphical format.",
+                            Tags = new [] { "chart", "graph", "series" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Min, max and step", Anchor = "#min-max-and-step" }, new () { Text = "Format axis values", Anchor = "#format-axis-values" }, new () { Text = "Display grid lines", Anchor = "#display-grid-lines" }, new () { Text = "Set axis title", Anchor = "#set-axis-title" } ],
+                            Name = "Axis",
+                            Path = "chart-axis",
+                            Title = "Blazor Chart - Axis Config | Free UI Components by Radzen",
+                            Description = "By default the Radzen Blazor Chart determines the Y axis minimum and maximum based on the range of values.",
+                            Tags = new [] { "chart", "graph", "series" }
+                        },
+                        new Example
+                        {
+                            Name = "Multiple Axes",
+                            Path = "multiple-axes-chart",
+                            Description = "Radzen Blazor Chart with multiple value axes for combining series with different scales.",
+                            Tags = new [] { "chart", "graph", "multiple", "axes", "axis", "dual", "secondary" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Inverted Axis",
+                            Path = "inverted-axis-chart",
+                            Description = "Radzen Blazor Chart with inverted axes to reverse the direction of values or categories.",
+                            Tags = new [] { "chart", "graph", "inverted", "reversed", "axis", "flip" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Axis Crossing",
+                            Path = "axis-crossing-chart",
+                            Description = "Radzen Blazor Chart with axis crossing to position axes at specific values instead of chart edges.",
+                            Tags = new [] { "chart", "graph", "axis", "crossing", "origin", "intersect" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Logarithmic Axis",
+                            Path = "logarithmic-axis-chart",
+                            Description = "Radzen Blazor Chart with logarithmic value axis for data spanning several orders of magnitude.",
+                            Tags = new [] { "chart", "graph", "logarithmic", "log", "axis", "scale" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Indexed Category Axis",
+                            Path = "indexed-category-axis-chart",
+                            Description = "Radzen Blazor Chart with indexed category axis where series are aligned by index rather than category value.",
+                            Tags = new [] { "chart", "graph", "indexed", "category", "axis" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Legend position", Anchor = "#legend-position" }, new () { Text = "Hide the legend", Anchor = "#hide-the-legend" } ],
+                            Name = "Legend",
+                            Path = "chart-legend",
+                            Title = "Blazor Chart - Legend Config | Free UI Components by Radzen",
+                            Description = "The Radzen Blazor Chart displays a legend by default. It uses the Title property of the series (or category values for pie series) as items in the legend.",
+                            Tags = new [] { "chart", "graph", "legend" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
+                            Name = "ToolTip",
+                            Path = "chart-tooltip",
+                            Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
+                            Description = "Blazor Chart tooltip shown on hover. Customize content or disable tooltips per series.",
+                            Tags = new [] { "chart", "graph", "legend" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Auto Rotation", Anchor = "#auto-rotation" }, new () { Text = "Predefined Rotation", Anchor = "#rotation" } ],
+                            Name = "Label Rotation",
+                            Path = "chart-label-rotation",
+                            Title = "Blazor Chart - Label Rotation | Free UI Components by Radzen",
+                            Description = "The Radzen Blazor Chart can rotate the labels of the horizontal axis.",
+                            Tags = new [] { "chart", "label", "rotate", "rotation" }
+                        },
+                        new Example
+                        {
+                            Name = "Interpolation",
+                            Path = "chart-interpolation",
+                            Title = "Blazor Chart - Interpolation | Free UI Components by Radzen",
+                            Description = "This example demonstrates Radzen Blazor Chart interpolation mode.",
+                            Tags = new [] { "chart", "interpolation", "spline", "step" }
+                        },
+                        new Example
+                        {
+                            Name = "Trends",
+                            Path = "chart-trends",
+                            Title = "Blazor Chart - Trends | Free UI Components by Radzen",
+                            Description = "Blazor Chart trend lines displaying mean, median, and mode measures of central tendency.",
+                            Tags = new [] { "chart", "trend", "median", "mean", "mode" }
+                        },
+                        new Example
+                        {
+                            Name = "Annotations",
+                            Path = "chart-annotations",
+                            Title = "Blazor Chart - Annotations | Free UI Components by Radzen",
+                            Description = "This example demonstrates RadzenSeriesAnnotation.",
+                            Tags = new [] { "chart", "annotation", "label" }
+                        },
+                        new Example
+                        {
+                            Name = "Styling Chart",
+                            Path = "styling-chart",
+                            Title = "Blazor Chart - Styling | Free UI Components by Radzen",
+                            Description = "This example demonstrates different color schemes, custom colors and styling of Radzen Blazor Chart component.",
+                            Tags = new [] { "chart", "graph", "styling" }
+                        },
+                    }
+                },
+                new Example
+                {
                     Name = "Area Chart",
                     Icon = "\ue770",
                     Children = new [] {
@@ -2226,14 +2350,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Scatter Line Chart",
-                            Path = "scatter-line-chart",
-                            Description = "Radzen Blazor Chart with line series and markers for scatter line visualization.",
-                            Tags = new [] { "chart", "graph", "scatter", "line", "marker", "point" },
-                            New = true
-                        },
-                        new Example
-                        {
                             Name = "Stacked Line Chart",
                             Path = "stacked-line-chart",
                             Description = "Radzen Blazor Chart with stacked line series showing cumulative values.",
@@ -2275,7 +2391,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Pie & Donut",
+                    Name = "Part-to-Whole Charts",
                     Icon = "\uf724",
                     Children = new [] {
                         new Example
@@ -2324,6 +2440,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Scatter Line Chart",
+                            Path = "scatter-line-chart",
+                            Description = "Radzen Blazor Chart with line series and markers for scatter line visualization.",
+                            Tags = new [] { "chart", "graph", "scatter", "line", "marker", "point" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Bubble Chart",
                             Path = "bubble-chart",
                             Description = "Radzen Blazor Chart with bubble series for visualizing three dimensions of data.",
@@ -2333,7 +2457,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Financial",
+                    Name = "Financial Charts",
                     Icon = "\uef92",
                     Children = new [] {
                         new Example
@@ -2427,7 +2551,6 @@ namespace RadzenBlazorDemos
                             Name = "Arc Gauge",
                             Path = "arc-gauge",
                             Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",
-                            Icon = "\ue9e4",
                             Tags = new [] { "gauge", "graph", "arc", "progress" }
                         },
                         new Example
@@ -2436,7 +2559,6 @@ namespace RadzenBlazorDemos
                             New = true,
                             Path = "linear-gauge",
                             Description = "Display values on a linear scale with configurable ticks, ranges, and pointer orientation.",
-                            Icon = "\ue260",
                             Tags = new [] { "gauge", "graph", "linear", "scale", "bar" },
                             Toc =
                             [
@@ -2454,7 +2576,6 @@ namespace RadzenBlazorDemos
                             Name = "Radial Gauge",
                             Path = "radial-gauge",
                             Description = "Demonstration and configuration of Radzen Blazor Radial Gauge component.",
-                            Icon = "\ue01b",
                             Tags = new [] { "gauge", "graph", "radial", "circle" }
                         },
                         new Example
@@ -2463,7 +2584,6 @@ namespace RadzenBlazorDemos
                             Path = "styling-gauge",
                             Title = "Blazor Gauge - Styling | Free UI Components by Radzen",
                             Description = "This example demonstrates multiple pointers with RadzenRadialGauge and multiple scales with RadzenArcGauge component.",
-                            Icon = "\ue41d",
                             Tags = new [] { "gauge", "graph", "styling" }
                         },
                     }
@@ -2479,7 +2599,6 @@ namespace RadzenBlazorDemos
                             Path = "zoom-pan-chart",
                             Description = "Radzen Blazor Chart with mouse wheel zoom and scrollbar pan for exploring large datasets.",
                             Tags = new [] { "chart", "zoom", "pan", "scroll", "interactive", "mouse", "wheel" },
-                            Icon = "\ue8ff",
                             New = true
                         },
                         new Example
@@ -2489,132 +2608,7 @@ namespace RadzenBlazorDemos
                             Path = "range-navigator",
                             Description = "Radzen Blazor Range Navigator with mini-chart and draggable selection for controlling chart visible range.",
                             Tags = new [] { "chart", "range", "navigator", "selector", "zoom", "pan", "interactive" },
-                            Icon = "\ue8ff",
                             New = true
-                        },
-                    }
-                },
-                new Example
-                {
-                    Name = "Configuration",
-                    Icon = "\ue8b8",
-                    Children = new [] {
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Chart Series", Anchor = "#series" }, new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                            Name = "Series",
-                            Path = "chart-series",
-                            Title = "Blazor Chart - Series Config | Free UI Components by Radzen",
-                            Description = "Use the Radzen Blazor Chart component to display data in a graphical format.",
-                            Tags = new [] { "chart", "graph", "series" }
-                        },
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Min, max and step", Anchor = "#min-max-and-step" }, new () { Text = "Format axis values", Anchor = "#format-axis-values" }, new () { Text = "Display grid lines", Anchor = "#display-grid-lines" }, new () { Text = "Set axis title", Anchor = "#set-axis-title" } ],
-                            Name = "Axis",
-                            Path = "chart-axis",
-                            Title = "Blazor Chart - Axis Config | Free UI Components by Radzen",
-                            Description = "By default the Radzen Blazor Chart determines the Y axis minimum and maximum based on the range of values.",
-                            Tags = new [] { "chart", "graph", "series" }
-                        },
-                        new Example
-                        {
-                            Name = "Multiple Axes",
-                            Path = "multiple-axes-chart",
-                            Description = "Radzen Blazor Chart with multiple value axes for combining series with different scales.",
-                            Tags = new [] { "chart", "graph", "multiple", "axes", "axis", "dual", "secondary" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Inverted Axis",
-                            Path = "inverted-axis-chart",
-                            Description = "Radzen Blazor Chart with inverted axes to reverse the direction of values or categories.",
-                            Tags = new [] { "chart", "graph", "inverted", "reversed", "axis", "flip" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Axis Crossing",
-                            Path = "axis-crossing-chart",
-                            Description = "Radzen Blazor Chart with axis crossing to position axes at specific values instead of chart edges.",
-                            Tags = new [] { "chart", "graph", "axis", "crossing", "origin", "intersect" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Logarithmic Axis",
-                            Path = "logarithmic-axis-chart",
-                            Description = "Radzen Blazor Chart with logarithmic value axis for data spanning several orders of magnitude.",
-                            Tags = new [] { "chart", "graph", "logarithmic", "log", "axis", "scale" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Name = "Indexed Category Axis",
-                            Path = "indexed-category-axis-chart",
-                            Description = "Radzen Blazor Chart with indexed category axis where series are aligned by index rather than category value.",
-                            Tags = new [] { "chart", "graph", "indexed", "category", "axis" },
-                            New = true
-                        },
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Legend position", Anchor = "#legend-position" }, new () { Text = "Hide the legend", Anchor = "#hide-the-legend" } ],
-                            Name = "Legend",
-                            Path = "chart-legend",
-                            Title = "Blazor Chart - Legend Config | Free UI Components by Radzen",
-                            Description = "The Radzen Blazor Chart displays a legend by default. It uses the Title property of the series (or category values for pie series) as items in the legend.",
-                            Tags = new [] { "chart", "graph", "legend" }
-                        },
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
-                            Name = "ToolTip",
-                            Path = "chart-tooltip",
-                            Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
-                            Description = "Blazor Chart tooltip shown on hover. Customize content or disable tooltips per series.",
-                            Tags = new [] { "chart", "graph", "legend" }
-                        },
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Auto Rotation", Anchor = "#auto-rotation" }, new () { Text = "Predefined Rotation", Anchor = "#rotation" } ],
-                            Name = "Label Rotation",
-                            Path = "chart-label-rotation",
-                            Title = "Blazor Chart - Label Rotation | Free UI Components by Radzen",
-                            Description = "The Radzen Blazor Chart can rotate the labels of the horizontal axis.",
-                            Tags = new [] { "chart", "label", "rotate", "rotation" }
-                        },
-                        new Example
-                        {
-                            Name = "Interpolation",
-                            Path = "chart-interpolation",
-                            Title = "Blazor Chart - Interpolation | Free UI Components by Radzen",
-                            Description = "This example demonstrates Radzen Blazor Chart interpolation mode.",
-                            Tags = new [] { "chart", "interpolation", "spline", "step" }
-                        },
-                        new Example
-                        {
-                            Name = "Trends",
-                            Path = "chart-trends",
-                            Title = "Blazor Chart - Trends | Free UI Components by Radzen",
-                            Description = "Blazor Chart trend lines displaying mean, median, and mode measures of central tendency.",
-                            Tags = new [] { "chart", "trend", "median", "mean", "mode" }
-                        },
-                        new Example
-                        {
-                            Name = "Annotations",
-                            Path = "chart-annotations",
-                            Title = "Blazor Chart - Annotations | Free UI Components by Radzen",
-                            Description = "This example demonstrates RadzenSeriesAnnotation.",
-                            Tags = new [] { "chart", "annotation", "label" }
-                        },
-                        new Example
-                        {
-                            Name = "Styling Chart",
-                            Path = "styling-chart",
-                            Title = "Blazor Chart - Styling | Free UI Components by Radzen",
-                            Description = "This example demonstrates different color schemes, custom colors and styling of Radzen Blazor Chart component.",
-                            Tags = new [] { "chart", "graph", "styling" }
                         },
                     }
                 },
@@ -2661,7 +2655,7 @@ namespace RadzenBlazorDemos
                     Path = "radar-column-chart",
                     Description = "Radzen Blazor Spider Chart with radial column bars for displaying categorical data.",
                     Tags = new [] { "spider", "radar", "column", "chart", "radial", "bar" },
-                    Icon = "\ueb39",
+                    Icon = "\uf04e",
                     New = true
                 },
                 new Example
