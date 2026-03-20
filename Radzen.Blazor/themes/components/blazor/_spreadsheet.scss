@@ -470,14 +470,12 @@
     position: absolute;
     pointer-events: none;
     z-index: 1;
-    overflow: hidden;
+}
 
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: fill;
-        display: block;
-    }
+.rz-spreadsheet-image-clip {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
 }
 
 .rz-spreadsheet-image.rz-spreadsheet-frozen-row,
@@ -489,7 +487,39 @@
     z-index: 4;
 }
 
-.rz-spreadsheet-image-selected {
-    pointer-events: auto;
-    outline: 2px solid #258cfb;
+.rz-spreadsheet-image-container {
+    position: absolute;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+        display: block;
+        pointer-events: auto;
+    }
+
+    .rz-spreadsheet-selection-range {
+        position: absolute;
+        inset: 0;
+    }
 }
+
+.rz-spreadsheet-image-resize-handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #258cfb;
+    border: 1px solid white;
+    pointer-events: auto;
+    z-index: 5;
+}
+
+.rz-spreadsheet-image-resize-nw { cursor: nwse-resize; }
+.rz-spreadsheet-image-resize-n { cursor: ns-resize; }
+.rz-spreadsheet-image-resize-ne { cursor: nesw-resize; }
+.rz-spreadsheet-image-resize-e { cursor: ew-resize; }
+.rz-spreadsheet-image-resize-se { cursor: nwse-resize; }
+.rz-spreadsheet-image-resize-s { cursor: ns-resize; }
+.rz-spreadsheet-image-resize-sw { cursor: nesw-resize; }
+.rz-spreadsheet-image-resize-w { cursor: ew-resize; }
