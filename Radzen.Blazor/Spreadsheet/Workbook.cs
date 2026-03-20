@@ -123,28 +123,213 @@ public class Workbook
         public XElement? NumFmtsElement { get; set; }
     }
 
-    private static void SaveContentTypes(ZipArchive archive)
+    private static void SaveDrawing(ZipArchive archive, Sheet sheet, int drawingIndex, Dictionary<string, string> mediaMap, ref int globalMediaIndex)
     {
+        XNamespace xdr = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
+        XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
+        XNamespace r = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+
+        var drawingDoc = new XDocument(
+            new XElement(xdr + "wsDr",
+                new XAttribute(XNamespace.Xmlns + "xdr", xdr.NamespaceName),
+                new XAttribute(XNamespace.Xmlns + "a", a.NamespaceName),
+                new XAttribute(XNamespace.Xmlns + "r", r.NamespaceName)));
+
+        var drawingRels = new List<(string Id, string Target)>();
+        var imageRelIndex = 1;
+
+        foreach (var image in sheet.Images)
+        {
+            var imageRelId = $"rId{imageRelIndex++}";
+
+            // Deduplicate media: use base64 of data as key
+            var hash = Convert.ToBase64String(image.Data);
+            if (!mediaMap.TryGetValue(hash, out var mediaPath))
+            {
+                var ext = ContentTypeToExtension(image.ContentType);
+                mediaPath = $"xl/media/image{globalMediaIndex++}.{ext}";
+                mediaMap[hash] = mediaPath;
+
+                // Write image bytes to archive
+                using (var mediaEntry = archive.CreateEntry(mediaPath).Open())
+                {
+                    mediaEntry.Write(image.Data, 0, image.Data.Length);
+                }
+            }
+
+            // Relative path from xl/drawings/ to xl/media/
+            var relTarget = "../media/" + mediaPath.Split('/').Last();
+            drawingRels.Add((imageRelId, relTarget));
+
+            // Build anchor element
+            XElement anchorElement;
+            var fromElement = new XElement(xdr + "from",
+                new XElement(xdr + "col", image.From.Column.ToString(CultureInfo.InvariantCulture)),
+                new XElement(xdr + "colOff", image.From.ColumnOffset.ToString(CultureInfo.InvariantCulture)),
+                new XElement(xdr + "row", image.From.Row.ToString(CultureInfo.InvariantCulture)),
+                new XElement(xdr + "rowOff", image.From.RowOffset.ToString(CultureInfo.InvariantCulture)));
+
+            var cNvPr = new XElement(xdr + "cNvPr",
+                new XAttribute("id", imageRelIndex.ToString(CultureInfo.InvariantCulture)),
+                new XAttribute("name", image.Name ?? $"Image {imageRelIndex - 1}"));
+
+            if (image.Description != null)
+            {
+                cNvPr.Add(new XAttribute("descr", image.Description));
+            }
+
+            var picElement = new XElement(xdr + "pic",
+                new XElement(xdr + "nvPicPr",
+                    cNvPr,
+                    new XElement(xdr + "cNvPicPr")),
+                new XElement(xdr + "blipFill",
+                    new XElement(a + "blip", new XAttribute(r + "embed", imageRelId)),
+                    new XElement(a + "stretch",
+                        new XElement(a + "fillRect"))),
+                new XElement(xdr + "spPr",
+                    new XElement(a + "prstGeom", new XAttribute("prst", "rect"),
+                        new XElement(a + "avLst"))));
+
+            if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To != null)
+            {
+                var toElement = new XElement(xdr + "to",
+                    new XElement(xdr + "col", image.To.Column.ToString(CultureInfo.InvariantCulture)),
+                    new XElement(xdr + "colOff", image.To.ColumnOffset.ToString(CultureInfo.InvariantCulture)),
+                    new XElement(xdr + "row", image.To.Row.ToString(CultureInfo.InvariantCulture)),
+                    new XElement(xdr + "rowOff", image.To.RowOffset.ToString(CultureInfo.InvariantCulture)));
+
+                anchorElement = new XElement(xdr + "twoCellAnchor",
+                    fromElement,
+                    toElement,
+                    picElement,
+                    new XElement(xdr + "clientData"));
+            }
+            else
+            {
+                var extElement = new XElement(xdr + "ext",
+                    new XAttribute("cx", image.Width.ToString(CultureInfo.InvariantCulture)),
+                    new XAttribute("cy", image.Height.ToString(CultureInfo.InvariantCulture)));
+
+                anchorElement = new XElement(xdr + "oneCellAnchor",
+                    fromElement,
+                    extElement,
+                    picElement,
+                    new XElement(xdr + "clientData"));
+            }
+
+            drawingDoc.Root!.Add(anchorElement);
+        }
+
+        // Save drawing XML
+        using (var entry = archive.CreateEntry($"xl/drawings/drawing{drawingIndex}.xml").Open())
+        {
+            drawingDoc.Save(entry);
+        }
+
+        // Save drawing relationships
+        if (drawingRels.Count > 0)
+        {
+            var pkgNs = "http://schemas.openxmlformats.org/package/2006/relationships";
+            var drawingRelsDoc = new XDocument(
+                new XElement(XName.Get("Relationships", pkgNs)));
+
+            foreach (var (id, target) in drawingRels)
+            {
+                drawingRelsDoc.Root!.Add(new XElement(XName.Get("Relationship", pkgNs),
+                    new XAttribute("Id", id),
+                    new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"),
+                    new XAttribute("Target", target)));
+            }
+
+            using (var relsEntry = archive.CreateEntry($"xl/drawings/_rels/drawing{drawingIndex}.xml.rels").Open())
+            {
+                drawingRelsDoc.Save(relsEntry);
+            }
+        }
+    }
+
+    private void SaveContentTypes(ZipArchive archive)
+    {
+        var ctNs = "http://schemas.openxmlformats.org/package/2006/content-types";
         var contentTypes = new XDocument(
-            new XElement(XName.Get("Types", "http://schemas.openxmlformats.org/package/2006/content-types"),
-                new XElement(XName.Get("Default", "http://schemas.openxmlformats.org/package/2006/content-types"),
+            new XElement(XName.Get("Types", ctNs),
+                new XElement(XName.Get("Default", ctNs),
                     new XAttribute("Extension", "rels"),
                     new XAttribute("ContentType", "application/vnd.openxmlformats-package.relationships+xml")),
-                new XElement(XName.Get("Default", "http://schemas.openxmlformats.org/package/2006/content-types"),
+                new XElement(XName.Get("Default", ctNs),
                     new XAttribute("Extension", "xml"),
                     new XAttribute("ContentType", "application/xml")),
-                new XElement(XName.Get("Override", "http://schemas.openxmlformats.org/package/2006/content-types"),
+                new XElement(XName.Get("Override", ctNs),
                     new XAttribute("PartName", "/xl/workbook.xml"),
                     new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml")),
-                new XElement(XName.Get("Override", "http://schemas.openxmlformats.org/package/2006/content-types"),
+                new XElement(XName.Get("Override", ctNs),
                     new XAttribute("PartName", "/xl/sharedStrings.xml"),
                     new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml")),
-                new XElement(XName.Get("Override", "http://schemas.openxmlformats.org/package/2006/content-types"),
+                new XElement(XName.Get("Override", ctNs),
                     new XAttribute("PartName", "/xl/styles.xml"),
                     new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"))));
 
+        // Add image extension defaults for any sheets with images
+        var imageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var sheet in sheets)
+        {
+            foreach (var image in sheet.Images)
+            {
+                var ext = ContentTypeToExtension(image.ContentType);
+                imageExtensions.Add(ext);
+            }
+        }
+
+        foreach (var ext in imageExtensions)
+        {
+            contentTypes.Root!.Add(new XElement(XName.Get("Default", ctNs),
+                new XAttribute("Extension", ext),
+                new XAttribute("ContentType", ExtensionToContentType(ext))));
+        }
+
+        // Add drawing overrides
+        for (var i = 0; i < sheets.Count; i++)
+        {
+            if (sheets[i].Images.Count > 0)
+            {
+                contentTypes.Root!.Add(new XElement(XName.Get("Override", ctNs),
+                    new XAttribute("PartName", $"/xl/drawings/drawing{i + 1}.xml"),
+                    new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.drawing+xml")));
+            }
+        }
+
         using var entry = archive.CreateEntry("[Content_Types].xml").Open();
         contentTypes.Save(entry);
+    }
+
+    private static string ContentTypeToExtension(string contentType)
+    {
+        return contentType switch
+        {
+            "image/png" => "png",
+            "image/jpeg" => "jpeg",
+            "image/gif" => "gif",
+            "image/bmp" => "bmp",
+            "image/svg+xml" => "svg",
+            "image/webp" => "webp",
+            "image/tiff" => "tiff",
+            _ => "png"
+        };
+    }
+
+    private static string ExtensionToContentType(string extension)
+    {
+        return extension switch
+        {
+            "png" => "image/png",
+            "jpeg" or "jpg" => "image/jpeg",
+            "gif" => "image/gif",
+            "bmp" => "image/bmp",
+            "svg" => "image/svg+xml",
+            "webp" => "image/webp",
+            "tiff" or "tif" => "image/tiff",
+            _ => "image/png"
+        };
     }
 
     private static void SaveRelationships(ZipArchive archive)
@@ -280,6 +465,10 @@ public class Workbook
             new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"),
             new XAttribute("Target", "styles.xml")));
 
+        // Media deduplication map (hash -> media path in archive)
+        var mediaMap = new Dictionary<string, string>();
+        var globalMediaIndex = 1;
+
         // Process each sheet
         for (var i = 0; i < sheets.Count; i++)
         {
@@ -295,7 +484,7 @@ public class Workbook
                 new XAttribute("Target", $"worksheets/{sheetName}")));
 
             // Save individual sheet
-            SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, sharedStringsDoc);
+            SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, sharedStringsDoc, mediaMap, ref globalMediaIndex);
         }
 
         // Save workbook relationships
@@ -309,7 +498,7 @@ public class Workbook
             new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships")));
     }
 
-    private void SaveSheet(ZipArchive archive, Sheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    private void SaveSheet(ZipArchive archive, Sheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc, Dictionary<string, string> mediaMap, ref int globalMediaIndex)
     {
         var sheetDoc = CreateSheetDocument(sheet, sheetId, relId);
         var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
@@ -329,16 +518,38 @@ public class Workbook
         // Add hyperlinks
         var hyperlinkRels = AddHyperlinks(sheet, sheetDoc);
 
+        // Track all sheet relationship entries
+        var sheetRelEntries = new List<(string Id, string Type, string Target, bool External)>();
+        foreach (var (id, url) in hyperlinkRels)
+        {
+            sheetRelEntries.Add((id, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", url, true));
+        }
+
+        // Add drawing reference if sheet has images
+        if (sheet.Images.Count > 0)
+        {
+            var drawingRelId = $"rId{hyperlinkRels.Count + 1}";
+            var drawingIndex = sheets.IndexOf(sheet) + 1;
+            var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+            XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+            sheetDoc.Root!.Add(new XElement(XName.Get("drawing", ns),
+                new XAttribute(rNs + "id", drawingRelId)));
+
+            sheetRelEntries.Add((drawingRelId, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing", $"../drawings/drawing{drawingIndex}.xml", false));
+
+            SaveDrawing(archive, sheet, drawingIndex, mediaMap, ref globalMediaIndex);
+        }
+
         // Save sheet in xl/worksheets/ subdirectory
         using (var entry = archive.CreateEntry($"xl/worksheets/{sheetName}").Open())
         {
             sheetDoc.Save(entry);
         }
 
-        // Save sheet relationships for hyperlinks
-        if (hyperlinkRels.Count > 0)
+        // Save sheet relationships
+        if (sheetRelEntries.Count > 0)
         {
-            SaveSheetRelationships(archive, sheetName, hyperlinkRels);
+            SaveSheetRelationships(archive, sheetName, sheetRelEntries);
         }
     }
 
@@ -386,22 +597,31 @@ public class Workbook
         return rels;
     }
 
-    private static void SaveSheetRelationships(ZipArchive archive, string sheetName, List<(string Id, string Url)> rels)
+    private static void SaveSheetRelationships(ZipArchive archive, string sheetName, List<(string Id, string Type, string Target, bool External)> rels)
     {
+        var pkgNs = "http://schemas.openxmlformats.org/package/2006/relationships";
         var relsDoc = new XDocument(
-            new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships")));
+            new XElement(XName.Get("Relationships", pkgNs)));
 
-        foreach (var (id, url) in rels)
+        foreach (var (id, type, target, external) in rels)
         {
-            relsDoc.Root!.Add(new XElement(XName.Get("Relationship", "http://schemas.openxmlformats.org/package/2006/relationships"),
+            var relElement = new XElement(XName.Get("Relationship", pkgNs),
                 new XAttribute("Id", id),
-                new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink"),
-                new XAttribute("Target", url),
-                new XAttribute("TargetMode", "External")));
+                new XAttribute("Type", type),
+                new XAttribute("Target", target));
+
+            if (external)
+            {
+                relElement.Add(new XAttribute("TargetMode", "External"));
+            }
+
+            relsDoc.Root!.Add(relElement);
         }
 
-        using var entry = archive.CreateEntry($"xl/worksheets/_rels/{sheetName}.rels").Open();
-        relsDoc.Save(entry);
+        using (var entry = archive.CreateEntry($"xl/worksheets/_rels/{sheetName}.rels").Open())
+        {
+            relsDoc.Save(entry);
+        }
     }
 
     private static XDocument CreateSheetDocument(Sheet sheet, int sheetId, string relId)
@@ -1634,6 +1854,9 @@ public class Workbook
         // Parse hyperlinks
         ParseHyperlinks(archive, sheetInfo, sheetDoc, sNs, sheet);
 
+        // Parse drawings (images)
+        ParseDrawings(archive, sheetInfo, sheetDoc, sNs, sheet);
+
         sheet.Name = sheetInfo.Name;
         return sheet;
     }
@@ -1964,6 +2187,249 @@ public class Workbook
                 }
             }
         }
+    }
+
+    private static void ParseDrawings(ZipArchive archive, SheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    {
+        // Find <drawing r:id="..."/> element in sheet XML
+        XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+        var drawingElement = sheetDoc.Descendants(sNs + "drawing").FirstOrDefault();
+        if (drawingElement == null)
+        {
+            return;
+        }
+
+        var drawingRelId = drawingElement.Attribute(rNs + "id")?.Value;
+        if (drawingRelId == null)
+        {
+            return;
+        }
+
+        // Load sheet relationships to resolve drawing rId
+        var sheetFileName = sheetInfo.FullPath.Split('/').Last();
+        var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
+        var relsEntry = archive.GetEntry(relsPath);
+        if (relsEntry == null)
+        {
+            return;
+        }
+
+        var sheetRelMap = new Dictionary<string, string>();
+        using (var relsStream = relsEntry.Open())
+        {
+            var relsDoc = XDocument.Load(relsStream);
+            var relsNs = XNamespace.Get("http://schemas.openxmlformats.org/package/2006/relationships");
+            foreach (var rel in relsDoc.Descendants(relsNs + "Relationship"))
+            {
+                var id = rel.Attribute("Id")?.Value;
+                var target = rel.Attribute("Target")?.Value;
+                if (id != null && target != null)
+                {
+                    sheetRelMap[id] = target;
+                }
+            }
+        }
+
+        if (!sheetRelMap.TryGetValue(drawingRelId, out var drawingTarget))
+        {
+            return;
+        }
+
+        // Resolve drawing path relative to xl/worksheets/
+        var drawingPath = ResolvePath("xl/worksheets/", drawingTarget);
+        var drawingEntry = archive.GetEntry(drawingPath);
+        if (drawingEntry == null)
+        {
+            return;
+        }
+
+        // Load drawing relationships (for resolving image rIds)
+        var drawingFileName = drawingPath.Split('/').Last();
+        var drawingDir = drawingPath[..drawingPath.LastIndexOf('/')];
+        var drawingRelsPath = $"{drawingDir}/_rels/{drawingFileName}.rels";
+        var drawingRelMap = new Dictionary<string, string>();
+        var drawingRelsEntry = archive.GetEntry(drawingRelsPath);
+        if (drawingRelsEntry != null)
+        {
+            using var drawingRelsStream = drawingRelsEntry.Open();
+            var drawingRelsDoc = XDocument.Load(drawingRelsStream);
+            var relsNs = XNamespace.Get("http://schemas.openxmlformats.org/package/2006/relationships");
+            foreach (var rel in drawingRelsDoc.Descendants(relsNs + "Relationship"))
+            {
+                var id = rel.Attribute("Id")?.Value;
+                var target = rel.Attribute("Target")?.Value;
+                if (id != null && target != null)
+                {
+                    drawingRelMap[id] = target;
+                }
+            }
+        }
+
+        // Parse drawing XML
+        XNamespace xdr = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
+        XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
+
+        using var drawingStream = drawingEntry.Open();
+        var drawingDoc = XDocument.Load(drawingStream);
+
+        foreach (var anchor in drawingDoc.Root!.Elements())
+        {
+            ImageAnchorMode mode;
+            if (anchor.Name == xdr + "twoCellAnchor")
+            {
+                mode = ImageAnchorMode.TwoCellAnchor;
+            }
+            else if (anchor.Name == xdr + "oneCellAnchor")
+            {
+                mode = ImageAnchorMode.OneCellAnchor;
+            }
+            else
+            {
+                continue;
+            }
+
+            var pic = anchor.Element(xdr + "pic");
+            if (pic == null)
+            {
+                continue;
+            }
+
+            // Parse anchor positions
+            var from = ParseCellAnchor(anchor.Element(xdr + "from"), xdr);
+            if (from == null)
+            {
+                continue;
+            }
+
+            var image = new SheetImage
+            {
+                AnchorMode = mode,
+                From = from
+            };
+
+            if (mode == ImageAnchorMode.TwoCellAnchor)
+            {
+                var to = ParseCellAnchor(anchor.Element(xdr + "to"), xdr);
+                if (to == null)
+                {
+                    continue;
+                }
+                image.To = to;
+            }
+            else
+            {
+                var ext = anchor.Element(xdr + "ext");
+                if (ext != null)
+                {
+                    if (long.TryParse(ext.Attribute("cx")?.Value, out var cx))
+                    {
+                        image.Width = cx;
+                    }
+                    if (long.TryParse(ext.Attribute("cy")?.Value, out var cy))
+                    {
+                        image.Height = cy;
+                    }
+                }
+            }
+
+            // Get image rId from blip
+            var blipFill = pic.Element(xdr + "blipFill");
+            var blip = blipFill?.Element(a + "blip");
+            var embedId = blip?.Attribute(rNs + "embed")?.Value;
+            if (embedId == null || !drawingRelMap.TryGetValue(embedId, out var imageTarget))
+            {
+                continue;
+            }
+
+            // Resolve image path
+            var imagePath = ResolvePath(drawingDir + "/", imageTarget);
+            var imageEntry = archive.GetEntry(imagePath);
+            if (imageEntry == null)
+            {
+                continue;
+            }
+
+            // Read image data
+            using var imageStream = imageEntry.Open();
+            using var ms = new System.IO.MemoryStream();
+            imageStream.CopyTo(ms);
+            image.Data = ms.ToArray();
+
+            // Determine content type from extension
+            var ext2 = imagePath.Split('.').Last().ToLowerInvariant();
+            image.ContentType = ext2 switch
+            {
+                "png" => "image/png",
+                "jpg" or "jpeg" => "image/jpeg",
+                "gif" => "image/gif",
+                "bmp" => "image/bmp",
+                "svg" => "image/svg+xml",
+                "webp" => "image/webp",
+                "tiff" or "tif" => "image/tiff",
+                _ => "image/png"
+            };
+
+            // Parse name/description
+            var nvPicPr = pic.Element(xdr + "nvPicPr");
+            var cNvPr = nvPicPr?.Element(xdr + "cNvPr");
+            image.Name = cNvPr?.Attribute("name")?.Value;
+            image.Description = cNvPr?.Attribute("descr")?.Value;
+
+            sheet.AddImage(image);
+        }
+    }
+
+    private static CellAnchor? ParseCellAnchor(XElement? element, XNamespace xdr)
+    {
+        if (element == null)
+        {
+            return null;
+        }
+
+        var col = element.Element(xdr + "col")?.Value;
+        var colOff = element.Element(xdr + "colOff")?.Value;
+        var row = element.Element(xdr + "row")?.Value;
+        var rowOff = element.Element(xdr + "rowOff")?.Value;
+
+        if (col == null || row == null)
+        {
+            return null;
+        }
+
+        return new CellAnchor
+        {
+            Column = int.Parse(col, System.Globalization.CultureInfo.InvariantCulture),
+            ColumnOffset = long.TryParse(colOff, out var co) ? co : 0,
+            Row = int.Parse(row, System.Globalization.CultureInfo.InvariantCulture),
+            RowOffset = long.TryParse(rowOff, out var ro) ? ro : 0
+        };
+    }
+
+    private static string ResolvePath(string basePath, string relativePath)
+    {
+        // Handle relative paths like ../media/image1.png
+        var parts = (basePath.TrimEnd('/') + "/" + relativePath).Split('/');
+        var stack = new System.Collections.Generic.Stack<string>();
+        foreach (var part in parts)
+        {
+            if (part == "..")
+            {
+                if (stack.Count > 0)
+                {
+                    stack.Pop();
+                }
+            }
+            else if (part != "." && part.Length > 0)
+            {
+                stack.Push(part);
+            }
+        }
+        var result = new string[stack.Count];
+        for (var i = stack.Count - 1; i >= 0; i--)
+        {
+            result[i] = stack.Pop();
+        }
+        return string.Join("/", result);
     }
 
     private class StyleInfo

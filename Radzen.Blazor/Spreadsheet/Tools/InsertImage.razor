@@ -1,0 +1,50 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button"
+    Disabled=@IsDisabled Size="ButtonSize.Small">
+    <InputFile OnChange=@OnFileSelectedAsync accept="image/*" disabled=@IsDisabled />
+    <i class="notranslate rzi">image</i>
+</RadzenButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
+    {
+        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var file = e.File;
+        if (file == null)
+        {
+            return;
+        }
+
+        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+        using var ms = new System.IO.MemoryStream();
+        await stream.CopyToAsync(ms);
+
+        var address = Sheet.Selection.Cell;
+        var image = new SheetImage
+        {
+            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            From = new CellAnchor { Row = address.Row, Column = address.Column },
+            Width = 2000000,
+            Height = 1500000,
+            Data = ms.ToArray(),
+            ContentType = file.ContentType ?? "image/png",
+            Name = file.Name
+        };
+
+        var command = new InsertImageCommand(Sheet, image);
+        Sheet.Commands.Execute(command);
+    }
+}

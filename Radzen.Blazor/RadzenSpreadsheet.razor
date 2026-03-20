@@ -71,6 +71,7 @@
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <InsertHyperlink Sheet=@Sheet />
+                            <InsertImage Sheet=@Sheet />
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
@@ -116,6 +117,7 @@
             </Template>
             <ChildContent>
                 <SelectionOverlay Sheet=@Sheet Context=@context />
+                <ImageOverlay Sheet=@Sheet Context=@context />
                 <CellEditor Sheet=@Sheet Context=@context />
                 @foreach (var table in Sheet.Tables)
                 {

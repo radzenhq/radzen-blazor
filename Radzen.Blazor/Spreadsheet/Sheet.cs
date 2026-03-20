@@ -95,6 +95,22 @@ public partial class Sheet
     /// </summary>
     public IReadOnlyList<Table> Tables => tables;
 
+    private readonly List<SheetImage> images = [];
+
+    /// <summary>
+    /// Gets the list of images associated with the sheet.
+    /// </summary>
+    public IReadOnlyList<SheetImage> Images => images;
+
+    /// <summary>
+    /// Gets or sets the currently selected image.
+    /// </summary>
+    public SheetImage? SelectedImage { get; set; }
+
+    internal void AddImage(SheetImage image) => images.Add(image);
+
+    internal bool RemoveImage(SheetImage image) => images.Remove(image);
+
     private readonly HashSet<int> filteredColumns = [];
 
     /// <summary>
