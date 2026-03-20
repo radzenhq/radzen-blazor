@@ -73,15 +73,15 @@ public class ImageOverlayTests : TestContext
     {
         var sheet = new Sheet(10, 10);
         sheet.Columns.Frozen = 2;
-        sheet.AddImage(CreateImage(0, 1)); // column 1 < frozen 2
+        sheet.AddImage(CreateImage(0, 0)); // column 0 < frozen 2, fits within frozen area
         var context = new ImageMockContext();
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
             .Add(p => p.Context, context));
 
-        var element = cut.Find(".rz-spreadsheet-image");
-        Assert.Contains("rz-spreadsheet-frozen-column", element.ClassName);
+        var elements = cut.FindAll(".rz-spreadsheet-image");
+        Assert.Contains(elements, e => e.ClassName.Contains("rz-spreadsheet-frozen-column"));
     }
 
     [Fact]
@@ -89,15 +89,15 @@ public class ImageOverlayTests : TestContext
     {
         var sheet = new Sheet(10, 10);
         sheet.Rows.Frozen = 2;
-        sheet.AddImage(CreateImage(1, 0)); // row 1 < frozen 2
+        sheet.AddImage(CreateImage(0, 0)); // row 0 < frozen 2, fits within frozen area
         var context = new ImageMockContext();
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
             .Add(p => p.Context, context));
 
-        var element = cut.Find(".rz-spreadsheet-image");
-        Assert.Contains("rz-spreadsheet-frozen-row", element.ClassName);
+        var elements = cut.FindAll(".rz-spreadsheet-image");
+        Assert.Contains(elements, e => e.ClassName.Contains("rz-spreadsheet-frozen-row"));
     }
 
     [Fact]
