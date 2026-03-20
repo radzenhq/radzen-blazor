@@ -2,7 +2,11 @@
 
 @foreach (var image in Sheet.Images)
 {
-    <div class=@GetClass(image) style=@GetStyle(image) @onpointerdown=@(e => OnImagePointerDown(e, image)) @onpointerdown:stopPropagation>
-        <img src=@GetDataUri(image) alt=@(image.Description ?? image.Name ?? "") />
-    </div>
+    var imageRange = GetImageRange(image);
+    @foreach (var zone in Sheet.GetRanges(imageRange))
+    {
+        <div class=@GetClass(image, zone.FrozenRow, zone.FrozenColumn) style=@GetZoneStyle(image, imageRange, zone) @onpointerdown=@(e => OnImagePointerDown(e, image)) @onpointerdown:stopPropagation>
+            <img src=@GetDataUri(image) alt=@(image.Description ?? image.Name ?? "") style=@GetImgStyle(image, imageRange, zone) />
+        </div>
+    }
 }
