@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Radzen.Blazor.Spreadsheet;
@@ -338,10 +339,8 @@ public partial class Sheet
 
             for (var columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
-                if (Cells.TryGet(address.Row + rowIndex, address.Column + columnIndex, out var cell))
-                {
-                    cell.SetValue(cells[columnIndex]);
-                }
+                var cell = Cells[address.Row + rowIndex, address.Column + columnIndex];
+                cell.SetValue(cells[columnIndex]);
             }
         }
     }
@@ -359,27 +358,14 @@ public partial class Sheet
 
         BeginUpdate();
 
-        // Shift cell contents left for all rows starting at deleted column
-        for (var row = 0; row < RowCount; row++)
-        {
-            for (var col = columnIndex; col < ColumnCount - 1; col++)
-            {
-                var target = Cells[row, col];
-                var source = Cells[row, col + 1];
-                target.CopyFrom(source);
-            }
-
-            // Clear last column (now out of logical bounds)
-            var last = Cells[row, ColumnCount - 1];
-            last.Formula = null;
-            last.Data = new CellData(null);
-        }
+        // Shift cells left using sparse operation - O(populated cells) instead of O(rows × columns)
+        Cells.ShiftColumnsLeft(columnIndex);
 
         // Mark deleted column index as invalid for references
         invalidReferenceColumns.Add(columnIndex);
 
         // Any formulas that reference this column should be turned into =#REF!
-        InvalidateFormulasReferencingColumn(columnIndex);
+        InvalidateFormulasReferencing(column: columnIndex);
 
         // Decrease column count
         ColumnCount--;
@@ -400,27 +386,14 @@ public partial class Sheet
 
         BeginUpdate();
 
-        // Shift cell contents up for all columns starting at deleted row
-        for (var col = 0; col < ColumnCount; col++)
-        {
-            for (var row = rowIndex; row < RowCount - 1; row++)
-            {
-                var target = Cells[row, col];
-                var source = Cells[row + 1, col];
-                target.CopyFrom(source);
-            }
-
-            // Clear last row (now out of logical bounds)
-            var last = Cells[RowCount - 1, col];
-            last.Formula = null;
-            last.Data = new CellData(null);
-        }
+        // Shift cells up using sparse operation - O(populated cells) instead of O(rows × columns)
+        Cells.ShiftRowsUp(rowIndex);
 
         // Mark deleted row index as invalid for references
         invalidReferenceRows.Add(rowIndex);
 
         // Any formulas that reference this row should be turned into =#REF!
-        InvalidateFormulasReferencingRow(rowIndex);
+        InvalidateFormulasReferencing(row: rowIndex);
 
         // Decrease row count
         RowCount--;
@@ -430,24 +403,19 @@ public partial class Sheet
 
     private void AdjustFormulas(Func<FormulaToken, CellRef> adjust)
     {
-        // Iterate through all cells to update their formulas
-        for (var row = 0; row < RowCount; row++)
+        // Snapshot to avoid collection-modified errors when setting Formula triggers graph updates
+        foreach (var cell in Cells.GetPopulatedCells().ToList())
         {
-            for (var col = 0; col < ColumnCount; col++)
+            if (cell.FormulaSyntaxTree == null || string.IsNullOrEmpty(cell.Formula))
             {
-                var cell = Cells[row, col];
+                continue;
+            }
 
-                if (cell.FormulaSyntaxTree == null || string.IsNullOrEmpty(cell.Formula))
-                {
-                    continue;
-                }
+            var newFormula = FormulaRewriter.Rewrite(cell.Formula!, cell.FormulaSyntaxTree!, adjust);
 
-                var newFormula = FormulaRewriter.Rewrite(cell.Formula!, cell.FormulaSyntaxTree!, adjust);
-
-                if (!string.Equals(newFormula, cell.Formula, StringComparison.Ordinal))
-                {
-                    cell.Formula = newFormula;
-                }
+            if (!string.Equals(newFormula, cell.Formula, StringComparison.Ordinal))
+            {
+                cell.Formula = newFormula;
             }
         }
     }
@@ -522,10 +490,17 @@ public partial class Sheet
                 var dr = sr + rowDelta;
                 var dc = sc + colDelta;
 
-                if (!sourceSheet.Cells.TryGet(sr, sc, out var srcCell) || !Cells.TryGet(dr, dc, out var dstCell))
+                if (!sourceSheet.Cells.TryGet(sr, sc, out var srcCell))
                 {
                     continue;
                 }
+
+                if (dr < 0 || dr >= RowCount || dc < 0 || dc >= ColumnCount)
+                {
+                    continue;
+                }
+
+                var dstCell = Cells[dr, dc];
 
                 if (!string.IsNullOrEmpty(srcCell.Formula))
                 {
@@ -558,75 +533,51 @@ public partial class Sheet
         }
     }
 
-    private void InvalidateFormulasReferencingRow(int rowIndex)
+    private void InvalidateFormulasReferencing(int? row = null, int? column = null)
     {
-        for (var row = 0; row < RowCount; row++)
+        // Snapshot to avoid collection-modified errors when setting Formula triggers graph updates
+        foreach (var cell in Cells.GetPopulatedCells().ToList())
         {
-            for (var col = 0; col < ColumnCount; col++)
-            {
-                var cell = Cells[row, col];
-                var tree = cell.FormulaSyntaxTree;
-                if (tree == null) continue;
+            var tree = cell.FormulaSyntaxTree;
+            if (tree == null) continue;
 
-                var hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.Address.Row == rowIndex
+            bool hasRef;
+
+            if (row.HasValue)
+            {
+                var rowIndex = row.Value;
+                hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.Address.Row == rowIndex
                     || node is RangeSyntaxNode r && r.Start.Token.Address.Row <= rowIndex && r.End.Token.Address.Row >= rowIndex).Count > 0;
-
-                if (hasRef)
-                {
-                    // Replace the referenced tokens with #REF! while preserving formula structure
-                    var tokens = FormulaLexer.Scan(cell.Formula!, false);
-                    for (int i = 0; i < tokens.Count; i++)
-                    {
-                        var t = tokens[i];
-                        if (t.Type == FormulaTokenType.CellIdentifier && t.Address.Row == rowIndex)
-                        {
-                            tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
-                        }
-                    }
-                    var rebuilt = new StringBuilder();
-                    foreach (var t in tokens)
-                    {
-                        if (t.Type == FormulaTokenType.None) break;
-                        rebuilt.Append(t.Value);
-                    }
-                    cell.Formula = rebuilt.ToString();
-                }
             }
-        }
-    }
-
-    private void InvalidateFormulasReferencingColumn(int columnIndex)
-    {
-        for (var row = 0; row < RowCount; row++)
-        {
-            for (var col = 0; col < ColumnCount; col++)
+            else
             {
-                var cell = Cells[row, col];
-                var tree = cell.FormulaSyntaxTree;
-                if (tree == null) continue;
-
-                var hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.Address.Column == columnIndex
+                var columnIndex = column!.Value;
+                hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.Address.Column == columnIndex
                     || node is RangeSyntaxNode r && r.Start.Token.Address.Column <= columnIndex && r.End.Token.Address.Column >= columnIndex).Count > 0;
+            }
 
-                if (hasRef)
+            if (hasRef)
+            {
+                var tokens = FormulaLexer.Scan(cell.Formula!, false);
+                for (int i = 0; i < tokens.Count; i++)
                 {
-                    var tokens = FormulaLexer.Scan(cell.Formula!, false);
-                    for (int i = 0; i < tokens.Count; i++)
+                    var t = tokens[i];
+                    if (t.Type == FormulaTokenType.CellIdentifier)
                     {
-                        var t = tokens[i];
-                        if (t.Type == FormulaTokenType.CellIdentifier && t.Address.Column == columnIndex)
+                        if ((row.HasValue && t.Address.Row == row.Value) ||
+                            (column.HasValue && t.Address.Column == column.Value))
                         {
                             tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
                         }
                     }
-                    var rebuilt = new StringBuilder();
-                    foreach (var t in tokens)
-                    {
-                        if (t.Type == FormulaTokenType.None) break;
-                        rebuilt.Append(t.Value);
-                    }
-                    cell.Formula = rebuilt.ToString();
                 }
+                var rebuilt = new StringBuilder();
+                foreach (var t in tokens)
+                {
+                    if (t.Type == FormulaTokenType.None) break;
+                    rebuilt.Append(t.Value);
+                }
+                cell.Formula = rebuilt.ToString();
             }
         }
     }
@@ -653,25 +604,10 @@ public partial class Sheet
 
         BeginUpdate();
 
-        var oldRowCount = RowCount;
         RowCount += count;
 
-        for (var col = 0; col < ColumnCount; col++)
-        {
-            for (var row = oldRowCount - 1; row >= rowIndex; row--)
-            {
-                var target = Cells[row + count, col];
-                var source = Cells[row, col];
-                target.CopyFrom(source);
-            }
-
-            for (var r = 0; r < count; r++)
-            {
-                var inserted = Cells[rowIndex + r, col];
-                inserted.Formula = null;
-                inserted.Data = new CellData(null);
-            }
-        }
+        // Shift cells down using sparse operation - O(populated cells) instead of O(rows × columns)
+        Cells.ShiftRowsDown(rowIndex, count);
 
         // Adjust formulas: shift row indices at or after the insert point
         AdjustFormulas((cellToken) =>
@@ -706,25 +642,10 @@ public partial class Sheet
 
         BeginUpdate();
 
-        var oldColumnCount = ColumnCount;
         ColumnCount += count;
 
-        for (var row = 0; row < RowCount; row++)
-        {
-            for (var col = oldColumnCount - 1; col >= columnIndex; col--)
-            {
-                var target = Cells[row, col + count];
-                var source = Cells[row, col];
-                target.CopyFrom(source);
-            }
-
-            for (var c = 0; c < count; c++)
-            {
-                var inserted = Cells[row, columnIndex + c];
-                inserted.Formula = null;
-                inserted.Data = new CellData(null);
-            }
-        }
+        // Shift cells right using sparse operation - O(populated cells) instead of O(rows × columns)
+        Cells.ShiftColumnsRight(columnIndex, count);
 
         // Adjust formulas: shift column indices at or after the insert point
         AdjustFormulas((cellToken) =>

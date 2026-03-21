@@ -16,26 +16,23 @@ public class HyperlinkCommand(Sheet sheet, CellRef address, Hyperlink? hyperlink
     /// <inheritdoc/>
     public bool Execute()
     {
-        if (sheet.Cells.TryGet(address.Row, address.Column, out var cell))
+        var cell = sheet.Cells[address.Row, address.Column];
+
+        previousHyperlink = cell.Hyperlink?.Clone();
+        previousDisplayText = cell.Value?.ToString();
+
+        cell.Hyperlink = hyperlink?.Clone();
+
+        if (hyperlink != null && !string.IsNullOrEmpty(hyperlink.DisplayText))
         {
-            previousHyperlink = cell.Hyperlink?.Clone();
-            previousDisplayText = cell.Value?.ToString();
-
-            cell.Hyperlink = hyperlink?.Clone();
-
-            if (hyperlink != null && !string.IsNullOrEmpty(hyperlink.DisplayText))
-            {
-                cell.Value = hyperlink.DisplayText;
-            }
-            else if (hyperlink != null && (cell.Value == null || string.IsNullOrEmpty(cell.Value.ToString())))
-            {
-                cell.Value = hyperlink.Url;
-            }
-
-            return true;
+            cell.Value = hyperlink.DisplayText;
+        }
+        else if (hyperlink != null && (cell.Value == null || string.IsNullOrEmpty(cell.Value.ToString())))
+        {
+            cell.Value = hyperlink.Url;
         }
 
-        return false;
+        return true;
     }
 
     /// <inheritdoc/>
