@@ -24,12 +24,11 @@ public class FormatCommand(Sheet sheet, RangeRef range, Format format) : IComman
 
         foreach (var cellRef in range.GetCells())
         {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                existing[cellRef] = cell.Format.Clone();
+            var cell = sheet.Cells[cellRef.Row, cellRef.Column];
 
-                cell.Format = format.Clone();
-            }
+            existing[cellRef] = cell.Format.Clone();
+
+            cell.Format = format.Clone();
         }
         return true;
     }
