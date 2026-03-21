@@ -10,6 +10,7 @@ namespace Radzen.Blazor.Spreadsheet;
 public class MergedCellStore(Sheet sheet)
 {
     private readonly List<RangeRef> data = [];
+    private readonly Dictionary<(int row, int column), RangeRef> index = [];
     private readonly Sheet sheet = sheet;
 
     /// <summary>
@@ -26,6 +27,7 @@ public class MergedCellStore(Sheet sheet)
         if (range != RangeRef.Invalid)
         {
             data.Add(range);
+            IndexRange(range);
         }
     }
 
@@ -35,13 +37,41 @@ public class MergedCellStore(Sheet sheet)
     /// <param name="range"></param>
     public bool Remove(RangeRef range)
     {
-        return data.Remove(range);
+        if (data.Remove(range))
+        {
+            UnindexRange(range);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void IndexRange(RangeRef range)
+    {
+        for (var row = range.Start.Row; row <= range.End.Row; row++)
+        {
+            for (var col = range.Start.Column; col <= range.End.Column; col++)
+            {
+                index[(row, col)] = range;
+            }
+        }
+    }
+
+    private void UnindexRange(RangeRef range)
+    {
+        for (var row = range.Start.Row; row <= range.End.Row; row++)
+        {
+            for (var col = range.Start.Column; col <= range.End.Column; col++)
+            {
+                index.Remove((row, col));
+            }
+        }
     }
 
     /// <summary>
     /// Checks if the store contains a merged range that includes the specified cell address.
     /// </summary>
-    public bool Contains(CellRef address) => GetMergedRange(address) != RangeRef.Invalid;
+    public bool Contains(CellRef address) => index.ContainsKey((address.Row, address.Column));
 
     /// <summary>
     /// Checks if the store contains a specific range.
@@ -50,20 +80,13 @@ public class MergedCellStore(Sheet sheet)
 
     /// <summary>
     /// Gets the merged range that contains the specified cell address.
+    /// O(1) lookup via spatial index.
     /// </summary>
     /// <param name="address"></param>
     /// <returns>The merged range if found; otherwise, returns <see cref="RangeRef.Invalid"/>.</returns>
     public RangeRef GetMergedRange(CellRef address)
     {
-        foreach (var range in data)
-        {
-            if (range.Contains(address))
-            {
-                return range;
-            }
-        }
-
-        return RangeRef.Invalid;
+        return index.TryGetValue((address.Row, address.Column), out var range) ? range : RangeRef.Invalid;
     }
 
     /// <summary>
