@@ -202,10 +202,15 @@ public class Cell
     }
 
     /// <summary>
+    /// Gets a value indicating whether this cell has no meaningful content (no value, formula, format, or hyperlink).
+    /// </summary>
+    public bool IsEmpty => Value == null && Formula == null && format == null && Hyperlink == null;
+
+    /// <summary>
     /// Gets the address of the cell.
     /// </summary>
 
-    public CellRef Address { get; }
+    public CellRef Address { get; internal set; }
 
     /// <summary>
     /// Validates the cell's value against the sheet's validation rules.

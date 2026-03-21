@@ -305,7 +305,8 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
 
         if (!targetSheet.Cells.TryGet(address.Row, address.Column, out var cell))
         {
-            value = CellData.FromError(CellError.Ref);
+            // Cell is in bounds but not populated — treat as empty
+            value = new CellData(null);
             return;
         }
 
@@ -514,13 +515,17 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
                     return;
                 }
 
+                CellData cellValue;
+
                 if (!startSheet.Cells.TryGet(row, column, out var cell))
                 {
-                    value = CellData.FromError(CellError.Ref);
-                    return;
+                    // Cell is in bounds but not populated — treat as empty
+                    cellValue = new CellData(null);
                 }
-
-                var cellValue = EvaluateCell(cell);
+                else
+                {
+                    cellValue = EvaluateCell(cell);
+                }
                 // Do not short-circuit on errors here; include them in the range so
                 // functions like SUBTOTAL/AGGREGATE can decide how to handle them.
                 cells.Add(cellValue);

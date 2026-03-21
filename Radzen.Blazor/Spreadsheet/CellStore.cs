@@ -95,22 +95,194 @@ public class CellStore(Sheet sheet)
 
     /// <summary>
     /// Attempts to get a cell at the specified row and column.
+    /// Returns true only if the cell has been populated. Does not create new cells.
     /// </summary>
     /// <param name="row">The row index of the cell.</param>
     /// <param name="column">The column index of the cell.</param>
     /// <param name="cell">The cell at the specified row and column if it exists; otherwise, null.</param>
-    /// <returns>True if the cell exists; otherwise, false.</returns>
+    /// <returns>True if the cell exists in the store; otherwise, false.</returns>
     public bool TryGet(int row, int column, out Cell cell)
     {
-        if (InBounds(row, column))
+        if (InBounds(row, column) && data.TryGetValue((row, column), out cell!))
         {
-            cell = this[row, column];
             return true;
         }
 
         cell = null!;
 
         return false;
+    }
+
+    /// <summary>
+    /// Returns all populated cells in the store without creating new cells.
+    /// </summary>
+    internal IEnumerable<Cell> GetPopulatedCells() => data.Values;
+
+    /// <summary>
+    /// Removes all empty cells from the store, freeing memory.
+    /// A cell is empty when it has no value, formula, format, or hyperlink.
+    /// </summary>
+    /// <returns>The number of cells removed.</returns>
+    public int Compact()
+    {
+        var keysToRemove = new List<(int row, int column)>();
+
+        foreach (var kvp in data)
+        {
+            if (kvp.Value.IsEmpty)
+            {
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+
+        foreach (var key in keysToRemove)
+        {
+            data.Remove(key);
+        }
+
+        return keysToRemove.Count;
+    }
+
+    /// <summary>
+    /// Returns the number of populated cells in the store.
+    /// </summary>
+    internal int PopulatedCount => data.Count;
+
+    /// <summary>
+    /// Checks if a cell exists at the specified position without creating it.
+    /// </summary>
+    internal bool HasCell(int row, int column) => data.ContainsKey((row, column));
+
+    /// <summary>
+    /// Removes all cells at the specified row and shifts cells from higher rows up by one.
+    /// Only touches populated cells, making this O(populated) instead of O(rows × columns).
+    /// </summary>
+    internal void ShiftRowsUp(int deletedRow)
+    {
+        var toRemove = new List<(int row, int column)>();
+        var toRekey = new List<((int row, int column) key, Cell cell)>();
+
+        foreach (var kvp in data)
+        {
+            if (kvp.Key.row == deletedRow)
+            {
+                toRemove.Add(kvp.Key);
+            }
+            else if (kvp.Key.row > deletedRow)
+            {
+                toRekey.Add((kvp.Key, kvp.Value));
+            }
+        }
+
+        foreach (var key in toRemove)
+        {
+            data.Remove(key);
+        }
+
+        foreach (var (key, cell) in toRekey)
+        {
+            data.Remove(key);
+            var newRow = key.row - 1;
+            data[(newRow, key.column)] = cell;
+            cell.Address = new CellRef(newRow, key.column);
+        }
+    }
+
+    /// <summary>
+    /// Shifts all cells at or after the specified row down by the given count.
+    /// Only touches populated cells, making this O(populated) instead of O(rows × columns).
+    /// </summary>
+    internal void ShiftRowsDown(int fromRow, int count)
+    {
+        var toRekey = new List<((int row, int column) key, Cell cell)>();
+
+        foreach (var kvp in data)
+        {
+            if (kvp.Key.row >= fromRow)
+            {
+                toRekey.Add((kvp.Key, kvp.Value));
+            }
+        }
+
+        // Remove all affected entries first to avoid key conflicts
+        foreach (var (key, _) in toRekey)
+        {
+            data.Remove(key);
+        }
+
+        // Add back at new positions
+        foreach (var (key, cell) in toRekey)
+        {
+            var newRow = key.row + count;
+            data[(newRow, key.column)] = cell;
+            cell.Address = new CellRef(newRow, key.column);
+        }
+    }
+
+    /// <summary>
+    /// Removes all cells at the specified column and shifts cells from higher columns left by one.
+    /// Only touches populated cells, making this O(populated) instead of O(rows × columns).
+    /// </summary>
+    internal void ShiftColumnsLeft(int deletedColumn)
+    {
+        var toRemove = new List<(int row, int column)>();
+        var toRekey = new List<((int row, int column) key, Cell cell)>();
+
+        foreach (var kvp in data)
+        {
+            if (kvp.Key.column == deletedColumn)
+            {
+                toRemove.Add(kvp.Key);
+            }
+            else if (kvp.Key.column > deletedColumn)
+            {
+                toRekey.Add((kvp.Key, kvp.Value));
+            }
+        }
+
+        foreach (var key in toRemove)
+        {
+            data.Remove(key);
+        }
+
+        foreach (var (key, cell) in toRekey)
+        {
+            data.Remove(key);
+            var newCol = key.column - 1;
+            data[(key.row, newCol)] = cell;
+            cell.Address = new CellRef(key.row, newCol);
+        }
+    }
+
+    /// <summary>
+    /// Shifts all cells at or after the specified column right by the given count.
+    /// Only touches populated cells, making this O(populated) instead of O(rows × columns).
+    /// </summary>
+    internal void ShiftColumnsRight(int fromColumn, int count)
+    {
+        var toRekey = new List<((int row, int column) key, Cell cell)>();
+
+        foreach (var kvp in data)
+        {
+            if (kvp.Key.column >= fromColumn)
+            {
+                toRekey.Add((kvp.Key, kvp.Value));
+            }
+        }
+
+        // Remove all affected entries first to avoid key conflicts
+        foreach (var (key, _) in toRekey)
+        {
+            data.Remove(key);
+        }
+
+        // Add back at new positions
+        foreach (var (key, cell) in toRekey)
+        {
+            var newCol = key.column + count;
+            data[(key.row, newCol)] = cell;
+            cell.Address = new CellRef(key.row, newCol);
+        }
     }
 
     /// <summary>
