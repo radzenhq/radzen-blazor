@@ -30,21 +30,21 @@ public class MergeCellsCommand(Sheet sheet, RangeRef range, bool center = false)
 
         foreach (var cellRef in range.GetCells())
         {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                savedCells[cellRef] = (cell.Value, cell.Formula, cell.Format.Clone());
+            var cell = sheet.Cells[cellRef.Row, cellRef.Column];
 
-                if (cellRef != range.Start)
-                {
-                    cell.Value = null;
-                }
+            savedCells[cellRef] = (cell.Value, cell.Formula, cell.Format.Clone());
+
+            if (cellRef != range.Start)
+            {
+                cell.Value = null;
             }
         }
 
         sheet.MergedCells.Add(range);
 
-        if (center && sheet.Cells.TryGet(range.Start.Row, range.Start.Column, out var topLeft))
+        if (center)
         {
+            var topLeft = sheet.Cells[range.Start.Row, range.Start.Column];
             topLeft.Format = topLeft.Format.WithTextAlign(TextAlign.Center);
         }
 

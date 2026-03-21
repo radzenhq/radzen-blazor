@@ -20,39 +20,38 @@ public class BorderCommand(Sheet sheet, RangeRef range, BorderStyle? top, Border
 
         foreach (var cellRef in range.GetCells())
         {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
+            var cell = sheet.Cells[cellRef.Row, cellRef.Column];
+
+            existing[cellRef] = cell.Format.Clone();
+
+            var isTopEdge = cellRef.Row == range.Start.Row;
+            var isBottomEdge = cellRef.Row == range.End.Row;
+            var isLeftEdge = cellRef.Column == range.Start.Column;
+            var isRightEdge = cellRef.Column == range.End.Column;
+
+            var newFormat = cell.Format.Clone();
+
+            if (isTopEdge && top != null)
             {
-                existing[cellRef] = cell.Format.Clone();
-
-                var isTopEdge = cellRef.Row == range.Start.Row;
-                var isBottomEdge = cellRef.Row == range.End.Row;
-                var isLeftEdge = cellRef.Column == range.Start.Column;
-                var isRightEdge = cellRef.Column == range.End.Column;
-
-                var newFormat = cell.Format.Clone();
-
-                if (isTopEdge && top != null)
-                {
-                    newFormat.BorderTop = top.Clone();
-                }
-
-                if (isBottomEdge && bottom != null)
-                {
-                    newFormat.BorderBottom = bottom.Clone();
-                }
-
-                if (isLeftEdge && left != null)
-                {
-                    newFormat.BorderLeft = left.Clone();
-                }
-
-                if (isRightEdge && right != null)
-                {
-                    newFormat.BorderRight = right.Clone();
-                }
-
-                cell.Format = newFormat;
+                newFormat.BorderTop = top.Clone();
             }
+
+            if (isBottomEdge && bottom != null)
+            {
+                newFormat.BorderBottom = bottom.Clone();
+            }
+
+            if (isLeftEdge && left != null)
+            {
+                newFormat.BorderLeft = left.Clone();
+            }
+
+            if (isRightEdge && right != null)
+            {
+                newFormat.BorderRight = right.Clone();
+            }
+
+            cell.Format = newFormat;
         }
 
         return true;
@@ -87,17 +86,16 @@ public class AllBordersCommand(Sheet sheet, RangeRef range, BorderStyle style) :
 
         foreach (var cellRef in range.GetCells())
         {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                existing[cellRef] = cell.Format.Clone();
+            var cell = sheet.Cells[cellRef.Row, cellRef.Column];
 
-                var newFormat = cell.Format.Clone();
-                newFormat.BorderTop = style.Clone();
-                newFormat.BorderRight = style.Clone();
-                newFormat.BorderBottom = style.Clone();
-                newFormat.BorderLeft = style.Clone();
-                cell.Format = newFormat;
-            }
+            existing[cellRef] = cell.Format.Clone();
+
+            var newFormat = cell.Format.Clone();
+            newFormat.BorderTop = style.Clone();
+            newFormat.BorderRight = style.Clone();
+            newFormat.BorderBottom = style.Clone();
+            newFormat.BorderLeft = style.Clone();
+            cell.Format = newFormat;
         }
 
         return true;
@@ -132,17 +130,16 @@ public class NoBordersCommand(Sheet sheet, RangeRef range) : ICommand
 
         foreach (var cellRef in range.GetCells())
         {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                existing[cellRef] = cell.Format.Clone();
+            var cell = sheet.Cells[cellRef.Row, cellRef.Column];
 
-                var newFormat = cell.Format.Clone();
-                newFormat.BorderTop = null;
-                newFormat.BorderRight = null;
-                newFormat.BorderBottom = null;
-                newFormat.BorderLeft = null;
-                cell.Format = newFormat;
-            }
+            existing[cellRef] = cell.Format.Clone();
+
+            var newFormat = cell.Format.Clone();
+            newFormat.BorderTop = null;
+            newFormat.BorderRight = null;
+            newFormat.BorderBottom = null;
+            newFormat.BorderLeft = null;
+            cell.Format = newFormat;
         }
 
         return true;
