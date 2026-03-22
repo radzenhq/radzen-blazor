@@ -8,9 +8,6 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Base class for commands that modify the format of cells in a range, with snapshot/restore for undo.
 /// </summary>
-/// <summary>
-/// Base class for commands that modify the format of cells in a range, with snapshot/restore for undo.
-/// </summary>
 public abstract class RangeFormatCommandBase(Worksheet sheet, RangeRef range) : ICommand
 {
     /// <summary>
