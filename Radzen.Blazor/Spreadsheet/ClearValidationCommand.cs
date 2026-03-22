@@ -17,7 +17,7 @@ public class ClearValidationCommand(Sheet sheet, RangeRef range) : ICommand
     public bool Execute()
     {
         savedValidators = sheet.Validation.RemoveAll(range);
-        RefreshCells();
+        sheet.RefreshCells(range, validate: true);
         return true;
     }
 
@@ -28,18 +28,6 @@ public class ClearValidationCommand(Sheet sheet, RangeRef range) : ICommand
         {
             sheet.Validation.Add(range, validator);
         }
-        RefreshCells();
-    }
-
-    private void RefreshCells()
-    {
-        foreach (var cellRef in range.GetCells())
-        {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                cell.Validate();
-                cell.OnChanged();
-            }
-        }
+        sheet.RefreshCells(range, validate: true);
     }
 }
