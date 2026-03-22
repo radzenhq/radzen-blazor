@@ -94,10 +94,13 @@ class DatedifFunction : FormulaFunction
 
     private static int DaysIgnoringYears(DateTime start, DateTime end)
     {
-        var adjustedEnd = new DateTime(start.Year, end.Month, end.Day);
+        var day = Math.Min(end.Day, DateTime.DaysInMonth(start.Year, end.Month));
+        var adjustedEnd = new DateTime(start.Year, end.Month, day);
         if (adjustedEnd < start)
         {
-            adjustedEnd = new DateTime(start.Year + 1, end.Month, end.Day);
+            var nextYear = start.Year + 1;
+            day = Math.Min(end.Day, DateTime.DaysInMonth(nextYear, end.Month));
+            adjustedEnd = new DateTime(nextYear, end.Month, day);
         }
         return (adjustedEnd - start).Days;
     }
