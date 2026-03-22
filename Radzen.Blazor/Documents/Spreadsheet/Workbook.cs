@@ -108,13 +108,17 @@ public class Workbook
         SaveWorkbook(archive);
     }
 
+    private record struct FontKey(string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize);
+    private record struct CellStyleKey(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId);
+    private record struct BorderKey(string? TopStyle, string? TopColor, string? RightStyle, string? RightColor, string? BottomStyle, string? BottomColor, string? LeftStyle, string? LeftColor);
+
     private class StyleTracker
     {
-        public Dictionary<(string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize), int> FontStyles { get; } = new();
+        public Dictionary<FontKey, int> FontStyles { get; } = new();
         public Dictionary<string, int> FillStyles { get; } = new();
-        public Dictionary<(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId), int> CellStyles { get; } = new();
+        public Dictionary<CellStyleKey, int> CellStyles { get; } = new();
         public Dictionary<string, int> NumberFormats { get; } = new(StringComparer.OrdinalIgnoreCase);
-        public Dictionary<(string? TopStyle, string? TopColor, string? RightStyle, string? RightColor, string? BottomStyle, string? BottomColor, string? LeftStyle, string? LeftColor), int> BorderStyles { get; } = new();
+        public Dictionary<BorderKey, int> BorderStyles { get; } = new();
         public XDocument StylesDocument { get; set; } = null!;
         public XElement FontsElement { get; set; } = null!;
         public XElement FillsElement { get; set; } = null!;
@@ -142,8 +146,7 @@ public class Workbook
         {
             var imageRelId = $"rId{imageRelIndex++}";
 
-            // Deduplicate media: use base64 of data as key
-            var hash = Convert.ToBase64String(image.Data);
+            var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image.Data));
             if (!mediaMap.TryGetValue(hash, out var mediaPath))
             {
                 var ext = ContentTypeToExtension(image.ContentType);
@@ -562,30 +565,26 @@ public class Workbook
 
         XElement? hyperlinksElement = null;
 
-        for (var row = 0; row < sheet.RowCount; row++)
+        foreach (var cell in sheet.Cells.GetPopulatedCells())
         {
-            for (var col = 0; col < sheet.ColumnCount; col++)
+            if (cell.Hyperlink != null)
             {
-                var cell = sheet.Cells[row, col];
-                if (cell.Hyperlink != null)
+                hyperlinksElement ??= new XElement(XName.Get("hyperlinks", ns));
+
+                var relId = $"rId{relIndex++}";
+                var cellRef = cell.Address.ToString();
+
+                var hyperlinkElement = new XElement(XName.Get("hyperlink", ns),
+                    new XAttribute("ref", cellRef),
+                    new XAttribute(rNs + "id", relId));
+
+                if (cell.Hyperlink.DisplayText != null)
                 {
-                    hyperlinksElement ??= new XElement(XName.Get("hyperlinks", ns));
-
-                    var relId = $"rId{relIndex++}";
-                    var cellRef = new CellRef(row, col).ToString();
-
-                    var hyperlinkElement = new XElement(XName.Get("hyperlink", ns),
-                        new XAttribute("ref", cellRef),
-                        new XAttribute(rNs + "id", relId));
-
-                    if (cell.Hyperlink.DisplayText != null)
-                    {
-                        hyperlinkElement.Add(new XAttribute("display", cell.Hyperlink.DisplayText));
-                    }
-
-                    hyperlinksElement.Add(hyperlinkElement);
-                    rels.Add((relId, cell.Hyperlink.Url));
+                    hyperlinkElement.Add(new XAttribute("display", cell.Hyperlink.DisplayText));
                 }
+
+                hyperlinksElement.Add(hyperlinkElement);
+                rels.Add((relId, cell.Hyperlink.Url));
             }
         }
 
@@ -685,25 +684,37 @@ public class Workbook
 
     private void ProcessSheetData(Worksheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
-        for (var row = 0; row < sheet.RowCount; row++)
+        var cellsByRow = sheet.Cells.GetPopulatedCells()
+            .Where(c => c.GetValue() != null)
+            .GroupBy(c => c.Address.Row)
+            .ToDictionary(g => g.Key, g => g.OrderBy(c => c.Address.Column).ToList());
+
+        // Include rows with data, custom height, or hidden state
+        var rowsToProcess = new SortedSet<int>(cellsByRow.Keys);
+
+        foreach (var rowIndex in sheet.Rows.GetCustomSizedIndices())
+        {
+            rowsToProcess.Add(rowIndex);
+        }
+
+        foreach (var rowIndex in sheet.Rows.GetHiddenIndices())
+        {
+            rowsToProcess.Add(rowIndex);
+        }
+
+        foreach (var row in rowsToProcess)
         {
             var rowElement = CreateRowElement(sheet, row);
 
-            for (var col = 0; col < sheet.ColumnCount; col++)
+            if (cellsByRow.TryGetValue(row, out var cells))
             {
-                var cell = sheet.Cells[row, col];
-                var value = cell.GetValue();
-
-                if (value == null)
+                foreach (var cell in cells)
                 {
-                    continue;
+                    var cellElement = CreateCellElement(sheet, row, cell.Address.Column, cell, styleTracker, sharedStrings, sharedStringsDoc);
+                    rowElement.Add(cellElement);
                 }
-
-                var cellElement = CreateCellElement(sheet, row, col, cell, styleTracker, sharedStrings, sharedStringsDoc);
-                rowElement.Add(cellElement);
             }
 
-            // Always add the row element, even if it has no cells, to preserve row height
             sheetData.Add(rowElement);
         }
     }
@@ -749,23 +760,7 @@ public class Workbook
 
     private static bool HasCellFormatting(Cell cell)
     {
-        return cell.Format.Color != null ||
-               cell.Format.BackgroundColor != null ||
-               cell.Format.Bold ||
-               cell.Format.Italic ||
-               cell.Format.Underline ||
-               cell.Format.Strikethrough ||
-               cell.Format.WrapText ||
-               cell.Format.FontFamily != null ||
-               cell.Format.FontSize != null ||
-               cell.Format.BorderTop != null ||
-               cell.Format.BorderRight != null ||
-               cell.Format.BorderBottom != null ||
-               cell.Format.BorderLeft != null ||
-               cell.Format.TextAlign != TextAlign.Left ||
-               cell.Format.VerticalAlign != VerticalAlign.Top ||
-               !string.IsNullOrEmpty(cell.Format.NumberFormat) ||
-               cell.ValueType == CellDataType.Date;
+        return !cell.Format.IsDefault || cell.ValueType == CellDataType.Date;
     }
 
     private int GetOrCreateCellStyle(Cell cell, StyleTracker styleTracker)
@@ -775,7 +770,7 @@ public class Workbook
         var numFmtId = GetOrCreateNumberFormat(cell, styleTracker);
         var borderId = GetOrCreateBorderStyle(cell, styleTracker);
 
-        var styleKey = (fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId);
+        var styleKey = new CellStyleKey(fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId);
 
         if (!styleTracker.CellStyles.TryGetValue(styleKey, out int styleId))
         {
@@ -789,7 +784,7 @@ public class Workbook
 
     private int GetOrCreateFontStyle(Cell cell, StyleTracker styleTracker)
     {
-        var fontKey = (cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline, cell.Format.Strikethrough, cell.Format.FontFamily, cell.Format.FontSize);
+        var fontKey = new FontKey(cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline, cell.Format.Strikethrough, cell.Format.FontFamily, cell.Format.FontSize);
 
         if (!styleTracker.FontStyles.TryGetValue(fontKey, out int fontId))
         {
@@ -830,7 +825,7 @@ public class Workbook
             return 0;
         }
 
-        var borderKey = (
+        var borderKey = new BorderKey(
             bt?.ToXlsxStyle(), bt?.Color,
             br?.ToXlsxStyle(), br?.Color,
             bb?.ToXlsxStyle(), bb?.Color,
