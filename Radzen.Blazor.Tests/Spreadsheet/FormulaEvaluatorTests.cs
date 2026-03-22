@@ -7,7 +7,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class FormulaEvaluationTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void ShouldEvaluateFormulaAfterSettingIt()
@@ -270,12 +270,12 @@ public class FormulaEvaluationTests
     public void Evaluator_ShouldResolveCrossSheetCellReference()
     {
         var wb = new Workbook();
-        var s1 = wb.AddSheet("Sheet1", 5, 5);
-        var s2 = wb.AddSheet("Sheet2", 5, 5);
+        var s1 = wb.AddSheet("Worksheet1", 5, 5);
+        var s2 = wb.AddSheet("Worksheet2", 5, 5);
 
-        s2.Cells[0, 2].Value = 42; // C1 on Sheet2
+        s2.Cells[0, 2].Value = 42; // C1 on Worksheet2
 
-        s1.Cells[0, 0].Formula = "=Sheet2!C1"; // A1 on Sheet1 refers to Sheet2!C1
+        s1.Cells[0, 0].Formula = "=Worksheet2!C1"; // A1 on Worksheet1 refers to Worksheet2!C1
 
         Assert.Equal(42d, s1.Cells[0, 0].Data.GetValueOrDefault<double>());
     }
@@ -284,15 +284,15 @@ public class FormulaEvaluationTests
     public void Evaluator_ShouldResolveCrossSheetRangeInFunction()
     {
         var wb = new Workbook();
-        var s1 = wb.AddSheet("Sheet1", 5, 5);
-        var s2 = wb.AddSheet("Sheet2", 5, 5);
+        var s1 = wb.AddSheet("Worksheet1", 5, 5);
+        var s2 = wb.AddSheet("Worksheet2", 5, 5);
 
         s2.Cells[0, 0].Value = 1; // A1
         s2.Cells[0, 1].Value = 2; // B1
         s2.Cells[1, 0].Value = 3; // A2
         s2.Cells[1, 1].Value = 4; // B2
 
-        s1.Cells[0, 0].Formula = "=SUM(Sheet2!A1:Sheet2!B2)";
+        s1.Cells[0, 0].Formula = "=SUM(Worksheet2!A1:Worksheet2!B2)";
 
         Assert.Equal(10d, s1.Cells[0, 0].Data.GetValueOrDefault<double>());
     }

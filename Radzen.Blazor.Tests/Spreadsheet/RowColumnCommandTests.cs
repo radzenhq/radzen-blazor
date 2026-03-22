@@ -8,7 +8,7 @@ public class RowColumnCommandTests
     [Fact]
     public void DeleteRowsCommand_SingleRow_ExecuteAndUndo_RestoresState()
     {
-        var sheet = new Sheet(4, 3);
+        var sheet = new Worksheet(4, 3);
         sheet.Cells[0, 0].Value = "R1";
         sheet.Cells[1, 0].Value = "R2";
         sheet.Cells[2, 0].Value = "R3";
@@ -34,7 +34,7 @@ public class RowColumnCommandTests
     [Fact]
     public void DeleteRowsCommand_ExecuteAndUndo_RestoresState()
     {
-        var sheet = new Sheet(6, 3);
+        var sheet = new Worksheet(6, 3);
         sheet.Cells[0, 0].Value = "R1";
         sheet.Cells[1, 0].Value = "R2";
         sheet.Cells[2, 0].Value = "R3";
@@ -63,7 +63,7 @@ public class RowColumnCommandTests
     [Fact]
     public void InsertRowAfterCommand_ExecuteAndUndo_RestoresState()
     {
-        var sheet = new Sheet(4, 3);
+        var sheet = new Worksheet(4, 3);
         sheet.Cells[1, 0].Value = 1d; // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
 
@@ -86,7 +86,7 @@ public class RowColumnCommandTests
     [Fact]
     public void InsertRowBeforeCommand_ExecuteAndUndo_RestoresState()
     {
-        var sheet = new Sheet(4, 3);
+        var sheet = new Worksheet(4, 3);
         sheet.Cells[1, 0].Value = 1d; // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
 
@@ -110,7 +110,7 @@ public class RowColumnCommandTests
     [Fact]
     public void InsertRowAfterCommand_WithMultiSelection_InsertsAfterLastRow()
     {
-        var sheet = new Sheet(6, 2);
+        var sheet = new Worksheet(6, 2);
         // Mark rows with their index in A
         for (int r = 0; r < 6; r++) sheet.Cells[r, 0].Value = r + 1;
 
@@ -134,7 +134,7 @@ public class RowColumnCommandTests
     [Fact]
     public void InsertRowBeforeCommand_WithMultiSelection_InsertsBeforeFirstRow()
     {
-        var sheet = new Sheet(6, 2);
+        var sheet = new Worksheet(6, 2);
         for (int r = 0; r < 6; r++) sheet.Cells[r, 0].Value = r + 1;
 
         // Simulate selection rows 2..4 (first is 2) -> insert at index 2
@@ -155,7 +155,7 @@ public class RowColumnCommandTests
     [Fact]
     public void InsertColumnAfterCommand_WithMultiSelection_InsertsAfterLastColumn()
     {
-        var sheet = new Sheet(2, 6);
+        var sheet = new Worksheet(2, 6);
         // Mark columns with their index in row 1
         for (int c = 0; c < 6; c++) sheet.Cells[0, c].Value = c + 1;
 
@@ -177,7 +177,7 @@ public class RowColumnCommandTests
     [Fact]
     public void InsertColumnBeforeCommand_WithMultiSelection_InsertsBeforeFirstColumn()
     {
-        var sheet = new Sheet(2, 6);
+        var sheet = new Worksheet(2, 6);
         for (int c = 0; c < 6; c++) sheet.Cells[0, c].Value = c + 1;
 
         // Simulate selection columns 2..4 (first is 2) -> insert at index 2
@@ -198,7 +198,7 @@ public class RowColumnCommandTests
     [Fact]
     public void DeleteColumnsCommand_SingleColumn_ExecuteAndUndo_RestoresState()
     {
-        var sheet = new Sheet(3, 4);
+        var sheet = new Worksheet(3, 4);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[0, 1].Value = "B";
         sheet.Cells[0, 2].Value = "C";
@@ -224,7 +224,7 @@ public class RowColumnCommandTests
     [Fact]
     public void DeleteColumnsCommand_ExecuteAndUndo_RestoresState()
     {
-        var sheet = new Sheet(3, 6);
+        var sheet = new Worksheet(3, 6);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[0, 1].Value = "B";
         sheet.Cells[0, 2].Value = "C";
@@ -254,7 +254,7 @@ public class RowColumnCommandTests
     [Fact]
     public void InsertColumnBeforeCommand_ExecuteAndUndo_RestoresState()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[1, 0].Value = 1d;   // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
 
@@ -278,7 +278,7 @@ public class RowColumnCommandTests
     [Fact]
     public void InsertColumnAfterCommand_ExecuteAndUndo_RestoresState()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[1, 0].Value = 1d;   // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
 

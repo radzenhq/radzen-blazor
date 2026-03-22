@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class RandBetweenFunctionTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Theory]
     [InlineData(1, 100)]

@@ -6,9 +6,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Command to add a data validation rule to a range.
 /// </summary>
-public class DataValidationCommand(Sheet sheet, RangeRef range, ICellValidator rule) : ICommand
+public class DataValidationCommand(Worksheet sheet, RangeRef range, ICellValidator rule) : ICommand
 {
-    private readonly Sheet sheet = sheet;
+    private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private readonly ICellValidator rule = rule;
 

@@ -14,7 +14,7 @@ public class Cell
     /// <summary>
     /// Gets the sheet that contains this cell.
     /// </summary>
-    public Sheet Sheet { get; private set; }
+    public Worksheet Worksheet { get; private set; }
 
     private Format? format;
 
@@ -55,7 +55,7 @@ public class Cell
     /// Clones the cell, creating a new instance with the same properties.
     /// </summary>
 
-    public Cell Clone() => new(Sheet, Address)
+    public Cell Clone() => new(Worksheet, Address)
     {
         Data = new CellData(Value),
         Formula = Formula,
@@ -81,7 +81,7 @@ public class Cell
         ArgumentNullException.ThrowIfNull(sb);
         var effectiveFormat = format;
 
-        var conditionalFormat = Sheet.ConditionalFormats.Calculate(this);
+        var conditionalFormat = Worksheet.ConditionalFormats.Calculate(this);
 
         if (conditionalFormat != null)
         {
@@ -117,7 +117,7 @@ public class Cell
         {
             Data = new CellData(value);
 
-            Sheet.OnCellValueChanged(this);
+            Worksheet.OnCellValueChanged(this);
         }
     }
 
@@ -197,7 +197,7 @@ public class Cell
         {
             formula = value;
             FormulaSyntaxTree = value != null ? FormulaParser.Parse(value) : null;
-            Sheet.OnCellFormulaChanged(this);
+            Worksheet.OnCellFormulaChanged(this);
         }
     }
 
@@ -217,7 +217,7 @@ public class Cell
     /// </summary>
     public void Validate()
     {
-        ValidationErrors = Sheet.Validation.Validate(this);
+        ValidationErrors = Worksheet.Validation.Validate(this);
     }
 
     /// <summary>
@@ -238,9 +238,9 @@ public class Cell
         ValidationErrors = [];
     }
 
-    internal Cell(Sheet sheet, CellRef address)
+    internal Cell(Worksheet sheet, CellRef address)
     {
         Address = address;
-        Sheet = sheet;
+        Worksheet = sheet;
     }
 }

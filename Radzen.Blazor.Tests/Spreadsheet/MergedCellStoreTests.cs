@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class MergedCellStoreTests
 {
-    private readonly Sheet sheet = new(20, 20);
+    private readonly Worksheet sheet = new(20, 20);
 
     // --- Add ---
 
@@ -332,7 +332,7 @@ public class MergedCellStoreTests
     [Fact]
     public void LargeRange_AllCellsIndexed()
     {
-        var largeSheet = new Sheet(100, 100);
+        var largeSheet = new Worksheet(100, 100);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(49, 49));
         largeSheet.MergedCells.Add(range);
 

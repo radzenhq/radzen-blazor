@@ -152,9 +152,9 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     [Parameter, EditorRequired]
     public SheetView View { get; set; } = default!;
 
-    private Axis Rows => View.Sheet.Rows;
-    private Axis Columns => View.Sheet.Columns;
-    private MergedCellStore MergedCells => View.Sheet.MergedCells;
+    private Axis Rows => View.Worksheet.Rows;
+    private Axis Columns => View.Worksheet.Columns;
+    private MergedCellStore MergedCells => View.Worksheet.MergedCells;
 
     /// <summary>
     /// Gets or sets splitter size in pixels. The splitter is used to separate frozen and non-frozen rows and columns.
@@ -199,16 +199,16 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     {
         if (View != null)
         {
-            View.Sheet.Rows.Changed -= OnChanged;
-            View.Sheet.Columns.Changed -= OnChanged;
+            View.Worksheet.Rows.Changed -= OnChanged;
+            View.Worksheet.Columns.Changed -= OnChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
         if (View != null)
         {
-            View.Sheet.Rows.Changed += OnChanged;
-            View.Sheet.Columns.Changed += OnChanged;
+            View.Worksheet.Rows.Changed += OnChanged;
+            View.Worksheet.Columns.Changed += OnChanged;
         }
     }
 

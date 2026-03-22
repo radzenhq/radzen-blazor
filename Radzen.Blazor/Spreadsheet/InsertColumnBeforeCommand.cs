@@ -3,7 +3,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Command that inserts a single column BEFORE the specified index and supports undo via snapshot.
 /// </summary>
-public class InsertColumnBeforeCommand(Sheet sheet, int columnIndex) : ColumnCommandBase(sheet, columnIndex)
+public class InsertColumnBeforeCommand(Worksheet sheet, int columnIndex) : ColumnCommandBase(sheet, columnIndex)
 {
     /// <summary>
     /// Executes the command.

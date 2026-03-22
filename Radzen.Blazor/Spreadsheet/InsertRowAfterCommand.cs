@@ -10,7 +10,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// </remarks>
 /// <param name="sheet"></param>
 /// <param name="rowIndex"></param>
-public class InsertRowAfterCommand(Sheet sheet, int rowIndex) : RowCommandBase(sheet, Math.Max(0, Math.Min(sheet.RowCount - 1, rowIndex)))
+public class InsertRowAfterCommand(Worksheet sheet, int rowIndex) : RowCommandBase(sheet, Math.Max(0, Math.Min(sheet.RowCount - 1, rowIndex)))
 {
     private readonly int baseRowIndex = rowIndex;
 

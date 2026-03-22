@@ -17,7 +17,7 @@ public partial class CellMenu : ComponentBase
     /// Represents the sheet containing the cell menu.
     /// </summary>
     [Parameter, EditorRequired]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Represents the row index of the cell menu.
@@ -74,7 +74,7 @@ public partial class CellMenu : ComponentBase
     {
         var didRowChange = parameters.TryGetValue<int>(nameof(Row), out var row) && Row != row;
         var didColumnChange = parameters.TryGetValue<int>(nameof(Column), out var column) && Column != column;
-        var didSheetChange = parameters.TryGetValue<Sheet>(nameof(Sheet), out var sheet) && Sheet != sheet;
+        var didSheetChange = parameters.TryGetValue<Worksheet>(nameof(Worksheet), out var sheet) && Worksheet != sheet;
 
         await base.SetParametersAsync(parameters);
 
@@ -92,7 +92,7 @@ public partial class CellMenu : ComponentBase
 
         var visitor = new InListCriterionVisitor(Column);
 
-        foreach (var filter in Sheet.Filters)
+        foreach (var filter in Worksheet.Filters)
         {
             filter.Criterion.Accept(visitor);
         }
@@ -345,7 +345,7 @@ public partial class CellMenu : ComponentBase
         // Check if any cell in the column (excluding header) has null or empty value
         for (int row = rangeToUse.Start.Row + 1; row <= rangeToUse.End.Row; row++)
         {
-            var cell = Sheet.Cells[row, Column];
+            var cell = Worksheet.Cells[row, Column];
             var value = cell.Value;
             var text = cell.GetValue();
             
@@ -445,7 +445,7 @@ public partial class CellMenu : ComponentBase
 
     private bool HasFilterApplied()
     {
-        foreach (var filter in Sheet.Filters)
+        foreach (var filter in Worksheet.Filters)
         {
             if (filter.Range.Contains(Row, Column))
             {
@@ -486,7 +486,7 @@ public partial class CellMenu : ComponentBase
                 // Check if this row is hidden by a filter that affects the current column
                 bool shouldSkipRow = false;
                 
-                foreach (var filter in Sheet.Filters)
+                foreach (var filter in Worksheet.Filters)
                 {
                     // If the filter affects the current column, we should include the value
                     // regardless of whether the row is hidden
@@ -496,7 +496,7 @@ public partial class CellMenu : ComponentBase
                     }
                     
                     // If the filter affects a different range and the row is hidden, skip it
-                    if (Sheet.Rows.IsHidden(row))
+                    if (Worksheet.Rows.IsHidden(row))
                     {
                         shouldSkipRow = true;
                         break;
@@ -508,7 +508,7 @@ public partial class CellMenu : ComponentBase
                     continue;
                 }
 
-                var cell = Sheet.Cells[row, Column];
+                var cell = Worksheet.Cells[row, Column];
                 var value = cell.Value;
                 var text = cell.GetValueAsString();
 
@@ -528,7 +528,7 @@ public partial class CellMenu : ComponentBase
 
     private Table? GetCurrentTable()
     {
-        foreach (var table in Sheet.Tables)
+        foreach (var table in Worksheet.Tables)
         {
             if (table.Range.Contains(Row, Column))
             {
@@ -541,9 +541,9 @@ public partial class CellMenu : ComponentBase
     private AutoFilter? GetCurrentAutoFilter()
     {
         // Check if the sheet has an auto filter and if the current cell is within its range
-        if (Sheet.AutoFilter != null && Sheet.AutoFilter.Range.Contains(Row, Column))
+        if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(Row, Column))
         {
-            return Sheet.AutoFilter;
+            return Worksheet.AutoFilter;
         }
         return null;
     }

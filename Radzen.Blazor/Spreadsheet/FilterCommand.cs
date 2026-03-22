@@ -10,7 +10,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 public class FilterCommand : ICommand
 {
-    private readonly Sheet sheet;
+    private readonly Worksheet sheet;
     private readonly SheetFilter filter;
 
     /// <summary>
@@ -18,7 +18,7 @@ public class FilterCommand : ICommand
     /// </summary>
     /// <param name="sheet">The sheet to add the filter to.</param>
     /// <param name="filter">The filter to add.</param>
-    public FilterCommand(Sheet sheet, SheetFilter filter)
+    public FilterCommand(Worksheet sheet, SheetFilter filter)
     {
         this.sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
         this.filter = filter ?? throw new ArgumentNullException(nameof(filter));
