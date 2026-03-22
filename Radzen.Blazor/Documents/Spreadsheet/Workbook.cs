@@ -108,13 +108,17 @@ public class Workbook
         SaveWorkbook(archive);
     }
 
+    private record struct FontKey(string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize);
+    private record struct CellStyleKey(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId);
+    private record struct BorderKey(string? TopStyle, string? TopColor, string? RightStyle, string? RightColor, string? BottomStyle, string? BottomColor, string? LeftStyle, string? LeftColor);
+
     private class StyleTracker
     {
-        public Dictionary<(string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize), int> FontStyles { get; } = new();
+        public Dictionary<FontKey, int> FontStyles { get; } = new();
         public Dictionary<string, int> FillStyles { get; } = new();
-        public Dictionary<(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId), int> CellStyles { get; } = new();
+        public Dictionary<CellStyleKey, int> CellStyles { get; } = new();
         public Dictionary<string, int> NumberFormats { get; } = new(StringComparer.OrdinalIgnoreCase);
-        public Dictionary<(string? TopStyle, string? TopColor, string? RightStyle, string? RightColor, string? BottomStyle, string? BottomColor, string? LeftStyle, string? LeftColor), int> BorderStyles { get; } = new();
+        public Dictionary<BorderKey, int> BorderStyles { get; } = new();
         public XDocument StylesDocument { get; set; } = null!;
         public XElement FontsElement { get; set; } = null!;
         public XElement FillsElement { get; set; } = null!;
@@ -749,23 +753,7 @@ public class Workbook
 
     private static bool HasCellFormatting(Cell cell)
     {
-        return cell.Format.Color != null ||
-               cell.Format.BackgroundColor != null ||
-               cell.Format.Bold ||
-               cell.Format.Italic ||
-               cell.Format.Underline ||
-               cell.Format.Strikethrough ||
-               cell.Format.WrapText ||
-               cell.Format.FontFamily != null ||
-               cell.Format.FontSize != null ||
-               cell.Format.BorderTop != null ||
-               cell.Format.BorderRight != null ||
-               cell.Format.BorderBottom != null ||
-               cell.Format.BorderLeft != null ||
-               cell.Format.TextAlign != TextAlign.Left ||
-               cell.Format.VerticalAlign != VerticalAlign.Top ||
-               !string.IsNullOrEmpty(cell.Format.NumberFormat) ||
-               cell.ValueType == CellDataType.Date;
+        return !cell.Format.IsDefault || cell.ValueType == CellDataType.Date;
     }
 
     private int GetOrCreateCellStyle(Cell cell, StyleTracker styleTracker)
@@ -775,7 +763,7 @@ public class Workbook
         var numFmtId = GetOrCreateNumberFormat(cell, styleTracker);
         var borderId = GetOrCreateBorderStyle(cell, styleTracker);
 
-        var styleKey = (fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId);
+        var styleKey = new CellStyleKey(fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId);
 
         if (!styleTracker.CellStyles.TryGetValue(styleKey, out int styleId))
         {
@@ -789,7 +777,7 @@ public class Workbook
 
     private int GetOrCreateFontStyle(Cell cell, StyleTracker styleTracker)
     {
-        var fontKey = (cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline, cell.Format.Strikethrough, cell.Format.FontFamily, cell.Format.FontSize);
+        var fontKey = new FontKey(cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline, cell.Format.Strikethrough, cell.Format.FontFamily, cell.Format.FontSize);
 
         if (!styleTracker.FontStyles.TryGetValue(fontKey, out int fontId))
         {
@@ -830,7 +818,7 @@ public class Workbook
             return 0;
         }
 
-        var borderKey = (
+        var borderKey = new BorderKey(
             bt?.ToXlsxStyle(), bt?.Color,
             br?.ToXlsxStyle(), br?.Color,
             bb?.ToXlsxStyle(), bb?.Color,
