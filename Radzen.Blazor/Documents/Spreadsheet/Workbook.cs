@@ -142,8 +142,7 @@ public class Workbook
         {
             var imageRelId = $"rId{imageRelIndex++}";
 
-            // Deduplicate media: use base64 of data as key
-            var hash = Convert.ToBase64String(image.Data);
+            var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image.Data));
             if (!mediaMap.TryGetValue(hash, out var mediaPath))
             {
                 var ext = ContentTypeToExtension(image.ContentType);
@@ -562,30 +561,26 @@ public class Workbook
 
         XElement? hyperlinksElement = null;
 
-        for (var row = 0; row < sheet.RowCount; row++)
+        foreach (var cell in sheet.Cells.GetPopulatedCells())
         {
-            for (var col = 0; col < sheet.ColumnCount; col++)
+            if (cell.Hyperlink != null)
             {
-                var cell = sheet.Cells[row, col];
-                if (cell.Hyperlink != null)
+                hyperlinksElement ??= new XElement(XName.Get("hyperlinks", ns));
+
+                var relId = $"rId{relIndex++}";
+                var cellRef = cell.Address.ToString();
+
+                var hyperlinkElement = new XElement(XName.Get("hyperlink", ns),
+                    new XAttribute("ref", cellRef),
+                    new XAttribute(rNs + "id", relId));
+
+                if (cell.Hyperlink.DisplayText != null)
                 {
-                    hyperlinksElement ??= new XElement(XName.Get("hyperlinks", ns));
-
-                    var relId = $"rId{relIndex++}";
-                    var cellRef = new CellRef(row, col).ToString();
-
-                    var hyperlinkElement = new XElement(XName.Get("hyperlink", ns),
-                        new XAttribute("ref", cellRef),
-                        new XAttribute(rNs + "id", relId));
-
-                    if (cell.Hyperlink.DisplayText != null)
-                    {
-                        hyperlinkElement.Add(new XAttribute("display", cell.Hyperlink.DisplayText));
-                    }
-
-                    hyperlinksElement.Add(hyperlinkElement);
-                    rels.Add((relId, cell.Hyperlink.Url));
+                    hyperlinkElement.Add(new XAttribute("display", cell.Hyperlink.DisplayText));
                 }
+
+                hyperlinksElement.Add(hyperlinkElement);
+                rels.Add((relId, cell.Hyperlink.Url));
             }
         }
 
@@ -685,25 +680,37 @@ public class Workbook
 
     private void ProcessSheetData(Worksheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
-        for (var row = 0; row < sheet.RowCount; row++)
+        var cellsByRow = sheet.Cells.GetPopulatedCells()
+            .Where(c => c.GetValue() != null)
+            .GroupBy(c => c.Address.Row)
+            .ToDictionary(g => g.Key, g => g.OrderBy(c => c.Address.Column).ToList());
+
+        // Include rows with data, custom height, or hidden state
+        var rowsToProcess = new SortedSet<int>(cellsByRow.Keys);
+
+        foreach (var rowIndex in sheet.Rows.GetCustomSizedIndices())
+        {
+            rowsToProcess.Add(rowIndex);
+        }
+
+        foreach (var rowIndex in sheet.Rows.GetHiddenIndices())
+        {
+            rowsToProcess.Add(rowIndex);
+        }
+
+        foreach (var row in rowsToProcess)
         {
             var rowElement = CreateRowElement(sheet, row);
 
-            for (var col = 0; col < sheet.ColumnCount; col++)
+            if (cellsByRow.TryGetValue(row, out var cells))
             {
-                var cell = sheet.Cells[row, col];
-                var value = cell.GetValue();
-
-                if (value == null)
+                foreach (var cell in cells)
                 {
-                    continue;
+                    var cellElement = CreateCellElement(sheet, row, cell.Address.Column, cell, styleTracker, sharedStrings, sharedStringsDoc);
+                    rowElement.Add(cellElement);
                 }
-
-                var cellElement = CreateCellElement(sheet, row, col, cell, styleTracker, sharedStrings, sharedStringsDoc);
-                rowElement.Add(cellElement);
             }
 
-            // Always add the row element, even if it has no cells, to preserve row height
             sheetData.Add(rowElement);
         }
     }
