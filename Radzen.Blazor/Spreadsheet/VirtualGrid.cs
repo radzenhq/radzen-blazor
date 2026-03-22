@@ -161,7 +161,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
     private double SplitterHeight => Rows.Frozen > 0 ? SplitterSize : 0;
 
-    private string SpacerStyle => $"width: {(Columns.Total + SplitterWidth).ToPx()}; height: {(Rows.Total + SplitterHeight).ToPx()};";
+    private string SpacerStyle => $"width: {(View.TotalWidth + SplitterWidth).ToPx()}; height: {(View.TotalHeight + SplitterHeight).ToPx()};";
 
     /// <summary>
     /// Gets or sets additional attributes that will be rendered in the root element of the virtual grid.
@@ -264,15 +264,15 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     /// </summary>
     public async Task ScrollToAsync(int row, int column)
     {
-        var columnRange = Columns.GetPixelRange(column);
-        var rowRange = Rows.GetPixelRange(row);
+        var columnRange = View.GetColumnPixelRange(column);
+        var rowRange = View.GetRowPixelRange(row);
 
-        var frozenColumnRange = Columns.GetPixelRange(Columns.Frozen);
-        var frozenRowRange = Rows.GetPixelRange(Rows.Frozen);
+        var frozenColumnRange = View.GetColumnPixelRange(Columns.Frozen);
+        var frozenRowRange = View.GetRowPixelRange(Rows.Frozen);
 
-        var visibleLeft = ScrollLeft + frozenColumnRange.End - Columns.Offset;
+        var visibleLeft = ScrollLeft + frozenColumnRange.End - View.ColumnHeaderOffset;
         var visibleRight = ScrollLeft + region.Width;
-        var visibleTop = ScrollTop + frozenRowRange.End - Rows.Offset;
+        var visibleTop = ScrollTop + frozenRowRange.End - View.RowHeaderOffset;
         var visibleBottom = ScrollTop + region.Height;
 
         var scrollX = ScrollLeft;
@@ -303,23 +303,23 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
     private void Render(double scrollX, double scrollY)
     {
-        var columnRange = Columns.GetIndexRange(scrollX, scrollX + region.Width);
-        var rowRange = Rows.GetIndexRange(scrollY, scrollY + region.Height);
+        var columnRange = View.GetColumnRange(scrollX, scrollX + region.Width);
+        var rowRange = View.GetRowRange(scrollY, scrollY + region.Height);
 
         items.Clear();
 
-        if (Rows.Offset > 0)
+        if (View.RowHeaderOffset > 0)
         {
-            if (Columns.Offset > 0)
+            if (View.ColumnHeaderOffset > 0)
             {
                 var item = new VirtualCorner
                 {
-                    Rect = new PixelRectangle(0, 0, Rows.Offset, Columns.Offset)
+                    Rect = new PixelRectangle(0, 0, View.RowHeaderOffset, View.ColumnHeaderOffset)
                 };
                 items.Add(item);
             }
 
-            var left = Columns.Offset;
+            var left = View.ColumnHeaderOffset;
 
             for (var x = 0; x < Columns.Frozen; x++)
             {
@@ -331,7 +331,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
                 var item = new VirtualColumnHeader
                 {
                     Column = x,
-                    Rect = new PixelRectangle(0, left, Rows.Offset, left + Columns[x]),
+                    Rect = new PixelRectangle(0, left, View.RowHeaderOffset, left + Columns[x]),
                     FrozenState = FrozenState.Column,
                 };
                 items.Add(item);
@@ -358,16 +358,16 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
                 var item = new VirtualColumnHeader
                 {
                     Column = x,
-                    Rect = new PixelRectangle(0, left + SplitterWidth, Rows.Offset, left + SplitterWidth + Columns[x]),
+                    Rect = new PixelRectangle(0, left + SplitterWidth, View.RowHeaderOffset, left + SplitterWidth + Columns[x]),
                 };
                 items.Add(item);
                 left += Columns[x];
             }
         }
 
-        if (Columns.Offset > 0)
+        if (View.ColumnHeaderOffset > 0)
         {
-            var headerTop = Rows.Offset;
+            var headerTop = View.RowHeaderOffset;
 
             for (var y = 0; y < Rows.Frozen; y++)
             {
@@ -379,7 +379,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
                 var item = new VirtualRowHeader
                 {
                     Row = y,
-                    Rect = new PixelRectangle(headerTop, 0, headerTop + Rows[y], Columns.Offset),
+                    Rect = new PixelRectangle(headerTop, 0, headerTop + Rows[y], View.ColumnHeaderOffset),
                     FrozenState = FrozenState.Row,
                 };
                 items.Add(item);
@@ -406,14 +406,14 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
                 var item = new VirtualRowHeader
                 {
                     Row = y,
-                    Rect = new PixelRectangle(headerTop + SplitterHeight, 0, headerTop + SplitterHeight + Rows[y], Columns.Offset),
+                    Rect = new PixelRectangle(headerTop + SplitterHeight, 0, headerTop + SplitterHeight + Rows[y], View.ColumnHeaderOffset),
                 };
                 items.Add(item);
                 headerTop += Rows[y];
             }
         }
 
-        var frozenTop = Rows.Offset;
+        var frozenTop = View.RowHeaderOffset;
 
         for (var y = 0; y < Rows.Frozen; y++)
         {
@@ -422,7 +422,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
                 continue;
             }
 
-            var frozenLeft = Columns.Offset;
+            var frozenLeft = View.ColumnHeaderOffset;
 
             for (var x = 0; x < Columns.Frozen; x++)
             {
@@ -482,7 +482,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
                 continue;
             }
 
-            var frozenLeft = Columns.Offset;
+            var frozenLeft = View.ColumnHeaderOffset;
             for (var x = 0; x < Columns.Frozen; x++)
             {
                 if (Columns.IsHidden(x))
@@ -628,8 +628,8 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
             return GetRectangle(mergedRange, ScrollTop, ScrollLeft);
         }
 
-        var columnRange = Columns.GetPixelRange(left);
-        var rowRange = Rows.GetPixelRange(top);
+        var columnRange = View.GetColumnPixelRange(left);
+        var rowRange = View.GetRowPixelRange(top);
 
         if (left >= Columns.Frozen)
         {
@@ -648,8 +648,8 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
     private PixelRectangle GetRectangle(int top, int left, int bottom, int right, double scrollTop, double scrollLeft)
     {
-        var columnRange = Columns.GetPixelRange(left, right);
-        var rowRange = Rows.GetPixelRange(top, bottom);
+        var columnRange = View.GetColumnPixelRange(left, right);
+        var rowRange = View.GetRowPixelRange(top, bottom);
 
         if (left >= Columns.Frozen)
         {

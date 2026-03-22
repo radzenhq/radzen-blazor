@@ -177,8 +177,6 @@ public partial class Sheet
     {
         Rows = new(24, rows);
         Columns = new(100, columns);
-        Rows.Offset = 24;
-        Columns.Offset = 100;
         Selection = new(this);
         Editor = new(this);
         MergedCells = new(this);

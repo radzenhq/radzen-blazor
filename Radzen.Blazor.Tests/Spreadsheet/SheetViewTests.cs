@@ -44,26 +44,26 @@ public class SheetViewTests
     // --- Rendering method delegation ---
 
     [Fact]
-    public void GetRowRange_DelegatesToAxis()
+    public void GetRowRange_AddsOffset()
     {
         var sheet = new Sheet(100, 10);
         var view = new SheetView(sheet);
 
-        var fromAxis = sheet.Rows.GetIndexRange(0, 500);
+        // SheetView subtracts the header offset before calling Axis
+        var fromAxis = sheet.Rows.GetIndexRange(0 - view.RowHeaderOffset, 500 - view.RowHeaderOffset);
         var fromView = view.GetRowRange(0, 500);
 
         Assert.Equal(fromAxis.Start, fromView.Start);
         Assert.Equal(fromAxis.End, fromView.End);
-        Assert.Equal(fromAxis.Offset, fromView.Offset);
     }
 
     [Fact]
-    public void GetColumnRange_DelegatesToAxis()
+    public void GetColumnRange_AddsOffset()
     {
         var sheet = new Sheet(10, 100);
         var view = new SheetView(sheet);
 
-        var fromAxis = sheet.Columns.GetIndexRange(0, 500);
+        var fromAxis = sheet.Columns.GetIndexRange(0 - view.ColumnHeaderOffset, 500 - view.ColumnHeaderOffset);
         var fromView = view.GetColumnRange(0, 500);
 
         Assert.Equal(fromAxis.Start, fromView.Start);
@@ -71,7 +71,7 @@ public class SheetViewTests
     }
 
     [Fact]
-    public void GetRowPixelRange_DelegatesToAxis()
+    public void GetRowPixelRange_AddsOffset()
     {
         var sheet = new Sheet(10, 10);
         sheet.Rows[3] = 50;
@@ -80,12 +80,12 @@ public class SheetViewTests
         var fromAxis = sheet.Rows.GetPixelRange(2, 4);
         var fromView = view.GetRowPixelRange(2, 4);
 
-        Assert.Equal(fromAxis.Start, fromView.Start);
-        Assert.Equal(fromAxis.End, fromView.End);
+        Assert.Equal(fromAxis.Start + view.RowHeaderOffset, fromView.Start);
+        Assert.Equal(fromAxis.End + view.RowHeaderOffset, fromView.End);
     }
 
     [Fact]
-    public void GetRowPixelRange_SingleIndex_DelegatesToAxis()
+    public void GetRowPixelRange_SingleIndex_AddsOffset()
     {
         var sheet = new Sheet(10, 10);
         var view = new SheetView(sheet);
@@ -93,12 +93,12 @@ public class SheetViewTests
         var fromAxis = sheet.Rows.GetPixelRange(5);
         var fromView = view.GetRowPixelRange(5);
 
-        Assert.Equal(fromAxis.Start, fromView.Start);
-        Assert.Equal(fromAxis.End, fromView.End);
+        Assert.Equal(fromAxis.Start + view.RowHeaderOffset, fromView.Start);
+        Assert.Equal(fromAxis.End + view.RowHeaderOffset, fromView.End);
     }
 
     [Fact]
-    public void GetColumnPixelRange_DelegatesToAxis()
+    public void GetColumnPixelRange_AddsOffset()
     {
         var sheet = new Sheet(10, 10);
         sheet.Columns[2] = 200;
@@ -107,12 +107,12 @@ public class SheetViewTests
         var fromAxis = sheet.Columns.GetPixelRange(1, 3);
         var fromView = view.GetColumnPixelRange(1, 3);
 
-        Assert.Equal(fromAxis.Start, fromView.Start);
-        Assert.Equal(fromAxis.End, fromView.End);
+        Assert.Equal(fromAxis.Start + view.ColumnHeaderOffset, fromView.Start);
+        Assert.Equal(fromAxis.End + view.ColumnHeaderOffset, fromView.End);
     }
 
     [Fact]
-    public void GetColumnPixelRange_SingleIndex_DelegatesToAxis()
+    public void GetColumnPixelRange_SingleIndex_AddsOffset()
     {
         var sheet = new Sheet(10, 10);
         var view = new SheetView(sheet);
@@ -120,26 +120,26 @@ public class SheetViewTests
         var fromAxis = sheet.Columns.GetPixelRange(5);
         var fromView = view.GetColumnPixelRange(5);
 
-        Assert.Equal(fromAxis.Start, fromView.Start);
-        Assert.Equal(fromAxis.End, fromView.End);
+        Assert.Equal(fromAxis.Start + view.ColumnHeaderOffset, fromView.Start);
+        Assert.Equal(fromAxis.End + view.ColumnHeaderOffset, fromView.End);
     }
 
     [Fact]
-    public void TotalHeight_DelegatesToAxis()
+    public void TotalHeight_IncludesOffset()
     {
         var sheet = new Sheet(10, 10);
         var view = new SheetView(sheet);
 
-        Assert.Equal(sheet.Rows.Total, view.TotalHeight);
+        Assert.Equal(sheet.Rows.Total + view.RowHeaderOffset, view.TotalHeight);
     }
 
     [Fact]
-    public void TotalWidth_DelegatesToAxis()
+    public void TotalWidth_IncludesOffset()
     {
         var sheet = new Sheet(10, 10);
         var view = new SheetView(sheet);
 
-        Assert.Equal(sheet.Columns.Total, view.TotalWidth);
+        Assert.Equal(sheet.Columns.Total + view.ColumnHeaderOffset, view.TotalWidth);
     }
 
     // --- Per-sheet Commands ---
