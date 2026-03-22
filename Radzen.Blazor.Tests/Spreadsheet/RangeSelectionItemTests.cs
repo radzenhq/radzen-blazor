@@ -80,7 +80,8 @@ public class RangeSelectionItemTests : TestContext
         var context = new MockVirtualGridContext();
 
         // Get the split ranges (frozen and non-frozen parts)
-        var ranges = sheet.GetRanges(mergedRange).ToList();
+        var view = new SheetView(sheet);
+        var ranges = view.GetRanges(mergedRange).ToList();
         Assert.Equal(2, ranges.Count); // Should be split into 2 parts
 
         // Test the frozen part (A1:A1)

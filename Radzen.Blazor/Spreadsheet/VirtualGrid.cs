@@ -134,6 +134,10 @@ public interface IVirtualGridContext
     /// Gets the pixel rectangle for a specific range of rows and columns in the virtual grid.
     /// </summary>
     PixelRectangle GetRectangle(int top, int left, int bottom, int right);
+    /// <summary>
+    /// Splits a range into regions based on frozen pane boundaries for rendering.
+    /// </summary>
+    IEnumerable<RangeInfo> GetRanges(RangeRef range);
 }
 
 /// <summary>
@@ -547,7 +551,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
                 continue;
             }
 
-            var ranges = MergedCells.SplitRange(adjustedRange.Value);
+            var ranges = MergedCells.SplitRange(adjustedRange.Value, Rows.Frozen, Columns.Frozen);
 
             foreach (var splitRange in ranges)
             {
@@ -676,4 +680,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
     /// <inheritdoc/>
     public PixelRectangle GetRectangle(int top, int left, int bottom, int right) => GetRectangle(top, left, bottom, right, ScrollTop, ScrollLeft);
+
+    /// <inheritdoc/>
+    public IEnumerable<RangeInfo> GetRanges(RangeRef range) => View.GetRanges(range);
 }

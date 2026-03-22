@@ -16,7 +16,7 @@ public class CellSelectionTests : TestContext
         // Arrange
         var cell = new CellRef(0, 0);
         sheet.Selection.Select(new RangeRef(cell, cell));
-        var context = new MockVirtualGridContext();
+        var context = new MockVirtualGridContext(sheet);
 
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
@@ -41,7 +41,7 @@ public class CellSelectionTests : TestContext
         var cell = new CellRef(0, 0);
         sheet.Columns.Frozen = 1;
         sheet.Selection.Select(new RangeRef(cell, cell));
-        var context = new MockVirtualGridContext();
+        var context = new MockVirtualGridContext(sheet);
 
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
@@ -59,7 +59,7 @@ public class CellSelectionTests : TestContext
     {
         // Arrange
         var cell = new CellRef(0, 0);
-        var context = new MockVirtualGridContext();
+        var context = new MockVirtualGridContext(sheet);
         sheet.Rows.Frozen = 1;
         sheet.Selection.Select(new RangeRef(cell, cell));
 
@@ -80,7 +80,7 @@ public class CellSelectionTests : TestContext
         // Arrange
         var cell = new CellRef(0, 0);
         sheet.Selection.Select(new RangeRef(cell, cell));
-        var context = new MockVirtualGridContext();
+        var context = new MockVirtualGridContext(sheet);
 
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
@@ -101,7 +101,7 @@ public class CellSelectionTests : TestContext
         var range = new RangeRef(new CellRef(0, 0), new CellRef(2, 0));
         sheet.MergedCells.Add(range);
         sheet.Selection.Select(range);
-        var context = new MockVirtualGridContext();
+        var context = new MockVirtualGridContext(sheet);
 
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
@@ -144,7 +144,7 @@ public class CellSelectionTests : TestContext
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 2));
         sheet.MergedCells.Add(range);
         sheet.Selection.Select(range);
-        var context = new MockVirtualGridContext();
+        var context = new MockVirtualGridContext(sheet);
 
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
@@ -188,7 +188,7 @@ public class CellSelectionTests : TestContext
         var range = new RangeRef(new CellRef(0, 0), new CellRef(2, 2));
         sheet.MergedCells.Add(range);
         sheet.Selection.Select(range);
-        var context = new MockVirtualGridContext();
+        var context = new MockVirtualGridContext(sheet);
 
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
@@ -249,6 +249,15 @@ public class CellSelectionTests : TestContext
 public class MockVirtualGridContext : IVirtualGridContext
 {
     private readonly Dictionary<(int Row, int Column), PixelRectangle> rectangle = [];
+    private SheetView view;
+
+    public MockVirtualGridContext(Sheet sheet = null)
+    {
+        if (sheet != null)
+        {
+            view = new SheetView(sheet);
+        }
+    }
 
     public void SetupRectangle(int row, int column, PixelRectangle rectangle)
     {
@@ -258,4 +267,7 @@ public class MockVirtualGridContext : IVirtualGridContext
     public PixelRectangle GetRectangle(int row, int column) => throw new NotImplementedException();
 
     public PixelRectangle GetRectangle(int top, int left, int bottom, int right) => new(new (left * 100, (right + 1) * 100), new (top*24, (bottom + 1)*24));
+
+    public IEnumerable<RangeInfo> GetRanges(RangeRef range) =>
+        view != null ? view.GetRanges(range) : [new RangeInfo { Range = range }];
 } 
