@@ -31,6 +31,6 @@ public partial class CellSelection
         var mergedRange = Sheet.MergedCells.GetMergedRange(Cell);
         var range = mergedRange != RangeRef.Invalid ? mergedRange : new RangeRef(Cell, Cell);
 
-        return Sheet.GetRanges(range);
+        return Context.GetRanges(range);
     }
 }
