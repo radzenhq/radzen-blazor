@@ -248,6 +248,16 @@ public class Axis(double size, int count)
     }
 
     /// <summary>
+    /// Returns the indices of all items with a custom (non-default) size.
+    /// </summary>
+    internal IEnumerable<int> GetCustomSizedIndices() => data.Keys;
+
+    /// <summary>
+    /// Returns the indices of all hidden items.
+    /// </summary>
+    internal IEnumerable<int> GetHiddenIndices() => hidden;
+
+    /// <summary>
     /// Gets the total size of the axis, including all visible items, default values for hidden items, and the offset.
     /// </summary>
     public double Total
