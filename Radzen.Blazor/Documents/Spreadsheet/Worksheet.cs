@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Radzen.Blazor.Spreadsheet;
 namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
@@ -59,10 +58,6 @@ public partial class Worksheet
     /// </summary>
     public Selection Selection { get; }
     /// <summary>
-    /// Gets the editor object that manages cell editing in the sheet.
-    /// </summary>
-    public Editor Editor { get; }
-    /// <summary>
     /// Gets the row axis for the sheet, which defines the properties of the rows.
     /// </summary>
     public Axis Rows { get; }
@@ -82,11 +77,6 @@ public partial class Worksheet
     /// Gets the conditional formatting store for the sheet.
     /// </summary>
     public ConditionalFormatStore ConditionalFormats { get; }
-    /// <summary>
-    /// Gets the undo/redo stack for the sheet, which allows tracking and reverting changes made to the sheet.
-    /// When a SheetView is created for this sheet, it replaces this with its own per-sheet instance.
-    /// </summary>
-    public UndoRedoStack Commands { get; internal set; }
     /// <summary>
     /// Gets the name of the sheet.
     /// </summary>
@@ -128,9 +118,11 @@ public partial class Worksheet
     /// </summary>
     internal event Action? SelectedImageChanged;
 
-    internal void AddImage(SheetImage image) => images.Add(image);
+    internal event Action? ImagesChanged;
 
-    internal bool RemoveImage(SheetImage image) => images.Remove(image);
+    internal void AddImage(SheetImage image) { images.Add(image); ImagesChanged?.Invoke(); }
+
+    internal bool RemoveImage(SheetImage image) { var removed = images.Remove(image); if (removed) ImagesChanged?.Invoke(); return removed; }
 
     private readonly HashSet<int> filteredColumns = [];
 
@@ -179,10 +171,8 @@ public partial class Worksheet
         Rows = new(24, rows);
         Columns = new(100, columns);
         Selection = new(this);
-        Editor = new(this);
         MergedCells = new();
         Cells = new CellStore(this);
-        Commands = new();
         Validation = new();
         ConditionalFormats = new();
     }

@@ -8,6 +8,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsDisabled => Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid;
 
     private void OnDeleteColumnClick()
@@ -19,7 +22,7 @@
         var range = Worksheet.Selection.Range;
         var start = range.Start.Column;
         var end = range.End.Column;
-        Worksheet.Commands.Execute(new DeleteColumnsCommand(Worksheet, start, end));
+        Spreadsheet?.Execute(new DeleteColumnsCommand(Worksheet, start, end));
     }
 }
 

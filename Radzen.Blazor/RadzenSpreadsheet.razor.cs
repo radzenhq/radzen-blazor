@@ -25,6 +25,31 @@ public interface ISpreadsheet
     /// </summary>
     /// <returns></returns>
     Task<bool> AcceptAsync();
+
+    /// <summary>
+    /// Executes a command through the active view's undo/redo stack.
+    /// </summary>
+    bool Execute(ICommand command);
+
+    /// <summary>
+    /// Undoes the last command.
+    /// </summary>
+    void Undo();
+
+    /// <summary>
+    /// Redoes the last undone command.
+    /// </summary>
+    void Redo();
+
+    /// <summary>
+    /// Gets whether there is a command to undo.
+    /// </summary>
+    bool CanUndo { get; }
+
+    /// <summary>
+    /// Gets whether there is a command to redo.
+    /// </summary>
+    bool CanRedo { get; }
 }
 
 /// <summary>
@@ -90,6 +115,23 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private SheetView? ActiveView => Worksheet != null ? (workbookView ??= new WorkbookView(workbook!)).GetView(Worksheet) : null;
 
+    private Editor? Editor => ActiveView?.Editor;
+
+    /// <inheritdoc/>
+    public bool Execute(ICommand command) => ActiveView?.Commands.Execute(command) ?? false;
+
+    /// <inheritdoc/>
+    public void Undo() => ActiveView?.Commands.Undo();
+
+    /// <inheritdoc/>
+    public void Redo() => ActiveView?.Commands.Redo();
+
+    /// <inheritdoc/>
+    public bool CanUndo => ActiveView?.Commands.CanUndo ?? false;
+
+    /// <inheritdoc/>
+    public bool CanRedo => ActiveView?.Commands.CanRedo ?? false;
+
     private async Task OnWorkbookChangedAsync(Workbook? value)
     {
         workbook = value;
@@ -134,7 +176,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Worksheet != null && validationListRow >= 0 && validationListColumn >= 0)
         {
             var address = new CellRef(validationListRow, validationListColumn);
-            Worksheet.Editor.StartEdit(address, value);
+            Editor!.StartEdit(address, value);
             await AcceptAsync();
         }
 
@@ -157,7 +199,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (filter != null && Worksheet != null)
         {
             var command = new FilterCommand(Worksheet, filter);
-            Worksheet.Commands.Execute(command);
+            Execute(command);
         }
 
         if (cellMenuPopup != null)
@@ -176,7 +218,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 if (table.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
                     var command = new SortCommand(Worksheet, table.Range, SortOrder.Ascending, cellMenuColumn);
-                    Worksheet.Commands.Execute(command);
+                    Execute(command);
                     break;
                 }
             }
@@ -185,7 +227,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
             {
                 var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range, SortOrder.Ascending, cellMenuColumn, skipHeaderRow: true);
-                Worksheet.Commands.Execute(command);
+                Execute(command);
             }
         }
 
@@ -205,7 +247,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 if (table.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
                     var command = new SortCommand(Worksheet, table.Range, SortOrder.Descending, cellMenuColumn);
-                    Worksheet.Commands.Execute(command);
+                    Execute(command);
                     break;
                 }
             }
@@ -214,7 +256,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
             {
                 var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range, SortOrder.Descending, cellMenuColumn, skipHeaderRow: true);
-                Worksheet.Commands.Execute(command);
+                Execute(command);
             }
         }
 
@@ -243,7 +285,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             foreach (var filter in filtersToRemove)
             {
                 var command = new RemoveFilterCommand(Worksheet, filter);
-                Worksheet.Commands.Execute(command);
+                Execute(command);
             }
         }
 
@@ -285,7 +327,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             if (result is SheetFilter filter)
             {
                 var command = new FilterCommand(Worksheet, filter);
-                Worksheet.Commands.Execute(command);
+                Execute(command);
             }
         }
     }
@@ -309,7 +351,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 var format = string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase) ? null : formatCode;
                 var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(format));
-                Worksheet.Commands.Execute(command);
+                Execute(command);
             }
         }
     }
@@ -342,23 +384,23 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (Worksheet is not null)
         {
-            if (Worksheet.Editor.HasChanges)
+            if (Editor!.HasChanges)
             {
-                var command = new AcceptEditCommand(Worksheet);
+                var command = new AcceptEditCommand(ActiveView!);
 
-                var valid = Worksheet.Commands.Execute(command);
+                var valid = Execute(command);
 
-                if (!valid && Worksheet.Editor.Cell is not null)
+                if (!valid && Editor!.Cell is not null)
                 {
-                    var error = string.Join(Environment.NewLine, Worksheet.Editor.Cell.ValidationErrors);
-                    var errorStyle = Worksheet.Validation.GetErrorStyleForCell(Worksheet.Editor.Cell.Address);
+                    var error = string.Join(Environment.NewLine, Editor!.Cell.ValidationErrors);
+                    var errorStyle = Worksheet.Validation.GetErrorStyleForCell(Editor!.Cell.Address);
 
                     switch (errorStyle)
                     {
                         case DataValidationErrorStyle.Information:
                             await DialogService.Alert(error, "Information");
                             // Accept the value despite validation failure
-                            Worksheet.Editor.Cell.ClearValidationErrors();
+                            Editor!.Cell.ClearValidationErrors();
                             break;
 
                         case DataValidationErrorStyle.Warning:
@@ -368,12 +410,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                             if (confirmed == true)
                             {
-                                Worksheet.Editor.Cell.ClearValidationErrors();
+                                Editor!.Cell.ClearValidationErrors();
                             }
                             else
                             {
                                 command.Unexecute();
-                                Worksheet.Editor.Cancel();
+                                Editor!.Cancel();
                                 result = false;
                             }
                             break;
@@ -381,7 +423,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                         default: // Stop
                             await DialogService.Alert(error, "Invalid Value");
                             command.Unexecute();
-                            Worksheet.Editor.Cancel();
+                            Editor!.Cancel();
                             result = false;
                             break;
                     }
@@ -393,7 +435,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             }
             else
             {
-                Worksheet.Editor.EndEdit();
+                Editor!.EndEdit();
             }
         }
 
@@ -428,9 +470,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Task CancelEditAsync()
     {
-        if (Worksheet?.Editor.Mode != EditMode.None)
+        if (Editor?.Mode != EditMode.None)
         {
-            Worksheet?.Editor.Cancel();
+            Editor?.Cancel();
         }
 
         return Task.CompletedTask;
@@ -468,8 +510,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (Worksheet?.SelectedImage != null)
         {
-            var command = new DeleteImageCommand(Worksheet, Worksheet.SelectedImage);
-            Worksheet.Commands.Execute(command);
+            Execute(new DeleteImageCommand(Worksheet, Worksheet.SelectedImage));
             return Task.CompletedTask;
         }
 
@@ -478,14 +519,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Task UndoAsync()
     {
-        Worksheet?.Commands.Undo();
+        Undo();
 
         return Task.CompletedTask;
     }
 
     private Task RedoAsync()
     {
-        Worksheet?.Commands.Redo();
+        Redo();
 
         return Task.CompletedTask;
     }
@@ -655,13 +696,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = PasteFromClipboardAsync();
                 break;
             case "clear":
-                Worksheet.Commands.Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
+                Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
                 break;
             case "sort-ascending":
-                Worksheet.Commands.Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Ascending, column));
+                Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Ascending, column));
                 break;
             case "sort-descending":
-                Worksheet.Commands.Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
+                Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
                 break;
         }
 
@@ -689,13 +730,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = PasteFromClipboardAsync();
                 break;
             case "insert-row-before":
-                Worksheet.Commands.Execute(new InsertRowBeforeCommand(Worksheet, row));
+                Execute(new InsertRowBeforeCommand(Worksheet, row));
                 break;
             case "insert-row-after":
-                Worksheet.Commands.Execute(new InsertRowAfterCommand(Worksheet, row));
+                Execute(new InsertRowAfterCommand(Worksheet, row));
                 break;
             case "delete-row":
-                Worksheet.Commands.Execute(new DeleteRowsCommand(Worksheet, row, row));
+                Execute(new DeleteRowsCommand(Worksheet, row, row));
                 break;
             case "hide-row":
                 Worksheet.Rows.Hide(row);
@@ -729,13 +770,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = PasteFromClipboardAsync();
                 break;
             case "insert-column-before":
-                Worksheet.Commands.Execute(new InsertColumnBeforeCommand(Worksheet, column));
+                Execute(new InsertColumnBeforeCommand(Worksheet, column));
                 break;
             case "insert-column-after":
-                Worksheet.Commands.Execute(new InsertColumnAfterCommand(Worksheet, column));
+                Execute(new InsertColumnAfterCommand(Worksheet, column));
                 break;
             case "delete-column":
-                Worksheet.Commands.Execute(new DeleteColumnsCommand(Worksheet, column, column));
+                Execute(new DeleteColumnsCommand(Worksheet, column, column));
                 break;
             case "hide-column":
                 Worksheet.Columns.Hide(column);
@@ -1043,7 +1084,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                 inputPrompt?.Hide();
 
-                Worksheet.Editor.StartEdit(address, cell.GetValue());
+                Editor!.StartEdit(address, cell.GetValue());
             }
         }
     }
@@ -1110,7 +1151,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (char.IsLetterOrDigit(ch) || char.IsPunctuation(ch) || char.IsSymbol(ch) || char.IsSeparator(ch))
         {
             inputPrompt?.Hide();
-            Worksheet?.Editor.StartEdit(Worksheet.Selection.Cell, ch.ToString());
+            Editor?.StartEdit(Worksheet!.Selection.Cell, ch.ToString());
         }
     }
 
@@ -1387,7 +1428,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             capture.Image.Width = capture.OriginalWidth;
             capture.Image.Height = capture.OriginalHeight;
 
-            Worksheet.Commands.Execute(new ResizeImageCommand(capture.Image, finalWidth, finalHeight));
+            Execute(new ResizeImageCommand(capture.Image, finalWidth, finalHeight));
 
             imageResizeCapture = null;
             onImageResizePointerMoveAsync = null;

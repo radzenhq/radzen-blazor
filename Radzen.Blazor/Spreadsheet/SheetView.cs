@@ -21,6 +21,11 @@ public class SheetView
     public UndoRedoStack Commands { get; } = new();
 
     /// <summary>
+    /// Gets the per-sheet editor.
+    /// </summary>
+    public Editor Editor { get; }
+
+    /// <summary>
     /// Gets or sets the header offset for rows (height of column headers in pixels).
     /// </summary>
     public double RowHeaderOffset { get; set; } = 24;
@@ -32,12 +37,11 @@ public class SheetView
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SheetView"/> class.
-    /// Injects its own UndoRedoStack into the sheet so callers can use Worksheet.Commands transparently.
     /// </summary>
     public SheetView(Worksheet sheet)
     {
         Worksheet = sheet ?? throw new System.ArgumentNullException(nameof(sheet));
-        sheet.Commands = Commands;
+        Editor = new Editor(sheet);
     }
 
     /// <summary>
@@ -46,7 +50,7 @@ public class SheetView
     /// </summary>
     public IndexRange GetRowRange(double start, double end, bool includeFrozen = false)
     {
-        return Worksheet.Rows.GetIndexRange(start - RowHeaderOffset, end - RowHeaderOffset, includeFrozen);
+        return GetIndexRange(Worksheet.Rows, start - RowHeaderOffset, end - RowHeaderOffset, includeFrozen);
     }
 
     /// <summary>
@@ -55,7 +59,7 @@ public class SheetView
     /// </summary>
     public IndexRange GetColumnRange(double start, double end, bool includeFrozen = false)
     {
-        return Worksheet.Columns.GetIndexRange(start - ColumnHeaderOffset, end - ColumnHeaderOffset, includeFrozen);
+        return GetIndexRange(Worksheet.Columns, start - ColumnHeaderOffset, end - ColumnHeaderOffset, includeFrozen);
     }
 
     /// <summary>
@@ -63,7 +67,7 @@ public class SheetView
     /// </summary>
     public PixelRange GetRowPixelRange(int startIndex, int endIndex)
     {
-        var range = Worksheet.Rows.GetPixelRange(startIndex, endIndex);
+        var range = GetPixelRange(Worksheet.Rows, startIndex, endIndex);
         return new PixelRange(range.Start + RowHeaderOffset, range.End + RowHeaderOffset);
     }
 
@@ -72,7 +76,7 @@ public class SheetView
     /// </summary>
     public PixelRange GetRowPixelRange(int index)
     {
-        var range = Worksheet.Rows.GetPixelRange(index);
+        var range = GetPixelRange(Worksheet.Rows, index, index);
         return new PixelRange(range.Start + RowHeaderOffset, range.End + RowHeaderOffset);
     }
 
@@ -81,7 +85,7 @@ public class SheetView
     /// </summary>
     public PixelRange GetColumnPixelRange(int startIndex, int endIndex)
     {
-        var range = Worksheet.Columns.GetPixelRange(startIndex, endIndex);
+        var range = GetPixelRange(Worksheet.Columns, startIndex, endIndex);
         return new PixelRange(range.Start + ColumnHeaderOffset, range.End + ColumnHeaderOffset);
     }
 
@@ -90,8 +94,100 @@ public class SheetView
     /// </summary>
     public PixelRange GetColumnPixelRange(int index)
     {
-        var range = Worksheet.Columns.GetPixelRange(index);
+        var range = GetPixelRange(Worksheet.Columns, index, index);
         return new PixelRange(range.Start + ColumnHeaderOffset, range.End + ColumnHeaderOffset);
+    }
+
+    private static IndexRange GetIndexRange(Axis axis, double start, double end, bool includeFrozen = false)
+    {
+        var currentPosition = 0d;
+        var startOffset = 0d;
+
+        if (!includeFrozen)
+        {
+            if (axis.Frozen > 0)
+            {
+                // Calculate position after frozen items
+                for (int index = 0; index < axis.Frozen; index++)
+                {
+                    if (!axis.IsHidden(index))
+                    {
+                        currentPosition += axis[index];
+                    }
+                }
+            }
+        }
+
+        // Find start index - include items that start before the viewport end
+        int startIndex = includeFrozen ? 0 : axis.Frozen;
+
+        for (; startIndex < axis.Count - 1; startIndex++)
+        {
+            if (axis.IsHidden(startIndex))
+            {
+                continue;
+            }
+
+            var segmentSize = axis[startIndex];
+
+            if (currentPosition + segmentSize > start)
+            {
+                startOffset = start - currentPosition;
+                break;
+            }
+
+            currentPosition += segmentSize;
+        }
+
+        // Find end index - include items that end after the viewport start
+        int endIndex;
+        for (endIndex = startIndex; endIndex < axis.Count - 1; endIndex++)
+        {
+            if (axis.IsHidden(endIndex))
+            {
+                continue;
+            }
+
+            var segmentSize = axis[endIndex];
+            currentPosition += segmentSize;
+
+            if (currentPosition >= end)
+            {
+                break;
+            }
+        }
+
+        return new IndexRange(startIndex, endIndex, startOffset);
+    }
+
+    private static PixelRange GetPixelRange(Axis axis, int startIndex, int endIndex)
+    {
+        double start;
+        double end;
+        var currentPosition = 0d;
+
+        for (var index = 0; index < startIndex; index++)
+        {
+            if (!axis.IsHidden(index))
+            {
+                var segmentSize = axis[index];
+                currentPosition += segmentSize;
+            }
+        }
+        start = currentPosition;
+
+        for (var index = startIndex; index <= endIndex; index++)
+        {
+            if (!axis.IsHidden(index))
+            {
+                var segmentSize = axis[index];
+                currentPosition += segmentSize;
+            }
+        }
+
+        end = currentPosition;
+
+        return new PixelRange(start, end);
     }
 
     /// <summary>

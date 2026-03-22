@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 
-using Radzen.Blazor.Spreadsheet;
 namespace Radzen.Documents.Spreadsheet;
 #nullable enable
 
@@ -248,68 +247,6 @@ public class Axis(double size, int count)
         hidden.UnionWith(newHidden);
     }
 
-    internal IndexRange GetIndexRange(double start, double end, bool includeFrozen = false)
-    {
-        var currentPosition = 0d;
-        var startOffset = 0d;
-
-        if (!includeFrozen)
-        {
-            if (Frozen > 0)
-            {
-                // Calculate position after frozen items
-                for (int index = 0; index < Frozen; index++)
-                {
-                    if (!IsHidden(index))
-                    {
-                        currentPosition += this[index];
-                    }
-                }
-            }
-        }
-
-        // Find start index - include items that start before the viewport end
-        int startIndex = includeFrozen ? 0 : Frozen;
-
-        for (; startIndex < Count - 1; startIndex++)
-        {
-            if (IsHidden(startIndex))
-            {
-                continue;
-            }
-
-            var segmentSize = this[startIndex];
-
-            if (currentPosition + segmentSize > start)
-            {
-                startOffset = start - currentPosition;
-                break;
-            }
-
-            currentPosition += segmentSize;
-        }
-
-        // Find end index - include items that end after the viewport start
-        int endIndex;
-        for (endIndex = startIndex; endIndex < Count - 1; endIndex++)
-        {
-            if (IsHidden(endIndex))
-            {
-                continue;
-            }
-
-            var segmentSize = this[endIndex];
-            currentPosition += segmentSize;
-
-            if (currentPosition >= end)
-            {
-                break;
-            }
-        }
-
-        return new IndexRange(startIndex, endIndex, startOffset);
-    }
-
     /// <summary>
     /// Gets the total size of the axis, including all visible items, default values for hidden items, and the offset.
     /// </summary>
@@ -330,44 +267,4 @@ public class Axis(double size, int count)
             return total + size * (Count - data.Count - hidden.Count);
         }
     }
-
-    /// <summary>
-    /// Gets the pixel range for the specified start and end indices.
-    /// </summary>
-    /// <param name="startIndex"></param>
-    /// <param name="endIndex"></param>
-    public PixelRange GetPixelRange(int startIndex, int endIndex)
-    {
-        double start;
-        double end;
-        var currentPosition = 0d;
-
-        for (var index = 0; index < startIndex; index++)
-        {
-            if (!IsHidden(index))
-            {
-                var segmentSize = this[index];
-                currentPosition += segmentSize;
-            }
-        }
-        start = currentPosition;
-
-        for (var index = startIndex; index <= endIndex; index++)
-        {
-            if (!IsHidden(index))
-            {
-                var segmentSize = this[index];
-                currentPosition += segmentSize;
-            }
-        }
-
-        end = currentPosition;
-
-        return new PixelRange(start, end);
-    }
-
-    /// <summary>
-    /// Gets the pixel range for a single index, which is equivalent to calling GetPixelRange with the same start and end index.
-    /// </summary>
-    public PixelRange GetPixelRange(int startIndex) => GetPixelRange(startIndex, startIndex);
 }

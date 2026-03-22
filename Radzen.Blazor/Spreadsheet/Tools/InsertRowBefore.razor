@@ -8,6 +8,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsDisabled => Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid;
 
     private void OnInsertRowBeforeClick()
@@ -17,6 +20,6 @@
             return;
         }
 
-        Worksheet.Commands.Execute(new InsertRowBeforeCommand(Worksheet, Worksheet.Selection.Range.Start.Row));
+        Spreadsheet?.Execute(new InsertRowBeforeCommand(Worksheet, Worksheet.Selection.Range.Start.Row));
     }
 }

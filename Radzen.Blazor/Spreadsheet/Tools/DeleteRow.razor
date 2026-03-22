@@ -7,6 +7,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsDisabled => Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid;
 
     private void OnDeleteRowClick()
@@ -19,6 +22,6 @@
         var range = Worksheet.Selection.Range;
         var start = range.Start.Row;
         var end = range.End.Row;
-        Worksheet.Commands.Execute(new DeleteRowsCommand(Worksheet, start, end));
+        Spreadsheet?.Execute(new DeleteRowsCommand(Worksheet, start, end));
     }
 }
