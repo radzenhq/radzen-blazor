@@ -131,7 +131,7 @@
             @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
             {
                 <CellMenu Worksheet=@Worksheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync
-                         SortAscending=@OnCellMenuSortAscendingAsync SortDescending=@OnCellMenuSortDescendingAsync Clear=@OnCellMenuClearAsync
+                         SortAscending=@(() => OnCellMenuSortAsync(SortOrder.Ascending)) SortDescending=@(() => OnCellMenuSortAsync(SortOrder.Descending)) Clear=@OnCellMenuClearAsync
                          CustomFilter=@OnCellMenuCustomFilterAsync />
             }
         </Popup>
