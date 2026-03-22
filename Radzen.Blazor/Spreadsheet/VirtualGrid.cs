@@ -228,7 +228,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
         Render(ScrollLeft, ScrollTop);
     }
 
-    private List<VirtualItem>? items;
+    private readonly List<VirtualItem> items = [];
 
     /// <summary>
     /// Gets or sets the template used to render each virtual item in the grid.
@@ -322,7 +322,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
         var columnRange = Columns.GetIndexRange(scrollX, scrollX + region.Width);
         var rowRange = Rows.GetIndexRange(scrollY, scrollY + region.Height);
 
-        items = [];
+        items.Clear();
 
         if (Rows.Offset > 0)
         {

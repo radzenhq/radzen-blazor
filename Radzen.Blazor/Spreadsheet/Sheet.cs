@@ -253,6 +253,25 @@ public partial class Sheet
     }
 
     /// <summary>
+    /// Notifies populated cells in the given range that they should re-validate and/or refresh.
+    /// </summary>
+    internal void RefreshCells(RangeRef range, bool validate = false)
+    {
+        foreach (var cellRef in range.GetCells())
+        {
+            if (Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
+            {
+                if (validate)
+                {
+                    cell.Validate();
+                }
+
+                cell.OnChanged();
+            }
+        }
+    }
+
+    /// <summary>
     /// Begins an update operation on the sheet, preventing immediate evaluation of formulas and changes.
     /// </summary>
     public void BeginUpdate()
@@ -361,6 +380,12 @@ public partial class Sheet
         // Shift cells left using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftColumnsLeft(columnIndex);
 
+        // Shift column metadata (custom widths, hidden state)
+        Columns.ShiftUp(columnIndex);
+
+        // Shift merged cell ranges
+        MergedCells.ShiftColumnsLeft(columnIndex);
+
         // Mark deleted column index as invalid for references
         invalidReferenceColumns.Add(columnIndex);
 
@@ -388,6 +413,12 @@ public partial class Sheet
 
         // Shift cells up using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftRowsUp(rowIndex);
+
+        // Shift row metadata (custom heights, hidden state)
+        Rows.ShiftUp(rowIndex);
+
+        // Shift merged cell ranges
+        MergedCells.ShiftRowsUp(rowIndex);
 
         // Mark deleted row index as invalid for references
         invalidReferenceRows.Add(rowIndex);
@@ -609,6 +640,12 @@ public partial class Sheet
         // Shift cells down using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftRowsDown(rowIndex, count);
 
+        // Shift row metadata (custom heights, hidden state)
+        Rows.ShiftDown(rowIndex, count);
+
+        // Shift merged cell ranges
+        MergedCells.ShiftRowsDown(rowIndex, count);
+
         // Adjust formulas: shift row indices at or after the insert point
         AdjustFormulas((cellToken) =>
         {
@@ -646,6 +683,12 @@ public partial class Sheet
 
         // Shift cells right using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftColumnsRight(columnIndex, count);
+
+        // Shift column metadata (custom widths, hidden state)
+        Columns.ShiftDown(columnIndex, count);
+
+        // Shift merged cell ranges
+        MergedCells.ShiftColumnsRight(columnIndex, count);
 
         // Adjust formulas: shift column indices at or after the insert point
         AdjustFormulas((cellToken) =>
