@@ -68,10 +68,11 @@ jobs:
         run: |
           eval "$(ssh-agent -s)"
           echo "${{ secrets.DOKKU_SSH_PRIVATE_KEY }}" | ssh-add -
-          # DOKKU_REPO format: dokku@host:app-name
           REMOTE="${{ secrets.DOKKU_REPO }}"
-          HOST=$(echo "$REMOTE" | cut -d@ -f2 | cut -d: -f1)
-          APP_NAME=$(echo "$REMOTE" | cut -d: -f2)
+          # Extract app name (last path segment) and host, handling both
+          # ssh://dokku@host:port/app and dokku@host:app formats
+          APP_NAME=$(echo "$REMOTE" | sed 's|.*/||')
+          HOST=$(echo "$REMOTE" | sed 's|.*@||;s|[:/].*||')
           ssh -o StrictHostKeyChecking=no "dokku@${HOST}" config:set --no-restart "$APP_NAME" "GoogleMaps__ApiKey=${{ secrets.GOOGLE_MAPS_API_KEY }}"
 
       - name: Push to dokku

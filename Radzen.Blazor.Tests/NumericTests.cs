@@ -1,5 +1,6 @@
 using System;
 using Bunit;
+using Microsoft.AspNetCore.Components.Web;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -285,6 +286,52 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
+        }
+
+        [Fact]
+        public void Numeric_Raises_ChangeEvent_OnBackspace_When_Immediate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<double?>>(parameters =>
+                parameters.Add(p => p.Immediate, true).Add(p => p.Value, 5));
+
+            var raised = false;
+            object newValue = 1;
+
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("");
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
+
+            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "Backspace", Code = "Backspace" });
+
+            Assert.True(raised);
+            Assert.Null(newValue);
+        }
+
+        [Fact]
+        public void Numeric_Raises_ChangeEvent_OnDelete_When_Immediate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<double?>>(parameters =>
+                parameters.Add(p => p.Immediate, true).Add(p => p.Value, 5));
+
+            var raised = false;
+            object newValue = 1;
+
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("");
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
+
+            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "Delete", Code = "Delete" });
+
+            Assert.True(raised);
+            Assert.Null(newValue);
         }
 
         [Fact]
