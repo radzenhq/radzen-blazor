@@ -20,6 +20,12 @@ public partial class CellEditor : ComponentBase, IDisposable
     public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
+    [Parameter]
+    public Editor Editor { get; set; } = default!;
+
+    /// <summary>
     /// Gets or sets the virtual grid context.
     /// </summary>
     [Parameter]
@@ -39,16 +45,16 @@ public partial class CellEditor : ComponentBase, IDisposable
     {
         if (Worksheet != null)
         {
-            Worksheet.Editor.Changed -= OnEditModeChanged;
-            Worksheet.Editor.ValueChanged -= OnEditorValueChanged;
+            Editor.Changed -= OnEditModeChanged;
+            Editor.ValueChanged -= OnEditorValueChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
         if (Worksheet != null)
         {
-            Worksheet.Editor.Changed += OnEditModeChanged;
-            Worksheet.Editor.ValueChanged += OnEditorValueChanged;
+            Editor.Changed += OnEditModeChanged;
+            Editor.ValueChanged += OnEditorValueChanged;
 
             Render();
         }
@@ -56,7 +62,7 @@ public partial class CellEditor : ComponentBase, IDisposable
 
     private async Task OnBlurAsync()
     {
-        if (Worksheet.Editor.Mode == EditMode.Cell)
+        if (Editor.Mode == EditMode.Cell)
         {
             await Spreadsheet.AcceptAsync();
         }
@@ -67,13 +73,13 @@ public partial class CellEditor : ComponentBase, IDisposable
         if (Worksheet.Selection.Cell != CellRef.Invalid)
         {
             var cell = Worksheet.Cells[Worksheet.Selection.Cell];
-            Worksheet.Editor.StartEdit(cell.Address, Worksheet.Editor.Mode != EditMode.None ? Worksheet.Editor.Value : cell.GetValue(), EditMode.Cell);
+            Editor.StartEdit(cell.Address, Editor.Mode != EditMode.None ? Editor.Value : cell.GetValue(), EditMode.Cell);
         }
     }
 
     private void OnEditorValueChanged()
     {
-        if (Worksheet.Editor.Mode == EditMode.Formula)
+        if (Editor.Mode == EditMode.Formula)
         {
             StateHasChanged();
         }
@@ -123,7 +129,7 @@ public partial class CellEditor : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        Worksheet.Editor.Changed -= OnEditModeChanged;
-        Worksheet.Editor.ValueChanged -= OnEditorValueChanged;
+        Editor.Changed -= OnEditModeChanged;
+        Editor.ValueChanged -= OnEditorValueChanged;
     }
 }

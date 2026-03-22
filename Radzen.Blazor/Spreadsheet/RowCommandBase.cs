@@ -1,23 +1,23 @@
 using System;
 
-using Radzen.Blazor.Spreadsheet;
-namespace Radzen.Documents.Spreadsheet;
+using Radzen.Documents.Spreadsheet;
+namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
 
 /// <summary>
-/// Base class for column commands providing snapshot/restore and undo/redo support.
+/// Base class for row commands providing snapshot/restore and undo/redo support.
 /// </summary>
-public abstract class ColumnCommandBase : ICommand
+public abstract class RowCommandBase : ICommand
 {
     /// <summary>
     /// The sheet being operated on.
     /// </summary>
     protected readonly Worksheet sheet;
     /// <summary>
-    /// The column index being operated on.
+    /// The row index being operated on.
     /// </summary>
-    protected readonly int columnIndex;
+    protected readonly int rowIndex;
 
     private readonly object?[,] backupValues;
     private readonly string?[,] backupFormulas;
@@ -26,19 +26,19 @@ public abstract class ColumnCommandBase : ICommand
     private readonly int originalColumnCount;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ColumnCommandBase"/> class.
+    /// Initializes a new instance of the <see cref="RowCommandBase"/> class.
     /// </summary>
     /// <param name="sheet">The sheet being operated on.</param>
-    /// <param name="columnIndex">The column index being operated on.</param>
-    protected ColumnCommandBase(Worksheet sheet, int columnIndex)
+    /// <param name="rowIndex">The row index being operated on.</param>
+    protected RowCommandBase(Worksheet sheet, int rowIndex)
     {
         this.sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
-        if (columnIndex < 0 || columnIndex >= sheet.ColumnCount)
+        if (rowIndex < 0 || rowIndex >= sheet.RowCount)
         {
-            throw new ArgumentOutOfRangeException(nameof(columnIndex));
+            throw new ArgumentOutOfRangeException(nameof(rowIndex));
         }
 
-        this.columnIndex = columnIndex;
+        this.rowIndex = rowIndex;
 
         originalRowCount = sheet.RowCount;
         originalColumnCount = sheet.ColumnCount;
@@ -74,17 +74,7 @@ public abstract class ColumnCommandBase : ICommand
     /// </summary>
     public void Unexecute()
     {
-        // Restore column count
-        while (sheet.ColumnCount > originalColumnCount)
-        {
-            sheet.DeleteColumn(sheet.ColumnCount - 1);
-        }
-        while (sheet.ColumnCount < originalColumnCount)
-        {
-            sheet.InsertColumn(sheet.ColumnCount, 1);
-        }
-
-        // Guard rows as well
+        // Restore row count
         while (sheet.RowCount > originalRowCount)
         {
             sheet.DeleteRow(sheet.RowCount - 1);
@@ -92,6 +82,16 @@ public abstract class ColumnCommandBase : ICommand
         while (sheet.RowCount < originalRowCount)
         {
             sheet.InsertRow(sheet.RowCount, 1);
+        }
+
+        // Columns should not change for row commands, but guard for consistency
+        while (sheet.ColumnCount > originalColumnCount)
+        {
+            sheet.DeleteColumn(sheet.ColumnCount - 1);
+        }
+        while (sheet.ColumnCount < originalColumnCount)
+        {
+            sheet.InsertColumn(sheet.ColumnCount, 1);
         }
 
         // Restore cell contents
@@ -115,5 +115,3 @@ public abstract class ColumnCommandBase : ICommand
     /// </summary>
     protected abstract void DoExecute();
 }
-
-
