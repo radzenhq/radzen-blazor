@@ -247,19 +247,17 @@ public partial class Worksheet
     /// </summary>
     internal void RefreshCells(RangeRef range, bool validate = false)
     {
-        foreach (var cell in Cells.GetPopulatedCells())
+        foreach (var cellRef in range.GetCells())
         {
-            if (!range.Contains(cell.Address))
+            if (Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
             {
-                continue;
-            }
+                if (validate)
+                {
+                    cell.Validate();
+                }
 
-            if (validate)
-            {
-                cell.Validate();
+                cell.OnChanged();
             }
-
-            cell.OnChanged();
         }
     }
 
