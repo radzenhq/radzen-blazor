@@ -848,14 +848,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     Pointer = args.Pointer
                 };
 
-                onCellPointerMoveAsync = pointer => OnCellPointerMoveAsync(capture, pointer);
+                activeCapture = capture;
             }
         }
 
         return result;
     }
 
-    private Func<PointerEventArgs, Task>? onCellPointerMoveAsync;
+    private object? activeCapture;
 
     /// <summary>
     /// Invoked by JS interop when the pointer moves over a cell.
@@ -864,9 +864,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public async Task OnCellPointerMoveAsync(PointerEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
-        if (onCellPointerMoveAsync is not null)
+        if (activeCapture is PointerCapture capture)
         {
-            await onCellPointerMoveAsync(args);
+            await OnCellPointerMoveAsync(capture, args);
         }
     }
 
@@ -947,14 +947,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     Pointer = args.Pointer
                 };
 
-                onRowPointerMoveAsync = pointer => OnRowPointerMoveAsync(capture, pointer);
+                activeCapture = capture;
             }
         }
 
         return result;
     }
-
-    private Func<PointerEventArgs, Task>? onRowPointerMoveAsync;
 
     /// <summary>
     /// Invoked by JS interop when the pointer moves over a row header.
@@ -963,9 +961,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public async Task OnRowPointerMoveAsync(PointerEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
-        if (onRowPointerMoveAsync is not null)
+        if (activeCapture is PointerCapture capture)
         {
-            await onRowPointerMoveAsync(args);
+            await OnRowPointerMoveAsync(capture, args);
         }
     }
 
@@ -1011,14 +1009,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     Pointer = args.Pointer
                 };
 
-                onColumnPointerMoveAsync = pointer => OnColumnPointerMoveAsync(capture, pointer);
+                activeCapture = capture;
             }
         }
 
         return result;
     }
-
-    private Func<PointerEventArgs, Task>? onColumnPointerMoveAsync;
 
     /// <summary>
     /// Invoked by JS interop when the pointer moves over a column header.
@@ -1027,9 +1023,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public async Task OnColumnPointerMoveAsync(PointerEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
-        if (onColumnPointerMoveAsync is not null)
+        if (activeCapture is PointerCapture capture)
         {
-            await onColumnPointerMoveAsync(args);
+            await OnColumnPointerMoveAsync(capture, args);
         }
     }
 
@@ -1135,11 +1131,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private Func<PointerEventArgs, Task>? onColumnResizePointerMoveAsync;
-    private Func<PointerEventArgs, Task>? onRowResizePointerMoveAsync;
-    private Func<PointerEventArgs, Task>? onImageResizePointerMoveAsync;
-    private ImageResizeCapture? imageResizeCapture;
-
     /// <summary>
     /// Invoked by JS interop when the column resize handle is pressed.
     /// </summary>
@@ -1162,7 +1153,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     StartWidth = Worksheet?.Columns[args.Column] ?? 100
                 };
 
-                onColumnResizePointerMoveAsync = pointer => OnColumnResizePointerMoveAsync(capture, pointer);
+                activeCapture = capture;
             }
         }
 
@@ -1191,7 +1182,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     StartHeight = Worksheet?.Rows[args.Row] ?? 20
                 };
 
-                onRowResizePointerMoveAsync = pointer => OnRowResizePointerMoveAsync(capture, pointer);
+                activeCapture = capture;
             }
         }
 
@@ -1202,26 +1193,28 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// Invoked by JS interop when the pointer moves while resizing a column.
     /// </summary>
     [JSInvokable]
-    public async Task OnColumnResizePointerMoveAsync(PointerEventArgs args)
+    public Task OnColumnResizePointerMoveAsync(PointerEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
-        if (onColumnResizePointerMoveAsync is not null)
+        if (activeCapture is ColumnResizeCapture capture)
         {
-            await onColumnResizePointerMoveAsync(args);
+            return OnColumnResizePointerMoveAsync(capture, args);
         }
+        return Task.CompletedTask;
     }
 
     /// <summary>
     /// Invoked by JS interop when the pointer moves while resizing a row.
     /// </summary>
     [JSInvokable]
-    public async Task OnRowResizePointerMoveAsync(PointerEventArgs args)
+    public Task OnRowResizePointerMoveAsync(PointerEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
-        if (onRowResizePointerMoveAsync is not null)
+        if (activeCapture is RowResizeCapture capture)
         {
-            await onRowResizePointerMoveAsync(args);
+            return OnRowResizePointerMoveAsync(capture, args);
         }
+        return Task.CompletedTask;
     }
 
     private Task OnColumnResizePointerMoveAsync(ColumnResizeCapture capture, PointerEventArgs pointer)
@@ -1256,7 +1249,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnColumnResizePointerUpAsync(PointerEventArgs args)
     {
-        onColumnResizePointerMoveAsync = null;
+        activeCapture = null;
         return Task.CompletedTask;
     }
 
@@ -1266,7 +1259,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnRowResizePointerUpAsync(PointerEventArgs args)
     {
-        onRowResizePointerMoveAsync = null;
+        activeCapture = null;
         return Task.CompletedTask;
     }
 
@@ -1319,8 +1312,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 OriginalHeight = image.Height
             };
 
-            imageResizeCapture = capture;
-            onImageResizePointerMoveAsync = pointer => OnImageResizePointerMoveAsync(capture, pointer);
+            activeCapture = capture;
         }
 
         return result;
@@ -1330,13 +1322,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// Invoked by JS interop when the pointer moves while resizing an image.
     /// </summary>
     [JSInvokable]
-    public async Task OnImageResizePointerMoveAsync(PointerEventArgs args)
+    public Task OnImageResizePointerMoveAsync(PointerEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
-        if (onImageResizePointerMoveAsync is not null)
+        if (activeCapture is ImageResizeCapture capture)
         {
-            await onImageResizePointerMoveAsync(args);
+            return OnImageResizePointerMoveAsync(capture, args);
         }
+        return Task.CompletedTask;
     }
 
     private const double EmuPerPixel = 9525.0;
@@ -1398,9 +1391,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnImageResizePointerUpAsync(PointerEventArgs args)
     {
-        if (imageResizeCapture is not null && Worksheet is not null)
+        if (activeCapture is ImageResizeCapture capture && Worksheet is not null)
         {
-            var capture = imageResizeCapture;
             var finalWidth = capture.Image.Width;
             var finalHeight = capture.Image.Height;
 
@@ -1410,8 +1402,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             Execute(new ResizeImageCommand(capture.Image, finalWidth, finalHeight));
 
-            imageResizeCapture = null;
-            onImageResizePointerMoveAsync = null;
+            activeCapture = null;
         }
 
         return Task.CompletedTask;
@@ -1419,6 +1410,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
+        activeCapture = null;
+
         if (jsRef is not null)
         {
             try
