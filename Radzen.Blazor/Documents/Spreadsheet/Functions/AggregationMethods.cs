@@ -74,13 +74,14 @@ static class AggregationMethods
         {
             return CellData.FromNumber(0);
         }
-        items.Sort();
-        var n = items.Count;
+        var sorted = new List<double>(items);
+        sorted.Sort();
+        var n = sorted.Count;
         if (n % 2 == 1)
         {
-            return CellData.FromNumber(items[n / 2]);
+            return CellData.FromNumber(sorted[n / 2]);
         }
-        return CellData.FromNumber((items[n / 2 - 1] + items[n / 2]) / 2.0);
+        return CellData.FromNumber((sorted[n / 2 - 1] + sorted[n / 2]) / 2.0);
     }
 
     public static CellData Large(List<double> items, int k)
@@ -89,8 +90,9 @@ static class AggregationMethods
         {
             return CellData.FromError(CellError.Num);
         }
-        items.Sort((a, b) => b.CompareTo(a));
-        return CellData.FromNumber(items[k - 1]);
+        var sorted = new List<double>(items);
+        sorted.Sort((a, b) => b.CompareTo(a));
+        return CellData.FromNumber(sorted[k - 1]);
     }
 
     public static CellData Small(List<double> items, int k)
@@ -99,8 +101,9 @@ static class AggregationMethods
         {
             return CellData.FromError(CellError.Num);
         }
-        items.Sort();
-        return CellData.FromNumber(items[k - 1]);
+        var sorted = new List<double>(items);
+        sorted.Sort();
+        return CellData.FromNumber(sorted[k - 1]);
     }
 }
 
