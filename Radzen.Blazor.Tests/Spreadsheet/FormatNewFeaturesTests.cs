@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using Xunit;
 
+using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class FormatNewFeaturesTests

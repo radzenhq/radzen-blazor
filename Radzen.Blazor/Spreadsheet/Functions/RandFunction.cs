@@ -2,7 +2,7 @@
 
 using System.Security.Cryptography;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 class RandFunction : FormulaFunction
 {

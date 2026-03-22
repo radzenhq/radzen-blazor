@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 #nullable enable
 
 internal interface IFormulaSyntaxNodeVisitor

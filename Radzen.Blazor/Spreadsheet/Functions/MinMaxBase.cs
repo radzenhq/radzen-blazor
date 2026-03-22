@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 abstract class MinMaxBase : FormulaFunction
 {

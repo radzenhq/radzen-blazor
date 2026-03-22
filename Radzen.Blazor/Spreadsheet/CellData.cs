@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 /// <summary>

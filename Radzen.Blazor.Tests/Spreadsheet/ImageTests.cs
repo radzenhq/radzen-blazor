@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Linq;
 using Xunit;
 
+using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class ImageTests

@@ -2,7 +2,7 @@
 
 using System.Text;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 class ReptFunction : FormulaFunction
 {
