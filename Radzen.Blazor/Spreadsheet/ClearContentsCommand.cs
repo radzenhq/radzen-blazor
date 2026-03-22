@@ -2,7 +2,8 @@
 
 using System.Collections.Generic;
 
-namespace Radzen.Blazor.Spreadsheet;
+using Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 class ClearContentsCommand(Sheet sheet, RangeRef range) : ICommand
 {

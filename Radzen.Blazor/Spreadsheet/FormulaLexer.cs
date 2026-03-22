@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 

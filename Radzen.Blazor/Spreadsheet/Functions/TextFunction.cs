@@ -4,7 +4,7 @@ using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 class TextFunction : FormulaFunction
 {

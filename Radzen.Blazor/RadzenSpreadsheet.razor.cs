@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Spreadsheet;
+using Radzen.Documents.Spreadsheet;
 using Radzen.Blazor.Rendering;
 using Radzen;
 using System.Linq;
@@ -103,10 +104,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         // Check if this cell has list validation
         if (Sheet != null)
         {
-            var validators = Sheet.Validation.GetValidatorsForCell(new Spreadsheet.CellRef(args.Row, args.Column));
+            var validators = Sheet.Validation.GetValidatorsForCell(new CellRef(args.Row, args.Column));
             foreach (var v in validators)
             {
-                if (v is Spreadsheet.DataValidationRule rule && rule.Type == Spreadsheet.DataValidationType.List)
+                if (v is DataValidationRule rule && rule.Type == DataValidationType.List)
                 {
                     validationListRow = args.Row;
                     validationListColumn = args.Column;
@@ -132,7 +133,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (Sheet != null && validationListRow >= 0 && validationListColumn >= 0)
         {
-            var address = new Spreadsheet.CellRef(validationListRow, validationListColumn);
+            var address = new CellRef(validationListRow, validationListColumn);
             Sheet.Editor.StartEdit(address, value);
             await AcceptAsync();
         }
@@ -354,13 +355,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                     switch (errorStyle)
                     {
-                        case Spreadsheet.DataValidationErrorStyle.Information:
+                        case DataValidationErrorStyle.Information:
                             await DialogService.Alert(error, "Information");
                             // Accept the value despite validation failure
                             Sheet.Editor.Cell.ClearValidationErrors();
                             break;
 
-                        case Spreadsheet.DataValidationErrorStyle.Warning:
+                        case DataValidationErrorStyle.Warning:
                             var confirmed = await DialogService.Confirm(
                                 error + Environment.NewLine + Environment.NewLine + "Do you want to continue?",
                                 "Warning");
@@ -467,7 +468,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (Sheet?.SelectedImage != null)
         {
-            var command = new Spreadsheet.DeleteImageCommand(Sheet, Sheet.SelectedImage);
+            var command = new DeleteImageCommand(Sheet, Sheet.SelectedImage);
             Sheet.Commands.Execute(command);
             return Task.CompletedTask;
         }
@@ -1386,7 +1387,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             capture.Image.Width = capture.OriginalWidth;
             capture.Image.Height = capture.OriginalHeight;
 
-            Sheet.Commands.Execute(new Spreadsheet.ResizeImageCommand(capture.Image, finalWidth, finalHeight));
+            Sheet.Commands.Execute(new ResizeImageCommand(capture.Image, finalWidth, finalHeight));
 
             imageResizeCapture = null;
             onImageResizePointerMoveAsync = null;

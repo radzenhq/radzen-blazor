@@ -1,4 +1,4 @@
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 using System;
 using System.Collections.Generic;

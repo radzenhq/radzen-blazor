@@ -1,5 +1,6 @@
 using Xunit;
 using Radzen.Blazor.Spreadsheet;
+using Radzen.Documents.Spreadsheet;
 
 namespace Radzen.Blazor.Spreadsheet.Tests;
 

@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 /// <summary>

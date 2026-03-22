@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 

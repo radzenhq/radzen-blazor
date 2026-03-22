@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 
+using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
 /// <summary>

@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 static class AggregationMethods
 {

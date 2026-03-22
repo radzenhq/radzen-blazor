@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 class IntFunction : FormulaFunction
 {
