@@ -137,38 +137,12 @@ public partial class CellMenu : ComponentBase
         }
     }
 
-    private class InListCriterionVisitor(int column) : IFilterCriterionVisitor
+    private class InListCriterionVisitor(int column) : FilterCriterionVisitorBase
     {
         private readonly int targetColumn = column;
         public HashSet<object?> FoundValues { get; } = [];
 
-        public void Visit(OrCriterion criterion)
-        {
-            foreach (var c in criterion.Criteria)
-            {
-                c.Accept(this);
-            }
-        }
-
-        public void Visit(AndCriterion criterion)
-        {
-            foreach (var c in criterion.Criteria)
-            {
-                c.Accept(this);
-            }
-        }
-
-        public void Visit(EqualToCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(GreaterThanCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(InListCriterion criterion)
+        public override void Visit(InListCriterion criterion)
         {
             if (criterion.Column == targetColumn)
             {
@@ -177,61 +151,6 @@ public partial class CellMenu : ComponentBase
                     FoundValues.Add(value);
                 }
             }
-        }
-
-        public void Visit(IsNullCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(LessThanCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(GreaterThanOrEqualCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(LessThanOrEqualCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(NotEqualToCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(StartsWithCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(DoesNotStartWithCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(EndsWithCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(DoesNotEndWithCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(ContainsCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
-        }
-
-        public void Visit(DoesNotContainCriterion criterion)
-        {
-            // Not relevant for InListCriterion extraction
         }
     }
 
