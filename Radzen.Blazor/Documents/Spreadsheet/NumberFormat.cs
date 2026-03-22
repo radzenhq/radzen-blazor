@@ -17,50 +17,15 @@ public static class NumberFormat
     /// Applies a format code to a value and returns the formatted string.
     /// Returns null when the format is General/null (caller should fall back to default rendering).
     /// </summary>
-    public static string? Apply(string? formatCode, object? value, CellDataType type)
-    {
-        if (value == null || string.IsNullOrEmpty(formatCode) ||
-            string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
-        {
-            return null;
-        }
-
-        // Text format: @ returns value as-is
-        if (formatCode == "@")
-        {
-            return value.ToString();
-        }
-
-        // For string values with non-@ format, pass through raw
-        if (type == CellDataType.String && value is string s)
-        {
-            return s;
-        }
-
-        var parsed = ParseFormatCode(formatCode);
-
-        // Get numeric value
-        if (!TryGetNumber(value, type, out var number))
-        {
-            return value.ToString();
-        }
-
-        // Select section based on sign
-        var section = SelectSection(parsed, number);
-
-        if (section.IsDate)
-        {
-            return FormatDate(section, value, type, number);
-        }
-
-        return FormatNumber(section, number);
-    }
+    public static string? Apply(string? formatCode, object? value, CellDataType type, Dictionary<string, object>? cache = null)
+        => ApplyWithColor(formatCode, value, type, cache).Text;
 
     /// <summary>
     /// Applies a format code to a value and returns the formatted string and optional color.
     /// The color is determined by color codes in the format string (e.g., [Red], [Green]).
+    /// When <paramref name="cache"/> is provided, parsed format codes are cached for reuse across multiple calls.
     /// </summary>
-    public static (string? Text, string? Color) ApplyWithColor(string? formatCode, object? value, CellDataType type)
+    public static (string? Text, string? Color) ApplyWithColor(string? formatCode, object? value, CellDataType type, Dictionary<string, object>? cache = null)
     {
         if (value == null || string.IsNullOrEmpty(formatCode) ||
             string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
@@ -78,7 +43,7 @@ public static class NumberFormat
             return (s, null);
         }
 
-        var parsed = ParseFormatCode(formatCode);
+        var parsed = GetOrParseFormatCode(formatCode, cache);
 
         if (!TryGetNumber(value, type, out var number))
         {
@@ -601,6 +566,23 @@ public static class NumberFormat
     }
 
     #region Parsing
+
+    private static ParsedFormat GetOrParseFormatCode(string formatCode, Dictionary<string, object>? cache)
+    {
+        if (cache != null)
+        {
+            if (cache.TryGetValue(formatCode, out var cached))
+            {
+                return (ParsedFormat)cached;
+            }
+
+            var result = ParseFormatCode(formatCode);
+            cache[formatCode] = result;
+            return result;
+        }
+
+        return ParseFormatCode(formatCode);
+    }
 
     private static ParsedFormat ParseFormatCode(string formatCode)
     {
