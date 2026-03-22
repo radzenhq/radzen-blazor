@@ -6,28 +6,28 @@
         <RadzenDropDown @bind-Value=@ValidationType Data=@ValidationTypes TextProperty="Name" ValueProperty="Value" Style="width: 100%" Change=@OnTypeChanged />
     </RadzenFormField>
 
-    @if (ValidationType != "list" && ValidationType != "custom")
+    @if (ValidationType != DataValidationType.List && ValidationType != DataValidationType.Custom)
     {
         <RadzenFormField Text="Operator">
             <RadzenDropDown @bind-Value=@Operator Data=@Operators TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
         </RadzenFormField>
     }
 
-    @if (ValidationType == "custom")
+    @if (ValidationType == DataValidationType.Custom)
     {
         <RadzenFormField Text="Formula">
             <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
         </RadzenFormField>
     }
-    else if (ValidationType == "list")
+    else if (ValidationType == DataValidationType.List)
     {
         <RadzenFormField Text="Values (comma separated)">
             <RadzenTextArea @bind-Value=@Formula1 Rows="3" Style="width: 100%" />
         </RadzenFormField>
     }
-    else if (Operator == "between" || Operator == "notBetween")
+    else if (Operator == DataValidationOperator.Between || Operator == DataValidationOperator.NotBetween)
     {
-        @if (ValidationType == "date")
+        @if (ValidationType == DataValidationType.Date)
         {
             <RadzenFormField Text="Minimum">
                 <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
@@ -36,7 +36,7 @@
                 <RadzenDatePicker @bind-Value=@Formula2Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
             </RadzenFormField>
         }
-        else if (ValidationType == "time")
+        else if (ValidationType == DataValidationType.Time)
         {
             <RadzenFormField Text="Minimum">
                 <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
@@ -57,13 +57,13 @@
     }
     else
     {
-        @if (ValidationType == "date")
+        @if (ValidationType == DataValidationType.Date)
         {
             <RadzenFormField Text="Value">
                 <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
             </RadzenFormField>
         }
-        else if (ValidationType == "time")
+        else if (ValidationType == DataValidationType.Time)
         {
             <RadzenFormField Text="Value">
                 <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
@@ -120,12 +120,12 @@
     [Inject]
     public DialogService DialogService { get; set; } = default!;
 
-    private string ValidationType { get; set; } = "wholeNumber";
-    private string Operator { get; set; } = "between";
+    private DataValidationType ValidationType { get; set; } = DataValidationType.WholeNumber;
+    private DataValidationOperator Operator { get; set; } = DataValidationOperator.Between;
     private string Formula1 { get; set; } = "";
     private string Formula2 { get; set; } = "";
     private bool AllowBlank { get; set; } = true;
-    private string ErrorStyle { get; set; } = "stop";
+    private DataValidationErrorStyle ErrorStyle { get; set; } = DataValidationErrorStyle.Stop;
     private string ErrorTitle { get; set; } = "";
     private string ErrorMessage { get; set; } = "The value you entered is not valid.";
     private bool ShowInputMessage { get; set; }
@@ -134,84 +134,52 @@
     private DateTime? Formula1Date { get; set; }
     private DateTime? Formula2Date { get; set; }
 
-    private static readonly List<OptionItem> ValidationTypes =
+    private static readonly List<DropDownItem<DataValidationType>> ValidationTypes =
     [
-        new("Whole Number", "wholeNumber"),
-        new("Decimal", "decimal"),
-        new("List", "list"),
-        new("Date", "date"),
-        new("Time", "time"),
-        new("Text Length", "textLength"),
-        new("Custom", "custom")
+        new("Whole Number", DataValidationType.WholeNumber),
+        new("Decimal", DataValidationType.Decimal),
+        new("List", DataValidationType.List),
+        new("Date", DataValidationType.Date),
+        new("Time", DataValidationType.Time),
+        new("Text Length", DataValidationType.TextLength),
+        new("Custom", DataValidationType.Custom)
     ];
 
-    private static readonly List<OptionItem> AllOperators =
+    private static readonly List<DropDownItem<DataValidationOperator>> AllOperators =
     [
-        new("Between", "between"),
-        new("Not Between", "notBetween"),
-        new("Equal To", "equal"),
-        new("Not Equal To", "notEqual"),
-        new("Greater Than", "greaterThan"),
-        new("Less Than", "lessThan"),
-        new("Greater Than or Equal", "greaterThanOrEqual"),
-        new("Less Than or Equal", "lessThanOrEqual")
+        new("Between", DataValidationOperator.Between),
+        new("Not Between", DataValidationOperator.NotBetween),
+        new("Equal To", DataValidationOperator.Equal),
+        new("Not Equal To", DataValidationOperator.NotEqual),
+        new("Greater Than", DataValidationOperator.GreaterThan),
+        new("Less Than", DataValidationOperator.LessThan),
+        new("Greater Than or Equal", DataValidationOperator.GreaterThanOrEqual),
+        new("Less Than or Equal", DataValidationOperator.LessThanOrEqual)
     ];
 
-    private static readonly List<OptionItem> ErrorStyles =
+    private static readonly List<DropDownItem<DataValidationErrorStyle>> ErrorStyles =
     [
-        new("Stop", "stop"),
-        new("Warning", "warning"),
-        new("Information", "information")
+        new("Stop", DataValidationErrorStyle.Stop),
+        new("Warning", DataValidationErrorStyle.Warning),
+        new("Information", DataValidationErrorStyle.Information)
     ];
 
-    private List<OptionItem> Operators => AllOperators;
+    private List<DropDownItem<DataValidationOperator>> Operators => AllOperators;
 
     private void OnTypeChanged()
     {
-        if (ValidationType == "list")
+        if (ValidationType == DataValidationType.List)
         {
-            Operator = "equal";
+            Operator = DataValidationOperator.Equal;
         }
     }
 
     private void OnOk()
     {
-        var type = ValidationType switch
-        {
-            "wholeNumber" => DataValidationType.WholeNumber,
-            "decimal" => DataValidationType.Decimal,
-            "list" => DataValidationType.List,
-            "date" => DataValidationType.Date,
-            "time" => DataValidationType.Time,
-            "textLength" => DataValidationType.TextLength,
-            "custom" => DataValidationType.Custom,
-            _ => DataValidationType.WholeNumber
-        };
-
-        var op = Operator switch
-        {
-            "between" => DataValidationOperator.Between,
-            "notBetween" => DataValidationOperator.NotBetween,
-            "equal" => DataValidationOperator.Equal,
-            "notEqual" => DataValidationOperator.NotEqual,
-            "greaterThan" => DataValidationOperator.GreaterThan,
-            "lessThan" => DataValidationOperator.LessThan,
-            "greaterThanOrEqual" => DataValidationOperator.GreaterThanOrEqual,
-            "lessThanOrEqual" => DataValidationOperator.LessThanOrEqual,
-            _ => DataValidationOperator.Between
-        };
-
-        var errorStyle = ErrorStyle switch
-        {
-            "warning" => DataValidationErrorStyle.Warning,
-            "information" => DataValidationErrorStyle.Information,
-            _ => DataValidationErrorStyle.Stop
-        };
-
         var formula1 = Formula1;
         var formula2 = Formula2;
 
-        if (ValidationType == "date")
+        if (ValidationType == DataValidationType.Date)
         {
             if (Formula1Date.HasValue)
             {
@@ -222,7 +190,7 @@
                 formula2 = Formula2Date.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
-        else if (ValidationType == "time")
+        else if (ValidationType == DataValidationType.Time)
         {
             if (Formula1Date.HasValue)
             {
@@ -236,12 +204,12 @@
 
         var rule = new DataValidationRule
         {
-            Type = type,
-            Operator = op,
+            Type = ValidationType,
+            Operator = Operator,
             Formula1 = formula1,
             Formula2 = formula2,
             AllowBlank = AllowBlank,
-            ErrorStyle = errorStyle,
+            ErrorStyle = ErrorStyle,
             ErrorTitle = string.IsNullOrEmpty(ErrorTitle) ? null : ErrorTitle,
             Error = string.IsNullOrEmpty(ErrorMessage) ? "The value you entered is not valid." : ErrorMessage,
             ShowErrorMessage = true,
@@ -258,9 +226,9 @@
         DialogService.Close(null);
     }
 
-    private sealed class OptionItem(string name, string value)
+    private sealed class DropDownItem<T>(string name, T value)
     {
         public string Name { get; } = name;
-        public string Value { get; } = value;
+        public T Value { get; } = value;
     }
 }
