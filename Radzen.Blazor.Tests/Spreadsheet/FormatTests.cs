@@ -60,4 +60,25 @@ public class FormatTests
         format.NumberFormat = "0%";
         Assert.False(fired);
     }
+
+    [Fact]
+    public void IsDefault_ReturnsTrue_ForNewFormat()
+    {
+        var format = new Format();
+        Assert.True(format.IsDefault);
+    }
+
+    [Fact]
+    public void IsDefault_ReturnsFalse_WhenBoldSet()
+    {
+        var format = new Format { Bold = true };
+        Assert.False(format.IsDefault);
+    }
+
+    [Fact]
+    public void IsDefault_ReturnsFalse_WhenColorSet()
+    {
+        var format = new Format { Color = "#FF0000" };
+        Assert.False(format.IsDefault);
+    }
 }
