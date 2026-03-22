@@ -78,7 +78,8 @@ class XLookupFunction : FormulaFunction
         // Wildcard matching only applies when match_mode == 2 and lookup_value is string
         bool useWildcard = matchMode == 2 && lookupValue.Type == CellDataType.String;
 
-        int index = -1;
+        int index;
+        CellData? error;
 
         // Binary search only for match_mode in {0,-1,1} and when requested
         bool canBinary = !useWildcard && (matchMode == 0 || matchMode == -1 || matchMode == 1) && (searchMode == 2 || searchMode == -2);
@@ -87,11 +88,16 @@ class XLookupFunction : FormulaFunction
         {
             // Binary search assumes sorted lookupArray according to searchMode (ascending for 2, descending for -2)
             bool ascending = searchMode == 2;
-            index = BinarySearch(lookupArray, lookupRows, lookupCols, lookupValue, matchMode, ascending);
+            (index, error) = BinarySearch(lookupArray, lookupRows, lookupCols, lookupValue, matchMode, ascending);
         }
         else
         {
-            index = LinearSearch(lookupArray, lookupRows, lookupCols, lookupValue, matchMode, searchMode, useWildcard);
+            (index, error) = LinearSearch(lookupArray, lookupRows, lookupCols, lookupValue, matchMode, searchMode, useWildcard);
+        }
+
+        if (error is not null)
+        {
+            return error;
         }
 
         if (index == -1)
@@ -107,7 +113,7 @@ class XLookupFunction : FormulaFunction
         return resultCell;
     }
 
-    private static int LinearSearch(System.Collections.Generic.List<CellData> lookupArray, int rows, int columns, CellData lookupValue, int matchMode, int searchMode, bool useWildcard)
+    private static (int index, CellData? error) LinearSearch(System.Collections.Generic.List<CellData> lookupArray, int rows, int columns, CellData lookupValue, int matchMode, int searchMode, bool useWildcard)
     {
         int start, end, step;
         if (searchMode == -1)
@@ -125,7 +131,7 @@ class XLookupFunction : FormulaFunction
             var cell = lookupArray[i];
             if (cell.IsError)
             {
-                return -1; // propagate error by signaling not found; caller will handle if_not_found or NA; VLOOKUP propagated error, but here we can't return CellData from here
+                return (-1, cell);
             }
 
             bool equal;
@@ -143,14 +149,14 @@ class XLookupFunction : FormulaFunction
             {
                 if (equal)
                 {
-                    return i;
+                    return (i, null);
                 }
             }
             else if (matchMode == -1)
             {
                 if (equal)
                 {
-                    return i;
+                    return (i, null);
                 }
                 if (cell.IsLessThan(lookupValue) || cell.IsEqualTo(lookupValue))
                 {
@@ -162,20 +168,20 @@ class XLookupFunction : FormulaFunction
             {
                 if (equal)
                 {
-                    return i;
+                    return (i, null);
                 }
                 // For next larger, when traversing forward, pick first > value (if reverse, still first in traversal order)
                 if (cell.IsGreaterThan(lookupValue))
                 {
-                    return i;
+                    return (i, null);
                 }
             }
         }
 
-        return bestIndex;
+        return (bestIndex, null);
     }
 
-    private static int BinarySearch(System.Collections.Generic.List<CellData> lookupArray, int rows, int columns, CellData lookupValue, int matchMode, bool ascending)
+    private static (int index, CellData? error) BinarySearch(System.Collections.Generic.List<CellData> lookupArray, int rows, int columns, CellData lookupValue, int matchMode, bool ascending)
     {
         int lo = 0, hi = rows * columns - 1;
         int found = -1;
@@ -186,7 +192,7 @@ class XLookupFunction : FormulaFunction
             var cell = lookupArray[mid];
             if (cell.IsError)
             {
-                return -1;
+                return (-1, cell);
             }
 
             int cmp;
@@ -223,7 +229,7 @@ class XLookupFunction : FormulaFunction
 
         if (found != -1)
         {
-            return found;
+            return (found, null);
         }
 
         // No exact match; handle approximate
@@ -231,15 +237,15 @@ class XLookupFunction : FormulaFunction
         {
             // next smaller item: in ascending, hi will be index of last <; in descending, lo is last < due to reversed order
             int candidate = ascending ? hi : lo;
-            return (candidate >= 0 && candidate < rows * columns) ? candidate : -1;
+            return ((candidate >= 0 && candidate < rows * columns) ? candidate : -1, null);
         }
         if (matchMode == 1)
         {
             // next larger item: in ascending, lo is first >; in descending, hi is first > due to reversed
             int candidate = ascending ? lo : hi;
-            return (candidate >= 0 && candidate < rows * columns) ? candidate : -1;
+            return ((candidate >= 0 && candidate < rows * columns) ? candidate : -1, null);
         }
 
-        return -1;
+        return (-1, null);
     }
 }
