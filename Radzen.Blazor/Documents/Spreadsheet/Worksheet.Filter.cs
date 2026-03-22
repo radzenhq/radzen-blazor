@@ -143,6 +143,106 @@ public interface IFilterCriterionVisitor
 }
 
 /// <summary>
+/// Base implementation of <see cref="IFilterCriterionVisitor"/> with no-op defaults.
+/// Composite criteria (Or, And) recurse into their children by default.
+/// Override only the methods you need.
+/// </summary>
+public abstract class FilterCriterionVisitorBase : IFilterCriterionVisitor
+{
+    /// <inheritdoc/>
+    public virtual void Visit(OrCriterion criterion)
+    {
+        ArgumentNullException.ThrowIfNull(criterion);
+
+        foreach (var c in criterion.Criteria)
+        {
+            c.Accept(this);
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(AndCriterion criterion)
+    {
+        ArgumentNullException.ThrowIfNull(criterion);
+
+        foreach (var c in criterion.Criteria)
+        {
+            c.Accept(this);
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(EqualToCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(GreaterThanCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(InListCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(IsNullCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(LessThanCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(GreaterThanOrEqualCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(LessThanOrEqualCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(NotEqualToCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(StartsWithCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(DoesNotStartWithCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(EndsWithCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(DoesNotEndWithCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(ContainsCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(DoesNotContainCriterion criterion)
+    {
+    }
+}
+
+/// <summary>
 /// Represents a filter criterion that combines multiple criteria using a logical OR operation.
 /// </summary>
 public class OrCriterion : FilterCriterion
