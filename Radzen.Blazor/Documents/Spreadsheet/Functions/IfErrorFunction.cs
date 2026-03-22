@@ -18,14 +18,14 @@ class IfErrorFunction : FormulaFunction
     {
         var value = arguments.GetSingle("value");
 
-        if (value == null)
+        if (value is null)
         {
             return CellData.FromError(CellError.Value);
         }
 
         var valueIfError = arguments.GetSingle("value_if_error");
 
-        if (valueIfError == null)
+        if (valueIfError is null)
         {
             return CellData.FromError(CellError.Value);
         }

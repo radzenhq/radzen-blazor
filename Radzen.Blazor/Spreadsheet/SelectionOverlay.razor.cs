@@ -25,14 +25,14 @@ public partial class SelectionOverlay : IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed += OnSelectionChanged;
         }
@@ -46,7 +46,7 @@ public partial class SelectionOverlay : IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }

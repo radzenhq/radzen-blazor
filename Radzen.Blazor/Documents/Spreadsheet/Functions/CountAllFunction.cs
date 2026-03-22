@@ -15,7 +15,7 @@ class CountAllFunction : FormulaFunction
     {
         var values = arguments.GetSequence("value");
 
-        if (values == null || values.Count == 0)
+        if (values is null || values.Count == 0)
         {
             return CellData.FromNumber(0d);
         }

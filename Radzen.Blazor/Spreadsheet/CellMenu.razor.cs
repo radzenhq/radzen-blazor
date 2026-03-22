@@ -273,7 +273,7 @@ public partial class CellMenu : ComponentBase
             var value = cell.Value;
             var text = cell.GetValue();
             
-            if (value == null || string.IsNullOrEmpty(text))
+            if (value is null || string.IsNullOrEmpty(text))
             {
                 return true;
             }
@@ -366,7 +366,7 @@ public partial class CellMenu : ComponentBase
 
     private List<(string Text, object? Value)> LoadAvailableValues()
     {
-        if (cachedAvailableValues != null)
+        if (cachedAvailableValues is not null)
         {
             return cachedAvailableValues;
         }
@@ -441,7 +441,7 @@ public partial class CellMenu : ComponentBase
             }
         }
 
-        if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(Row, Column))
+        if (Worksheet.AutoFilter is not null && Worksheet.AutoFilter.Range.Contains(Row, Column))
         {
             return Worksheet.AutoFilter.Range;
         }

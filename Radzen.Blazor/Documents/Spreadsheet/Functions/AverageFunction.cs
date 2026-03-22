@@ -16,7 +16,7 @@ class AverageFunction : FormulaFunction
     {
         var values = arguments.GetSequence("number");
 
-        if (values == null || values.Count == 0)
+        if (values is null || values.Count == 0)
         {
             return CellData.FromError(CellError.Div0);
         }

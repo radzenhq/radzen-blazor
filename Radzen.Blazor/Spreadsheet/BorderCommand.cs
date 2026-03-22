@@ -70,22 +70,22 @@ public class BorderCommand(Worksheet sheet, RangeRef range, BorderStyle? top, Bo
 
         var newFormat = current.Clone();
 
-        if (cellRef.Row == range.Start.Row && top != null)
+        if (cellRef.Row == range.Start.Row && top is not null)
         {
             newFormat.BorderTop = top.Clone();
         }
 
-        if (cellRef.Row == range.End.Row && bottom != null)
+        if (cellRef.Row == range.End.Row && bottom is not null)
         {
             newFormat.BorderBottom = bottom.Clone();
         }
 
-        if (cellRef.Column == range.Start.Column && left != null)
+        if (cellRef.Column == range.Start.Column && left is not null)
         {
             newFormat.BorderLeft = left.Clone();
         }
 
-        if (cellRef.Column == range.End.Column && right != null)
+        if (cellRef.Column == range.End.Column && right is not null)
         {
             newFormat.BorderRight = right.Clone();
         }

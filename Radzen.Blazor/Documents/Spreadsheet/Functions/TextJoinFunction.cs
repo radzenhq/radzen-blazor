@@ -21,7 +21,7 @@ class TextJoinFunction : FormulaFunction
         var ignoreArg = arguments.GetSingle("ignore_empty");
         var texts = arguments.GetSequence("text");
 
-        if (delimiterArg == null || ignoreArg == null || texts == null)
+        if (delimiterArg is null || ignoreArg is null || texts is null)
         {
             return CellData.FromError(CellError.Value);
         }

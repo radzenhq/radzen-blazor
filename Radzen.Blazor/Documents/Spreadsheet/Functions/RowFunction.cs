@@ -17,7 +17,7 @@ class RowFunction : FormulaFunction
     {
         var reference = arguments.GetRange("reference");
 
-        if (reference == null)
+        if (reference is null)
         {
             // No reference provided: use current cell
             return CellData.FromNumber(arguments.CurrentCell.Address.Row + 1);

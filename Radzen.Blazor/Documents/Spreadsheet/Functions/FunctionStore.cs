@@ -141,13 +141,13 @@ public class FunctionStore
         {
             var fn = (FunctionSyntaxNode)node;
 
-            if (fn.IsInside(position) && (best == null || fn.Token.Start > best.Token.Start))
+            if (fn.IsInside(position) && (best is null || fn.Token.Start > best.Token.Start))
             {
                 best = fn;
             }
         }
 
-        if (best == null)
+        if (best is null)
         {
             return null;
         }

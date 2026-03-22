@@ -102,7 +102,7 @@ class XlsxWriter(Workbook workbook)
                 new XAttribute("id", imageRelIndex.ToString(CultureInfo.InvariantCulture)),
                 new XAttribute("name", image.Name ?? $"Image {imageRelIndex - 1}"));
 
-            if (image.Description != null)
+            if (image.Description is not null)
             {
                 cNvPr.Add(new XAttribute("descr", image.Description));
             }
@@ -119,7 +119,7 @@ class XlsxWriter(Workbook workbook)
                     new XElement(a + "prstGeom", new XAttribute("prst", "rect"),
                         new XElement(a + "avLst"))));
 
-            if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To != null)
+            if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To is not null)
             {
                 var toElement = new XElement(xdr + "to",
                     new XElement(xdr + "col", image.To.Column.ToString(CultureInfo.InvariantCulture)),
@@ -493,7 +493,7 @@ class XlsxWriter(Workbook workbook)
 
         foreach (var cell in sheet.Cells.GetPopulatedCells())
         {
-            if (cell.Hyperlink != null)
+            if (cell.Hyperlink is not null)
             {
                 hyperlinksElement ??= new XElement(XName.Get("hyperlinks", ns));
 
@@ -504,7 +504,7 @@ class XlsxWriter(Workbook workbook)
                     new XAttribute("ref", cellRef),
                     new XAttribute(rNs + "id", relId));
 
-                if (cell.Hyperlink.DisplayText != null)
+                if (cell.Hyperlink.DisplayText is not null)
                 {
                     hyperlinkElement.Add(new XAttribute("display", cell.Hyperlink.DisplayText));
                 }
@@ -514,7 +514,7 @@ class XlsxWriter(Workbook workbook)
             }
         }
 
-        if (hyperlinksElement != null)
+        if (hyperlinksElement is not null)
         {
             sheetDoc.Root!.Add(hyperlinksElement);
         }
@@ -611,7 +611,7 @@ class XlsxWriter(Workbook workbook)
     private void ProcessSheetData(Worksheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
         var cellsByRow = sheet.Cells.GetPopulatedCells()
-            .Where(c => c.GetValue() != null)
+            .Where(c => c.GetValue() is not null)
             .GroupBy(c => c.Address.Row)
             .ToDictionary(g => g.Key, g => g.OrderBy(c => c.Address.Column).ToList());
 
@@ -724,7 +724,7 @@ class XlsxWriter(Workbook workbook)
 
     private int GetOrCreateFillStyle(Cell cell, StyleTracker styleTracker)
     {
-        if (cell.Format.BackgroundColor == null)
+        if (cell.Format.BackgroundColor is null)
         {
             return 0;
         }
@@ -746,7 +746,7 @@ class XlsxWriter(Workbook workbook)
         var bb = cell.Format.BorderBottom;
         var bl = cell.Format.BorderLeft;
 
-        if (bt == null && br == null && bb == null && bl == null)
+        if (bt is null && br is null && bb is null && bl is null)
         {
             return 0;
         }
@@ -788,7 +788,7 @@ class XlsxWriter(Workbook workbook)
     {
         var sideElement = new XElement(XName.Get(side, ns));
 
-        if (style != null && style.LineStyle != BorderLineStyle.None)
+        if (style is not null && style.LineStyle != BorderLineStyle.None)
         {
             sideElement.Add(new XAttribute("style", style.ToXlsxStyle()));
             sideElement.Add(new XElement(XName.Get("color", ns),
@@ -832,7 +832,7 @@ class XlsxWriter(Workbook workbook)
         styleTracker.NumberFormats[formatCode] = newId;
 
         // Create numFmt element
-        if (styleTracker.NumFmtsElement == null)
+        if (styleTracker.NumFmtsElement is null)
         {
             styleTracker.NumFmtsElement = new XElement(XName.Get("numFmts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 new XAttribute("count", "0"));
@@ -859,7 +859,7 @@ class XlsxWriter(Workbook workbook)
             new XElement(XName.Get("name", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 new XAttribute("val", fontName)));
 
-        if (cell.Format.Color != null)
+        if (cell.Format.Color is not null)
         {
             fontElement.Add(new XElement(XName.Get("color", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 new XAttribute("rgb", cell.Format.Color.ToXLSXColor())));
@@ -967,7 +967,7 @@ class XlsxWriter(Workbook workbook)
 
     private static string FormatValueInvariant(object? value)
     {
-        if (value == null)
+        if (value is null)
         {
             return string.Empty;
         }
@@ -1054,7 +1054,7 @@ class XlsxWriter(Workbook workbook)
 
     private static void AddAutoFilter(Worksheet sheet, XDocument sheetDoc)
     {
-        if (sheet.AutoFilter != null)
+        if (sheet.AutoFilter is not null)
         {
             var uid = Guid.NewGuid().ToString("B").ToUpperInvariant();
             var autoFilter = new XElement(XName.Get("autoFilter", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
@@ -1065,7 +1065,7 @@ class XlsxWriter(Workbook workbook)
             foreach (var filter in sheet.Filters)
             {
                 var filterColumn = CreateFilterColumn(filter, sheet.AutoFilter.Range);
-                if (filterColumn != null)
+                if (filterColumn is not null)
                 {
                     autoFilter.Add(filterColumn);
                 }
@@ -1159,7 +1159,7 @@ class XlsxWriter(Workbook workbook)
                         _ => (string?)null // "stop" is the default, omit it
                     };
 
-                    if (errorStyleStr != null)
+                    if (errorStyleStr is not null)
                     {
                         element.Add(new XAttribute("errorStyle", errorStyleStr));
                     }
@@ -1189,7 +1189,7 @@ class XlsxWriter(Workbook workbook)
             }
         }
 
-        if (dataValidationsElement != null)
+        if (dataValidationsElement is not null)
         {
             var count = dataValidationsElement.Elements().Count();
             dataValidationsElement.Add(new XAttribute("count", count.ToString(CultureInfo.InvariantCulture)));
@@ -1213,7 +1213,7 @@ class XlsxWriter(Workbook workbook)
         else if (filter.Criterion is OrCriterion orCriterion)
         {
             var firstLeaf = orCriterion.Criteria.OfType<FilterCriterionLeaf>().FirstOrDefault();
-            if (firstLeaf != null)
+            if (firstLeaf is not null)
             {
                 var colId = firstLeaf.Column - autoFilterRange.Start.Column;
                 if (colId >= 0 && colId <= autoFilterRange.End.Column - autoFilterRange.Start.Column)
@@ -1227,7 +1227,7 @@ class XlsxWriter(Workbook workbook)
         else if (filter.Criterion is AndCriterion andCriterion)
         {
             var firstLeaf = andCriterion.Criteria.OfType<FilterCriterionLeaf>().FirstOrDefault();
-            if (firstLeaf != null)
+            if (firstLeaf is not null)
             {
                 var colId = firstLeaf.Column - autoFilterRange.Start.Column;
                 if (colId >= 0 && colId <= autoFilterRange.End.Column - autoFilterRange.Start.Column)

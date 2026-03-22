@@ -97,7 +97,7 @@ public class DataCellStore<T>(DataSheet<T> sheet, int pageSize = 20) : CellStore
                 }
 
                 // If no data was loaded, create an empty cell
-                if (cell == null)
+                if (cell is null)
                 {
                     return base[row, column];
                 }

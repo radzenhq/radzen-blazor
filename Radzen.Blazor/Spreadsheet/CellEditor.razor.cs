@@ -43,7 +43,7 @@ public partial class CellEditor : ComponentBase, IDisposable
     /// <inheritdoc />
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Editor.Changed -= OnEditModeChanged;
             Editor.ValueChanged -= OnEditorValueChanged;
@@ -51,7 +51,7 @@ public partial class CellEditor : ComponentBase, IDisposable
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Editor.Changed += OnEditModeChanged;
             Editor.ValueChanged += OnEditorValueChanged;
@@ -117,7 +117,7 @@ public partial class CellEditor : ComponentBase, IDisposable
         className = ClassList.Create("rz-spreadsheet-cell-editor")
             .Add("rz-spreadsheet-frozen-column", Worksheet.Selection.Cell != CellRef.Invalid && Worksheet.Selection.Cell.Column < Worksheet.Columns.Frozen)
             .Add("rz-spreadsheet-frozen-row", Worksheet.Selection.Cell != CellRef.Invalid && Worksheet.Selection.Cell.Row < Worksheet.Rows.Frozen)
-            .Add($"rz-spreadsheet-cell-editor-{cell.ValueType.ToString().ToLowerInvariant()}", cell != null)
+            .Add($"rz-spreadsheet-cell-editor-{cell.ValueType.ToString().ToLowerInvariant()}", cell is not null)
             .ToString();
     }
 

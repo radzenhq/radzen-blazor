@@ -18,7 +18,7 @@ class DatedifFunction : FormulaFunction
     public override CellData Evaluate(FunctionArguments arguments)
     {
         var startArg = arguments.GetSingle("start_date");
-        if (startArg == null || startArg.IsError)
+        if (startArg is null || startArg.IsError)
         {
             return startArg ?? CellData.FromError(CellError.Value);
         }
@@ -29,7 +29,7 @@ class DatedifFunction : FormulaFunction
         }
 
         var endArg = arguments.GetSingle("end_date");
-        if (endArg == null || endArg.IsError)
+        if (endArg is null || endArg.IsError)
         {
             return endArg ?? CellData.FromError(CellError.Value);
         }

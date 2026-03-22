@@ -49,7 +49,7 @@ abstract class LookupFunctionBase : FormulaFunction
         var indexArg = arguments.GetSingle("index");
         var isSortedArg = arguments.GetSingle("is_sorted");
 
-        if (searchKey == null || rangeArg == null || indexArg == null)
+        if (searchKey is null || rangeArg is null || indexArg is null)
         {
             return CellData.FromError(CellError.Value);
         }
@@ -94,7 +94,7 @@ abstract class LookupFunctionBase : FormulaFunction
         }
 
         var isSorted = false;
-        if (isSortedArg != null && !isSortedArg.IsEmpty)
+        if (isSortedArg is not null && !isSortedArg.IsEmpty)
         {
             var maybeBool = isSortedArg.GetValueOrDefault<bool?>();
             if (maybeBool is null)

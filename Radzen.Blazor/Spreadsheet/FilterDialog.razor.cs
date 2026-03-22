@@ -91,7 +91,7 @@ public partial class FilterDialog : ComponentBase
         selectedOperator = FilterOperator.Equals;
         secondOperator = FilterOperator.None;
 
-        if (Filter != null)
+        if (Filter is not null)
         {
             var visitor = new FilterCriterionVisitor(Column);
             Filter.Accept(visitor);
@@ -104,11 +104,11 @@ public partial class FilterDialog : ComponentBase
         var dataTable = GetCurrentTable();
         var autoFilter = GetCurrentAutoFilter();
         var rangeToUse = RangeRef.Invalid;
-        if (dataTable != null)
+        if (dataTable is not null)
         {
             rangeToUse = dataTable.Range;
         }
-        else if (autoFilter != null)
+        else if (autoFilter is not null)
         {
             rangeToUse = autoFilter.Range;
         }
@@ -171,11 +171,11 @@ public partial class FilterDialog : ComponentBase
 
         RangeRef rangeToUse = RangeRef.Invalid;
 
-        if (dataTable != null)
+        if (dataTable is not null)
         {
             rangeToUse = dataTable.Range;
         }
-        else if (autoFilter != null)
+        else if (autoFilter is not null)
         {
             rangeToUse = autoFilter.Range;
         }
@@ -245,7 +245,7 @@ public partial class FilterDialog : ComponentBase
 
     private AutoFilter? GetCurrentAutoFilter()
     {
-        if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(Row, Column))
+        if (Worksheet.AutoFilter is not null && Worksheet.AutoFilter.Range.Contains(Row, Column))
         {
             return Worksheet.AutoFilter;
         }
