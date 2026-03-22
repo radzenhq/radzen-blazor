@@ -33,7 +33,7 @@ public enum FrozenState
     Both = Row | Column
 }
 
-class VirtualRegion
+internal class VirtualRegion
 {
     public double Width { get; set; }
     public double Height { get; set; }
@@ -174,8 +174,8 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; } = new Dictionary<string, object>();
 
-    ElementReference scrollable;
-    ElementReference content;
+    private ElementReference scrollable;
+    private ElementReference content;
 
     private DotNetObjectReference<VirtualGrid>? reference;
 
