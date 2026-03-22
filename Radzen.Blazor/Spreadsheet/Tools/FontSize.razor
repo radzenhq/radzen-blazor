@@ -11,6 +11,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private static readonly List<double> FontSizes =
     [
         8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 36, 48, 72
@@ -34,7 +37,7 @@
                 {
                     double? fontSize = value == 11 ? null : value;
                     var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithFontSize(fontSize));
-                    Worksheet.Commands.Execute(command);
+                    Spreadsheet?.Execute(command);
                 }
             }
         }

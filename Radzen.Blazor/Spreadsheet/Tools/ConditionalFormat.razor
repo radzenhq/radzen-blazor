@@ -18,6 +18,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private async Task OnClickAsync(RadzenSplitButtonItem? item)
@@ -38,7 +41,7 @@
         if (result is ConditionalFormatBase rule)
         {
             var command = new ConditionalFormatCommand(Worksheet, Worksheet.Selection.Range, rule);
-            Worksheet.Commands.Execute(command);
+            Spreadsheet?.Execute(command);
         }
     }
 }

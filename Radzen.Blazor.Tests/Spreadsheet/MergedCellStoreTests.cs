@@ -413,16 +413,17 @@ public class MergedCellStoreTests
     [Fact]
     public void MergeCellsCommand_UsesIndexCorrectly()
     {
+        var view = new SheetView(sheet);
         sheet.Cells[0, 0].Value = "merged";
         var range = new RangeRef(new CellRef(0, 0), new CellRef(1, 1));
 
         var cmd = new MergeCellsCommand(sheet, range);
-        sheet.Commands.Execute(cmd);
+        view.Commands.Execute(cmd);
 
         Assert.True(sheet.MergedCells.Contains(new CellRef(0, 0)));
         Assert.True(sheet.MergedCells.Contains(new CellRef(1, 1)));
 
-        sheet.Commands.Undo();
+        view.Commands.Undo();
 
         Assert.False(sheet.MergedCells.Contains(new CellRef(0, 0)));
         Assert.False(sheet.MergedCells.Contains(new CellRef(1, 1)));
@@ -431,15 +432,16 @@ public class MergedCellStoreTests
     [Fact]
     public void UnmergeCellsCommand_ClearsIndex()
     {
+        var view = new SheetView(sheet);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(1, 1));
         sheet.MergedCells.Add(range);
 
         var cmd = new UnmergeCellsCommand(sheet, new CellRef(0, 0));
-        sheet.Commands.Execute(cmd);
+        view.Commands.Execute(cmd);
 
         Assert.False(sheet.MergedCells.Contains(new CellRef(0, 0)));
 
-        sheet.Commands.Undo();
+        view.Commands.Undo();
 
         Assert.True(sheet.MergedCells.Contains(new CellRef(0, 0)));
     }

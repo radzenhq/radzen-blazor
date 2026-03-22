@@ -21,8 +21,8 @@
                 <RadzenTabsItem Text="Home">
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <Undo Commands=@Worksheet?.Commands />
-                            <Redo Commands=@Worksheet?.Commands />
+                            <Undo Commands=@ActiveView?.Commands />
+                            <Redo Commands=@ActiveView?.Commands />
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <FontFamily Worksheet=@Worksheet />
@@ -91,7 +91,7 @@
         </RadzenTabs>
 @if (Worksheet != null)
 {
-        <FormulaEditor Worksheet=@Worksheet />
+        <FormulaEditor Worksheet=@Worksheet Editor=@Editor />
         <VirtualGrid @ref=@grid style="flex: 1" View=@ActiveView>
             <Template>
                 @switch (context)
@@ -119,7 +119,7 @@
             <ChildContent>
                 <SelectionOverlay Worksheet=@Worksheet Context=@context />
                 <ImageOverlay Worksheet=@Worksheet Context=@context />
-                <CellEditor Worksheet=@Worksheet Context=@context />
+                <CellEditor Worksheet=@Worksheet Editor=@Editor Context=@context />
                 @foreach (var table in Worksheet.Tables)
                 {
                     <TableFrame Worksheet=@Worksheet Table=@table Context=@context />

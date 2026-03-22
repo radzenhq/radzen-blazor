@@ -32,7 +32,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
     {
         if (Worksheet != null)
         {
-            Worksheet.Commands.Changed -= OnChanged;
+            Worksheet.ImagesChanged -= OnChanged;
             Worksheet.SelectedImageChanged -= OnChanged;
         }
 
@@ -40,7 +40,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
         if (Worksheet != null)
         {
-            Worksheet.Commands.Changed += OnChanged;
+            Worksheet.ImagesChanged += OnChanged;
             Worksheet.SelectedImageChanged += OnChanged;
         }
     }
@@ -54,7 +54,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
     {
         if (Worksheet != null)
         {
-            Worksheet.Commands.Changed -= OnChanged;
+            Worksheet.ImagesChanged -= OnChanged;
             Worksheet.SelectedImageChanged -= OnChanged;
         }
     }

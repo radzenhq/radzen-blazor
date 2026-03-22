@@ -340,21 +340,22 @@ public class DataValidationTests
     public void Command_IntegrationWithUndoRedo()
     {
         var sheet = new Worksheet(10, 10);
+        var view = new SheetView(sheet);
         sheet.Cells[0, 0].Value = 3;
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule { Type = DataValidationType.WholeNumber, Operator = DataValidationOperator.GreaterThan, Formula1 = "5" };
 
         var command = new DataValidationCommand(sheet, range, rule);
-        sheet.Commands.Execute(command);
+        view.Commands.Execute(command);
 
         Assert.True(sheet.Cells[0, 0].HasValidationErrors);
-        Assert.True(sheet.Commands.CanUndo);
+        Assert.True(view.Commands.CanUndo);
 
-        sheet.Commands.Undo();
+        view.Commands.Undo();
         sheet.Cells[0, 0].Validate();
         Assert.False(sheet.Cells[0, 0].HasValidationErrors);
 
-        sheet.Commands.Redo();
+        view.Commands.Redo();
         Assert.True(sheet.Cells[0, 0].HasValidationErrors);
     }
 

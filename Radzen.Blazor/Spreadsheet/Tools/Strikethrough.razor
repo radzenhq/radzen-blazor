@@ -10,6 +10,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsStrikethrough
     {
         get
@@ -28,7 +31,7 @@
                 {
                     var newFormat = cell.Format.WithStrikethrough(value);
                     var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, newFormat);
-                    Worksheet.Commands.Execute(command);
+                    Spreadsheet?.Execute(command);
                 }
             }
         }

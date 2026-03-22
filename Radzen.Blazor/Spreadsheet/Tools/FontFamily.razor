@@ -11,6 +11,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private static readonly List<string> FontFamilies =
     [
         "Arial",
@@ -44,7 +47,7 @@
                 {
                     var fontFamily = value == "Aptos Narrow" ? null : value;
                     var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithFontFamily(fontFamily));
-                    Worksheet.Commands.Execute(command);
+                    Spreadsheet?.Execute(command);
                 }
             }
         }

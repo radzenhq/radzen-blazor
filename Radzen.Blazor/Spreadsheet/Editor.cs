@@ -26,9 +26,12 @@ public enum EditMode
 /// <summary>
 /// Represents a command to accept edits made in the spreadsheet editor.
 /// </summary>
-/// <param name="sheet"></param>
-public class AcceptEditCommand(Worksheet sheet) : ICommand
+/// <param name="view"></param>
+public class AcceptEditCommand(SheetView view) : ICommand
 {
+    private readonly Worksheet sheet = view.Worksheet;
+    private readonly Editor editor = view.Editor;
+
     private RangeRef range = RangeRef.Invalid;
     private CellRef cell = CellRef.Invalid;
 
@@ -48,12 +51,12 @@ public class AcceptEditCommand(Worksheet sheet) : ICommand
 
         if (value != null)
         {
-            sheet.Editor.Value = value;
-            sheet.Editor.Address = cell;
+            editor.Value = value;
+            editor.Address = cell;
         }
 
-        value = sheet.Editor.Cell?.GetValue();
-        return sheet.Editor.Accept();
+        value = editor.Cell?.GetValue();
+        return editor.Accept();
     }
 
     /// <inheritdoc/>
