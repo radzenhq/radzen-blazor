@@ -10,6 +10,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private async Task OnClickAsync()
@@ -36,7 +39,7 @@
         if (result is Hyperlink hyperlink)
         {
             var command = new HyperlinkCommand(Worksheet, address, hyperlink);
-            Worksheet.Commands.Execute(command);
+            Spreadsheet?.Execute(command);
         }
     }
 }

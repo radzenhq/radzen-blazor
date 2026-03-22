@@ -10,6 +10,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsAutoFilterEnabled
     {
         get
@@ -38,14 +41,14 @@
                     if (dataTableIndex >= 0)
                     {
                         var command = new TableFilterCommand(Worksheet, dataTableIndex);
-                        Worksheet.Commands.Execute(command);
+                        Spreadsheet?.Execute(command);
                     }
                 }
                 else
                 {
                     // Apply to sheet selection range
                     var command = new SheetAutoFilterCommand(Worksheet, Worksheet.Selection.Range);
-                    Worksheet.Commands.Execute(command);
+                    Spreadsheet?.Execute(command);
                 }
             }
         }
