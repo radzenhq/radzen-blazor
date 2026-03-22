@@ -2,6 +2,7 @@ using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
+using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class FormatCellsDialogTests : TestContext

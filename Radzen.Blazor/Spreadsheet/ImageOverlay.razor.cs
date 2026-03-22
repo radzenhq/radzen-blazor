@@ -5,6 +5,7 @@ using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
 
 #nullable enable
+using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
 /// <summary>

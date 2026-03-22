@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
 /// Command that inserts a single row AFTER the specified row index and supports undo via snapshot.

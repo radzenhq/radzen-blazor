@@ -1,4 +1,4 @@
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
 /// Represents a data table in a spreadsheet, defined by a range.
