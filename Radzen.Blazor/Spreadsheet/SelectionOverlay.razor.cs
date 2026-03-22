@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Components;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Renders an overlay for the selection in a spreadsheet.
 /// </summary>
-public partial class SelectionOverlay
+public partial class SelectionOverlay : IDisposable
 {
     /// <summary>
     /// Gets or sets the sheet that contains the selection overlay.
@@ -41,5 +42,13 @@ public partial class SelectionOverlay
     private void OnSelectionChanged()
     {
         StateHasChanged();
+    }
+
+    void IDisposable.Dispose()
+    {
+        if (Worksheet != null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
     }
 }

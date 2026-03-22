@@ -266,7 +266,6 @@ public partial class CellView : CellBase, IDisposable
 
     private void OnCellChanged(Cell cell)
     {
-        //Console.WriteLine($"Cell {Row}:{Column} changed: {cell.Value}");
         StateHasChanged();
     }
 

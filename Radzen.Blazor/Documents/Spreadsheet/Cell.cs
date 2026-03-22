@@ -70,7 +70,19 @@ public class Cell
         ArgumentNullException.ThrowIfNull(other);
         Data = other.Data;
         Formula = other.Formula;
+
+        if (format != null)
+        {
+            format.Changed -= OnFormatChanged;
+        }
+
         format = other.format;
+
+        if (format != null)
+        {
+            format.Changed += OnFormatChanged;
+        }
+
         Hyperlink = other.Hyperlink?.Clone();
 
         Changed?.Invoke(this);
