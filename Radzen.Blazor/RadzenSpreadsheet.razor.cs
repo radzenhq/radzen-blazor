@@ -511,7 +511,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Worksheet?.SelectedImage != null)
         {
             Execute(new DeleteImageCommand(Worksheet, Worksheet.SelectedImage));
-            return Task.CompletedTask;
+        }
+        else if (Worksheet != null && Worksheet.Selection.Range != RangeRef.Invalid)
+        {
+            Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
         }
 
         return Task.CompletedTask;
@@ -687,13 +690,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         switch (args.Value?.ToString())
         {
             case "cut":
-                _ = CutSelectionAsync();
+                _ = InvokeAsync(CutSelectionAsync);
                 break;
             case "copy":
-                _ = CopySelectionAsync();
+                _ = InvokeAsync(CopySelectionAsync);
                 break;
             case "paste":
-                _ = PasteFromClipboardAsync();
+                _ = InvokeAsync(PasteFromClipboardAsync);
                 break;
             case "clear":
                 Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
@@ -721,13 +724,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         switch (args.Value?.ToString())
         {
             case "cut":
-                _ = CutSelectionAsync();
+                _ = InvokeAsync(CutSelectionAsync);
                 break;
             case "copy":
-                _ = CopySelectionAsync();
+                _ = InvokeAsync(CopySelectionAsync);
                 break;
             case "paste":
-                _ = PasteFromClipboardAsync();
+                _ = InvokeAsync(PasteFromClipboardAsync);
                 break;
             case "insert-row-before":
                 Execute(new InsertRowBeforeCommand(Worksheet, row));
@@ -761,13 +764,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         switch (args.Value?.ToString())
         {
             case "cut":
-                _ = CutSelectionAsync();
+                _ = InvokeAsync(CutSelectionAsync);
                 break;
             case "copy":
-                _ = CopySelectionAsync();
+                _ = InvokeAsync(CopySelectionAsync);
                 break;
             case "paste":
-                _ = PasteFromClipboardAsync();
+                _ = InvokeAsync(PasteFromClipboardAsync);
                 break;
             case "insert-column-before":
                 Execute(new InsertColumnBeforeCommand(Worksheet, column));
