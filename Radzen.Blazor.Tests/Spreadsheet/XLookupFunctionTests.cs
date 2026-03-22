@@ -112,4 +112,19 @@ public class XLookupFunctionTests
 
         Assert.Equal(CellError.NA, sheet.Cells["C1"].Value);
     }
+
+    [Fact]
+    public void ShouldPropagateErrorInLookupArray()
+    {
+        sheet.Cells["A1"].Value = "P1";
+        sheet.Cells["A2"].Formula = "=1/0"; // #DIV/0! error in lookup array
+        sheet.Cells["A3"].Value = "P3";
+        sheet.Cells["B1"].Value = 10;
+        sheet.Cells["B2"].Value = 20;
+        sheet.Cells["B3"].Value = 30;
+
+        sheet.Cells["C1"].Formula = "=XLOOKUP(\"P3\",A1:A3,B1:B3)";
+
+        Assert.Equal(CellError.Div0, sheet.Cells["C1"].Value);
+    }
 }

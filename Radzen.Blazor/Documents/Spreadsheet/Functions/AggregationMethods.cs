@@ -72,7 +72,7 @@ static class AggregationMethods
     {
         if (items.Count == 0)
         {
-            return CellData.FromNumber(0);
+            return CellData.FromError(CellError.Num);
         }
         var sorted = new List<double>(items);
         sorted.Sort();

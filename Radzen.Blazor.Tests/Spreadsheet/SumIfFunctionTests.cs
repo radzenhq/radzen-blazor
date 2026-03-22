@@ -267,7 +267,7 @@ public class SumIfFunctionTests
         sheet.Cells["A1"].Value = 10;
         sheet.Cells["A2"].Value = 20;
         sheet.Cells["A3"].Value = 30;
-        
+
         sheet.Cells["B1"].Value = 100;
         sheet.Cells["B2"].Value = "text"; // Non-numeric
         sheet.Cells["B3"].Value = 300;
@@ -275,5 +275,21 @@ public class SumIfFunctionTests
         sheet.Cells["C1"].Formula = "=SUMIF(A1:A3,\">15\",B1:B3)";
 
         Assert.Equal(300d, sheet.Cells["C1"].Value);
+    }
+
+    [Fact]
+    public void ShouldPropagateErrorFromCriteria()
+    {
+        sheet.Cells["A1"].Value = 10;
+        sheet.Cells["A2"].Value = 20;
+
+        sheet.Cells["B1"].Value = 100;
+        sheet.Cells["B2"].Value = 200;
+
+        // criteria references a cell with an error
+        sheet.Cells["C1"].Formula = "=1/0";
+        sheet.Cells["D1"].Formula = "=SUMIF(A1:A2,C1,B1:B2)";
+
+        Assert.Equal(CellError.Div0, sheet.Cells["D1"].Value);
     }
 }

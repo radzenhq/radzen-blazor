@@ -256,6 +256,28 @@ public class DatedifFunctionTests
 
         Assert.Equal(CellError.Num, sheet.Cells["A3"].Value);
     }
+
+    [Fact]
+    public void ShouldHandleLeapDayInYDWhenStartYearIsNotLeapYear()
+    {
+        // end is Feb 29 (leap year), start year is not a leap year
+        sheet.Cells["A1"].Value = new DateTime(2023, 1, 1);
+        sheet.Cells["A2"].Value = new DateTime(2024, 2, 29);
+        sheet.Cells["A3"].Formula = "=DATEDIF(A1,A2,\"YD\")";
+
+        Assert.Equal(58d, sheet.Cells["A3"].Value);
+    }
+
+    [Fact]
+    public void ShouldHandleLeapDayInYDWhenAdjustedEndBeforeStart()
+    {
+        // end is Feb 29, start is March 15 in a non-leap year — adjusted end < start, so add 1 year
+        sheet.Cells["A1"].Value = new DateTime(2023, 3, 15);
+        sheet.Cells["A2"].Value = new DateTime(2024, 2, 29);
+        sheet.Cells["A3"].Formula = "=DATEDIF(A1,A2,\"YD\")";
+
+        Assert.Equal(351d, sheet.Cells["A3"].Value);
+    }
 }
 
 public class TimeFunctionTests

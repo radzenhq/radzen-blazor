@@ -86,6 +86,11 @@ public readonly struct RangeRef : IEquatable<RangeRef>
         var startCol = Math.Max(Start.Column, other.Start.Column);
         var endCol = Math.Min(End.Column, other.End.Column);
 
+        if (startRow > endRow || startCol > endCol)
+        {
+            return Invalid;
+        }
+
         return new RangeRef(new CellRef(startRow, startCol), new CellRef(endRow, endCol));
     }
 
