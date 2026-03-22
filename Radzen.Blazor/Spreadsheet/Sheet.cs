@@ -83,8 +83,9 @@ public partial class Sheet
     public ConditionalFormatStore ConditionalFormats { get; }
     /// <summary>
     /// Gets the undo/redo stack for the sheet, which allows tracking and reverting changes made to the sheet.
+    /// When a SheetView is created for this sheet, it replaces this with its own per-sheet instance.
     /// </summary>
-    public UndoRedoStack Commands { get; }
+    public UndoRedoStack Commands { get; internal set; }
     /// <summary>
     /// Gets the name of the sheet.
     /// </summary>
