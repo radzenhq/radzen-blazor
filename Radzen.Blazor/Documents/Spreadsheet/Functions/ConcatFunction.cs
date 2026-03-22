@@ -17,7 +17,7 @@ class ConcatFunction : FormulaFunction
     {
         var values = arguments.GetSequence("text");
 
-        if (values == null || values.Count == 0)
+        if (values is null || values.Count == 0)
         {
             return CellData.FromError(CellError.Value);
         }

@@ -67,7 +67,7 @@ public abstract class HeaderBase : CellBase, IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }
@@ -76,7 +76,7 @@ public abstract class HeaderBase : CellBase, IDisposable
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed += OnSelectionChanged;
         }
@@ -122,7 +122,7 @@ public abstract class HeaderBase : CellBase, IDisposable
     /// <inheritdoc/>
     void IDisposable.Dispose()
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }

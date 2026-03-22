@@ -56,7 +56,7 @@ internal class CellDependencyGraph
 
     public void Add(Cell cell)
     {
-        if (cell.Formula == null)
+        if (cell.Formula is null)
         {
             return;
         }
@@ -142,7 +142,7 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
         var address = cellIdentifierSyntaxNode.Token.Address;
         var targetSheet = ResolveSheet(address.Worksheet);
 
-        if (targetSheet == null)
+        if (targetSheet is null)
         {
             return;
         }
@@ -169,7 +169,7 @@ class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
         var endAddress = rangeSyntaxNode.End.Token.Address;
         var targetSheet = ResolveSheet(startAddress.Worksheet);
 
-        if (targetSheet == null)
+        if (targetSheet is null)
         {
             return;
         }

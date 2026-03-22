@@ -21,13 +21,13 @@
 
     private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
     {
-        if (Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
         {
             return;
         }
 
         var file = e.File;
-        if (file == null)
+        if (file is null)
         {
             return;
         }

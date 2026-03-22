@@ -25,7 +25,7 @@ class XLookupFunction : FormulaFunction
         var matchModeArg = arguments.GetSingle("match_mode");
         var searchModeArg = arguments.GetSingle("search_mode");
 
-        if (lookupArray == null || returnArray == null)
+        if (lookupArray is null || returnArray is null)
         {
             return CellData.FromError(CellError.Value);
         }
@@ -96,7 +96,7 @@ class XLookupFunction : FormulaFunction
 
         if (index == -1)
         {
-            if (ifNotFound != null)
+            if (ifNotFound is not null)
             {
                 return ifNotFound;
             }

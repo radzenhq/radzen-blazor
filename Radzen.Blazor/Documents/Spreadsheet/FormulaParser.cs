@@ -436,7 +436,7 @@ internal class FormulaParser
                 // If either side has a sheet, ensure both sides have the same sheet; if only one has sheet, propagate to the other
                 var startAddr = start.Token.Address;
                 var endAddr = endToken.Address;
-                if (startAddr.Worksheet != null && endAddr.Worksheet == null)
+                if (startAddr.Worksheet is not null && endAddr.Worksheet is null)
                 {
                     endToken.Address = new CellRef(endAddr.Row, endAddr.Column)
                     {
@@ -445,7 +445,7 @@ internal class FormulaParser
                         Worksheet = startAddr.Worksheet
                     };
                 }
-                else if (endAddr.Worksheet != null && startAddr.Worksheet == null)
+                else if (endAddr.Worksheet is not null && startAddr.Worksheet is null)
                 {
                     start = new CellSyntaxNode(new FormulaToken(start.Token.Type, start.Token.Value)
                     {

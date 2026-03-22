@@ -31,7 +31,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
             Editor.ValueChanged -= OnEditorValueChanged;
@@ -39,7 +39,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed += OnSelectionChanged;
             Editor.ValueChanged += OnEditorValueChanged;
@@ -84,12 +84,12 @@ public partial class FormulaEditor : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }
 
-        if (Editor != null)
+        if (Editor is not null)
         {
             Editor.ValueChanged -= OnEditorValueChanged;
         }

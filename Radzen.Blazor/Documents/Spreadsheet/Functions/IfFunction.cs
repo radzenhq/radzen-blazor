@@ -17,7 +17,7 @@ class IfFunction : FormulaFunction
     {
         var logicalTest = arguments.GetSingle("logical_test");
 
-        if (logicalTest == null)
+        if (logicalTest is null)
         {
             return CellData.FromError(CellError.Value);
         }
@@ -29,7 +29,7 @@ class IfFunction : FormulaFunction
 
         var trueValue = arguments.GetSingle("value_if_true");
 
-        if (trueValue == null)
+        if (trueValue is null)
         {
             return CellData.FromError(CellError.Value);
         }

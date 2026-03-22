@@ -197,7 +197,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (View != null)
+        if (View is not null)
         {
             View.Worksheet.Rows.Changed -= OnChanged;
             View.Worksheet.Columns.Changed -= OnChanged;
@@ -205,7 +205,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
         await base.SetParametersAsync(parameters);
 
-        if (View != null)
+        if (View is not null)
         {
             View.Worksheet.Rows.Changed += OnChanged;
             View.Worksheet.Columns.Changed += OnChanged;
@@ -547,7 +547,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
             var adjustedRange = AdjustRangeForHiddenRowsAndColumns(range);
             
             // Skip if the entire range is hidden
-            if (adjustedRange == null)
+            if (adjustedRange is null)
             {
                 continue;
             }

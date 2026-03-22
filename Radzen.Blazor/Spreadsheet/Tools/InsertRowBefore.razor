@@ -11,11 +11,11 @@
     [CascadingParameter]
     public ISpreadsheet? Spreadsheet { get; set; }
 
-    private bool IsDisabled => Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid;
 
     private void OnInsertRowBeforeClick()
     {
-        if (Worksheet == null)
+        if (Worksheet is null)
         {
             return;
         }

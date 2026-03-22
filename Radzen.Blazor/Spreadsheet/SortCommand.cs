@@ -80,7 +80,7 @@ public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int k
             var targetCell = sheet.Cells[cellRef];
             targetCell.Value = value;
             targetCell.Formula = formula;
-            if (format != null)
+            if (format is not null)
             {
                 targetCell.Format = format;
             }

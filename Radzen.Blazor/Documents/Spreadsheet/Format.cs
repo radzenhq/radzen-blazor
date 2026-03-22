@@ -256,19 +256,19 @@ public class Format
     /// Gets a value indicating whether all format properties are at their default values.
     /// </summary>
     public bool IsDefault =>
-        Color == null &&
-        BackgroundColor == null &&
+        Color is null &&
+        BackgroundColor is null &&
         !Bold &&
         !Italic &&
         !Underline &&
         !Strikethrough &&
         !WrapText &&
-        FontFamily == null &&
-        FontSize == null &&
-        BorderTop == null &&
-        BorderRight == null &&
-        BorderBottom == null &&
-        BorderLeft == null &&
+        FontFamily is null &&
+        FontSize is null &&
+        BorderTop is null &&
+        BorderRight is null &&
+        BorderBottom is null &&
+        BorderLeft is null &&
         TextAlign == TextAlign.Left &&
         VerticalAlign == VerticalAlign.Top &&
         string.IsNullOrEmpty(NumberFormat);
@@ -285,14 +285,14 @@ public class Format
     public void AppendStyle(StringBuilder sb)
     {
         ArgumentNullException.ThrowIfNull(sb);
-        if (Color != null)
+        if (Color is not null)
         {
             sb.Append("color: ");
             sb.Append(Color);
             sb.Append(';');
         }
 
-        if (BackgroundColor != null)
+        if (BackgroundColor is not null)
         {
             sb.Append("background-color: ");
             sb.Append(BackgroundColor);
@@ -322,14 +322,14 @@ public class Format
             sb.Append("text-decoration: line-through;");
         }
 
-        if (FontFamily != null)
+        if (FontFamily is not null)
         {
             sb.Append("font-family: ");
             sb.Append(FontFamily);
             sb.Append(';');
         }
 
-        if (FontSize != null)
+        if (FontSize is not null)
         {
             sb.Append("font-size: ");
             sb.Append(FontSize.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
@@ -394,12 +394,12 @@ public class Format
         ArgumentNullException.ThrowIfNull(format);
         var merged = Clone();
 
-        if (format.Color != null)
+        if (format.Color is not null)
         {
             merged.Color = format.Color;
         }
 
-        if (format.BackgroundColor != null)
+        if (format.BackgroundColor is not null)
         {
             merged.BackgroundColor = format.BackgroundColor;
         }
@@ -439,37 +439,37 @@ public class Format
             merged.VerticalAlign = format.VerticalAlign;
         }
 
-        if (format.NumberFormat != null)
+        if (format.NumberFormat is not null)
         {
             merged.NumberFormat = format.NumberFormat;
         }
 
-        if (format.FontFamily != null)
+        if (format.FontFamily is not null)
         {
             merged.FontFamily = format.FontFamily;
         }
 
-        if (format.FontSize != null)
+        if (format.FontSize is not null)
         {
             merged.FontSize = format.FontSize;
         }
 
-        if (format.BorderTop != null)
+        if (format.BorderTop is not null)
         {
             merged.BorderTop = format.BorderTop.Clone();
         }
 
-        if (format.BorderRight != null)
+        if (format.BorderRight is not null)
         {
             merged.BorderRight = format.BorderRight.Clone();
         }
 
-        if (format.BorderBottom != null)
+        if (format.BorderBottom is not null)
         {
             merged.BorderBottom = format.BorderBottom.Clone();
         }
 
-        if (format.BorderLeft != null)
+        if (format.BorderLeft is not null)
         {
             merged.BorderLeft = format.BorderLeft.Clone();
         }

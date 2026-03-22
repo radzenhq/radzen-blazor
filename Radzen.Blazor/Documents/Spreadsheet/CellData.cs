@@ -68,7 +68,7 @@ static class TypeExtensions
         return Epoch.AddDays(number);
     }
 
-    public static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
+    public static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) is not null;
 
     public static bool IsNumeric(this Type type)
     {
@@ -104,7 +104,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// </summary>
     public CellData(object? data)
     {
-        if (data == null)
+        if (data is null)
         {
             Value = null;
             Type = CellDataType.Empty;
@@ -138,7 +138,7 @@ public class CellData : IComparable, IComparable<CellData>
 
     internal static bool TryConvertFromString(string? value, out object? converted, out CellDataType? valueType)
     {
-        if (value == null)
+        if (value is null)
         {
             converted = null;
             valueType = CellDataType.Empty;
@@ -255,7 +255,7 @@ public class CellData : IComparable, IComparable<CellData>
 
     private static CellDataType GetValueType(object? value, Type valType, bool isNullable, Type? nullableType)
     {
-        if (value == null)
+        if (value is null)
         {
             return CellDataType.Empty;
         }
@@ -296,12 +296,12 @@ public class CellData : IComparable, IComparable<CellData>
     {
         var val = GetValue(typeof(T));
 
-        return val == null ? default : (T)val;
+        return val is null ? default : (T)val;
     }
 
     private object? GetValue(Type type)
     {
-        if (Value == null && Type == CellDataType.String)
+        if (Value is null && Type == CellDataType.String)
         {
             return string.Empty;
         }
@@ -313,7 +313,7 @@ public class CellData : IComparable, IComparable<CellData>
 
         var conversionType = type;
 
-        if (Nullable.GetUnderlyingType(type) != null)
+        if (Nullable.GetUnderlyingType(type) is not null)
         {
             conversionType = Nullable.GetUnderlyingType(type);
         }
@@ -323,7 +323,7 @@ public class CellData : IComparable, IComparable<CellData>
             return Value?.ToString();
         }
 
-        if (Value is IConvertible && conversionType != null)
+        if (Value is IConvertible && conversionType is not null)
         {
             try
             {
@@ -341,20 +341,20 @@ public class CellData : IComparable, IComparable<CellData>
     /// <inheritdoc />
     public int CompareTo(CellData? other)
     {
-        if (other == null)
+        if (other is null)
         {
             return 1;
         }
 
         switch (Value)
         {
-            case null when other.Value == null:
+            case null when other.Value is null:
                 return 0;
             case null:
                 return -1;
         }
 
-        if (other.Value == null)
+        if (other.Value is null)
         {
             return 1;
         }
@@ -421,7 +421,7 @@ public class CellData : IComparable, IComparable<CellData>
 
         if (Type == CellDataType.Empty || other.Type == CellDataType.Empty)
         {
-            return other.Value == null && Value == null;
+            return other.Value is null && Value is null;
         }
 
         return ((IComparable)Value!).CompareTo(other.Value) == 0;
@@ -434,7 +434,7 @@ public class CellData : IComparable, IComparable<CellData>
     public bool IsLessThan(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
-        if (Value == null || other.Value == null)
+        if (Value is null || other.Value is null)
             return false;
 
         var compareResult = ((IComparable)Value).CompareTo(other.Value);
@@ -448,7 +448,7 @@ public class CellData : IComparable, IComparable<CellData>
     public bool IsGreaterThan(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
-        if (Value == null || other.Value == null)
+        if (Value is null || other.Value is null)
             return false;
 
         var compareResult = ((IComparable)Value).CompareTo(other.Value);
@@ -462,7 +462,7 @@ public class CellData : IComparable, IComparable<CellData>
     public bool IsLessThanOrEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
-        if (Value == null || other.Value == null)
+        if (Value is null || other.Value is null)
             return false;
 
         var compareResult = ((IComparable)Value).CompareTo(other.Value);
@@ -476,7 +476,7 @@ public class CellData : IComparable, IComparable<CellData>
     public bool IsGreaterThanOrEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
-        if (Value == null || other.Value == null)
+        if (Value is null || other.Value is null)
             return false;
 
         var compareResult = ((IComparable)Value).CompareTo(other.Value);
@@ -486,7 +486,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return Value == null ? -1 : Value.GetHashCode();
+        return Value is null ? -1 : Value.GetHashCode();
     }
 
     internal CellData(object value, CellDataType type)

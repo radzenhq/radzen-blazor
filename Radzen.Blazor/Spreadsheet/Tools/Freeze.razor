@@ -50,7 +50,7 @@
 
     private void FreezeFirstColumn()
     {
-        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
             Worksheet.Rows.Frozen = 0;
             Worksheet.Columns.Frozen = 1;
@@ -59,7 +59,7 @@
 
     private void FreezeTopRow()
     {
-        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
             Worksheet.Rows.Frozen = 1;
             Worksheet.Columns.Frozen = 0;
@@ -68,7 +68,7 @@
 
     private void FreezeRows()
     {
-        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
             var frozenRows = Worksheet.Selection.Cell.Row;
             Worksheet.Rows.Frozen = frozenRows;
@@ -77,7 +77,7 @@
 
     private void FreezeColumns()
     {
-        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
             Worksheet.Columns.Frozen = Worksheet.Selection.Cell.Column;
         }
@@ -85,7 +85,7 @@
 
     private void FreezePanes()
     {
-        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
             Worksheet.Rows.Frozen = Worksheet.Selection.Cell.Row;
             Worksheet.Columns.Frozen = Worksheet.Selection.Cell.Column;
@@ -94,7 +94,7 @@
 
     private void Unfreeze()
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.Rows.Frozen = 0;
             Worksheet.Columns.Frozen = 0;
@@ -103,14 +103,14 @@
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed += OnSelectionChanged;
         }
@@ -123,7 +123,7 @@
 
     public void Dispose()
     {
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }

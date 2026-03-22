@@ -16,7 +16,7 @@ abstract class MinMaxBase : FormulaFunction
     {
         var values = arguments.GetSequence("number");
 
-        if (values == null)
+        if (values is null)
         {
             return CellData.FromNumber(0d);
         }

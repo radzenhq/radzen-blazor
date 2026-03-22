@@ -15,7 +15,7 @@ class LenFunction : FormulaFunction
     {
         var textArg = arguments.GetSingle("text");
 
-        if (textArg == null)
+        if (textArg is null)
         {
             return CellData.FromError(CellError.Value);
         }

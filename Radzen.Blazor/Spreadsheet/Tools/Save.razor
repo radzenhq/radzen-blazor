@@ -2,7 +2,7 @@
 @using Microsoft.JSInterop
 @using System.IO
 @inject IJSRuntime JSRuntime
-<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnSaveAsync Icon="download" ButtonType="ButtonType.Button" Disabled=@(Workbook == null) />
+<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnSaveAsync Icon="download" ButtonType="ButtonType.Button" Disabled=@(Workbook is null) />
 @code {
 #nullable enable
 
@@ -14,7 +14,7 @@
 
     private async Task OnSaveAsync()
     {
-        if (Workbook != null)
+        if (Workbook is not null)
         {
             var stream = new MemoryStream();
             Workbook.SaveToStream(stream);

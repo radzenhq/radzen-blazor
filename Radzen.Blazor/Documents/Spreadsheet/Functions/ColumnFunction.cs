@@ -15,7 +15,7 @@ class ColumnFunction : FormulaFunction
     {
         var reference = arguments.GetRange("reference");
 
-        if (reference == null)
+        if (reference is null)
         {
             return CellData.FromNumber(arguments.CurrentCell.Address.Column + 1);
         }

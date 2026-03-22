@@ -41,7 +41,7 @@ public partial class InputPrompt : ComponentBase
         message = null;
         cell = CellRef.Invalid;
 
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             var validators = Worksheet.Validation.GetValidatorsForCell(address);
 
@@ -93,8 +93,8 @@ public partial class InputPrompt : ComponentBase
         style = $"transform: translate({left.ToPx()}, {top.ToPx()});";
 
         className = ClassList.Create("rz-spreadsheet-input-prompt")
-            .Add("rz-spreadsheet-frozen-column", Worksheet != null && cell.Column < Worksheet.Columns.Frozen)
-            .Add("rz-spreadsheet-frozen-row", Worksheet != null && cell.Row < Worksheet.Rows.Frozen)
+            .Add("rz-spreadsheet-frozen-column", Worksheet is not null && cell.Column < Worksheet.Columns.Frozen)
+            .Add("rz-spreadsheet-frozen-row", Worksheet is not null && cell.Row < Worksheet.Rows.Frozen)
             .ToString();
     }
 }

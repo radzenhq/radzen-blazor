@@ -18,7 +18,7 @@ class EdateFunction : FormulaFunction
     {
         var startArg = arguments.GetSingle("start_date");
 
-        if (startArg == null || startArg.IsError)
+        if (startArg is null || startArg.IsError)
         {
             return startArg ?? CellData.FromError(CellError.Value);
         }

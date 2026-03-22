@@ -37,7 +37,7 @@ class ClearContentsCommand(Worksheet sheet, RangeRef range) : ICommand
         {
             if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
             {
-                if (formula != null)
+                if (formula is not null)
                 {
                     cell.Formula = formula;
                 }

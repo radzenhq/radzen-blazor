@@ -25,7 +25,7 @@ abstract class RoundFunctionBase : FormulaFunction
         var numberArg = arguments.GetSingle("number");
         var digitsArg = arguments.GetSingle("num_digits");
 
-        if (numberArg == null)
+        if (numberArg is null)
         {
             return CellData.FromError(CellError.Value);
         }
@@ -35,7 +35,7 @@ abstract class RoundFunctionBase : FormulaFunction
             return numberArg;
         }
 
-        if (digitsArg != null && digitsArg.IsError)
+        if (digitsArg is not null && digitsArg.IsError)
         {
             return digitsArg;
         }
@@ -47,7 +47,7 @@ abstract class RoundFunctionBase : FormulaFunction
 
         double? digits = null;
 
-        if (digitsArg == null)
+        if (digitsArg is null)
         {
             if (TryGetDefaultDigits(out var def))
             {

@@ -44,7 +44,7 @@ static class XlsxReader
         var borderStyles = new Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)>();
 
         var stylesEntry = archive.GetEntry("xl/styles.xml");
-        if (stylesEntry != null)
+        if (stylesEntry is not null)
         {
             using var s = stylesEntry.Open();
             var stylesDoc = XDocument.Load(s);
@@ -67,21 +67,21 @@ static class XlsxReader
         {
             var color = fonts[i].Element(stylesNs + "color")?.Attribute("rgb")?.Value;
             string? colorValue = null;
-            if (color != null)
+            if (color is not null)
             {
                 colorValue = "#" + color[2..]; // Convert from "FFFF0000" to "#FF0000"
             }
-            bool bold = fonts[i].Element(stylesNs + "b") != null;
-            bool italic = fonts[i].Element(stylesNs + "i") != null;
-            bool underline = fonts[i].Element(stylesNs + "u") != null;
-            bool strikethrough = fonts[i].Element(stylesNs + "strike") != null;
+            bool bold = fonts[i].Element(stylesNs + "b") is not null;
+            bool italic = fonts[i].Element(stylesNs + "i") is not null;
+            bool underline = fonts[i].Element(stylesNs + "u") is not null;
+            bool strikethrough = fonts[i].Element(stylesNs + "strike") is not null;
 
             var fontName = fonts[i].Element(stylesNs + "name")?.Attribute("val")?.Value;
-            string? fontFamily = fontName != null && fontName != "Aptos Narrow" ? fontName : null;
+            string? fontFamily = fontName is not null && fontName != "Aptos Narrow" ? fontName : null;
 
             var szValue = fonts[i].Element(stylesNs + "sz")?.Attribute("val")?.Value;
             double? fontSize = null;
-            if (szValue != null && double.TryParse(szValue, System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture, out var sz) && sz != 11)
+            if (szValue is not null && double.TryParse(szValue, System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture, out var sz) && sz != 11)
             {
                 fontSize = sz;
             }
@@ -100,7 +100,7 @@ static class XlsxReader
             var bottom = ParseBorderSide(borders[i].Element(stylesNs + "bottom"), stylesNs);
             var left = ParseBorderSide(borders[i].Element(stylesNs + "left"), stylesNs);
 
-            if (top != null || right != null || bottom != null || left != null)
+            if (top is not null || right is not null || bottom is not null || left is not null)
             {
                 borderStyles[i] = (top, right, bottom, left);
             }
@@ -109,7 +109,7 @@ static class XlsxReader
 
     private static BorderStyle? ParseBorderSide(XElement? element, XNamespace ns)
     {
-        if (element == null)
+        if (element is null)
         {
             return null;
         }
@@ -128,7 +128,7 @@ static class XlsxReader
 
         var colorElement = element.Element(ns + "color");
         var rgbColor = colorElement?.Attribute("rgb")?.Value;
-        var color = rgbColor != null ? "#" + rgbColor[2..] : "#000000";
+        var color = rgbColor is not null ? "#" + rgbColor[2..] : "#000000";
 
         return new BorderStyle { LineStyle = lineStyle, Color = color };
     }
@@ -139,7 +139,7 @@ static class XlsxReader
         for (var i = 0; i < fills.Count; i++)
         {
             var fgColor = fills[i].Element(stylesNs + "patternFill")?.Element(stylesNs + "fgColor")?.Attribute("rgb")?.Value;
-            if (fgColor != null)
+            if (fgColor is not null)
             {
                 fillColors[i] = "#" + fgColor[2..]; // Convert from "FFFF0000" to "#FF0000"
             }
@@ -153,7 +153,7 @@ static class XlsxReader
         {
             var numFmtId = numFmt.Attribute("numFmtId")?.Value;
             var formatCode = numFmt.Attribute("formatCode")?.Value;
-            if (numFmtId != null && formatCode != null)
+            if (numFmtId is not null && formatCode is not null)
             {
                 numberFormats[int.Parse(numFmtId, CultureInfo.InvariantCulture)] = formatCode;
             }
@@ -178,13 +178,13 @@ static class XlsxReader
             var applyBorder = cellXfs[i].Attribute("applyBorder")?.Value;
             var applyAlignment = cellXfs[i].Attribute("applyAlignment")?.Value;
             var numFmtIdAttr = cellXfs[i].Attribute("numFmtId")?.Value;
-            var numFmtId = numFmtIdAttr != null ? int.Parse(numFmtIdAttr, CultureInfo.InvariantCulture) : 0;
+            var numFmtId = numFmtIdAttr is not null ? int.Parse(numFmtIdAttr, CultureInfo.InvariantCulture) : 0;
 
-            if (fontId != null && fillId != null)
+            if (fontId is not null && fillId is not null)
             {
                 var fontIdValue = int.Parse(fontId, CultureInfo.InvariantCulture);
                 var fillIdValue = int.Parse(fillId, CultureInfo.InvariantCulture);
-                var borderIdValue = borderId != null ? int.Parse(borderId, CultureInfo.InvariantCulture) : 0;
+                var borderIdValue = borderId is not null ? int.Parse(borderId, CultureInfo.InvariantCulture) : 0;
 
                 var (textAlign, verticalAlign, wrapText) = ParseAlignment(cellXfs[i], stylesNs, applyAlignment);
 
@@ -209,7 +209,7 @@ static class XlsxReader
         if (applyAlignment == "1")
         {
             var alignment = cellXf.Element(stylesNs + "alignment");
-            if (alignment != null)
+            if (alignment is not null)
             {
                 var horizontal = alignment.Attribute("horizontal")?.Value;
                 textAlign = horizontal switch
@@ -238,7 +238,7 @@ static class XlsxReader
         var sharedStrings = new List<string>();
         var sharedEntry = archive.GetEntry("xl/sharedStrings.xml");
 
-        if (sharedEntry != null)
+        if (sharedEntry is not null)
         {
             using var s = sharedEntry.Open();
             var doc = XDocument.Load(s);
@@ -289,7 +289,7 @@ static class XlsxReader
         var sheet = new Worksheet(100, 100); // adjust size as needed
 
         var sheetEntry = archive.GetEntry(sheetInfo.FullPath);
-        if (sheetEntry == null)
+        if (sheetEntry is null)
         {
             return sheet;
         }
@@ -334,10 +334,10 @@ static class XlsxReader
         // Parse default row height from sheet format properties
         var defaultRowHeight = 20.0; // Default fallback
         var sheetFormatPr = sheetDoc.Descendants(sNs + "sheetFormatPr").FirstOrDefault();
-        if (sheetFormatPr != null)
+        if (sheetFormatPr is not null)
         {
             var defaultHeight = sheetFormatPr.Attribute("defaultRowHeight")?.Value;
-            if (defaultHeight != null && double.TryParse(defaultHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
+            if (defaultHeight is not null && double.TryParse(defaultHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
             {
                 defaultRowHeight = Math.Round(heightPoints * (96.0 / 72.0));
             }
@@ -349,20 +349,20 @@ static class XlsxReader
     private static void ParseFrozenPanes(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var sheetView = sheetDoc.Descendants(sNs + "sheetView").FirstOrDefault();
-        if (sheetView != null)
+        if (sheetView is not null)
         {
             var pane = sheetView.Element(sNs + "pane");
-            if (pane != null)
+            if (pane is not null)
             {
                 var xSplit = pane.Attribute("xSplit")?.Value;
                 var ySplit = pane.Attribute("ySplit")?.Value;
 
-                if (xSplit != null && int.TryParse(xSplit, out var frozenColumns))
+                if (xSplit is not null && int.TryParse(xSplit, out var frozenColumns))
                 {
                     sheet.Columns.Frozen = frozenColumns;
                 }
 
-                if (ySplit != null && int.TryParse(ySplit, out var frozenRows))
+                if (ySplit is not null && int.TryParse(ySplit, out var frozenRows))
                 {
                     sheet.Rows.Frozen = frozenRows;
                 }
@@ -373,7 +373,7 @@ static class XlsxReader
     private static void ParseColumnWidths(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var cols = sheetDoc.Descendants(sNs + "cols").FirstOrDefault();
-        if (cols != null)
+        if (cols is not null)
         {
             foreach (var col in cols.Elements(sNs + "col"))
             {
@@ -381,7 +381,7 @@ static class XlsxReader
                 var max = col.Attribute("max")?.Value;
                 var width = col.Attribute("width")?.Value;
 
-                if (min != null && max != null && width != null &&
+                if (min is not null && max is not null && width is not null &&
                     int.TryParse(min, out var minCol) &&
                     int.TryParse(max, out var maxCol) &&
                     double.TryParse(width, NumberStyles.Float, CultureInfo.InvariantCulture, out var colWidth))
@@ -413,12 +413,12 @@ static class XlsxReader
         var rowHeight = rowElem.Attribute("ht")?.Value;
         var customHeight = rowElem.Attribute("customHeight")?.Value;
 
-        if (rowIndex != null && int.TryParse(rowIndex, out var rowNum))
+        if (rowIndex is not null && int.TryParse(rowIndex, out var rowNum))
         {
             var actualRowIndex = rowNum - 1; // Convert from 1-based to 0-based
             if (actualRowIndex >= 0 && actualRowIndex < sheet.Rows.Count)
             {
-                if (rowHeight != null && double.TryParse(rowHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
+                if (rowHeight is not null && double.TryParse(rowHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
                 {
                     // Excel row height is in points, convert to pixels
                     // 1 point = 1/72 inch, 1 inch = 96 pixels (standard DPI)
@@ -444,7 +444,7 @@ static class XlsxReader
     {
         var cellRef = cellElem.Attribute("r")!;
 
-        if (cellRef == null)
+        if (cellRef is null)
         {
             return;
         }
@@ -454,7 +454,7 @@ static class XlsxReader
         var valueElem = cellElem.Element(sNs + "v");
         var formulaElem = cellElem.Element(sNs + "f");
 
-        if (valueElem == null && formulaElem == null)
+        if (valueElem is null && formulaElem is null)
         {
             return;
         }
@@ -464,7 +464,7 @@ static class XlsxReader
         // Apply cell style if present
         ApplyCellStyle(cellElem, sheet, address, styleInfo);
 
-        if (formulaElem != null)
+        if (formulaElem is not null)
         {
             var formulaValue = formulaElem.Value;
             if (!formulaValue.StartsWith('='))
@@ -488,14 +488,14 @@ static class XlsxReader
     private static void ApplyCellStyle(XElement cellElem, Worksheet sheet, CellRef address, StyleInfo styleInfo)
     {
         var styleId = cellElem.Attribute("s")?.Value;
-        if (styleId != null &&
+        if (styleId is not null &&
             styleInfo.CellStyles.TryGetValue(int.Parse(styleId, CultureInfo.InvariantCulture), out var style))
         {
             var fmt = sheet.Cells[address.Row, address.Column].Format;
 
             if (styleInfo.FontStyles.TryGetValue(style.FontId, out var fontStyle))
             {
-                if (fontStyle.Color != null)
+                if (fontStyle.Color is not null)
                 {
                     fmt.Color = fontStyle.Color;
                 }
@@ -503,11 +503,11 @@ static class XlsxReader
                 fmt.Italic = fontStyle.Italic;
                 fmt.Underline = fontStyle.Underline;
                 fmt.Strikethrough = fontStyle.Strikethrough;
-                if (fontStyle.FontFamily != null)
+                if (fontStyle.FontFamily is not null)
                 {
                     fmt.FontFamily = fontStyle.FontFamily;
                 }
-                if (fontStyle.FontSize != null)
+                if (fontStyle.FontSize is not null)
                 {
                     fmt.FontSize = fontStyle.FontSize;
                 }
@@ -532,7 +532,7 @@ static class XlsxReader
                     ? custom
                     : NumberFormatPresets.GetFormatCode(style.NumFmtId);
 
-                if (formatCode != null && !string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
+                if (formatCode is not null && !string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
                 {
                     fmt.NumberFormat = formatCode;
                 }
@@ -561,7 +561,7 @@ static class XlsxReader
     private static void ParseAutoFilter(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var autoFilterElement = sheetDoc.Descendants(sNs + "autoFilter").FirstOrDefault();
-        if (autoFilterElement != null)
+        if (autoFilterElement is not null)
         {
             var refAttribute = autoFilterElement.Attribute("ref")?.Value;
             if (!string.IsNullOrEmpty(refAttribute))
@@ -590,13 +590,13 @@ static class XlsxReader
             var customFiltersElement = filterColumn.Element(sNs + "customFilters");
             var filtersElement = filterColumn.Element(sNs + "filters");
 
-            if (customFiltersElement != null)
+            if (customFiltersElement is not null)
             {
                 var criterion = DeserializeFilterCriterion(customFiltersElement, actualColumn);
                 var sheetFilter = new SheetFilter(criterion, range);
                 sheet.AddFilter(sheetFilter);
             }
-            else if (filtersElement != null)
+            else if (filtersElement is not null)
             {
                 var criterion = DeserializeFilterCriterion(filtersElement, actualColumn);
                 var sheetFilter = new SheetFilter(criterion, range);
@@ -618,7 +618,7 @@ static class XlsxReader
         var sheetFileName = sheetInfo.FullPath.Split('/').Last();
         var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
         var relsEntry = archive.GetEntry(relsPath);
-        if (relsEntry != null)
+        if (relsEntry is not null)
         {
             using var relsStream = relsEntry.Open();
             var relsDoc = XDocument.Load(relsStream);
@@ -627,7 +627,7 @@ static class XlsxReader
             {
                 var id = rel.Attribute("Id")?.Value;
                 var target = rel.Attribute("Target")?.Value;
-                if (id != null && target != null)
+                if (id is not null && target is not null)
                 {
                     relMap[id] = target;
                 }
@@ -642,7 +642,7 @@ static class XlsxReader
             var relId = hyperlink.Attribute(rNs + "id")?.Value;
             var display = hyperlink.Attribute("display")?.Value;
 
-            if (cellRef != null && relId != null && relMap.TryGetValue(relId, out var url))
+            if (cellRef is not null && relId is not null && relMap.TryGetValue(relId, out var url))
             {
                 var address = CellRef.Parse(cellRef);
                 if (address.Row < sheet.RowCount && address.Column < sheet.ColumnCount)
@@ -662,13 +662,13 @@ static class XlsxReader
         // Find <drawing r:id="..."/> element in sheet XML
         XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
         var drawingElement = sheetDoc.Descendants(sNs + "drawing").FirstOrDefault();
-        if (drawingElement == null)
+        if (drawingElement is null)
         {
             return;
         }
 
         var drawingRelId = drawingElement.Attribute(rNs + "id")?.Value;
-        if (drawingRelId == null)
+        if (drawingRelId is null)
         {
             return;
         }
@@ -677,7 +677,7 @@ static class XlsxReader
         var sheetFileName = sheetInfo.FullPath.Split('/').Last();
         var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
         var relsEntry = archive.GetEntry(relsPath);
-        if (relsEntry == null)
+        if (relsEntry is null)
         {
             return;
         }
@@ -691,7 +691,7 @@ static class XlsxReader
             {
                 var id = rel.Attribute("Id")?.Value;
                 var target = rel.Attribute("Target")?.Value;
-                if (id != null && target != null)
+                if (id is not null && target is not null)
                 {
                     sheetRelMap[id] = target;
                 }
@@ -706,7 +706,7 @@ static class XlsxReader
         // Resolve drawing path relative to xl/worksheets/
         var drawingPath = ResolvePath("xl/worksheets/", drawingTarget);
         var drawingEntry = archive.GetEntry(drawingPath);
-        if (drawingEntry == null)
+        if (drawingEntry is null)
         {
             return;
         }
@@ -717,7 +717,7 @@ static class XlsxReader
         var drawingRelsPath = $"{drawingDir}/_rels/{drawingFileName}.rels";
         var drawingRelMap = new Dictionary<string, string>();
         var drawingRelsEntry = archive.GetEntry(drawingRelsPath);
-        if (drawingRelsEntry != null)
+        if (drawingRelsEntry is not null)
         {
             using var drawingRelsStream = drawingRelsEntry.Open();
             var drawingRelsDoc = XDocument.Load(drawingRelsStream);
@@ -726,7 +726,7 @@ static class XlsxReader
             {
                 var id = rel.Attribute("Id")?.Value;
                 var target = rel.Attribute("Target")?.Value;
-                if (id != null && target != null)
+                if (id is not null && target is not null)
                 {
                     drawingRelMap[id] = target;
                 }
@@ -757,14 +757,14 @@ static class XlsxReader
             }
 
             var pic = anchor.Element(xdr + "pic");
-            if (pic == null)
+            if (pic is null)
             {
                 continue;
             }
 
             // Parse anchor positions
             var from = ParseCellAnchor(anchor.Element(xdr + "from"), xdr);
-            if (from == null)
+            if (from is null)
             {
                 continue;
             }
@@ -778,7 +778,7 @@ static class XlsxReader
             if (mode == ImageAnchorMode.TwoCellAnchor)
             {
                 var to = ParseCellAnchor(anchor.Element(xdr + "to"), xdr);
-                if (to == null)
+                if (to is null)
                 {
                     continue;
                 }
@@ -787,7 +787,7 @@ static class XlsxReader
             else
             {
                 var ext = anchor.Element(xdr + "ext");
-                if (ext != null)
+                if (ext is not null)
                 {
                     if (long.TryParse(ext.Attribute("cx")?.Value, out var cx))
                     {
@@ -804,7 +804,7 @@ static class XlsxReader
             var blipFill = pic.Element(xdr + "blipFill");
             var blip = blipFill?.Element(a + "blip");
             var embedId = blip?.Attribute(rNs + "embed")?.Value;
-            if (embedId == null || !drawingRelMap.TryGetValue(embedId, out var imageTarget))
+            if (embedId is null || !drawingRelMap.TryGetValue(embedId, out var imageTarget))
             {
                 continue;
             }
@@ -812,7 +812,7 @@ static class XlsxReader
             // Resolve image path
             var imagePath = ResolvePath(drawingDir + "/", imageTarget);
             var imageEntry = archive.GetEntry(imagePath);
-            if (imageEntry == null)
+            if (imageEntry is null)
             {
                 continue;
             }
@@ -849,7 +849,7 @@ static class XlsxReader
 
     private static CellAnchor? ParseCellAnchor(XElement? element, XNamespace xdr)
     {
-        if (element == null)
+        if (element is null)
         {
             return null;
         }
@@ -859,7 +859,7 @@ static class XlsxReader
         var row = element.Element(xdr + "row")?.Value;
         var rowOff = element.Element(xdr + "rowOff")?.Value;
 
-        if (col == null || row == null)
+        if (col is null || row is null)
         {
             return null;
         }
@@ -954,7 +954,7 @@ static class XlsxReader
     private static void ParseDataValidations(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var dataValidationsElement = sheetDoc.Descendants(sNs + "dataValidations").FirstOrDefault();
-        if (dataValidationsElement == null)
+        if (dataValidationsElement is null)
         {
             return;
         }
@@ -1015,7 +1015,7 @@ static class XlsxReader
 
             // For list type, formula1 contains individually quoted items: "Yes","No","Maybe"
             // Or may be wrapped as a single string: "Yes,No,Maybe"
-            if (type == DataValidationType.List && formula1 != null)
+            if (type == DataValidationType.List && formula1 is not null)
             {
                 // Remove surrounding quotes from each item and rejoin with commas
                 var parts = formula1.Split(',');

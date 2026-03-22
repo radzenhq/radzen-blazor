@@ -15,7 +15,7 @@ class SumFunction : FormulaFunction
     {
         var numbers = arguments.GetSequence("number");
 
-        if (numbers == null || numbers.Count == 0)
+        if (numbers is null || numbers.Count == 0)
         {
             return CellData.FromError(CellError.Value);
         }
