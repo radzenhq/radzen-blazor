@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
 /// Base class for formula functions that provides common functionality for evaluation.

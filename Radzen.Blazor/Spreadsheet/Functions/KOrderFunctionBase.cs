@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 abstract class KOrderFunctionBase : FormulaFunction
 {

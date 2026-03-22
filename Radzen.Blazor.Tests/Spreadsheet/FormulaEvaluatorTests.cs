@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using Xunit;
 
+using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class FormulaEvaluationTests

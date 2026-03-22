@@ -1,7 +1,7 @@
 #nullable enable
 
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 class SearchFunction : FormulaFunction
 {

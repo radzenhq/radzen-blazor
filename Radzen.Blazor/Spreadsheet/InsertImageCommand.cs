@@ -1,4 +1,5 @@
-namespace Radzen.Blazor.Spreadsheet;
+using Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
 /// Command to insert an image into a sheet.

@@ -1,4 +1,4 @@
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
 /// Command that deletes a contiguous range of columns and supports undo via snapshot.

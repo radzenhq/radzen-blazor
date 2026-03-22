@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
 /// Represents a list of cell data originating from a rectangular range, carrying its row/column dimensions.
