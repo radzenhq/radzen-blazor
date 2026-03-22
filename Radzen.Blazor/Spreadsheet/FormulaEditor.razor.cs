@@ -84,8 +84,15 @@ public partial class FormulaEditor : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        Worksheet.Selection.Changed -= OnSelectionChanged;
-        Editor.ValueChanged -= OnEditorValueChanged;
+        if (Worksheet != null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        if (Editor != null)
+        {
+            Editor.ValueChanged -= OnEditorValueChanged;
+        }
     }
 
     private async Task OnBlurAsync()
