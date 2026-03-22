@@ -21,23 +21,31 @@ public class DataCellStore<T>(DataSheet<T> sheet, int pageSize = 20) : CellStore
         {
             page = pageNumber;
 
-            var data = await sheet.DataLoader(new DataSheetLoaderRequest
+            try
             {
-                Take = pageSize,
-                Skip = pageNumber * pageSize
-            });
-
-            // Populate cells for the loaded page
-            for (var i = 0; i < data.Count; i++)
-            {
-                var dataItem = data[i];
-                var row = pageNumber * pageSize + i + 1; // +1 for header row
-
-                for (var column = 0; column < columnAccessors.Count; column++)
+                var data = await sheet.DataLoader(new DataSheetLoaderRequest
                 {
-                    var value = columnAccessors[column].GetValue(dataItem);
-                    this[row, column].Value = value;
+                    Take = pageSize,
+                    Skip = pageNumber * pageSize
+                });
+
+                // Populate cells for the loaded page
+                for (var i = 0; i < data.Count; i++)
+                {
+                    var dataItem = data[i];
+                    var row = pageNumber * pageSize + i + 1; // +1 for header row
+
+                    for (var column = 0; column < columnAccessors.Count; column++)
+                    {
+                        var value = columnAccessors[column].GetValue(dataItem);
+                        this[row, column].Value = value;
+                    }
                 }
+            }
+            catch
+            {
+                // Reset page so the next access retries
+                page = -1;
             }
         }
     }

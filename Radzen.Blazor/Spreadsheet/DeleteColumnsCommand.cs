@@ -1,10 +1,12 @@
+using System;
+
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
 /// <summary>
 /// Command that deletes a contiguous range of columns and supports undo via snapshot.
 /// </summary>
-public class DeleteColumnsCommand : ColumnCommandBase
+public class DeleteColumnsCommand : SheetSnapshotCommandBase
 {
     private readonly int startColumnIndex;
     private readonly int endColumnIndex;
@@ -12,16 +14,13 @@ public class DeleteColumnsCommand : ColumnCommandBase
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteColumnsCommand"/> class.
     /// </summary>
-    /// <param name="sheet"></param>
-    /// <param name="startColumnIndex"></param>
-    /// <param name="endColumnIndex"></param>
-    /// <exception cref="System.ArgumentOutOfRangeException"></exception>
-    public DeleteColumnsCommand(Worksheet sheet, int startColumnIndex, int endColumnIndex) : base(sheet, startColumnIndex)
+    public DeleteColumnsCommand(Worksheet sheet, int startColumnIndex, int endColumnIndex) : base(sheet)
     {
         if (startColumnIndex < 0 || endColumnIndex < startColumnIndex || endColumnIndex >= sheet.ColumnCount)
         {
-            throw new System.ArgumentOutOfRangeException(nameof(startColumnIndex));
+            throw new ArgumentOutOfRangeException(nameof(startColumnIndex));
         }
+
         this.startColumnIndex = startColumnIndex;
         this.endColumnIndex = endColumnIndex;
     }
