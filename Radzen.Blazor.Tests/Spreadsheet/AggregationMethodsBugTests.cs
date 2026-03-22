@@ -70,4 +70,14 @@ public class AggregationMethodsBugTests
         var items = new List<double> { 5, 3, 1, 4, 2 };
         Assert.Equal(2d, AggregationMethods.Small(items, 2).Value);
     }
+
+    [Fact]
+    public void Median_ShouldReturnNumErrorForEmptyList()
+    {
+        var items = new List<double>();
+        var result = AggregationMethods.Median(items);
+
+        Assert.True(result.IsError);
+        Assert.Equal(CellError.Num, result.Value);
+    }
 }
