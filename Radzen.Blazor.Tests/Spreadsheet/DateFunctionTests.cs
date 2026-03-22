@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class DateFunctionTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void ShouldCreateDateFromYearMonthDay()
@@ -93,7 +93,7 @@ public class DateFunctionTests
 
 public class EdateFunctionTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void ShouldAddOneMonth()
@@ -140,7 +140,7 @@ public class EdateFunctionTests
 
 public class EomonthFunctionTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void ShouldReturnEndOfSameMonth()
@@ -185,7 +185,7 @@ public class EomonthFunctionTests
 
 public class DatedifFunctionTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void ShouldReturnFullYears()
@@ -260,7 +260,7 @@ public class DatedifFunctionTests
 
 public class TimeFunctionTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void ShouldReturnFractionOfDay()

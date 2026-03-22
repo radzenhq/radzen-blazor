@@ -61,7 +61,7 @@ internal class CellDependencyGraph
         }
 
         var tree = FormulaParser.Parse(cell.Formula);
-        var visitor = new DependencyVisitor(cell.Sheet);
+        var visitor = new DependencyVisitor(cell.Worksheet);
         tree.Root.Accept(visitor);
 
         if (dependencies.TryGetValue(cell, out var oldDependencies))
@@ -91,9 +91,9 @@ internal class CellDependencyGraph
 
 }
 
-class DependencyVisitor(Sheet sheet) : IFormulaSyntaxNodeVisitor
+class DependencyVisitor(Worksheet sheet) : IFormulaSyntaxNodeVisitor
 {
-    private readonly Sheet sheet = sheet;
+    private readonly Worksheet sheet = sheet;
 
     public HashSet<Cell> Dependencies { get; } = [];
 
@@ -129,11 +129,11 @@ class DependencyVisitor(Sheet sheet) : IFormulaSyntaxNodeVisitor
         var address = cellIdentifierSyntaxNode.Token.Address;
         var targetSheet = sheet;
 
-        if (!string.IsNullOrEmpty(address.Sheet))
+        if (!string.IsNullOrEmpty(address.Worksheet))
         {
             var wb = sheet.Workbook;
-            targetSheet = wb.GetSheet(address.Sheet) ?? targetSheet;
-            if (targetSheet.Name != address.Sheet)
+            targetSheet = wb.GetSheet(address.Worksheet) ?? targetSheet;
+            if (targetSheet.Name != address.Worksheet)
             {
                 return;
             }

@@ -60,7 +60,7 @@ public abstract partial class FrameItemBase : ComponentBase
     /// Gets or sets the sheet that contains the frame item.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets the CSS class for the frame item.

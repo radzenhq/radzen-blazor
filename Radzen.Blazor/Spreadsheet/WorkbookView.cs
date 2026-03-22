@@ -12,7 +12,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class WorkbookView
 {
-    private readonly Dictionary<Sheet, SheetView> views = [];
+    private readonly Dictionary<Worksheet, SheetView> views = [];
 
     /// <summary>
     /// Gets the workbook this view wraps.
@@ -30,7 +30,7 @@ public class WorkbookView
     /// <summary>
     /// Gets or creates a SheetView for the specified sheet.
     /// </summary>
-    public SheetView GetView(Sheet sheet)
+    public SheetView GetView(Worksheet sheet)
     {
         ArgumentNullException.ThrowIfNull(sheet);
 
@@ -46,7 +46,7 @@ public class WorkbookView
     /// <summary>
     /// Removes the view for the specified sheet, freeing its undo history and rendering state.
     /// </summary>
-    public bool Remove(Sheet sheet)
+    public bool Remove(Worksheet sheet)
     {
         return views.Remove(sheet);
     }

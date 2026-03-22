@@ -16,7 +16,7 @@ public class ImageTests
     [Fact]
     public void AddImage_AddsToCollection()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateTestImage();
 
         sheet.AddImage(image);
@@ -28,7 +28,7 @@ public class ImageTests
     [Fact]
     public void RemoveImage_RemovesFromCollection()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateTestImage();
         sheet.AddImage(image);
 
@@ -41,7 +41,7 @@ public class ImageTests
     [Fact]
     public void RemoveImage_ReturnsFalse_WhenNotFound()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateTestImage();
 
         var result = sheet.RemoveImage(image);
@@ -67,14 +67,14 @@ public class ImageTests
     [Fact]
     public void Images_Empty_ByDefault()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         Assert.Empty(sheet.Images);
     }
 
     [Fact]
     public void SelectedImage_Null_ByDefault()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         Assert.Null(sheet.SelectedImage);
     }
 
@@ -83,7 +83,7 @@ public class ImageTests
     [Fact]
     public void InsertImageCommand_Execute_AddsImage()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateTestImage();
         var command = new InsertImageCommand(sheet, image);
 
@@ -94,7 +94,7 @@ public class ImageTests
     [Fact]
     public void InsertImageCommand_Unexecute_RemovesImage()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateTestImage();
         var command = new InsertImageCommand(sheet, image);
         command.Execute();
@@ -107,7 +107,7 @@ public class ImageTests
     [Fact]
     public void DeleteImageCommand_Execute_RemovesImage()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateTestImage();
         sheet.AddImage(image);
         var command = new DeleteImageCommand(sheet, image);
@@ -119,7 +119,7 @@ public class ImageTests
     [Fact]
     public void DeleteImageCommand_Execute_ClearsSelectedImage()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateTestImage();
         sheet.AddImage(image);
         sheet.SelectedImage = image;
@@ -133,7 +133,7 @@ public class ImageTests
     [Fact]
     public void DeleteImageCommand_Unexecute_RestoresImage()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateTestImage();
         sheet.AddImage(image);
         var command = new DeleteImageCommand(sheet, image);
@@ -239,7 +239,7 @@ public class ImageTests
     public void RoundTrip_OneCellAnchor_PreservesPositionAndSize()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         workbook.AddSheet(sheet);
 
         var image = new SheetImage
@@ -274,7 +274,7 @@ public class ImageTests
     public void RoundTrip_TwoCellAnchor_PreservesAnchors()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         workbook.AddSheet(sheet);
 
         var image = new SheetImage
@@ -307,7 +307,7 @@ public class ImageTests
     public void RoundTrip_MultipleImages_AllPreserved()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         workbook.AddSheet(sheet);
 
         for (var i = 0; i < 3; i++)
@@ -333,7 +333,7 @@ public class ImageTests
     public void RoundTrip_NoImages_EmptyCollection()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         workbook.AddSheet(sheet);
 
         var reimported = ExportAndReimport(workbook);
@@ -345,7 +345,7 @@ public class ImageTests
     public void RoundTrip_JpegImage_ContentTypePreserved()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         workbook.AddSheet(sheet);
 
         sheet.AddImage(new SheetImage
@@ -367,7 +367,7 @@ public class ImageTests
     public void RoundTrip_ImageDeduplication_SameBytesOneMediaFile()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         workbook.AddSheet(sheet);
 
         // Add two images with the same data
@@ -407,7 +407,7 @@ public class ImageTests
     public void RoundTrip_ImageName_Preserved()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         workbook.AddSheet(sheet);
 
         sheet.AddImage(new SheetImage
@@ -429,7 +429,7 @@ public class ImageTests
     public void RoundTrip_ImageData_PreservedExactly()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         workbook.AddSheet(sheet);
 
         sheet.AddImage(new SheetImage
@@ -450,7 +450,7 @@ public class ImageTests
     public void RoundTrip_ViaFile_DoesNotCorruptZip()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         workbook.AddSheet(sheet);
         sheet.Cells[0, 0].Value = "test";
 

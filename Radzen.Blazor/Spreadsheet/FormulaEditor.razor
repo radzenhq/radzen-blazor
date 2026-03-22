@@ -4,6 +4,6 @@
 @using Radzen.Documents.Spreadsheet
 
 <div class="rz-spreadsheet-formula-editor">
-    <SheetEditor tabindex="-1" @bind-Value=@Sheet.Editor.Value Focus=@(this.AsNonRenderingEventHandler(OnFocus))
-        Sheet=@Sheet Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync)) />
+    <SheetEditor tabindex="-1" @bind-Value=@Worksheet.Editor.Value Focus=@(this.AsNonRenderingEventHandler(OnFocus))
+        Worksheet=@Worksheet Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync)) />
 </div>

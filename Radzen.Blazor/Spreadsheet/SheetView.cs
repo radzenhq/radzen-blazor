@@ -13,7 +13,7 @@ public class SheetView
     /// <summary>
     /// Gets the document sheet this view wraps.
     /// </summary>
-    public Sheet Sheet { get; }
+    public Worksheet Worksheet { get; }
 
     /// <summary>
     /// Gets the per-sheet undo/redo stack.
@@ -32,11 +32,11 @@ public class SheetView
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SheetView"/> class.
-    /// Injects its own UndoRedoStack into the sheet so callers can use Sheet.Commands transparently.
+    /// Injects its own UndoRedoStack into the sheet so callers can use Worksheet.Commands transparently.
     /// </summary>
-    public SheetView(Sheet sheet)
+    public SheetView(Worksheet sheet)
     {
-        Sheet = sheet ?? throw new System.ArgumentNullException(nameof(sheet));
+        Worksheet = sheet ?? throw new System.ArgumentNullException(nameof(sheet));
         sheet.Commands = Commands;
     }
 
@@ -46,7 +46,7 @@ public class SheetView
     /// </summary>
     public IndexRange GetRowRange(double start, double end, bool includeFrozen = false)
     {
-        return Sheet.Rows.GetIndexRange(start - RowHeaderOffset, end - RowHeaderOffset, includeFrozen);
+        return Worksheet.Rows.GetIndexRange(start - RowHeaderOffset, end - RowHeaderOffset, includeFrozen);
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public class SheetView
     /// </summary>
     public IndexRange GetColumnRange(double start, double end, bool includeFrozen = false)
     {
-        return Sheet.Columns.GetIndexRange(start - ColumnHeaderOffset, end - ColumnHeaderOffset, includeFrozen);
+        return Worksheet.Columns.GetIndexRange(start - ColumnHeaderOffset, end - ColumnHeaderOffset, includeFrozen);
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public class SheetView
     /// </summary>
     public PixelRange GetRowPixelRange(int startIndex, int endIndex)
     {
-        var range = Sheet.Rows.GetPixelRange(startIndex, endIndex);
+        var range = Worksheet.Rows.GetPixelRange(startIndex, endIndex);
         return new PixelRange(range.Start + RowHeaderOffset, range.End + RowHeaderOffset);
     }
 
@@ -72,7 +72,7 @@ public class SheetView
     /// </summary>
     public PixelRange GetRowPixelRange(int index)
     {
-        var range = Sheet.Rows.GetPixelRange(index);
+        var range = Worksheet.Rows.GetPixelRange(index);
         return new PixelRange(range.Start + RowHeaderOffset, range.End + RowHeaderOffset);
     }
 
@@ -81,7 +81,7 @@ public class SheetView
     /// </summary>
     public PixelRange GetColumnPixelRange(int startIndex, int endIndex)
     {
-        var range = Sheet.Columns.GetPixelRange(startIndex, endIndex);
+        var range = Worksheet.Columns.GetPixelRange(startIndex, endIndex);
         return new PixelRange(range.Start + ColumnHeaderOffset, range.End + ColumnHeaderOffset);
     }
 
@@ -90,19 +90,19 @@ public class SheetView
     /// </summary>
     public PixelRange GetColumnPixelRange(int index)
     {
-        var range = Sheet.Columns.GetPixelRange(index);
+        var range = Worksheet.Columns.GetPixelRange(index);
         return new PixelRange(range.Start + ColumnHeaderOffset, range.End + ColumnHeaderOffset);
     }
 
     /// <summary>
     /// Gets the total scrollable height including the row header offset.
     /// </summary>
-    public double TotalHeight => Sheet.Rows.Total + RowHeaderOffset;
+    public double TotalHeight => Worksheet.Rows.Total + RowHeaderOffset;
 
     /// <summary>
     /// Gets the total scrollable width including the column header offset.
     /// </summary>
-    public double TotalWidth => Sheet.Columns.Total + ColumnHeaderOffset;
+    public double TotalWidth => Worksheet.Columns.Total + ColumnHeaderOffset;
 
     /// <summary>
     /// Splits a range into regions based on frozen pane boundaries for rendering.
@@ -114,10 +114,10 @@ public class SheetView
             yield break;
         }
 
-        var frozenRows = Sheet.Rows.Frozen;
-        var frozenColumns = Sheet.Columns.Frozen;
+        var frozenRows = Worksheet.Rows.Frozen;
+        var frozenColumns = Worksheet.Columns.Frozen;
 
-        var bottomRightRange = new RangeRef(new CellRef(frozenRows, frozenColumns), new CellRef(Sheet.RowCount - 1, Sheet.ColumnCount - 1));
+        var bottomRightRange = new RangeRef(new CellRef(frozenRows, frozenColumns), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1));
 
         if (range.Overlaps(bottomRightRange))
         {
@@ -152,7 +152,7 @@ public class SheetView
         }
 
         var topRightRange = frozenRows > 0
-            ? new RangeRef(new CellRef(0, frozenColumns), new CellRef(frozenRows - 1, Sheet.ColumnCount - 1))
+            ? new RangeRef(new CellRef(0, frozenColumns), new CellRef(frozenRows - 1, Worksheet.ColumnCount - 1))
             : RangeRef.Invalid;
 
         if (range.Overlaps(topRightRange))
@@ -170,7 +170,7 @@ public class SheetView
         }
 
         var bottomLeftRange = frozenColumns > 0
-            ? new RangeRef(new CellRef(frozenRows, 0), new CellRef(Sheet.RowCount - 1, frozenColumns - 1))
+            ? new RangeRef(new CellRef(frozenRows, 0), new CellRef(Worksheet.RowCount - 1, frozenColumns - 1))
             : RangeRef.Invalid;
 
         if (range.Overlaps(bottomLeftRange))

@@ -10,7 +10,7 @@ public class SortCommandTests
     public void SortCommand_ShouldSortDataInAscendingOrder()
     {
         // Arrange
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var range = RangeRef.Parse("A1:A3");
         
         // Set up test data
@@ -34,7 +34,7 @@ public class SortCommandTests
     public void SortCommand_ShouldSortDataInDescendingOrder()
     {
         // Arrange
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var range = RangeRef.Parse("A1:A3");
         
         // Set up test data
@@ -58,7 +58,7 @@ public class SortCommandTests
     public void SortCommand_ShouldRestoreOriginalOrderWhenUndone()
     {
         // Arrange
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var range = RangeRef.Parse("A1:A3");
         
         // Set up test data
@@ -82,7 +82,7 @@ public class SortCommandTests
     public void SortCommand_ShouldReturnFalseForInvalidRange()
     {
         // Arrange
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var command = new SortCommand(sheet, RangeRef.Invalid, SortOrder.Ascending, 0);
         
         // Act
@@ -96,7 +96,7 @@ public class SortCommandTests
     public void SortCommand_ShouldPreserveCellFormatting()
     {
         // Arrange
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var range = RangeRef.Parse("A1:A2");
         
         // Set up test data with formatting
@@ -122,7 +122,7 @@ public class SortCommandTests
     public void SortCommand_ShouldWorkWithAutoFilterRange()
     {
         // Arrange
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var range = RangeRef.Parse("A1:B3");
         
         // Set up test data in a format similar to AutoFilter

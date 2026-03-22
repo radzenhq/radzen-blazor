@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class AutoFilterTests
 {
-    private readonly Sheet sheet = new(10, 10);
+    private readonly Worksheet sheet = new(10, 10);
 
     [Fact]
     public void Should_ToggleSheetAutoFilter()

@@ -87,7 +87,7 @@ public partial class CellView : CellBase, IDisposable
     /// Gets or sets the sheet that contains the cell.
     /// </summary>
     [Parameter, EditorRequired]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Event callback that is invoked when the toggle button is clicked.
@@ -128,9 +128,9 @@ public partial class CellView : CellBase, IDisposable
 
     private bool HasListValidation()
     {
-        if (Sheet == null) return false;
+        if (Worksheet == null) return false;
 
-        var validators = Sheet.Validation.GetValidatorsForCell(new CellRef(Row, Column));
+        var validators = Worksheet.Validation.GetValidatorsForCell(new CellRef(Row, Column));
         foreach (var v in validators)
         {
             if (v is DataValidationRule rule && rule.Type == DataValidationType.List)
@@ -143,9 +143,9 @@ public partial class CellView : CellBase, IDisposable
 
     private bool ShouldShowCellMenu()
     {
-        if (Sheet?.Tables != null)
+        if (Worksheet?.Tables != null)
         {
-            foreach (var table in Sheet.Tables)
+            foreach (var table in Worksheet.Tables)
             {
                 if (Column >= table.Range.Start.Column &&
                     Column <= table.Range.End.Column)
@@ -158,11 +158,11 @@ public partial class CellView : CellBase, IDisposable
             }
         }
 
-        if (Sheet?.AutoFilter != null)
+        if (Worksheet?.AutoFilter != null)
         {
-            if (Column >= Sheet.AutoFilter.Range.Start.Column && Column <= Sheet.AutoFilter.Range.End.Column)
+            if (Column >= Worksheet.AutoFilter.Range.Start.Column && Column <= Worksheet.AutoFilter.Range.End.Column)
             {
-                if (Row == Sheet.AutoFilter.Start.Row)
+                if (Row == Worksheet.AutoFilter.Start.Row)
                 {
                     return ShouldShowMenuForMergedCell();
                 }
@@ -180,7 +180,7 @@ public partial class CellView : CellBase, IDisposable
     private bool ShouldShowMenuForMergedCell()
     {
         // Check if the current cell is part of a merged range
-        var mergedRange = Sheet.MergedCells.GetMergedRange(new CellRef(Row, Column));
+        var mergedRange = Worksheet.MergedCells.GetMergedRange(new CellRef(Row, Column));
 
         if (mergedRange == RangeRef.Invalid)
         {
@@ -189,11 +189,11 @@ public partial class CellView : CellBase, IDisposable
         }
 
         // If the merged range overlaps with frozen columns, we need to check which split region this cell belongs to
-        if (mergedRange.Start.Column < Sheet.Columns.Frozen && mergedRange.End.Column >= Sheet.Columns.Frozen)
+        if (mergedRange.Start.Column < Worksheet.Columns.Frozen && mergedRange.End.Column >= Worksheet.Columns.Frozen)
         {
             // The merged range is split horizontally by frozen columns
             // Only show the menu for the region that is after the frozen columns
-            return Column >= Sheet.Columns.Frozen;
+            return Column >= Worksheet.Columns.Frozen;
         }
 
         // If the merged range doesn't overlap with frozen columns, show the menu
@@ -233,11 +233,11 @@ public partial class CellView : CellBase, IDisposable
     {
         var didRowChange = parameters.TryGetValue<int>(nameof(Row), out var row) && Row != row;
         var didColumnChange = parameters.TryGetValue<int>(nameof(Column), out var column) && Column != column;
-        var didSheetChange = parameters.TryGetValue<Sheet>(nameof(Sheet), out var sheet) && Sheet != sheet;
+        var didSheetChange = parameters.TryGetValue<Worksheet>(nameof(Worksheet), out var sheet) && Worksheet != sheet;
 
-        if (didSheetChange && Sheet != null)
+        if (didSheetChange && Worksheet != null)
         {
-            Sheet.AutoFilterChanged -= OnAutoFilterChanged;
+            Worksheet.AutoFilterChanged -= OnAutoFilterChanged;
         }
 
         await base.SetParametersAsync(parameters);
@@ -249,18 +249,18 @@ public partial class CellView : CellBase, IDisposable
                 cell.Changed -= OnCellChanged;
             }
 
-            if (Sheet != null)
+            if (Worksheet != null)
             {
-                cell = Sheet.Cells[Row, Column];
+                cell = Worksheet.Cells[Row, Column];
                 cell.Changed += OnCellChanged;
             }
 
             showCellMenu = ShouldShowCellMenu();
         }
 
-        if (didSheetChange && Sheet != null)
+        if (didSheetChange && Worksheet != null)
         {
-            Sheet.AutoFilterChanged += OnAutoFilterChanged;
+            Worksheet.AutoFilterChanged += OnAutoFilterChanged;
         }
     }
 
@@ -287,9 +287,9 @@ public partial class CellView : CellBase, IDisposable
             cell.Changed -= OnCellChanged;
         }
 
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.AutoFilterChanged -= OnAutoFilterChanged;
+            Worksheet.AutoFilterChanged -= OnAutoFilterChanged;
         }
     }
 }

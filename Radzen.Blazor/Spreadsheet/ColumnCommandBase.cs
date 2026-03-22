@@ -13,7 +13,7 @@ public abstract class ColumnCommandBase : ICommand
     /// <summary>
     /// The sheet being operated on.
     /// </summary>
-    protected readonly Sheet sheet;
+    protected readonly Worksheet sheet;
     /// <summary>
     /// The column index being operated on.
     /// </summary>
@@ -30,7 +30,7 @@ public abstract class ColumnCommandBase : ICommand
     /// </summary>
     /// <param name="sheet">The sheet being operated on.</param>
     /// <param name="columnIndex">The column index being operated on.</param>
-    protected ColumnCommandBase(Sheet sheet, int columnIndex)
+    protected ColumnCommandBase(Worksheet sheet, int columnIndex)
     {
         this.sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
         if (columnIndex < 0 || columnIndex >= sheet.ColumnCount)

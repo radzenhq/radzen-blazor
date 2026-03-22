@@ -38,7 +38,7 @@ public abstract class FilterCriterion
     /// <summary>
     /// Throws <see cref="ArgumentNullException" /> when the sheet is null.
     /// </summary>
-    protected static void ThrowIfNullSheet(Sheet sheet)
+    protected static void ThrowIfNullSheet(Worksheet sheet)
     {
         ArgumentNullException.ThrowIfNull(sheet);
     }
@@ -48,7 +48,7 @@ public abstract class FilterCriterion
     /// <param name="sheet"></param>
     /// <param name="row"></param>
     /// <returns></returns>
-    public abstract bool Matches(Sheet sheet, int row);
+    public abstract bool Matches(Worksheet sheet, int row);
 
     /// <summary>
     /// Accepts a visitor that can perform operations on this filter criterion.
@@ -153,7 +153,7 @@ public class OrCriterion : FilterCriterion
     public FilterCriterion[] Criteria { get; init; } = [];
 
     /// <inheritdoc/>
-    public override bool Matches(Sheet sheet, int row)
+    public override bool Matches(Worksheet sheet, int row)
     {
         ThrowIfNullSheet(sheet);
         foreach (var criterion in Criteria)
@@ -186,7 +186,7 @@ public class AndCriterion : FilterCriterion
     public FilterCriterion[] Criteria { get; init; } = [];
 
     /// <inheritdoc/>
-    public override bool Matches(Sheet sheet, int row)
+    public override bool Matches(Worksheet sheet, int row)
     {
         ThrowIfNullSheet(sheet);
         foreach (var criterion in Criteria)
@@ -219,7 +219,7 @@ public abstract class FilterCriterionLeaf : FilterCriterion
     public int Column { get; init; }
 
     /// <inheritdoc/>
-    public override bool Matches(Sheet sheet, int row)
+    public override bool Matches(Worksheet sheet, int row)
     {
         ThrowIfNullSheet(sheet);
         var cell = sheet.Cells[row, Column];
@@ -669,7 +669,7 @@ public class DoesNotContainCriterion : StringFilterCriterion
     }
 }
 
-public partial class Sheet
+public partial class Worksheet
 {
     private AutoFilter? autoFilter;
 

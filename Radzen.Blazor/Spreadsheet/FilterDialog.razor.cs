@@ -46,7 +46,7 @@ public partial class FilterDialog : ComponentBase
     /// The sheet containing the data to filter.
     /// </summary>
     [Parameter, EditorRequired]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// The column index to filter.
@@ -114,7 +114,7 @@ public partial class FilterDialog : ComponentBase
         }
         if (rangeToUse != RangeRef.Invalid)
         {
-            var headerCell = Sheet.Cells[rangeToUse.Start.Row, Column];
+            var headerCell = Worksheet.Cells[rangeToUse.Start.Row, Column];
             var headerText = headerCell.GetValueAsString();
             fieldName = string.IsNullOrEmpty(headerText) ? $"Column {Column + 1}" : headerText;
         }
@@ -233,7 +233,7 @@ public partial class FilterDialog : ComponentBase
 
     private Table? GetCurrentTable()
     {
-        foreach (var table in Sheet.Tables)
+        foreach (var table in Worksheet.Tables)
         {
             if (table.Range.Contains(Row, Column))
             {
@@ -245,9 +245,9 @@ public partial class FilterDialog : ComponentBase
 
     private AutoFilter? GetCurrentAutoFilter()
     {
-        if (Sheet.AutoFilter != null && Sheet.AutoFilter.Range.Contains(Row, Column))
+        if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(Row, Column))
         {
-            return Sheet.AutoFilter;
+            return Worksheet.AutoFilter;
         }
         return null;
     }

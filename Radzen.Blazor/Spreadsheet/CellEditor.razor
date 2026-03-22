@@ -4,10 +4,10 @@
 @using Radzen.Documents.Spreadsheet
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 
-@if (Sheet.Editor.Mode != EditMode.None)
+@if (Worksheet.Editor.Mode != EditMode.None)
 {
 <div class=@className style=@cellStyle>
-    <SheetEditor @bind-Value=@Sheet.Editor.Value AutoFocus=@(Sheet.Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
-        Sheet=@Sheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
+    <SheetEditor @bind-Value=@Worksheet.Editor.Value AutoFocus=@(Worksheet.Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
+        Worksheet=@Worksheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
 </div>
 }

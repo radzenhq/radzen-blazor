@@ -6,17 +6,17 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet == null || Sheet.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid;
 
     private void OnInsertRowAfterClick()
     {
-        if (Sheet == null)
+        if (Worksheet == null)
         {
             return;
         }
 
-        Sheet.Commands.Execute(new InsertRowAfterCommand(Sheet, Sheet.Selection.Range.End.Row));
+        Worksheet.Commands.Execute(new InsertRowAfterCommand(Worksheet, Worksheet.Selection.Range.End.Row));
     }
 }

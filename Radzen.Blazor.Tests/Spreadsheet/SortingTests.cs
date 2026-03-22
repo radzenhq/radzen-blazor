@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class SortingTests
 {
-    private readonly Sheet sheet = new(5, 5);
+    private readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void Should_SortStringsInAscendingOrder()
