@@ -19,6 +19,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private void OnClick(RadzenSplitButtonItem? item)
@@ -38,43 +41,43 @@
             case null:
             {
                 var command = new AllBordersCommand(Worksheet, range, border);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
             case "outside":
             {
                 var command = new BorderCommand(Worksheet, range, border, border, border, border);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
             case "top":
             {
                 var command = new BorderCommand(Worksheet, range, top: border, right: null, bottom: null, left: null);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
             case "bottom":
             {
                 var command = new BorderCommand(Worksheet, range, top: null, right: null, bottom: border, left: null);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
             case "left":
             {
                 var command = new BorderCommand(Worksheet, range, top: null, right: null, bottom: null, left: border);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
             case "right":
             {
                 var command = new BorderCommand(Worksheet, range, top: null, right: border, bottom: null, left: null);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
             case "none":
             {
                 var command = new NoBordersCommand(Worksheet, range);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
         }

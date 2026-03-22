@@ -10,6 +10,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsBold
     {
         get
@@ -28,7 +31,7 @@
                 {
                     var newFormat = cell.Format.WithBold(value);
                     var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, newFormat);
-                    Worksheet.Commands.Execute(command);
+                    Spreadsheet?.Execute(command);
                 }
             }
         }

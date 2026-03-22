@@ -17,6 +17,12 @@ public partial class FormulaEditor : ComponentBase, IDisposable
     public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
+    /// Gets or sets the editor.
+    /// </summary>
+    [Parameter]
+    public Editor Editor { get; set; } = default!;
+
+    /// <summary>
     /// Gets or sets the spreadsheet instance that contains the sheet.
     /// </summary>
     [CascadingParameter]
@@ -28,7 +34,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
         if (Worksheet != null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
-            Worksheet.Editor.ValueChanged -= OnEditorValueChanged;
+            Editor.ValueChanged -= OnEditorValueChanged;
         }
 
         await base.SetParametersAsync(parameters);
@@ -36,7 +42,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
         if (Worksheet != null)
         {
             Worksheet.Selection.Changed += OnSelectionChanged;
-            Worksheet.Editor.ValueChanged += OnEditorValueChanged;
+            Editor.ValueChanged += OnEditorValueChanged;
 
             Render();
         }
@@ -47,7 +53,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
         if (Worksheet.Selection.Cell != CellRef.Invalid)
         {
             var cell = Worksheet.Cells[Worksheet.Selection.Cell];
-            Worksheet.Editor.StartEdit(cell.Address, Worksheet.Editor.Mode != EditMode.None ? Worksheet.Editor.Value : cell.GetValue(), EditMode.Formula);
+            Editor.StartEdit(cell.Address, Editor.Mode != EditMode.None ? Editor.Value : cell.GetValue(), EditMode.Formula);
         }
     }
 
@@ -57,7 +63,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
         {
             var cell = Worksheet.Cells[Worksheet.Selection.Cell];
 
-            Worksheet.Editor.Value = cell.GetValue();
+            Editor.Value = cell.GetValue();
         }
     }
 
@@ -70,7 +76,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
 
     private void OnEditorValueChanged()
     {
-        if (Worksheet.Editor.Mode == EditMode.Cell)
+        if (Editor.Mode == EditMode.Cell)
         {
             StateHasChanged();
         }
@@ -79,12 +85,12 @@ public partial class FormulaEditor : ComponentBase, IDisposable
     void IDisposable.Dispose()
     {
         Worksheet.Selection.Changed -= OnSelectionChanged;
-        Worksheet.Editor.ValueChanged -= OnEditorValueChanged;
+        Editor.ValueChanged -= OnEditorValueChanged;
     }
 
     private async Task OnBlurAsync()
     {
-        if (Worksheet.Editor.Mode == EditMode.Formula)
+        if (Editor.Mode == EditMode.Formula)
         {
             await Spreadsheet.AcceptAsync();
         }
