@@ -77,12 +77,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (didWorkbookChange)
         {
             workbook = Workbook;
+            workbookView = null;
         }
     }
 
     private const int sheetIndex = 0;
 
     private Sheet? Sheet => workbook?.Sheets[sheetIndex];
+
+    private WorkbookView? workbookView;
+
+    private SheetView? ActiveView => Sheet != null ? (workbookView ??= new WorkbookView(workbook!)).GetView(Sheet) : null;
 
     private async Task OnWorkbookChangedAsync(Workbook? value)
     {
@@ -876,13 +881,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             deltaY += grid.ScrollTop - capture.ScrollTop;
 
-            var columnPixelRange = grid.Columns.GetPixelRange(capture.Column, capture.Column);
+            var columnPixelRange = grid.View.GetColumnPixelRange(capture.Column, capture.Column);
 
-            var columnIndex = grid.Columns.GetIndexRange(columnPixelRange.Start + deltaX, columnPixelRange.Start + deltaX, true);
+            var columnIndex = grid.View.GetColumnRange(columnPixelRange.Start + deltaX, columnPixelRange.Start + deltaX, true);
 
-            var rowPixelRange = grid.Rows.GetPixelRange(capture.Row, capture.Row);
+            var rowPixelRange = grid.View.GetRowPixelRange(capture.Row, capture.Row);
 
-            var rowIndex = grid.Rows.GetIndexRange(rowPixelRange.Start + deltaY, rowPixelRange.Start + deltaY, true);
+            var rowIndex = grid.View.GetRowRange(rowPixelRange.Start + deltaY, rowPixelRange.Start + deltaY, true);
 
             return new CellRef(rowIndex.Start, columnIndex.Start);
         }
