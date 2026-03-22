@@ -19,7 +19,7 @@ abstract class KOrderFunctionBase : FormulaFunction
         var arrayArg = arguments.GetRange("array");
         var kArg = arguments.GetSingle("k");
 
-        if (arrayArg == null || kArg == null)
+        if (arrayArg is null || kArg is null)
         {
             return CellData.FromError(CellError.Value);
         }

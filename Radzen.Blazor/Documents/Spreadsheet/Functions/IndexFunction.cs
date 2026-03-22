@@ -21,20 +21,20 @@ class IndexFunction : FormulaFunction
         var colArg = arguments.GetSingle("column_num");
         var areaArg = arguments.GetSingle("area_num");
 
-        if (array == null)
+        if (array is null)
         {
             return CellData.FromError(CellError.Value);
         }
 
-        if (rowArg != null && rowArg.IsError)
+        if (rowArg is not null && rowArg.IsError)
         {
             return rowArg;
         }
-        if (colArg != null && colArg.IsError)
+        if (colArg is not null && colArg.IsError)
         {
             return colArg;
         }
-        if (areaArg != null && areaArg.IsError)
+        if (areaArg is not null && areaArg.IsError)
         {
             return areaArg;
         }
@@ -54,7 +54,7 @@ class IndexFunction : FormulaFunction
         }
 
         // area selection: only area 1 is supported in this implementation
-        if (areaArg != null)
+        if (areaArg is not null)
         {
             if (!areaArg.TryGetInt(out var areaIndex, allowBooleans: false, nonNumericTextAsZero: false))
             {
@@ -71,7 +71,7 @@ class IndexFunction : FormulaFunction
         int? row = null;
         int? col = null;
 
-        if (rowArg != null)
+        if (rowArg is not null)
         {
             if (!rowArg.TryGetInt(out var rowIndex, allowBooleans: false, nonNumericTextAsZero: false))
             {
@@ -80,7 +80,7 @@ class IndexFunction : FormulaFunction
             row = rowIndex;
         }
 
-        if (colArg != null)
+        if (colArg is not null)
         {
             if (!colArg.TryGetInt(out var colIndex, allowBooleans: false, nonNumericTextAsZero: false))
             {

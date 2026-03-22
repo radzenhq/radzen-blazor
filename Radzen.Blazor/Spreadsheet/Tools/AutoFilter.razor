@@ -17,25 +17,25 @@
     {
         get
         {
-            if (Worksheet == null) return false;
+            if (Worksheet is null) return false;
 
             // Check if we're in a data table
             var dataTable = GetCurrentTable();
-            if (dataTable != null)
+            if (dataTable is not null)
             {
                 return dataTable.ShowFilterButton;
             }
 
             // Check if sheet has auto filter
-            return Worksheet.AutoFilter != null;
+            return Worksheet.AutoFilter is not null;
         }
         set
         {
-            if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
+            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
             {
                 // Check if we're in a data table
                 var dataTable = GetCurrentTable();
-                if (dataTable != null)
+                if (dataTable is not null)
                 {
                     var dataTableIndex = GetTableIndex(dataTable);
                     if (dataTableIndex >= 0)
@@ -58,7 +58,7 @@
 
     private Table? GetCurrentTable()
     {
-        if (Worksheet?.Tables == null) return null;
+        if (Worksheet?.Tables is null) return null;
 
         var selectedCell = Worksheet.Selection.Cell;
         if (selectedCell == CellRef.Invalid) return null;
@@ -76,7 +76,7 @@
 
     private int GetTableIndex(Table table)
     {
-        if (Worksheet?.Tables == null) return -1;
+        if (Worksheet?.Tables is null) return -1;
 
         for (int i = 0; i < Worksheet.Tables.Count; i++)
         {
@@ -91,14 +91,14 @@
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed += OnSelectionChanged;
         }
@@ -111,7 +111,7 @@
 
     public void Dispose()
     {
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }

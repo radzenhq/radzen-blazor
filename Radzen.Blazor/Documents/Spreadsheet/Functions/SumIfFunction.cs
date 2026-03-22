@@ -17,14 +17,14 @@ class SumIfFunction : FormulaFunction
     {
         var range = arguments.GetRange("range");
 
-        if (range == null)
+        if (range is null)
         {
             return CellData.FromError(CellError.Value);
         }
 
         var criteria = arguments.GetSingle("criteria");
 
-        if (criteria == null)
+        if (criteria is null)
         {
             return CellData.FromError(CellError.Value);
         }

@@ -24,7 +24,7 @@ class AggregateFunction : FormulaFunction
         var range = arguments.GetRange("array");
         var kArg = arguments.GetSingle("k");
 
-        if (funcArg == null || optsArg == null || range == null)
+        if (funcArg is null || optsArg is null || range is null)
         {
             return CellData.FromError(CellError.Value);
         }
@@ -53,7 +53,7 @@ class AggregateFunction : FormulaFunction
             var cell = range[i];
 
             // hidden rows
-            if (ignoreHidden && rl != null && rl.IsRowHiddenAt(i))
+            if (ignoreHidden && rl is not null && rl.IsRowHiddenAt(i))
             {
                 continue;
             }
@@ -95,7 +95,7 @@ class AggregateFunction : FormulaFunction
                 return AggregationMethods.Median(numbers);
             case 14: // LARGE
             {
-                if (kArg == null || kArg.IsError) 
+                if (kArg is null || kArg.IsError) 
                 {
                     return kArg ?? CellData.FromError(CellError.Value);
                 }
@@ -108,7 +108,7 @@ class AggregateFunction : FormulaFunction
             }
             case 15: // SMALL
             {
-                if (kArg == null || kArg.IsError) 
+                if (kArg is null || kArg.IsError) 
                 {
                     return kArg ?? CellData.FromError(CellError.Value);
                 }

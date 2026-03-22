@@ -17,7 +17,7 @@
 
     private async Task OnClickAsync()
     {
-        if (Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
         {
             return;
         }

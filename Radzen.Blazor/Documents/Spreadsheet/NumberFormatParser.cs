@@ -238,7 +238,7 @@ static class NumberFormatParser
                 {
                     var bracketContent = section[(i + 1)..end];
                     var colorCss = MapColorCode(bracketContent);
-                    if (colorCss != null)
+                    if (colorCss is not null)
                     {
                         tokens.Add(new FormatToken(TokenType.ColorCode, colorCss));
                     }

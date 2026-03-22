@@ -160,7 +160,7 @@ public class DataValidationRule : ICellValidator
             return [];
         }
 
-        if (Formula1.StartsWith('=') && sheet != null)
+        if (Formula1.StartsWith('=') && sheet is not null)
         {
             return ResolveListFromRange(sheet);
         }
@@ -181,7 +181,7 @@ public class DataValidationRule : ICellValidator
             {
                 for (var col = range.Start.Column; col <= range.End.Column; col++)
                 {
-                    if (sheet.Cells.TryGet(row, col, out var cell) && cell.Value != null)
+                    if (sheet.Cells.TryGet(row, col, out var cell) && cell.Value is not null)
                     {
                         items.Add(cell.Value.ToString() ?? "");
                     }
@@ -214,7 +214,7 @@ public class DataValidationRule : ICellValidator
     {
         ArgumentNullException.ThrowIfNull(cell);
 
-        if (AllowBlank && (cell.Value == null || (cell.Value is string s && string.IsNullOrEmpty(s)) || cell.ValueType == CellDataType.Empty))
+        if (AllowBlank && (cell.Value is null || (cell.Value is string s && string.IsNullOrEmpty(s)) || cell.ValueType == CellDataType.Empty))
         {
             return true;
         }

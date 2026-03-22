@@ -5,7 +5,7 @@
 <div class="rz-virtual-grid" @attributes=@AdditionalAttributes>
     <div @ref=@content class="rz-virtual-grid-content" style=@ContentStyle>
     @ChildContent?.Invoke(this)
-@if (items != null)
+@if (items is not null)
 {
     @foreach (var item in items)
     {

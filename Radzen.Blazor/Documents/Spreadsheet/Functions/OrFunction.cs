@@ -15,7 +15,7 @@ class OrFunction : FormulaFunction
     {
         var logicals = arguments.GetSequence("logical");
 
-        if (logicals == null || logicals.Count == 0)
+        if (logicals is null || logicals.Count == 0)
         {
             return CellData.FromError(CellError.Value);
         }

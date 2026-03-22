@@ -30,7 +30,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.ImagesChanged -= OnChanged;
             Worksheet.SelectedImageChanged -= OnChanged;
@@ -38,7 +38,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.ImagesChanged += OnChanged;
             Worksheet.SelectedImageChanged += OnChanged;
@@ -52,7 +52,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.ImagesChanged -= OnChanged;
             Worksheet.SelectedImageChanged -= OnChanged;
@@ -61,7 +61,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     private RangeRef GetImageRange(SheetImage image)
     {
-        if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To != null)
+        if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To is not null)
         {
             return new RangeRef(
                 new CellRef(image.From.Row, image.From.Column),
@@ -101,7 +101,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     private (double width, double height) GetImageDimensions(SheetImage image, RangeRef imageRange)
     {
-        if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To != null)
+        if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To is not null)
         {
             var fullRect = Context.GetRectangle(imageRange.Start.Row, imageRange.Start.Column, imageRange.End.Row, imageRange.End.Column);
             return (

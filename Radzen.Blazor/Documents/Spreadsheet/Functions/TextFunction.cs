@@ -21,7 +21,7 @@ class TextFunction : FormulaFunction
         var valueArg = arguments.GetSingle("value");
         var formatArg = arguments.GetSingle("format_text");
 
-        if (valueArg == null || formatArg == null)
+        if (valueArg is null || formatArg is null)
         {
             return CellData.FromError(CellError.Value);
         }

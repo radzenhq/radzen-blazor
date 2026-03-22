@@ -18,7 +18,7 @@ class ValueFunction : FormulaFunction
     public override CellData Evaluate(FunctionArguments arguments)
     {
         var arg = arguments.GetSingle("text");
-        if (arg == null)
+        if (arg is null)
         {
             return CellData.FromError(CellError.Value);
         }
