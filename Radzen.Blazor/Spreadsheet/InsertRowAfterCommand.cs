@@ -15,6 +15,11 @@ public class InsertRowAfterCommand : SheetSnapshotCommandBase
     /// </summary>
     public InsertRowAfterCommand(Worksheet sheet, int rowIndex) : base(sheet)
     {
+        if (rowIndex < 0 || rowIndex >= sheet.RowCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(rowIndex));
+        }
+
         this.rowIndex = rowIndex;
     }
 
