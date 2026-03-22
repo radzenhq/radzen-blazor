@@ -419,7 +419,7 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        if (Type == CellDataType.Empty || Type == CellDataType.Empty)
+        if (Type == CellDataType.Empty || other.Type == CellDataType.Empty)
         {
             return other.Value == null && Value == null;
         }

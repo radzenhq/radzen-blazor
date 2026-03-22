@@ -457,11 +457,6 @@ public partial class Worksheet
                 var newCol = addr.IsColumnAbsolute ? addr.Column : addr.Column + colDelta;
 
                 var sb = new StringBuilder();
-                if (formula.Length > 0 && formula[0] == '=')
-                {
-                    // no-op; we'll reconstruct by joining tokens
-                }
-
                 if (addr.IsColumnAbsolute)
                 {
                     sb.Append('$');
