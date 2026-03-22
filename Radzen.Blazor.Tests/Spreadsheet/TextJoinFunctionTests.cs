@@ -8,7 +8,7 @@ public class TextJoinFunctionTests
     [Fact]
     public void TextJoin_Literals_IgnoreEmptyTrue()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells["A1"].Formula = "=TEXTJOIN(\" \",TRUE,\"The\",\"sun\",\"will\",\"come\",\"up\",\"tomorrow.\")";
         Assert.Equal("The sun will come up tomorrow.", sheet.Cells["A1"].Data.Value);
     }
@@ -16,7 +16,7 @@ public class TextJoinFunctionTests
     [Fact]
     public void TextJoin_Range_CommaSpace_IgnoreEmptyTrue()
     {
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         // A2:A8 values
         sheet.Cells["A2"].Value = "US Dollar";
         sheet.Cells["A3"].Value = "Australian Dollar";
@@ -33,7 +33,7 @@ public class TextJoinFunctionTests
     [Fact]
     public void TextJoin_Range2D_CommaSpace_IgnoreEmptyVariants()
     {
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         // A2:B8 grid
         sheet.Cells["A2"].Value = "a1";
         sheet.Cells["B2"].Value = "b1";

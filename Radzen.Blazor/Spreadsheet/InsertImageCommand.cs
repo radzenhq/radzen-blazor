@@ -4,9 +4,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Command to insert an image into a sheet.
 /// </summary>
-public class InsertImageCommand(Sheet sheet, SheetImage image) : ICommand
+public class InsertImageCommand(Worksheet sheet, SheetImage image) : ICommand
 {
-    private readonly Sheet sheet = sheet;
+    private readonly Worksheet sheet = sheet;
     private readonly SheetImage image = image;
 
     /// <inheritdoc/>

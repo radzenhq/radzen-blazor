@@ -121,7 +121,7 @@ class IndexFunction : FormulaFunction
             {
                 var startRow = arr.StartRow;
                 var startCol = arr.StartColumn + (cIndex - 1);
-                var result = new RangeList(arr.Rows, 1, startRow, startCol, arr.Sheet);
+                var result = new RangeList(arr.Rows, 1, startRow, startCol, arr.Worksheet);
                 for (int i = 0; i < arr.Rows; i++)
                 {
                     var idx = i * arr.Columns + (cIndex - 1);
@@ -144,7 +144,7 @@ class IndexFunction : FormulaFunction
             {
                 var startRow = arr.StartRow + (rIndex - 1);
                 var startCol = arr.StartColumn;
-                var result = new RangeList(1, arr.Columns, startRow, startCol, arr.Sheet);
+                var result = new RangeList(1, arr.Columns, startRow, startCol, arr.Worksheet);
                 for (int j = 0; j < arr.Columns; j++)
                 {
                     var idx = (rIndex - 1) * arr.Columns + j;

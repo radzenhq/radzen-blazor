@@ -9,12 +9,12 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 /// <param name="sheet"></param>
 [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "CellRef indexer is intentional for spreadsheet access.")]
-public class CellStore(Sheet sheet)
+public class CellStore(Worksheet sheet)
 {
     /// <summary>
     /// Gets the sheet that owns this cell store.
     /// </summary>
-    public Sheet Sheet { get; } = sheet;
+    public Worksheet Worksheet { get; } = sheet;
 
     /// <summary>
     /// Stores the cells in a dictionary, where the key is a tuple of (row, column).
@@ -43,7 +43,7 @@ public class CellStore(Sheet sheet)
 
             if (!data.TryGetValue((row, column), out var cell))
             {
-                this[row, column] = cell = new(Sheet, new CellRef(row, column));
+                this[row, column] = cell = new(Worksheet, new CellRef(row, column));
             }
 
             return cell;
@@ -90,7 +90,7 @@ public class CellStore(Sheet sheet)
 
     private bool InBounds(int row, int column)
     {
-        return row >= 0 && row < Sheet.RowCount && column >= 0 && column < Sheet.ColumnCount;
+        return row >= 0 && row < Worksheet.RowCount && column >= 0 && column < Worksheet.ColumnCount;
     }
 
     /// <summary>
@@ -293,12 +293,12 @@ public class CellStore(Sheet sheet)
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the row or column index is out of range.</exception>
     protected void EnsureWithinBounds(int row, int column)
     {
-        if (row < 0 || row >= Sheet.RowCount)
+        if (row < 0 || row >= Worksheet.RowCount)
         {
             throw new ArgumentOutOfRangeException(nameof(row), "Row index is out of range.");
         }
 
-        if (column < 0 || column >= Sheet.ColumnCount)
+        if (column < 0 || column >= Worksheet.ColumnCount)
         {
             throw new ArgumentOutOfRangeException(nameof(column), "Column index is out of range.");
         }

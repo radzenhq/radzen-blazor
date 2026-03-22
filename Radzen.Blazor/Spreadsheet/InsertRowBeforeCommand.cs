@@ -3,7 +3,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Command that inserts a single row BEFORE the specified row index and supports undo via snapshot.
 /// </summary>
-public class InsertRowBeforeCommand(Sheet sheet, int rowIndex) : RowCommandBase(sheet, rowIndex)
+public class InsertRowBeforeCommand(Worksheet sheet, int rowIndex) : RowCommandBase(sheet, rowIndex)
 {
     /// <summary>
     /// Executes the command.

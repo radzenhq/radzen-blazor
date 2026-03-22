@@ -9,9 +9,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Represents a command to apply formatting to a range of cells in a spreadsheet.
 /// </summary>
-public class FormatCommand(Sheet sheet, RangeRef range, Format format) : ICommand
+public class FormatCommand(Worksheet sheet, RangeRef range, Format format) : ICommand
 {
-    private readonly Sheet sheet = sheet;
+    private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private readonly Format format = format;
     private readonly Dictionary<CellRef, Format> existing = [];

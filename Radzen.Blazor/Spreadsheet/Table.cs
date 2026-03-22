@@ -11,9 +11,9 @@ public class Table
     /// <summary>
     /// Initializes a new instance of the <see cref="Table"/> class.
     /// </summary>
-    public Table(Sheet sheet, RangeRef range)
+    public Table(Worksheet sheet, RangeRef range)
     {
-        Sheet = sheet;
+        Worksheet = sheet;
         Range = range;
         Filter = new AutoFilter(sheet, range);
     }
@@ -21,7 +21,7 @@ public class Table
     /// <summary>
     /// Gets the sheet to which the table is applied.
     /// </summary>
-    public Sheet Sheet { get; }
+    public Worksheet Worksheet { get; }
 
     /// <summary>
     /// Gets the range of the table.
@@ -53,7 +53,7 @@ public class Table
             if (showFilterButton != value)
             {
                 showFilterButton = value;
-                Sheet.OnAutoFilterChanged();
+                Worksheet.OnAutoFilterChanged();
             }
         }
     }
@@ -63,7 +63,7 @@ public class Table
     /// </summary>
     public void Sort(SortOrder order, int column)
     {
-        Sheet.Sort(Range, order, column - Range.Start.Column);
+        Worksheet.Sort(Range, order, column - Range.Start.Column);
     }
 }
 
@@ -75,16 +75,16 @@ public class AutoFilter
     /// <summary>
     /// Initializes a new instance of the <see cref="AutoFilter"/> class.
     /// </summary>
-    public AutoFilter(Sheet sheet, RangeRef range)
+    public AutoFilter(Worksheet sheet, RangeRef range)
     {
-        Sheet = sheet;
+        Worksheet = sheet;
         Range = range;
     }
 
     /// <summary>
     /// Gets the sheet to which the auto filter is applied.
     /// </summary>
-    public Sheet Sheet { get; }
+    public Worksheet Worksheet { get; }
 
     /// <summary>
     /// Gets the range of the filter
@@ -101,7 +101,7 @@ public class AutoFilter
             // Find the first visible row in the data table range
             for (int row = Range.Start.Row; row <= Range.End.Row; row++)
             {
-                if (!Sheet.Rows.IsHidden(row))
+                if (!Worksheet.Rows.IsHidden(row))
                 {
                     return new CellRef(row, Range.Start.Column);
                 }

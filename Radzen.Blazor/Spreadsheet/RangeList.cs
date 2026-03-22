@@ -10,8 +10,8 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 public class RangeList : List<CellData>
 {
-    private readonly Sheet sheet;
-    internal Sheet Sheet => sheet;
+    private readonly Worksheet sheet;
+    internal Worksheet Worksheet => sheet;
     /// <summary>
     /// Number of rows in the range.
     /// </summary>
@@ -40,7 +40,7 @@ public class RangeList : List<CellData>
     /// <param name="startRow">Starting row index.</param>
     /// <param name="startColumn">Starting column index.</param>
     /// <param name="sheet">The sheet instance providing row visibility information.</param>
-    public RangeList(int rows, int columns, int startRow, int startColumn, Sheet sheet)
+    public RangeList(int rows, int columns, int startRow, int startColumn, Worksheet sheet)
     {
         Rows = rows;
         Columns = columns;

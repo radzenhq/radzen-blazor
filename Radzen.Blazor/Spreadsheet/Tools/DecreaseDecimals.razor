@@ -8,35 +8,35 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
     private void OnClick()
     {
-        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            if (Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+            if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
             {
                 var newFormat = NumberFormat.AdjustDecimals(cell.Format.NumberFormat, -1);
-                var command = new FormatCommand(Sheet, Sheet.Selection.Range, cell.Format.WithNumberFormat(newFormat));
-                Sheet.Commands.Execute(command);
+                var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(newFormat));
+                Worksheet.Commands.Execute(command);
             }
         }
     }
 
-    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Sheet?.Selection != null)
+        if (Worksheet?.Selection != null)
         {
-            Sheet.Selection.Changed -= OnSelectionChanged;
+            Worksheet.Selection.Changed -= OnSelectionChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Sheet?.Selection != null)
+        if (Worksheet?.Selection != null)
         {
-            Sheet.Selection.Changed += OnSelectionChanged;
+            Worksheet.Selection.Changed += OnSelectionChanged;
         }
     }
 
@@ -47,9 +47,9 @@
 
     public void Dispose()
     {
-        if (Sheet?.Selection != null)
+        if (Worksheet?.Selection != null)
         {
-            Sheet.Selection.Changed -= OnSelectionChanged;
+            Worksheet.Selection.Changed -= OnSelectionChanged;
         }
     }
 }

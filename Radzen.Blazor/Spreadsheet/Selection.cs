@@ -7,7 +7,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// A class for managing the selection of cells or ranges in a spreadsheet.
 /// </summary>
 /// <param name="sheet"></param>
-public class Selection(Sheet sheet)
+public class Selection(Worksheet sheet)
 {
     /// <summary>
     /// Gets or sets the range of cells that are currently selected.

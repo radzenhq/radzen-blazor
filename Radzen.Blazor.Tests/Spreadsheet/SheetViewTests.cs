@@ -11,10 +11,10 @@ public class SheetViewTests
     [Fact]
     public void Constructor_SetsSheet()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var view = new SheetView(sheet);
 
-        Assert.Same(sheet, view.Sheet);
+        Assert.Same(sheet, view.Worksheet);
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class SheetViewTests
     [Fact]
     public void Constructor_CreatesCommands()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var view = new SheetView(sheet);
 
         Assert.NotNull(view.Commands);
@@ -35,7 +35,7 @@ public class SheetViewTests
     [Fact]
     public void DefaultOffsets()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var view = new SheetView(sheet);
 
         Assert.Equal(24, view.RowHeaderOffset);
@@ -47,7 +47,7 @@ public class SheetViewTests
     [Fact]
     public void GetRowRange_AddsOffset()
     {
-        var sheet = new Sheet(100, 10);
+        var sheet = new Worksheet(100, 10);
         var view = new SheetView(sheet);
 
         // SheetView subtracts the header offset before calling Axis
@@ -61,7 +61,7 @@ public class SheetViewTests
     [Fact]
     public void GetColumnRange_AddsOffset()
     {
-        var sheet = new Sheet(10, 100);
+        var sheet = new Worksheet(10, 100);
         var view = new SheetView(sheet);
 
         var fromAxis = sheet.Columns.GetIndexRange(0 - view.ColumnHeaderOffset, 500 - view.ColumnHeaderOffset);
@@ -74,7 +74,7 @@ public class SheetViewTests
     [Fact]
     public void GetRowPixelRange_AddsOffset()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Rows[3] = 50;
         var view = new SheetView(sheet);
 
@@ -88,7 +88,7 @@ public class SheetViewTests
     [Fact]
     public void GetRowPixelRange_SingleIndex_AddsOffset()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var view = new SheetView(sheet);
 
         var fromAxis = sheet.Rows.GetPixelRange(5);
@@ -101,7 +101,7 @@ public class SheetViewTests
     [Fact]
     public void GetColumnPixelRange_AddsOffset()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Columns[2] = 200;
         var view = new SheetView(sheet);
 
@@ -115,7 +115,7 @@ public class SheetViewTests
     [Fact]
     public void GetColumnPixelRange_SingleIndex_AddsOffset()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var view = new SheetView(sheet);
 
         var fromAxis = sheet.Columns.GetPixelRange(5);
@@ -128,7 +128,7 @@ public class SheetViewTests
     [Fact]
     public void TotalHeight_IncludesOffset()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var view = new SheetView(sheet);
 
         Assert.Equal(sheet.Rows.Total + view.RowHeaderOffset, view.TotalHeight);
@@ -137,7 +137,7 @@ public class SheetViewTests
     [Fact]
     public void TotalWidth_IncludesOffset()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var view = new SheetView(sheet);
 
         Assert.Equal(sheet.Columns.Total + view.ColumnHeaderOffset, view.TotalWidth);
@@ -148,7 +148,7 @@ public class SheetViewTests
     [Fact]
     public void Commands_ExecuteAndUndo()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var view = new SheetView(sheet);
         sheet.Cells[0, 0].Value = "A";
 
@@ -165,21 +165,21 @@ public class SheetViewTests
     [Fact]
     public void Commands_InjectedIntoSheet()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var view = new SheetView(sheet);
 
-        // Sheet.Commands should be the same instance as view.Commands
+        // Worksheet.Commands should be the same instance as view.Commands
         Assert.Same(view.Commands, sheet.Commands);
     }
 
     [Fact]
     public void Commands_ViaSheetCommands_UsesViewStack()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         var view = new SheetView(sheet);
         sheet.Cells[0, 0].Value = "A";
 
-        // Execute through Sheet.Commands (the way all tool components do it)
+        // Execute through Worksheet.Commands (the way all tool components do it)
         var cmd = new ClearContentsCommand(sheet, new RangeRef(new CellRef(0, 0), new CellRef(0, 0)));
         sheet.Commands.Execute(cmd);
 
@@ -194,8 +194,8 @@ public class SheetViewTests
     [Fact]
     public void Commands_IndependentPerView()
     {
-        var sheet1 = new Sheet(5, 5);
-        var sheet2 = new Sheet(5, 5);
+        var sheet1 = new Worksheet(5, 5);
+        var sheet2 = new Worksheet(5, 5);
         var view1 = new SheetView(sheet1);
         var view2 = new SheetView(sheet2);
 
@@ -238,20 +238,20 @@ public class WorkbookViewTests
     public void GetView_CreatesViewForSheet()
     {
         var wb = new Workbook();
-        var sheet = wb.AddSheet("Sheet1", 10, 10);
+        var sheet = wb.AddSheet("Worksheet1", 10, 10);
         var view = new WorkbookView(wb);
 
         var sheetView = view.GetView(sheet);
 
         Assert.NotNull(sheetView);
-        Assert.Same(sheet, sheetView.Sheet);
+        Assert.Same(sheet, sheetView.Worksheet);
     }
 
     [Fact]
     public void GetView_ReturnsSameViewForSameSheet()
     {
         var wb = new Workbook();
-        var sheet = wb.AddSheet("Sheet1", 10, 10);
+        var sheet = wb.AddSheet("Worksheet1", 10, 10);
         var view = new WorkbookView(wb);
 
         var v1 = view.GetView(sheet);
@@ -264,24 +264,24 @@ public class WorkbookViewTests
     public void GetView_DifferentViewsForDifferentSheets()
     {
         var wb = new Workbook();
-        var s1 = wb.AddSheet("Sheet1", 10, 10);
-        var s2 = wb.AddSheet("Sheet2", 10, 10);
+        var s1 = wb.AddSheet("Worksheet1", 10, 10);
+        var s2 = wb.AddSheet("Worksheet2", 10, 10);
         var view = new WorkbookView(wb);
 
         var v1 = view.GetView(s1);
         var v2 = view.GetView(s2);
 
         Assert.NotSame(v1, v2);
-        Assert.Same(s1, v1.Sheet);
-        Assert.Same(s2, v2.Sheet);
+        Assert.Same(s1, v1.Worksheet);
+        Assert.Same(s2, v2.Worksheet);
     }
 
     [Fact]
     public void GetView_PerSheetUndoHistory()
     {
         var wb = new Workbook();
-        var s1 = wb.AddSheet("Sheet1", 5, 5);
-        var s2 = wb.AddSheet("Sheet2", 5, 5);
+        var s1 = wb.AddSheet("Worksheet1", 5, 5);
+        var s2 = wb.AddSheet("Worksheet2", 5, 5);
         var wbView = new WorkbookView(wb);
 
         s1.Cells[0, 0].Value = "A";
@@ -296,7 +296,7 @@ public class WorkbookViewTests
         Assert.True(v1.Commands.CanUndo);
         Assert.False(v2.Commands.CanUndo);
 
-        // Sheet2 is unaffected
+        // Worksheet2 is unaffected
         Assert.Equal("B", s2.Cells[0, 0].Value);
     }
 
@@ -304,7 +304,7 @@ public class WorkbookViewTests
     public void Remove_DisposesView()
     {
         var wb = new Workbook();
-        var sheet = wb.AddSheet("Sheet1", 10, 10);
+        var sheet = wb.AddSheet("Worksheet1", 10, 10);
         var view = new WorkbookView(wb);
 
         var v1 = view.GetView(sheet);
@@ -323,7 +323,7 @@ public class WorkbookViewTests
     {
         var wb = new Workbook();
         var view = new WorkbookView(wb);
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
 
         Assert.False(view.Remove(sheet));
     }

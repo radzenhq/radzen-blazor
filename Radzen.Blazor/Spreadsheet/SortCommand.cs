@@ -17,9 +17,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <param name="order">The sort order (ascending or descending).</param>
 /// <param name="keyIndex">The column index to sort by.</param>
 /// <param name="skipHeaderRow">If true, skips the first row (header) when sorting.</param>
-public class SortCommand(Sheet sheet, RangeRef range, SortOrder order, int keyIndex, bool skipHeaderRow = false) : ICommand
+public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int keyIndex, bool skipHeaderRow = false) : ICommand
 {
-    private readonly Sheet sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+    private readonly Worksheet sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
     private readonly RangeRef range = range;
     private readonly SortOrder order = order;
     private readonly int keyIndex = keyIndex;

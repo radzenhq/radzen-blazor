@@ -10,7 +10,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 public class SheetAutoFilterCommand : ICommand
 {
-    private readonly Sheet sheet;
+    private readonly Worksheet sheet;
     private readonly RangeRef range;
     private readonly AutoFilter? previousAutoFilter;
 
@@ -19,7 +19,7 @@ public class SheetAutoFilterCommand : ICommand
     /// </summary>
     /// <param name="sheet">The sheet to toggle auto filter on.</param>
     /// <param name="range">The range to apply auto filter to.</param>
-    public SheetAutoFilterCommand(Sheet sheet, RangeRef range)
+    public SheetAutoFilterCommand(Worksheet sheet, RangeRef range)
     {
         ArgumentNullException.ThrowIfNull(sheet);
         this.sheet = sheet;

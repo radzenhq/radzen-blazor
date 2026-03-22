@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class RoundDownFunctionTests
 {
-    readonly Sheet sheet = new(10, 10);
+    readonly Worksheet sheet = new(10, 10);
 
     [Fact]
     public void ShouldRoundDownToZeroDecimalPlaces()

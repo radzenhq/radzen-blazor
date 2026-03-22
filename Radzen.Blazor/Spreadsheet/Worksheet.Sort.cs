@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Radzen.Documents.Spreadsheet;
 #nullable enable
 
-public partial class Sheet
+public partial class Worksheet
 {
     /// <summary>
     /// Sorts the specified range of cells in the sheet based on the specified order and key index.

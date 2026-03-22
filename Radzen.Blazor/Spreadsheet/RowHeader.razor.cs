@@ -24,7 +24,7 @@ public partial class RowHeader : CellBase, IDisposable
     /// Gets or sets the sheet that contains the row header.
     /// </summary>
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
     private bool active;
     private bool selected;
@@ -46,17 +46,17 @@ public partial class RowHeader : CellBase, IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Selection.Changed -= OnSelectionChanged;
+            Worksheet.Selection.Changed -= OnSelectionChanged;
         }
         var didRowChange = parameters.TryGetValue<int>(nameof(Row), out var row) && Row != row;
 
         await base.SetParametersAsync(parameters);
 
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Selection.Changed += OnSelectionChanged;
+            Worksheet.Selection.Changed += OnSelectionChanged;
         }
 
         if (didRowChange)
@@ -79,18 +79,18 @@ public partial class RowHeader : CellBase, IDisposable
     {
         var dirty = false;
 
-        if (Sheet is not null)
+        if (Worksheet is not null)
         {
             var address = new RowRef(Row);
 
-            if (Sheet.Selection.IsActive(address) != active)
+            if (Worksheet.Selection.IsActive(address) != active)
             {
                 active = !active;
 
                 dirty = true;
             }
 
-            if (Sheet.Selection.IsSelected(address) != selected)
+            if (Worksheet.Selection.IsSelected(address) != selected)
             {
                 selected = !selected;
 
@@ -103,9 +103,9 @@ public partial class RowHeader : CellBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Selection.Changed -= OnSelectionChanged;
+            Worksheet.Selection.Changed -= OnSelectionChanged;
         }
     }
 }

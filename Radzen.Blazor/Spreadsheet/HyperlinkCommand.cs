@@ -6,9 +6,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Command to set or remove a hyperlink on a cell.
 /// </summary>
-public class HyperlinkCommand(Sheet sheet, CellRef address, Hyperlink? hyperlink) : ICommand
+public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyperlink) : ICommand
 {
-    private readonly Sheet sheet = sheet;
+    private readonly Worksheet sheet = sheet;
     private readonly CellRef address = address;
     private readonly Hyperlink? hyperlink = hyperlink;
     private Hyperlink? previousHyperlink;

@@ -4,9 +4,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Command to delete an image from a sheet.
 /// </summary>
-public class DeleteImageCommand(Sheet sheet, SheetImage image) : ICommand
+public class DeleteImageCommand(Worksheet sheet, SheetImage image) : ICommand
 {
-    private readonly Sheet sheet = sheet;
+    private readonly Worksheet sheet = sheet;
     private readonly SheetImage image = image;
 
     /// <inheritdoc/>

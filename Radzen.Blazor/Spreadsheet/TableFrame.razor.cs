@@ -18,7 +18,7 @@ public partial class TableFrame
     /// Gets or sets the sheet that contains the table.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the context for the virtual grid that contains the table.
