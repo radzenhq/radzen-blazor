@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
@@ -100,4 +102,88 @@ public class SheetView
     /// Gets the total scrollable width including the column header offset.
     /// </summary>
     public double TotalWidth => Sheet.Columns.Total + ColumnHeaderOffset;
+
+    /// <summary>
+    /// Splits a range into regions based on frozen pane boundaries for rendering.
+    /// </summary>
+    public IEnumerable<RangeInfo> GetRanges(RangeRef range)
+    {
+        if (range == RangeRef.Invalid)
+        {
+            yield break;
+        }
+
+        var frozenRows = Sheet.Rows.Frozen;
+        var frozenColumns = Sheet.Columns.Frozen;
+
+        var bottomRightRange = new RangeRef(new CellRef(frozenRows, frozenColumns), new CellRef(Sheet.RowCount - 1, Sheet.ColumnCount - 1));
+
+        if (range.Overlaps(bottomRightRange))
+        {
+            yield return new RangeInfo
+            {
+                Range = range.Intersection(bottomRightRange),
+                FrozenRow = false,
+                FrozenColumn = false,
+                Top = range.Start.Row >= frozenRows,
+                Left = range.Start.Column >= frozenColumns,
+                Bottom = true,
+                Right = true
+            };
+        }
+
+        var topLeftRange = frozenRows > 0 && frozenColumns > 0
+            ? new RangeRef(new CellRef(0, 0), new CellRef(frozenRows - 1, frozenColumns - 1))
+            : RangeRef.Invalid;
+
+        if (range.Overlaps(topLeftRange))
+        {
+            yield return new RangeInfo
+            {
+                Range = range.Intersection(topLeftRange),
+                FrozenRow = true,
+                FrozenColumn = true,
+                Top = true,
+                Left = true,
+                Bottom = range.End.Row < frozenRows,
+                Right = range.End.Column < frozenColumns
+            };
+        }
+
+        var topRightRange = frozenRows > 0
+            ? new RangeRef(new CellRef(0, frozenColumns), new CellRef(frozenRows - 1, Sheet.ColumnCount - 1))
+            : RangeRef.Invalid;
+
+        if (range.Overlaps(topRightRange))
+        {
+            yield return new RangeInfo
+            {
+                Range = range.Intersection(topRightRange),
+                FrozenRow = true,
+                FrozenColumn = false,
+                Top = true,
+                Left = range.Start.Column >= frozenColumns,
+                Bottom = range.End.Row < frozenRows,
+                Right = true
+            };
+        }
+
+        var bottomLeftRange = frozenColumns > 0
+            ? new RangeRef(new CellRef(frozenRows, 0), new CellRef(Sheet.RowCount - 1, frozenColumns - 1))
+            : RangeRef.Invalid;
+
+        if (range.Overlaps(bottomLeftRange))
+        {
+            yield return new RangeInfo
+            {
+                Range = range.Intersection(bottomLeftRange),
+                FrozenRow = false,
+                FrozenColumn = true,
+                Top = range.Start.Row >= frozenRows,
+                Left = true,
+                Bottom = true,
+                Right = range.End.Column < frozenColumns
+            };
+        }
+    }
 }
