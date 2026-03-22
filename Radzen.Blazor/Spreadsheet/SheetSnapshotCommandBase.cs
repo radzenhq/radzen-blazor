@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
@@ -15,9 +17,7 @@ public abstract class SheetSnapshotCommandBase : ICommand
     /// </summary>
     protected readonly Worksheet sheet;
 
-    private readonly object?[,] backupValues;
-    private readonly string?[,] backupFormulas;
-    private readonly Format?[,] backupFormats;
+    private readonly Dictionary<(int row, int column), (object? value, string? formula, Format? format)> backupCells;
     private readonly int originalRowCount;
     private readonly int originalColumnCount;
 
@@ -31,19 +31,11 @@ public abstract class SheetSnapshotCommandBase : ICommand
         originalRowCount = sheet.RowCount;
         originalColumnCount = sheet.ColumnCount;
 
-        backupValues = new object?[sheet.RowCount, sheet.ColumnCount];
-        backupFormulas = new string?[sheet.RowCount, sheet.ColumnCount];
-        backupFormats = new Format?[sheet.RowCount, sheet.ColumnCount];
+        backupCells = [];
 
-        for (var r = 0; r < sheet.RowCount; r++)
+        foreach (var cell in sheet.Cells.GetPopulatedCells())
         {
-            for (var c = 0; c < sheet.ColumnCount; c++)
-            {
-                var cell = sheet.Cells[r, c];
-                backupValues[r, c] = cell.Value;
-                backupFormulas[r, c] = cell.Formula;
-                backupFormats[r, c] = cell.Format?.Clone();
-            }
+            backupCells[(cell.Address.Row, cell.Address.Column)] = (cell.Value, cell.Formula, cell.Format?.Clone());
         }
     }
 
@@ -79,17 +71,33 @@ public abstract class SheetSnapshotCommandBase : ICommand
             sheet.InsertColumn(sheet.ColumnCount, 1);
         }
 
-        for (var r = 0; r < originalRowCount; r++)
+        // Clear any cells that were created by the operation but weren't in the backup
+        foreach (var cell in sheet.Cells.GetPopulatedCells().ToList())
         {
-            for (var c = 0; c < originalColumnCount; c++)
+            if (!backupCells.ContainsKey((cell.Address.Row, cell.Address.Column)))
             {
-                var cell = sheet.Cells[r, c];
-                cell.Value = backupValues[r, c];
-                cell.Formula = backupFormulas[r, c];
-                if (backupFormats[r, c] != null)
-                {
-                    cell.Format = backupFormats[r, c]!;
-                }
+                cell.Value = null;
+                cell.Formula = null;
+            }
+        }
+
+        // Restore backed-up cells
+        foreach (var ((row, column), (value, formula, format)) in backupCells)
+        {
+            var cell = sheet.Cells[row, column];
+
+            if (formula != null)
+            {
+                cell.Formula = formula;
+            }
+            else
+            {
+                cell.Value = value;
+            }
+
+            if (format != null)
+            {
+                cell.Format = format;
             }
         }
     }
