@@ -33,7 +33,6 @@ public partial class SelectionOverlay
         if (Sheet != null)
         {
             Sheet.Selection.Changed += OnSelectionChanged;
-            StateHasChanged();
         }
     }
 
