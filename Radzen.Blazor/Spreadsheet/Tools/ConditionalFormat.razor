@@ -30,7 +30,14 @@
             return;
         }
 
-        var ruleType = item?.Value ?? "greater";
+        var ruleType = item?.Value switch
+        {
+            "less" => ConditionalFormatRuleType.LessThan,
+            "between" => ConditionalFormatRuleType.Between,
+            "equal" => ConditionalFormatRuleType.EqualTo,
+            "text" => ConditionalFormatRuleType.TextContains,
+            _ => ConditionalFormatRuleType.GreaterThan
+        };
 
         var result = await DialogService.OpenAsync<ConditionalFormatDialog>("Conditional Formatting",
             new Dictionary<string, object?>

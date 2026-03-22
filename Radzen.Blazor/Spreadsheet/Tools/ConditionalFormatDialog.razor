@@ -6,14 +6,14 @@
         <RadzenDropDown @bind-Value=@RuleType Data=@RuleTypes TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
     </RadzenFormField>
 
-    @if (RuleType == "greater" || RuleType == "less" || RuleType == "equal")
+    @if (RuleType == ConditionalFormatRuleType.GreaterThan || RuleType == ConditionalFormatRuleType.LessThan || RuleType == ConditionalFormatRuleType.EqualTo)
     {
         <RadzenFormField Text="Value">
             <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
         </RadzenFormField>
     }
 
-    @if (RuleType == "between")
+    @if (RuleType == ConditionalFormatRuleType.Between)
     {
         <RadzenFormField Text="Minimum">
             <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
@@ -23,7 +23,7 @@
         </RadzenFormField>
     }
 
-    @if (RuleType == "text")
+    @if (RuleType == ConditionalFormatRuleType.TextContains)
     {
         <RadzenFormField Text="Text">
             <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
@@ -50,20 +50,20 @@
     public DialogService DialogService { get; set; } = default!;
 
     [Parameter]
-    public string RuleType { get; set; } = "greater";
+    public ConditionalFormatRuleType RuleType { get; set; } = ConditionalFormatRuleType.GreaterThan;
 
     private string Value1 { get; set; } = "";
     private string Value2 { get; set; } = "";
     private string BackgroundColor { get; set; } = "#FFEB9C";
     private string TextColor { get; set; } = "#9C5700";
 
-    private static readonly List<RuleTypeOption> RuleTypes =
+    private static readonly List<DropDownItem<ConditionalFormatRuleType>> RuleTypes =
     [
-        new("Greater Than", "greater"),
-        new("Less Than", "less"),
-        new("Between", "between"),
-        new("Equal To", "equal"),
-        new("Text Contains", "text")
+        new("Greater Than", ConditionalFormatRuleType.GreaterThan),
+        new("Less Than", ConditionalFormatRuleType.LessThan),
+        new("Between", ConditionalFormatRuleType.Between),
+        new("Equal To", ConditionalFormatRuleType.EqualTo),
+        new("Text Contains", ConditionalFormatRuleType.TextContains)
     ];
 
     private void OnOk()
@@ -71,19 +71,19 @@
         var format = new Format { BackgroundColor = BackgroundColor, Color = TextColor };
         ConditionalFormatBase? rule = RuleType switch
         {
-            "greater" when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+            ConditionalFormatRuleType.GreaterThan when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out var v) =>
                 new GreaterThanRule { Value = v, Format = format },
-            "less" when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+            ConditionalFormatRuleType.LessThan when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out var v) =>
                 new LessThanRule { Value = v, Format = format },
-            "between" when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+            ConditionalFormatRuleType.Between when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out var min) &&
                 double.TryParse(Value2, System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out var max) =>
                 new BetweenRule { Minimum = min, Maximum = max, Format = format },
-            "equal" => new EqualToRule { Value = Value1, Format = format },
-            "text" => new TextContainsRule { Text = Value1, Format = format },
+            ConditionalFormatRuleType.EqualTo => new EqualToRule { Value = Value1, Format = format },
+            ConditionalFormatRuleType.TextContains => new TextContainsRule { Text = Value1, Format = format },
             _ => null
         };
 
@@ -98,9 +98,9 @@
         DialogService.Close(null);
     }
 
-    private sealed class RuleTypeOption(string name, string value)
+    private sealed class DropDownItem<T>(string name, T value)
     {
         public string Name { get; } = name;
-        public string Value { get; } = value;
+        public T Value { get; } = value;
     }
 }
