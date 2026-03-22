@@ -29,10 +29,12 @@ public class SheetView
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SheetView"/> class.
+    /// Injects its own UndoRedoStack into the sheet so callers can use Sheet.Commands transparently.
     /// </summary>
     public SheetView(Sheet sheet)
     {
         Sheet = sheet ?? throw new System.ArgumentNullException(nameof(sheet));
+        sheet.Commands = Commands;
     }
 
     /// <summary>
