@@ -89,7 +89,7 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
     }
 
     /// <inheritdoc/>
-    public void Dispose()
+    void IDisposable.Dispose()
     {
         if (Worksheet?.Selection is not null)
         {
