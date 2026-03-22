@@ -4,7 +4,7 @@
 {
     var imageRange = GetImageRange(image);
     var selected = Sheet.SelectedImage == image;
-    @foreach (var zone in Sheet.GetRanges(imageRange))
+    @foreach (var zone in Context.GetRanges(imageRange))
     {
         <div class=@GetClass(zone.FrozenRow, zone.FrozenColumn) style=@GetZoneStyle(image, imageRange, zone) @onpointerdown=@(e => OnImagePointerDown(e, image)) @onpointerdown:stopPropagation>
             <div class="rz-spreadsheet-image-clip">

@@ -25,7 +25,7 @@ public class ImageOverlayTests : TestContext
     public void ImageOverlay_RendersNothing_WhenNoImages()
     {
         var sheet = new Sheet(10, 10);
-        var context = new ImageMockContext();
+        var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
@@ -40,7 +40,7 @@ public class ImageOverlayTests : TestContext
         var sheet = new Sheet(10, 10);
         sheet.AddImage(CreateImage(0, 0));
         sheet.AddImage(CreateImage(2, 2));
-        var context = new ImageMockContext();
+        var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
@@ -58,7 +58,7 @@ public class ImageOverlayTests : TestContext
     {
         var sheet = new Sheet(10, 10);
         sheet.AddImage(CreateImage(0, 0));
-        var context = new ImageMockContext();
+        var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
@@ -74,7 +74,7 @@ public class ImageOverlayTests : TestContext
         var sheet = new Sheet(10, 10);
         sheet.Columns.Frozen = 2;
         sheet.AddImage(CreateImage(0, 0)); // column 0 < frozen 2, fits within frozen area
-        var context = new ImageMockContext();
+        var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
@@ -90,7 +90,7 @@ public class ImageOverlayTests : TestContext
         var sheet = new Sheet(10, 10);
         sheet.Rows.Frozen = 2;
         sheet.AddImage(CreateImage(0, 0)); // row 0 < frozen 2, fits within frozen area
-        var context = new ImageMockContext();
+        var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
@@ -107,7 +107,7 @@ public class ImageOverlayTests : TestContext
         sheet.Rows.Frozen = 1;
         sheet.Columns.Frozen = 1;
         sheet.AddImage(CreateImage(2, 2)); // row 2, col 2 - not frozen
-        var context = new ImageMockContext();
+        var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
@@ -123,7 +123,7 @@ public class ImageOverlayTests : TestContext
     {
         var sheet = new Sheet(10, 10);
         sheet.AddImage(CreateImage(0, 0));
-        var context = new ImageMockContext();
+        var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
@@ -145,7 +145,7 @@ public class ImageOverlayTests : TestContext
         var image = CreateImage(0, 0);
         sheet.AddImage(image);
         sheet.SelectedImage = image;
-        var context = new ImageMockContext();
+        var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
             .Add(p => p.Sheet, sheet)
@@ -172,6 +172,16 @@ public class ImageOverlayTests : TestContext
 
 public class ImageMockContext : IVirtualGridContext
 {
+    private SheetView view;
+
+    public ImageMockContext(Sheet sheet = null)
+    {
+        if (sheet != null)
+        {
+            view = new SheetView(sheet);
+        }
+    }
+
     public PixelRectangle GetRectangle(int row, int column)
     {
         return new PixelRectangle(row * 24, column * 100, (row + 1) * 24, (column + 1) * 100);
@@ -181,4 +191,7 @@ public class ImageMockContext : IVirtualGridContext
     {
         return new PixelRectangle(new PixelRange(left * 100, (right + 1) * 100), new PixelRange(top * 24, (bottom + 1) * 24));
     }
+
+    public IEnumerable<RangeInfo> GetRanges(RangeRef range) =>
+        view != null ? view.GetRanges(range) : [new RangeInfo { Range = range }];
 }
