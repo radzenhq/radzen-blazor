@@ -60,7 +60,7 @@ internal class CellDependencyGraph
             return;
         }
 
-        var tree = FormulaParser.Parse(cell.Formula);
+        var tree = cell.FormulaSyntaxTree ?? FormulaParser.Parse(cell.Formula);
         var visitor = new DependencyVisitor(cell.Worksheet);
         tree.Root.Accept(visitor);
 
