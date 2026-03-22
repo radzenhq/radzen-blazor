@@ -65,7 +65,7 @@ public class Workbook
     {
         foreach (var sheet in sheets)
         {
-            if (sheet.Name == name)
+            if (string.Equals(sheet.Name, name, StringComparison.OrdinalIgnoreCase))
             {
                 return sheet;
             }
