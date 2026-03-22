@@ -649,34 +649,26 @@ public static class NumberFormat
         var suffix = new StringBuilder();
         string? sectionColor = null;
 
-        // Extract color code from tokens
+        // Single pass: extract color, detect date tokens, and parse number format
+        var seenDigit = false;
+
         foreach (var token in tokens)
         {
             if (token.Type == TokenType.ColorCode)
             {
-                sectionColor = token.Text;
-                break;
+                sectionColor ??= token.Text;
+                continue;
             }
-        }
 
-        // Check for AM/PM and date tokens
-        foreach (var token in tokens)
-        {
             if (token.Type == TokenType.AmPm) is12Hour = true;
+
             if (token.Type is TokenType.Year or TokenType.Month or TokenType.Day
                 or TokenType.Hour or TokenType.Minute or TokenType.Second or TokenType.AmPm)
             {
                 isDate = true;
             }
-        }
 
-        if (!isDate)
-        {
-            // Parse number format tokens
-            var seenDigit = false;
-            var afterDigits = false;
-
-            foreach (var token in tokens)
+            if (!isDate)
             {
                 switch (token.Type)
                 {
@@ -709,7 +701,6 @@ public static class NumberFormat
                         break;
                     case TokenType.Percent:
                         isPercentage = true;
-                        afterDigits = seenDigit;
                         break;
                     case TokenType.Exponent:
                         isScientific = true;
@@ -735,7 +726,10 @@ public static class NumberFormat
                         break;
                 }
             }
+        }
 
+        if (!isDate)
+        {
             // Check for trailing commas (scaling)
             var trimmed = section.TrimEnd();
             var trailingCommas = 0;
