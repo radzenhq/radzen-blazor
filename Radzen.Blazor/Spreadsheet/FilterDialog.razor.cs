@@ -270,30 +270,24 @@ public partial class FilterDialog : ComponentBase
         }
     }
 
-    private class FilterCriterionVisitor(int column) : IFilterCriterionVisitor
+    private class FilterCriterionVisitor(int column) : FilterCriterionVisitorBase
     {
         public List<(FilterOperator Operator, string? Value)> Criteria { get; } = [];
         public LogicalFilterOperator LogicalOperator { get; set; } = LogicalFilterOperator.And;
 
-        public void Visit(OrCriterion criterion)
+        public override void Visit(OrCriterion criterion)
         {
             LogicalOperator = LogicalFilterOperator.Or;
-            foreach (var c in criterion.Criteria)
-            {
-                c.Accept(this);
-            }
+            base.Visit(criterion);
         }
 
-        public void Visit(AndCriterion criterion)
+        public override void Visit(AndCriterion criterion)
         {
             LogicalOperator = LogicalFilterOperator.And;
-            foreach (var c in criterion.Criteria)
-            {
-                c.Accept(this);
-            }
+            base.Visit(criterion);
         }
 
-        public void Visit(EqualToCriterion criterion)
+        public override void Visit(EqualToCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -301,7 +295,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(GreaterThanCriterion criterion)
+        public override void Visit(GreaterThanCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -309,12 +303,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(InListCriterion criterion)
-        {
-            // Not used for custom filter dialog
-        }
-
-        public void Visit(IsNullCriterion criterion)
+        public override void Visit(IsNullCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -322,7 +311,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(LessThanCriterion criterion)
+        public override void Visit(LessThanCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -330,7 +319,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(GreaterThanOrEqualCriterion criterion)
+        public override void Visit(GreaterThanOrEqualCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -338,7 +327,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(LessThanOrEqualCriterion criterion)
+        public override void Visit(LessThanOrEqualCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -346,7 +335,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(NotEqualToCriterion criterion)
+        public override void Visit(NotEqualToCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -354,7 +343,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(StartsWithCriterion criterion)
+        public override void Visit(StartsWithCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -362,7 +351,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(DoesNotStartWithCriterion criterion)
+        public override void Visit(DoesNotStartWithCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -370,7 +359,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(EndsWithCriterion criterion)
+        public override void Visit(EndsWithCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -378,7 +367,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(DoesNotEndWithCriterion criterion)
+        public override void Visit(DoesNotEndWithCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -386,7 +375,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(ContainsCriterion criterion)
+        public override void Visit(ContainsCriterion criterion)
         {
             if (criterion.Column == column)
             {
@@ -394,7 +383,7 @@ public partial class FilterDialog : ComponentBase
             }
         }
 
-        public void Visit(DoesNotContainCriterion criterion)
+        public override void Visit(DoesNotContainCriterion criterion)
         {
             if (criterion.Column == column)
             {
