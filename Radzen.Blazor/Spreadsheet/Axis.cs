@@ -299,11 +299,6 @@ public class Axis(double size, int count)
     }
 
     /// <summary>
-    /// Gets or sets the offset of the axis. This is used to adjust the starting position of the axis, for example, to render headers.
-    /// </summary>
-    public double Offset { get; set; }
-
-    /// <summary>
     /// Shifts custom sizes and hidden state up after a row/column is deleted.
     /// Entries at the deleted index are removed; entries above are unchanged;
     /// entries below are decremented by one.
@@ -388,7 +383,7 @@ public class Axis(double size, int count)
 
     internal IndexRange GetIndexRange(double start, double end, bool includeFrozen = false)
     {
-        var currentPosition = Offset;
+        var currentPosition = 0d;
         var startOffset = 0d;
 
         if (!includeFrozen)
@@ -465,7 +460,7 @@ public class Axis(double size, int count)
                 }
             }
 
-            return total + size * (Count - data.Count - hidden.Count) + Offset;
+            return total + size * (Count - data.Count - hidden.Count);
         }
     }
 
@@ -478,7 +473,7 @@ public class Axis(double size, int count)
     {
         double start;
         double end;
-        var currentPosition = Offset;
+        var currentPosition = 0d;
 
         for (var index = 0; index < startIndex; index++)
         {

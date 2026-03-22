@@ -39,59 +39,65 @@ public class SheetView
 
     /// <summary>
     /// Gets the visible row index range for the given scroll position and viewport height.
+    /// Accounts for the row header offset.
     /// </summary>
     public IndexRange GetRowRange(double start, double end, bool includeFrozen = false)
     {
-        return Sheet.Rows.GetIndexRange(start, end, includeFrozen);
+        return Sheet.Rows.GetIndexRange(start - RowHeaderOffset, end - RowHeaderOffset, includeFrozen);
     }
 
     /// <summary>
     /// Gets the visible column index range for the given scroll position and viewport width.
+    /// Accounts for the column header offset.
     /// </summary>
     public IndexRange GetColumnRange(double start, double end, bool includeFrozen = false)
     {
-        return Sheet.Columns.GetIndexRange(start, end, includeFrozen);
+        return Sheet.Columns.GetIndexRange(start - ColumnHeaderOffset, end - ColumnHeaderOffset, includeFrozen);
     }
 
     /// <summary>
-    /// Gets the pixel range for the specified row indices.
+    /// Gets the pixel range for the specified row indices, offset by the row header height.
     /// </summary>
     public PixelRange GetRowPixelRange(int startIndex, int endIndex)
     {
-        return Sheet.Rows.GetPixelRange(startIndex, endIndex);
+        var range = Sheet.Rows.GetPixelRange(startIndex, endIndex);
+        return new PixelRange(range.Start + RowHeaderOffset, range.End + RowHeaderOffset);
     }
 
     /// <summary>
-    /// Gets the pixel range for a single row index.
+    /// Gets the pixel range for a single row index, offset by the row header height.
     /// </summary>
     public PixelRange GetRowPixelRange(int index)
     {
-        return Sheet.Rows.GetPixelRange(index);
+        var range = Sheet.Rows.GetPixelRange(index);
+        return new PixelRange(range.Start + RowHeaderOffset, range.End + RowHeaderOffset);
     }
 
     /// <summary>
-    /// Gets the pixel range for the specified column indices.
+    /// Gets the pixel range for the specified column indices, offset by the column header width.
     /// </summary>
     public PixelRange GetColumnPixelRange(int startIndex, int endIndex)
     {
-        return Sheet.Columns.GetPixelRange(startIndex, endIndex);
+        var range = Sheet.Columns.GetPixelRange(startIndex, endIndex);
+        return new PixelRange(range.Start + ColumnHeaderOffset, range.End + ColumnHeaderOffset);
     }
 
     /// <summary>
-    /// Gets the pixel range for a single column index.
+    /// Gets the pixel range for a single column index, offset by the column header width.
     /// </summary>
     public PixelRange GetColumnPixelRange(int index)
     {
-        return Sheet.Columns.GetPixelRange(index);
+        var range = Sheet.Columns.GetPixelRange(index);
+        return new PixelRange(range.Start + ColumnHeaderOffset, range.End + ColumnHeaderOffset);
     }
 
     /// <summary>
-    /// Gets the total scrollable height including all visible rows and the header offset.
+    /// Gets the total scrollable height including the row header offset.
     /// </summary>
-    public double TotalHeight => Sheet.Rows.Total;
+    public double TotalHeight => Sheet.Rows.Total + RowHeaderOffset;
 
     /// <summary>
-    /// Gets the total scrollable width including all visible columns and the header offset.
+    /// Gets the total scrollable width including the column header offset.
     /// </summary>
-    public double TotalWidth => Sheet.Columns.Total;
+    public double TotalWidth => Sheet.Columns.Total + ColumnHeaderOffset;
 }
