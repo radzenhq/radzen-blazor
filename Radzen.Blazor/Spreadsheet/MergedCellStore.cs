@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
 /// Represents a store for merged cell ranges in a spreadsheet.
