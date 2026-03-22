@@ -162,6 +162,35 @@ public class SheetViewTests
     }
 
     [Fact]
+    public void Commands_InjectedIntoSheet()
+    {
+        var sheet = new Sheet(5, 5);
+        var view = new SheetView(sheet);
+
+        // Sheet.Commands should be the same instance as view.Commands
+        Assert.Same(view.Commands, sheet.Commands);
+    }
+
+    [Fact]
+    public void Commands_ViaSheetCommands_UsesViewStack()
+    {
+        var sheet = new Sheet(5, 5);
+        var view = new SheetView(sheet);
+        sheet.Cells[0, 0].Value = "A";
+
+        // Execute through Sheet.Commands (the way all tool components do it)
+        var cmd = new ClearContentsCommand(sheet, new RangeRef(new CellRef(0, 0), new CellRef(0, 0)));
+        sheet.Commands.Execute(cmd);
+
+        Assert.Null(sheet.Cells[0, 0].Value);
+        Assert.True(view.Commands.CanUndo);
+
+        // Undo through view.Commands
+        view.Commands.Undo();
+        Assert.Equal("A", sheet.Cells[0, 0].Value);
+    }
+
+    [Fact]
     public void Commands_IndependentPerView()
     {
         var sheet1 = new Sheet(5, 5);
