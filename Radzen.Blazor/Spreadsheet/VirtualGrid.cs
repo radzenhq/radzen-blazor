@@ -149,7 +149,7 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     /// <summary>
     /// Gets or sets the sheet view that provides rendering state and access to the document model.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public SheetView View { get; set; } = default!;
 
     private Axis Rows => View.Worksheet.Rows;
