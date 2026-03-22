@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 
 #nullable enable
+using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
 /// <summary>

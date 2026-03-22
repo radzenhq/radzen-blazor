@@ -1,4 +1,4 @@
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 /// <summary>
 /// Command that inserts a single column BEFORE the specified index and supports undo via snapshot.

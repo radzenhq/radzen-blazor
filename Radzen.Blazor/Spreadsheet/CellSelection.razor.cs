@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 
+using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
 /// <summary>

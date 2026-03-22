@@ -3,7 +3,7 @@
 using System;
 using System.Globalization;
 
-namespace Radzen.Blazor.Spreadsheet;
+namespace Radzen.Documents.Spreadsheet;
 
 class WeeknumFunction : FormulaFunction
 {
