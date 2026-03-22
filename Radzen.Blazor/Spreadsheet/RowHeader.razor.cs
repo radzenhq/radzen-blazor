@@ -1,8 +1,6 @@
-
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
-using System;
-using System.Threading.Tasks;
 
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
@@ -12,7 +10,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Renders a row header in a spreadsheet.
 /// </summary>
-public partial class RowHeader : CellBase, IDisposable
+public partial class RowHeader : HeaderBase
 {
     /// <summary>
     /// Gets or sets the row index for the row header.
@@ -20,93 +18,26 @@ public partial class RowHeader : CellBase, IDisposable
     [Parameter]
     public int Row { get; set; }
 
-    /// <summary>
-    /// Gets or sets the sheet that contains the row header.
-    /// </summary>
-    [Parameter]
-    public Worksheet? Worksheet { get; set; }
+    /// <inheritdoc/>
+    protected override int Index => Row;
 
-    private bool active;
-    private bool selected;
+    /// <inheritdoc/>
+    protected override string IndexParameterName => nameof(Row);
+
+    /// <inheritdoc/>
+    [SuppressMessage("Design", "CA1062", Justification = "Base class guarantees non-null.")]
+    protected override bool CheckIsActive(Selection selection) => selection.IsActive(new RowRef(Row));
+
+    /// <inheritdoc/>
+    [SuppressMessage("Design", "CA1062", Justification = "Base class guarantees non-null.")]
+    protected override bool CheckIsSelected(Selection selection) => selection.IsSelected(new RowRef(Row));
 
     private string Class => ClassList.Create("rz-spreadsheet-row-header")
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
                                      .Add("rz-spreadsheet-frozen-column", FrozenState.HasFlag(FrozenState.Column))
-                                     .Add("rz-spreadsheet-header-active", active)
-                                     .Add("rz-spreadsheet-header-selected", selected)
+                                     .Add("rz-spreadsheet-header-active", Active)
+                                     .Add("rz-spreadsheet-header-selected", Selected)
                                      .ToString();
 
     private string ResizeHandleStyle => $"top: {Rect.Bottom.ToPx()}; left: {Rect.Left.ToPx()}; width: {Rect.Width.ToPx()};";
-
-    /// <inheritdoc/>
-    protected override void OnInitialized()
-    {
-        UpdateState();
-    }
-
-    /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        if (Worksheet != null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
-        var didRowChange = parameters.TryGetValue<int>(nameof(Row), out var row) && Row != row;
-
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet != null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
-
-        if (didRowChange)
-        {
-            UpdateState();
-        }
-    }
-
-    private void OnSelectionChanged()
-    {
-        var dirty = UpdateState();
-
-        if (dirty)
-        {
-            StateHasChanged();
-        }
-    }
-
-    private bool UpdateState()
-    {
-        var dirty = false;
-
-        if (Worksheet is not null)
-        {
-            var address = new RowRef(Row);
-
-            if (Worksheet.Selection.IsActive(address) != active)
-            {
-                active = !active;
-
-                dirty = true;
-            }
-
-            if (Worksheet.Selection.IsSelected(address) != selected)
-            {
-                selected = !selected;
-
-                dirty = true;
-            }
-        }
-
-        return dirty;
-    }
-
-    void IDisposable.Dispose()
-    {
-        if (Worksheet != null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
-    }
 }
