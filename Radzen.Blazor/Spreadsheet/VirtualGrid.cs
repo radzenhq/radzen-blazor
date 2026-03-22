@@ -142,22 +142,14 @@ public interface IVirtualGridContext
 public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGridContext
 {
     /// <summary>
-    /// Gets or sets the axis store for rows in the virtual grid.
+    /// Gets or sets the sheet view that provides rendering state and access to the document model.
     /// </summary>
     [Parameter, EditorRequired]
-    public Axis Rows { get; set; } = default!;
+    public SheetView View { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the axis store for columns in the virtual grid.
-    /// </summary>
-    [Parameter, EditorRequired]
-    public Axis Columns { get; set; } = default!;
-
-    /// <summary>
-    /// Gets or sets the store for merged cells in the virtual grid.
-    /// </summary>
-    [Parameter, EditorRequired]
-    public MergedCellStore MergedCells { get; set; } = default!;
+    private Axis Rows => View.Sheet.Rows;
+    private Axis Columns => View.Sheet.Columns;
+    private MergedCellStore MergedCells => View.Sheet.MergedCells;
 
     /// <summary>
     /// Gets or sets splitter size in pixels. The splitter is used to separate frozen and non-frozen rows and columns.
@@ -200,26 +192,18 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Rows != null)
+        if (View != null)
         {
-            Rows.Changed -= OnChanged;
-        }
-
-        if (Columns != null)
-        {
-            Columns.Changed -= OnChanged;
+            View.Sheet.Rows.Changed -= OnChanged;
+            View.Sheet.Columns.Changed -= OnChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Rows != null)
+        if (View != null)
         {
-            Rows.Changed += OnChanged;
-        }
-
-        if (Columns != null)
-        {
-            Columns.Changed += OnChanged;
+            View.Sheet.Rows.Changed += OnChanged;
+            View.Sheet.Columns.Changed += OnChanged;
         }
     }
 
