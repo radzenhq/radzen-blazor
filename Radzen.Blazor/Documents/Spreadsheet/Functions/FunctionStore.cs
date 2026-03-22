@@ -135,32 +135,30 @@ public class FunctionStore
         var syntaxTree = FormulaParser.Parse(text);
         var root = syntaxTree.Root;
 
-        var candidates = root.Find(node =>
+        FunctionSyntaxNode? best = null;
+
+        foreach (var node in root.Find(node => node is FunctionSyntaxNode f && f.Token.Start <= position))
         {
-            if (node is  FunctionSyntaxNode function)
+            var fn = (FunctionSyntaxNode)node;
+
+            if (fn.IsInside(position) && (best == null || fn.Token.Start > best.Token.Start))
             {
-                return function.Token.Start <= position;
+                best = fn;
             }
+        }
 
-            return false;
-        }).Cast<FunctionSyntaxNode>();
-
-        var candidate = candidates
-            .OrderByDescending(x => x.Token.Start)
-            .FirstOrDefault(x => x.IsInside(position));
-
-        if (candidate == null)
+        if (best == null)
         {
             return null;
         }
 
-        var function = Get(candidate.Name);
+        var function = Get(best.Name);
 
         if (function is ErrorFunction)
         {
             return null;
         }
 
-        return new FunctionHintData(function, candidate.GetArgumentIndexAtPosition(position));
+        return new FunctionHintData(function, best.GetArgumentIndexAtPosition(position));
     }
 }
