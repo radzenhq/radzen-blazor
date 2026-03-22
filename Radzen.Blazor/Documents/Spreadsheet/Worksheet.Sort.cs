@@ -16,6 +16,11 @@ public partial class Worksheet
     {
         if (range != RangeRef.Invalid)
         {
+            if (keyIndex < range.Start.Column || keyIndex > range.End.Column)
+            {
+                throw new ArgumentOutOfRangeException(nameof(keyIndex));
+            }
+
             var rows = new List<(object? key, List<Cell> cells)>();
 
             for (var row = range.Start.Row; row <= range.End.Row; row++)
