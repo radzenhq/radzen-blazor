@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class FilteringTests
 {
-    private readonly Sheet sheet = new(10, 10);
+    private readonly Worksheet sheet = new(10, 10);
 
     [Fact]
     public void Should_FilterEqualToCriterion()
@@ -61,7 +61,7 @@ public class FilteringTests
     [Fact]
     public void Should_TreatNumericStringsEqualToNumbers()
     {
-        var sheet = new Sheet(5, 1);
+        var sheet = new Worksheet(5, 1);
         sheet.Cells[0, 0].Value = "Header"; // Header row (should not be filtered)
         sheet.Cells[1, 0].Value = "10";     // row 1: string
         sheet.Cells[2, 0].Value = 10;       // row 2: number
@@ -119,7 +119,7 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithAndCriterion()
     {
-        var sheet = new Sheet(4, 2);
+        var sheet = new Worksheet(4, 2);
 
         sheet.Cells[0, 0].Value = "Status"; sheet.Cells[0, 1].Value = "Value"; // Header row
         sheet.Cells[1, 0].Value = "Active"; sheet.Cells[1, 1].Value = 85;
@@ -147,7 +147,7 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithNestedOrInAndCriterion()
     {
-        var sheet = new Sheet(5, 2);
+        var sheet = new Worksheet(5, 2);
 
         sheet.Cells[0, 0].Value = "Status"; sheet.Cells[0, 1].Value = "Value"; // Header row
         sheet.Cells[1, 0].Value = "Active"; sheet.Cells[1, 1].Value = 90;
@@ -286,7 +286,7 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithInListCriterionInComplexFilter()
     {
-        var sheet = new Sheet(6, 2);
+        var sheet = new Worksheet(6, 2);
 
         sheet.Cells[1, 0].Value = "Active"; sheet.Cells[1, 1].Value = 90;
         sheet.Cells[2, 0].Value = "Pending"; sheet.Cells[2, 1].Value = 45;
@@ -764,7 +764,7 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithComplexCombinationOfNewCriteria()
     {
-        var sheet = new Sheet(6, 2);
+        var sheet = new Worksheet(6, 2);
 
         sheet.Cells[1, 0].Value = "Active"; sheet.Cells[1, 1].Value = 85;
         sheet.Cells[2, 0].Value = "Pending"; sheet.Cells[2, 1].Value = 60;
@@ -1072,7 +1072,7 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithComplexStringCriteriaCombination()
     {
-        var sheet = new Sheet(6, 2);
+        var sheet = new Worksheet(6, 2);
 
         sheet.Cells[1, 0].Value = "Apple"; sheet.Cells[1, 1].Value = "Red";
         sheet.Cells[2, 0].Value = "Banana"; sheet.Cells[2, 1].Value = "Yellow";

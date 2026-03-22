@@ -9,7 +9,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class CellSelectionTests : TestContext
 {
-    private readonly Sheet sheet = new (4,4);
+    private readonly Worksheet sheet = new (4,4);
 
     [Fact]
     public void CellSelection_RendersWithCorrectClasses()
@@ -22,7 +22,7 @@ public class CellSelectionTests : TestContext
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
             .Add(p => p.Cell, cell)
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         // Assert
@@ -47,7 +47,7 @@ public class CellSelectionTests : TestContext
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
             .Add(p => p.Cell, cell)
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         // Assert
@@ -67,7 +67,7 @@ public class CellSelectionTests : TestContext
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
             .Add(p => p.Cell, cell)
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         // Assert
@@ -86,7 +86,7 @@ public class CellSelectionTests : TestContext
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
             .Add(p => p.Cell, cell)
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         // Assert
@@ -107,7 +107,7 @@ public class CellSelectionTests : TestContext
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
             .Add(p => p.Cell, new CellRef(0, 0))
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         // Assert
@@ -150,7 +150,7 @@ public class CellSelectionTests : TestContext
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
             .Add(p => p.Cell, new CellRef(0, 0))
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         // Assert
@@ -194,7 +194,7 @@ public class CellSelectionTests : TestContext
         // Act
         var cut = RenderComponent<CellSelection>(parameters => parameters
             .Add(p => p.Cell, new CellRef(0, 0))
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         // Assert
@@ -252,7 +252,7 @@ public class MockVirtualGridContext : IVirtualGridContext
     private readonly Dictionary<(int Row, int Column), PixelRectangle> rectangle = [];
     private SheetView view;
 
-    public MockVirtualGridContext(Sheet sheet = null)
+    public MockVirtualGridContext(Worksheet sheet = null)
     {
         if (sheet != null)
         {

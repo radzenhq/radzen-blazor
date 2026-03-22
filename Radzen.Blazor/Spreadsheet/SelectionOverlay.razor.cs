@@ -13,7 +13,7 @@ public partial class SelectionOverlay
     /// Gets or sets the sheet that contains the selection overlay.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the context for the virtual grid that contains the selection overlay.
@@ -24,16 +24,16 @@ public partial class SelectionOverlay
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Selection.Changed -= OnSelectionChanged;
+            Worksheet.Selection.Changed -= OnSelectionChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Selection.Changed += OnSelectionChanged;
+            Worksheet.Selection.Changed += OnSelectionChanged;
         }
     }
 

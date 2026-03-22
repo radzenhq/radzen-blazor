@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class SumFunctionTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void ShouldEvaluateSumFunction()

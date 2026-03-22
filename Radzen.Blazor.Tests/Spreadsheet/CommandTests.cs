@@ -8,7 +8,7 @@ public class MergeCellsCommandTests
     [Fact]
     public void Execute_MergesCells()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[0, 1].Value = "B";
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 1));
@@ -22,7 +22,7 @@ public class MergeCellsCommandTests
     [Fact]
     public void Unexecute_RestoresCells()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[0, 1].Value = "B";
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 1));
@@ -38,7 +38,7 @@ public class MergeCellsCommandTests
     [Fact]
     public void Execute_RejectsOverlap()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range1 = new RangeRef(new CellRef(0, 0), new CellRef(0, 1));
         sheet.MergedCells.Add(range1);
 
@@ -50,7 +50,7 @@ public class MergeCellsCommandTests
     [Fact]
     public void Execute_MergeAndCenter_SetsAlignment()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = "A";
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 1));
 
@@ -66,7 +66,7 @@ public class UnmergeCellsCommandTests
     [Fact]
     public void Execute_UnmergesCells()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 1));
         sheet.MergedCells.Add(range);
 
@@ -78,7 +78,7 @@ public class UnmergeCellsCommandTests
     [Fact]
     public void Unexecute_RestoresMerge()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 1));
         sheet.MergedCells.Add(range);
 
@@ -95,7 +95,7 @@ public class BorderCommandTests
     [Fact]
     public void AllBordersCommand_AppliesBordersToAllCells()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = "A";
         var range = new RangeRef(new CellRef(0, 0), new CellRef(1, 1));
         var border = new BorderStyle { LineStyle = BorderLineStyle.Thin };
@@ -113,7 +113,7 @@ public class BorderCommandTests
     [Fact]
     public void AllBordersCommand_Unexecute_RestoresOriginal()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = "A";
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var border = new BorderStyle();
@@ -128,7 +128,7 @@ public class BorderCommandTests
     [Fact]
     public void NoBordersCommand_ClearsBorders()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Format.BorderTop = new BorderStyle();
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
 

@@ -15,7 +15,7 @@ public class DeleteRowsCommand : RowCommandBase
     /// <param name="startRowIndex"></param>
     /// <param name="endRowIndex"></param>
     /// <exception cref="System.ArgumentOutOfRangeException"></exception>
-    public DeleteRowsCommand(Sheet sheet, int startRowIndex, int endRowIndex) : base(sheet, startRowIndex)
+    public DeleteRowsCommand(Worksheet sheet, int startRowIndex, int endRowIndex) : base(sheet, startRowIndex)
     {
         if (startRowIndex < 0 || endRowIndex < startRowIndex || endRowIndex >= sheet.RowCount)
         {

@@ -12,13 +12,13 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
     {
-        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid)
         {
             return;
         }
@@ -33,7 +33,7 @@
         using var ms = new System.IO.MemoryStream();
         await stream.CopyToAsync(ms);
 
-        var address = Sheet.Selection.Cell;
+        var address = Worksheet.Selection.Cell;
         var image = new SheetImage
         {
             AnchorMode = ImageAnchorMode.OneCellAnchor,
@@ -45,7 +45,7 @@
             Name = file.Name
         };
 
-        var command = new InsertImageCommand(Sheet, image);
-        Sheet.Commands.Execute(command);
+        var command = new InsertImageCommand(Worksheet, image);
+        Worksheet.Commands.Execute(command);
     }
 }

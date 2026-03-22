@@ -8,9 +8,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Command to clear all data validation rules from a range.
 /// </summary>
-public class ClearValidationCommand(Sheet sheet, RangeRef range) : ICommand
+public class ClearValidationCommand(Worksheet sheet, RangeRef range) : ICommand
 {
-    private readonly Sheet sheet = sheet;
+    private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private List<ICellValidator> savedValidators = [];
 

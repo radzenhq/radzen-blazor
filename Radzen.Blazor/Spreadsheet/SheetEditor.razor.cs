@@ -34,7 +34,7 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
     /// Gets or sets the sheet associated with the content editable element.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = null!;
+    public Worksheet Worksheet { get; set; } = null!;
 
     /// <summary>
     /// Event callback that is invoked when the value of the content editable element changes.
@@ -224,7 +224,7 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
             {
                 currentToken = tokens[^2];
 
-                functions = Sheet.FunctionRegistry.GetFunctionsForPrefix(currentToken.Value);
+                functions = Worksheet.FunctionRegistry.GetFunctionsForPrefix(currentToken.Value);
 
                 if (functions.Count > 0)
                 {
@@ -255,7 +255,7 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
 
         if (value is not null && functions.Count < 1)
         {
-            hint = Sheet.FunctionRegistry.CreateFunctionHint(value, caretPosition);
+            hint = Worksheet.FunctionRegistry.CreateFunctionHint(value, caretPosition);
         }
         else
         {

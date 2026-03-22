@@ -8,7 +8,7 @@ public class DataValidationTests
 {
     private static Cell CreateCell(object? value)
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = value;
         return sheet.Cells[0, 0];
     }
@@ -280,7 +280,7 @@ public class DataValidationTests
     [Fact]
     public void DataValidationCommand_ExecuteAndUnexecute()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 3;
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule { Type = DataValidationType.WholeNumber, Operator = DataValidationOperator.GreaterThan, Formula1 = "5" };
@@ -301,7 +301,7 @@ public class DataValidationTests
     [Fact]
     public void DataValidationCommand_ValidValue()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 10;
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule { Type = DataValidationType.WholeNumber, Operator = DataValidationOperator.GreaterThan, Formula1 = "5" };
@@ -315,7 +315,7 @@ public class DataValidationTests
     [Fact]
     public void ClearValidationCommand_ExecuteAndUnexecute()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 3;
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule { Type = DataValidationType.WholeNumber, Operator = DataValidationOperator.GreaterThan, Formula1 = "5" };
@@ -339,7 +339,7 @@ public class DataValidationTests
     [Fact]
     public void Command_IntegrationWithUndoRedo()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 3;
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule { Type = DataValidationType.WholeNumber, Operator = DataValidationOperator.GreaterThan, Formula1 = "5" };
@@ -364,7 +364,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_WholeNumber()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 5));
         var rule = new DataValidationRule
         {
@@ -396,7 +396,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_List()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 0));
         var rule = new DataValidationRule
         {
@@ -419,7 +419,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_Decimal()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule
         {
@@ -444,7 +444,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_TextLength()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule
         {
@@ -469,7 +469,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_PreservesErrorStyle()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule
         {
@@ -492,7 +492,7 @@ public class DataValidationTests
     public void Xlsx_NoValidation_NoElement()
     {
         var workbook = new Workbook();
-        workbook.AddSheet("Sheet1", 10, 10);
+        workbook.AddSheet("Worksheet1", 10, 10);
 
         var loaded = SaveAndLoad(workbook);
         var loadedSheet = loaded.Sheets[0];
@@ -504,7 +504,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_AllowBlank()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new DataValidationRule
         {
@@ -535,7 +535,7 @@ public class DataValidationTests
             Formula1 = "2024-01-01",
             Formula2 = "2024-12-31"
         };
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = new System.DateTime(2024, 6, 15);
         Assert.True(rule.Validate(sheet.Cells[0, 0]));
 
@@ -552,7 +552,7 @@ public class DataValidationTests
             Operator = DataValidationOperator.GreaterThan,
             Formula1 = "2024-06-01"
         };
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = new System.DateTime(2024, 7, 1);
         Assert.True(rule.Validate(sheet.Cells[0, 0]));
 
@@ -566,7 +566,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_List_PreservesItems()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 0));
         var rule = new DataValidationRule
         {
@@ -593,7 +593,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_FormulaGreaterThanZero_Valid()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 5;
         var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>0" };
         Assert.True(rule.Validate(sheet.Cells[0, 0]));
@@ -602,7 +602,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_FormulaGreaterThanZero_Invalid()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = -1;
         var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>0" };
         Assert.False(rule.Validate(sheet.Cells[0, 0]));
@@ -611,7 +611,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_FormulaReturningNumber_Valid()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 5;
         var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1" };
         Assert.True(rule.Validate(sheet.Cells[0, 0])); // non-zero = valid
@@ -620,7 +620,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_FormulaReturningNumber_Zero_Invalid()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 0;
         var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1" };
         Assert.False(rule.Validate(sheet.Cells[0, 0])); // zero = invalid
@@ -636,7 +636,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_InvalidFormula_ReturnsFalse()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 5;
         var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=NONEXISTENTFUNCTION()" };
         Assert.False(rule.Validate(sheet.Cells[0, 0]));
@@ -733,7 +733,7 @@ public class DataValidationTests
     [Fact]
     public void ShowInputMessage_FoundViaGetValidatorsForCell()
     {
-        var sheet = new Sheet(40, 40);
+        var sheet = new Worksheet(40, 40);
         var range = RangeRef.Parse("J4:J10");
         var rule = new DataValidationRule
         {
@@ -760,7 +760,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_FormulaCrossCell_Valid()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 100; // A1
         sheet.Cells[0, 1].Value = 50;  // B1
         var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>B1" };
@@ -770,7 +770,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_FormulaCrossCell_Invalid()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 10;  // A1
         sheet.Cells[0, 1].Value = 50;  // B1
         var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>B1" };
@@ -787,7 +787,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_AllowBlank_False()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         // Cell with no value and AllowBlank = false
         var rule = new DataValidationRule { Type = DataValidationType.Custom, Formula1 = "=A1>0", AllowBlank = false };
         Assert.False(rule.Validate(sheet.Cells[0, 0]));
@@ -798,7 +798,7 @@ public class DataValidationTests
     [Fact]
     public void ClearValidationErrors_RemovesErrors()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 3;
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         sheet.Validation.Add(range, new DataValidationRule
@@ -820,7 +820,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_Custom()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 0));
         var rule = new DataValidationRule
         {
@@ -845,7 +845,7 @@ public class DataValidationTests
     public void Xlsx_RoundTrip_InputPromptFields()
     {
         var workbook = new Workbook();
-        var sheet = workbook.AddSheet("Sheet1", 10, 10);
+        var sheet = workbook.AddSheet("Worksheet1", 10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(5, 0));
         var rule = new DataValidationRule
         {
@@ -873,7 +873,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_RelativeRef_ShiftsPerCell()
     {
-        var sheet = new Sheet(10, 15);
+        var sheet = new Worksheet(10, 15);
         // H4 = 200, H5 = 50
         sheet.Cells[3, 7].Value = 200;  // H4
         sheet.Cells[4, 7].Value = 50;   // H5
@@ -900,7 +900,7 @@ public class DataValidationTests
     [Fact]
     public void Custom_AbsoluteRef_DoesNotShift()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 100;  // A1
         sheet.Cells[0, 1].Value = 50;   // B1 (threshold)
         sheet.Cells[1, 0].Value = 30;   // A2
@@ -925,7 +925,7 @@ public class DataValidationTests
     [Fact]
     public void List_FromCellRange_Valid()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = "Red";
         sheet.Cells[1, 0].Value = "Green";
         sheet.Cells[2, 0].Value = "Blue";
@@ -948,7 +948,7 @@ public class DataValidationTests
     [Fact]
     public void List_GetListItems_FromCellRange()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = "Apple";
         sheet.Cells[1, 0].Value = "Banana";
         sheet.Cells[2, 0].Value = "Cherry";

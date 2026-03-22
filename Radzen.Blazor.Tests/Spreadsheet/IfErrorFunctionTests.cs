@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class IfErrorFunctionTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void ShouldEvaluateIfErrorFunctionWithNoError()

@@ -14,11 +14,11 @@ enum ClipboardOperation
 class SpreadsheetClipboard
 {
     private RangeRef? range;
-    private Sheet? sheet;
+    private Worksheet? sheet;
     private ClipboardOperation operation;
     private string? csv;
 
-    public void Copy(Sheet sheet)
+    public void Copy(Worksheet sheet)
     {
         this.sheet = sheet;
         range = sheet.Selection.Range;
@@ -26,7 +26,7 @@ class SpreadsheetClipboard
         csv = sheet.GetDelimitedString(range.Value);
     }
 
-    public void Cut(Sheet sheet)
+    public void Cut(Worksheet sheet)
     {
         this.sheet = sheet;
         range = sheet.Selection.Range;
@@ -34,7 +34,7 @@ class SpreadsheetClipboard
         csv = sheet.GetDelimitedString(range.Value);
     }
 
-    public void Paste(Sheet targetSheet, CellRef destinationStart)
+    public void Paste(Worksheet targetSheet, CellRef destinationStart)
     {
         if (range.HasValue && sheet is not null)
         {
@@ -49,7 +49,7 @@ class SpreadsheetClipboard
         }
     }
 
-    public bool TryPaste(Sheet targetSheet, CellRef destinationStart, string pastedText)
+    public bool TryPaste(Worksheet targetSheet, CellRef destinationStart, string pastedText)
     {
         if (range.HasValue && sheet is not null && !string.IsNullOrEmpty(csv) && pastedText == csv)
         {
@@ -62,7 +62,7 @@ class SpreadsheetClipboard
         return false;
     }
 
-    public void Paste(Sheet targetSheet, CellRef destinationStart, string pastedText)
+    public void Paste(Worksheet targetSheet, CellRef destinationStart, string pastedText)
     {
         if (!TryPaste(targetSheet, destinationStart, pastedText))
         {
@@ -78,7 +78,7 @@ class SpreadsheetClipboard
         operation = ClipboardOperation.Copy;
     }
 
-    private static void Clear(Sheet sourceSheet, RangeRef source)
+    private static void Clear(Worksheet sourceSheet, RangeRef source)
     {
         for (var sr = source.Start.Row; sr <= source.End.Row; sr++)
         {

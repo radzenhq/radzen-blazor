@@ -5,20 +5,20 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet == null || Sheet.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid;
 
     private void OnDeleteRowClick()
     {
-        if (Sheet == null)
+        if (Worksheet == null)
         {
             return;
         }
 
-        var range = Sheet.Selection.Range;
+        var range = Worksheet.Selection.Range;
         var start = range.Start.Row;
         var end = range.End.Row;
-        Sheet.Commands.Execute(new DeleteRowsCommand(Sheet, start, end));
+        Worksheet.Commands.Execute(new DeleteRowsCommand(Worksheet, start, end));
     }
 }

@@ -13,7 +13,7 @@ public abstract class RowCommandBase : ICommand
     /// <summary>
     /// The sheet being operated on.
     /// </summary>
-    protected readonly Sheet sheet;
+    protected readonly Worksheet sheet;
     /// <summary>
     /// The row index being operated on.
     /// </summary>
@@ -30,7 +30,7 @@ public abstract class RowCommandBase : ICommand
     /// </summary>
     /// <param name="sheet">The sheet being operated on.</param>
     /// <param name="rowIndex">The row index being operated on.</param>
-    protected RowCommandBase(Sheet sheet, int rowIndex)
+    protected RowCommandBase(Worksheet sheet, int rowIndex)
     {
         this.sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
         if (rowIndex < 0 || rowIndex >= sheet.RowCount)

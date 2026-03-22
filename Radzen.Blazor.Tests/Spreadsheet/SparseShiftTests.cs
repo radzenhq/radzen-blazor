@@ -11,7 +11,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsUp_RemovesDeletedRowAndShiftsCellsUp()
     {
-        var sheet = new Sheet(5, 3);
+        var sheet = new Worksheet(5, 3);
         sheet.Cells[0, 0].Value = "R1";
         sheet.Cells[1, 0].Value = "R2";
         sheet.Cells[2, 0].Value = "R3";
@@ -27,7 +27,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsUp_UpdatesCellAddresses()
     {
-        var sheet = new Sheet(5, 3);
+        var sheet = new Worksheet(5, 3);
         sheet.Cells[2, 1].Value = "target";
 
         sheet.Cells.ShiftRowsUp(0);
@@ -40,7 +40,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsUp_LeavesLowerRowsUntouched()
     {
-        var sheet = new Sheet(5, 3);
+        var sheet = new Worksheet(5, 3);
         sheet.Cells[0, 0].Value = "keep";
         sheet.Cells[3, 0].Value = "shift";
 
@@ -54,7 +54,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsUp_DeleteFirstRow()
     {
-        var sheet = new Sheet(3, 2);
+        var sheet = new Worksheet(3, 2);
         sheet.Cells[0, 0].Value = "first";
         sheet.Cells[1, 0].Value = "second";
         sheet.Cells[2, 0].Value = "third";
@@ -69,7 +69,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsUp_DeleteLastRow()
     {
-        var sheet = new Sheet(3, 2);
+        var sheet = new Worksheet(3, 2);
         sheet.Cells[0, 0].Value = "first";
         sheet.Cells[2, 0].Value = "last";
 
@@ -82,7 +82,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsUp_OnlySparsePopulatedCellsAreInStore()
     {
-        var sheet = new Sheet(1000, 1000);
+        var sheet = new Worksheet(1000, 1000);
         sheet.Cells[500, 500].Value = "data";
 
         var countBefore = sheet.Cells.PopulatedCount;
@@ -98,7 +98,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsDown_ShiftsCellsDownByCount()
     {
-        var sheet = new Sheet(10, 3);
+        var sheet = new Worksheet(10, 3);
         sheet.Cells[1, 0].Value = "A";
         sheet.Cells[2, 0].Value = "B";
 
@@ -113,7 +113,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsDown_UpdatesCellAddresses()
     {
-        var sheet = new Sheet(10, 3);
+        var sheet = new Worksheet(10, 3);
         sheet.Cells[2, 1].Value = "target";
 
         sheet.Cells.ShiftRowsDown(2, 3);
@@ -126,7 +126,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsDown_LeavesLowerRowsUntouched()
     {
-        var sheet = new Sheet(10, 3);
+        var sheet = new Worksheet(10, 3);
         sheet.Cells[0, 0].Value = "stay";
         sheet.Cells[3, 0].Value = "move";
 
@@ -142,7 +142,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftColumnsLeft_RemovesDeletedColumnAndShiftsCellsLeft()
     {
-        var sheet = new Sheet(3, 5);
+        var sheet = new Worksheet(3, 5);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[0, 1].Value = "B";
         sheet.Cells[0, 2].Value = "C";
@@ -158,7 +158,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftColumnsLeft_UpdatesCellAddresses()
     {
-        var sheet = new Sheet(3, 5);
+        var sheet = new Worksheet(3, 5);
         sheet.Cells[1, 3].Value = "target";
 
         sheet.Cells.ShiftColumnsLeft(0);
@@ -173,7 +173,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftColumnsRight_ShiftsCellsRightByCount()
     {
-        var sheet = new Sheet(3, 10);
+        var sheet = new Worksheet(3, 10);
         sheet.Cells[0, 1].Value = "A";
         sheet.Cells[0, 2].Value = "B";
 
@@ -188,7 +188,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftColumnsRight_UpdatesCellAddresses()
     {
-        var sheet = new Sheet(3, 10);
+        var sheet = new Worksheet(3, 10);
         sheet.Cells[1, 2].Value = "target";
 
         sheet.Cells.ShiftColumnsRight(2, 3);
@@ -198,12 +198,12 @@ public class SparseShiftTests
         Assert.Equal(new CellRef(1, 5), cell.Address);
     }
 
-    // --- Sheet.DeleteRow sparse behavior ---
+    // --- Worksheet.DeleteRow sparse behavior ---
 
     [Fact]
     public void DeleteRow_DoesNotCreateEmptyCells()
     {
-        var sheet = new Sheet(1000, 1000);
+        var sheet = new Worksheet(1000, 1000);
         sheet.Cells[500, 500].Value = "data";
 
         var countBefore = sheet.Cells.PopulatedCount;
@@ -216,7 +216,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteRow_PreservesDataCorrectly()
     {
-        var sheet = new Sheet(5, 3);
+        var sheet = new Worksheet(5, 3);
         sheet.Cells[0, 0].Value = 10d;
         sheet.Cells[1, 0].Value = 20d;
         sheet.Cells[2, 0].Value = 30d;
@@ -237,7 +237,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteRow_MultipleColumns()
     {
-        var sheet = new Sheet(4, 3);
+        var sheet = new Worksheet(4, 3);
         sheet.Cells[0, 0].Value = "A1";
         sheet.Cells[0, 1].Value = "B1";
         sheet.Cells[0, 2].Value = "C1";
@@ -256,7 +256,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteRow_InvalidatesFormulasReferencingDeletedRow()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[0, 0].Value = 10;
         sheet.Cells[2, 0].Value = 30;
         sheet.Cells[1, 1].Formula = "=A1+A3";
@@ -271,17 +271,17 @@ public class SparseShiftTests
     [Fact]
     public void DeleteRow_ThrowsOnInvalidIndex()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         Assert.Throws<ArgumentOutOfRangeException>(() => sheet.DeleteRow(-1));
         Assert.Throws<ArgumentOutOfRangeException>(() => sheet.DeleteRow(5));
     }
 
-    // --- Sheet.DeleteColumn sparse behavior ---
+    // --- Worksheet.DeleteColumn sparse behavior ---
 
     [Fact]
     public void DeleteColumn_DoesNotCreateEmptyCells()
     {
-        var sheet = new Sheet(1000, 1000);
+        var sheet = new Worksheet(1000, 1000);
         sheet.Cells[500, 500].Value = "data";
 
         var countBefore = sheet.Cells.PopulatedCount;
@@ -293,7 +293,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteColumn_PreservesDataCorrectly()
     {
-        var sheet = new Sheet(3, 5);
+        var sheet = new Worksheet(3, 5);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[0, 1].Value = "B";
         sheet.Cells[0, 2].Value = "C";
@@ -312,7 +312,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteColumn_InvalidatesFormulasReferencingDeletedColumn()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[0, 0].Value = 1;
         sheet.Cells[0, 2].Value = 3;
         sheet.Cells[1, 1].Formula = "=A1+C1";
@@ -324,12 +324,12 @@ public class SparseShiftTests
         Assert.Equal(CellError.Ref, sheet.Cells[1, 0].Value);
     }
 
-    // --- Sheet.InsertRow sparse behavior ---
+    // --- Worksheet.InsertRow sparse behavior ---
 
     [Fact]
     public void InsertRow_DoesNotCreateEmptyCells()
     {
-        var sheet = new Sheet(1000, 1000);
+        var sheet = new Worksheet(1000, 1000);
         sheet.Cells[500, 500].Value = "data";
 
         var countBefore = sheet.Cells.PopulatedCount;
@@ -342,7 +342,7 @@ public class SparseShiftTests
     [Fact]
     public void InsertRow_ShiftsValuesDown()
     {
-        var sheet = new Sheet(5, 3);
+        var sheet = new Worksheet(5, 3);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[1, 0].Value = "B";
         sheet.Cells[2, 0].Value = "C";
@@ -359,7 +359,7 @@ public class SparseShiftTests
     [Fact]
     public void InsertRow_AdjustsFormulaReferences()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[1, 0].Value = 42;
         sheet.Cells[1, 1].Formula = "=A2+10";
         Assert.Equal(52d, sheet.Cells[1, 1].Value);
@@ -373,7 +373,7 @@ public class SparseShiftTests
     [Fact]
     public void InsertRow_MultipleRows()
     {
-        var sheet = new Sheet(5, 3);
+        var sheet = new Worksheet(5, 3);
         sheet.Cells[0, 0].Value = "X";
         sheet.Cells[1, 0].Value = "Y";
 
@@ -387,12 +387,12 @@ public class SparseShiftTests
         Assert.Equal("Y", sheet.Cells[4, 0].Value);
     }
 
-    // --- Sheet.InsertColumn sparse behavior ---
+    // --- Worksheet.InsertColumn sparse behavior ---
 
     [Fact]
     public void InsertColumn_DoesNotCreateEmptyCells()
     {
-        var sheet = new Sheet(1000, 1000);
+        var sheet = new Worksheet(1000, 1000);
         sheet.Cells[500, 500].Value = "data";
 
         var countBefore = sheet.Cells.PopulatedCount;
@@ -404,7 +404,7 @@ public class SparseShiftTests
     [Fact]
     public void InsertColumn_ShiftsValuesRight()
     {
-        var sheet = new Sheet(3, 5);
+        var sheet = new Worksheet(3, 5);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[0, 1].Value = "B";
         sheet.Cells[0, 2].Value = "C";
@@ -421,7 +421,7 @@ public class SparseShiftTests
     [Fact]
     public void InsertColumn_AdjustsFormulaReferences()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[1, 0].Value = 42;
         sheet.Cells[1, 1].Formula = "=A2+10";
         Assert.Equal(52d, sheet.Cells[1, 1].Value);
@@ -437,7 +437,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteRow_EmptySheet_DeletesWithoutError()
     {
-        var sheet = new Sheet(3, 3);
+        var sheet = new Worksheet(3, 3);
         sheet.DeleteRow(1);
         Assert.Equal(2, sheet.RowCount);
     }
@@ -445,7 +445,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteColumn_EmptySheet_DeletesWithoutError()
     {
-        var sheet = new Sheet(3, 3);
+        var sheet = new Worksheet(3, 3);
         sheet.DeleteColumn(1);
         Assert.Equal(2, sheet.ColumnCount);
     }
@@ -453,7 +453,7 @@ public class SparseShiftTests
     [Fact]
     public void InsertRow_AtEnd_IncreasesCount()
     {
-        var sheet = new Sheet(3, 3);
+        var sheet = new Worksheet(3, 3);
         sheet.Cells[2, 0].Value = "last";
 
         sheet.InsertRow(3, 1);
@@ -465,7 +465,7 @@ public class SparseShiftTests
     [Fact]
     public void InsertColumn_AtEnd_IncreasesCount()
     {
-        var sheet = new Sheet(3, 3);
+        var sheet = new Worksheet(3, 3);
         sheet.Cells[0, 2].Value = "last";
 
         sheet.InsertColumn(3, 1);
@@ -477,7 +477,7 @@ public class SparseShiftTests
     [Fact]
     public void MultipleDeleteRows_CumulativeCorrectness()
     {
-        var sheet = new Sheet(6, 2);
+        var sheet = new Worksheet(6, 2);
         for (int r = 0; r < 6; r++)
             sheet.Cells[r, 0].Value = (double)(r + 1);
 
@@ -494,7 +494,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteThenInsert_RestoresRowCount()
     {
-        var sheet = new Sheet(5, 3);
+        var sheet = new Worksheet(5, 3);
         sheet.Cells[2, 0].Value = "middle";
 
         sheet.DeleteRow(0);
@@ -507,7 +507,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftRowsUp_MultipleColumnsPreserved()
     {
-        var sheet = new Sheet(5, 4);
+        var sheet = new Worksheet(5, 4);
         sheet.Cells[2, 0].Value = "A";
         sheet.Cells[2, 1].Value = "B";
         sheet.Cells[2, 2].Value = "C";
@@ -524,7 +524,7 @@ public class SparseShiftTests
     [Fact]
     public void ShiftColumnsLeft_MultipleRowsPreserved()
     {
-        var sheet = new Sheet(4, 5);
+        var sheet = new Worksheet(4, 5);
         sheet.Cells[0, 2].Value = "R1";
         sheet.Cells[1, 2].Value = "R2";
         sheet.Cells[2, 2].Value = "R3";
@@ -541,7 +541,7 @@ public class SparseShiftTests
     [Fact]
     public void PopulatedCount_ReflectsOnlyAccessedCells()
     {
-        var sheet = new Sheet(100, 100);
+        var sheet = new Worksheet(100, 100);
 
         Assert.Equal(0, sheet.Cells.PopulatedCount);
 
@@ -555,7 +555,7 @@ public class SparseShiftTests
     [Fact]
     public void HasCell_ReturnsFalseForUnpopulated()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
 
         Assert.False(sheet.Cells.HasCell(5, 5));
 
@@ -566,7 +566,7 @@ public class SparseShiftTests
     [Fact]
     public void DeleteRow_FormulaReferencingDifferentRowNotInvalidated()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[0, 0].Value = 10;
         sheet.Cells[3, 0].Value = 30;
         sheet.Cells[3, 1].Formula = "=A1+100";
@@ -581,7 +581,7 @@ public class SparseShiftTests
     [Fact]
     public void InsertRow_FormulaBeforeInsertPointNotAdjusted()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[0, 0].Value = 10;
         sheet.Cells[0, 1].Formula = "=A1+5";
 

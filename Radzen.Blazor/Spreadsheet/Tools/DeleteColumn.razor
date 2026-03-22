@@ -6,20 +6,20 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet == null || Sheet.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid;
 
     private void OnDeleteColumnClick()
     {
-        if (Sheet == null)
+        if (Worksheet == null)
         {
             return;
         }
-        var range = Sheet.Selection.Range;
+        var range = Worksheet.Selection.Range;
         var start = range.Start.Column;
         var end = range.End.Column;
-        Sheet.Commands.Execute(new DeleteColumnsCommand(Sheet, start, end));
+        Worksheet.Commands.Execute(new DeleteColumnsCommand(Worksheet, start, end));
     }
 }
 

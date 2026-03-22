@@ -81,7 +81,7 @@ public static class ColumnMapping
 /// Represents a data sheet that can load data from a data source.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class DataSheet<T> : Sheet where T : class, new()
+public class DataSheet<T> : Worksheet where T : class, new()
 {
     /// <summary>
     /// Gets the collection of column mappings for the data sheet.
