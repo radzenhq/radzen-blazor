@@ -108,6 +108,144 @@ public class MergedCellStore(Sheet sheet)
     /// </summary>
     public List<RangeRef> GetOverlappingRanges(RangeRef range) => [.. data.Where(range.Overlaps)];
 
+    /// <summary>
+    /// Adjusts all merged ranges after a row is deleted.
+    /// Ranges fully on the deleted row are removed. Ranges spanning the deleted row shrink.
+    /// Ranges below the deleted row shift up by one.
+    /// </summary>
+    internal void ShiftRowsUp(int deletedRow)
+    {
+        for (int i = data.Count - 1; i >= 0; i--)
+        {
+            var range = data[i];
+
+            if (range.Start.Row > deletedRow)
+            {
+                // Entirely below — shift up
+                var shifted = new RangeRef(
+                    new CellRef(range.Start.Row - 1, range.Start.Column),
+                    new CellRef(range.End.Row - 1, range.End.Column));
+                ReplaceAt(i, shifted);
+            }
+            else if (range.End.Row >= deletedRow && range.Start.Row <= deletedRow)
+            {
+                // Spans or sits on the deleted row
+                if (range.Start.Row == range.End.Row)
+                {
+                    // Entirely on the deleted row — remove
+                    UnindexRange(range);
+                    data.RemoveAt(i);
+                }
+                else
+                {
+                    // Shrink: end row decreases by one
+                    var shrunk = new RangeRef(
+                        range.Start,
+                        new CellRef(range.End.Row - 1, range.End.Column));
+                    ReplaceAt(i, shrunk);
+                }
+            }
+            // Entirely above — no change
+        }
+    }
+
+    /// <summary>
+    /// Adjusts all merged ranges after rows are inserted.
+    /// Ranges at or below the insert point shift down by count.
+    /// </summary>
+    internal void ShiftRowsDown(int fromRow, int count)
+    {
+        for (int i = 0; i < data.Count; i++)
+        {
+            var range = data[i];
+
+            if (range.Start.Row >= fromRow)
+            {
+                // Entirely at or below — shift down
+                var shifted = new RangeRef(
+                    new CellRef(range.Start.Row + count, range.Start.Column),
+                    new CellRef(range.End.Row + count, range.End.Column));
+                ReplaceAt(i, shifted);
+            }
+            else if (range.End.Row >= fromRow)
+            {
+                // Starts above, ends at or below — expand
+                var expanded = new RangeRef(
+                    range.Start,
+                    new CellRef(range.End.Row + count, range.End.Column));
+                ReplaceAt(i, expanded);
+            }
+            // Entirely above — no change
+        }
+    }
+
+    /// <summary>
+    /// Adjusts all merged ranges after a column is deleted.
+    /// </summary>
+    internal void ShiftColumnsLeft(int deletedColumn)
+    {
+        for (int i = data.Count - 1; i >= 0; i--)
+        {
+            var range = data[i];
+
+            if (range.Start.Column > deletedColumn)
+            {
+                var shifted = new RangeRef(
+                    new CellRef(range.Start.Row, range.Start.Column - 1),
+                    new CellRef(range.End.Row, range.End.Column - 1));
+                ReplaceAt(i, shifted);
+            }
+            else if (range.End.Column >= deletedColumn && range.Start.Column <= deletedColumn)
+            {
+                if (range.Start.Column == range.End.Column)
+                {
+                    UnindexRange(range);
+                    data.RemoveAt(i);
+                }
+                else
+                {
+                    var shrunk = new RangeRef(
+                        range.Start,
+                        new CellRef(range.End.Row, range.End.Column - 1));
+                    ReplaceAt(i, shrunk);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adjusts all merged ranges after columns are inserted.
+    /// </summary>
+    internal void ShiftColumnsRight(int fromColumn, int count)
+    {
+        for (int i = 0; i < data.Count; i++)
+        {
+            var range = data[i];
+
+            if (range.Start.Column >= fromColumn)
+            {
+                var shifted = new RangeRef(
+                    new CellRef(range.Start.Row, range.Start.Column + count),
+                    new CellRef(range.End.Row, range.End.Column + count));
+                ReplaceAt(i, shifted);
+            }
+            else if (range.End.Column >= fromColumn)
+            {
+                var expanded = new RangeRef(
+                    range.Start,
+                    new CellRef(range.End.Row, range.End.Column + count));
+                ReplaceAt(i, expanded);
+            }
+        }
+    }
+
+    private void ReplaceAt(int i, RangeRef newRange)
+    {
+        UnindexRange(data[i]);
+        data[i] = newRange;
+        IndexRange(newRange);
+    }
+
     internal List<RangeRef> SplitRange(RangeRef range)
     {
         var result = new List<RangeRef>();

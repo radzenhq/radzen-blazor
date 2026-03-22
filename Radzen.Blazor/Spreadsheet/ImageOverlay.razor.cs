@@ -98,23 +98,21 @@ public partial class ImageOverlay : ComponentBase, IDisposable
         return $"transform: translate({rect.Left.ToPx()}, {rect.Top.ToPx()}); width: {rect.Width.ToPx()}; height: {rect.Height.ToPx()};";
     }
 
-    private string GetImgStyle(SheetImage image, RangeRef imageRange, RangeInfo zone)
+    private (double width, double height) GetImageDimensions(SheetImage image, RangeRef imageRange)
     {
-        double imgWidth, imgHeight;
-
         if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To != null)
         {
             var fullRect = Context.GetRectangle(imageRange.Start.Row, imageRange.Start.Column, imageRange.End.Row, imageRange.End.Column);
-            imgWidth = fullRect.Width + image.From.ColumnOffset / EmuPerPixel + image.To.ColumnOffset / EmuPerPixel;
-            imgHeight = fullRect.Height + image.From.RowOffset / EmuPerPixel + image.To.RowOffset / EmuPerPixel;
-        }
-        else
-        {
-            imgWidth = image.Width / EmuPerPixel;
-            imgHeight = image.Height / EmuPerPixel;
+            return (
+                fullRect.Width + image.From.ColumnOffset / EmuPerPixel + image.To.ColumnOffset / EmuPerPixel,
+                fullRect.Height + image.From.RowOffset / EmuPerPixel + image.To.RowOffset / EmuPerPixel);
         }
 
-        // Calculate pixel offset from image start to zone start using column/row sizes (scroll-independent)
+        return (image.Width / EmuPerPixel, image.Height / EmuPerPixel);
+    }
+
+    private (double x, double y) GetZoneOffset(SheetImage image, RangeInfo zone)
+    {
         double offsetX = image.From.ColumnOffset / EmuPerPixel;
         double offsetY = image.From.RowOffset / EmuPerPixel;
 
@@ -127,6 +125,14 @@ public partial class ImageOverlay : ComponentBase, IDisposable
         {
             offsetY -= Sheet.Rows[row];
         }
+
+        return (offsetX, offsetY);
+    }
+
+    private string GetImgStyle(SheetImage image, RangeRef imageRange, RangeInfo zone)
+    {
+        var (imgWidth, imgHeight) = GetImageDimensions(image, imageRange);
+        var (offsetX, offsetY) = GetZoneOffset(image, zone);
 
         return $"position: absolute; left: {offsetX.ToPx()}; top: {offsetY.ToPx()}; width: {imgWidth.ToPx()}; height: {imgHeight.ToPx()};";
     }
@@ -153,32 +159,8 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     private string GetHandleStyle(SheetImage image, RangeRef imageRange, RangeInfo zone, string direction)
     {
-        double imgWidth, imgHeight;
-
-        if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To != null)
-        {
-            var fullRect = Context.GetRectangle(imageRange.Start.Row, imageRange.Start.Column, imageRange.End.Row, imageRange.End.Column);
-            imgWidth = fullRect.Width + image.From.ColumnOffset / EmuPerPixel + image.To.ColumnOffset / EmuPerPixel;
-            imgHeight = fullRect.Height + image.From.RowOffset / EmuPerPixel + image.To.RowOffset / EmuPerPixel;
-        }
-        else
-        {
-            imgWidth = image.Width / EmuPerPixel;
-            imgHeight = image.Height / EmuPerPixel;
-        }
-
-        double offsetX = image.From.ColumnOffset / EmuPerPixel;
-        double offsetY = image.From.RowOffset / EmuPerPixel;
-
-        for (var col = image.From.Column; col < zone.Range.Start.Column; col++)
-        {
-            offsetX -= Sheet.Columns[col];
-        }
-
-        for (var row = image.From.Row; row < zone.Range.Start.Row; row++)
-        {
-            offsetY -= Sheet.Rows[row];
-        }
+        var (imgWidth, imgHeight) = GetImageDimensions(image, imageRange);
+        var (offsetX, offsetY) = GetZoneOffset(image, zone);
 
         const double half = 4; // half of 8px handle
         double x = 0, y = 0;
@@ -200,19 +182,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     private PixelRectangle GetImageRect(SheetImage image, RangeRef imageRange)
     {
-        double imgWidth, imgHeight;
-
-        if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To != null)
-        {
-            var fullRect = Context.GetRectangle(imageRange.Start.Row, imageRange.Start.Column, imageRange.End.Row, imageRange.End.Column);
-            imgWidth = fullRect.Width + image.From.ColumnOffset / EmuPerPixel + image.To.ColumnOffset / EmuPerPixel;
-            imgHeight = fullRect.Height + image.From.RowOffset / EmuPerPixel + image.To.RowOffset / EmuPerPixel;
-        }
-        else
-        {
-            imgWidth = image.Width / EmuPerPixel;
-            imgHeight = image.Height / EmuPerPixel;
-        }
+        var (imgWidth, imgHeight) = GetImageDimensions(image, imageRange);
 
         var startRect = Context.GetRectangle(image.From.Row, image.From.Column);
         var left = startRect.Left + image.From.ColumnOffset / EmuPerPixel;

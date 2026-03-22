@@ -303,6 +303,89 @@ public class Axis(double size, int count)
     /// </summary>
     public double Offset { get; set; }
 
+    /// <summary>
+    /// Shifts custom sizes and hidden state up after a row/column is deleted.
+    /// Entries at the deleted index are removed; entries above are unchanged;
+    /// entries below are decremented by one.
+    /// </summary>
+    internal void ShiftUp(int deletedIndex)
+    {
+        var newData = new Dictionary<int, double>();
+        foreach (var kvp in data)
+        {
+            if (kvp.Key < deletedIndex)
+            {
+                newData[kvp.Key] = kvp.Value;
+            }
+            else if (kvp.Key > deletedIndex)
+            {
+                newData[kvp.Key - 1] = kvp.Value;
+            }
+            // kvp.Key == deletedIndex is dropped
+        }
+        data.Clear();
+        foreach (var kvp in newData)
+        {
+            data[kvp.Key] = kvp.Value;
+        }
+
+        var newHidden = new HashSet<int>();
+        foreach (var idx in hidden)
+        {
+            if (idx < deletedIndex)
+            {
+                newHidden.Add(idx);
+            }
+            else if (idx > deletedIndex)
+            {
+                newHidden.Add(idx - 1);
+            }
+            // idx == deletedIndex is dropped
+        }
+        hidden.Clear();
+        hidden.UnionWith(newHidden);
+    }
+
+    /// <summary>
+    /// Shifts custom sizes and hidden state down after rows/columns are inserted.
+    /// Entries at or after the insert point are incremented by count.
+    /// </summary>
+    internal void ShiftDown(int fromIndex, int count)
+    {
+        var newData = new Dictionary<int, double>();
+        foreach (var kvp in data)
+        {
+            if (kvp.Key < fromIndex)
+            {
+                newData[kvp.Key] = kvp.Value;
+            }
+            else
+            {
+                newData[kvp.Key + count] = kvp.Value;
+            }
+        }
+        data.Clear();
+        foreach (var kvp in newData)
+        {
+            data[kvp.Key] = kvp.Value;
+        }
+
+        var newHidden = new HashSet<int>();
+        foreach (var idx in hidden)
+        {
+            if (idx < fromIndex)
+            {
+                newHidden.Add(idx);
+            }
+            else
+            {
+                newHidden.Add(idx + count);
+            }
+        }
+        hidden.Clear();
+        hidden.UnionWith(newHidden);
+    }
+
     internal IndexRange GetIndexRange(double start, double end, bool includeFrozen = false)
     {
         var currentPosition = Offset;
