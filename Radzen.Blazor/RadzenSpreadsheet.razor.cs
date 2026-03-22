@@ -208,7 +208,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private async Task OnCellMenuSortAscendingAsync()
+    private async Task OnCellMenuSortAsync(SortOrder order)
     {
         if (Worksheet != null)
         {
@@ -217,7 +217,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 if (table.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    var command = new SortCommand(Worksheet, table.Range, SortOrder.Ascending, cellMenuColumn);
+                    var command = new SortCommand(Worksheet, table.Range, order, cellMenuColumn);
                     Execute(command);
                     break;
                 }
@@ -226,36 +226,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             // Check if we're in an auto filter
             if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
             {
-                var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range, SortOrder.Ascending, cellMenuColumn, skipHeaderRow: true);
-                Execute(command);
-            }
-        }
-
-        if (cellMenuPopup != null)
-        {
-            await cellMenuPopup.CloseAsync();
-        }
-    }
-
-    private async Task OnCellMenuSortDescendingAsync()
-    {
-        if (Worksheet != null)
-        {
-            // Check if we're in a data table
-            foreach (var table in Worksheet.Tables)
-            {
-                if (table.Range.Contains(cellMenuRow, cellMenuColumn))
-                {
-                    var command = new SortCommand(Worksheet, table.Range, SortOrder.Descending, cellMenuColumn);
-                    Execute(command);
-                    break;
-                }
-            }
-
-            // Check if we're in an auto filter
-            if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
-            {
-                var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range, SortOrder.Descending, cellMenuColumn, skipHeaderRow: true);
+                var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range, order, cellMenuColumn, skipHeaderRow: true);
                 Execute(command);
             }
         }
@@ -511,7 +482,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Worksheet?.SelectedImage != null)
         {
             Execute(new DeleteImageCommand(Worksheet, Worksheet.SelectedImage));
-            return Task.CompletedTask;
+        }
+        else if (Worksheet != null && Worksheet.Selection.Range != RangeRef.Invalid)
+        {
+            Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
         }
 
         return Task.CompletedTask;
@@ -675,6 +649,24 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }, menuArgs => OnColumnContextMenuItemClick(menuArgs, column));
     }
 
+    private bool HandleCommonContextMenuAction(string? action)
+    {
+        switch (action)
+        {
+            case "cut":
+                _ = InvokeAsync(CutSelectionAsync);
+                return true;
+            case "copy":
+                _ = InvokeAsync(CopySelectionAsync);
+                return true;
+            case "paste":
+                _ = InvokeAsync(PasteFromClipboardAsync);
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private void OnContextMenuItemClick(MenuItemEventArgs args, int row, int column)
     {
         if (Worksheet is null)
@@ -684,26 +676,22 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         ContextMenuService.Close();
 
-        switch (args.Value?.ToString())
+        var action = args.Value?.ToString();
+
+        if (!HandleCommonContextMenuAction(action))
         {
-            case "cut":
-                _ = CutSelectionAsync();
-                break;
-            case "copy":
-                _ = CopySelectionAsync();
-                break;
-            case "paste":
-                _ = PasteFromClipboardAsync();
-                break;
-            case "clear":
-                Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
-                break;
-            case "sort-ascending":
-                Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Ascending, column));
-                break;
-            case "sort-descending":
-                Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
-                break;
+            switch (action)
+            {
+                case "clear":
+                    Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
+                    break;
+                case "sort-ascending":
+                    Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Ascending, column));
+                    break;
+                case "sort-descending":
+                    Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
+                    break;
+            }
         }
 
         StateHasChanged();
@@ -718,32 +706,28 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         ContextMenuService.Close();
 
-        switch (args.Value?.ToString())
+        var action = args.Value?.ToString();
+
+        if (!HandleCommonContextMenuAction(action))
         {
-            case "cut":
-                _ = CutSelectionAsync();
-                break;
-            case "copy":
-                _ = CopySelectionAsync();
-                break;
-            case "paste":
-                _ = PasteFromClipboardAsync();
-                break;
-            case "insert-row-before":
-                Execute(new InsertRowBeforeCommand(Worksheet, row));
-                break;
-            case "insert-row-after":
-                Execute(new InsertRowAfterCommand(Worksheet, row));
-                break;
-            case "delete-row":
-                Execute(new DeleteRowsCommand(Worksheet, row, row));
-                break;
-            case "hide-row":
-                Worksheet.Rows.Hide(row);
-                break;
-            case "unhide-row":
-                Worksheet.Rows.Show(row);
-                break;
+            switch (action)
+            {
+                case "insert-row-before":
+                    Execute(new InsertRowBeforeCommand(Worksheet, row));
+                    break;
+                case "insert-row-after":
+                    Execute(new InsertRowAfterCommand(Worksheet, row));
+                    break;
+                case "delete-row":
+                    Execute(new DeleteRowsCommand(Worksheet, row, row));
+                    break;
+                case "hide-row":
+                    Worksheet.Rows.Hide(row);
+                    break;
+                case "unhide-row":
+                    Worksheet.Rows.Show(row);
+                    break;
+            }
         }
 
         StateHasChanged();
@@ -758,32 +742,28 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         ContextMenuService.Close();
 
-        switch (args.Value?.ToString())
+        var action = args.Value?.ToString();
+
+        if (!HandleCommonContextMenuAction(action))
         {
-            case "cut":
-                _ = CutSelectionAsync();
-                break;
-            case "copy":
-                _ = CopySelectionAsync();
-                break;
-            case "paste":
-                _ = PasteFromClipboardAsync();
-                break;
-            case "insert-column-before":
-                Execute(new InsertColumnBeforeCommand(Worksheet, column));
-                break;
-            case "insert-column-after":
-                Execute(new InsertColumnAfterCommand(Worksheet, column));
-                break;
-            case "delete-column":
-                Execute(new DeleteColumnsCommand(Worksheet, column, column));
-                break;
-            case "hide-column":
-                Worksheet.Columns.Hide(column);
-                break;
-            case "unhide-column":
-                Worksheet.Columns.Show(column);
-                break;
+            switch (action)
+            {
+                case "insert-column-before":
+                    Execute(new InsertColumnBeforeCommand(Worksheet, column));
+                    break;
+                case "insert-column-after":
+                    Execute(new InsertColumnAfterCommand(Worksheet, column));
+                    break;
+                case "delete-column":
+                    Execute(new DeleteColumnsCommand(Worksheet, column, column));
+                    break;
+                case "hide-column":
+                    Worksheet.Columns.Hide(column);
+                    break;
+                case "unhide-column":
+                    Worksheet.Columns.Show(column);
+                    break;
+            }
         }
 
         StateHasChanged();
