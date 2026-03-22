@@ -6,18 +6,14 @@ namespace Radzen.Blazor.Spreadsheet;
 #nullable enable
 
 /// <summary>
-/// Base class for row commands providing snapshot/restore and undo/redo support.
+/// Base class for commands that need a full sheet snapshot for undo support.
 /// </summary>
-public abstract class RowCommandBase : ICommand
+public abstract class SheetSnapshotCommandBase : ICommand
 {
     /// <summary>
     /// The sheet being operated on.
     /// </summary>
     protected readonly Worksheet sheet;
-    /// <summary>
-    /// The row index being operated on.
-    /// </summary>
-    protected readonly int rowIndex;
 
     private readonly object?[,] backupValues;
     private readonly string?[,] backupFormulas;
@@ -26,19 +22,11 @@ public abstract class RowCommandBase : ICommand
     private readonly int originalColumnCount;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RowCommandBase"/> class.
+    /// Initializes a new instance of the <see cref="SheetSnapshotCommandBase"/> class.
     /// </summary>
-    /// <param name="sheet">The sheet being operated on.</param>
-    /// <param name="rowIndex">The row index being operated on.</param>
-    protected RowCommandBase(Worksheet sheet, int rowIndex)
+    protected SheetSnapshotCommandBase(Worksheet sheet)
     {
         this.sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
-        if (rowIndex < 0 || rowIndex >= sheet.RowCount)
-        {
-            throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        }
-
-        this.rowIndex = rowIndex;
 
         originalRowCount = sheet.RowCount;
         originalColumnCount = sheet.ColumnCount;
@@ -62,7 +50,6 @@ public abstract class RowCommandBase : ICommand
     /// <summary>
     /// Executes the command.
     /// </summary>
-    /// <returns></returns>
     public bool Execute()
     {
         DoExecute();
@@ -70,11 +57,10 @@ public abstract class RowCommandBase : ICommand
     }
 
     /// <summary>
-    /// Unexecutes the command.
+    /// Unexecutes the command by restoring the sheet to its original state.
     /// </summary>
     public void Unexecute()
     {
-        // Restore row count
         while (sheet.RowCount > originalRowCount)
         {
             sheet.DeleteRow(sheet.RowCount - 1);
@@ -84,7 +70,6 @@ public abstract class RowCommandBase : ICommand
             sheet.InsertRow(sheet.RowCount, 1);
         }
 
-        // Columns should not change for row commands, but guard for consistency
         while (sheet.ColumnCount > originalColumnCount)
         {
             sheet.DeleteColumn(sheet.ColumnCount - 1);
@@ -94,7 +79,6 @@ public abstract class RowCommandBase : ICommand
             sheet.InsertColumn(sheet.ColumnCount, 1);
         }
 
-        // Restore cell contents
         for (var r = 0; r < originalRowCount; r++)
         {
             for (var c = 0; c < originalColumnCount; c++)
