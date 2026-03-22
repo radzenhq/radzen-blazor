@@ -74,19 +74,19 @@ public partial class CellView : CellBase, IDisposable
     /// <summary>
     /// Gets or sets the row index of the cell.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public int Row { get; set; }
 
     /// <summary>
     /// Gets or sets the column index of the cell.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public int Column { get; set; }
 
     /// <summary>
     /// Gets or sets the sheet that contains the cell.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>

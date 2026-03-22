@@ -45,19 +45,19 @@ public partial class FilterDialog : ComponentBase
     /// <summary>
     /// The sheet containing the data to filter.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// The column index to filter.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public int Column { get; set; }
 
     /// <summary>
     /// The row index where the filter was triggered.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public int Row { get; set; }
 
     /// <summary>
