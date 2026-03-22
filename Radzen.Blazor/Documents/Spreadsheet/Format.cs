@@ -253,6 +253,27 @@ public class Format
     }
 
     /// <summary>
+    /// Gets a value indicating whether all format properties are at their default values.
+    /// </summary>
+    public bool IsDefault =>
+        Color == null &&
+        BackgroundColor == null &&
+        !Bold &&
+        !Italic &&
+        !Underline &&
+        !Strikethrough &&
+        !WrapText &&
+        FontFamily == null &&
+        FontSize == null &&
+        BorderTop == null &&
+        BorderRight == null &&
+        BorderBottom == null &&
+        BorderLeft == null &&
+        TextAlign == TextAlign.Left &&
+        VerticalAlign == VerticalAlign.Top &&
+        string.IsNullOrEmpty(NumberFormat);
+
+    /// <summary>
     /// Occurs when the format is changed, allowing for updates to be made to the UI or other components that depend on this format.
     /// </summary>
     public event Action? Changed;
