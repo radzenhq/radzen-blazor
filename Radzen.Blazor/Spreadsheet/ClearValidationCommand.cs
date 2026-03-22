@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
-using Radzen.Blazor.Spreadsheet;
-namespace Radzen.Documents.Spreadsheet;
+using Radzen.Documents.Spreadsheet;
+namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
 

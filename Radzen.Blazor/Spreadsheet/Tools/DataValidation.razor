@@ -15,6 +15,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private async Task OnClickAsync(RadzenSplitButtonItem? item)
@@ -29,7 +32,7 @@
         if (action == "clear")
         {
             var command = new ClearValidationCommand(Worksheet, Worksheet.Selection.Range);
-            Worksheet.Commands.Execute(command);
+            Spreadsheet?.Execute(command);
             return;
         }
 
@@ -38,7 +41,7 @@
         if (result is DataValidationRule rule)
         {
             var command = new DataValidationCommand(Worksheet, Worksheet.Selection.Range, rule);
-            Worksheet.Commands.Execute(command);
+            Spreadsheet?.Execute(command);
         }
     }
 }

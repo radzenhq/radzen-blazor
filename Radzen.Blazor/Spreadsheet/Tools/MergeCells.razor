@@ -15,6 +15,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private void OnClick(RadzenSplitButtonItem? item)
@@ -32,19 +35,19 @@
             case null:
             {
                 var command = new MergeCellsCommand(Worksheet, Worksheet.Selection.Range, center: true);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
             case "merge":
             {
                 var command = new MergeCellsCommand(Worksheet, Worksheet.Selection.Range);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
             case "unmerge":
             {
                 var command = new UnmergeCellsCommand(Worksheet, Worksheet.Selection.Cell);
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
                 break;
             }
         }

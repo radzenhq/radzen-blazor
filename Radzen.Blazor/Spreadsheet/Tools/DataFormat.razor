@@ -11,6 +11,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private static readonly List<FormatOption> FormatOptions =
     [
         new("General", "General"),
@@ -42,7 +45,7 @@
                 {
                     var format = value == "General" ? null : value;
                     var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(format));
-                    Worksheet.Commands.Execute(command);
+                    Spreadsheet?.Execute(command);
                 }
             }
         }

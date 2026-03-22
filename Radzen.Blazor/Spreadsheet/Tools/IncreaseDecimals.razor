@@ -10,6 +10,9 @@
     [Parameter]
     public Worksheet? Worksheet { get; set; }
 
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
     private void OnClick()
     {
         if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
@@ -18,7 +21,7 @@
             {
                 var newFormat = NumberFormat.AdjustDecimals(cell.Format.NumberFormat, 1);
                 var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(newFormat));
-                Worksheet.Commands.Execute(command);
+                Spreadsheet?.Execute(command);
             }
         }
     }
