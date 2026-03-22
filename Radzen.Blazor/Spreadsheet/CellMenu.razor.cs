@@ -16,19 +16,19 @@ public partial class CellMenu : ComponentBase
     /// <summary>
     /// Represents the sheet containing the cell menu.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Represents the row index of the cell menu.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public int Row { get; set; }
 
     /// <summary>
     /// Represents the column index of the cell menu.
     /// </summary>
-    [Parameter, EditorRequired]
+    [Parameter]
     public int Column { get; set; }
 
     /// <summary>
