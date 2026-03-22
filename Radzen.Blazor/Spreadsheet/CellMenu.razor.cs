@@ -342,22 +342,7 @@ public partial class CellMenu : ComponentBase
 
     private bool ComputeShouldShowBlankOption()
     {
-        var dataTable = GetCurrentTable();
-        var autoFilter = GetCurrentAutoFilter();
-
-        // Determine the range to use for checking blank values
-        RangeRef rangeToUse = RangeRef.Invalid;
-        
-        if (dataTable != null)
-        {
-            // Use data table range if the cell is part of a data table
-            rangeToUse = dataTable.Range;
-        }
-        else if (autoFilter != null)
-        {
-            // Use auto filter range if the cell is part of an auto filter
-            rangeToUse = autoFilter.Range;
-        }
+        var rangeToUse = GetActiveFilterRange();
 
         if (rangeToUse == RangeRef.Invalid) return false;
 
@@ -419,22 +404,7 @@ public partial class CellMenu : ComponentBase
         
         if (selectedFilterValues.Count != 0)
         {
-            var dataTable = GetCurrentTable();
-            var autoFilter = GetCurrentAutoFilter();
-
-            // Determine the range to use for the filter
-            RangeRef rangeToUse = RangeRef.Invalid;
-            
-            if (dataTable != null)
-            {
-                // Use data table range if the cell is part of a data table
-                rangeToUse = dataTable.Range;
-            }
-            else if (autoFilter != null)
-            {
-                // Use auto filter range if the cell is part of an auto filter
-                rangeToUse = autoFilter.Range;
-            }
+            var rangeToUse = GetActiveFilterRange();
 
             if (rangeToUse != RangeRef.Invalid)
             {
@@ -489,22 +459,7 @@ public partial class CellMenu : ComponentBase
     private List<(string Text, object? Value)> ComputeAvailableValues()
     {
         var availableValues = new List<(string Text, object? Value)>();
-        var dataTable = GetCurrentTable();
-        var autoFilter = GetCurrentAutoFilter();
-
-        // Determine the range to use for loading values
-        RangeRef rangeToUse = RangeRef.Invalid;
-        
-        if (dataTable != null)
-        {
-            // Use data table range if the cell is part of a data table
-            rangeToUse = dataTable.Range;
-        }
-        else if (autoFilter != null)
-        {
-            // Use auto filter range if the cell is part of an auto filter
-            rangeToUse = autoFilter.Range;
-        }
+        var rangeToUse = GetActiveFilterRange();
 
         if (rangeToUse != RangeRef.Invalid)
         {
@@ -557,26 +512,22 @@ public partial class CellMenu : ComponentBase
         return availableValues;
     }
 
-    private Table? GetCurrentTable()
+    private RangeRef GetActiveFilterRange()
     {
         foreach (var table in Worksheet.Tables)
         {
             if (table.Range.Contains(Row, Column))
             {
-                return table;
+                return table.Range;
             }
         }
-        return null;
-    }
 
-    private AutoFilter? GetCurrentAutoFilter()
-    {
-        // Check if the sheet has an auto filter and if the current cell is within its range
         if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(Row, Column))
         {
-            return Worksheet.AutoFilter;
+            return Worksheet.AutoFilter.Range;
         }
-        return null;
+
+        return RangeRef.Invalid;
     }
 
     private async Task OnCustomFilterAsync()
