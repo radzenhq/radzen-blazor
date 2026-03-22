@@ -35,7 +35,7 @@ public class GreaterThanRule : ConditionalFormatBase
         if (cell.Value is float f) { number = f; return true; }
         if (cell.Value is decimal dec) { number = (double)dec; return true; }
         if (cell.Value is long l) { number = l; return true; }
-        if (cell.Value != null)
+        if (cell.Value is not null)
         {
             return double.TryParse(cell.Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
         }
@@ -107,7 +107,7 @@ public class EqualToRule : ConditionalFormatBase
     public override Format? GetFormat(Cell cell)
     {
         ArgumentNullException.ThrowIfNull(cell);
-        if (cell.Value != null && cell.Value.Equals(Value))
+        if (cell.Value is not null && cell.Value.Equals(Value))
         {
             return Format;
         }
@@ -135,7 +135,7 @@ public class TextContainsRule : ConditionalFormatBase
     {
         ArgumentNullException.ThrowIfNull(cell);
         var cellText = cell.Value?.ToString();
-        if (cellText != null && cellText.Contains(Text, StringComparison.OrdinalIgnoreCase))
+        if (cellText is not null && cellText.Contains(Text, StringComparison.OrdinalIgnoreCase))
         {
             return Format;
         }

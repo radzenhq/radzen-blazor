@@ -17,7 +17,7 @@ class IntFunction : FormulaFunction
     {
         var numberArg = arguments.GetSingle("number");
 
-        if (numberArg == null)
+        if (numberArg is null)
         {
             return CellData.FromError(CellError.Value);
         }

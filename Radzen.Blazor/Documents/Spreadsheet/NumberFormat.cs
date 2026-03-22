@@ -26,7 +26,7 @@ public static class NumberFormat
     /// </summary>
     public static (string? Text, string? Color) ApplyWithColor(string? formatCode, object? value, CellDataType type)
     {
-        if (value == null || string.IsNullOrEmpty(formatCode) ||
+        if (value is null || string.IsNullOrEmpty(formatCode) ||
             string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
         {
             return (null, null);

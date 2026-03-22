@@ -2,7 +2,7 @@
 @using Radzen.Blazor.Rendering
 
 <li class="@Class">
-    @if (ChildContent != null)
+    @if (ChildContent is not null)
     {
         @ChildContent
     }

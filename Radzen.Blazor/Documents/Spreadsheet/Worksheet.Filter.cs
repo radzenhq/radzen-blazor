@@ -379,7 +379,7 @@ public abstract class NumericFilterCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override bool Matches(object? value)
     {
-        if (value == null || Value == null)
+        if (value is null || Value is null)
         {
             return false;
         }
@@ -414,7 +414,7 @@ public class EqualToCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override bool Matches(object? value)
     {
-        if (value == null || Value == null)
+        if (value is null || Value is null)
         {
             return false;
         }
@@ -517,7 +517,7 @@ public class NotEqualToCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override bool Matches(object? value)
     {
-        if (value == null || Value == null)
+        if (value is null || Value is null)
         {
             return false;
         }
@@ -566,11 +566,11 @@ public class InListCriterion : FilterCriterionLeaf
         }
 
         // Check for numeric coercion matches (only if value is not null)
-        if (value != null && TryCoerce(value, out var numericValue))
+        if (value is not null && TryCoerce(value, out var numericValue))
         {
             foreach (var listValue in Values)
             {
-                if (listValue != null && TryCoerce(listValue, out var numericListValue))
+                if (listValue is not null && TryCoerce(listValue, out var numericListValue))
                 {
                     if (numericValue == numericListValue)
                     {
@@ -599,7 +599,7 @@ public class IsNullCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override bool Matches(object? value)
     {
-        return value == null;
+        return value is null;
     }
 
     /// <inheritdoc/>
@@ -632,7 +632,7 @@ public abstract class StringFilterCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override bool Matches(object? value)
     {
-        if (value == null || Value == null)
+        if (value is null || Value is null)
         {
             return false;
         }
@@ -816,7 +816,7 @@ public partial class Worksheet
 
         var existingFilter = GetFilter(filter.Range);
 
-        if (existingFilter != null)
+        if (existingFilter is not null)
         {
             RemoveFilter(existingFilter);
         }

@@ -19,7 +19,7 @@ class SubtotalFunction : FormulaFunction
         var funcArg = arguments.GetSingle("function_num");
         var values = arguments.GetRange("ref");
 
-        if (funcArg == null || values == null)
+        if (funcArg is null || values is null)
         {
             return CellData.FromError(CellError.Value);
         }
@@ -61,7 +61,7 @@ class SubtotalFunction : FormulaFunction
             }
 
             // Hidden rows handling if available
-            if (excludeHidden && rangeList != null)
+            if (excludeHidden && rangeList is not null)
             {
                 if (rangeList.IsRowHiddenAt(i))
                 {

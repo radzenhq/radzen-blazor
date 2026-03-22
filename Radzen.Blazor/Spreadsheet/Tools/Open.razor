@@ -16,7 +16,7 @@
     {
         var file = args.File;
 
-        if (file != null)
+        if (file is not null)
         {
             using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10); // 10 MB max size
             using var memoryStream = new MemoryStream();

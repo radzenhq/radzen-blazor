@@ -104,12 +104,12 @@ public class ConditionalFormatStore
             foreach (var rule in kvp.Value)
             {
                 var candidate = rule.GetFormat(cell);
-                if (candidate == null)
+                if (candidate is null)
                 {
                     continue;
                 }
 
-                overlay = overlay == null ? candidate.Clone() : overlay.Merge(candidate);
+                overlay = overlay is null ? candidate.Clone() : overlay.Merge(candidate);
             }
         }
 

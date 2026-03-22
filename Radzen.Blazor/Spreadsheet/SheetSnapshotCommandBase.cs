@@ -86,7 +86,7 @@ public abstract class SheetSnapshotCommandBase : ICommand
         {
             var cell = sheet.Cells[row, column];
 
-            if (formula != null)
+            if (formula is not null)
             {
                 cell.Formula = formula;
             }
@@ -95,7 +95,7 @@ public abstract class SheetSnapshotCommandBase : ICommand
                 cell.Value = value;
             }
 
-            if (format != null)
+            if (format is not null)
             {
                 cell.Format = format;
             }

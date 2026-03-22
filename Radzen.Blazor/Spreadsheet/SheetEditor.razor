@@ -7,7 +7,7 @@
     <SheetEditorHighlight Value=@value />
 </div>
 <Popup @ref=@popup class="rz-spreadsheet-highlight-popup" Close="OnPopupClose">
-@if (functionHint != null)
+@if (functionHint is not null)
 {
     <FunctionHint ArgumentIndex=@functionHint.ArgumentIndex Function=@functionHint.Function />
 }

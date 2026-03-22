@@ -16,7 +16,7 @@ class ChooseFunction : FormulaFunction
     {
         var values = arguments.GetSequence("value");
 
-        if (values == null)
+        if (values is null)
         {
             return CellData.FromError(CellError.Value);
         }

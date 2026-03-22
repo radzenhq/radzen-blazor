@@ -10,18 +10,18 @@
     [Parameter]
     public UndoRedoStack? Commands { get; set; }
 
-    private bool IsDisabled => Commands == null || !Commands.CanRedo;
+    private bool IsDisabled => Commands is null || !Commands.CanRedo;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Commands != null)
+        if (Commands is not null)
         {
             Commands.Changed -= OnCommandsChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Commands != null)
+        if (Commands is not null)
         {
             Commands.Changed += OnCommandsChanged;
         }
@@ -39,7 +39,7 @@
 
     public void Dispose()
     {
-        if (Commands != null)
+        if (Commands is not null)
         {
             Commands.Changed -= OnCommandsChanged;
         }

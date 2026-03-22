@@ -193,7 +193,7 @@ public partial class Worksheet
     {
         var tree = cell.FormulaSyntaxTree;
 
-        if (tree == null)
+        if (tree is null)
         {
             return;
         }
@@ -427,7 +427,7 @@ public partial class Worksheet
         // Snapshot to avoid collection-modified errors when setting Formula triggers graph updates
         foreach (var cell in Cells.GetPopulatedCells().ToList())
         {
-            if (cell.FormulaSyntaxTree == null || string.IsNullOrEmpty(cell.Formula))
+            if (cell.FormulaSyntaxTree is null || string.IsNullOrEmpty(cell.Formula))
             {
                 continue;
             }
@@ -555,7 +555,7 @@ public partial class Worksheet
         foreach (var cell in Cells.GetPopulatedCells().ToList())
         {
             var tree = cell.FormulaSyntaxTree;
-            if (tree == null) continue;
+            if (tree is null) continue;
 
             bool hasRef;
 

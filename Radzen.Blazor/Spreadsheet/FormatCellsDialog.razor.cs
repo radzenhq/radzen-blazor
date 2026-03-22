@@ -133,7 +133,7 @@ public partial class FormatCellsDialog : ComponentBase
 
     private void UpdatePreview()
     {
-        if (SampleValue == null)
+        if (SampleValue is null)
         {
             preview = "";
             return;

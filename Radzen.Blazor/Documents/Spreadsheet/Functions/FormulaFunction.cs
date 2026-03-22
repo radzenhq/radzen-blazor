@@ -55,7 +55,7 @@ public abstract class FormulaFunction
         error = null;
         var arg = arguments.GetSingle(parameterName);
 
-        if (arg == null)
+        if (arg is null)
         {
             error = CellData.FromError(CellError.Value);
             return false;
@@ -87,7 +87,7 @@ public abstract class FormulaFunction
         error = null;
         var arg = arguments.GetSingle(parameterName);
 
-        if (arg == null)
+        if (arg is null)
         {
             if (isRequired)
             {

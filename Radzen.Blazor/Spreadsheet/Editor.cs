@@ -49,7 +49,7 @@ public class AcceptEditCommand(SheetView view) : ICommand
 
         cell = sheet.Selection.Cell;
 
-        if (value != null)
+        if (value is not null)
         {
             editor.Value = value;
             editor.Address = cell;
@@ -134,7 +134,7 @@ public class Editor(Worksheet sheet)
     /// <summary>
     /// Checks if there are changes in the editor that need to be accepted or canceled.
     /// </summary>
-    public bool HasChanges => Mode != EditMode.None && (Cell == null || Cell.GetValue() != Value);
+    public bool HasChanges => Mode != EditMode.None && (Cell is null || Cell.GetValue() != Value);
 
     /// <summary>
     /// Occurs when the value being edited in the spreadsheet editor changes.

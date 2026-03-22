@@ -25,7 +25,7 @@ public class Cell
     {
         get
         {
-            if (format == null)
+            if (format is null)
             {
                 format = new Format();
                 format.Changed += OnFormatChanged;
@@ -35,14 +35,14 @@ public class Cell
 
         set
         {
-            if (format != null)
+            if (format is not null)
             {
                 format.Changed -= OnFormatChanged;
             }
 
             format = value;
 
-            if (format != null)
+            if (format is not null)
             {
                 format.Changed += OnFormatChanged;
             }
@@ -71,14 +71,14 @@ public class Cell
         Data = other.Data;
         Formula = other.Formula;
 
-        if (format != null)
+        if (format is not null)
         {
             format.Changed -= OnFormatChanged;
         }
 
         format = other.format;
 
-        if (format != null)
+        if (format is not null)
         {
             format.Changed += OnFormatChanged;
         }
@@ -95,7 +95,7 @@ public class Cell
 
         var conditionalFormat = Worksheet.ConditionalFormats.Calculate(this);
 
-        if (conditionalFormat != null)
+        if (conditionalFormat is not null)
         {
             effectiveFormat = format?.Merge(conditionalFormat) ?? conditionalFormat;
         }
@@ -208,7 +208,7 @@ public class Cell
         set
         {
             formula = value;
-            FormulaSyntaxTree = value != null ? FormulaParser.Parse(value) : null;
+            FormulaSyntaxTree = value is not null ? FormulaParser.Parse(value) : null;
             Worksheet.OnCellFormulaChanged(this);
         }
     }
@@ -216,7 +216,7 @@ public class Cell
     /// <summary>
     /// Gets a value indicating whether this cell has no meaningful content (no value, formula, format, or hyperlink).
     /// </summary>
-    public bool IsEmpty => Value == null && Formula == null && format == null && Hyperlink == null;
+    public bool IsEmpty => Value is null && Formula is null && format is null && Hyperlink is null;
 
     /// <summary>
     /// Gets the address of the cell.

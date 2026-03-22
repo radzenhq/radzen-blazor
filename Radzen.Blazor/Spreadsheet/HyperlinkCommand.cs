@@ -24,11 +24,11 @@ public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyper
 
         cell.Hyperlink = hyperlink?.Clone();
 
-        if (hyperlink != null && !string.IsNullOrEmpty(hyperlink.DisplayText))
+        if (hyperlink is not null && !string.IsNullOrEmpty(hyperlink.DisplayText))
         {
             cell.Value = hyperlink.DisplayText;
         }
-        else if (hyperlink != null && (cell.Value == null || string.IsNullOrEmpty(cell.Value.ToString())))
+        else if (hyperlink is not null && (cell.Value is null || string.IsNullOrEmpty(cell.Value.ToString())))
         {
             cell.Value = hyperlink.Url;
         }
@@ -42,7 +42,7 @@ public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyper
         if (sheet.Cells.TryGet(address.Row, address.Column, out var cell))
         {
             cell.Hyperlink = previousHyperlink?.Clone();
-            if (previousDisplayText != null)
+            if (previousDisplayText is not null)
             {
                 cell.Value = previousDisplayText;
             }

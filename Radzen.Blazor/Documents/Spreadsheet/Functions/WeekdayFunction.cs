@@ -17,7 +17,7 @@ class WeekdayFunction : FormulaFunction
     public override CellData Evaluate(FunctionArguments arguments)
     {
         var serialArg = arguments.GetSingle("serial_number");
-        if (serialArg == null)
+        if (serialArg is null)
         {
             return CellData.FromError(CellError.Value);
         }
@@ -34,7 +34,7 @@ class WeekdayFunction : FormulaFunction
         // Determine return_type (default 1)
         var returnType = 1;
         var returnTypeArg = arguments.GetSingle("return_type");
-        if (returnTypeArg != null)
+        if (returnTypeArg is not null)
         {
             if (returnTypeArg.IsError)
             {

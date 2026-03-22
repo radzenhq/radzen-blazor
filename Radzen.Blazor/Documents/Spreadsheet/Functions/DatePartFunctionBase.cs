@@ -14,7 +14,7 @@ abstract class DatePartFunctionBase : FormulaFunction
     public override CellData Evaluate(FunctionArguments arguments)
     {
         var arg = arguments.GetSingle("serial_number");
-        if (arg == null)
+        if (arg is null)
         {
             return CellData.FromError(CellError.Value);
         }
