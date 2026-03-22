@@ -179,7 +179,7 @@ public partial class Sheet
         Columns = new(100, columns);
         Selection = new(this);
         Editor = new(this);
-        MergedCells = new(this);
+        MergedCells = new();
         Cells = new CellStore(this);
         Commands = new();
         Validation = new();
@@ -832,81 +832,4 @@ public partial class Sheet
         }
     }
 
-    internal IEnumerable<RangeInfo> GetRanges(RangeRef range)
-    {
-        if (range == RangeRef.Invalid)
-        {
-            yield break;
-        }
-
-        var bottomRightRange = new RangeRef(new CellRef(Rows.Frozen, Columns.Frozen), new CellRef(Rows.Count - 1, Columns.Count - 1));
-
-        if (range.Overlaps(bottomRightRange))
-        {
-            yield return new RangeInfo
-            {
-                Range = range.Intersection(bottomRightRange),
-                FrozenRow = false,
-                FrozenColumn = false,
-                Top = range.Start.Row >= Rows.Frozen,
-                Left = range.Start.Column >= Columns.Frozen,
-                Bottom = true,
-                Right = true
-            };
-        }
-
-        var topLeftRange = Rows.Frozen > 0 && Columns.Frozen > 0
-            ? new RangeRef(new CellRef(0, 0), new CellRef(Rows.Frozen - 1, Columns.Frozen - 1))
-            : RangeRef.Invalid;
-
-        if (range.Overlaps(topLeftRange))
-        {
-            yield return new RangeInfo
-            {
-                Range = range.Intersection(topLeftRange),
-                FrozenRow = true,
-                FrozenColumn = true,
-                Top = true,
-                Left = true,
-                Bottom = range.End.Row < Rows.Frozen,
-                Right = range.End.Column < Columns.Frozen
-            };
-        }
-
-        var topRightRange = Rows.Frozen > 0
-            ? new RangeRef(new CellRef(0, Columns.Frozen), new CellRef(Rows.Frozen - 1, ColumnCount - 1))
-            : RangeRef.Invalid;
-
-        if (range.Overlaps(topRightRange))
-        {
-            yield return new RangeInfo
-            {
-                Range = range.Intersection(topRightRange),
-                FrozenRow = true,
-                FrozenColumn = false,
-                Top = true,
-                Left = range.Start.Column >= Columns.Frozen,
-                Bottom = range.End.Row < Rows.Frozen,
-                Right = true
-            };
-        }
-
-        var bottomLeftRange = Columns.Frozen > 0
-            ? new RangeRef(new CellRef(Rows.Frozen, 0), new CellRef(RowCount - 1, Columns.Frozen - 1))
-            : RangeRef.Invalid;
-
-        if (range.Overlaps(bottomLeftRange))
-        {
-            yield return new RangeInfo
-            {
-                Range = range.Intersection(bottomLeftRange),
-                FrozenRow = false,
-                FrozenColumn = true,
-                Top = range.Start.Row >= Rows.Frozen,
-                Left = true,
-                Bottom = true,
-                Right = range.End.Column < Columns.Frozen
-            };
-        }
-    }
 }
