@@ -32,6 +32,7 @@ public partial class RowHeader : CellBase, IDisposable
     private string Class => ClassList.Create("rz-spreadsheet-row-header")
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
                                      .Add("rz-spreadsheet-frozen-column", FrozenState.HasFlag(FrozenState.Column))
+                                     .Add("rz-spreadsheet-header-active", active)
                                      .Add("rz-spreadsheet-header-selected", selected)
                                      .ToString();
 
