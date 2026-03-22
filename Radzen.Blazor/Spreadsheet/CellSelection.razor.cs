@@ -19,7 +19,7 @@ public partial class CellSelection
     /// Gets or sets the sheet that contains the cell for which the selection is displayed.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the virtual grid context that provides information about the grid's state.
@@ -29,7 +29,7 @@ public partial class CellSelection
 
     private IEnumerable<RangeInfo> GetRanges()
     {
-        var mergedRange = Sheet.MergedCells.GetMergedRange(Cell);
+        var mergedRange = Worksheet.MergedCells.GetMergedRange(Cell);
         var range = mergedRange != RangeRef.Invalid ? mergedRange : new RangeRef(Cell, Cell);
 
         return Context.GetRanges(range);

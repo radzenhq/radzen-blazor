@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class FilterCommandTests
 {
-    private readonly Sheet sheet = new(10, 10);
+    private readonly Worksheet sheet = new(10, 10);
 
     [Fact]
     public void Should_AddFilterWithCommand()

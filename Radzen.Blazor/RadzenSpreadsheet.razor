@@ -21,77 +21,77 @@
                 <RadzenTabsItem Text="Home">
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <Undo Commands=@Sheet?.Commands />
-                            <Redo Commands=@Sheet?.Commands />
+                            <Undo Commands=@Worksheet?.Commands />
+                            <Redo Commands=@Worksheet?.Commands />
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <FontFamily Sheet=@Sheet />
-                            <FontSize Sheet=@Sheet />
+                            <FontFamily Worksheet=@Worksheet />
+                            <FontSize Worksheet=@Worksheet />
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <Bold Sheet=@Sheet />
-                            <Italic Sheet=@Sheet />
-                            <Underline Sheet=@Sheet />
-                            <Strikethrough Sheet=@Sheet />
-                            <Color Sheet=@Sheet />
-                            <BackgroundColor Sheet=@Sheet />
-                            <CellBorders Sheet=@Sheet />
+                            <Bold Worksheet=@Worksheet />
+                            <Italic Worksheet=@Worksheet />
+                            <Underline Worksheet=@Worksheet />
+                            <Strikethrough Worksheet=@Worksheet />
+                            <Color Worksheet=@Worksheet />
+                            <BackgroundColor Worksheet=@Worksheet />
+                            <CellBorders Worksheet=@Worksheet />
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <TextAlign Sheet=@Sheet />
-                            <VerticalAlign Sheet=@Sheet />
-                            <TextWrap Sheet=@Sheet />
-                            <MergeCells Sheet=@Sheet />
+                            <TextAlign Worksheet=@Worksheet />
+                            <VerticalAlign Worksheet=@Worksheet />
+                            <TextWrap Worksheet=@Worksheet />
+                            <MergeCells Worksheet=@Worksheet />
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <ConditionalFormat Sheet=@Sheet />
+                            <ConditionalFormat Worksheet=@Worksheet />
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Format">
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <DataFormat Sheet=@Sheet />
-                        <IncreaseDecimals Sheet=@Sheet />
-                        <DecreaseDecimals Sheet=@Sheet />
+                        <DataFormat Worksheet=@Worksheet />
+                        <IncreaseDecimals Worksheet=@Worksheet />
+                        <DecreaseDecimals Worksheet=@Worksheet />
                         <RadzenButton Text="Format Cells..." Click=@OnFormatCellsAsync
                             ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
-                            Disabled=@(Sheet?.Selection.Cell == CellRef.Invalid) />
+                            Disabled=@(Worksheet?.Selection.Cell == CellRef.Invalid) />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Insert">
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <DeleteRow Sheet=@Sheet />
-                            <InsertRowAfter Sheet=@Sheet />
-                            <InsertRowBefore Sheet=@Sheet />
+                            <DeleteRow Worksheet=@Worksheet />
+                            <InsertRowAfter Worksheet=@Worksheet />
+                            <InsertRowBefore Worksheet=@Worksheet />
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <DeleteColumn Sheet=@Sheet />
-                            <InsertColumnAfter Sheet=@Sheet />
-                            <InsertColumnBefore Sheet=@Sheet />
+                            <DeleteColumn Worksheet=@Worksheet />
+                            <InsertColumnAfter Worksheet=@Worksheet />
+                            <InsertColumnBefore Worksheet=@Worksheet />
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <InsertHyperlink Sheet=@Sheet />
-                            <InsertImage Sheet=@Sheet />
+                            <InsertHyperlink Worksheet=@Worksheet />
+                            <InsertImage Worksheet=@Worksheet />
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="View">
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <Freeze Sheet=@Sheet />
+                        <Freeze Worksheet=@Worksheet />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Data">
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <AutoFilter Sheet=@Sheet />
-                        <DataValidation Sheet=@Sheet />
+                        <AutoFilter Worksheet=@Worksheet />
+                        <DataValidation Worksheet=@Worksheet />
                     </RadzenStack>
                 </RadzenTabsItem>
             </Tabs>
         </RadzenTabs>
-@if (Sheet != null)
+@if (Worksheet != null)
 {
-        <FormulaEditor Sheet=@Sheet />
+        <FormulaEditor Worksheet=@Worksheet />
         <VirtualGrid @ref=@grid style="flex: 1" View=@ActiveView>
             <Template>
                 @switch (context)
@@ -100,13 +100,13 @@
                         <CornerHeaderCell Rect=@context.Rect />
                         break;
                     case VirtualColumnHeader column:
-                        <ColumnHeader Sheet=@Sheet FrozenState=@column.FrozenState Column=@column.Column Rect=@context.Rect />
+                        <ColumnHeader Worksheet=@Worksheet FrozenState=@column.FrozenState Column=@column.Column Rect=@context.Rect />
                         break;
                     case VirtualRowHeader row:
-                        <RowHeader Sheet=@Sheet FrozenState=@row.FrozenState Row=@row.Row Rect=@context.Rect />
+                        <RowHeader Worksheet=@Worksheet FrozenState=@row.FrozenState Row=@row.Row Rect=@context.Rect />
                         break;
                     case VirtualDataItem item:
-                        <CellView Sheet=@Sheet Column=@item.Column Row=@item.Row FrozenState=@item.FrozenState Rect=@context.Rect Toggle=@OnCellToggleAsync />
+                        <CellView Worksheet=@Worksheet Column=@item.Column Row=@item.Row FrozenState=@item.FrozenState Rect=@context.Rect Toggle=@OnCellToggleAsync />
                         break;
                     case VirtualHorizontalSplitter horizontalSplitter:
                         <Splitter class="rz-spreadsheet-horizontal-splitter" Rect=@horizontalSplitter.Rect />
@@ -117,20 +117,20 @@
                 }
             </Template>
             <ChildContent>
-                <SelectionOverlay Sheet=@Sheet Context=@context />
-                <ImageOverlay Sheet=@Sheet Context=@context />
-                <CellEditor Sheet=@Sheet Context=@context />
-                @foreach (var table in Sheet.Tables)
+                <SelectionOverlay Worksheet=@Worksheet Context=@context />
+                <ImageOverlay Worksheet=@Worksheet Context=@context />
+                <CellEditor Worksheet=@Worksheet Context=@context />
+                @foreach (var table in Worksheet.Tables)
                 {
-                    <TableFrame Sheet=@Sheet Table=@table Context=@context />
+                    <TableFrame Worksheet=@Worksheet Table=@table Context=@context />
                 }
-                <InputPrompt @ref=@inputPrompt Sheet=@Sheet Context=@context />
+                <InputPrompt @ref=@inputPrompt Worksheet=@Worksheet Context=@context />
             </ChildContent>
         </VirtualGrid>
         <Popup @ref=@cellMenuPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
             @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
             {
-                <CellMenu Sheet=@Sheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync
+                <CellMenu Worksheet=@Worksheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync
                          SortAscending=@OnCellMenuSortAscendingAsync SortDescending=@OnCellMenuSortDescendingAsync Clear=@OnCellMenuClearAsync
                          CustomFilter=@OnCellMenuCustomFilterAsync />
             }

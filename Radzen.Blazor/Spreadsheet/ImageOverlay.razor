@@ -1,10 +1,10 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
-@foreach (var image in Sheet.Images)
+@foreach (var image in Worksheet.Images)
 {
     var imageRange = GetImageRange(image);
-    var selected = Sheet.SelectedImage == image;
+    var selected = Worksheet.SelectedImage == image;
     @foreach (var zone in Context.GetRanges(imageRange))
     {
         <div class=@GetClass(zone.FrozenRow, zone.FrozenColumn) style=@GetZoneStyle(image, imageRange, zone) @onpointerdown=@(e => OnImagePointerDown(e, image)) @onpointerdown:stopPropagation>

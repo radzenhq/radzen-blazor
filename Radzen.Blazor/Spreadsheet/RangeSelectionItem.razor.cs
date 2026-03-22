@@ -25,7 +25,7 @@ public partial class RangeSelectionItem
     /// Gets or sets the sheet that contains the range selection item.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the cell reference that defines the position of the range selection item in the spreadsheet.
@@ -70,7 +70,7 @@ public partial class RangeSelectionItem
     public bool Right { get; set; }
 
     private string Class => ClassList.Create("rz-spreadsheet-selection-range")
-            .Add("rz-spreadsheet-selection-range-mask", Range.Overlaps(Sheet.MergedCells.GetMergedRangeOrSelf(Cell)))
+            .Add("rz-spreadsheet-selection-range-mask", Range.Overlaps(Worksheet.MergedCells.GetMergedRangeOrSelf(Cell)))
             .Add("rz-spreadsheet-selection-range-top", Top)
             .Add("rz-spreadsheet-selection-range-left", Left)
             .Add("rz-spreadsheet-selection-range-bottom", Bottom)
@@ -85,7 +85,7 @@ public partial class RangeSelectionItem
         {
             var rect = Context.GetRectangle(Range.Start.Row, Range.Start.Column, Range.End.Row, Range.End.Column);
 
-            var mergedCellRange = Sheet.MergedCells.GetMergedRangeOrSelf(Cell);
+            var mergedCellRange = Worksheet.MergedCells.GetMergedRangeOrSelf(Cell);
 
             var intersectionRange = Range.Intersection(mergedCellRange);
             var cellRect = Context.GetRectangle(intersectionRange.Start.Row, intersectionRange.Start.Column, intersectionRange.End.Row, intersectionRange.End.Column);

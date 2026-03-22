@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class AggregateFunctionTests
 {
-    readonly Sheet sheet = new(15, 5);
+    readonly Worksheet sheet = new(15, 5);
 
     void SeedWithErrors()
     {

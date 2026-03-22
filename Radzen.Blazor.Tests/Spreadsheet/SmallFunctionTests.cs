@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class SmallFunctionTests
 {
-    readonly Sheet sheet = new(12, 12);
+    readonly Worksheet sheet = new(12, 12);
 
     [Fact]
     public void ShouldReturn4thSmallestInFirstColumn()
