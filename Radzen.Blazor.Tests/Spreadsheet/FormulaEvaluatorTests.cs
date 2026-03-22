@@ -255,6 +255,50 @@ public class FormulaEvaluationTests
         Assert.Equal(true, sheet.Cells["A3"].Value);
     }
 
+    [Fact]
+    public void ShouldRecalculateRangeFormulaWhenMiddleCellChanges()
+    {
+        var ws = new Worksheet(10, 5);
+        ws.Cells["A1"].Value = 1;
+        ws.Cells["A2"].Value = 2;
+        ws.Cells["A3"].Value = 3;
+        ws.Cells["A4"].Value = 4;
+        ws.Cells["A5"].Value = 5;
+        ws.Cells["B1"].Formula = "=SUM(A1:A5)";
+
+        Assert.Equal(15d, ws.Cells["B1"].Value);
+
+        ws.Cells["A3"].Value = 10;
+
+        Assert.Equal(22d, ws.Cells["B1"].Value);
+    }
+
+    [Fact]
+    public void ShouldRecalculateRangeFormulaWhenAnyCellInRangeChanges()
+    {
+        var ws = new Worksheet(10, 5);
+        ws.Cells["A1"].Value = 1;
+        ws.Cells["A2"].Value = 2;
+        ws.Cells["A3"].Value = 3;
+        ws.Cells["A4"].Value = 4;
+        ws.Cells["A5"].Value = 5;
+        ws.Cells["B1"].Formula = "=SUM(A1:A5)";
+
+        Assert.Equal(15d, ws.Cells["B1"].Value);
+
+        ws.Cells["A2"].Value = 20;
+        Assert.Equal(33d, ws.Cells["B1"].Value);
+
+        ws.Cells["A4"].Value = 40;
+        Assert.Equal(69d, ws.Cells["B1"].Value);
+
+        ws.Cells["A1"].Value = 10;
+        Assert.Equal(78d, ws.Cells["B1"].Value);
+
+        ws.Cells["A5"].Value = 50;
+        Assert.Equal(123d, ws.Cells["B1"].Value);
+    }
+
     // IFERROR function tests are in IfErrorFunctionTests.cs
 
     [Fact]
