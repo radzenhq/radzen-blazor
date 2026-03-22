@@ -1,28 +1,13 @@
-using System;
-
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
-
-#nullable enable
 
 /// <summary>
 /// Represents a command to remove a filter from a sheet, supporting undo and redo operations.
 /// </summary>
-public class RemoveFilterCommand : ICommand
+public class RemoveFilterCommand(Worksheet sheet, SheetFilter filter) : ICommand
 {
-    private readonly Worksheet sheet;
-    private readonly SheetFilter filter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RemoveFilterCommand"/> class.
-    /// </summary>
-    /// <param name="sheet">The sheet to remove the filter from.</param>
-    /// <param name="filter">The filter to remove.</param>
-    public RemoveFilterCommand(Worksheet sheet, SheetFilter filter)
-    {
-        this.sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
-        this.filter = filter ?? throw new ArgumentNullException(nameof(filter));
-    }
+    private readonly Worksheet sheet = sheet;
+    private readonly SheetFilter filter = filter;
 
     /// <inheritdoc/>
     public bool Execute()
@@ -35,4 +20,4 @@ public class RemoveFilterCommand : ICommand
     {
         sheet.AddFilter(filter);
     }
-} 
+}

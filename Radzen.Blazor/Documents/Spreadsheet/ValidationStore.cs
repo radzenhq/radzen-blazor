@@ -111,12 +111,9 @@ public class ValidationStore
     public IReadOnlyList<ICellValidator> GetValidatorsForCell(CellRef cellRef)
     {
         var result = new List<ICellValidator>();
-        foreach (var kvp in validators)
+        foreach (var (_, list) in GetMatchingRanges(cellRef))
         {
-            if (kvp.Key.Contains(cellRef))
-            {
-                result.AddRange(kvp.Value);
-            }
+            result.AddRange(list);
         }
         return result;
     }
@@ -141,25 +138,22 @@ public class ValidationStore
     {
         var style = DataValidationErrorStyle.Information;
 
-        foreach (var kvp in validators)
+        foreach (var (_, list) in GetMatchingRanges(cellRef))
         {
-            if (kvp.Key.Contains(cellRef))
+            foreach (var validator in list)
             {
-                foreach (var validator in kvp.Value)
+                var validatorStyle = validator is DataValidationRule rule
+                    ? rule.ErrorStyle
+                    : DataValidationErrorStyle.Stop;
+
+                if (validatorStyle == DataValidationErrorStyle.Stop)
                 {
-                    var validatorStyle = validator is DataValidationRule rule
-                        ? rule.ErrorStyle
-                        : DataValidationErrorStyle.Stop;
+                    return DataValidationErrorStyle.Stop;
+                }
 
-                    if (validatorStyle == DataValidationErrorStyle.Stop)
-                    {
-                        return DataValidationErrorStyle.Stop;
-                    }
-
-                    if (validatorStyle == DataValidationErrorStyle.Warning && style == DataValidationErrorStyle.Information)
-                    {
-                        style = DataValidationErrorStyle.Warning;
-                    }
+                if (validatorStyle == DataValidationErrorStyle.Warning && style == DataValidationErrorStyle.Information)
+                {
+                    style = DataValidationErrorStyle.Warning;
                 }
             }
         }
@@ -175,24 +169,32 @@ public class ValidationStore
         ArgumentNullException.ThrowIfNull(cell);
         var errors = new List<string>();
 
-        foreach (var kvp in validators)
+        foreach (var (range, list) in GetMatchingRanges(cell.Address))
         {
-            if (kvp.Key.Contains(cell.Address))
+            foreach (var validator in list)
             {
-                foreach (var validator in kvp.Value)
-                {
-                    var valid = validator is DataValidationRule rule
-                        ? rule.Validate(cell, kvp.Key.Start)
-                        : validator.Validate(cell);
+                var valid = validator is DataValidationRule rule
+                    ? rule.Validate(cell, range.Start)
+                    : validator.Validate(cell);
 
-                    if (!valid)
-                    {
-                        errors.Add(validator.Error);
-                    }
+                if (!valid)
+                {
+                    errors.Add(validator.Error);
                 }
             }
         }
 
         return errors;
+    }
+
+    private IEnumerable<KeyValuePair<RangeRef, List<ICellValidator>>> GetMatchingRanges(CellRef cellRef)
+    {
+        foreach (var kvp in validators)
+        {
+            if (kvp.Key.Contains(cellRef))
+            {
+                yield return kvp;
+            }
+        }
     }
 }
