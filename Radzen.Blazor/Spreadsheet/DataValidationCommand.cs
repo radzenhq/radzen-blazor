@@ -15,7 +15,7 @@ public class DataValidationCommand(Sheet sheet, RangeRef range, ICellValidator r
     public bool Execute()
     {
         sheet.Validation.Add(range, rule);
-        RefreshCells();
+        sheet.RefreshCells(range, validate: true);
         return true;
     }
 
@@ -23,18 +23,6 @@ public class DataValidationCommand(Sheet sheet, RangeRef range, ICellValidator r
     public void Unexecute()
     {
         sheet.Validation.Remove(range, rule);
-        RefreshCells();
-    }
-
-    private void RefreshCells()
-    {
-        foreach (var cellRef in range.GetCells())
-        {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                cell.Validate();
-                cell.OnChanged();
-            }
-        }
+        sheet.RefreshCells(range, validate: true);
     }
 }

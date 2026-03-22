@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
@@ -17,7 +15,7 @@ public class ConditionalFormatCommand(Sheet sheet, RangeRef range, ConditionalFo
     public bool Execute()
     {
         sheet.ConditionalFormats.Add(range, rule);
-        RefreshCells();
+        sheet.RefreshCells(range);
         return true;
     }
 
@@ -25,17 +23,6 @@ public class ConditionalFormatCommand(Sheet sheet, RangeRef range, ConditionalFo
     public void Unexecute()
     {
         sheet.ConditionalFormats.Remove(range, rule);
-        RefreshCells();
-    }
-
-    private void RefreshCells()
-    {
-        foreach (var cellRef in range.GetCells())
-        {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                cell.OnChanged();
-            }
-        }
+        sheet.RefreshCells(range);
     }
 }
