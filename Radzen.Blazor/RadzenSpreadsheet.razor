@@ -91,7 +91,7 @@
 @if (Sheet != null)
 {
         <FormulaEditor Sheet=@Sheet />
-        <VirtualGrid @ref=@grid style="flex: 1" Rows=@Sheet.Rows Columns=@Sheet.Columns MergedCells=@Sheet.MergedCells>
+        <VirtualGrid @ref=@grid style="flex: 1" View=@ActiveView>
             <Template>
                 @switch (context)
                 {
