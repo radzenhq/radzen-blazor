@@ -234,7 +234,7 @@ public partial class CellView : CellBase, IDisposable
         var didColumnChange = parameters.TryGetValue<int>(nameof(Column), out var column) && Column != column;
         var didSheetChange = parameters.TryGetValue<Sheet>(nameof(Sheet), out var sheet) && Sheet != sheet;
 
-        if (Sheet != null)
+        if (didSheetChange && Sheet != null)
         {
             Sheet.AutoFilterChanged -= OnAutoFilterChanged;
         }
@@ -257,7 +257,7 @@ public partial class CellView : CellBase, IDisposable
             showCellMenu = ShouldShowCellMenu();
         }
 
-        if (Sheet != null)
+        if (didSheetChange && Sheet != null)
         {
             Sheet.AutoFilterChanged += OnAutoFilterChanged;
         }
@@ -276,17 +276,6 @@ public partial class CellView : CellBase, IDisposable
         {
             showCellMenu = show;
             StateHasChanged();
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
-
-        if (!firstRender)
-        {
-            //Console.WriteLine($"Cell {Row}:{Column} rendered with value: {cell.Value}");
         }
     }
 

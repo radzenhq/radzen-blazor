@@ -282,7 +282,7 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
         {
             var wb = sheet.Workbook;
             targetSheet = wb.GetSheet(address.Sheet) ?? targetSheet;
-            if (targetSheet.Name != address.Sheet)
+            if (!string.Equals(targetSheet.Name, address.Sheet, StringComparison.OrdinalIgnoreCase))
             {
                 value = CellData.FromError(CellError.Ref);
                 return;
@@ -469,8 +469,8 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
         if (!string.IsNullOrEmpty(start.Sheet))
         {
             var wb = sheet.Workbook;
-            startSheet = wb.Sheets.FirstOrDefault(s => s.Name == start.Sheet) ?? startSheet;
-            if (startSheet.Name != start.Sheet)
+            startSheet = wb.Sheets.FirstOrDefault(s => string.Equals(s.Name, start.Sheet, StringComparison.OrdinalIgnoreCase)) ?? startSheet;
+            if (!string.Equals(startSheet.Name, start.Sheet, StringComparison.OrdinalIgnoreCase))
             {
                 value = CellData.FromError(CellError.Ref);
                 return;
@@ -481,8 +481,8 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
         var endSheet = startSheet;
         if (!string.IsNullOrEmpty(end.Sheet))
         {
-            endSheet = sheet.Workbook.Sheets.FirstOrDefault(s => s.Name == end.Sheet) ?? endSheet;
-            if (endSheet.Name != end.Sheet || endSheet != startSheet)
+            endSheet = sheet.Workbook.Sheets.FirstOrDefault(s => string.Equals(s.Name, end.Sheet, StringComparison.OrdinalIgnoreCase)) ?? endSheet;
+            if (!string.Equals(endSheet.Name, end.Sheet, StringComparison.OrdinalIgnoreCase) || endSheet != startSheet)
             {
                 value = CellData.FromError(CellError.Ref);
                 return;
