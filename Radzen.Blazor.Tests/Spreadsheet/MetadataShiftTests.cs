@@ -10,7 +10,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_ShiftsCustomRowHeights()
     {
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         sheet.Rows[5] = 40; // row 5 has custom height 40
 
         sheet.DeleteRow(3);
@@ -24,7 +24,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_ShiftsCustomRowHeights_BeforeTarget()
     {
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         sheet.Rows[2] = 50; // row 2 has custom height
 
         sheet.DeleteRow(5); // delete row after the custom one
@@ -36,7 +36,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_RemovesCustomHeightOfDeletedRow()
     {
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         sheet.Rows[3] = 60; // row 3 has custom height
 
         sheet.DeleteRow(3);
@@ -48,7 +48,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteColumn_ShiftsCustomColumnWidths()
     {
-        var sheet = new Sheet(5, 10);
+        var sheet = new Worksheet(5, 10);
         sheet.Columns[5] = 200; // column 5 has custom width
 
         sheet.DeleteColumn(3);
@@ -63,7 +63,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_ShiftsHiddenRows()
     {
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         sheet.Rows.Hide(5);
 
         sheet.DeleteRow(3);
@@ -76,7 +76,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_RemovesHiddenStateOfDeletedRow()
     {
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         sheet.Rows.Hide(3);
 
         sheet.DeleteRow(3);
@@ -88,7 +88,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteColumn_ShiftsHiddenColumns()
     {
-        var sheet = new Sheet(5, 10);
+        var sheet = new Worksheet(5, 10);
         sheet.Columns.Hide(5);
 
         sheet.DeleteColumn(3);
@@ -102,7 +102,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertRow_ShiftsCustomRowHeights()
     {
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         sheet.Rows[3] = 40;
 
         sheet.InsertRow(2, 1);
@@ -115,7 +115,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertRow_LeavesEarlierRowsUnchanged()
     {
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         sheet.Rows[1] = 50;
 
         sheet.InsertRow(5, 1);
@@ -127,7 +127,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertColumn_ShiftsCustomColumnWidths()
     {
-        var sheet = new Sheet(5, 10);
+        var sheet = new Worksheet(5, 10);
         sheet.Columns[3] = 200;
 
         sheet.InsertColumn(2, 1);
@@ -141,7 +141,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertRow_ShiftsHiddenRows()
     {
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         sheet.Rows.Hide(3);
 
         sheet.InsertRow(2, 1);
@@ -153,7 +153,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertColumn_ShiftsHiddenColumns()
     {
-        var sheet = new Sheet(5, 10);
+        var sheet = new Worksheet(5, 10);
         sheet.Columns.Hide(3);
 
         sheet.InsertColumn(2, 1);
@@ -167,7 +167,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_ShiftsMergedRangesDown()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(5, 0), new CellRef(6, 2));
         sheet.MergedCells.Add(range);
 
@@ -184,7 +184,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_LeavesEarlierMergedRangesUnchanged()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(1, 2));
         sheet.MergedCells.Add(range);
 
@@ -197,7 +197,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteColumn_ShiftsMergedRangesLeft()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(0, 5), new CellRef(2, 6));
         sheet.MergedCells.Add(range);
 
@@ -213,7 +213,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertRow_ShiftsMergedRangesDown()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(3, 0), new CellRef(4, 2));
         sheet.MergedCells.Add(range);
 
@@ -227,7 +227,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertRow_LeavesEarlierMergedRangesUnchanged()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(1, 2));
         sheet.MergedCells.Add(range);
 
@@ -239,7 +239,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertColumn_ShiftsMergedRangesRight()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(0, 3), new CellRef(2, 4));
         sheet.MergedCells.Add(range);
 
@@ -253,7 +253,7 @@ public class MetadataShiftTests
     [Fact]
     public void InsertColumn_LeavesEarlierMergedRangesUnchanged()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(0, 0), new CellRef(2, 1));
         sheet.MergedCells.Add(range);
 
@@ -267,7 +267,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_RemovesMergedRangeThatIsFullyContained()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         // Single-row merged range at row 3
         var range = new RangeRef(new CellRef(3, 0), new CellRef(3, 2));
         sheet.MergedCells.Add(range);
@@ -281,7 +281,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteRow_ShrinksMergedRangeThatSpansDeletedRow()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         // Range spans rows 2-5
         var range = new RangeRef(new CellRef(2, 0), new CellRef(5, 2));
         sheet.MergedCells.Add(range);
@@ -297,7 +297,7 @@ public class MetadataShiftTests
     [Fact]
     public void DeleteColumn_ShrinksMergedRangeThatSpansDeletedColumn()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var range = new RangeRef(new CellRef(0, 2), new CellRef(2, 5));
         sheet.MergedCells.Add(range);
 

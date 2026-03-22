@@ -17,7 +17,7 @@ enum FormulaAdjustment
 /// <summary>
 /// Represents a sheet in a spreadsheet.
 /// </summary>
-public partial class Sheet
+public partial class Worksheet
 {
     private readonly CellDependencyGraph graph = new();
     private readonly HashSet<int> invalidReferenceRows = [];
@@ -90,7 +90,7 @@ public partial class Sheet
     /// <summary>
     /// Gets the name of the sheet.
     /// </summary>
-    public string Name { get; internal set; } = "Sheet1";
+    public string Name { get; internal set; } = "Worksheet1";
     private readonly List<Table> tables = [];
 
     /// <summary>
@@ -170,11 +170,11 @@ public partial class Sheet
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Sheet"/> class with the specified number of rows and columns.
+    /// Initializes a new instance of the <see cref="Worksheet"/> class with the specified number of rows and columns.
     /// </summary>
     /// <param name="rows"></param>
     /// <param name="columns"></param>
-    public Sheet(int rows, int columns)
+    public Worksheet(int rows, int columns)
     {
         Rows = new(24, rows);
         Columns = new(100, columns);
@@ -500,7 +500,7 @@ public partial class Sheet
         return result.ToString();
     }
 
-    internal void PasteRange(Sheet sourceSheet, RangeRef source, CellRef destinationStart, FormulaAdjustment adjustment)
+    internal void PasteRange(Worksheet sourceSheet, RangeRef source, CellRef destinationStart, FormulaAdjustment adjustment)
     {
         if (source == RangeRef.Invalid)
         {

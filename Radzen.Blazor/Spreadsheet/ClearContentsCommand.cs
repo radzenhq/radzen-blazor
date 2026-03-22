@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Radzen.Blazor.Spreadsheet;
 namespace Radzen.Documents.Spreadsheet;
 
-class ClearContentsCommand(Sheet sheet, RangeRef range) : ICommand
+class ClearContentsCommand(Worksheet sheet, RangeRef range) : ICommand
 {
     private readonly Dictionary<CellRef, (object? value, string? formula)> snapshot = [];
 

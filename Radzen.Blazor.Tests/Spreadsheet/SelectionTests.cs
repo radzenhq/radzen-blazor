@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class SelectionTests
 {
-    readonly Sheet sheet = new(4, 4);
+    readonly Worksheet sheet = new(4, 4);
 
     [Fact]
     public void Should_SelectSingleCell()

@@ -7,7 +7,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class RangeSelectionItemTests : TestContext
 {
-    private readonly Sheet sheet = new(4, 4);
+    private readonly Worksheet sheet = new(4, 4);
 
     [Fact]
     public void RangeSelectionItem_ShouldCalculateCorrectMaskForMergedCells()
@@ -25,7 +25,7 @@ public class RangeSelectionItemTests : TestContext
         // Act
         var cut = RenderComponent<RangeSelectionItem>(parameters => parameters
             .Add(p => p.Range, selectionRange)
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Cell, sheet.Selection.Cell) // This should be A1 (the active cell)
             .Add(p => p.Context, context));
 
@@ -52,7 +52,7 @@ public class RangeSelectionItemTests : TestContext
         // Act
         var cut = RenderComponent<RangeSelectionItem>(parameters => parameters
             .Add(p => p.Range, selectionRange)
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Cell, sheet.Selection.Cell)
             .Add(p => p.Context, context));
 
@@ -89,7 +89,7 @@ public class RangeSelectionItemTests : TestContext
         var frozenRange = ranges.First(r => r.FrozenColumn);
         var frozenCut = RenderComponent<RangeSelectionItem>(parameters => parameters
             .Add(p => p.Range, frozenRange.Range)
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Cell, sheet.Selection.Cell)
             .Add(p => p.Context, context)
             .Add(p => p.FrozenColumn, frozenRange.FrozenColumn)
@@ -112,7 +112,7 @@ public class RangeSelectionItemTests : TestContext
         var nonFrozenRange = ranges.First(r => !r.FrozenColumn);
         var nonFrozenCut = RenderComponent<RangeSelectionItem>(parameters => parameters
             .Add(p => p.Range, nonFrozenRange.Range)
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Cell, sheet.Selection.Cell)
             .Add(p => p.Context, context)
             .Add(p => p.FrozenColumn, nonFrozenRange.FrozenColumn)

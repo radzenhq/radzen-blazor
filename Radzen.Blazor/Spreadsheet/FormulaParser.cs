@@ -436,16 +436,16 @@ internal class FormulaParser
                 // If either side has a sheet, ensure both sides have the same sheet; if only one has sheet, propagate to the other
                 var startAddr = start.Token.Address;
                 var endAddr = endToken.Address;
-                if (startAddr.Sheet != null && endAddr.Sheet == null)
+                if (startAddr.Worksheet != null && endAddr.Worksheet == null)
                 {
                     endToken.Address = new CellRef(endAddr.Row, endAddr.Column)
                     {
                         IsColumnAbsolute = endAddr.IsColumnAbsolute,
                         IsRowAbsolute = endAddr.IsRowAbsolute,
-                        Sheet = startAddr.Sheet
+                        Worksheet = startAddr.Worksheet
                     };
                 }
-                else if (endAddr.Sheet != null && startAddr.Sheet == null)
+                else if (endAddr.Worksheet != null && startAddr.Worksheet == null)
                 {
                     start = new CellSyntaxNode(new FormulaToken(start.Token.Type, start.Token.Value)
                     {
@@ -453,7 +453,7 @@ internal class FormulaParser
                         {
                             IsColumnAbsolute = startAddr.IsColumnAbsolute,
                             IsRowAbsolute = startAddr.IsRowAbsolute,
-                            Sheet = endAddr.Sheet
+                            Worksheet = endAddr.Worksheet
                         }
                     });
                 }

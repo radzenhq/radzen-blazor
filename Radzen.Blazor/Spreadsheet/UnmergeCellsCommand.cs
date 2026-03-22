@@ -6,9 +6,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Command to unmerge cells that contain a given cell address.
 /// </summary>
-public class UnmergeCellsCommand(Sheet sheet, CellRef address) : ICommand
+public class UnmergeCellsCommand(Worksheet sheet, CellRef address) : ICommand
 {
-    private readonly Sheet sheet = sheet;
+    private readonly Worksheet sheet = sheet;
     private readonly CellRef address = address;
     private RangeRef removedRange = RangeRef.Invalid;
 

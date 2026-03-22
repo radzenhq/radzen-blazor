@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class XLookupFunctionTests
 {
-    readonly Sheet sheet = new(20, 10);
+    readonly Worksheet sheet = new(20, 10);
 
     [Fact]
     public void ShouldFindExactMatchAndReturnFromAnotherColumn()

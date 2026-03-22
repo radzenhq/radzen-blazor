@@ -8,7 +8,7 @@ public class InsertRowColumnTests
     [Fact]
     public void InsertColumn_ShiftsReferencesAndValues()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
 
         sheet.Cells[1, 0].Value = 1;   // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
@@ -28,7 +28,7 @@ public class InsertRowColumnTests
     [Fact]
     public void InsertRow_ShiftsReferencesAndValues()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
 
         sheet.Cells[1, 0].Value = 1;   // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
@@ -48,7 +48,7 @@ public class InsertRowColumnTests
     [Fact]
     public void InsertRow_IncreasesRowCount()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.InsertRow(2, 2);
         Assert.Equal(7, sheet.RowCount);
     }
@@ -56,7 +56,7 @@ public class InsertRowColumnTests
     [Fact]
     public void InsertColumn_IncreasesColumnCount()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.InsertColumn(3, 3);
         Assert.Equal(8, sheet.ColumnCount);
     }

@@ -19,7 +19,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
     /// Gets or sets the sheet.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the virtual grid context.
@@ -30,18 +30,18 @@ public partial class ImageOverlay : ComponentBase, IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Commands.Changed -= OnChanged;
-            Sheet.SelectedImageChanged -= OnChanged;
+            Worksheet.Commands.Changed -= OnChanged;
+            Worksheet.SelectedImageChanged -= OnChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Commands.Changed += OnChanged;
-            Sheet.SelectedImageChanged += OnChanged;
+            Worksheet.Commands.Changed += OnChanged;
+            Worksheet.SelectedImageChanged += OnChanged;
         }
     }
 
@@ -52,10 +52,10 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Commands.Changed -= OnChanged;
-            Sheet.SelectedImageChanged -= OnChanged;
+            Worksheet.Commands.Changed -= OnChanged;
+            Worksheet.SelectedImageChanged -= OnChanged;
         }
     }
 
@@ -74,7 +74,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
         var endCol = image.From.Column;
         var remaining = widthPx - (Context.GetRectangle(image.From.Row, image.From.Column).Width - image.From.ColumnOffset / EmuPerPixel);
-        while (remaining > 0 && endCol < Sheet.ColumnCount - 1)
+        while (remaining > 0 && endCol < Worksheet.ColumnCount - 1)
         {
             endCol++;
             remaining -= Context.GetRectangle(image.From.Row, endCol).Width;
@@ -82,7 +82,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
         var endRow = image.From.Row;
         remaining = heightPx - (Context.GetRectangle(image.From.Row, image.From.Column).Height - image.From.RowOffset / EmuPerPixel);
-        while (remaining > 0 && endRow < Sheet.RowCount - 1)
+        while (remaining > 0 && endRow < Worksheet.RowCount - 1)
         {
             endRow++;
             remaining -= Context.GetRectangle(endRow, image.From.Column).Height;
@@ -119,12 +119,12 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
         for (var col = image.From.Column; col < zone.Range.Start.Column; col++)
         {
-            offsetX -= Sheet.Columns[col];
+            offsetX -= Worksheet.Columns[col];
         }
 
         for (var row = image.From.Row; row < zone.Range.Start.Row; row++)
         {
-            offsetY -= Sheet.Rows[row];
+            offsetY -= Worksheet.Rows[row];
         }
 
         return (offsetX, offsetY);
@@ -199,8 +199,8 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     private void OnImagePointerDown(PointerEventArgs e, SheetImage image)
     {
-        Sheet.SelectedImage = image;
-        Sheet.Selection.Clear();
+        Worksheet.SelectedImage = image;
+        Worksheet.Selection.Clear();
         StateHasChanged();
     }
 }

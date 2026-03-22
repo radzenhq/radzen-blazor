@@ -7,7 +7,7 @@ public class ConditionalFormatRuleTests
 {
     private static Cell CreateCell(object? value)
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = value;
         return sheet.Cells[0, 0];
     }
@@ -63,7 +63,7 @@ public class ConditionalFormatRuleTests
     [Fact]
     public void ConditionalFormatCommand_ExecuteAndUnexecute()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells[0, 0].Value = 20;
         var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
         var rule = new GreaterThanRule { Value = 10, Format = new Format { Bold = true } };

@@ -153,7 +153,7 @@ public class DataValidationRule : ICellValidator
     /// <summary>
     /// Gets the list items for List type validation, resolving cell range references from the given sheet.
     /// </summary>
-    public IReadOnlyList<string> GetListItems(Sheet? sheet)
+    public IReadOnlyList<string> GetListItems(Worksheet? sheet)
     {
         if (Type != DataValidationType.List || string.IsNullOrEmpty(Formula1))
         {
@@ -168,7 +168,7 @@ public class DataValidationRule : ICellValidator
         return Formula1.Split(',').Select(s => s.Trim().Trim('"')).ToList();
     }
 
-    private IReadOnlyList<string> ResolveListFromRange(Sheet sheet)
+    private IReadOnlyList<string> ResolveListFromRange(Worksheet sheet)
     {
         try
         {
@@ -262,7 +262,7 @@ public class DataValidationRule : ICellValidator
 
     private bool ValidateList(Cell cell)
     {
-        var items = GetListItems(cell.Sheet);
+        var items = GetListItems(cell.Worksheet);
         var cellValue = cell.Value?.ToString() ?? "";
         return items.Any(item => string.Equals(item, cellValue, StringComparison.OrdinalIgnoreCase));
     }
@@ -317,7 +317,7 @@ public class DataValidationRule : ICellValidator
 
             if (rowDelta != 0 || colDelta != 0)
             {
-                formula = Sheet.AdjustFormulaForCopy(formula, rowDelta, colDelta);
+                formula = Worksheet.AdjustFormulaForCopy(formula, rowDelta, colDelta);
             }
 
             var tree = FormulaParser.Parse(formula);
@@ -327,7 +327,7 @@ public class DataValidationRule : ICellValidator
                 return false;
             }
 
-            var evaluator = new FormulaEvaluator(cell.Sheet, cell);
+            var evaluator = new FormulaEvaluator(cell.Worksheet, cell);
             var result = evaluator.Evaluate(tree.Root);
 
             if (result.Value is bool boolValue)

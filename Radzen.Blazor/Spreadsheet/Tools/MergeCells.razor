@@ -13,13 +13,13 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private void OnClick(RadzenSplitButtonItem? item)
     {
-        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid)
         {
             return;
         }
@@ -31,20 +31,20 @@
             case "merge-center":
             case null:
             {
-                var command = new MergeCellsCommand(Sheet, Sheet.Selection.Range, center: true);
-                Sheet.Commands.Execute(command);
+                var command = new MergeCellsCommand(Worksheet, Worksheet.Selection.Range, center: true);
+                Worksheet.Commands.Execute(command);
                 break;
             }
             case "merge":
             {
-                var command = new MergeCellsCommand(Sheet, Sheet.Selection.Range);
-                Sheet.Commands.Execute(command);
+                var command = new MergeCellsCommand(Worksheet, Worksheet.Selection.Range);
+                Worksheet.Commands.Execute(command);
                 break;
             }
             case "unmerge":
             {
-                var command = new UnmergeCellsCommand(Sheet, Sheet.Selection.Cell);
-                Sheet.Commands.Execute(command);
+                var command = new UnmergeCellsCommand(Worksheet, Worksheet.Selection.Cell);
+                Worksheet.Commands.Execute(command);
                 break;
             }
         }

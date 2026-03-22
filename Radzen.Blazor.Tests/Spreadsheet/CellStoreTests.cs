@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class CellStoreTests
 {
-    readonly CellStore cellStore = new(new Sheet(5, 5));
+    readonly CellStore cellStore = new(new Worksheet(5, 5));
 
     [Fact]
     public void CellStore_ShouldReturnNewCell_WhenCellDoesNotExist()
@@ -31,7 +31,7 @@ public class CellStoreTests
     [Fact]
     public void CellStore_ShouldReturnExistingCell_WhenCellExists()
     {
-        var expectedCell = new Cell(cellStore.Sheet, new CellRef(0, 0));
+        var expectedCell = new Cell(cellStore.Worksheet, new CellRef(0, 0));
         cellStore[0, 0] = expectedCell;
         var cell = cellStore[0, 0];
         Assert.Same(expectedCell, cell);
@@ -40,7 +40,7 @@ public class CellStoreTests
     [Fact]
     public void CellStore_ShouldReturnExistingCell_ViaA1Notation()
     {
-        var expectedCell = new Cell(cellStore.Sheet, new CellRef(0, 0));
+        var expectedCell = new Cell(cellStore.Worksheet, new CellRef(0, 0));
 
         cellStore[0, 0] = expectedCell;
 
@@ -58,8 +58,8 @@ public class CellStoreTests
     [Fact]
     public void CellStore_ShouldSupport_MultipleLettersInA1Notation()
     {
-        var cellStore = new CellStore(new Sheet(5, 30));
-        var expectedCell = new Cell(cellStore.Sheet, new CellRef(0, 26));
+        var cellStore = new CellStore(new Worksheet(5, 30));
+        var expectedCell = new Cell(cellStore.Worksheet, new CellRef(0, 26));
 
         cellStore[0, 26] = expectedCell;
 

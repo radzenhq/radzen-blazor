@@ -17,7 +17,7 @@ public partial class CellEditor : ComponentBase, IDisposable
     /// Gets or sets the sheet.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the virtual grid context.
@@ -37,18 +37,18 @@ public partial class CellEditor : ComponentBase, IDisposable
     /// <inheritdoc />
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Editor.Changed -= OnEditModeChanged;
-            Sheet.Editor.ValueChanged -= OnEditorValueChanged;
+            Worksheet.Editor.Changed -= OnEditModeChanged;
+            Worksheet.Editor.ValueChanged -= OnEditorValueChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Editor.Changed += OnEditModeChanged;
-            Sheet.Editor.ValueChanged += OnEditorValueChanged;
+            Worksheet.Editor.Changed += OnEditModeChanged;
+            Worksheet.Editor.ValueChanged += OnEditorValueChanged;
 
             Render();
         }
@@ -56,7 +56,7 @@ public partial class CellEditor : ComponentBase, IDisposable
 
     private async Task OnBlurAsync()
     {
-        if (Sheet.Editor.Mode == EditMode.Cell)
+        if (Worksheet.Editor.Mode == EditMode.Cell)
         {
             await Spreadsheet.AcceptAsync();
         }
@@ -64,16 +64,16 @@ public partial class CellEditor : ComponentBase, IDisposable
 
     private void OnFocus()
     {
-        if (Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            var cell = Sheet.Cells[Sheet.Selection.Cell];
-            Sheet.Editor.StartEdit(cell.Address, Sheet.Editor.Mode != EditMode.None ? Sheet.Editor.Value : cell.GetValue(), EditMode.Cell);
+            var cell = Worksheet.Cells[Worksheet.Selection.Cell];
+            Worksheet.Editor.StartEdit(cell.Address, Worksheet.Editor.Mode != EditMode.None ? Worksheet.Editor.Value : cell.GetValue(), EditMode.Cell);
         }
     }
 
     private void OnEditorValueChanged()
     {
-        if (Sheet.Editor.Mode == EditMode.Formula)
+        if (Worksheet.Editor.Mode == EditMode.Formula)
         {
             StateHasChanged();
         }
@@ -81,7 +81,7 @@ public partial class CellEditor : ComponentBase, IDisposable
 
     private void Render()
     {
-        var address = Sheet.Selection.Cell;
+        var address = Worksheet.Selection.Cell;
 
         if (address == CellRef.Invalid)
         {
@@ -90,7 +90,7 @@ public partial class CellEditor : ComponentBase, IDisposable
             return;
         }
 
-        var cell = Sheet.Cells[address];
+        var cell = Worksheet.Cells[address];
 
         if (address != CellRef.Invalid)
         {
@@ -98,7 +98,7 @@ public partial class CellEditor : ComponentBase, IDisposable
             var sb = StringBuilderCache.Acquire();
             rect.AppendStyle(sb);
 
-            cell = Sheet.Cells[address];
+            cell = Worksheet.Cells[address];
             cell.ApplyFormat(sb);
 
             cellStyle = StringBuilderCache.GetStringAndRelease(sb);
@@ -109,8 +109,8 @@ public partial class CellEditor : ComponentBase, IDisposable
         }
 
         className = ClassList.Create("rz-spreadsheet-cell-editor")
-            .Add("rz-spreadsheet-frozen-column", Sheet.Selection.Cell != CellRef.Invalid && Sheet.Selection.Cell.Column < Sheet.Columns.Frozen)
-            .Add("rz-spreadsheet-frozen-row", Sheet.Selection.Cell != CellRef.Invalid && Sheet.Selection.Cell.Row < Sheet.Rows.Frozen)
+            .Add("rz-spreadsheet-frozen-column", Worksheet.Selection.Cell != CellRef.Invalid && Worksheet.Selection.Cell.Column < Worksheet.Columns.Frozen)
+            .Add("rz-spreadsheet-frozen-row", Worksheet.Selection.Cell != CellRef.Invalid && Worksheet.Selection.Cell.Row < Worksheet.Rows.Frozen)
             .Add($"rz-spreadsheet-cell-editor-{cell.ValueType.ToString().ToLowerInvariant()}", cell != null)
             .ToString();
     }
@@ -123,7 +123,7 @@ public partial class CellEditor : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        Sheet.Editor.Changed -= OnEditModeChanged;
-        Sheet.Editor.ValueChanged -= OnEditorValueChanged;
+        Worksheet.Editor.Changed -= OnEditModeChanged;
+        Worksheet.Editor.ValueChanged -= OnEditorValueChanged;
     }
 }

@@ -14,7 +14,7 @@ public partial class InputPrompt : ComponentBase
     /// Gets or sets the sheet.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the virtual grid context.
@@ -41,9 +41,9 @@ public partial class InputPrompt : ComponentBase
         message = null;
         cell = CellRef.Invalid;
 
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            var validators = Sheet.Validation.GetValidatorsForCell(address);
+            var validators = Worksheet.Validation.GetValidatorsForCell(address);
 
             foreach (var v in validators)
             {
@@ -93,8 +93,8 @@ public partial class InputPrompt : ComponentBase
         style = $"transform: translate({left.ToPx()}, {top.ToPx()});";
 
         className = ClassList.Create("rz-spreadsheet-input-prompt")
-            .Add("rz-spreadsheet-frozen-column", Sheet != null && cell.Column < Sheet.Columns.Frozen)
-            .Add("rz-spreadsheet-frozen-row", Sheet != null && cell.Row < Sheet.Rows.Frozen)
+            .Add("rz-spreadsheet-frozen-column", Worksheet != null && cell.Column < Worksheet.Columns.Frozen)
+            .Add("rz-spreadsheet-frozen-row", Worksheet != null && cell.Row < Worksheet.Rows.Frozen)
             .ToString();
     }
 }

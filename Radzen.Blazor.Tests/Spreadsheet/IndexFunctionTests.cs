@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class IndexFunctionTests
 {
-    readonly Sheet sheet = new(10, 10);
+    readonly Worksheet sheet = new(10, 10);
 
     void Seed()
     {

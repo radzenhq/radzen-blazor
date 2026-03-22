@@ -14,14 +14,14 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 public class Workbook
 {
-    private readonly List<Sheet> sheets = [];
+    private readonly List<Worksheet> sheets = [];
 
     /// <summary>
     /// Gets the collection of sheets in the workbook.
     /// </summary>
-    public IReadOnlyList<Sheet> Sheets => sheets;
+    public IReadOnlyList<Worksheet> Sheets => sheets;
 
-    internal Workbook(Sheet sheet)
+    internal Workbook(Worksheet sheet)
     {
         AddSheet(sheet);
     }
@@ -36,9 +36,9 @@ public class Workbook
     /// <summary>
     /// Adds a new sheet to the workbook with the specified name, rows, and columns.
     /// </summary>
-    public Sheet AddSheet(string name, int rows, int columns)
+    public Worksheet AddSheet(string name, int rows, int columns)
     {
-        var sheet = new Sheet(rows, columns)
+        var sheet = new Worksheet(rows, columns)
         {
             Name = name
         };
@@ -50,7 +50,7 @@ public class Workbook
     /// Adds an existing sheet to the workbook.
     /// </summary>
     /// <param name="sheet"></param>
-    public void AddSheet(Sheet sheet)
+    public void AddSheet(Worksheet sheet)
     {
         ArgumentNullException.ThrowIfNull(sheet);
         sheets.Add(sheet);
@@ -61,7 +61,7 @@ public class Workbook
     /// Gets the sheet with the specified name or null if not found.
     /// </summary>
     /// <param name="name"></param>
-    public Sheet? GetSheet(string name)
+    public Worksheet? GetSheet(string name)
     {
         foreach (var sheet in sheets)
         {
@@ -123,7 +123,7 @@ public class Workbook
         public XElement? NumFmtsElement { get; set; }
     }
 
-    private static void SaveDrawing(ZipArchive archive, Sheet sheet, int drawingIndex, Dictionary<string, string> mediaMap, ref int globalMediaIndex)
+    private static void SaveDrawing(ZipArchive archive, Worksheet sheet, int drawingIndex, Dictionary<string, string> mediaMap, ref int globalMediaIndex)
     {
         XNamespace xdr = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
         XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
@@ -498,7 +498,7 @@ public class Workbook
             new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships")));
     }
 
-    private void SaveSheet(ZipArchive archive, Sheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc, Dictionary<string, string> mediaMap, ref int globalMediaIndex)
+    private void SaveSheet(ZipArchive archive, Worksheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc, Dictionary<string, string> mediaMap, ref int globalMediaIndex)
     {
         var sheetDoc = CreateSheetDocument(sheet, sheetId, relId);
         var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
@@ -553,7 +553,7 @@ public class Workbook
         }
     }
 
-    private static List<(string Id, string Url)> AddHyperlinks(Sheet sheet, XDocument sheetDoc)
+    private static List<(string Id, string Url)> AddHyperlinks(Worksheet sheet, XDocument sheetDoc)
     {
         var rels = new List<(string Id, string Url)>();
         var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
@@ -624,7 +624,7 @@ public class Workbook
         }
     }
 
-    private static XDocument CreateSheetDocument(Sheet sheet, int sheetId, string relId)
+    private static XDocument CreateSheetDocument(Worksheet sheet, int sheetId, string relId)
     {
         var uid = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
@@ -638,19 +638,19 @@ public class Workbook
                 new XElement(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
     }
 
-    private static XElement CreateSheetProperties(Sheet sheet)
+    private static XElement CreateSheetProperties(Worksheet sheet)
     {
         return new XElement(XName.Get("sheetPr", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             sheet.Filters.Count > 0 ? new XAttribute("filterMode", "1") : null);
     }
 
-    private static XElement CreateDimension(Sheet sheet)
+    private static XElement CreateDimension(Worksheet sheet)
     {
         return new XElement(XName.Get("dimension", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XAttribute("ref", $"A1:{new CellRef(sheet.RowCount - 1, sheet.ColumnCount - 1)}"));
     }
 
-    private static XElement CreateSheetViews(Sheet sheet)
+    private static XElement CreateSheetViews(Worksheet sheet)
     {
         return new XElement(XName.Get("sheetViews", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XElement(XName.Get("sheetView", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
@@ -663,7 +663,7 @@ public class Workbook
                     new XAttribute("state", "frozen"))));
     }
 
-    private static XElement CreateColumns(Sheet sheet)
+    private static XElement CreateColumns(Worksheet sheet)
     {
         return new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             Enumerable.Range(0, sheet.ColumnCount).Select(col =>
@@ -683,7 +683,7 @@ public class Workbook
             }));
     }
 
-    private void ProcessSheetData(Sheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    private void ProcessSheetData(Worksheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
         for (var row = 0; row < sheet.RowCount; row++)
         {
@@ -708,7 +708,7 @@ public class Workbook
         }
     }
 
-    private static XElement CreateRowElement(Sheet sheet, int row)
+    private static XElement CreateRowElement(Worksheet sheet, int row)
     {
         var rowElement = new XElement(XName.Get("row", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XAttribute("r", row + 1));
@@ -729,7 +729,7 @@ public class Workbook
         return rowElement;
     }
 
-    private XElement CreateCellElement(Sheet sheet, int row, int col, Cell cell, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    private XElement CreateCellElement(Worksheet sheet, int row, int col, Cell cell, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
         var cellElement = new XElement(XName.Get("c", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XAttribute("r", new CellRef(row, col).ToString()));
@@ -1114,7 +1114,7 @@ public class Workbook
         }
     }
 
-    private static void AddMergedCells(Sheet sheet, XDocument sheetDoc)
+    private static void AddMergedCells(Worksheet sheet, XDocument sheetDoc)
     {
         if (sheet.MergedCells.Ranges.Count > 0)
         {
@@ -1131,7 +1131,7 @@ public class Workbook
         }
     }
 
-    private static void AddAutoFilter(Sheet sheet, XDocument sheetDoc)
+    private static void AddAutoFilter(Worksheet sheet, XDocument sheetDoc)
     {
         if (sheet.AutoFilter != null)
         {
@@ -1154,7 +1154,7 @@ public class Workbook
         }
     }
 
-    private static void AddDataValidations(Sheet sheet, XDocument sheetDoc)
+    private static void AddDataValidations(Worksheet sheet, XDocument sheetDoc)
     {
         var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         XElement? dataValidationsElement = null;
@@ -1276,7 +1276,7 @@ public class Workbook
         }
     }
 
-    private static void ParseDataValidations(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    private static void ParseDataValidations(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var dataValidationsElement = sheetDoc.Descendants(sNs + "dataValidations").FirstOrDefault();
         if (dataValidationsElement == null)
@@ -1780,7 +1780,7 @@ public class Workbook
         return sharedStrings;
     }
 
-    private static List<SheetInfo> ParseSheetDefinitions(ZipArchive archive)
+    private static List<WorksheetInfo> ParseSheetDefinitions(ZipArchive archive)
     {
         // Parse sheet definitions (sheet names + target file paths)
         var workbookEntry = archive.GetEntry("xl/workbook.xml") ?? throw new InvalidDataException("workbook.xml not found");
@@ -1794,7 +1794,7 @@ public class Workbook
         .Select(sheet => new
         {
             Name = sheet.Attribute("name")!.Value,
-            SheetId = sheet.Attribute("sheetId")!.Value,
+            WorksheetId = sheet.Attribute("sheetId")!.Value,
             RelId = sheet.Attribute(r + "id")!.Value
         })
         .ToList();
@@ -1811,14 +1811,14 @@ public class Workbook
                 r => r.Attribute("Target")!.Value.Replace("\\", "/", StringComparison.Ordinal)
             );
 
-        return sheets.Select(sheet => new SheetInfo(sheet.Name, sheet.SheetId, sheet.RelId, relMap))
+        return sheets.Select(sheet => new WorksheetInfo(sheet.Name, sheet.WorksheetId, sheet.RelId, relMap))
             .Where(sheet => sheet.HasValidPath)
             .ToList();
     }
 
-    private static Sheet LoadSheet(ZipArchive archive, SheetInfo sheetInfo, StyleInfo styleInfo, List<string> sharedStrings)
+    private static Worksheet LoadSheet(ZipArchive archive, WorksheetInfo sheetInfo, StyleInfo styleInfo, List<string> sharedStrings)
     {
-        var sheet = new Sheet(100, 100); // adjust size as needed
+        var sheet = new Worksheet(100, 100); // adjust size as needed
 
         var sheetEntry = archive.GetEntry(sheetInfo.FullPath);
         if (sheetEntry == null)
@@ -1878,7 +1878,7 @@ public class Workbook
         return defaultRowHeight;
     }
 
-    private static void ParseFrozenPanes(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    private static void ParseFrozenPanes(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var sheetView = sheetDoc.Descendants(sNs + "sheetView").FirstOrDefault();
         if (sheetView != null)
@@ -1902,7 +1902,7 @@ public class Workbook
         }
     }
 
-    private static void ParseColumnWidths(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    private static void ParseColumnWidths(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var cols = sheetDoc.Descendants(sNs + "cols").FirstOrDefault();
         if (cols != null)
@@ -1931,7 +1931,7 @@ public class Workbook
         }
     }
 
-    private static void ParseRowsAndCells(XDocument sheetDoc, XNamespace sNs, Sheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
+    private static void ParseRowsAndCells(XDocument sheetDoc, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
     {
         foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
         {
@@ -1939,7 +1939,7 @@ public class Workbook
         }
     }
 
-    private static void ParseRow(XElement rowElem, XNamespace sNs, Sheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
+    private static void ParseRow(XElement rowElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
     {
         var rowIndex = rowElem.Attribute("r")?.Value;
         var rowHeight = rowElem.Attribute("ht")?.Value;
@@ -1972,7 +1972,7 @@ public class Workbook
         }
     }
 
-    private static void ParseCell(XElement cellElem, XNamespace sNs, Sheet sheet, StyleInfo styleInfo, List<string> sharedStrings)
+    private static void ParseCell(XElement cellElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings)
     {
         var cellRef = cellElem.Attribute("r")!;
 
@@ -2017,7 +2017,7 @@ public class Workbook
         }
     }
 
-    private static void ApplyCellStyle(XElement cellElem, Sheet sheet, CellRef address, StyleInfo styleInfo)
+    private static void ApplyCellStyle(XElement cellElem, Worksheet sheet, CellRef address, StyleInfo styleInfo)
     {
         var styleId = cellElem.Attribute("s")?.Value;
         if (styleId != null &&
@@ -2072,7 +2072,7 @@ public class Workbook
         }
     }
 
-    private static void ParseMergedCells(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    private static void ParseMergedCells(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var mergeCells = sheetDoc.Descendants(sNs + "mergeCell")
             .Select(m => m.Attribute("ref")?.Value)
@@ -2090,7 +2090,7 @@ public class Workbook
         }
     }
 
-    private static void ParseAutoFilter(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    private static void ParseAutoFilter(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var autoFilterElement = sheetDoc.Descendants(sNs + "autoFilter").FirstOrDefault();
         if (autoFilterElement != null)
@@ -2111,7 +2111,7 @@ public class Workbook
         }
     }
 
-    private static void ParseFilterColumn(XElement filterColumn, XNamespace sNs, RangeRef range, Sheet sheet)
+    private static void ParseFilterColumn(XElement filterColumn, XNamespace sNs, RangeRef range, Worksheet sheet)
     {
         var colIdAttribute = filterColumn.Attribute("colId")?.Value;
         if (!string.IsNullOrEmpty(colIdAttribute) && int.TryParse(colIdAttribute, out var colId))
@@ -2137,7 +2137,7 @@ public class Workbook
         }
     }
 
-    private static void ParseHyperlinks(ZipArchive archive, SheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    private static void ParseHyperlinks(ZipArchive archive, WorksheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         var hyperlinks = sheetDoc.Descendants(sNs + "hyperlink").ToList();
         if (hyperlinks.Count == 0)
@@ -2189,7 +2189,7 @@ public class Workbook
         }
     }
 
-    private static void ParseDrawings(ZipArchive archive, SheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    private static void ParseDrawings(ZipArchive archive, WorksheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
         // Find <drawing r:id="..."/> element in sheet XML
         XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
@@ -2455,10 +2455,10 @@ public class Workbook
         }
     }
 
-    private class SheetInfo
+    private class WorksheetInfo
     {
         public string Name { get; }
-        public string SheetId { get; }
+        public string WorksheetId { get; }
         public string RelId { get; }
         public Dictionary<string, string> RelMap { get; }
         public bool HasValidPath => RelMap.TryGetValue(RelId, out _);
@@ -2474,10 +2474,10 @@ public class Workbook
             }
         }
 
-        public SheetInfo(string name, string sheetId, string relId, Dictionary<string, string> relMap)
+        public WorksheetInfo(string name, string sheetId, string relId, Dictionary<string, string> relMap)
         {
             Name = name;
-            SheetId = sheetId;
+            WorksheetId = sheetId;
             RelId = relId;
             RelMap = relMap;
         }

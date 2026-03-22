@@ -8,19 +8,19 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private async Task OnClickAsync()
     {
-        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid)
         {
             return;
         }
 
-        var address = Sheet.Selection.Cell;
-        Sheet.Cells.TryGet(address.Row, address.Column, out var cell);
+        var address = Worksheet.Selection.Cell;
+        Worksheet.Cells.TryGet(address.Row, address.Column, out var cell);
 
         var existing = cell?.Hyperlink;
         var url = existing?.Url ?? "";
@@ -35,8 +35,8 @@
 
         if (result is Hyperlink hyperlink)
         {
-            var command = new HyperlinkCommand(Sheet, address, hyperlink);
-            Sheet.Commands.Execute(command);
+            var command = new HyperlinkCommand(Worksheet, address, hyperlink);
+            Worksheet.Commands.Execute(command);
         }
     }
 }

@@ -17,19 +17,19 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private void OnClick(RadzenSplitButtonItem? item)
     {
-        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid)
         {
             return;
         }
 
         var value = item?.Value;
-        var range = Sheet.Selection.Range;
+        var range = Worksheet.Selection.Range;
         var border = new BorderStyle();
 
         switch (value)
@@ -37,44 +37,44 @@
             case "all":
             case null:
             {
-                var command = new AllBordersCommand(Sheet, range, border);
-                Sheet.Commands.Execute(command);
+                var command = new AllBordersCommand(Worksheet, range, border);
+                Worksheet.Commands.Execute(command);
                 break;
             }
             case "outside":
             {
-                var command = new BorderCommand(Sheet, range, border, border, border, border);
-                Sheet.Commands.Execute(command);
+                var command = new BorderCommand(Worksheet, range, border, border, border, border);
+                Worksheet.Commands.Execute(command);
                 break;
             }
             case "top":
             {
-                var command = new BorderCommand(Sheet, range, top: border, right: null, bottom: null, left: null);
-                Sheet.Commands.Execute(command);
+                var command = new BorderCommand(Worksheet, range, top: border, right: null, bottom: null, left: null);
+                Worksheet.Commands.Execute(command);
                 break;
             }
             case "bottom":
             {
-                var command = new BorderCommand(Sheet, range, top: null, right: null, bottom: border, left: null);
-                Sheet.Commands.Execute(command);
+                var command = new BorderCommand(Worksheet, range, top: null, right: null, bottom: border, left: null);
+                Worksheet.Commands.Execute(command);
                 break;
             }
             case "left":
             {
-                var command = new BorderCommand(Sheet, range, top: null, right: null, bottom: null, left: border);
-                Sheet.Commands.Execute(command);
+                var command = new BorderCommand(Worksheet, range, top: null, right: null, bottom: null, left: border);
+                Worksheet.Commands.Execute(command);
                 break;
             }
             case "right":
             {
-                var command = new BorderCommand(Sheet, range, top: null, right: border, bottom: null, left: null);
-                Sheet.Commands.Execute(command);
+                var command = new BorderCommand(Worksheet, range, top: null, right: border, bottom: null, left: null);
+                Worksheet.Commands.Execute(command);
                 break;
             }
             case "none":
             {
-                var command = new NoBordersCommand(Sheet, range);
-                Sheet.Commands.Execute(command);
+                var command = new NoBordersCommand(Worksheet, range);
+                Worksheet.Commands.Execute(command);
                 break;
             }
         }

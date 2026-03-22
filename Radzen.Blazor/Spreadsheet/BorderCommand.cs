@@ -11,12 +11,12 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Base class for commands that modify the format of cells in a range, with snapshot/restore for undo.
 /// </summary>
-public abstract class RangeFormatCommandBase(Sheet sheet, RangeRef range) : ICommand
+public abstract class RangeFormatCommandBase(Worksheet sheet, RangeRef range) : ICommand
 {
     /// <summary>
     /// The sheet being operated on.
     /// </summary>
-    protected readonly Sheet sheet = sheet;
+    protected readonly Worksheet sheet = sheet;
 
     /// <summary>
     /// The range of cells being modified.
@@ -63,7 +63,7 @@ public abstract class RangeFormatCommandBase(Sheet sheet, RangeRef range) : ICom
 /// <summary>
 /// Command to apply border styles to the edges of a range.
 /// </summary>
-public class BorderCommand(Sheet sheet, RangeRef range, BorderStyle? top, BorderStyle? right, BorderStyle? bottom, BorderStyle? left)
+public class BorderCommand(Worksheet sheet, RangeRef range, BorderStyle? top, BorderStyle? right, BorderStyle? bottom, BorderStyle? left)
     : RangeFormatCommandBase(sheet, range)
 {
     /// <inheritdoc/>
@@ -100,7 +100,7 @@ public class BorderCommand(Sheet sheet, RangeRef range, BorderStyle? top, Border
 /// <summary>
 /// Command to apply borders to all edges of all cells in a range.
 /// </summary>
-public class AllBordersCommand(Sheet sheet, RangeRef range, BorderStyle style)
+public class AllBordersCommand(Worksheet sheet, RangeRef range, BorderStyle style)
     : RangeFormatCommandBase(sheet, range)
 {
     /// <inheritdoc/>
@@ -120,7 +120,7 @@ public class AllBordersCommand(Sheet sheet, RangeRef range, BorderStyle style)
 /// <summary>
 /// Command to clear all borders from cells in a range.
 /// </summary>
-public class NoBordersCommand(Sheet sheet, RangeRef range)
+public class NoBordersCommand(Worksheet sheet, RangeRef range)
     : RangeFormatCommandBase(sheet, range)
 {
     /// <inheritdoc/>

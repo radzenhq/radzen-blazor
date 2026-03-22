@@ -8,7 +8,7 @@ public class ConcatFunctionTests
     [Fact]
     public void Concat_Literals_Works()
     {
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         sheet.Cells["A1"].Formula = "=CONCAT(\"The\",\" \",\"sun\",\" \",\"will\",\" \",\"come\",\" \",\"up\",\" \",\"tomorrow.\")";
         Assert.Equal("The sun will come up tomorrow.", sheet.Cells["A1"].Data.Value);
     }
@@ -16,7 +16,7 @@ public class ConcatFunctionTests
     [Fact]
     public void Concat_SingleRange_LinearizesRowMajor()
     {
-        var sheet = new Sheet(20, 10);
+        var sheet = new Worksheet(20, 10);
         sheet.Cells["B2"].Value = "a1";
         sheet.Cells["C2"].Value = "b1";
         sheet.Cells["B3"].Value = "a2";
@@ -36,7 +36,7 @@ public class ConcatFunctionTests
     [Fact]
     public void Concat_MixedArgs_RangeAndLiterals()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Cells["B2"].Value = "Andreas";
         sheet.Cells["C2"].Value = "Hauser";
         sheet.Cells["A1"].Formula = "=CONCAT(B2,\" \",C2)";

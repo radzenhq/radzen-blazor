@@ -16,13 +16,13 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private async Task OnClickAsync(RadzenSplitButtonItem? item)
     {
-        if (Sheet == null || Sheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet == null || Worksheet.Selection.Cell == CellRef.Invalid)
         {
             return;
         }
@@ -37,8 +37,8 @@
 
         if (result is ConditionalFormatBase rule)
         {
-            var command = new ConditionalFormatCommand(Sheet, Sheet.Selection.Range, rule);
-            Sheet.Commands.Execute(command);
+            var command = new ConditionalFormatCommand(Worksheet, Worksheet.Selection.Range, rule);
+            Worksheet.Commands.Execute(command);
         }
     }
 }

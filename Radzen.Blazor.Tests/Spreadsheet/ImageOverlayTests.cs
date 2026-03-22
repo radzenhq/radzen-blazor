@@ -25,11 +25,11 @@ public class ImageOverlayTests : TestContext
     [Fact]
     public void ImageOverlay_RendersNothing_WhenNoImages()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         Assert.Empty(cut.FindAll(".rz-spreadsheet-image"));
@@ -38,13 +38,13 @@ public class ImageOverlayTests : TestContext
     [Fact]
     public void ImageOverlay_RendersDivAndImg_ForEachImage()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.AddImage(CreateImage(0, 0));
         sheet.AddImage(CreateImage(2, 2));
         var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         var divs = cut.FindAll(".rz-spreadsheet-image");
@@ -57,12 +57,12 @@ public class ImageOverlayTests : TestContext
     [Fact]
     public void ImageOverlay_HasCorrectCssClass()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.AddImage(CreateImage(0, 0));
         var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         var element = cut.Find("div");
@@ -72,13 +72,13 @@ public class ImageOverlayTests : TestContext
     [Fact]
     public void ImageOverlay_AppliesFrozenColumnClass()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Columns.Frozen = 2;
         sheet.AddImage(CreateImage(0, 0)); // column 0 < frozen 2, fits within frozen area
         var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         var elements = cut.FindAll(".rz-spreadsheet-image");
@@ -88,13 +88,13 @@ public class ImageOverlayTests : TestContext
     [Fact]
     public void ImageOverlay_AppliesFrozenRowClass()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Rows.Frozen = 2;
         sheet.AddImage(CreateImage(0, 0)); // row 0 < frozen 2, fits within frozen area
         var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         var elements = cut.FindAll(".rz-spreadsheet-image");
@@ -104,14 +104,14 @@ public class ImageOverlayTests : TestContext
     [Fact]
     public void ImageOverlay_NoFrozenClass_WhenNotInFrozenArea()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.Rows.Frozen = 1;
         sheet.Columns.Frozen = 1;
         sheet.AddImage(CreateImage(2, 2)); // row 2, col 2 - not frozen
         var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         var element = cut.Find(".rz-spreadsheet-image");
@@ -122,12 +122,12 @@ public class ImageOverlayTests : TestContext
     [Fact]
     public void ImageOverlay_DataUri_ContainsCorrectBase64AndContentType()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         sheet.AddImage(CreateImage(0, 0));
         var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         var img = cut.Find("img");
@@ -142,14 +142,14 @@ public class ImageOverlayTests : TestContext
     [Fact]
     public void ImageOverlay_SelectedImage_HasSelectedClass()
     {
-        var sheet = new Sheet(10, 10);
+        var sheet = new Worksheet(10, 10);
         var image = CreateImage(0, 0);
         sheet.AddImage(image);
         sheet.SelectedImage = image;
         var context = new ImageMockContext(sheet);
 
         var cut = RenderComponent<ImageOverlay>(parameters => parameters
-            .Add(p => p.Sheet, sheet)
+            .Add(p => p.Worksheet, sheet)
             .Add(p => p.Context, context));
 
         var element = cut.Find(".rz-spreadsheet-selection-range");
@@ -175,7 +175,7 @@ public class ImageMockContext : IVirtualGridContext
 {
     private SheetView view;
 
-    public ImageMockContext(Sheet sheet = null)
+    public ImageMockContext(Worksheet sheet = null)
     {
         if (sheet != null)
         {

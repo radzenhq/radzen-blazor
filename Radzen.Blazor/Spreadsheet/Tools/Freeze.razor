@@ -16,9 +16,9 @@
 #nullable enable
 
     [Parameter]
-    public Sheet? Sheet { get; set; }
+    public Worksheet? Worksheet { get; set; }
 
-    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
     private void OnFreezeClick(RadzenSplitButtonItem? item)
     {
@@ -50,69 +50,69 @@
 
     private void FreezeFirstColumn()
     {
-        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            Sheet.Rows.Frozen = 0;
-            Sheet.Columns.Frozen = 1;
+            Worksheet.Rows.Frozen = 0;
+            Worksheet.Columns.Frozen = 1;
         }
     }
 
     private void FreezeTopRow()
     {
-        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            Sheet.Rows.Frozen = 1;
-            Sheet.Columns.Frozen = 0;
+            Worksheet.Rows.Frozen = 1;
+            Worksheet.Columns.Frozen = 0;
         }
     }
 
     private void FreezeRows()
     {
-        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            var frozenRows = Sheet.Selection.Cell.Row;
-            Sheet.Rows.Frozen = frozenRows;
+            var frozenRows = Worksheet.Selection.Cell.Row;
+            Worksheet.Rows.Frozen = frozenRows;
         }
     }
 
     private void FreezeColumns()
     {
-        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            Sheet.Columns.Frozen = Sheet.Selection.Cell.Column;
+            Worksheet.Columns.Frozen = Worksheet.Selection.Cell.Column;
         }
     }
 
     private void FreezePanes()
     {
-        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            Sheet.Rows.Frozen = Sheet.Selection.Cell.Row;
-            Sheet.Columns.Frozen = Sheet.Selection.Cell.Column;
+            Worksheet.Rows.Frozen = Worksheet.Selection.Cell.Row;
+            Worksheet.Columns.Frozen = Worksheet.Selection.Cell.Column;
         }
     }
 
     private void Unfreeze()
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Rows.Frozen = 0;
-            Sheet.Columns.Frozen = 0;
+            Worksheet.Rows.Frozen = 0;
+            Worksheet.Columns.Frozen = 0;
         }
     }
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Sheet?.Selection != null)
+        if (Worksheet?.Selection != null)
         {
-            Sheet.Selection.Changed -= OnSelectionChanged;
+            Worksheet.Selection.Changed -= OnSelectionChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Sheet?.Selection != null)
+        if (Worksheet?.Selection != null)
         {
-            Sheet.Selection.Changed += OnSelectionChanged;
+            Worksheet.Selection.Changed += OnSelectionChanged;
         }
     }
 
@@ -123,9 +123,9 @@
 
     public void Dispose()
     {
-        if (Sheet?.Selection != null)
+        if (Worksheet?.Selection != null)
         {
-            Sheet.Selection.Changed -= OnSelectionChanged;
+            Worksheet.Selection.Changed -= OnSelectionChanged;
         }
     }
 } 

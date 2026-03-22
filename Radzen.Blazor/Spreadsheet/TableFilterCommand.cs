@@ -10,7 +10,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 public class TableFilterCommand : ICommand
 {
-    private readonly Sheet sheet;
+    private readonly Worksheet sheet;
     private readonly int tableIndex;
     private readonly bool previousShowFilterButton;
 
@@ -19,7 +19,7 @@ public class TableFilterCommand : ICommand
     /// </summary>
     /// <param name="sheet">The sheet containing the table.</param>
     /// <param name="tableIndex">The index of the table to toggle filter button on.</param>
-    public TableFilterCommand(Sheet sheet, int tableIndex)
+    public TableFilterCommand(Worksheet sheet, int tableIndex)
     {
         ArgumentNullException.ThrowIfNull(sheet);
         this.sheet = sheet;

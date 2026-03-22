@@ -1,10 +1,10 @@
 @using Radzen.Documents.Spreadsheet
-@if (Sheet.Selection.Cell != CellRef.Invalid)
+@if (Worksheet.Selection.Cell != CellRef.Invalid)
 {
-    <CellSelection Context=@Context Cell=@Sheet.Selection.Cell Sheet=@Sheet />
+    <CellSelection Context=@Context Cell=@Worksheet.Selection.Cell Worksheet=@Worksheet />
 }
-@foreach (var range in Context.GetRanges(Sheet.Selection.Range))
+@foreach (var range in Context.GetRanges(Worksheet.Selection.Range))
 {
-    <RangeSelectionItem Context=@Context Range=@range.Range Sheet=@Sheet Cell=@Sheet.Selection.Cell FrozenRow=@range.FrozenRow 
+    <RangeSelectionItem Context=@Context Range=@range.Range Worksheet=@Worksheet Cell=@Worksheet.Selection.Cell FrozenRow=@range.FrozenRow 
                         FrozenColumn=@range.FrozenColumn Top=@range.Top Left=@range.Left Bottom=@range.Bottom Right=@range.Right />
 }

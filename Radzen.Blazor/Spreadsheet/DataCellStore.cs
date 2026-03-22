@@ -72,7 +72,7 @@ public class DataCellStore<T>(DataSheet<T> sheet, int pageSize = 20) : CellStore
                 {
                     if (column < sheet.ColumnMappings.Count)
                     {
-                        this[row, column] = cell = new(Sheet, new CellRef(row, column))
+                        this[row, column] = cell = new(Worksheet, new CellRef(row, column))
                         {
                             Value = sheet.ColumnMappings[column].Name
                         };

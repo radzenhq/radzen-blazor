@@ -8,7 +8,7 @@ public class DeleteRowColumnTests
     [Fact]
     public void DeleteColumn_ShiftsDataAndDecreasesColumnCount()
     {
-        var sheet = new Sheet(3, 4);
+        var sheet = new Worksheet(3, 4);
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[0, 1].Value = "B";
         sheet.Cells[0, 2].Value = "C";
@@ -25,7 +25,7 @@ public class DeleteRowColumnTests
     [Fact]
     public void DeleteRow_ShiftsDataAndDecreasesRowCount()
     {
-        var sheet = new Sheet(4, 2);
+        var sheet = new Worksheet(4, 2);
         sheet.Cells[0, 0].Value = "R1";
         sheet.Cells[1, 0].Value = "R2";
         sheet.Cells[2, 0].Value = "R3";
@@ -42,7 +42,7 @@ public class DeleteRowColumnTests
     [Fact]
     public void DeleteColumn_DoesNotAdjustFormulas_RefsBecomeError()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[0, 0].Value = 1;   // A1
         sheet.Cells[0, 1].Value = 2;   // B1
         sheet.Cells[0, 2].Value = 3;   // C1
@@ -61,7 +61,7 @@ public class DeleteRowColumnTests
     [Fact]
     public void DeleteRow_DoesNotAdjustFormulas_RefsBecomeError()
     {
-        var sheet = new Sheet(5, 5);
+        var sheet = new Worksheet(5, 5);
         sheet.Cells[0, 0].Value = 1;   // A1
         sheet.Cells[1, 0].Value = 2;   // A2
         sheet.Cells[2, 0].Value = 3;   // A3

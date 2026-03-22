@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class BooleanArithmeticTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void TruePlusOneShouldEqualTwo()
@@ -84,7 +84,7 @@ public class BooleanArithmeticTests
 
 public class BooleanSumTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void SumWithDirectBooleanConstantsShouldCoerceToNumbers()
@@ -138,7 +138,7 @@ public class BooleanSumTests
 
 public class BooleanCountTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void CountWithDirectBooleanConstantsShouldCountThem()
@@ -192,7 +192,7 @@ public class BooleanCountTests
 
 public class BooleanAverageTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void AverageWithDirectBooleanConstantsShouldIncludeThem()
@@ -255,7 +255,7 @@ public class BooleanAverageTests
 
 public class BooleanComparisonTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void TrueEqualsOneShouldBeFalse()
@@ -308,7 +308,7 @@ public class BooleanComparisonTests
 
 public class BooleanMinMaxTests
 {
-    readonly Sheet sheet = new(5, 5);
+    readonly Worksheet sheet = new(5, 5);
 
     [Fact]
     public void MinWithDirectBooleanConstantsShouldCoerceToNumbers()

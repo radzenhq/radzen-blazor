@@ -15,7 +15,7 @@ public class DeleteColumnsCommand : ColumnCommandBase
     /// <param name="startColumnIndex"></param>
     /// <param name="endColumnIndex"></param>
     /// <exception cref="System.ArgumentOutOfRangeException"></exception>
-    public DeleteColumnsCommand(Sheet sheet, int startColumnIndex, int endColumnIndex) : base(sheet, startColumnIndex)
+    public DeleteColumnsCommand(Worksheet sheet, int startColumnIndex, int endColumnIndex) : base(sheet, startColumnIndex)
     {
         if (startColumnIndex < 0 || endColumnIndex < startColumnIndex || endColumnIndex >= sheet.ColumnCount)
         {

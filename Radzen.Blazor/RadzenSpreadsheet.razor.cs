@@ -84,11 +84,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private const int sheetIndex = 0;
 
-    private Sheet? Sheet => workbook?.Sheets[sheetIndex];
+    private Worksheet? Worksheet => workbook?.Sheets[sheetIndex];
 
     private WorkbookView? workbookView;
 
-    private SheetView? ActiveView => Sheet != null ? (workbookView ??= new WorkbookView(workbook!)).GetView(Sheet) : null;
+    private SheetView? ActiveView => Worksheet != null ? (workbookView ??= new WorkbookView(workbook!)).GetView(Worksheet) : null;
 
     private async Task OnWorkbookChangedAsync(Workbook? value)
     {
@@ -102,16 +102,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         ArgumentNullException.ThrowIfNull(args);
 
         // Check if this cell has list validation
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            var validators = Sheet.Validation.GetValidatorsForCell(new CellRef(args.Row, args.Column));
+            var validators = Worksheet.Validation.GetValidatorsForCell(new CellRef(args.Row, args.Column));
             foreach (var v in validators)
             {
                 if (v is DataValidationRule rule && rule.Type == DataValidationType.List)
                 {
                     validationListRow = args.Row;
                     validationListColumn = args.Column;
-                    validationListItems = rule.GetListItems(Sheet);
+                    validationListItems = rule.GetListItems(Worksheet);
                     if (validationListPopup != null)
                     {
                         await validationListPopup.ToggleAsync(args.Element);
@@ -131,10 +131,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnValidationListValueSelectedAsync(string value)
     {
-        if (Sheet != null && validationListRow >= 0 && validationListColumn >= 0)
+        if (Worksheet != null && validationListRow >= 0 && validationListColumn >= 0)
         {
             var address = new CellRef(validationListRow, validationListColumn);
-            Sheet.Editor.StartEdit(address, value);
+            Worksheet.Editor.StartEdit(address, value);
             await AcceptAsync();
         }
 
@@ -154,10 +154,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnCellMenuApplyAsync(SheetFilter? filter)
     {
-        if (filter != null && Sheet != null)
+        if (filter != null && Worksheet != null)
         {
-            var command = new FilterCommand(Sheet, filter);
-            Sheet.Commands.Execute(command);
+            var command = new FilterCommand(Worksheet, filter);
+            Worksheet.Commands.Execute(command);
         }
 
         if (cellMenuPopup != null)
@@ -168,24 +168,24 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnCellMenuSortAscendingAsync()
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
             // Check if we're in a data table
-            foreach (var table in Sheet.Tables)
+            foreach (var table in Worksheet.Tables)
             {
                 if (table.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    var command = new SortCommand(Sheet, table.Range, SortOrder.Ascending, cellMenuColumn);
-                    Sheet.Commands.Execute(command);
+                    var command = new SortCommand(Worksheet, table.Range, SortOrder.Ascending, cellMenuColumn);
+                    Worksheet.Commands.Execute(command);
                     break;
                 }
             }
 
             // Check if we're in an auto filter
-            if (Sheet.AutoFilter != null && Sheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
+            if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
             {
-                var command = new SortCommand(Sheet, Sheet.AutoFilter.Range, SortOrder.Ascending, cellMenuColumn, skipHeaderRow: true);
-                Sheet.Commands.Execute(command);
+                var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range, SortOrder.Ascending, cellMenuColumn, skipHeaderRow: true);
+                Worksheet.Commands.Execute(command);
             }
         }
 
@@ -197,24 +197,24 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnCellMenuSortDescendingAsync()
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
             // Check if we're in a data table
-            foreach (var table in Sheet.Tables)
+            foreach (var table in Worksheet.Tables)
             {
                 if (table.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    var command = new SortCommand(Sheet, table.Range, SortOrder.Descending, cellMenuColumn);
-                    Sheet.Commands.Execute(command);
+                    var command = new SortCommand(Worksheet, table.Range, SortOrder.Descending, cellMenuColumn);
+                    Worksheet.Commands.Execute(command);
                     break;
                 }
             }
 
             // Check if we're in an auto filter
-            if (Sheet.AutoFilter != null && Sheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
+            if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
             {
-                var command = new SortCommand(Sheet, Sheet.AutoFilter.Range, SortOrder.Descending, cellMenuColumn, skipHeaderRow: true);
-                Sheet.Commands.Execute(command);
+                var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range, SortOrder.Descending, cellMenuColumn, skipHeaderRow: true);
+                Worksheet.Commands.Execute(command);
             }
         }
 
@@ -226,12 +226,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnCellMenuClearAsync()
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
             // Remove all filters that affect the current column
             var filtersToRemove = new List<SheetFilter>();
 
-            foreach (var filter in Sheet.Filters)
+            foreach (var filter in Worksheet.Filters)
             {
                 if (filter.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
@@ -242,8 +242,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             // Execute remove commands for each filter
             foreach (var filter in filtersToRemove)
             {
-                var command = new RemoveFilterCommand(Sheet, filter);
-                Sheet.Commands.Execute(command);
+                var command = new RemoveFilterCommand(Worksheet, filter);
+                Worksheet.Commands.Execute(command);
             }
         }
 
@@ -260,14 +260,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             await cellMenuPopup.CloseAsync();
         }
 
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            FilterCriterion? existingFilter = Sheet.Filters.FirstOrDefault(f => f.Range.Contains(cellMenuRow, cellMenuColumn))?.Criterion;
+            FilterCriterion? existingFilter = Worksheet.Filters.FirstOrDefault(f => f.Range.Contains(cellMenuRow, cellMenuColumn))?.Criterion;
 
 
             var parameters = new Dictionary<string, object?>
             {
-                { nameof(FilterDialog.Sheet), Sheet },
+                { nameof(FilterDialog.Worksheet), Worksheet },
                 { nameof(FilterDialog.Column), cellMenuColumn },
                 { nameof(FilterDialog.Row), cellMenuRow }
             };
@@ -284,16 +284,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             if (result is SheetFilter filter)
             {
-                var command = new FilterCommand(Sheet, filter);
-                Sheet.Commands.Execute(command);
+                var command = new FilterCommand(Worksheet, filter);
+                Worksheet.Commands.Execute(command);
             }
         }
     }
 
     private async Task OnFormatCellsAsync()
     {
-        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid &&
-            Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+        if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid &&
+            Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
         {
             var parameters = new Dictionary<string, object?>
             {
@@ -308,17 +308,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             if (result is string formatCode)
             {
                 var format = string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase) ? null : formatCode;
-                var command = new FormatCommand(Sheet, Sheet.Selection.Range, cell.Format.WithNumberFormat(format));
-                Sheet.Commands.Execute(command);
+                var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(format));
+                Worksheet.Commands.Execute(command);
             }
         }
     }
 
     private async Task MoveSelectionAsync(int rowOffset, int columnOffset)
     {
-        if (Sheet is not null)
+        if (Worksheet is not null)
         {
-            var address = Sheet.Selection.Move(rowOffset, columnOffset);
+            var address = Worksheet.Selection.Move(rowOffset, columnOffset);
             inputPrompt?.Show(address);
             await ScrollToAsync(address);
         }
@@ -340,25 +340,25 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         isAccepting = true;
 
-        if (Sheet is not null)
+        if (Worksheet is not null)
         {
-            if (Sheet.Editor.HasChanges)
+            if (Worksheet.Editor.HasChanges)
             {
-                var command = new AcceptEditCommand(Sheet);
+                var command = new AcceptEditCommand(Worksheet);
 
-                var valid = Sheet.Commands.Execute(command);
+                var valid = Worksheet.Commands.Execute(command);
 
-                if (!valid && Sheet.Editor.Cell is not null)
+                if (!valid && Worksheet.Editor.Cell is not null)
                 {
-                    var error = string.Join(Environment.NewLine, Sheet.Editor.Cell.ValidationErrors);
-                    var errorStyle = Sheet.Validation.GetErrorStyleForCell(Sheet.Editor.Cell.Address);
+                    var error = string.Join(Environment.NewLine, Worksheet.Editor.Cell.ValidationErrors);
+                    var errorStyle = Worksheet.Validation.GetErrorStyleForCell(Worksheet.Editor.Cell.Address);
 
                     switch (errorStyle)
                     {
                         case DataValidationErrorStyle.Information:
                             await DialogService.Alert(error, "Information");
                             // Accept the value despite validation failure
-                            Sheet.Editor.Cell.ClearValidationErrors();
+                            Worksheet.Editor.Cell.ClearValidationErrors();
                             break;
 
                         case DataValidationErrorStyle.Warning:
@@ -368,12 +368,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                             if (confirmed == true)
                             {
-                                Sheet.Editor.Cell.ClearValidationErrors();
+                                Worksheet.Editor.Cell.ClearValidationErrors();
                             }
                             else
                             {
                                 command.Unexecute();
-                                Sheet.Editor.Cancel();
+                                Worksheet.Editor.Cancel();
                                 result = false;
                             }
                             break;
@@ -381,7 +381,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                         default: // Stop
                             await DialogService.Alert(error, "Invalid Value");
                             command.Unexecute();
-                            Sheet.Editor.Cancel();
+                            Worksheet.Editor.Cancel();
                             result = false;
                             break;
                     }
@@ -393,7 +393,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             }
             else
             {
-                Sheet.Editor.EndEdit();
+                Worksheet.Editor.EndEdit();
             }
         }
 
@@ -406,9 +406,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (await AcceptAsync())
         {
-            if (Sheet is not null)
+            if (Worksheet is not null)
             {
-                var address = Sheet.Selection.Cycle(rowOffset, columnOffset);
+                var address = Worksheet.Selection.Cycle(rowOffset, columnOffset);
 
                 await ScrollToAsync(address);
                 inputPrompt?.Show(address);
@@ -418,9 +418,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task ExtendSelectionAsync(int rowOffset, int columnOffset)
     {
-        if (Sheet is not null)
+        if (Worksheet is not null)
         {
-            var address = Sheet.Selection.Extend(rowOffset, columnOffset);
+            var address = Worksheet.Selection.Extend(rowOffset, columnOffset);
 
             await ScrollToAsync(address);
         }
@@ -428,9 +428,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Task CancelEditAsync()
     {
-        if (Sheet?.Editor.Mode != EditMode.None)
+        if (Worksheet?.Editor.Mode != EditMode.None)
         {
-            Sheet?.Editor.Cancel();
+            Worksheet?.Editor.Cancel();
         }
 
         return Task.CompletedTask;
@@ -466,10 +466,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Task DeleteSelectedAsync()
     {
-        if (Sheet?.SelectedImage != null)
+        if (Worksheet?.SelectedImage != null)
         {
-            var command = new DeleteImageCommand(Sheet, Sheet.SelectedImage);
-            Sheet.Commands.Execute(command);
+            var command = new DeleteImageCommand(Worksheet, Worksheet.SelectedImage);
+            Worksheet.Commands.Execute(command);
             return Task.CompletedTask;
         }
 
@@ -478,24 +478,24 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Task UndoAsync()
     {
-        Sheet?.Commands.Undo();
+        Worksheet?.Commands.Undo();
 
         return Task.CompletedTask;
     }
 
     private Task RedoAsync()
     {
-        Sheet?.Commands.Redo();
+        Worksheet?.Commands.Redo();
 
         return Task.CompletedTask;
     }
 
     private async Task CopySelectionAsync()
     {
-        if (Sheet is not null)
+        if (Worksheet is not null)
         {
-            var text = Sheet.GetDelimitedString(Sheet.Selection.Range);
-            clipboard.Copy(Sheet);
+            var text = Worksheet.GetDelimitedString(Worksheet.Selection.Range);
+            clipboard.Copy(Worksheet);
 
             if (jsRef is not null)
             {
@@ -506,10 +506,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task CutSelectionAsync()
     {
-        if (Sheet is not null)
+        if (Worksheet is not null)
         {
-            var text = Sheet.GetDelimitedString(Sheet.Selection.Range);
-            clipboard.Cut(Sheet);
+            var text = Worksheet.GetDelimitedString(Worksheet.Selection.Range);
+            clipboard.Cut(Worksheet);
 
             if (jsRef is not null)
             {
@@ -531,9 +531,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnPasteAsync(string text)
     {
-        if (Sheet is not null)
+        if (Worksheet is not null)
         {
-            clipboard.Paste(Sheet, Sheet.Selection.Cell, text);
+            clipboard.Paste(Worksheet, Worksheet.Selection.Cell, text);
         }
 
         return Task.CompletedTask;
@@ -547,14 +547,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        if (Sheet is null)
+        if (Worksheet is null)
         {
             return;
         }
 
         await AcceptAsync();
 
-        Sheet.Selection.Select(new CellRef(args.Row, args.Column));
+        Worksheet.Selection.Select(new CellRef(args.Row, args.Column));
 
         var row = args.Row;
         var column = args.Column;
@@ -578,14 +578,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        if (Sheet is null)
+        if (Worksheet is null)
         {
             return;
         }
 
         await AcceptAsync();
 
-        Sheet.Selection.Select(new RowRef(args.Row));
+        Worksheet.Selection.Select(new RowRef(args.Row));
 
         var row = args.Row;
 
@@ -610,14 +610,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        if (Sheet is null)
+        if (Worksheet is null)
         {
             return;
         }
 
         await AcceptAsync();
 
-        Sheet.Selection.Select(new ColumnRef(args.Column));
+        Worksheet.Selection.Select(new ColumnRef(args.Column));
 
         var column = args.Column;
 
@@ -636,7 +636,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void OnContextMenuItemClick(MenuItemEventArgs args, int row, int column)
     {
-        if (Sheet is null)
+        if (Worksheet is null)
         {
             return;
         }
@@ -655,13 +655,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = PasteFromClipboardAsync();
                 break;
             case "clear":
-                Sheet.Commands.Execute(new ClearContentsCommand(Sheet, Sheet.Selection.Range));
+                Worksheet.Commands.Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
                 break;
             case "sort-ascending":
-                Sheet.Commands.Execute(new SortCommand(Sheet, new RangeRef(new CellRef(0, 0), new CellRef(Sheet.RowCount - 1, Sheet.ColumnCount - 1)), SortOrder.Ascending, column));
+                Worksheet.Commands.Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Ascending, column));
                 break;
             case "sort-descending":
-                Sheet.Commands.Execute(new SortCommand(Sheet, new RangeRef(new CellRef(0, 0), new CellRef(Sheet.RowCount - 1, Sheet.ColumnCount - 1)), SortOrder.Descending, column));
+                Worksheet.Commands.Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
                 break;
         }
 
@@ -670,7 +670,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void OnRowContextMenuItemClick(MenuItemEventArgs args, int row)
     {
-        if (Sheet is null)
+        if (Worksheet is null)
         {
             return;
         }
@@ -689,19 +689,19 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = PasteFromClipboardAsync();
                 break;
             case "insert-row-before":
-                Sheet.Commands.Execute(new InsertRowBeforeCommand(Sheet, row));
+                Worksheet.Commands.Execute(new InsertRowBeforeCommand(Worksheet, row));
                 break;
             case "insert-row-after":
-                Sheet.Commands.Execute(new InsertRowAfterCommand(Sheet, row));
+                Worksheet.Commands.Execute(new InsertRowAfterCommand(Worksheet, row));
                 break;
             case "delete-row":
-                Sheet.Commands.Execute(new DeleteRowsCommand(Sheet, row, row));
+                Worksheet.Commands.Execute(new DeleteRowsCommand(Worksheet, row, row));
                 break;
             case "hide-row":
-                Sheet.Rows.Hide(row);
+                Worksheet.Rows.Hide(row);
                 break;
             case "unhide-row":
-                Sheet.Rows.Show(row);
+                Worksheet.Rows.Show(row);
                 break;
         }
 
@@ -710,7 +710,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void OnColumnContextMenuItemClick(MenuItemEventArgs args, int column)
     {
-        if (Sheet is null)
+        if (Worksheet is null)
         {
             return;
         }
@@ -729,19 +729,19 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 _ = PasteFromClipboardAsync();
                 break;
             case "insert-column-before":
-                Sheet.Commands.Execute(new InsertColumnBeforeCommand(Sheet, column));
+                Worksheet.Commands.Execute(new InsertColumnBeforeCommand(Worksheet, column));
                 break;
             case "insert-column-after":
-                Sheet.Commands.Execute(new InsertColumnAfterCommand(Sheet, column));
+                Worksheet.Commands.Execute(new InsertColumnAfterCommand(Worksheet, column));
                 break;
             case "delete-column":
-                Sheet.Commands.Execute(new DeleteColumnsCommand(Sheet, column, column));
+                Worksheet.Commands.Execute(new DeleteColumnsCommand(Worksheet, column, column));
                 break;
             case "hide-column":
-                Sheet.Columns.Hide(column);
+                Worksheet.Columns.Hide(column);
                 break;
             case "unhide-column":
-                Sheet.Columns.Show(column);
+                Worksheet.Columns.Show(column);
                 break;
         }
 
@@ -750,7 +750,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task PasteFromClipboardAsync()
     {
-        if (Sheet is null)
+        if (Worksheet is null)
         {
             return;
         }
@@ -764,11 +764,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (!string.IsNullOrEmpty(text))
         {
-            clipboard.Paste(Sheet, Sheet.Selection.Cell, text);
+            clipboard.Paste(Worksheet, Worksheet.Selection.Cell, text);
         }
         else
         {
-            clipboard.Paste(Sheet, Sheet.Selection.Cell);
+            clipboard.Paste(Worksheet, Worksheet.Selection.Cell);
         }
     }
 
@@ -797,20 +797,20 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (result)
         {
             // Clear image selection when clicking a cell
-            if (Sheet != null)
+            if (Worksheet != null)
             {
-                Sheet.SelectedImage = null;
+                Worksheet.SelectedImage = null;
             }
 
             var address = new CellRef(args.Row, args.Column);
 
             if (args.Pointer.ShiftKey)
             {
-                Sheet?.Selection.Merge(address);
+                Worksheet?.Selection.Merge(address);
             }
             else
             {
-                Sheet?.Selection.Select(address);
+                Worksheet?.Selection.Select(address);
 
             }
 
@@ -864,7 +864,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (address != CellRef.Invalid)
         {
-            Sheet?.Selection.Merge(address);
+            Worksheet?.Selection.Merge(address);
 
             await ScrollToAsync(address);
         }
@@ -909,11 +909,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             if (args.Pointer.ShiftKey)
             {
-                Sheet?.Selection.Merge(new CellRef(args.Row, Sheet.ColumnCount - 1));
+                Worksheet?.Selection.Merge(new CellRef(args.Row, Worksheet.ColumnCount - 1));
             }
             else
             {
-                Sheet?.Selection.Select(new RowRef(args.Row));
+                Worksheet?.Selection.Select(new RowRef(args.Row));
             }
 
             if (grid is not null)
@@ -954,7 +954,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (address != CellRef.Invalid)
         {
-            Sheet?.Selection.Merge(new CellRef(address.Row, Sheet.ColumnCount - 1));
+            Worksheet?.Selection.Merge(new CellRef(address.Row, Worksheet.ColumnCount - 1));
 
             await ScrollToAsync(address);
         }
@@ -973,11 +973,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             if (args.Pointer.ShiftKey)
             {
-                Sheet?.Selection.Merge(new CellRef(Sheet.RowCount - 1, args.Column));
+                Worksheet?.Selection.Merge(new CellRef(Worksheet.RowCount - 1, args.Column));
             }
             else
             {
-                Sheet?.Selection.Select(new ColumnRef(args.Column));
+                Worksheet?.Selection.Select(new ColumnRef(args.Column));
             }
 
             if (grid is not null)
@@ -1018,7 +1018,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (address != CellRef.Invalid)
         {
-            Sheet?.Selection.Merge(new CellRef(Sheet.RowCount - 1, address.Column));
+            Worksheet?.Selection.Merge(new CellRef(Worksheet.RowCount - 1, address.Column));
 
             await ScrollToAsync(address);
         }
@@ -1031,11 +1031,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public async Task OnCellDoubleClickAsync(CellEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            var address = Sheet.MergedCells.GetMergedRangeStartOrSelf(new CellRef(args.Row, args.Column));
+            var address = Worksheet.MergedCells.GetMergedRangeStartOrSelf(new CellRef(args.Row, args.Column));
 
-            var cell = Sheet.Cells[address];
+            var cell = Worksheet.Cells[address];
 
             if (cell != null)
             {
@@ -1043,7 +1043,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                 inputPrompt?.Hide();
 
-                Sheet.Editor.StartEdit(address, cell.GetValue());
+                Worksheet.Editor.StartEdit(address, cell.GetValue());
             }
         }
     }
@@ -1110,7 +1110,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (char.IsLetterOrDigit(ch) || char.IsPunctuation(ch) || char.IsSymbol(ch) || char.IsSeparator(ch))
         {
             inputPrompt?.Hide();
-            Sheet?.Editor.StartEdit(Sheet.Selection.Cell, ch.ToString());
+            Worksheet?.Editor.StartEdit(Worksheet.Selection.Cell, ch.ToString());
         }
     }
 
@@ -1138,7 +1138,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     ScrollLeft = grid.ScrollLeft,
                     Column = args.Column,
                     StartX = args.Pointer.ClientX,
-                    StartWidth = Sheet?.Columns[args.Column] ?? 100
+                    StartWidth = Worksheet?.Columns[args.Column] ?? 100
                 };
 
                 onColumnResizePointerMoveAsync = pointer => OnColumnResizePointerMoveAsync(capture, pointer);
@@ -1167,7 +1167,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     ScrollLeft = grid.ScrollLeft,
                     Row = args.Row,
                     StartY = args.Pointer.ClientY,
-                    StartHeight = Sheet?.Rows[args.Row] ?? 20
+                    StartHeight = Worksheet?.Rows[args.Row] ?? 20
                 };
 
                 onRowResizePointerMoveAsync = pointer => OnRowResizePointerMoveAsync(capture, pointer);
@@ -1205,11 +1205,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Task OnColumnResizePointerMoveAsync(ColumnResizeCapture capture, PointerEventArgs pointer)
     {
-        if (Sheet != null && capture.Column >= 0 && capture.Column < Sheet.Columns.Count)
+        if (Worksheet != null && capture.Column >= 0 && capture.Column < Worksheet.Columns.Count)
         {
             var delta = pointer.ClientX - capture.StartX;
             var newWidth = Math.Max(24, capture.StartWidth + delta);
-            Sheet.Columns[capture.Column] = newWidth;
+            Worksheet.Columns[capture.Column] = newWidth;
             StateHasChanged();
         }
 
@@ -1218,11 +1218,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Task OnRowResizePointerMoveAsync(RowResizeCapture capture, PointerEventArgs pointer)
     {
-        if (Sheet != null && capture.Row >= 0 && capture.Row < Sheet.Rows.Count)
+        if (Worksheet != null && capture.Row >= 0 && capture.Row < Worksheet.Rows.Count)
         {
             var delta = pointer.ClientY - capture.StartY;
             var newHeight = Math.Max(16, capture.StartHeight + delta);
-            Sheet.Rows[capture.Row] = newHeight;
+            Worksheet.Rows[capture.Row] = newHeight;
             StateHasChanged();
         }
 
@@ -1286,7 +1286,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         ArgumentNullException.ThrowIfNull(args);
         var result = await AcceptAsync();
 
-        if (result && Sheet?.SelectedImage is SheetImage image)
+        if (result && Worksheet?.SelectedImage is SheetImage image)
         {
             var capture = new ImageResizeCapture
             {
@@ -1377,7 +1377,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnImageResizePointerUpAsync(PointerEventArgs args)
     {
-        if (imageResizeCapture is not null && Sheet is not null)
+        if (imageResizeCapture is not null && Worksheet is not null)
         {
             var capture = imageResizeCapture;
             var finalWidth = capture.Image.Width;
@@ -1387,7 +1387,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             capture.Image.Width = capture.OriginalWidth;
             capture.Image.Height = capture.OriginalHeight;
 
-            Sheet.Commands.Execute(new ResizeImageCommand(capture.Image, finalWidth, finalHeight));
+            Worksheet.Commands.Execute(new ResizeImageCommand(capture.Image, finalWidth, finalHeight));
 
             imageResizeCapture = null;
             onImageResizePointerMoveAsync = null;

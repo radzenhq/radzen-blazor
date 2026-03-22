@@ -129,7 +129,7 @@ public class NumberFormatRoundTripTests
     private static Workbook CreateWorkbookWithFormats()
     {
         var workbook = new Workbook();
-        var sheet = new Sheet(10, 5);
+        var sheet = new Worksheet(10, 5);
         workbook.AddSheet(sheet);
 
         // Currency + Bold

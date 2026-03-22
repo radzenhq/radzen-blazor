@@ -14,7 +14,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
     /// Gets or sets the sheet that contains the formula editor.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; } = default!;
+    public Worksheet Worksheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the spreadsheet instance that contains the sheet.
@@ -25,18 +25,18 @@ public partial class FormulaEditor : ComponentBase, IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Selection.Changed -= OnSelectionChanged;
-            Sheet.Editor.ValueChanged -= OnEditorValueChanged;
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+            Worksheet.Editor.ValueChanged -= OnEditorValueChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Sheet != null)
+        if (Worksheet != null)
         {
-            Sheet.Selection.Changed += OnSelectionChanged;
-            Sheet.Editor.ValueChanged += OnEditorValueChanged;
+            Worksheet.Selection.Changed += OnSelectionChanged;
+            Worksheet.Editor.ValueChanged += OnEditorValueChanged;
 
             Render();
         }
@@ -44,20 +44,20 @@ public partial class FormulaEditor : ComponentBase, IDisposable
 
     private void OnFocus()
     {
-        if (Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            var cell = Sheet.Cells[Sheet.Selection.Cell];
-            Sheet.Editor.StartEdit(cell.Address, Sheet.Editor.Mode != EditMode.None ? Sheet.Editor.Value : cell.GetValue(), EditMode.Formula);
+            var cell = Worksheet.Cells[Worksheet.Selection.Cell];
+            Worksheet.Editor.StartEdit(cell.Address, Worksheet.Editor.Mode != EditMode.None ? Worksheet.Editor.Value : cell.GetValue(), EditMode.Formula);
         }
     }
 
     private void Render()
     {
-        if (Sheet.Selection.Cell != CellRef.Invalid)
+        if (Worksheet.Selection.Cell != CellRef.Invalid)
         {
-            var cell = Sheet.Cells[Sheet.Selection.Cell];
+            var cell = Worksheet.Cells[Worksheet.Selection.Cell];
 
-            Sheet.Editor.Value = cell.GetValue();
+            Worksheet.Editor.Value = cell.GetValue();
         }
     }
 
@@ -70,7 +70,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
 
     private void OnEditorValueChanged()
     {
-        if (Sheet.Editor.Mode == EditMode.Cell)
+        if (Worksheet.Editor.Mode == EditMode.Cell)
         {
             StateHasChanged();
         }
@@ -78,13 +78,13 @@ public partial class FormulaEditor : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        Sheet.Selection.Changed -= OnSelectionChanged;
-        Sheet.Editor.ValueChanged -= OnEditorValueChanged;
+        Worksheet.Selection.Changed -= OnSelectionChanged;
+        Worksheet.Editor.ValueChanged -= OnEditorValueChanged;
     }
 
     private async Task OnBlurAsync()
     {
-        if (Sheet.Editor.Mode == EditMode.Formula)
+        if (Worksheet.Editor.Mode == EditMode.Formula)
         {
             await Spreadsheet.AcceptAsync();
         }

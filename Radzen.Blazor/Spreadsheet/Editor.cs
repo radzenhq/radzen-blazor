@@ -27,7 +27,7 @@ public enum EditMode
 /// Represents a command to accept edits made in the spreadsheet editor.
 /// </summary>
 /// <param name="sheet"></param>
-public class AcceptEditCommand(Sheet sheet) : ICommand
+public class AcceptEditCommand(Worksheet sheet) : ICommand
 {
     private RangeRef range = RangeRef.Invalid;
     private CellRef cell = CellRef.Invalid;
@@ -70,7 +70,7 @@ public class AcceptEditCommand(Sheet sheet) : ICommand
 /// Represents an editor for a spreadsheet, allowing users to edit cell values or formulas.
 /// </summary>
 /// <param name="sheet"></param>
-public class Editor(Sheet sheet)
+public class Editor(Worksheet sheet)
 {
     /// <summary>
     /// Gets or sets the address of the cell being edited in the spreadsheet.
