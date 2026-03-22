@@ -265,6 +265,7 @@ public class Axis(double size, int count)
         get
         {
             var total = 0d;
+            var hiddenCustomCount = 0;
 
             foreach (var item in data)
             {
@@ -272,9 +273,13 @@ public class Axis(double size, int count)
                 {
                     total += item.Value;
                 }
+                else
+                {
+                    hiddenCustomCount++;
+                }
             }
 
-            return total + size * (Count - data.Count - hidden.Count);
+            return total + size * (Count - data.Count - hidden.Count + hiddenCustomCount);
         }
     }
 }
