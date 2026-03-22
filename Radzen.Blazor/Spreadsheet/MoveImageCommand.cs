@@ -20,7 +20,7 @@ public class MoveImageCommand(SheetImage image, CellAnchor newFrom, CellAnchor? 
 
         image.From = newFrom.Clone();
 
-        if (newTo != null)
+        if (newTo is not null)
         {
             image.To = newTo.Clone();
         }
@@ -31,12 +31,12 @@ public class MoveImageCommand(SheetImage image, CellAnchor newFrom, CellAnchor? 
     /// <inheritdoc/>
     public void Unexecute()
     {
-        if (oldFrom != null)
+        if (oldFrom is not null)
         {
             image.From = oldFrom.Clone();
         }
 
-        if (oldTo != null)
+        if (oldTo is not null)
         {
             image.To = oldTo.Clone();
         }

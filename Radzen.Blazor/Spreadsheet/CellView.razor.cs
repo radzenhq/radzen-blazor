@@ -101,7 +101,7 @@ public partial class CellView : CellBase, IDisposable
     private string Class => ClassList.Create("rz-spreadsheet-cell")
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
                                      .Add("rz-spreadsheet-frozen-column", FrozenState.HasFlag(FrozenState.Column))
-                                     .Add($"rz-spreadsheet-cell-{cell.ValueType.ToString().ToLowerInvariant()}", cell != null)
+                                     .Add($"rz-spreadsheet-cell-{cell.ValueType.ToString().ToLowerInvariant()}", cell is not null)
                                      .Add("rz-spreadsheet-cell-invalid", cell?.HasValidationErrors == true)
                                      .ToString();
 
@@ -110,7 +110,7 @@ public partial class CellView : CellBase, IDisposable
 
     private string? GetDisplayValue()
     {
-        if (cell == null) return null;
+        if (cell is null) return null;
         var (formatted, color) = NumberFormat.ApplyWithColor(cell.Format?.NumberFormat, cell.Value, cell.ValueType);
         numberFormatColor = color;
         return formatted ?? cell.Value?.ToString();
@@ -128,7 +128,7 @@ public partial class CellView : CellBase, IDisposable
 
     private bool HasListValidation()
     {
-        if (Worksheet == null) return false;
+        if (Worksheet is null) return false;
 
         var validators = Worksheet.Validation.GetValidatorsForCell(new CellRef(Row, Column));
         foreach (var v in validators)
@@ -143,7 +143,7 @@ public partial class CellView : CellBase, IDisposable
 
     private bool ShouldShowCellMenu()
     {
-        if (Worksheet?.Tables != null)
+        if (Worksheet?.Tables is not null)
         {
             foreach (var table in Worksheet.Tables)
             {
@@ -158,7 +158,7 @@ public partial class CellView : CellBase, IDisposable
             }
         }
 
-        if (Worksheet?.AutoFilter != null)
+        if (Worksheet?.AutoFilter is not null)
         {
             if (Column >= Worksheet.AutoFilter.Range.Start.Column && Column <= Worksheet.AutoFilter.Range.End.Column)
             {
@@ -206,7 +206,7 @@ public partial class CellView : CellBase, IDisposable
         base.AppendStyle(sb);
         cell.ApplyFormat(sb);
 
-        if (numberFormatColor != null)
+        if (numberFormatColor is not null)
         {
             sb.Append("color: ");
             sb.Append(numberFormatColor);
@@ -216,7 +216,7 @@ public partial class CellView : CellBase, IDisposable
 
     private async Task OnToggleAsync()
     {
-        if (cellMenuButton != null)
+        if (cellMenuButton is not null)
         {
             var args = new CellMenuToggleEventArgs
             {
@@ -235,7 +235,7 @@ public partial class CellView : CellBase, IDisposable
         var didColumnChange = parameters.TryGetValue<int>(nameof(Column), out var column) && Column != column;
         var didSheetChange = parameters.TryGetValue<Worksheet>(nameof(Worksheet), out var sheet) && Worksheet != sheet;
 
-        if (didSheetChange && Worksheet != null)
+        if (didSheetChange && Worksheet is not null)
         {
             Worksheet.AutoFilterChanged -= OnAutoFilterChanged;
         }
@@ -244,12 +244,12 @@ public partial class CellView : CellBase, IDisposable
 
         if (didRowChange || didColumnChange || didSheetChange)
         {
-            if (cell != null)
+            if (cell is not null)
             {
                 cell.Changed -= OnCellChanged;
             }
 
-            if (Worksheet != null)
+            if (Worksheet is not null)
             {
                 cell = Worksheet.Cells[Row, Column];
                 cell.Changed += OnCellChanged;
@@ -258,7 +258,7 @@ public partial class CellView : CellBase, IDisposable
             showCellMenu = ShouldShowCellMenu();
         }
 
-        if (didSheetChange && Worksheet != null)
+        if (didSheetChange && Worksheet is not null)
         {
             Worksheet.AutoFilterChanged += OnAutoFilterChanged;
         }
@@ -281,12 +281,12 @@ public partial class CellView : CellBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (cell != null)
+        if (cell is not null)
         {
             cell.Changed -= OnCellChanged;
         }
 
-        if (Worksheet != null)
+        if (Worksheet is not null)
         {
             Worksheet.AutoFilterChanged -= OnAutoFilterChanged;
         }

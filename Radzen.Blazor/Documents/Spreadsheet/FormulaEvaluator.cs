@@ -260,7 +260,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
         }
 
         CellData result;
-        if (cell.FormulaSyntaxTree != null)
+        if (cell.FormulaSyntaxTree is not null)
         {
             cell.FormulaSyntaxTree.Root.Accept(this);
             result = (CellData)value!;
@@ -329,7 +329,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
         // Process arguments according to parameter definitions
         var functionArguments = ProcessArguments(function, functionSyntaxNode.Arguments);
         
-        if (functionArguments == null)
+        if (functionArguments is null)
         {
             return; // Error already set in ProcessArguments
         }
@@ -366,7 +366,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
                 {
                     var argumentNode = argumentNodes[argumentIndex];
                     var argument = ProcessArgument(argumentNode, function);
-                    if (argument == null)
+                    if (argument is null)
                     {
                         return null; // Error already set
                     }
@@ -395,7 +395,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
                 if (argumentIndex < argumentNodes.Count)
                 {
                     var argument = ProcessArgument(argumentNodes[argumentIndex], function);
-                    if (argument == null)
+                    if (argument is null)
                     {
                         return null; // Error already set
                     }

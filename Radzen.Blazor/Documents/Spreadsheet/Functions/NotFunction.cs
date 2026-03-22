@@ -15,7 +15,7 @@ class NotFunction : FormulaFunction
     {
         var value = arguments.GetSingle("logical");
 
-        if (value == null)
+        if (value is null)
         {
             return CellData.FromError(CellError.Value);
         }

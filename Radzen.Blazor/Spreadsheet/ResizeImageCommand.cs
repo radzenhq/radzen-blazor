@@ -36,7 +36,7 @@ public class ResizeImageCommand : ICommand
     /// <inheritdoc/>
     public bool Execute()
     {
-        if (newTo != null)
+        if (newTo is not null)
         {
             oldTo = image.To?.Clone();
             image.To = newTo.Clone();
@@ -55,7 +55,7 @@ public class ResizeImageCommand : ICommand
     /// <inheritdoc/>
     public void Unexecute()
     {
-        if (newTo != null)
+        if (newTo is not null)
         {
             image.To = oldTo?.Clone();
         }

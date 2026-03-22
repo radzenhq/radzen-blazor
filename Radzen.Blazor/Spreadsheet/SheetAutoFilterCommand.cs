@@ -30,7 +30,7 @@ public class SheetAutoFilterCommand : ICommand
     /// <inheritdoc/>
     public bool Execute()
     {
-        if (sheet.AutoFilter == null)
+        if (sheet.AutoFilter is null)
         {
             sheet.AutoFilter = new AutoFilter(sheet, range);
         }

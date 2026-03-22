@@ -63,7 +63,7 @@ public class MergeCellsCommand(Worksheet sheet, RangeRef range, bool center = fa
             {
                 cell.Format = kvp.Value.Format.Clone();
 
-                if (kvp.Value.Formula != null)
+                if (kvp.Value.Formula is not null)
                 {
                     cell.Formula = kvp.Value.Formula;
                 }

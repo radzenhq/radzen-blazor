@@ -50,7 +50,7 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
         }
         set
         {
-            if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid)
+            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
             {
                 if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
                 {
@@ -70,14 +70,14 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed += OnSelectionChanged;
         }
@@ -91,7 +91,7 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        if (Worksheet?.Selection != null)
+        if (Worksheet?.Selection is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
         }
