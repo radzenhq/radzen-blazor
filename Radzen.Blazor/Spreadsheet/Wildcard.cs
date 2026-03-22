@@ -10,7 +10,7 @@ static class Wildcard
 {
     private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(100);
 
-    static string BuildRegexFromPattern(string pattern, bool full)
+    static Regex BuildRegex(string pattern, bool full)
     {
         var builder = StringBuilderCache.Acquire(pattern.Length);
 
@@ -44,15 +44,15 @@ static class Wildcard
         }
 
         var regexBody = StringBuilderCache.GetStringAndRelease(builder);
-        return full ? "^" + regexBody + "$" : regexBody;
+        var regexPattern = full ? "^" + regexBody + "$" : regexBody;
+        return new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled, RegexTimeout);
     }
 
     public static bool IsFullMatch(string text, string pattern)
     {
         try
         {
-            var rx = new Regex(BuildRegexFromPattern(pattern, full: true), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, RegexTimeout);
-            return rx.IsMatch(text);
+            return BuildRegex(pattern, full: true).IsMatch(text);
         }
         catch (RegexMatchTimeoutException)
         {
@@ -64,7 +64,7 @@ static class Wildcard
     {
         try
         {
-            var rx = new Regex(BuildRegexFromPattern(pattern, full: false), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, RegexTimeout);
+            var rx = BuildRegex(pattern, full: false);
             var input = startIndex > 0 ? text[startIndex..] : text;
             var match = rx.Match(input);
             return match.Success ? startIndex + match.Index : -1;
