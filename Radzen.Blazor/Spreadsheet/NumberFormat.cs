@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -13,7 +12,6 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public static class NumberFormat
 {
-    private static readonly ConcurrentDictionary<string, ParsedFormat> Cache = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Applies a format code to a value and returns the formatted string.
@@ -39,7 +37,7 @@ public static class NumberFormat
             return s;
         }
 
-        var parsed = Cache.GetOrAdd(formatCode, static code => ParseFormatCode(code));
+        var parsed = ParseFormatCode(formatCode);
 
         // Get numeric value
         if (!TryGetNumber(value, type, out var number))
@@ -80,7 +78,7 @@ public static class NumberFormat
             return (s, null);
         }
 
-        var parsed = Cache.GetOrAdd(formatCode, static code => ParseFormatCode(code));
+        var parsed = ParseFormatCode(formatCode);
 
         if (!TryGetNumber(value, type, out var number))
         {
