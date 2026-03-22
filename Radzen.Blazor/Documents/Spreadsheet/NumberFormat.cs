@@ -410,16 +410,15 @@ public static class NumberFormat
         // Add thousands separators
         if (hasThousands && intStr.Length > 0)
         {
-            var formatted = new StringBuilder();
-            var count = 0;
-            for (var i = intStr.Length - 1; i >= 0; i--)
+            var formatted = new StringBuilder(intStr.Length + (intStr.Length - 1) / 3);
+            for (var i = 0; i < intStr.Length; i++)
             {
-                if (count > 0 && count % 3 == 0)
+                var remaining = intStr.Length - i;
+                if (i > 0 && remaining % 3 == 0)
                 {
-                    formatted.Insert(0, ',');
+                    formatted.Append(',');
                 }
-                formatted.Insert(0, intStr[i]);
-                count++;
+                formatted.Append(intStr[i]);
             }
             intStr = formatted.ToString();
         }

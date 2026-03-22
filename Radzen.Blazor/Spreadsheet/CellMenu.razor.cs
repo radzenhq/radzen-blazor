@@ -68,6 +68,8 @@ public partial class CellMenu : ComponentBase
     public EventCallback CustomFilter { get; set; }
 
     private readonly HashSet<object?> selectedFilterValues = [];
+    private List<(string Text, object? Value)>? cachedAvailableValues;
+    private bool? cachedShowBlank;
 
     /// <inheritdoc />
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -81,9 +83,16 @@ public partial class CellMenu : ComponentBase
         // Check if any of the key parameters have changed
         if (didRowChange || didColumnChange || didSheetChange)
         {
+            InvalidateCache();
             // Reinitialize the selected filter values
             InitializeSelectedFilterValues();
         }
+    }
+
+    private void InvalidateCache()
+    {
+        cachedAvailableValues = null;
+        cachedShowBlank = null;
     }
 
     private void InitializeSelectedFilterValues()
@@ -321,7 +330,18 @@ public partial class CellMenu : ComponentBase
 
     private bool ShouldShowBlankOption()
     {
-        var table = GetCurrentTable();
+        if (cachedShowBlank.HasValue)
+        {
+            return cachedShowBlank.Value;
+        }
+
+        var result = ComputeShouldShowBlankOption();
+        cachedShowBlank = result;
+        return result;
+    }
+
+    private bool ComputeShouldShowBlankOption()
+    {
         var dataTable = GetCurrentTable();
         var autoFilter = GetCurrentAutoFilter();
 
@@ -456,6 +476,17 @@ public partial class CellMenu : ComponentBase
     }
 
     private List<(string Text, object? Value)> LoadAvailableValues()
+    {
+        if (cachedAvailableValues != null)
+        {
+            return cachedAvailableValues;
+        }
+
+        cachedAvailableValues = ComputeAvailableValues();
+        return cachedAvailableValues;
+    }
+
+    private List<(string Text, object? Value)> ComputeAvailableValues()
     {
         var availableValues = new List<(string Text, object? Value)>();
         var dataTable = GetCurrentTable();
