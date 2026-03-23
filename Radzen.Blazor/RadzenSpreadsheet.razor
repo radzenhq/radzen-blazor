@@ -91,6 +91,7 @@
         </RadzenTabs>
 @if (Worksheet != null)
 {
+        <CascadingValue Value="@CellTypes">
         <FormulaEditor Worksheet=@Worksheet Editor=@Editor />
         <VirtualGrid @ref=@grid style="flex: 1" View=@ActiveView>
             <Template>
@@ -169,6 +170,7 @@
                 <ValidationListPopup Items=@validationListItems ValueSelected=@OnValidationListValueSelectedAsync />
             }
         </Popup>
+        </CascadingValue>
 }
     </CascadingValue>
 </div>
