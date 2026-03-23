@@ -189,8 +189,12 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             double res = 0d;
             switch (binaryExpressionSyntaxNode.Operator)
             {
-                case BinaryOperator.Plus: res = l + r; break;
-                case BinaryOperator.Minus: res = l - r; break;
+                case BinaryOperator.Plus: 
+                    res = l + r; 
+                break;
+                case BinaryOperator.Minus: 
+                res = l - r; 
+                break;
                 case BinaryOperator.Multiply: res = l * r; break;
                 case BinaryOperator.Divide: res = l / r; break;
             }
