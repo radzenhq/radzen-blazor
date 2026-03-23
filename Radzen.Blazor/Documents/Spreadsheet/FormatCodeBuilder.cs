@@ -8,7 +8,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Builds format codes from UI state for the Format Cells dialog.
 /// </summary>
-public static class FormatCodeBuilder
+internal static class FormatCodeBuilder
 {
     /// <summary>
     /// Builds a format code string from the given parameters.

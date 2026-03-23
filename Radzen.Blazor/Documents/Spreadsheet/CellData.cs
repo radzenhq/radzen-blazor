@@ -405,7 +405,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// <summary>
     /// Checks if this cell data is equal to another cell data.
     /// </summary>
-    public bool IsEqualTo(CellData other)
+    internal bool IsEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
         // special handling of empty cell vs empty string.
@@ -431,7 +431,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// Checks if this cell data is less than another cell data.
     /// </summary>
     /// <param name="other"></param>
-    public bool IsLessThan(CellData other)
+    internal bool IsLessThan(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
         if (Value is null || other.Value is null)
@@ -445,7 +445,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// Checks if this cell data is greater than another cell data.
     /// </summary>
     /// <param name="other"></param>
-    public bool IsGreaterThan(CellData other)
+    internal bool IsGreaterThan(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
         if (Value is null || other.Value is null)
@@ -459,7 +459,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// Checks if this cell data is less than or equal to another cell data.
     /// </summary>
     /// <param name="other"></param>
-    public bool IsLessThanOrEqualTo(CellData other)
+    internal bool IsLessThanOrEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
         if (Value is null || other.Value is null)
@@ -473,7 +473,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// Checks if this cell data is greater than or equal to another cell data.
     /// </summary>
     /// <param name="other"></param>
-    public bool IsGreaterThanOrEqualTo(CellData other)
+    internal bool IsGreaterThanOrEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
         if (Value is null || other.Value is null)
@@ -525,7 +525,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// </summary>
     /// <param name="criteria">The criteria to match against</param>
     /// <returns>True if this cell matches the criteria, false otherwise</returns>
-    public bool MatchesCriteria(CellData criteria)
+    internal bool MatchesCriteria(CellData criteria)
     {
         ArgumentNullException.ThrowIfNull(criteria);
         // Handle error criteria

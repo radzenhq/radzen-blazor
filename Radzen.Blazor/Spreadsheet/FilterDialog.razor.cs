@@ -108,9 +108,9 @@ public partial class FilterDialog : ComponentBase
         {
             rangeToUse = dataTable.Range;
         }
-        else if (autoFilter is not null)
+        else if (autoFilter?.Range is not null)
         {
-            rangeToUse = autoFilter.Range;
+            rangeToUse = autoFilter.Range.Value;
         }
         if (rangeToUse != RangeRef.Invalid)
         {
@@ -175,9 +175,9 @@ public partial class FilterDialog : ComponentBase
         {
             rangeToUse = dataTable.Range;
         }
-        else if (autoFilter is not null)
+        else if (autoFilter?.Range is not null)
         {
-            rangeToUse = autoFilter.Range;
+            rangeToUse = autoFilter.Range.Value;
         }
 
         if (rangeToUse == RangeRef.Invalid)
@@ -245,7 +245,7 @@ public partial class FilterDialog : ComponentBase
 
     private AutoFilter? GetCurrentAutoFilter()
     {
-        if (Worksheet.AutoFilter is not null && Worksheet.AutoFilter.Range.Contains(Row, Column))
+        if (Worksheet.AutoFilter.Range is not null && Worksheet.AutoFilter.Range.Value.Contains(Row, Column))
         {
             return Worksheet.AutoFilter;
         }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -76,9 +75,8 @@ public class Cell
         Changed?.Invoke(this);
     }
 
-    internal void ApplyFormat(StringBuilder sb)
+    internal Format? GetEffectiveFormat()
     {
-        ArgumentNullException.ThrowIfNull(sb);
         var effectiveFormat = format;
 
         var conditionalFormat = Worksheet.ConditionalFormats.Calculate(this);
@@ -88,7 +86,7 @@ public class Cell
             effectiveFormat = format?.Merge(conditionalFormat) ?? conditionalFormat;
         }
 
-        effectiveFormat?.AppendStyle(sb);
+        return effectiveFormat;
     }
 
     private void OnFormatChanged()
@@ -233,7 +231,7 @@ public class Cell
     /// <summary>
     /// Clears the validation errors for the cell.
     /// </summary>
-    public void ClearValidationErrors()
+    internal void ClearValidationErrors()
     {
         ValidationErrors = [];
     }

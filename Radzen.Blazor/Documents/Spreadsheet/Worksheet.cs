@@ -25,7 +25,7 @@ public partial class Worksheet
     /// <summary>
     /// Gets a value indicating whether the sheet is currently being updated.
     /// </summary>
-    public bool IsUpdating { get; private set; }
+    internal bool IsUpdating { get; private set; }
 
     private bool isEvaluating;
 
@@ -129,7 +129,7 @@ public partial class Worksheet
     /// <summary>
     /// Gets the set of columns that have filters applied.
     /// </summary>
-    public IReadOnlySet<int> FilteredColumns => filteredColumns;
+    internal IReadOnlySet<int> FilteredColumns => filteredColumns;
 
     /// <summary>
     /// Gets the registry of formula functions available in the sheet.
@@ -175,6 +175,7 @@ public partial class Worksheet
         Cells = new CellStore(this);
         Validation = new();
         ConditionalFormats = new();
+        AutoFilter = new(this);
     }
 
     /// <summary>
@@ -182,7 +183,7 @@ public partial class Worksheet
     /// </summary>
     /// <param name="address"></param>
     /// <returns></returns>
-    public CellRef Clamp(CellRef address)
+    internal CellRef Clamp(CellRef address)
     {
         var row = Math.Max(0, Math.Min(RowCount - 1, address.Row));
         var column = Math.Max(0, Math.Min(ColumnCount - 1, address.Column));
@@ -291,7 +292,7 @@ public partial class Worksheet
     /// <param name="rowDelimiter"></param>
     /// <param name="cellDelimiter"></param>
     /// <returns></returns>
-    public string GetDelimitedString(RangeRef range, string rowDelimiter = "\n", string cellDelimiter = "\t")
+    internal string GetDelimitedString(RangeRef range, string rowDelimiter = "\n", string cellDelimiter = "\t")
     {
         ArgumentNullException.ThrowIfNull(rowDelimiter);
         ArgumentNullException.ThrowIfNull(cellDelimiter);
@@ -333,7 +334,7 @@ public partial class Worksheet
     /// <param name="value"></param>
     /// <param name="cellDelimiter"></param>
 
-    public void InsertDelimitedString(CellRef address, string value, string cellDelimiter = "\t")
+    internal void InsertDelimitedString(CellRef address, string value, string cellDelimiter = "\t")
     {
         ArgumentNullException.ThrowIfNull(value);
         ArgumentNullException.ThrowIfNull(cellDelimiter);

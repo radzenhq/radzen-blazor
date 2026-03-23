@@ -771,8 +771,6 @@ public class DoesNotContainCriterion : StringFilterCriterion
 
 public partial class Worksheet
 {
-    private AutoFilter? autoFilter;
-
     /// <summary>
     /// Gets or sets the range for the auto filter applied to the sheet.
     /// </summary>
@@ -784,21 +782,9 @@ public partial class Worksheet
     }
 
     /// <summary>
-    /// Gets or sets the range for the auto filter applied to the sheet.
+    /// Gets the auto filter for this sheet. Always non-null. Set its Range property to enable or disable.
     /// </summary>
-    public AutoFilter? AutoFilter
-    {
-        get => autoFilter;
-        set
-        {
-            if (autoFilter != value)
-            {
-                autoFilter = value;
-
-                OnAutoFilterChanged();
-            }
-        }
-    }
+    public AutoFilter AutoFilter { get; private set; } = default!;
 
     private readonly List<SheetFilter> filters = [];
 
@@ -880,6 +866,15 @@ public partial class Worksheet
         filters.RemoveAt(index);
 
         ApplyFilters();
+    }
+
+    /// <summary>
+    /// Clears all filters and shows all rows.
+    /// </summary>
+    public void ClearFilters()
+    {
+        filters.Clear();
+        Rows.ShowAll();
     }
 
     private void ApplyFilters()

@@ -441,9 +441,9 @@ public partial class CellMenu : ComponentBase
             }
         }
 
-        if (Worksheet.AutoFilter is not null && Worksheet.AutoFilter.Range.Contains(Row, Column))
+        if (Worksheet.AutoFilter.Range is not null && Worksheet.AutoFilter.Range.Value.Contains(Row, Column))
         {
-            return Worksheet.AutoFilter.Range;
+            return Worksheet.AutoFilter.Range.Value;
         }
 
         return RangeRef.Invalid;
