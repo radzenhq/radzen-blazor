@@ -127,6 +127,33 @@
                 <InputPrompt @ref=@inputPrompt Worksheet=@Worksheet Context=@context />
             </ChildContent>
         </VirtualGrid>
+        <div class="rz-spreadsheet-sheet-tabs">
+            <RadzenButton Icon="add" Click=@OnAddSheetAsync ButtonStyle="ButtonStyle.Light" Size="ButtonSize.ExtraSmall" class="rz-spreadsheet-add-sheet" />
+            <RadzenTabs SelectedIndex=@sheetIndex Change=@OnSheetTabChanged RenderMode="TabRenderMode.Server" TabPosition="TabPosition.Bottom">
+                <Tabs>
+                    @for (var i = 0; i < workbook!.Sheets.Count; i++)
+                    {
+                        var sheet = workbook.Sheets[i];
+                        <RadzenTabsItem Text=@sheet.Name>
+                            <Template Context="tab">
+                                <RadzenSplitButton Text=@sheet.Name
+                                    Click=@(item => OnSheetAction(item, sheet))
+                                    ButtonStyle="ButtonStyle.Light"
+                                    Variant="Variant.Text"
+                                    Size="ButtonSize.ExtraSmall">
+                                    <ChildContent>
+                                        <RadzenSplitButtonItem Text="Rename" Value="rename" Icon="edit" />
+                                        <RadzenSplitButtonItem Text="Delete" Value="delete" Icon="delete" Disabled=@(workbook.Sheets.Count <= 1) />
+                                        <RadzenSplitButtonItem Text="Move Left" Value="move-left" Icon="chevron_left" Disabled=@(workbook.IndexOf(sheet) == 0) />
+                                        <RadzenSplitButtonItem Text="Move Right" Value="move-right" Icon="chevron_right" Disabled=@(workbook.IndexOf(sheet) == workbook.Sheets.Count - 1) />
+                                    </ChildContent>
+                                </RadzenSplitButton>
+                            </Template>
+                        </RadzenTabsItem>
+                    }
+                </Tabs>
+            </RadzenTabs>
+        </div>
         <Popup @ref=@cellMenuPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
             @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
             {

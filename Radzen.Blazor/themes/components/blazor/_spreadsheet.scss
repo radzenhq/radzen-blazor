@@ -523,3 +523,28 @@
 .rz-spreadsheet-image-resize-s { cursor: ns-resize; }
 .rz-spreadsheet-image-resize-sw { cursor: nesw-resize; }
 .rz-spreadsheet-image-resize-w { cursor: ew-resize; }
+
+.rz-spreadsheet-sheet-tabs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-top: 1px solid #e0e0e0;
+}
+
+.rz-spreadsheet-sheet-tabs .rz-tabview {
+    flex: 1;
+    min-width: 0;
+}
+
+.rz-spreadsheet-sheet-tabs .rz-tabview-panels {
+    display: none;
+}
+
+.rz-spreadsheet-sheet-tabs .rz-tabview-nav {
+    border: none;
+}
+
+.rz-spreadsheet-add-sheet {
+    margin-inline: 4px;
+    flex-shrink: 0;
+}

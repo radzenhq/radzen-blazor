@@ -80,7 +80,7 @@ public partial class Worksheet
     /// <summary>
     /// Gets the name of the sheet.
     /// </summary>
-    public string Name { get; internal set; } = "Worksheet1";
+    public string Name { get; set; } = "Worksheet1";
     private readonly List<Table> tables = [];
 
     /// <summary>

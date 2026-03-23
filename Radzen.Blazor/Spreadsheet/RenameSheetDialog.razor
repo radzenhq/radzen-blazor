@@ -1,0 +1,13 @@
+@using Microsoft.AspNetCore.Components
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="16px">
+    <RadzenTextBox @bind-Value=@Name Style="width: 100%" />
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <RadzenText TextStyle="TextStyle.Caption" Style="color: var(--rz-form-error-color, #f44336)">@error</RadzenText>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End">
+        <RadzenButton Text="OK" Click=@OnOk ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+        <RadzenButton Text="Cancel" Click=@OnCancel ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
+    </RadzenStack>
+</RadzenStack>
