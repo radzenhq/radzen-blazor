@@ -30,16 +30,29 @@ public class GreaterThanRule : ConditionalFormatBase
     internal static bool TryGetNumber(Cell cell, out double number)
     {
         number = 0;
-        if (cell.Value is double d) { number = d; return true; }
-        if (cell.Value is int i) { number = i; return true; }
-        if (cell.Value is float f) { number = f; return true; }
-        if (cell.Value is decimal dec) { number = (double)dec; return true; }
-        if (cell.Value is long l) { number = l; return true; }
-        if (cell.Value is not null)
+
+        switch (cell.Value)
         {
-            return double.TryParse(cell.Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
+            case double d:
+                number = d;
+                return true;
+            case int i:
+                number = i;
+                return true;
+            case float f:
+                number = f;
+                return true;
+            case decimal dec:
+                number = (double)dec;
+                return true;
+            case long l:
+                number = l;
+                return true;
+            case not null:
+                return double.TryParse(cell.Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
+            default:
+                return false;
         }
-        return false;
     }
 }
 
