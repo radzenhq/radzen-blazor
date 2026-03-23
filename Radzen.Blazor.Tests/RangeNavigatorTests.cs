@@ -13,7 +13,7 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenRangeNavigator>();
 
-            Assert.Contains("rz-range-navigator", component.Markup);
+            Assert.Contains("rz-range-nav", component.Markup);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenRangeNavigator>();
 
-            Assert.Contains("rz-range-navigator-window", component.Markup);
+            Assert.Contains("rz-range-nav-window", component.Markup);
         }
 
         [Fact]

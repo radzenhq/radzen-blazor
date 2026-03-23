@@ -842,11 +842,6 @@ $slider-handle-height: 20px !default;
 $slider-handle-border-radius: 50% !default;
 $slider-handle-hover-background-color: var(--rz-primary) !default;
 $slider-handle-hover-shadow: 0px 0px 0px 10px var(--rz-primary-lighter) !default;
-$range-navigator-handle-width: 20px !default;
-$range-navigator-handle-border-radius: 50% !default;
-$range-navigator-handle-background-color: var(--rz-base-300) !default;
-$range-navigator-handle-height: 20px !default;
-$range-navigator-handle-hover-background-color: var(--rz-primary) !default;
 $slider-disabled-background-color: var(--rz-base-400) !default;
 $slider-disabled-range-background-color: var(--rz-base-200) !default;
 $slider-disabled-range-border: none !default;
@@ -865,6 +860,16 @@ $slider-disabled-handle-background-color: $slider-disabled-range-background-colo
     }
   }
 }
+
+// Range Navigator
+$range-nav-compact-background-color: var(--rz-primary-lighter) !default;
+$range-nav-compact-window-background-color: var(--rz-primary) !default;
+$range-nav-handle-width: 20px !default;
+$range-nav-handle-border-radius: 50% !default;
+$range-nav-handle-background-color: var(--rz-base-300) !default;
+$range-nav-handle-height: 20px !default;
+$range-nav-handle-hover-background-color: var(--rz-primary) !default;
+$range-nav-handle-hover-shadow: 0px 0px 0px 10px var(--rz-primary-lighter) !default;
 
 // Rating
 $rating-color: var(--rz-text-secondary-color) !default;
