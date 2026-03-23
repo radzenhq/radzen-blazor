@@ -1,10 +1,14 @@
-<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
-    <RadzenCard Variant="Variant.Outlined" Style="width: 100%;">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-            <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
-            <RadzenCheckBox @bind-Value="@showTooltipOnLegend" Name="legendTooltip"></RadzenCheckBox>
-            <RadzenLabel Text="Show Tooltip On Legend" Component="legendTooltip" />
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showTooltipOnLegend" Name="legendTooltip"></RadzenCheckBox>
+                <RadzenLabel Text="Show Tooltip On Legend" Component="legendTooltip" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
 
