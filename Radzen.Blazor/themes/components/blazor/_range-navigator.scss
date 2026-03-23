@@ -1,30 +1,25 @@
-$range-nav-height: 5rem !default;
-$range-nav-compact-height: 1rem !default;
-$range-nav-border-radius: var(--rz-border-radius) !default;
-$range-nav-border: var(--rz-border-width) solid var(--rz-chart-axis-color) !default;
-$range-nav-shade-background-color: var(--rz-base-background-color) !default;
-$range-nav-shade-opacity: 0.7 !default;
-$range-nav-compact-background-color: var(--rz-base-background-color) !default;
-$range-nav-compact-border-radius: var(--rz-border-radius) !default;
-$range-nav-compact-window-background-color: var(--rz-secondary-lighter) !default;
-$range-nav-handle-width: 0.5rem !default;
-$range-nav-handle-border-radius: var(--rz-border-radius) !default;
-$range-nav-handle-background-color: var(--rz-base-400) !default;
-$range-nav-handle-hover-background-color: var(--rz-base-500) !default;
-$range-nav-handle-height: 1.5rem !default;
-$range-nav-handle-shadow: none !default;
-$range-nav-handle-hover-shadow: none !default;
+$range-navigator-height: 5rem !default;
+$range-navigator-compact-height: 1rem !default;
+$range-navigator-border-radius: var(--rz-border-radius) !default;
+$range-navigator-border: var(--rz-border-width) solid var(--rz-chart-axis-color) !default;
+$range-navigator-shade-background-color: var(--rz-base-background-color) !default;
+$range-navigator-shade-opacity: 0.5 !default;
+$range-navigator-handle-width: 0.5rem !default;
+$range-navigator-handle-border-radius: var(--rz-border-radius) !default;
+$range-navigator-handle-background-color: var(--rz-base-400) !default;
+$range-navigator-handle-hover-background-color: var(--rz-base-500) !default;
+$range-navigator-handle-height: 1.5rem !default;
 
-.rz-range-nav {
+.rz-range-navigator {
   position: relative;
   overflow: visible;
-  height: var(--rz-range-nav-height);
-  border: var(--rz-range-nav-border);
-  border-radius: var(--rz-range-nav-border-radius);
+  height: var(--rz-range-navigator-height);
+  border: var(--rz-range-navigator-border);
+  border-radius: var(--rz-range-navigator-border-radius);
 
   svg {
     display: block;
-    border-radius: var(--rz-range-nav-border-radius);
+    border-radius: var(--rz-range-navigator-border-radius);
 
     [dir="rtl"] & {
       transform: scaleX(-1);
@@ -32,33 +27,33 @@ $range-nav-handle-hover-shadow: none !default;
   }
 }
 
-.rz-range-nav-shade {
+.rz-range-navigator-shade {
   position: absolute;
   inset-block-start: 0;
   inset-block-end: 0;
-  background: var(--rz-range-nav-shade-background-color);
-  opacity: var(--rz-range-nav-shade-opacity);
+  background: var(--rz-range-navigator-shade-background-color);
+  opacity: var(--rz-range-navigator-shade-opacity);
   pointer-events: none;
   z-index: 1;
 
   &-start {
     inset-inline-start: 0;
-    border-start-start-radius: var(--rz-range-nav-border-radius);
-    border-end-start-radius: var(--rz-range-nav-border-radius);
+    border-start-start-radius: var(--rz-range-navigator-border-radius);
+    border-end-start-radius: var(--rz-range-navigator-border-radius);
   }
 
   &-end {
     inset-inline-end: 0;
-    border-start-end-radius: var(--rz-range-nav-border-radius);
-    border-end-end-radius: var(--rz-range-nav-border-radius);
+    border-start-end-radius: var(--rz-range-navigator-border-radius);
+    border-end-end-radius: var(--rz-range-navigator-border-radius);
   }
 }
 
-.rz-range-nav-window {
+.rz-range-navigator-window {
   position: absolute;
   inset-block-start: 0;
   inset-block-end: 0;
-  border: var(--rz-range-nav-border);
+  border: var(--rz-range-navigator-border);
   border-width: 0 var(--rz-border-width);
   background: transparent;
   cursor: grab;
@@ -70,11 +65,11 @@ $range-nav-handle-hover-shadow: none !default;
   }
 }
 
-.rz-range-nav-handle {
+.rz-range-navigator-handle {
   position: absolute;
   inset-block-start: 0;
   inset-block-end: 0;
-  width: var(--rz-range-nav-handle-width);
+  width: var(--rz-range-navigator-handle-width);
   cursor: ew-resize;
   z-index: 3;
 
@@ -83,38 +78,36 @@ $range-nav-handle-hover-shadow: none !default;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    height: var(--rz-range-nav-handle-height);
+    height: var(--rz-range-navigator-handle-height);
     inset-inline-start: 0;
     inset-inline-end: 0;
-    background: var(--rz-range-nav-handle-background-color);
-    box-shadow: var(--rz-range-nav-handle-shadow);
-    transition: background 0.15s, box-shadow 0.15s;
+    background: var(--rz-range-navigator-handle-background-color);
+    transition: background 0.15s;
   }
 
   &:hover::before,
   &:active::before {
-    background: var(--rz-range-nav-handle-hover-background-color);
-    box-shadow: var(--rz-range-nav-handle-hover-shadow);
+    background: var(--rz-range-navigator-handle-hover-background-color);
   }
 
   &-start {
-    inset-inline-start: calc(var(--rz-range-nav-handle-width) / -2);
+    inset-inline-start: calc(var(--rz-range-navigator-handle-width) / -2);
 
     &::before {
-      border-radius: var(--rz-range-nav-handle-border-radius);
+      border-radius: var(--rz-range-navigator-handle-border-radius);
     }
   }
 
   &-end {
-    inset-inline-end: calc(var(--rz-range-nav-handle-width) / -2);
+    inset-inline-end: calc(var(--rz-range-navigator-handle-width) / -2);
 
     &::before {
-      border-radius: var(--rz-range-nav-handle-border-radius);
+      border-radius: var(--rz-range-navigator-handle-border-radius);
     }
   }
 }
 
-.rz-range-nav-label {
+.rz-range-navigator-label {
   position: absolute;
   bottom: 100%;
   white-space: nowrap;
@@ -142,7 +135,7 @@ $range-nav-handle-hover-shadow: none !default;
     inset-inline-start: auto;
 
     &::after {
-      inset-inline-end: max(4px, calc(var(--rz-range-nav-handle-width) / 2 - 4px));
+      inset-inline-end: max(4px, calc(var(--rz-range-navigator-handle-width) / 2 - 4px));
     }
   }
 
@@ -151,22 +144,22 @@ $range-nav-handle-hover-shadow: none !default;
     inset-inline-end: auto;
 
     &::after {
-      inset-inline-start: max(4px, calc(var(--rz-range-nav-handle-width) / 2 - 4px));
+      inset-inline-start: max(4px, calc(var(--rz-range-navigator-handle-width) / 2 - 4px));
     }
   }
 }
 
-.rz-range-nav-axis {
+.rz-range-navigator-axis {
   position: absolute;
   inset-inline-start: 0;
   inset-inline-end: 0;
   bottom: 0;
-  height: 1.5rem;
+  height: 24px;
   pointer-events: none;
   z-index: 0;
 }
 
-.rz-range-nav-tick {
+.rz-range-navigator-tick {
   position: absolute;
   top: 0;
   transform: translateX(-50%);
@@ -180,66 +173,87 @@ $range-nav-handle-hover-shadow: none !default;
   }
 }
 
-.rz-range-nav-tick-mark {
+.rz-range-navigator-tick-mark {
   width: 1px;
   height: 6px;
-  background: var(--rz-chart-axis-color);
+  background: var(--rz-base-300, #d1d5db);
   margin: 0 auto;
 }
 
-.rz-range-nav-tick-label {
-  font-size: var(--rz-chart-axis-font-size);
+.rz-range-navigator-tick-label {
+  font-size: 0.625rem;
   line-height: 1.2;
-  color: var(--rz-chart-axis-label-color);
+  color: var(--rz-text-secondary-color, #6b7280);
   white-space: nowrap;
   text-align: center;
 }
 
-.rz-range-nav-has-axis {
-  padding-bottom: 1.5rem;
+.rz-range-navigator-has-axis {
+  padding-bottom: 24px;
 
-  .rz-range-nav-shade {
-    bottom: 1.5rem;
+  .rz-range-navigator-shade {
+    bottom: 24px;
   }
 
-  .rz-range-nav-window {
-    bottom: 1.5rem;
+  .rz-range-navigator-window {
+    bottom: 24px;
   }
 }
 
 /* Compact Range Navigator */
-.rz-range-nav-compact {
-  height: var(--rz-range-nav-compact-height);
-  background: var(--rz-range-nav-compact-background-color);
-  border-radius: var(--rz-range-nav-compact-border-radius);
+.rz-range-navigator-compact {
+  height: var(--rz-range-navigator-compact-height);
+  background: var(--rz-base-200, #e5e7eb);
 
-  .rz-range-nav-shade {
+  .rz-range-navigator-shade {
     background: transparent;
     opacity: 1;
   }
 
-  .rz-range-nav-window {
+  .rz-range-navigator-window {
     border: none;
-    background: var(--rz-range-nav-compact-window-background-color);
-    border-radius: var(--rz-range-nav-compact-border-radius);
+    background: var(--rz-primary, #1E88E5);
+    border-radius: 8px;
     opacity: 0.85;
   }
 
+  .rz-range-navigator-handle {
+    width: 6px;
+    background: var(--rz-primary-darker, #1565C0);
+    border-radius: 3px;
+    top: 2px;
+    bottom: 2px;
+
+    &-start {
+      inset-inline-start: 0;
+      border-radius: 3px;
+    }
+
+    &-end {
+      inset-inline-end: 0;
+      border-radius: 3px;
+    }
+
+    &:hover,
+    &:active {
+      background: var(--rz-primary-dark, #1976D2);
+    }
+  }
 }
 
-.rz-range-nav-compact.rz-range-nav-has-axis {
+.rz-range-navigator-compact.rz-range-navigator-has-axis {
   padding-bottom: 0;
-  margin-bottom: 1.5rem;
+  margin-bottom: 24px;
 
-  .rz-range-nav-shade {
+  .rz-range-navigator-shade {
     bottom: 0;
   }
 
-  .rz-range-nav-window {
+  .rz-range-navigator-window {
     bottom: 0;
   }
 
-  .rz-range-nav-axis {
+  .rz-range-navigator-axis {
     top: 100%;
     bottom: auto;
   }
