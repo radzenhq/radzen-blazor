@@ -3,6 +3,8 @@ using Xunit;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
+#nullable enable
+
 public class NumberFormatPresetsTests
 {
     [Theory]
