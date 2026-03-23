@@ -51,39 +51,39 @@ public class NumberFormatPresetsTests
     }
 
     [Theory]
-    [InlineData("0", NumberFormatCategory.Number)]
-    [InlineData("0.00", NumberFormatCategory.Number)]
-    [InlineData("#,##0", NumberFormatCategory.Number)]
-    [InlineData("#,##0.00", NumberFormatCategory.Number)]
-    public void GetCategory_NumberFormats(string code, NumberFormatCategory expected)
+    [InlineData("0", (int)NumberFormatCategory.Number)]
+    [InlineData("0.00", (int)NumberFormatCategory.Number)]
+    [InlineData("#,##0", (int)NumberFormatCategory.Number)]
+    [InlineData("#,##0.00", (int)NumberFormatCategory.Number)]
+    public void GetCategory_NumberFormats(string code, int expected)
     {
-        Assert.Equal(expected, NumberFormatPresets.GetCategory(code));
+        Assert.Equal((NumberFormatCategory)expected, NumberFormatPresets.GetCategory(code));
     }
 
     [Theory]
-    [InlineData("mm/dd/yyyy", NumberFormatCategory.Date)]
-    [InlineData("yyyy-mm-dd", NumberFormatCategory.Date)]
-    [InlineData("d-mmm-yy", NumberFormatCategory.Date)]
-    public void GetCategory_DateFormats(string code, NumberFormatCategory expected)
+    [InlineData("mm/dd/yyyy", (int)NumberFormatCategory.Date)]
+    [InlineData("yyyy-mm-dd", (int)NumberFormatCategory.Date)]
+    [InlineData("d-mmm-yy", (int)NumberFormatCategory.Date)]
+    public void GetCategory_DateFormats(string code, int expected)
     {
-        Assert.Equal(expected, NumberFormatPresets.GetCategory(code));
+        Assert.Equal((NumberFormatCategory)expected, NumberFormatPresets.GetCategory(code));
     }
 
     [Theory]
-    [InlineData("0%", NumberFormatCategory.Percentage)]
-    [InlineData("0.00%", NumberFormatCategory.Percentage)]
-    public void GetCategory_PercentageFormats(string code, NumberFormatCategory expected)
+    [InlineData("0%", (int)NumberFormatCategory.Percentage)]
+    [InlineData("0.00%", (int)NumberFormatCategory.Percentage)]
+    public void GetCategory_PercentageFormats(string code, int expected)
     {
-        Assert.Equal(expected, NumberFormatPresets.GetCategory(code));
+        Assert.Equal((NumberFormatCategory)expected, NumberFormatPresets.GetCategory(code));
     }
 
     [Theory]
-    [InlineData(null, NumberFormatCategory.General)]
-    [InlineData("", NumberFormatCategory.General)]
-    [InlineData("General", NumberFormatCategory.General)]
-    public void GetCategory_NullOrGeneral_ReturnsGeneral(string? code, NumberFormatCategory expected)
+    [InlineData(null, (int)NumberFormatCategory.General)]
+    [InlineData("", (int)NumberFormatCategory.General)]
+    [InlineData("General", (int)NumberFormatCategory.General)]
+    public void GetCategory_NullOrGeneral_ReturnsGeneral(string? code, int expected)
     {
-        Assert.Equal(expected, NumberFormatPresets.GetCategory(code));
+        Assert.Equal((NumberFormatCategory)expected, NumberFormatPresets.GetCategory(code));
     }
 
     [Fact]

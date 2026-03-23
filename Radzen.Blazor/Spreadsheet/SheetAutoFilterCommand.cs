@@ -12,7 +12,7 @@ public class SheetAutoFilterCommand : ICommand
 {
     private readonly Worksheet sheet;
     private readonly RangeRef range;
-    private readonly AutoFilter? previousAutoFilter;
+    private readonly RangeRef? previousRange;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SheetAutoFilterCommand"/> class.
@@ -24,20 +24,22 @@ public class SheetAutoFilterCommand : ICommand
         ArgumentNullException.ThrowIfNull(sheet);
         this.sheet = sheet;
         this.range = range;
-        this.previousAutoFilter = sheet.AutoFilter;
+        this.previousRange = sheet.AutoFilter.Range;
     }
 
     /// <inheritdoc/>
     public bool Execute()
     {
-        if (sheet.AutoFilter is null)
+        if (sheet.AutoFilter.Range is null)
         {
-            sheet.AutoFilter = new AutoFilter(sheet, range);
+            sheet.AutoFilter.Range = range;
         }
         else
         {
-            sheet.AutoFilter = null;
+            sheet.AutoFilter.Range = null;
         }
+
+        sheet.OnAutoFilterChanged();
 
         return true;
     }
@@ -45,6 +47,7 @@ public class SheetAutoFilterCommand : ICommand
     /// <inheritdoc/>
     public void Unexecute()
     {
-        sheet.AutoFilter = previousAutoFilter;
+        sheet.AutoFilter.Range = previousRange;
+        sheet.OnAutoFilterChanged();
     }
-} 
+}

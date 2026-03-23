@@ -1054,17 +1054,17 @@ class XlsxWriter(Workbook workbook)
 
     private static void AddAutoFilter(Worksheet sheet, XDocument sheetDoc)
     {
-        if (sheet.AutoFilter is not null)
+        if (sheet.AutoFilter.Range is not null)
         {
             var uid = Guid.NewGuid().ToString("B").ToUpperInvariant();
             var autoFilter = new XElement(XName.Get("autoFilter", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("ref", sheet.AutoFilter.Range.ToString()),
+                new XAttribute("ref", sheet.AutoFilter.Range.Value.ToString()),
                 new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid));
 
             // Process each filter and create filterColumn elements
             foreach (var filter in sheet.Filters)
             {
-                var filterColumn = CreateFilterColumn(filter, sheet.AutoFilter.Range);
+                var filterColumn = CreateFilterColumn(filter, sheet.AutoFilter.Range.Value);
                 if (filterColumn is not null)
                 {
                     autoFilter.Add(filterColumn);

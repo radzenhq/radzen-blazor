@@ -10,8 +10,8 @@ public class AutoFilterTests
     [Fact]
     public void Should_ToggleSheetAutoFilter()
     {
-        // Initially no auto filter
-        Assert.Null(sheet.AutoFilter);
+        // Initially no auto filter range
+        Assert.Null(sheet.AutoFilter.Range);
 
         // Apply auto filter to range A1:C5
         var range = RangeRef.Parse("A1:C5");
@@ -19,14 +19,14 @@ public class AutoFilterTests
         command.Execute();
 
         // Auto filter should be applied
-        Assert.NotNull(sheet.AutoFilter);
+        Assert.NotNull(sheet.AutoFilter.Range);
         Assert.Equal(range, sheet.AutoFilter.Range);
 
         // Undo the command
         command.Unexecute();
 
-        // Auto filter should be removed
-        Assert.Null(sheet.AutoFilter);
+        // Auto filter range should be removed
+        Assert.Null(sheet.AutoFilter.Range);
     }
 
     [Fact]

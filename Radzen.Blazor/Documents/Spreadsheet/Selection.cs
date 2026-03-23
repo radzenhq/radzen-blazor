@@ -29,7 +29,7 @@ public class Selection(Worksheet sheet)
     /// Updates the selection to a new cell address and triggers a change event.
     /// </summary>
     /// <param name="address"></param>
-    public void Update(CellRef address)
+    internal void Update(CellRef address)
     {
         Cell = address;
 
@@ -61,7 +61,7 @@ public class Selection(Worksheet sheet)
     /// <summary>
     /// Moves the selection by a specified number of rows and columns.
     /// </summary>
-    public CellRef Move(int rowOffset, int columnOffset)
+    internal CellRef Move(int rowOffset, int columnOffset)
     {
         var column = OffsetColumn(columnOffset);
         var row = OffsetRow(rowOffset);
@@ -94,7 +94,7 @@ public class Selection(Worksheet sheet)
     /// <summary>
     /// Cycles through the selection within the current range, moving by the specified row and column offsets.
     /// </summary>
-    public CellRef Cycle(int rowOffset, int columnOffset)
+    internal CellRef Cycle(int rowOffset, int columnOffset)
     {
         if (Cell == CellRef.Invalid)
         {
@@ -179,22 +179,13 @@ public class Selection(Worksheet sheet)
     /// <summary>
     /// Checks if the specified address is within the active selection range.
     /// </summary>
-    public bool IsActive(ColumnRef address) => Range.Contains(address);
+    internal bool IsActive(ColumnRef address) => Range.Contains(address);
 
-    /// <summary>
-    /// Checks if the specified address is within the active selection range.
-    /// </summary>
-    public bool IsActive(RowRef address) => Range.Contains(address);
+    internal bool IsActive(RowRef address) => Range.Contains(address);
 
-    /// <summary>
-    /// Checks if the specified cell address is within the active selection range.
-    /// </summary>
-    public bool IsSelected(RowRef address) => Range.End.Column == sheet.ColumnCount - 1 && Range.Start.Column == 0 && IsActive(address);
+    internal bool IsSelected(RowRef address) => Range.End.Column == sheet.ColumnCount - 1 && Range.Start.Column == 0 && IsActive(address);
 
-    /// <summary>
-    /// Checks if the specified column address is within the active selection range.
-    /// </summary>
-    public bool IsSelected(ColumnRef address) => Range.End.Row == sheet.RowCount - 1 && Range.Start.Row == 0 && IsActive(address);
+    internal bool IsSelected(ColumnRef address) => Range.End.Row == sheet.RowCount - 1 && Range.Start.Row == 0 && IsActive(address);
 
     /// <summary>
     /// Selects a cell address.
@@ -289,7 +280,7 @@ public class Selection(Worksheet sheet)
     /// <summary>
     /// Extends the current selection by a specified number of rows and columns, adjusting the active cell and range accordingly.
     /// </summary>
-    public CellRef Extend(int rowOffset, int columnOffset)
+    internal CellRef Extend(int rowOffset, int columnOffset)
     {
         if (Cell == CellRef.Invalid || Range == RangeRef.Invalid)
         {

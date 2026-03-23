@@ -1,6 +1,5 @@
 using Radzen.Blazor.Rendering;
 using System;
-using System.Text;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -56,30 +55,6 @@ public class BorderStyle
     /// Creates a copy of this border style.
     /// </summary>
     public BorderStyle Clone() => new() { Color = Color, LineStyle = LineStyle };
-
-    internal void AppendCss(StringBuilder sb, string side)
-    {
-        if (LineStyle == BorderLineStyle.None)
-        {
-            return;
-        }
-
-        sb.Append("border-");
-        sb.Append(side);
-        sb.Append(": ");
-        sb.Append(LineStyle switch
-        {
-            BorderLineStyle.Thin => "1px solid ",
-            BorderLineStyle.Medium => "2px solid ",
-            BorderLineStyle.Thick => "3px solid ",
-            BorderLineStyle.Dashed => "1px dashed ",
-            BorderLineStyle.Dotted => "1px dotted ",
-            BorderLineStyle.Double => "3px double ",
-            _ => "1px solid "
-        });
-        sb.Append(Color);
-        sb.Append(';');
-    }
 
     internal string ToXlsxStyle() => LineStyle switch
     {
@@ -276,120 +251,9 @@ public class Format
     /// <summary>
     /// Occurs when the format is changed, allowing for updates to be made to the UI or other components that depend on this format.
     /// </summary>
-    public event Action? Changed;
+    internal event Action? Changed;
 
-    /// <summary>
-    /// Appends the CSS styles defined by this format to the provided StringBuilder.
-    /// </summary>
-    /// <param name="sb"></param>
-    public void AppendStyle(StringBuilder sb)
-    {
-        ArgumentNullException.ThrowIfNull(sb);
-        if (Color is not null)
-        {
-            sb.Append("color: ");
-            sb.Append(Color);
-            sb.Append(';');
-        }
-
-        if (BackgroundColor is not null)
-        {
-            sb.Append("background-color: ");
-            sb.Append(BackgroundColor);
-            sb.Append(';');
-        }
-
-        if (Bold)
-        {
-            sb.Append("font-weight: bold;");
-        }
-
-        if (Italic)
-        {
-            sb.Append("font-style: italic;");
-        }
-
-        if (Underline && Strikethrough)
-        {
-            sb.Append("text-decoration: underline line-through;");
-        }
-        else if (Underline)
-        {
-            sb.Append("text-decoration: underline;");
-        }
-        else if (Strikethrough)
-        {
-            sb.Append("text-decoration: line-through;");
-        }
-
-        if (FontFamily is not null)
-        {
-            sb.Append("font-family: ");
-            sb.Append(FontFamily);
-            sb.Append(';');
-        }
-
-        if (FontSize is not null)
-        {
-            sb.Append("font-size: ");
-            sb.Append(FontSize.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            sb.Append("pt;");
-        }
-
-        if (WrapText)
-        {
-            sb.Append("white-space: pre-wrap; word-wrap: break-word;");
-        }
-        else
-        {
-            sb.Append("white-space: nowrap; overflow: hidden;");
-        }
-
-        BorderTop?.AppendCss(sb, "top");
-        BorderRight?.AppendCss(sb, "right");
-        BorderBottom?.AppendCss(sb, "bottom");
-        BorderLeft?.AppendCss(sb, "left");
-
-        if (VerticalAlign != VerticalAlign.Top || TextAlign != TextAlign.Left)
-        {
-            sb.Append("display: flex;");
-
-            // Handle vertical alignment with align-items
-            if (VerticalAlign != VerticalAlign.Top)
-            {
-                sb.Append("align-items: ");
-                sb.Append(VerticalAlign switch
-                {
-                    VerticalAlign.Top => "flex-start",
-                    VerticalAlign.Middle => "center",
-                    VerticalAlign.Bottom => "flex-end",
-                    _ => "flex-start"
-                });
-                sb.Append(';');
-            }
-
-            // Handle horizontal alignment with justify-content
-            if (TextAlign != TextAlign.Left)
-            {
-                sb.Append("justify-content: ");
-                sb.Append(TextAlign switch
-                {
-                    TextAlign.Center => "center",
-                    TextAlign.Right => "flex-end",
-                    TextAlign.Justify => "space-between",
-                    _ => "flex-start"
-                });
-                sb.Append(';');
-            }
-        }
-    }
-
-    /// <summary>
-    /// Creates a new format by merging this format with an overlay format.
-    /// </summary>
-    /// <param name="format">The format whose values should override this format.</param>
-    /// <returns>A new <see cref="Format"/> instance representing the merged result.</returns>
-    public Format Merge(Format format)
+    internal Format Merge(Format format)
     {
         ArgumentNullException.ThrowIfNull(format);
         var merged = Clone();

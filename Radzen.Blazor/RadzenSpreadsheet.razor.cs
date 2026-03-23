@@ -224,9 +224,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             }
 
             // Check if we're in an auto filter
-            if (Worksheet.AutoFilter != null && Worksheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
+            if (Worksheet.AutoFilter.Range is not null && Worksheet.AutoFilter.Range.Value.Contains(cellMenuRow, cellMenuColumn))
             {
-                var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range, order, cellMenuColumn, skipHeaderRow: true);
+                var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range.Value, order, cellMenuColumn, skipHeaderRow: true);
                 Execute(command);
             }
         }
