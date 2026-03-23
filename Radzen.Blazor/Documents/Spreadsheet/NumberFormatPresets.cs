@@ -8,7 +8,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Categories of number format codes.
 /// </summary>
-public enum NumberFormatCategory
+internal enum NumberFormatCategory
 {
     /// <summary>General format (no specific formatting).</summary>
     General,
@@ -33,7 +33,7 @@ public enum NumberFormatCategory
 /// <summary>
 /// Provides mappings between Excel built-in numFmtId values and format codes.
 /// </summary>
-public static class NumberFormatPresets
+internal static class NumberFormatPresets
 {
     private static readonly Dictionary<int, string> IdToCode = new()
     {
