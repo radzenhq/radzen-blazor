@@ -35,17 +35,11 @@ public class Cell
 
         set
         {
-            if (format is not null)
-            {
-                format.Changed -= OnFormatChanged;
-            }
+            format?.Changed -= OnFormatChanged;
 
             format = value;
 
-            if (format is not null)
-            {
-                format.Changed += OnFormatChanged;
-            }
+            format?.Changed += OnFormatChanged;
 
             OnFormatChanged();
         }
@@ -71,17 +65,11 @@ public class Cell
         Data = other.Data;
         Formula = other.Formula;
 
-        if (format is not null)
-        {
-            format.Changed -= OnFormatChanged;
-        }
+        format?.Changed -= OnFormatChanged;
 
         format = other.format;
 
-        if (format is not null)
-        {
-            format.Changed += OnFormatChanged;
-        }
+        format?.Changed += OnFormatChanged;
 
         Hyperlink = other.Hyperlink?.Clone();
 
