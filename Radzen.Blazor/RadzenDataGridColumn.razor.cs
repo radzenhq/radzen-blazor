@@ -1552,6 +1552,8 @@ namespace Radzen.Blazor
 
             return Enum.GetValues<FilterOperator>().Where(o =>
             {
+                if (o == FilterOperator.Custom) return false;
+
                 var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
 
