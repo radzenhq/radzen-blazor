@@ -1,11 +1,16 @@
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-mb-4">
-    <RadzenCheckBox @bind-Value="invertValue" Name="invertValue" />
-    <RadzenLabel Text="Invert Value Axis" Component="invertValue" />
-    <RadzenCheckBox @bind-Value="invertCategory" Name="invertCategory" />
-    <RadzenLabel Text="Invert Category Axis" Component="invertCategory" />
-</RadzenStack>
-
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="invertValue" Name="invertValue" />
+                <RadzenLabel Text="Invert Value Axis" Component="invertValue" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="invertCategory" Name="invertCategory" />
+                <RadzenLabel Text="Invert Category Axis" Component="invertCategory" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Style="height: 400px">
