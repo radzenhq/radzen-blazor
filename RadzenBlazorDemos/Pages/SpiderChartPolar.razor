@@ -1,5 +1,6 @@
-<RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap">
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
         <RadzenStack Gap="0.25rem">
             <RadzenText TextStyle="TextStyle.Caption">Grid Shape</RadzenText>
             <RadzenSelectBar @bind-Value="gridShape" TValue="SpiderChartGridShape" Size="ButtonSize.Small">
@@ -33,13 +34,13 @@
             </RadzenStack>
         }
         <RadzenStack Gap="0.25rem">
-            <RadzenSwitch @bind-Value="showAxisValues" />
             <RadzenText TextStyle="TextStyle.Caption">Show Axis Values</RadzenText>
+            <RadzenSwitch @bind-Value="showAxisValues" />
         </RadzenStack>
-    </RadzenStack>
-</RadzenCard>
+        </RadzenStack>
+    </RadzenCard>
 
-<RadzenSpiderChart Style="width: 100%; height: 500px;" GridShape="@gridShape" ShowAxisValues="@showAxisValues"
+    <RadzenSpiderChart Style="width: 100%; height: 500px;" GridShape="@gridShape" ShowAxisValues="@showAxisValues"
                    StartAngle="@startAngle" EndAngle="@endAngle">
     <RadzenSpiderSeries TItem="PolarData"
                         Data="@windData"
@@ -53,8 +54,9 @@
                         ValueProperty="@nameof(PolarData.Speed)"
                         Title="Gust Speed"
                         ValueFormatter="@(v => $"{v:F0} km/h")" />
-    <RadzenSpiderLegend Position="LegendPosition.Bottom" />
-</RadzenSpiderChart>
+        <RadzenSpiderLegend Position="LegendPosition.Bottom" />
+    </RadzenSpiderChart>
+</RadzenStack>
 
 @code {
     SpiderChartGridShape gridShape = SpiderChartGridShape.Circular;
