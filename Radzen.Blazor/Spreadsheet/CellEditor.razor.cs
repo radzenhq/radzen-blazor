@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -37,8 +38,15 @@ public partial class CellEditor : ComponentBase, IDisposable
     [CascadingParameter]
     public ISpreadsheet Spreadsheet { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the registered custom cell types.
+    /// </summary>
+    [CascadingParameter]
+    public Dictionary<string, SpreadsheetCellType>? CellTypes { get; set; }
+
     private string? cellStyle;
     private string? className;
+    private Type? customEditorType;
 
     /// <inheritdoc />
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -121,9 +129,50 @@ public partial class CellEditor : ComponentBase, IDisposable
             .ToString();
     }
 
+    private Type? ResolveEditorType()
+    {
+        if (CellTypes is not { Count: > 0 } || Worksheet is null)
+        {
+            return null;
+        }
+
+        var address = Worksheet.Selection.Cell;
+
+        if (address == CellRef.Invalid)
+        {
+            return null;
+        }
+
+        var typeName = Worksheet.Cells.GetCustomType(address.Row, address.Column);
+
+        if (typeName is not null && CellTypes.TryGetValue(typeName, out var cellType))
+        {
+            return cellType.EditorType;
+        }
+
+        return null;
+    }
+
+    private Dictionary<string, object> GetEditorParameters()
+    {
+        var address = Worksheet.Selection.Cell;
+        var cell = address != CellRef.Invalid ? Worksheet.Cells[address] : null;
+        var formattedValue = cell?.Value?.ToString();
+
+        var context = new SpreadsheetCellEditContext(
+            formattedValue, cell!, Worksheet, Editor, Spreadsheet
+        );
+
+        return new Dictionary<string, object>
+        {
+            { "Context", context }
+        };
+    }
+
     private void OnEditModeChanged()
     {
         Render();
+        customEditorType = ResolveEditorType();
         StateHasChanged();
     }
 

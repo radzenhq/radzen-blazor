@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -95,8 +96,15 @@ public partial class CellView : CellBase, IDisposable
     [Parameter]
     public EventCallback<CellMenuToggleEventArgs> Toggle { get; set; }
 
+    /// <summary>
+    /// Gets or sets the registered custom cell types.
+    /// </summary>
+    [CascadingParameter]
+    public Dictionary<string, SpreadsheetCellType>? CellTypes { get; set; }
+
     private RadzenButton? cellMenuButton;
     private bool showCellMenu;
+    private Type? customRendererType;
 
     private string Class => ClassList.Create("rz-spreadsheet-cell")
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
@@ -114,6 +122,34 @@ public partial class CellView : CellBase, IDisposable
         var (formatted, color) = NumberFormat.ApplyWithColor(cell.Format?.NumberFormat, cell.Value, cell.ValueType);
         numberFormatColor = color;
         return formatted ?? cell.Value?.ToString();
+    }
+
+    private Type? ResolveRendererType()
+    {
+        if (CellTypes is not { Count: > 0 } || Worksheet is null)
+        {
+            return null;
+        }
+
+        var typeName = Worksheet.Cells.GetCustomType(Row, Column);
+
+        if (typeName is not null && CellTypes.TryGetValue(typeName, out var cellType))
+        {
+            return cellType.RendererType;
+        }
+
+        return null;
+    }
+
+    private Dictionary<string, object> GetRendererParameters()
+    {
+        var displayValue = GetDisplayValue();
+        var context = new SpreadsheetCellRenderContext(displayValue, cell!, Worksheet);
+
+        return new Dictionary<string, object>
+        {
+            { "Context", context }
+        };
     }
 
     private string? GetValidationTooltip()
@@ -257,6 +293,7 @@ public partial class CellView : CellBase, IDisposable
             }
 
             showCellMenu = ShouldShowCellMenu();
+            customRendererType = ResolveRendererType();
         }
 
         if (didSheetChange && Worksheet is not null)
