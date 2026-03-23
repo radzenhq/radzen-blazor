@@ -4,6 +4,7 @@ using Xunit;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
+#nullable enable
 public class DataValidationTests
 {
     private static Cell CreateCell(object? value)
