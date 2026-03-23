@@ -104,12 +104,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             workbook = Workbook;
             workbookView = null;
+            sheetIndex = 0;
         }
     }
 
-    private const int sheetIndex = 0;
+    private int sheetIndex;
 
-    private Worksheet? Worksheet => workbook?.Sheets[sheetIndex];
+    private Worksheet? Worksheet => workbook != null && sheetIndex < workbook.Sheets.Count ? workbook.Sheets[sheetIndex] : null;
 
     private WorkbookView? workbookView;
 
@@ -137,6 +138,166 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         workbook = value;
 
         await WorkbookChanged.InvokeAsync(value);
+    }
+
+    private async Task OnSheetTabChanged(int index)
+    {
+        await AcceptAsync();
+
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
+
+        if (validationListPopup != null)
+        {
+            await validationListPopup.CloseAsync();
+        }
+
+        sheetIndex = index;
+    }
+
+    private async Task OnAddSheetAsync()
+    {
+        await AcceptAsync();
+
+        if (workbook is null)
+        {
+            return;
+        }
+
+        var name = GenerateSheetName();
+        workbook.AddSheet(name, 100, 26);
+        sheetIndex = workbook.Sheets.Count - 1;
+    }
+
+    private async Task OnSheetAction(RadzenSplitButtonItem? item, Worksheet sheet)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        switch (item.Value)
+        {
+            case "rename":
+                await OnRenameSheetAsync(sheet);
+                break;
+            case "delete":
+                await OnRemoveSheetAsync(sheet);
+                break;
+            case "move-left":
+                OnMoveSheetLeft(sheet);
+                break;
+            case "move-right":
+                OnMoveSheetRight(sheet);
+                break;
+        }
+    }
+
+    private async Task OnRemoveSheetAsync(Worksheet sheet)
+    {
+        await AcceptAsync();
+
+        if (workbook is null || workbook.Sheets.Count <= 1)
+        {
+            return;
+        }
+
+        var removedIndex = workbook.IndexOf(sheet);
+        workbook.RemoveSheet(sheet);
+        workbookView?.Remove(sheet);
+
+        if (sheetIndex >= workbook.Sheets.Count)
+        {
+            sheetIndex = workbook.Sheets.Count - 1;
+        }
+        else if (removedIndex < sheetIndex)
+        {
+            sheetIndex--;
+        }
+    }
+
+    private async Task OnRenameSheetAsync(Worksheet sheet)
+    {
+        var existingNames = workbook!.Sheets
+            .Where(s => s != sheet)
+            .Select(s => s.Name)
+            .ToList();
+
+        var name = await DialogService.OpenAsync<Spreadsheet.RenameSheetDialog>("Rename Sheet",
+            new Dictionary<string, object?> { { "Name", sheet.Name }, { "ExistingNames", existingNames } },
+            new DialogOptions { Width = "300px" });
+
+        if (name is string newName && !string.IsNullOrWhiteSpace(newName))
+        {
+            sheet.Name = newName;
+        }
+    }
+
+    private void OnMoveSheetLeft(Worksheet sheet)
+    {
+        if (workbook is null)
+        {
+            return;
+        }
+
+        var index = workbook.IndexOf(sheet);
+
+        if (index > 0)
+        {
+            workbook.MoveSheet(index, index - 1);
+
+            if (sheetIndex == index)
+            {
+                sheetIndex--;
+            }
+            else if (sheetIndex == index - 1)
+            {
+                sheetIndex++;
+            }
+        }
+    }
+
+    private void OnMoveSheetRight(Worksheet sheet)
+    {
+        if (workbook is null)
+        {
+            return;
+        }
+
+        var index = workbook.IndexOf(sheet);
+
+        if (index < workbook.Sheets.Count - 1)
+        {
+            workbook.MoveSheet(index, index + 1);
+
+            if (sheetIndex == index)
+            {
+                sheetIndex++;
+            }
+            else if (sheetIndex == index + 1)
+            {
+                sheetIndex--;
+            }
+        }
+    }
+
+    private string GenerateSheetName()
+    {
+        var index = 1;
+
+        while (true)
+        {
+            var name = $"Sheet{index}";
+
+            if (workbook!.GetSheet(name) == null)
+            {
+                return name;
+            }
+
+            index++;
+        }
     }
 
     private async Task OnCellToggleAsync(CellMenuToggleEventArgs args)
