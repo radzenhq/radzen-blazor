@@ -59,6 +59,15 @@ namespace Radzen.Blazor
 
         string contentStyle = "display:none;position:absolute;z-index:1;";
 
+        ElementReference toggleRef;
+        async Task OnToggleClick()
+        {
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.toggleMenuItem", toggleRef);
+            }
+        }
+
         /// <summary>
         /// Toggles the menu open/close state.
         /// </summary>
