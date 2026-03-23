@@ -36,6 +36,16 @@ public class SheetView
     public double ColumnHeaderOffset { get; set; } = 100;
 
     /// <summary>
+    /// Gets or sets the horizontal scroll position for this sheet.
+    /// </summary>
+    public double ScrollLeft { get; set; }
+
+    /// <summary>
+    /// Gets or sets the vertical scroll position for this sheet.
+    /// </summary>
+    public double ScrollTop { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="SheetView"/> class.
     /// </summary>
     public SheetView(Worksheet sheet)
