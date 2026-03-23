@@ -75,7 +75,15 @@ public class AutoFilter
     /// <summary>
     /// Initializes a new instance of the <see cref="AutoFilter"/> class.
     /// </summary>
-    public AutoFilter(Worksheet sheet, RangeRef range)
+    internal AutoFilter(Worksheet sheet)
+    {
+        Worksheet = sheet;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AutoFilter"/> class with a range.
+    /// </summary>
+    internal AutoFilter(Worksheet sheet, RangeRef range)
     {
         Worksheet = sheet;
         Range = range;
@@ -87,9 +95,9 @@ public class AutoFilter
     public Worksheet Worksheet { get; }
 
     /// <summary>
-    /// Gets the range of the filter
+    /// Gets or sets the range of the filter. Set to null to disable the auto filter.
     /// </summary>
-    public RangeRef Range { get; }
+    public RangeRef? Range { get; set; }
 
     /// <summary>
     /// Gets the first visible cell reference in the range.
@@ -98,17 +106,35 @@ public class AutoFilter
     {
         get
         {
+            if (Range is null)
+            {
+                return CellRef.Invalid;
+            }
+
+            var range = Range.Value;
+
             // Find the first visible row in the data table range
-            for (int row = Range.Start.Row; row <= Range.End.Row; row++)
+            for (int row = range.Start.Row; row <= range.End.Row; row++)
             {
                 if (!Worksheet.Rows.IsHidden(row))
                 {
-                    return new CellRef(row, Range.Start.Column);
+                    return new CellRef(row, range.Start.Column);
                 }
             }
-            
+
             // If all rows are hidden, return the original start
-            return Range.Start;
+            return range.Start;
+        }
+    }
+
+    /// <summary>
+    /// Clears all filter criteria while keeping the auto filter enabled.
+    /// </summary>
+    public void ShowAll()
+    {
+        if (Range is not null)
+        {
+            Worksheet.ClearFilters();
         }
     }
 }

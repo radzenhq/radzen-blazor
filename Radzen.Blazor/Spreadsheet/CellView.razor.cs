@@ -158,9 +158,10 @@ public partial class CellView : CellBase, IDisposable
             }
         }
 
-        if (Worksheet?.AutoFilter is not null)
+        if (Worksheet?.AutoFilter.Range is not null)
         {
-            if (Column >= Worksheet.AutoFilter.Range.Start.Column && Column <= Worksheet.AutoFilter.Range.End.Column)
+            var autoFilterRange = Worksheet.AutoFilter.Range.Value;
+            if (Column >= autoFilterRange.Start.Column && Column <= autoFilterRange.End.Column)
             {
                 if (Row == Worksheet.AutoFilter.Start.Row)
                 {

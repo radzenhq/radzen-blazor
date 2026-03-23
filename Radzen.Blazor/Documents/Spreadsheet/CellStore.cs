@@ -123,7 +123,7 @@ public class CellStore(Worksheet sheet)
     /// A cell is empty when it has no value, formula, format, or hyperlink.
     /// </summary>
     /// <returns>The number of cells removed.</returns>
-    public int Compact()
+    internal int Compact()
     {
         var keysToRemove = new List<(int row, int column)>();
 
