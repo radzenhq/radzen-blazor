@@ -67,8 +67,10 @@
     <Content Remove="wwwroot/css/**/*.css" />
   </ItemGroup>
 
-  <Target Name="CompileSass" BeforeTargets="MoveCss" Condition="'$(TargetFramework)' == 'net10.0'">
+  <Target Name="CompileSass" BeforeTargets="MoveCss" Condition="'$(TargetFramework)' == 'net10.0'"
+          Inputs="@(SassFile)" Outputs="$(IntermediateOutputPath)sass.stamp">
     <SassCompile InputFiles="@(SassFile)" OutputStyle="compressed" />
+    <Touch Files="$(IntermediateOutputPath)sass.stamp" AlwaysCreate="true" />
   </Target>
 
   <Target Name="MoveCss" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net10.0'">
