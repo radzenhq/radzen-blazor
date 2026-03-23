@@ -7,7 +7,14 @@
 @if (Editor.Mode != EditMode.None)
 {
 <div class=@className style=@cellStyle>
-    <SheetEditor @bind-Value=@Editor.Value AutoFocus=@(Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
-        Worksheet=@Worksheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
+    @if (customEditorType is not null)
+    {
+        <DynamicComponent Type=@customEditorType Parameters=@GetEditorParameters() />
+    }
+    else
+    {
+        <SheetEditor @bind-Value=@Editor.Value AutoFocus=@(Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
+            Worksheet=@Worksheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
+    }
 </div>
 }
