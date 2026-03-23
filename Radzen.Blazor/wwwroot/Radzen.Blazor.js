@@ -16,18 +16,6 @@ if (!Element.prototype.closest) {
   };
 }
 
-// Suppress "DotNetObjectReference already disposed" promise rejections during component teardown.
-function suppressDisposed(promise) {
-  if (promise && typeof promise.catch === 'function') {
-    promise.catch(function () { });
-  }
-}
-window.addEventListener('unhandledrejection', function (e) {
-  if (e.reason && e.reason.message && e.reason.message.indexOf('DotNetObjectReference') !== -1) {
-    e.preventDefault();
-  }
-});
-
 var resolveCallbacks = [];
 var rejectCallbacks = [];
 var radzenRecognition;
@@ -49,9 +37,8 @@ window.Radzen = {
             }
         };
     },
-    downloadFile: async function (fileName, data, mimeType) {
-        const buffer = typeof data.arrayBuffer === 'function' ? await data.arrayBuffer() : data;
-        const blob = new Blob([buffer], { type: mimeType });
+    downloadFile: function (fileName, data, mimeType) {
+        const blob = new Blob([data], { type: mimeType });
         const url = URL.createObjectURL(blob);
 
         const a = document.createElement("a");
@@ -129,7 +116,7 @@ window.Radzen = {
      var el = document.getElementById(id);
      if (el) {
         var handler = function (e) {
-            try { suppressDisposed(ref.invokeMethodAsync('RadzenComponent.RaiseMouseEnter')); } catch { }
+            try { ref.invokeMethodAsync('RadzenComponent.RaiseMouseEnter'); } catch { }
         };
         Radzen[id + 'mouseenter'] = handler;
         el.addEventListener('mouseenter', handler, false);
@@ -139,7 +126,7 @@ window.Radzen = {
      var el = document.getElementById(id);
      if (el) {
         var handler = function (e) {
-            try { suppressDisposed(ref.invokeMethodAsync('RadzenComponent.RaiseMouseLeave')); } catch { }
+            try { ref.invokeMethodAsync('RadzenComponent.RaiseMouseLeave'); } catch { }
         };
         Radzen[id + 'mouseleave'] = handler;
         el.addEventListener('mouseleave', handler, false);
@@ -550,7 +537,7 @@ window.Radzen = {
         }
 
         var eventType = drag.mode === 'move' ? 'move' : 'resize';
-        try { suppressDisposed(config.dotnetRef.invokeMethodAsync('OnGanttBarInteractionEnd', drag.index, eventType, newStartMs, newEndMs)); } catch { }
+        config.dotnetRef.invokeMethodAsync('OnGanttBarInteractionEnd', drag.index, eventType, newStartMs, newEndMs);
       }
 
       drag = null;
@@ -780,14 +767,6 @@ window.Radzen = {
 
       Radzen.updateMap(id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language);
     });
-
-    return {
-      dispose: function () {
-        if (Radzen[id] && Radzen[id].instance) {
-          delete Radzen[id].instance;
-        }
-      }
-    };
   },
   updateMap: function (id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language) {
     var api = function () {
@@ -862,6 +841,11 @@ window.Radzen = {
         }
     });
   },
+  destroyMap: function (id) {
+    if (Radzen[id].instance) {
+      delete Radzen[id].instance;
+    }
+  },
  focusSecurityCode: function (el) {
     if (!el) return;
     var firstInput = el.querySelector('.rz-security-code-input');
@@ -869,6 +853,25 @@ window.Radzen = {
         setTimeout(function () { firstInput.focus() }, 500);
     }
  },
+  destroySecurityCode: function (id, el) {
+    if (!Radzen[id]) return;
+
+    var inputs = el.getElementsByTagName('input');
+
+    if (Radzen[id].keyPress && Radzen[id].keyDown && Radzen[id].paste) {
+        var isAndroid = navigator.userAgent.match(/Android/i);
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].removeEventListener(isAndroid ? 'textInput' : 'keypress', Radzen[id].keyPress);
+            inputs[i].removeEventListener('keydown', Radzen[id].keyDown);
+            inputs[i].removeEventListener('paste', Radzen[id].paste);
+        }
+        delete Radzen[id].keyPress;
+        delete Radzen[id].keyDown;
+        delete Radzen[id].paste;
+    }
+
+    Radzen[id] = null;
+  },
   createSecurityCode: function (id, ref, el, isNumber) {
       if (!el || !ref) return;
 
@@ -895,7 +898,7 @@ window.Radzen = {
                   var code = Radzen[id].inputs.map(i => i.value).join('').trim();
                   hidden.value = code;
 
-                  try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', code)); } catch { }
+                  try { ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', code); } catch { }
 
                   Radzen[id].inputs[Radzen[id].inputs.length - 1].focus();
               }
@@ -935,7 +938,7 @@ window.Radzen = {
           var value = Radzen[id].inputs.map(i => i.value).join('').trim();
           hidden.value = value;
 
-          try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value)); } catch { }
+          try { ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value); } catch { }
 
           var index = Radzen[id].inputs.indexOf(e.currentTarget);
           if (index < Radzen[id].inputs.length - 1) {
@@ -951,7 +954,7 @@ window.Radzen = {
               var value = Radzen[id].inputs.map(i => i.value).join('').trim();
               hidden.value = value;
 
-              try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value)); } catch { }
+              try { ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value); } catch { }
 
               var index = Radzen[id].inputs.indexOf(e.currentTarget);
               if (index > 0) {
@@ -965,27 +968,6 @@ window.Radzen = {
           Radzen[id].inputs[i].addEventListener('keydown', Radzen[id].keyDown);
           Radzen[id].inputs[i].addEventListener('paste', Radzen[id].paste);
       }
-
-      return {
-          dispose: function () {
-              if (!Radzen[id]) return;
-
-              var inputs = el.getElementsByTagName('input');
-
-              if (Radzen[id].keyPress && Radzen[id].keyDown && Radzen[id].paste) {
-                  for (var i = 0; i < inputs.length; i++) {
-                      inputs[i].removeEventListener(isAndroid ? 'textInput' : 'keypress', Radzen[id].keyPress);
-                      inputs[i].removeEventListener('keydown', Radzen[id].keyDown);
-                      inputs[i].removeEventListener('paste', Radzen[id].paste);
-                  }
-                  delete Radzen[id].keyPress;
-                  delete Radzen[id].keyDown;
-                  delete Radzen[id].paste;
-              }
-
-              Radzen[id] = null;
-          }
-      };
   },
   createSlider: function (
     id,
@@ -1095,28 +1077,27 @@ window.Radzen = {
     parent.addEventListener('touchstart', Radzen[id].mouseDownHandler, {
       passive: true
     });
+  },
+  destroySlider: function (id, parent) {
+    if (!Radzen[id]) return;
 
-    return { dispose: function() {
-      if (!Radzen[id]) return;
+    if (Radzen[id].mouseMoveHandler) {
+      document.removeEventListener('mousemove', Radzen[id].mouseMoveHandler);
+      document.removeEventListener('touchmove', Radzen[id].mouseMoveHandler);
+      delete Radzen[id].mouseMoveHandler;
+    }
+    if (Radzen[id].mouseUpHandler) {
+      document.removeEventListener('mouseup', Radzen[id].mouseUpHandler);
+      document.removeEventListener('touchend', Radzen[id].mouseUpHandler);
+      delete Radzen[id].mouseUpHandler;
+    }
+    if (Radzen[id].mouseDownHandler) {
+      parent.removeEventListener('mousedown', Radzen[id].mouseDownHandler);
+      parent.removeEventListener('touchstart', Radzen[id].mouseDownHandler);
+      delete Radzen[id].mouseDownHandler;
+    }
 
-      if (Radzen[id].mouseMoveHandler) {
-        document.removeEventListener('mousemove', Radzen[id].mouseMoveHandler);
-        document.removeEventListener('touchmove', Radzen[id].mouseMoveHandler);
-        delete Radzen[id].mouseMoveHandler;
-      }
-      if (Radzen[id].mouseUpHandler) {
-        document.removeEventListener('mouseup', Radzen[id].mouseUpHandler);
-        document.removeEventListener('touchend', Radzen[id].mouseUpHandler);
-        delete Radzen[id].mouseUpHandler;
-      }
-      if (Radzen[id].mouseDownHandler) {
-        parent.removeEventListener('mousedown', Radzen[id].mouseDownHandler);
-        parent.removeEventListener('touchstart', Radzen[id].mouseDownHandler);
-        delete Radzen[id].mouseDownHandler;
-      }
-
-      Radzen[id] = null;
-    }};
+    Radzen[id] = null;
   },
   prepareDrag: function (el) {
     if (el) {
@@ -1184,24 +1165,6 @@ window.Radzen = {
         }
     }
     requestAnimationFrame(step);
-  },
-  createCarousel: function (container, ref) {
-    var scrollTimeout = null;
-    function handler() {
-        if (scrollTimeout) clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(function () {
-            var children = container.children;
-            if (!children.length) return;
-            var itemWidth = children[0].offsetWidth;
-            if (itemWidth === 0) return;
-            var index = Math.round(container.scrollLeft / itemWidth);
-            if (index < 0) index = 0;
-            if (index >= children.length) index = children.length - 1;
-            try { ref.invokeMethodAsync('RadzenCarousel.OnScroll', index); } catch { }
-        }, 100);
-    }
-    container.addEventListener('scroll', handler, { passive: true });
-    return { dispose: function () { container.removeEventListener('scroll', handler); } };
   },
   scrollIntoViewIfNeeded: function (ref, selector) {
     var el = selector ? ref.getElementsByClassName(selector)[0] : ref;
@@ -1565,7 +1528,7 @@ window.Radzen = {
 
       uploadComponent.files = Array.from(fileInput.files);
       uploadComponent.localFiles = files;
-      try { suppressDisposed(uploadComponent.invokeMethodAsync('RadzenUpload.OnChange', files)); } catch { }
+      try { uploadComponent.invokeMethodAsync('RadzenUpload.OnChange', files); } catch { }
     }
 
     for (var i = 0; i < fileInput.files.length; i++) {
@@ -1859,6 +1822,19 @@ window.Radzen = {
         clearTimeout(Radzen[id + 'duration']);
     }
   },
+  destroyDatePicker(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+
+      var button = el.querySelector('.rz-datepicker-trigger');
+      if (button) {
+          button.onclick = null;
+      }
+      var input = el.querySelector('.rz-inputtext');
+      if (input) {
+          input.onclick = null;
+      }
+  },
   createDatePicker(el, popupId, instance, callback) {
       if(!el) return;
       var handler = function (e, condition) {
@@ -1880,17 +1856,6 @@ window.Radzen = {
               handler(e, e.currentTarget.classList.contains('rz-input-trigger') && !e.currentTarget.classList.contains('rz-readonly'));
           };
       }
-
-      return {
-          dispose: function () {
-              if (button) {
-                  button.onclick = null;
-              }
-              if (input) {
-                  input.onclick = null;
-              }
-          }
-      };
   },
   findPopup: function (id) {
     var popups = [];
@@ -1984,7 +1949,7 @@ window.Radzen = {
 
     var isRTL = Radzen.isRTL(popup);
 
-    if (isRTL && parent && (!position || position == 'bottom' || position == 'top')) {
+    if (isRTL && (!position || position == 'bottom' || position == 'top')) {
       left = parentRect.right - rect.width;
     }
 
@@ -2004,7 +1969,7 @@ window.Radzen = {
           tooltipContent.classList.add('rz-top-tooltip-content');
             position = 'top';
             if (instance && callback) {
-                try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
+                try { instance.invokeMethodAsync(callback, position); } catch { }
             }
         }
       }
@@ -2022,7 +1987,7 @@ window.Radzen = {
           tooltipContent.classList.add('rz-left-tooltip-content');
           position = 'left';
           if (instance && callback) {
-              try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
+              try { instance.invokeMethodAsync(callback, position); } catch { }
           }
         }
       }
@@ -2040,7 +2005,7 @@ window.Radzen = {
           tooltipContent.classList.add('rz-right-tooltip-content');
           position = 'right';
           if (instance && callback) {
-              try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
+              try { instance.invokeMethodAsync(callback, position); } catch { }
           }
         }
       }
@@ -2279,9 +2244,9 @@ window.Radzen = {
 
     if (instance && callback) {
         if (callback.includes('RadzenTooltip')) {
-            try { suppressDisposed(instance.invokeMethodAsync(callback, null)); } catch { }
+            try { instance.invokeMethodAsync(callback, null); } catch { }
         } else {
-            try { suppressDisposed(instance.invokeMethodAsync(callback)); } catch { }
+            try { instance.invokeMethodAsync(callback); } catch { }
         }
     }
     Radzen.popups = (Radzen.popups || []).filter(function (obj) {
@@ -2513,7 +2478,7 @@ window.Radzen = {
                             lastDialog.parentElement.style.left = left + 'px';
                             lastDialog.parentElement.style.top = top + 'px';
 
-                            try { suppressDisposed(dialog.invokeMethodAsync('RadzenDialog.OnDrag', top, left)); } catch { }
+                            try { dialog.invokeMethodAsync('RadzenDialog.OnDrag', top, left); } catch { }
                         };
 
                         var stop = function () {
@@ -2905,7 +2870,7 @@ window.Radzen = {
     }
 
     function readPositionFromDOM() {
-      var w = ref.querySelector('.rz-range-nav-window');
+      var w = ref.querySelector('.rz-range-navigator-window');
       if (w) {
         var wRect = w.getBoundingClientRect();
         var rRect = ref.getBoundingClientRect();
@@ -2948,13 +2913,13 @@ window.Radzen = {
 
     function updateLabels(start, end) {
       if (!ref.navLabelInputEnd) return;
-      var labels = ref.querySelectorAll('.rz-range-nav-label');
+      var labels = ref.querySelectorAll('.rz-range-navigator-label');
       if (labels.length >= 2) {
         labels[0].textContent = formatLabel(start);
         labels[1].textContent = formatLabel(end);
         // Flip label direction when near edges
-        labels[0].className = 'rz-range-nav-label ' + (start < 0.1 ? 'rz-range-nav-label-end' : 'rz-range-nav-label-start');
-        labels[1].className = 'rz-range-nav-label ' + (end > 0.9 ? 'rz-range-nav-label-start' : 'rz-range-nav-label-end');
+        labels[0].className = 'rz-range-navigator-label ' + (start < 0.1 ? 'rz-range-navigator-label-end' : 'rz-range-navigator-label-start');
+        labels[1].className = 'rz-range-navigator-label ' + (end > 0.9 ? 'rz-range-navigator-label-start' : 'rz-range-navigator-label-end');
       }
     }
 
@@ -2963,9 +2928,9 @@ window.Radzen = {
       currentEnd = snap(end);
       start = currentStart;
       end = currentEnd;
-      var win = ref.querySelector('.rz-range-nav-window');
-      var shadeLeft = ref.querySelector('.rz-range-nav-shade-start');
-      var shadeRight = ref.querySelector('.rz-range-nav-shade-end');
+      var win = ref.querySelector('.rz-range-navigator-window');
+      var shadeLeft = ref.querySelector('.rz-range-navigator-shade-start');
+      var shadeRight = ref.querySelector('.rz-range-navigator-shade-end');
       if (win) {
         if (isRTL()) {
           win.style.right = (start * 100) + '%';
@@ -3075,34 +3040,36 @@ window.Radzen = {
         var w = entry.contentRect.width;
         var h = entry.contentRect.height;
         if (w > 0) {
-          try { suppressDisposed(instance.invokeMethodAsync('OnResize', w, h)); } catch (ex) {}
+          try { instance.invokeMethodAsync('OnResize', w, h); } catch (ex) {}
         }
       }
     });
     ref.navResizeObserver.observe(ref);
 
-    ref._radzenDispose = function () {
-      if (ref.navMouseDown) {
-        ref.removeEventListener('mousedown', ref.navMouseDown);
-        ref.removeEventListener('touchstart', ref.navMouseDown);
-        delete ref.navMouseDown;
-      }
-      if (ref.navMouseMove) {
-        document.removeEventListener('mousemove', ref.navMouseMove);
-        document.removeEventListener('touchmove', ref.navMouseMove);
-        delete ref.navMouseMove;
-      }
-      if (ref.navMouseUp) {
-        document.removeEventListener('mouseup', ref.navMouseUp);
-        document.removeEventListener('touchend', ref.navMouseUp);
-        delete ref.navMouseUp;
-      }
-      if (ref.navResizeObserver) {
-        ref.navResizeObserver.disconnect();
-        delete ref.navResizeObserver;
-      }
-    };
     return [width, height];
+  },
+
+  destroyRangeNavigator: function (ref) {
+    if (!ref) return;
+    if (ref.navMouseDown) {
+      ref.removeEventListener('mousedown', ref.navMouseDown);
+      ref.removeEventListener('touchstart', ref.navMouseDown);
+      delete ref.navMouseDown;
+    }
+    if (ref.navMouseMove) {
+      document.removeEventListener('mousemove', ref.navMouseMove);
+      document.removeEventListener('touchmove', ref.navMouseMove);
+      delete ref.navMouseMove;
+    }
+    if (ref.navMouseUp) {
+      document.removeEventListener('mouseup', ref.navMouseUp);
+      document.removeEventListener('touchend', ref.navMouseUp);
+      delete ref.navMouseUp;
+    }
+    if (ref.navResizeObserver) {
+      ref.navResizeObserver.disconnect();
+      delete ref.navResizeObserver;
+    }
   },
 
   updateRangeNavigatorLabels: function (ref, isDate, inputStart, inputEnd) {
@@ -3119,12 +3086,6 @@ window.Radzen = {
     }
     this.destroyResizable(ref);
   },
-  disposeElement: function (ref) {
-    if (ref && ref._radzenDispose) {
-      ref._radzenDispose();
-      delete ref._radzenDispose;
-    }
-  },
   destroyResizable: function (ref) {
     if (ref.resizeObserver) {
       ref.resizeObserver.disconnect();
@@ -3139,7 +3100,7 @@ window.Radzen = {
     ref.resizeHandler = function () {
       var rect = ref.getBoundingClientRect();
 
-      try { suppressDisposed(instance.invokeMethodAsync('Resize', rect.width, rect.height)); } catch { }
+      try { instance.invokeMethodAsync('Resize', rect.width, rect.height); } catch { }
     };
 
     if (window.ResizeObserver) {
@@ -3149,10 +3110,9 @@ window.Radzen = {
       window.addEventListener('resize', ref.resizeHandler);
     }
 
-    var self = this;
-    ref._radzenDispose = function () { self.destroyResizable(ref); };
     var rect = ref.getBoundingClientRect();
-    return { width: rect.width, height: rect.height };
+
+    return {width: rect.width, height: rect.height};
   },
   createChart: function (ref, instance) {
     var inside = false;
@@ -3161,7 +3121,7 @@ window.Radzen = {
         var rect = ref.getBoundingClientRect();
         var x = e.clientX - rect.left;
         var y = e.clientY - rect.top;
-        try { suppressDisposed(instance.invokeMethodAsync('MouseMove', x, y)); } catch { }
+        try { instance.invokeMethodAsync('MouseMove', x, y); } catch { }
      }
     }, 100);
     ref.mouseEnterHandler = function () {
@@ -3172,14 +3132,14 @@ window.Radzen = {
             return;
         }
         inside = false;
-        try { suppressDisposed(instance.invokeMethodAsync('MouseMove', -1, -1)); } catch { }
+        try { instance.invokeMethodAsync('MouseMove', -1, -1); } catch { }
     };
     ref.clickHandler = function (e) {
       var rect = ref.getBoundingClientRect();
       var x = e.clientX - rect.left;
       var y = e.clientY - rect.top;
       if (!e.target.closest('.rz-marker') && !e.target.closest('.rz-legend-item')) {
-        try { suppressDisposed(instance.invokeMethodAsync('Click', x, y)); } catch { }
+        try { instance.invokeMethodAsync('Click', x, y); } catch { }
       }
     };
 
@@ -3189,7 +3149,7 @@ window.Radzen = {
       var rect = ref.getBoundingClientRect();
       var x = e.clientX - rect.left;
       var delta = e.deltaY > 0 ? 1 : -1;
-      try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, delta)); } catch {}
+      try { instance.invokeMethodAsync('OnWheel', x, delta); } catch {}
     };
 
     ref.addEventListener('mouseenter', ref.mouseEnterHandler);
@@ -3270,7 +3230,7 @@ window.Radzen = {
       var newPos = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartPos + deltaPercent));
       setThumbPos(thumb, newPos);
       var position = newPos / 100;
-      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
+      try { instance.invokeMethodAsync('OnPan', position); } catch {}
     };
     document.addEventListener('mousemove', ref.scrollbarMoveHandler);
 
@@ -3288,7 +3248,7 @@ window.Radzen = {
       var clickX = isChartRTL() ? trackRect.right - e.clientX : e.clientX - trackRect.left;
       var thumbWidth = thumb.offsetWidth;
       var position = Math.max(0, Math.min(1 - thumbWidth / track.offsetWidth, (clickX - thumbWidth / 2) / track.offsetWidth));
-      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
+      try { instance.invokeMethodAsync('OnPan', position); } catch {}
     });
 
     // Touch support for scrollbar drag
@@ -3313,7 +3273,7 @@ window.Radzen = {
       var newPos = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartPos + deltaPercent));
       setThumbPos(thumb, newPos);
       var position = newPos / 100;
-      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
+      try { instance.invokeMethodAsync('OnPan', position); } catch {}
       e.preventDefault();
     };
     document.addEventListener('touchmove', ref.scrollbarTouchMoveHandler, { passive: false });
@@ -3358,10 +3318,10 @@ window.Radzen = {
         var x = midX - rect.left;
         var ratio = currentDistance / pinchStartDistance;
         if (ratio > 1.05) {
-          try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, -1)); } catch {}
+          try { instance.invokeMethodAsync('OnWheel', x, -1); } catch {}
           pinchStartDistance = currentDistance;
         } else if (ratio < 0.95) {
-          try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, 1)); } catch {}
+          try { instance.invokeMethodAsync('OnWheel', x, 1); } catch {}
           pinchStartDistance = currentDistance;
         }
         e.preventDefault();
@@ -3379,7 +3339,7 @@ window.Radzen = {
         var deltaPercent = (isChartRTL() ? dx : -dx) / chartWidth * 100;
         var newPos = Math.max(0, Math.min(100 - thumbWidth, currentPos + deltaPercent));
         var position = newPos / 100;
-        try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
+        try { instance.invokeMethodAsync('OnPan', position); } catch {}
         touchPanStartX = e.touches[0].clientX;
         e.preventDefault();
       }
@@ -3398,26 +3358,21 @@ window.Radzen = {
 
     // RTL detection
     ref._chartRTLObserver = new MutationObserver(function () {
-      try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
+      try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
     });
     ref._chartRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
-    try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
+    try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
 
-    this.createResizable(ref, instance);
-    var self = this;
-    ref._radzenDispose = function () { self.destroyChart(ref); };
-    var rect = ref.getBoundingClientRect();
-    return { width: rect.width, height: rect.height };
+    return this.createResizable(ref, instance);
   },
   createGauge: function (ref, instance) {
-    this.createResizable(ref, instance);
+    var result = this.createResizable(ref, instance);
     ref._gaugeRTLObserver = new MutationObserver(function () {
-      try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
+      try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
     });
     ref._gaugeRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
-    try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
-    var rect = ref.getBoundingClientRect();
-    return { width: rect.width, height: rect.height };
+    try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+    return result;
   },
   innerHTML: function (ref, value) {
     if (value != undefined) {
@@ -3460,7 +3415,7 @@ window.Radzen = {
   mediaQuery: function(query, instance) {
     if (instance) {
       function callback(event) {
-          try { suppressDisposed(instance.invokeMethodAsync('OnChange', event.matches)); } catch { }
+          try { instance.invokeMethodAsync('OnChange', event.matches); } catch { }
       };
       var query = matchMedia(query);
       this.mediaQueries[instance._id] = function() {
@@ -3478,7 +3433,7 @@ window.Radzen = {
   },
   createEditor: function (ref, uploadUrl, paste, instance, shortcuts) {
     ref.inputListener = function () {
-      try { suppressDisposed(instance.invokeMethodAsync('OnChange', ref.innerHTML)); } catch { }
+      try { instance.invokeMethodAsync('OnChange', ref.innerHTML); } catch { }
     };
     ref.keydownListener = function (e) {
       var key = '';
@@ -3495,7 +3450,7 @@ window.Radzen = {
 
       if (shortcuts.includes(key)) {
         e.preventDefault();
-        try { suppressDisposed(instance.invokeMethodAsync('ExecuteShortcutAsync', key)); } catch { }
+        try { instance.invokeMethodAsync('ExecuteShortcutAsync', key); } catch { }
       }
     };
 
@@ -3521,7 +3476,7 @@ window.Radzen = {
 
     ref.selectionChangeListener = function () {
       if (document.activeElement == ref) {
-        try { suppressDisposed(instance.invokeMethodAsync('OnSelectionChange')); } catch { }
+        try { instance.invokeMethodAsync('OnSelectionChange'); } catch { }
       }
     };
     ref.handleInsert = function (e, transfer, hasDelegate) {
@@ -3559,9 +3514,9 @@ window.Radzen = {
               } else {
                 document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
               }
-              try { suppressDisposed(instance.invokeMethodAsync('OnUploadComplete', xhr.responseText)); } catch { }
+              try { instance.invokeMethodAsync('OnUploadComplete', xhr.responseText); } catch { }
             } else {
-              try { suppressDisposed(instance.invokeMethodAsync('OnError', xhr.responseText)); } catch { }
+              try { instance.invokeMethodAsync('OnError', xhr.responseText); } catch { }
             }
           }
         }
@@ -3625,18 +3580,6 @@ window.Radzen = {
     ref.addEventListener('click', ref.clickListener);
     document.addEventListener('selectionchange', ref.selectionChangeListener);
     document.execCommand('styleWithCSS', false, true);
-    return {
-      dispose: function () {
-        if (ref) {
-          ref.removeEventListener('input', ref.inputListener);
-          ref.removeEventListener('paste', ref.pasteListener);
-          ref.removeEventListener('drop', ref.dropListener);
-          ref.removeEventListener('keydown', ref.keydownListener);
-          ref.removeEventListener('click', ref.clickListener);
-          document.removeEventListener('selectionchange', ref.selectionChangeListener);
-        }
-      }
-    };
   },
   saveSelection: function (ref) {
     if (!ref) return;
@@ -3707,16 +3650,26 @@ window.Radzen = {
       return result;
     }, { innerText: selection.toString(), innerHTML: innerHTML });
   },
+  destroyEditor: function (ref) {
+    if (ref) {
+      ref.removeEventListener('input', ref.inputListener);
+      ref.removeEventListener('paste', ref.pasteListener);
+      ref.removeEventListener('drop', ref.dropListener);
+      ref.removeEventListener('keydown', ref.keydownListener);
+      ref.removeEventListener('click', ref.clickListener);
+      document.removeEventListener('selectionchange', ref.selectionChangeListener);
+    }
+  },
   startDrag: function (ref, instance, handler) {
     if (!ref) {
         return { left: 0, top: 0, width: 0, height: 0 };
     }
     ref.mouseMoveHandler = function (e) {
-      try { suppressDisposed(instance.invokeMethodAsync(handler, { clientX: e.clientX, clientY: e.clientY })); } catch { }
+      try { instance.invokeMethodAsync(handler, { clientX: e.clientX, clientY: e.clientY }); } catch { }
     };
     ref.touchMoveHandler = function (e) {
       if (e.targetTouches[0] && ref.contains(e.targetTouches[0].target)) {
-        try { suppressDisposed(instance.invokeMethodAsync(handler, { clientX: e.targetTouches[0].clientX, clientY: e.targetTouches[0].clientY })); } catch { }
+        try { instance.invokeMethodAsync(handler, { clientX: e.targetTouches[0].clientX, clientY: e.targetTouches[0].clientY }); } catch { }
       }
     };
     ref.mouseUpHandler = function (e) {
@@ -4197,10 +4150,10 @@ window.Radzen = {
                 let current = event.results[event.results.length - 1][0]
                 let result = current.transcript;
 
-                try { suppressDisposed(componentRef.invokeMethodAsync("OnResult", result)); } catch { }
+                try { componentRef.invokeMethodAsync("OnResult", result); } catch { }
             };
             radzenRecognition.onend = function (event) {
-                try { suppressDisposed(componentRef.invokeMethodAsync("StopRecording")); } catch { }
+                try { componentRef.invokeMethodAsync("StopRecording"); } catch { }
                 radzenRecognition = null;
             };
             radzenRecognition.start();
@@ -4331,7 +4284,7 @@ window.Radzen = {
     createDraggable: function(element, ref, onDragStart) {
       function handleDragStart(e) {
         e.dataTransfer.setData('', e.target.id);
-        try { suppressDisposed(ref.invokeMethodAsync(onDragStart)); } catch { }
+        try { ref.invokeMethodAsync(onDragStart); } catch { }
       }
       element.draggable = true;
       element.addEventListener('dragstart', handleDragStart);
@@ -4351,7 +4304,7 @@ Radzen.registerFabMenu = function(element, dotnet){
   }
   const handler = function(e){
     if(!element.contains(e.target)){
-      try { suppressDisposed(dotnet.invokeMethodAsync('CloseAsync')); } catch { }
+      try { dotnet.invokeMethodAsync('CloseAsync'); } catch { }
     }
   };
   element.__rzOutsideClickHandler = handler;
@@ -4372,813 +4325,4 @@ Radzen.chatIsNearBottom = function(container, threshold) {
 Radzen.chatScrollToBottom = function(container) {
   if (!container) return;
   container.scrollTop = container.scrollHeight;
-};
-Radzen.noop = function() {};
-Radzen.getCookies = function() {
-  return document.cookie;
-};
-Radzen.setCookie = function(cookie) {
-  document.cookie = cookie;
-};
-Radzen.scrollToTop = function(elementId) {
-  try { var el = document.getElementById(elementId); if (el) el.scrollTop = 0; } catch(e) {}
-};
-Radzen.scrollIntoView = function(selector) {
-  var el = document.querySelector(selector);
-  if (el) el.scrollIntoView();
-};
-Radzen.delayedFocus = function(elementId, delay) {
-  setTimeout(function() { var el = document.getElementById(elementId); if (el) el.focus(); }, delay || 200);
-};
-Radzen.invokeRadzenCallback = function(key) {
-  var fn = Radzen[key];
-  if (typeof fn === 'function') fn();
-};
-Radzen.chatScrollAfterRender = function(selector, delay) {
-  setTimeout(function() {
-    var container = document.querySelector(selector);
-    if (container) container.scrollTop = container.scrollHeight;
-  }, delay || 100);
-};
-Radzen.createAutoComplete = function(el, popupId, openOnFocus) {
-  if (!el) return null;
-  var input = el.querySelector('input.rz-autocomplete-input, textarea.rz-autocomplete-input');
-  var list = el.querySelector('.rz-autocomplete-list');
-  if (!input) return null;
-  function onInput() { Radzen.openPopup(input.parentNode, popupId, true); }
-  function onFocus() { Radzen.openPopup(input.parentNode, popupId, true); }
-  function clearActive() { Radzen.activeElement = null; }
-  input.addEventListener('input', onInput);
-  input.addEventListener('blur', clearActive);
-  if (openOnFocus) input.addEventListener('focus', onFocus);
-  if (list) list.addEventListener('mousedown', clearActive);
-  return { dispose: function() {
-    input.removeEventListener('input', onInput);
-    input.removeEventListener('blur', clearActive);
-    if (openOnFocus) input.removeEventListener('focus', onFocus);
-    if (list) list.removeEventListener('mousedown', clearActive);
-  }};
-};
-Radzen.createDataGrid = function(el) {
-  if (!el) return null;
-  function onClick(e) {
-    var label = e.target.closest('.rz-cell-filter-label');
-    if (label) { e.preventDefault(); }
-    var btn = e.target.closest('button[aria-haspopup][aria-controls]');
-    if (btn && el.contains(btn) && label && label.contains(btn) && btn.getAttribute('aria-controls')) {
-      Radzen.togglePopup(btn.parentNode, btn.getAttribute('aria-controls'));
-    }
-  }
-  function onMousedown(e) {
-    var btn = e.target.closest('.rz-apply-filter');
-    if (btn) { Radzen.blur(btn, e); }
-  }
-  el.addEventListener('click', onClick);
-  el.addEventListener('mousedown', onMousedown);
-  return { dispose: function() {
-    el.removeEventListener('click', onClick);
-    el.removeEventListener('mousedown', onMousedown);
-  }};
-};
-Radzen.createDropDown = function(el) {
-  if (!el) return null;
-  function onMousedown() { Radzen.activeElement = null; }
-  function onFilterClick(e) {
-    var input = e.target.closest('.rz-multiselect-filter-container input');
-    if (input) { e.preventDefault(); e.stopPropagation(); }
-  }
-  el.addEventListener('mousedown', onMousedown);
-  el.addEventListener('click', onFilterClick, true);
-  return { dispose: function() {
-    el.removeEventListener('mousedown', onMousedown);
-    el.removeEventListener('click', onFilterClick, true);
-  }};
-};
-Radzen.createFileInput = function(el) {
-  if (!el) return null;
-  var choose = el.querySelector('.rz-fileupload-choose');
-  var fileInput = el.querySelector('input[type=file]');
-  function onKeydown(e) {
-    if (e.keyCode === 32 || e.keyCode === 13) {
-      e.preventDefault();
-      var child = choose.firstElementChild;
-      if (child) child.click();
-    }
-  }
-  function onStopKeydown(e) { e.stopPropagation(); }
-  function onChange(e) { Radzen.uploadInputChange(e, null, false, false, true); }
-  if (choose) choose.addEventListener('keydown', onKeydown);
-  if (fileInput) {
-    fileInput.addEventListener('keydown', onStopKeydown);
-    fileInput.addEventListener('change', onChange);
-  }
-  return { dispose: function() {
-    if (choose) choose.removeEventListener('keydown', onKeydown);
-    if (fileInput) {
-      fileInput.removeEventListener('keydown', onStopKeydown);
-      fileInput.removeEventListener('change', onChange);
-    }
-  }};
-};
-Radzen.createMask = function(el, id, mask, pattern, charPattern) {
-  if (!el) return null;
-  function onInput() { Radzen.mask(id, mask, pattern, charPattern); }
-  el.addEventListener('input', onInput);
-  return { dispose: function() { el.removeEventListener('input', onInput); }};
-};
-Radzen.createNumeric = function(el, isInteger, separator, min, max, isNullable) {
-  if (!el) return null;
-  var input = el.querySelector('.rz-numeric-input');
-  if (!input) return null;
-  function onKeypress(e) { Radzen.numericKeyPress(e, isInteger, separator); }
-  function onBlur(e) { Radzen.numericOnInput(e, min, max, isNullable); }
-  function onPaste(e) { Radzen.numericOnPaste(e, min, max); }
-  input.addEventListener('keypress', onKeypress);
-  if (min !== null || max !== null) {
-    input.addEventListener('blur', onBlur);
-    input.addEventListener('paste', onPaste);
-  }
-  return { dispose: function() {
-    input.removeEventListener('keypress', onKeypress);
-    input.removeEventListener('blur', onBlur);
-    input.removeEventListener('paste', onPaste);
-  }};
-};
-Radzen.createProfileMenu = function(el) {
-  if (!el) return null;
-  var toggle = el.querySelector('.rz-navigation-item-wrapper');
-  if (!toggle) return null;
-  function onClick() { Radzen.toggleMenuItem(toggle); }
-  toggle.addEventListener('click', onClick);
-  return { dispose: function() { toggle.removeEventListener('click', onClick); }};
-};
-Radzen.createSplitButton = function(el, popupId) {
-  if (!el) return null;
-  var btn = el.querySelector('.rz-splitbutton-menubutton');
-  if (!btn) return null;
-  function onClick() { if (popupId) Radzen.togglePopup(btn.parentNode, popupId); }
-  btn.addEventListener('click', onClick);
-  return { dispose: function() { btn.removeEventListener('click', onClick); }};
-};
-Radzen.createMenu = function(el, clickToOpen) {
-  if (!el) return null;
-  function onClick(e) {
-    var item = e.target.closest('.rz-navigation-item-wrapper');
-    if (!item || !el.contains(item)) return;
-    var navItem = item.closest('.rz-navigation-item');
-    var hasChildren = navItem && navItem.querySelector('.rz-navigation-menu');
-    if (clickToOpen || hasChildren) {
-      Radzen.toggleMenuItem(item);
-    } else {
-      Radzen.toggleMenuItem(item, e, false);
-    }
-  }
-  el.addEventListener('click', onClick);
-  var hoverItems = [];
-  if (!clickToOpen) {
-    el.querySelectorAll('.rz-navigation-item').forEach(function(navItem) {
-      if (!navItem.querySelector('.rz-navigation-menu')) return;
-      var li = navItem.closest('li') || navItem;
-      function onEnter(e) { Radzen.toggleMenuItem(li, e, true, false); }
-      function onLeave(e) { Radzen.toggleMenuItem(li, e, false, false); }
-      li.addEventListener('mouseenter', onEnter);
-      li.addEventListener('mouseleave', onLeave);
-      hoverItems.push({ el: li, onEnter: onEnter, onLeave: onLeave });
-    });
-  }
-  return { dispose: function() {
-    el.removeEventListener('click', onClick);
-    hoverItems.forEach(function(h) {
-      h.el.removeEventListener('mouseenter', h.onEnter);
-      h.el.removeEventListener('mouseleave', h.onLeave);
-    });
-  }};
-};
-Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, stream) {
-  if (!el) return null;
-  var choose = el.querySelector('.rz-fileupload-choose');
-  var fileInput = el.querySelector('input[type=file]');
-  function onKeydown(e) {
-    if (e.keyCode === 32 || e.keyCode === 13) {
-      e.preventDefault();
-      var child = choose.firstElementChild;
-      if (child) child.click();
-    }
-  }
-  function onStopKeydown(e) { e.stopPropagation(); }
-  function onChange(e) {
-    Radzen.uploadInputChange(e, url, auto, multiple, true, parameterName, method, stream);
-  }
-  function onImgError() { this.style.display = 'none'; }
-  if (choose) choose.addEventListener('keydown', onKeydown);
-  if (fileInput) {
-    fileInput.addEventListener('keydown', onStopKeydown);
-    if (url) fileInput.addEventListener('change', onChange);
-  }
-  el.querySelectorAll('.rz-fileupload-row img').forEach(function(img) {
-    img.addEventListener('error', onImgError);
-  });
-  return { dispose: function() {
-    if (choose) choose.removeEventListener('keydown', onKeydown);
-    if (fileInput) {
-      fileInput.removeEventListener('keydown', onStopKeydown);
-      if (url) fileInput.removeEventListener('change', onChange);
-    }
-    el.querySelectorAll('.rz-fileupload-row img').forEach(function(img) {
-      img.removeEventListener('error', onImgError);
-    });
-  }};
-};
-class Spreadsheet {
-  constructor(options) {
-    this.element = options.element;
-    this.dotNetRef = options.dotNetRef;
-    this.shortcuts = options.shortcuts;
-    this.element.addEventListener('keydown', this.onKeyDown);
-    this.element.addEventListener('pointerdown', this.onPointerDown);
-    this.element.addEventListener('dblclick', this.onDoubleClick);
-    this.element.addEventListener('contextmenu', this.onContextMenu);
-    addEventListener('paste', this.onPaste);
-    addEventListener('copy', this.onCopy);
-  }
-
-  onPaste = (e) => {
-    if (this.isActive(e.target)) {
-      var text = e.clipboardData.getData('text/plain');
-      this.dotNetRef.invokeMethodAsync('OnPasteAsync', text);
-    }
-  }
-
-  onCopy = async (e) => {
-    if (this.isActive(e.target)) {
-      this.dotNetRef.invokeMethodAsync('OnCopyAsync');
-    }
-  }
-
-  isActive = (target) => {
-    return target == this.element || this.element.contains(target);
-  }
-
-  copyToClipboard = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      // Clipboard API failed (e.g. user activation expired)
-    }
-  }
-
-  readClipboardText = async () => {
-    try {
-      return await navigator.clipboard.readText();
-    } catch {
-      return null;
-    }
-  }
-
-  onPointerDown = async (e) => {
-    if (e.button != 0) return;
-
-    if (e.target.matches('.rz-spreadsheet-autofill-handle')) {
-      addEventListener('pointermove', this.onAutofillPointerMove);
-      addEventListener('pointerup', this.onAutofillPointerUp);
-      this.dotNetRef.invokeMethodAsync('OnAutofillPointerDownAsync', this.toEventArgs(e));
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
-    if (e.target.matches('.rz-spreadsheet-cell')) {
-      const cell = e.target;
-      const row = +cell.dataset.row;
-      const column = +cell.dataset.column;
-      addEventListener('pointerup', this.onCellPointerUp);
-      addEventListener('pointermove', this.onCellPointerMove);
-      if (!(await this.dotNetRef.invokeMethodAsync('OnCellPointerDownAsync', { row, column, pointer: this.toEventArgs(e) }))) {
-        removeEventListener('pointermove', this.onCellPointerMove);
-      }
-    } else if (e.target.matches('.rz-spreadsheet-row-header')) {
-      const row = +e.target.dataset.row;
-      addEventListener('pointerup', this.onRowPointerUp);
-      addEventListener('pointermove', this.onRowPointerMove);
-      if (!(await this.dotNetRef.invokeMethodAsync('OnRowPointerDownAsync', { row, pointer: this.toEventArgs(e) }))) {
-        removeEventListener('pointermove', this.onRowPointerMove);
-      }
-    } else if (e.target.matches('.rz-spreadsheet-column-header')) {
-      const column = +e.target.dataset.column;
-      addEventListener('pointerup', this.onColumnPointerUp);
-      addEventListener('pointermove', this.onColumnPointerMove);
-      if (!(await this.dotNetRef.invokeMethodAsync('OnColumnPointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
-        removeEventListener('pointermove', this.onColumnPointerMove);
-      }
-    } else if (e.target.matches('.rz-spreadsheet-resize-handle')) {
-      const direction = e.target.dataset.direction;
-      addEventListener('pointermove', this.onDrawingResizeMove);
-      addEventListener('pointerup', this.onDrawingResizeUp);
-      if (!(await this.dotNetRef.invokeMethodAsync('OnDrawingResizePointerDownAsync', { direction, pointer: this.toEventArgs(e) }))) {
-        removeEventListener('pointermove', this.onDrawingResizeMove);
-        removeEventListener('pointerup', this.onDrawingResizeUp);
-      }
-      e.preventDefault();
-      e.stopPropagation();
-    } else if (e.target.closest('.rz-spreadsheet-image') || e.target.closest('.rz-spreadsheet-chart')) {
-      // Image and chart clicks are handled by Blazor event handlers directly
-      return;
-    } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
-      const column = +e.target.dataset.column;
-        addEventListener('pointermove', this.onColumnResizeMove);
-        addEventListener('pointerup', this.onColumnResizeUp);
-      if (!(await this.dotNetRef.invokeMethodAsync('OnColumnResizePointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
-        removeEventListener('pointermove', this.onColumnResizeMove);
-        removeEventListener('pointerup', this.onColumnResizeUp);
-      }
-      e.preventDefault();
-      e.stopPropagation();
-    } else if (e.target.matches('.rz-spreadsheet-row-resize-handle')) {
-      const row = +e.target.dataset.row;
-      addEventListener('pointermove', this.onRowResizeMove);
-      addEventListener('pointerup', this.onRowResizeUp);
-      if (!(await this.dotNetRef.invokeMethodAsync('OnRowResizePointerDownAsync', { row, pointer: this.toEventArgs(e) }))) {
-        removeEventListener('pointermove', this.onRowResizeMove);
-        removeEventListener('pointerup', this.onRowResizeUp);
-      }
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }
-
-  onContextMenu = (e) => {
-    if (e.target.matches('.rz-spreadsheet-cell')) {
-      e.preventDefault();
-      const row = +e.target.dataset.row;
-      const column = +e.target.dataset.column;
-      this.dotNetRef.invokeMethodAsync('OnCellContextMenuAsync', { row, column, pointer: this.toEventArgs(e) });
-    } else if (e.target.matches('.rz-spreadsheet-row-header')) {
-      e.preventDefault();
-      const row = +e.target.dataset.row;
-      this.dotNetRef.invokeMethodAsync('OnRowContextMenuAsync', { row, pointer: this.toEventArgs(e) });
-    } else if (e.target.matches('.rz-spreadsheet-column-header')) {
-      e.preventDefault();
-      const column = +e.target.dataset.column;
-      this.dotNetRef.invokeMethodAsync('OnColumnContextMenuAsync', { column, pointer: this.toEventArgs(e) });
-    }
-  }
-
-  onDoubleClick = (e) => {
-    if (e.target.matches('.rz-spreadsheet-cell')) {
-      const cell = e.target;
-      const row = +cell.dataset.row;
-      const column = +cell.dataset.column;
-      this.dotNetRef.invokeMethodAsync('OnCellDoubleClickAsync', { row, column, pointer: this.toEventArgs(e) });
-    }
-  }
-
-  onColumnPointerUp = (e) => {
-    removeEventListener('pointermove', this.onColumnPointerMove);
-    removeEventListener('pointerup', this.onColumnPointerUp);
-  }
-
-  onColumnPointerMove = (e) => {
-    this.invokeAsync('OnColumnPointerMoveAsync', e);
-  }
-
-  onRowPointerMove = (e) => {
-    this.invokeAsync('OnRowPointerMoveAsync', e);
-  }
-
-  onRowPointerUp = (e) => {
-    removeEventListener('pointermove', this.onRowPointerMove);
-    removeEventListener('pointerup', this.onRowPointerUp);
-  }
-
-  onCellPointerMove = (e) => {
-    this.invokeAsync('OnCellPointerMoveAsync', e);
-  }
-
-  onCellPointerUp = (e) => {
-    removeEventListener('pointermove', this.onCellPointerMove);
-    removeEventListener('pointerup', this.onCellPointerUp);
-  }
-
-  onKeyDown = (e) => {
-    let key = '';
-
-    if (e.ctrlKey || e.metaKey) {
-      key += 'Ctrl+';
-    }
-
-    if (e.altKey) {
-      key += 'Alt+';
-    }
-
-    if (e.shiftKey) {
-      key += 'Shift+';
-    }
-
-    key += e.code.replace('Key', '').replace('Digit', '').replace('Numpad', '');
-
-    if (this.shortcuts.includes(key)) {
-      e.preventDefault();
-    }
-
-    // Prevent default for printable characters when not already editing.
-    // Without this, the character gets inserted twice: once by StartEdit and
-    // once by the browser's default insertText when the editor receives focus.
-    if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1 && e.target === this.element) {
-      e.preventDefault();
-    }
-
-    this.invokeAsync('OnKeyDownAsync', e);
-  }
-
-  invokeAsync(name, e) {
-    this.dotNetRef.invokeMethodAsync(name, this.toEventArgs(e));
-  }
-
-  toEventArgs(e) {
-    return {
-      key: e.key,
-      code: e.code,
-      location: e.location,
-      repeat: e.repeat,
-      ctrlKey: e.ctrlKey,
-      shiftKey: e.shiftKey,
-      altKey: e.altKey,
-      metaKey: e.metaKey,
-      type: e.type,
-      button: e.button,
-      buttons: e.buttons,
-      clientX: e.clientX,
-      clientY: e.clientY,
-      offsetX: e.offsetX,
-      offsetY: e.offsetY,
-      pageX: e.pageX,
-      pageY: e.pageY,
-      screenX: e.screenX,
-      screenY: e.screenY
-    };
-  }
-
-  dispose() {
-    this.element.removeEventListener('keydown', this.onKeyDown);
-    this.element.removeEventListener('pointerdown', this.onPointerDown);
-    this.element.removeEventListener('dblclick', this.onDoubleClick);
-    this.element.removeEventListener('contextmenu', this.onContextMenu);
-    removeEventListener('paste', this.onPaste);
-    removeEventListener('copy', this.onCopy);
-  }
-
-  onColumnResizeMove = (e) => {
-    this.invokeAsync('OnColumnResizePointerMoveAsync', e);
-  }
-
-  onColumnResizeUp = (e) => {
-    this.invokeAsync('OnColumnResizePointerUpAsync', e);
-    removeEventListener('pointermove', this.onColumnResizeMove);
-    removeEventListener('pointerup', this.onColumnResizeUp);
-  }
-
-  onRowResizeMove = (e) => {
-    this.invokeAsync('OnRowResizePointerMoveAsync', e);
-  }
-
-  onRowResizeUp = (e) => {
-    this.invokeAsync('OnRowResizePointerUpAsync', e);
-    removeEventListener('pointermove', this.onRowResizeMove);
-    removeEventListener('pointerup', this.onRowResizeUp);
-  }
-
-  onDrawingResizeMove = (e) => {
-    this.invokeAsync('OnDrawingResizePointerMoveAsync', e);
-  }
-
-  onDrawingResizeUp = (e) => {
-    this.invokeAsync('OnDrawingResizePointerUpAsync', e);
-    removeEventListener('pointermove', this.onDrawingResizeMove);
-    removeEventListener('pointerup', this.onDrawingResizeUp);
-  }
-
-  onAutofillPointerMove = (e) => {
-    this.invokeAsync('OnAutofillPointerMoveAsync', e);
-  }
-
-  onAutofillPointerUp = (e) => {
-    this.dotNetRef.invokeMethodAsync('OnAutofillPointerUpAsync', this.toEventArgs(e));
-    removeEventListener('pointermove', this.onAutofillPointerMove);
-    removeEventListener('pointerup', this.onAutofillPointerUp);
-  }
-}
-
-class SheetEditor {
-  constructor(options) {
-    this.element = options.element;
-    this.element.innerText = options.value;
-    this.dotNetRef = options.dotNetRef;
-    this.element.addEventListener('input', this.onInput);
-    this.element.addEventListener('keydown', this.onKeyDown);
-    this.element.addEventListener('blur', this.onBlur);
-    this.element.addEventListener('focus', this.onFocus);
-    this.element.addEventListener('paste', this.onPaste);
-    document.addEventListener('selectionchange', this.onSelectionChange);
-    if (options.autoFocus) {
-      this.focus();
-    }
-  }
-
-  onPaste = (e) => {
-    e.preventDefault();
-    const text = e.clipboardData.getData('text/plain');
-    const selection = getSelection();
-    if (!selection.rangeCount) return;
-    selection.deleteFromDocument();
-    selection.getRangeAt(0).insertNode(document.createTextNode(text));
-    selection.collapseToEnd();
-    this.onInput();
-  };
-
-  onSelectionChange = (e) => {
-    const selection = getSelection();
-    if (!selection.focusNode) return;
-    const inside = selection.focusNode.parentElement == this.element || selection.focusNode == this.element;
-    let caretPosition = -1;
-
-    if (inside && selection.isCollapsed)
-    {
-      caretPosition = selection.focusOffset;
-    }
-
-    this.dotNetRef.invokeMethodAsync('OnSelectionChangeAsync', caretPosition);
-  };
-
-  onInput = () => {
-    this.dotNetRef.invokeMethodAsync('OnInputAsync', this.element.innerText);
-  };
-
-  setValue = (value, moveCaretTo) => {
-    this.element.innerText = value;
-    if (moveCaretTo != null) {
-      const range = document.createRange();
-      const el = this.element.childNodes[0];
-      range.selectNodeContents(el)
-      range.setStart(el, 0);
-      range.setEnd(el, moveCaretTo);
-      range.collapse(false);
-      const selection = getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  };
-
-  onKeyDown = (e) => {
-    if (e.key == 'Enter' && e.altKey) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const range = document.createRange();
-      range.selectNodeContents(this.element);
-      range.collapse(false);
-      range.deleteContents();
-
-
-      let br = document.createElement("br");
-      range.insertNode(br);
-
-      if (!br.previousSibling || br.previousSibling.nodeName != 'BR') {
-        br = br.cloneNode();
-        range.insertNode(br);
-      }
-
-      range.setStartAfter(br);
-      range.setEndAfter(br);
-
-      const selection = getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-    } else {
-       const popup = document.querySelector('.rz-spreadsheet-highlight-popup .rz-state-highlight') != null;
-       if (popup && (e.key == 'Tab' || e.key == 'ArrowUp' || e.key == 'ArrowDown')) {
-         e.stopPropagation();
-         e.preventDefault();
-         this.dotNetRef.invokeMethodAsync('OnKeyDownAsync', { key: e.key });
-       } else if (e.key != 'Enter' && e.key != 'Escape' && e.key != 'Tab') {
-         e.stopPropagation();
-       }
-    }
-  };
-
-  onBlur = (e) => {
-    if (e.relatedTarget && e.relatedTarget.matches('.rz-spreadsheet-editor-input') && e.relatedTarget.closest('.rz-spreadsheet') == this.element.closest('.rz-spreadsheet')) {
-      return;
-    }
-
-    this.dotNetRef.invokeMethodAsync('OnBlurAsync');
-  }
-
-  onFocus = () => {
-    this.dotNetRef.invokeMethodAsync('OnFocusAsync');
-  }
-
-  focus() {
-    this.element.focus();
-    const range = document.createRange();
-    range.selectNodeContents(this.element);
-    range.collapse(false);
-
-    const selection = getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-
-  dispose() {
-    this.element.removeEventListener('input', this.onInput);
-    this.element.removeEventListener('keydown', this.onKeyDown);
-    this.element.removeEventListener('blur', this.onBlur);
-    this.element.removeEventListener('focus', this.onFocus);
-    this.element.removeEventListener('paste', this.onPaste);
-    document.removeEventListener('selectionchange', this.onSelectionChange);
-  }
-}
-
-
-
-
-Radzen.createSheetEditor = (options) => new SheetEditor(options);
-Radzen.createSpreadsheet = (options) => new Spreadsheet(options);
-Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
-  var height = scrollable.clientHeight;
-  var width = scrollable.clientWidth;
-  var scrollHeight = scrollable.scrollHeight;
-  var scrollWidth = scrollable.scrollWidth;
-
-  content.addEventListener('mousewheel', function (e) {
-    scrollable.scrollBy({
-      top: e.deltaY,
-      left: e.deltaX
-    });
-    e.preventDefault();
-  });
-
-  scrollable.addEventListener('scroll', function () {
-    var scrollTop = scrollable.scrollTop;
-    var scrollLeft = scrollable.scrollLeft;
-
-    ref.invokeMethodAsync('OnScroll', scrollLeft, scrollTop);
-  });
-
-  var observer = new ResizeObserver(function () {
-    const height = scrollable.clientHeight;
-    const width = scrollable.clientWidth;
-
-    ref.invokeMethodAsync('OnResize', width, height);
-  });
-
-  observer.observe(scrollable);
-
-  return { width, height, scrollHeight, scrollWidth };
-};
-Radzen.scrollElementTo = (scrollable, left, top) => {
-  scrollable.scrollTo({ top: top, left: left });
-};
-Radzen.createFormField = function(el) {
-  if (!el) return null;
-  function onFocusIn() { el.classList.add('rz-state-focused'); }
-  function onFocusOut() { el.classList.remove('rz-state-focused'); }
-  el.addEventListener('focusin', onFocusIn);
-  el.addEventListener('focusout', onFocusOut);
-  return { dispose: function() {
-    el.removeEventListener('focusin', onFocusIn);
-    el.removeEventListener('focusout', onFocusOut);
-  }};
-};
-Radzen.createSignaturePad = function(element, ref, strokeColor, strokeWidth, disabled, initialValue) {
-  if (!element) return null;
-
-  var canvas = element.querySelector('canvas');
-  if (!canvas) return null;
-
-  var ctx = canvas.getContext('2d');
-  var drawing = false;
-  var paths = [];
-  var currentPath = [];
-
-  function syncSize() {
-    var rect = canvas.getBoundingClientRect();
-    var w = Math.round(rect.width);
-    var h = Math.round(rect.height);
-    if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
-      canvas.width = w;
-      canvas.height = h;
-      redraw();
-    }
-  }
-
-  function getPointerPos(e) {
-    var rect = canvas.getBoundingClientRect();
-    var scaleX = canvas.width / rect.width;
-    var scaleY = canvas.height / rect.height;
-    return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
-    };
-  }
-
-  function redraw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = strokeWidth;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    for (var i = 0; i < paths.length; i++) {
-      var path = paths[i];
-      if (path.length < 2) continue;
-      ctx.beginPath();
-      ctx.moveTo(path[0].x, path[0].y);
-      for (var j = 1; j < path.length; j++) {
-        ctx.lineTo(path[j].x, path[j].y);
-      }
-      ctx.stroke();
-    }
-  }
-
-  function loadImage(dataUrl) {
-    if (!dataUrl) return;
-    var img = new Image();
-    img.onload = function() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    };
-    img.src = dataUrl;
-  }
-
-  syncSize();
-
-  if (initialValue) {
-    loadImage(initialValue);
-  }
-
-  var resizeObserver = new ResizeObserver(function() { syncSize(); });
-  resizeObserver.observe(canvas);
-
-  function onPointerDown(e) {
-    if (disabled) return;
-    drawing = true;
-    currentPath = [getPointerPos(e)];
-    canvas.setPointerCapture(e.pointerId);
-    e.preventDefault();
-  }
-
-  function onPointerMove(e) {
-    if (!drawing || disabled) return;
-    var pos = getPointerPos(e);
-    currentPath.push(pos);
-
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = strokeWidth;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    if (currentPath.length >= 2) {
-      ctx.beginPath();
-      ctx.moveTo(currentPath[currentPath.length - 2].x, currentPath[currentPath.length - 2].y);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
-    }
-    e.preventDefault();
-  }
-
-  function onPointerUp(e) {
-    if (!drawing || disabled) return;
-    drawing = false;
-    if (currentPath.length > 0) {
-      paths.push(currentPath);
-      currentPath = [];
-    }
-    try { suppressDisposed(ref.invokeMethodAsync('RadzenSignaturePad.OnStrokeEnd', canvas.toDataURL('image/png'))); } catch (ex) { }
-    e.preventDefault();
-  }
-
-  canvas.addEventListener('pointerdown', onPointerDown);
-  canvas.addEventListener('pointermove', onPointerMove);
-  canvas.addEventListener('pointerup', onPointerUp);
-  canvas.addEventListener('pointercancel', onPointerUp);
-  canvas.style.touchAction = 'none';
-
-  return {
-    update: function(newStrokeColor, newStrokeWidth, newDisabled) {
-      strokeColor = newStrokeColor;
-      strokeWidth = newStrokeWidth;
-      disabled = newDisabled;
-      redraw();
-    },
-    clear: function() {
-      paths = [];
-      currentPath = [];
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    },
-    dispose: function() {
-      resizeObserver.disconnect();
-      canvas.removeEventListener('pointerdown', onPointerDown);
-      canvas.removeEventListener('pointermove', onPointerMove);
-      canvas.removeEventListener('pointerup', onPointerUp);
-      canvas.removeEventListener('pointercancel', onPointerUp);
-    }
-  };
 };
