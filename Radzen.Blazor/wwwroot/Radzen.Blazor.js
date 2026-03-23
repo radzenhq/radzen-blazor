@@ -2717,7 +2717,7 @@ window.Radzen = {
     }
 
     function readPositionFromDOM() {
-      var w = ref.querySelector('.rz-range-navigator-window');
+      var w = ref.querySelector('.rz-range-nav-window');
       if (w) {
         var wRect = w.getBoundingClientRect();
         var rRect = ref.getBoundingClientRect();
@@ -2760,13 +2760,13 @@ window.Radzen = {
 
     function updateLabels(start, end) {
       if (!ref.navLabelInputEnd) return;
-      var labels = ref.querySelectorAll('.rz-range-navigator-label');
+      var labels = ref.querySelectorAll('.rz-range-nav-label');
       if (labels.length >= 2) {
         labels[0].textContent = formatLabel(start);
         labels[1].textContent = formatLabel(end);
         // Flip label direction when near edges
-        labels[0].className = 'rz-range-navigator-label ' + (start < 0.1 ? 'rz-range-navigator-label-end' : 'rz-range-navigator-label-start');
-        labels[1].className = 'rz-range-navigator-label ' + (end > 0.9 ? 'rz-range-navigator-label-start' : 'rz-range-navigator-label-end');
+        labels[0].className = 'rz-range-nav-label ' + (start < 0.1 ? 'rz-range-nav-label-end' : 'rz-range-nav-label-start');
+        labels[1].className = 'rz-range-nav-label ' + (end > 0.9 ? 'rz-range-nav-label-start' : 'rz-range-nav-label-end');
       }
     }
 
@@ -2775,9 +2775,9 @@ window.Radzen = {
       currentEnd = snap(end);
       start = currentStart;
       end = currentEnd;
-      var win = ref.querySelector('.rz-range-navigator-window');
-      var shadeLeft = ref.querySelector('.rz-range-navigator-shade-start');
-      var shadeRight = ref.querySelector('.rz-range-navigator-shade-end');
+      var win = ref.querySelector('.rz-range-nav-window');
+      var shadeLeft = ref.querySelector('.rz-range-nav-shade-start');
+      var shadeRight = ref.querySelector('.rz-range-nav-shade-end');
       if (win) {
         if (isRTL()) {
           win.style.right = (start * 100) + '%';

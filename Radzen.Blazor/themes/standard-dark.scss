@@ -698,6 +698,15 @@ $colorpicker-input-labels-color: var(--rz-text-tertiary-color) !default;
 // ListBox
 $listbox-filter-border: var(--rz-border-base-700) !default;
 
+// Range Navigator
+$range-nav-compact-border-radius: calc(2 * var(--rz-border-radius)) !default;
+$range-nav-compact-window-background-color: var(--rz-primary-lighter) !default;
+$range-nav-handle-width: 1.25rem !default;
+$range-nav-handle-border-radius: calc(4 * var(--rz-border-radius)) !default;
+$range-nav-handle-background-color: var(--rz-base-600) !default;
+$range-nav-handle-height: 1.25rem !default;
+$range-nav-handle-hover-background-color: var(--rz-primary) !default;
+
 // Rating
 $rating-color: var(--rz-text-tertiary-color) !default;
 $rating-focus-color: var(--rz-primary-light) !default;
