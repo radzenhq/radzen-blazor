@@ -71,6 +71,50 @@ public class Workbook
     }
 
     /// <summary>
+    /// Removes a sheet from the workbook.
+    /// </summary>
+    /// <param name="sheet">The sheet to remove.</param>
+    /// <returns><c>true</c> if the sheet was removed; otherwise <c>false</c>.</returns>
+    public bool RemoveSheet(Worksheet sheet)
+    {
+        ArgumentNullException.ThrowIfNull(sheet);
+
+        return sheets.Remove(sheet);
+    }
+
+    /// <summary>
+    /// Gets the index of the specified sheet in the workbook.
+    /// </summary>
+    /// <param name="sheet">The sheet to find.</param>
+    /// <returns>The zero-based index of the sheet, or -1 if not found.</returns>
+    public int IndexOf(Worksheet sheet)
+    {
+        return sheets.IndexOf(sheet);
+    }
+
+    /// <summary>
+    /// Moves a sheet from one position to another.
+    /// </summary>
+    /// <param name="fromIndex">The current index of the sheet.</param>
+    /// <param name="toIndex">The target index for the sheet.</param>
+    public void MoveSheet(int fromIndex, int toIndex)
+    {
+        if (fromIndex < 0 || fromIndex >= sheets.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(fromIndex));
+        }
+
+        if (toIndex < 0 || toIndex >= sheets.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(toIndex));
+        }
+
+        var sheet = sheets[fromIndex];
+        sheets.RemoveAt(fromIndex);
+        sheets.Insert(toIndex, sheet);
+    }
+
+    /// <summary>
     /// Saves the workbook to the specified stream in the Open XML Spreadsheet format (XLSX).
     /// </summary>
     /// <param name="stream"></param>

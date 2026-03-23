@@ -197,6 +197,8 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var previousView = View;
+
         if (View is not null)
         {
             View.Worksheet.Rows.Changed -= OnChanged;
@@ -209,6 +211,14 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
         {
             View.Worksheet.Rows.Changed += OnChanged;
             View.Worksheet.Columns.Changed += OnChanged;
+
+            if (previousView is not null && View != previousView && region is not null)
+            {
+                previousView.ScrollLeft = ScrollLeft;
+                previousView.ScrollTop = ScrollTop;
+
+                Render(View.ScrollLeft, View.ScrollTop);
+            }
         }
     }
 
