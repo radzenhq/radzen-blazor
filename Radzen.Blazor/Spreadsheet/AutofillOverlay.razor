@@ -1,0 +1,23 @@
+@using Radzen.Documents.Spreadsheet
+@using Radzen.Blazor.Rendering
+@if (Worksheet?.Selection.Range != RangeRef.Invalid && Worksheet?.Selection.Cell != CellRef.Invalid)
+{
+    @foreach (var range in Context.GetRanges(Worksheet!.Selection.Range))
+    {
+        @if (range.Bottom && range.Right)
+        {
+            var rect = Context.GetRectangle(range.Range.Start.Row, range.Range.Start.Column, range.Range.End.Row, range.Range.End.Column);
+            <div class=@HandleClass(range.FrozenRow, range.FrozenColumn)
+                 style=@($"transform: translate({(rect.Left + rect.Width - 4).ToPx()}, {(rect.Top + rect.Height - 4).ToPx()});") ></div>
+        }
+    }
+
+    @if (AutofillRange is not null)
+    {
+        @foreach (var range in Context.GetRanges(AutofillRange.Value))
+        {
+            <AutofillItem Context=@Context Range=@range.Range Worksheet=@Worksheet FrozenRow=@range.FrozenRow
+                          FrozenColumn=@range.FrozenColumn Top=@range.Top Left=@range.Left Bottom=@range.Bottom Right=@range.Right />
+        }
+    }
+}

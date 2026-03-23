@@ -92,6 +92,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private int validationListRow = -1;
     private int validationListColumn = -1;
     private IReadOnlyList<string> validationListItems = [];
+    private RangeRef autofillSource = RangeRef.Invalid;
+    private PointerEventArgs? autofillStartPointer;
+    private RangeRef? autofillPreviewRange;
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -1077,6 +1080,108 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         return CellRef.Invalid;
     }
+
+    // ── Autofill ──────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Invoked by JS interop when the autofill handle is pressed.
+    /// </summary>
+    [JSInvokable]
+    public void OnAutofillPointerDownAsync(PointerEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        if (Worksheet is null)
+        {
+            return;
+        }
+
+        autofillSource = Worksheet.Selection.Range;
+        autofillStartPointer = args;
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the pointer moves during an autofill drag.
+    /// </summary>
+    [JSInvokable]
+    public void OnAutofillPointerMoveAsync(PointerEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        if (autofillSource == RangeRef.Invalid || autofillStartPointer is null || grid is null || Worksheet is null)
+        {
+            return;
+        }
+
+        var cell = GetAutofillTarget(args);
+
+        if (cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var fillRange = Spreadsheet.AutofillCommand.ComputeRange(autofillSource, cell);
+
+        if (fillRange != RangeRef.Invalid)
+        {
+            autofillPreviewRange = fillRange;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the pointer is released after an autofill drag.
+    /// </summary>
+    [JSInvokable]
+    public void OnAutofillPointerUpAsync(PointerEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        var fillRange = autofillPreviewRange;
+
+        autofillPreviewRange = null;
+
+        if (autofillSource != RangeRef.Invalid && Worksheet is not null && fillRange is not null && fillRange.Value != autofillSource)
+        {
+            var direction = Spreadsheet.AutofillCommand.GetDirection(autofillSource, fillRange.Value);
+            var command = new Spreadsheet.AutofillCommand(Worksheet, autofillSource, fillRange.Value, direction);
+            Execute(command);
+
+            Worksheet.Selection.Select(fillRange.Value);
+        }
+
+        autofillSource = RangeRef.Invalid;
+        autofillStartPointer = null;
+
+        StateHasChanged();
+    }
+
+    private CellRef GetAutofillTarget(PointerEventArgs args)
+    {
+        if (grid is null || autofillStartPointer is null)
+        {
+            return CellRef.Invalid;
+        }
+
+        var anchorRow = autofillSource.End.Row;
+        var anchorColumn = autofillSource.End.Column;
+
+        var deltaX = args.ClientX - autofillStartPointer.ClientX;
+        var deltaY = args.ClientY - autofillStartPointer.ClientY;
+
+        var columnPixelRange = grid.View.GetColumnPixelRange(anchorColumn, anchorColumn);
+        var rowPixelRange = grid.View.GetRowPixelRange(anchorRow, anchorRow);
+
+        var targetX = columnPixelRange.End + deltaX;
+        var targetY = rowPixelRange.End + deltaY;
+
+        var columnIndex = grid.View.GetColumnRange(targetX, targetX, true);
+        var rowIndex = grid.View.GetRowRange(targetY, targetY, true);
+
+        return new CellRef(rowIndex.Start, columnIndex.Start);
+    }
+
+    // ── Row pointer ──────────────────────────────────────────────────────
 
     /// <summary>
     /// Invoked by JS interop when a row header is clicked with the pointer.

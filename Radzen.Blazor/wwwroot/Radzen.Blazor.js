@@ -4418,6 +4418,15 @@ class Spreadsheet {
   onPointerDown = async (e) => {
     if (e.button != 0) return;
 
+    if (e.target.matches('.rz-spreadsheet-autofill-handle')) {
+      addEventListener('pointermove', this.onAutofillPointerMove);
+      addEventListener('pointerup', this.onAutofillPointerUp);
+      this.dotNetRef.invokeMethodAsync('OnAutofillPointerDownAsync', this.toEventArgs(e));
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
     if (e.target.matches('.rz-spreadsheet-cell')) {
       const cell = e.target;
       const row = +cell.dataset.row;
@@ -4626,6 +4635,16 @@ class Spreadsheet {
     this.invokeAsync('OnImageResizePointerUpAsync', e);
     removeEventListener('pointermove', this.onImageResizeMove);
     removeEventListener('pointerup', this.onImageResizeUp);
+  }
+
+  onAutofillPointerMove = (e) => {
+    this.invokeAsync('OnAutofillPointerMoveAsync', e);
+  }
+
+  onAutofillPointerUp = (e) => {
+    this.dotNetRef.invokeMethodAsync('OnAutofillPointerUpAsync', this.toEventArgs(e));
+    removeEventListener('pointermove', this.onAutofillPointerMove);
+    removeEventListener('pointerup', this.onAutofillPointerUp);
   }
 }
 
