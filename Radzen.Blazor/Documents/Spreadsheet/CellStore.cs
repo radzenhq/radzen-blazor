@@ -285,6 +285,54 @@ public class CellStore(Worksheet sheet)
         }
     }
 
+    private readonly Dictionary<RangeRef, string> customTypes = [];
+
+    /// <summary>
+    /// Sets a custom cell type for the specified cell.
+    /// </summary>
+    /// <param name="cell">The cell reference.</param>
+    /// <param name="type">The custom type name, or null to remove the custom type.</param>
+    public void SetCustomType(CellRef cell, string? type)
+    {
+        SetCustomType(cell.ToRange(), type);
+    }
+
+    /// <summary>
+    /// Sets a custom cell type for the specified range.
+    /// </summary>
+    /// <param name="range">The range of cells.</param>
+    /// <param name="type">The custom type name, or null to remove the custom type.</param>
+    public void SetCustomType(RangeRef range, string? type)
+    {
+        if (type is null)
+        {
+            customTypes.Remove(range);
+        }
+        else
+        {
+            customTypes[range] = type;
+        }
+    }
+
+    /// <summary>
+    /// Gets the custom cell type for the specified cell, or null if no custom type is set.
+    /// </summary>
+    /// <param name="row">The row index of the cell.</param>
+    /// <param name="column">The column index of the cell.</param>
+    /// <returns>The custom type name, or null if no custom type is set.</returns>
+    public string? GetCustomType(int row, int column)
+    {
+        foreach (var kvp in customTypes)
+        {
+            if (kvp.Key.Contains(row, column))
+            {
+                return kvp.Value;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// Ensures that the specified row and column indices are within the bounds of the sheet.
     /// </summary>

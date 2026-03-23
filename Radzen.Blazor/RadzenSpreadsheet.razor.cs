@@ -80,6 +80,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [Parameter]
     public EventCallback<Workbook?> WorkbookChanged { get; set; }
 
+    /// <summary>
+    /// Gets or sets the custom cell type definitions.
+    /// Maps cell type names to their renderer and editor component types.
+    /// </summary>
+    [Parameter]
+    public Dictionary<string, Spreadsheet.SpreadsheetCellType>? CellTypes { get; set; }
+
     /// <inheritdoc/>
     protected override string GetComponentCssClass() => "rz-spreadsheet";
 
