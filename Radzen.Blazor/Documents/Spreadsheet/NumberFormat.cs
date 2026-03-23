@@ -209,17 +209,34 @@ public static class NumberFormat
     private static bool TryGetNumber(object? value, CellDataType type, out double number)
     {
         number = 0;
-        if (value is double d) { number = d; return true; }
-        if (value is int i) { number = i; return true; }
-        if (value is float f) { number = f; return true; }
-        if (value is decimal dec) { number = (double)dec; return true; }
-        if (value is long l) { number = l; return true; }
-        if (value is DateTime dt) { number = dt.ToNumber(); return true; }
-        if (type == CellDataType.Number || type == CellDataType.Date)
+
+        switch (value)
         {
-            return double.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
+            case double d:
+                number = d;
+                return true;
+            case int i:
+                number = i;
+                return true;
+            case float f:
+                number = f;
+                return true;
+            case decimal dec:
+                number = (double)dec;
+                return true;
+            case long l:
+                number = l;
+                return true;
+            case DateTime dt:
+                number = dt.ToNumber();
+                return true;
+            default:
+                if (type == CellDataType.Number || type == CellDataType.Date)
+                {
+                    return double.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
+                }
+                return false;
         }
-        return false;
     }
 
     private static FormatSection SelectSection(ParsedFormat parsed, double value)
@@ -236,8 +253,15 @@ public static class NumberFormat
 
         if (parsed.Sections.Count >= 3)
         {
-            if (value > 0) return parsed.Sections[0];
-            if (value < 0) return parsed.Sections[1];
+            if (value > 0)
+            {
+                return parsed.Sections[0];
+            }
+
+            if (value < 0)
+            {
+                return parsed.Sections[1];
+            }
             return parsed.Sections[2];
         }
 
@@ -303,7 +327,10 @@ public static class NumberFormat
                     if (section.Is12Hour)
                     {
                         var h = dt.Hour % 12;
-                        if (h == 0) h = 12;
+                        if (h == 0)
+                        {
+                            h = 12;
+                        }
                         sb.Append(h.ToString(CultureInfo.InvariantCulture));
                     }
                     else
@@ -461,8 +488,14 @@ public static class NumberFormat
                 var chars = fracStr.ToCharArray();
                 for (var j = chars.Length - 1; j >= decimalZeros; j--)
                 {
-                    if (chars[j] == '0') chars[j] = ' ';
-                    else break;
+                    if (chars[j] == '0')
+                    {
+                        chars[j] = ' ';
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 fracStr = new string(chars);
             }
@@ -550,7 +583,10 @@ public static class NumberFormat
 
         if (exponent >= 0)
         {
-            if (expSign == '+') sb.Append('+');
+            if (expSign == '+')
+            {
+                sb.Append('+');
+            }
         }
         else
         {

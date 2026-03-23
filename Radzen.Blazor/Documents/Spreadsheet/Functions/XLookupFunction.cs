@@ -219,11 +219,25 @@ class XLookupFunction : FormulaFunction
 
             if (ascending)
             {
-                if (cmp < 0) lo = mid + 1; else hi = mid - 1;
+                if (cmp < 0)
+                {
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
             }
             else
             {
-                if (cmp > 0) lo = mid + 1; else hi = mid - 1;
+                if (cmp > 0)
+                {
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
             }
         }
 
