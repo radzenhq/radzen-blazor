@@ -1,0 +1,15 @@
+@using Radzen.Documents.Spreadsheet
+@using Radzen.Blazor.Rendering
+@inherits FrameItemBase
+<div class=@Class style=@Style></div>
+
+@code {
+    protected override string Class => ClassList.Create("rz-spreadsheet-autofill-range")
+                                                .Add("rz-spreadsheet-frozen-column", FrozenColumn)
+                                                .Add("rz-spreadsheet-frozen-row", FrozenRow)
+                                                .Add("rz-spreadsheet-autofill-range-top", Top)
+                                                .Add("rz-spreadsheet-autofill-range-left", Left)
+                                                .Add("rz-spreadsheet-autofill-range-bottom", Bottom)
+                                                .Add("rz-spreadsheet-autofill-range-right", Right)
+                                                .ToString();
+}
