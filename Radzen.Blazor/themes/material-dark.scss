@@ -862,6 +862,16 @@ $slider-disabled-handle-background-color: $slider-disabled-range-background-colo
   }
 }
 
+// Range Navigator
+$range-nav-compact-background-color: var(--rz-primary-lighter) !default;
+$range-nav-compact-window-background-color: var(--rz-primary) !default;
+$range-nav-handle-width: 20px !default;
+$range-nav-handle-border-radius: 50% !default;
+$range-nav-handle-background-color: var(--rz-base-300) !default;
+$range-nav-handle-height: 20px !default;
+$range-nav-handle-hover-background-color: var(--rz-primary) !default;
+$range-nav-handle-hover-shadow: 0px 0px 0px 10px var(--rz-primary-lighter) !default;
+
 // Rating
 $rating-color: var(--rz-text-secondary-color) !default;
 $rating-opacity: 1 !default;

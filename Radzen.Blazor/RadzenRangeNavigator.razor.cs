@@ -211,8 +211,8 @@ namespace Radzen.Blazor
 
             if (ticks.Count > 0)
             {
-                ticks[0].CssClass = "rz-range-navigator-tick-first";
-                ticks[ticks.Count - 1].CssClass = "rz-range-navigator-tick-last";
+                ticks[0].CssClass = "rz-range-nav-tick-first";
+                ticks[ticks.Count - 1].CssClass = "rz-range-nav-tick-last";
             }
 
             return ticks;
@@ -323,16 +323,16 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            var css = "rz-range-navigator";
+            var css = "rz-range-nav";
 
             if (IsCompact)
             {
-                css += " rz-range-navigator-compact";
+                css += " rz-range-nav-compact";
             }
 
             if (ShowAxis)
             {
-                css += " rz-range-navigator-has-axis";
+                css += " rz-range-nav-has-axis";
             }
 
             return css;

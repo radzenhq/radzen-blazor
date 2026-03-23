@@ -194,17 +194,22 @@
   --rz-chart-marker-stroke: #{$chart-marker-stroke};
 
   /* Range Navigator */
-  --rz-range-navigator-height: #{$range-navigator-height};
-  --rz-range-navigator-compact-height: #{$range-navigator-compact-height};
-  --rz-range-navigator-border-radius: #{$range-navigator-border-radius};
-  --rz-range-navigator-border: #{$range-navigator-border};
-  --rz-range-navigator-shade-background-color: #{$range-navigator-shade-background-color};
-  --rz-range-navigator-shade-opacity: #{$range-navigator-shade-opacity};
-  --rz-range-navigator-handle-width: #{$range-navigator-handle-width};
-  --rz-range-navigator-handle-border-radius: #{$range-navigator-handle-border-radius};
-  --rz-range-navigator-handle-background-color: #{$range-navigator-handle-background-color};
-  --rz-range-navigator-handle-hover-background-color: #{$range-navigator-handle-hover-background-color};
-  --rz-range-navigator-handle-height: #{$range-navigator-handle-height};
+  --rz-range-nav-height: #{$range-nav-height};
+  --rz-range-nav-compact-height: #{$range-nav-compact-height};
+  --rz-range-nav-border-radius: #{$range-nav-border-radius};
+  --rz-range-nav-border: #{$range-nav-border};
+  --rz-range-nav-shade-background-color: #{$range-nav-shade-background-color};
+  --rz-range-nav-shade-opacity: #{$range-nav-shade-opacity};
+  --rz-range-nav-compact-background-color: #{$range-nav-compact-background-color};
+  --rz-range-nav-compact-border-radius: #{$range-nav-compact-border-radius};
+  --rz-range-nav-compact-window-background-color: #{$range-nav-compact-window-background-color};
+  --rz-range-nav-handle-width: #{$range-nav-handle-width};
+  --rz-range-nav-handle-border-radius: #{$range-nav-handle-border-radius};
+  --rz-range-nav-handle-background-color: #{$range-nav-handle-background-color};
+  --rz-range-nav-handle-hover-background-color: #{$range-nav-handle-hover-background-color};
+  --rz-range-nav-handle-height: #{$range-nav-handle-height};
+  --rz-range-nav-handle-shadow: #{$range-nav-handle-shadow};
+  --rz-range-nav-handle-hover-shadow: #{$range-nav-handle-hover-shadow};
 
   /* Chat */
   --rz-chat-background-color: #{$rz-chat-background-color};

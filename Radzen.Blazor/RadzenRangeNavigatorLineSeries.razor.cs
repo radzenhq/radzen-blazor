@@ -183,7 +183,7 @@ namespace Radzen.Blazor
                 var fill = Fill ?? Stroke;
 
                 builder.OpenElement(0, "g");
-                builder.AddAttribute(1, "class", "rz-range-navigator-series");
+                builder.AddAttribute(1, "class", "rz-range-nav-series");
 
                 builder.OpenElement(2, "path");
                 builder.AddAttribute(3, "d", area);

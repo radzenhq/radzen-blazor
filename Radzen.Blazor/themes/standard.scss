@@ -510,6 +510,15 @@ $colorpicker-item-shadow: $rz-shadow-inset-level-1 !default;
 $colorpicker-handle-shadow: $rz-shadow-inset-level-1, $rz-shadow-1, 0 0 0 1px rgba(0,0,0,.08);
 $colorpicker-input-labels-color: var(--rz-text-tertiary-color) !default;
 
+// Range Navigator
+$range-nav-compact-border-radius: calc(2 * var(--rz-border-radius)) !default;
+$range-nav-compact-window-background-color: var(--rz-primary-lighter) !default;
+$range-nav-handle-width: 1.25rem !default;
+$range-nav-handle-border-radius: calc(4 * var(--rz-border-radius)) !default;
+$range-nav-handle-background-color: var(--rz-base-300) !default;
+$range-nav-handle-height: 1.25rem !default;
+$range-nav-handle-hover-background-color: var(--rz-primary) !default;
+
 // Rating
 $rating-color: var(--rz-text-tertiary-color) !default;
 $rating-disabled-opacity: 0.5 !default;
