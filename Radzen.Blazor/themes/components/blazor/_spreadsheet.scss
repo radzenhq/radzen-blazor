@@ -110,10 +110,60 @@
 
 .rz-spreadsheet-selection-range-mask {
     mask-repeat: no-repeat;
-    mask-image: linear-gradient(black, black), 
+    mask-image: linear-gradient(black, black),
                 linear-gradient(white, white);
     mask-composite: exclude;
     mask-repeat: no-repeat;
+}
+
+.rz-spreadsheet-autofill-handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #258cfb;
+    border: 1px solid #fff;
+    box-sizing: border-box;
+    cursor: crosshair;
+    z-index: 5;
+    pointer-events: auto;
+}
+
+.rz-spreadsheet-autofill-range {
+    position: absolute;
+    pointer-events: none;
+    box-sizing: border-box;
+    background: rgba(37, 140, 251, 0.08);
+    z-index: 2;
+}
+
+.rz-spreadsheet-autofill-range-top {
+    border-top: 2px dashed #258cfb;
+}
+
+.rz-spreadsheet-autofill-range-right {
+    border-right: 2px dashed #258cfb;
+}
+
+.rz-spreadsheet-autofill-range-bottom {
+    border-bottom: 2px dashed #258cfb;
+}
+
+.rz-spreadsheet-autofill-range-left {
+    border-left: 2px dashed #258cfb;
+}
+
+.rz-spreadsheet-autofill-handle.rz-spreadsheet-frozen-row,
+.rz-spreadsheet-autofill-handle.rz-spreadsheet-frozen-column {
+    z-index: 5;
+}
+
+.rz-spreadsheet-autofill-range.rz-spreadsheet-frozen-row,
+.rz-spreadsheet-autofill-range.rz-spreadsheet-frozen-column {
+    z-index: 3;
+}
+
+.rz-spreadsheet-autofill-range.rz-spreadsheet-frozen-row.rz-spreadsheet-frozen-column {
+    z-index: 4;
 }
 
 .rz-spreadsheet-column-header, .rz-spreadsheet-corner-header, .rz-spreadsheet-row-header {
