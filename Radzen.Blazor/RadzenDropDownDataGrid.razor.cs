@@ -682,7 +682,7 @@ namespace Radzen.Blazor
                 if (prevOrder != args.OrderBy && JSRuntime != null)
                 {
                     prevOrder = args.OrderBy!;
-                    await JSRuntime.InvokeVoidAsync("eval");
+                    await JSRuntime.InvokeVoidAsync("Radzen.noop");
                 }
             }
             else

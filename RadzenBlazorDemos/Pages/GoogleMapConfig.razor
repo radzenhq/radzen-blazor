@@ -50,15 +50,7 @@
     {
         var message = $"Custom information about <b>{marker.Title}</b>";
 
-        var code = $@"
-var map = Radzen['{map.UniqueID}'].instance;
-var marker = map.markers.find(m => m.title == '{marker.Title}');
-if(window.infoWindow) {{window.infoWindow.close();}}
-window.infoWindow = new google.maps.InfoWindow({{content: '{message}'}});
-setTimeout(() => window.infoWindow.open(map, marker), 200);
-";
-
-        await JSRuntime.InvokeVoidAsync("eval", code);
+        await JSRuntime.InvokeVoidAsync("showMapInfoWindow", map.UniqueID, marker.Title, message);
     }
 
     // Custom marker label

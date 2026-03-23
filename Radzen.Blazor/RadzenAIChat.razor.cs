@@ -435,11 +435,7 @@ namespace Radzen.Blazor
             if (!firstRender && messagesContainer.Context != null && JSRuntime != null)
             {
                 // Scroll to bottom when new messages are added
-                await JSRuntime.InvokeVoidAsync("eval", 
-                    "setTimeout(() => { " +
-                    "const container = document.querySelector('.rz-chat-messages'); " +
-                    "if (container) container.scrollTop = container.scrollHeight; " +
-                    "}, 100);");
+                await JSRuntime.InvokeVoidAsync("Radzen.chatScrollAfterRender", ".rz-chat-messages", 100);
             }
         }
 

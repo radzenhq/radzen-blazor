@@ -9,7 +9,7 @@
     {
         if (Attributes.TryGetValue("href", out var href))
         {
-            await JSRuntime.InvokeVoidAsync("eval", $"document.querySelector('{href}').scrollIntoView({{behavior: 'smooth'}})");
+            await JSRuntime.InvokeVoidAsync("scrollToElement", href);
         }
     }
 }

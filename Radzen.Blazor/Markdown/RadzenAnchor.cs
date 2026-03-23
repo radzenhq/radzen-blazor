@@ -47,7 +47,7 @@ internal class RadzenAnchor : ComponentBase
     {
         if (Attributes?.TryGetValue("href", out var href) == true)
         {
-            await JSRuntime.InvokeVoidAsync("eval", $"document.querySelector('{href}').scrollIntoView()");
+            await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoView", href?.ToString());
         }
     }
 }

@@ -65,7 +65,7 @@
             @if (Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Advanced || filterMode == FilterMode.CheckBoxList))
             {
                 <button type="button" tabindex="-1" @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
-                        class="@getFilterIconCss(Column)" onclick=@getFilterOpen() @onclick:preventDefault="true"
+                        class="@getFilterIconCss(Column)" @onclick:preventDefault="true"
                         aria-haspopup="dialog" aria-controls="@Column.GetColumnPopupID()" aria-expanded="false"
                         aria-label="@Grid.FilterToggleAriaLabel">
                     @Grid.FilterIcon
@@ -187,7 +187,7 @@
                     {
                         <div class="rz-grid-filter-buttons">
                             <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-clear-filter" Click="@ClearFilter" Text=@Grid.ClearFilterText title="@Grid.ClearFilterText" />
-                            <RadzenButton onmousedown="@getBlur()" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{Column.GetColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{Column.GetColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
                         </div>
                     }
                 </Popup>
@@ -383,6 +383,14 @@ else
             .Where(cell => cell != null)
             .ToList()
             .ForEach(cell => InvokeAsync(cell!.CloseFilter));
+        }
+        else if (Grid.FilterPopupRenderMode == PopupRenderMode.Initial)
+        {
+            var jsRuntime = Grid.GetJSRuntime();
+            if (jsRuntime != null)
+            {
+                await jsRuntime.InvokeVoidAsync("Radzen.togglePopup", filterButton, Column.GetColumnPopupID(), false, null, null, true, true);
+            }
         }
     }
 

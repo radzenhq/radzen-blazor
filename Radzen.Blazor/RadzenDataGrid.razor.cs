@@ -2554,6 +2554,7 @@ namespace Radzen.Blazor
 
         bool settingsChanged;
         bool visibleChanged;
+        IJSObjectReference? _jsRef;
         internal bool firstRender = true;
 
         /// <inheritdoc />
@@ -2695,6 +2696,12 @@ namespace Radzen.Blazor
             if (firstRender || visibleChanged)
             {
                 visibleChanged = false;
+
+                if (Visible && JSRuntime != null)
+                {
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createDataGrid", Element);
+                }
             }
         }
 
@@ -3437,8 +3444,8 @@ namespace Radzen.Blazor
         {
             if(indexOfColumnToReoder != null && uniqueIDOfColumnToReoder != null && AllowGrouping && JSRuntime != null)
             {
-                var functionName = $"Radzen['{getColumnUniqueId(indexOfColumnToReoder.Value)}end']";
-                await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
+                var callbackKey = $"{getColumnUniqueId(indexOfColumnToReoder.Value)}end";
+                await JSRuntime.InvokeVoidAsync("Radzen.invokeRadzenCallback", callbackKey);
 
                 var column = allColumns.Where(c => (!string.IsNullOrEmpty(c.UniqueID) ? c.UniqueID : c.Property) == uniqueIDOfColumnToReoder).FirstOrDefault();
 
@@ -3622,6 +3629,9 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
+
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
 
             if (groups != null)
             {
