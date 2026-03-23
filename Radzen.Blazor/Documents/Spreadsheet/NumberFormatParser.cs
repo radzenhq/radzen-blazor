@@ -105,7 +105,10 @@ static class NumberFormatParser
                 continue;
             }
 
-            if (token.Type == TokenType.AmPm) is12Hour = true;
+            if (token.Type == TokenType.AmPm)
+            {
+                is12Hour = true;
+            }
 
             if (token.Type is TokenType.Year or TokenType.Month or TokenType.Day
                 or TokenType.Hour or TokenType.Minute or TokenType.Second or TokenType.AmPm)
@@ -120,20 +123,40 @@ static class NumberFormatParser
                     case TokenType.Zero:
                         seenDigit = true;
                         hasDigitPlaceholders = true;
-                        if (inDecimal) { decimalPlaces += token.Text.Length; decimalZeros += token.Text.Length; }
-                        else integerZeros += token.Text.Length;
+                        if (inDecimal)
+                        {
+                            decimalPlaces += token.Text.Length;
+                            decimalZeros += token.Text.Length;
+                        }
+                        else
+                        {
+                            integerZeros += token.Text.Length;
+                        }
                         break;
                     case TokenType.Hash:
                         seenDigit = true;
                         hasDigitPlaceholders = true;
-                        if (inDecimal) decimalPlaces += token.Text.Length;
-                        else integerHashes += token.Text.Length;
+                        if (inDecimal)
+                        {
+                            decimalPlaces += token.Text.Length;
+                        }
+                        else
+                        {
+                            integerHashes += token.Text.Length;
+                        }
                         break;
                     case TokenType.QuestionMark:
                         seenDigit = true;
                         hasDigitPlaceholders = true;
-                        if (inDecimal) { decimalPlaces += token.Text.Length; decimalSpacePlaceholders += token.Text.Length; }
-                        else integerHashes += token.Text.Length;
+                        if (inDecimal)
+                        {
+                            decimalPlaces += token.Text.Length;
+                            decimalSpacePlaceholders += token.Text.Length;
+                        }
+                        else
+                        {
+                            integerHashes += token.Text.Length;
+                        }
                         break;
                     case TokenType.Decimal:
                         inDecimal = true;
@@ -152,19 +175,34 @@ static class NumberFormatParser
                         exponentFormat = token.Text;
                         break;
                     case TokenType.Underscore:
-                        if (!seenDigit) prefix.Append(' ');
-                        else suffix.Append(' ');
+                        if (!seenDigit)
+                        {
+                            prefix.Append(' ');
+                        }
+                        else
+                        {
+                            suffix.Append(' ');
+                        }
                         break;
                     case TokenType.Asterisk:
                         // Fill-repeat not applicable in HTML — skip
                         break;
                     case TokenType.Literal:
-                        if (!seenDigit) prefix.Append(token.Text);
-                        else suffix.Append(token.Text);
+                        if (!seenDigit)
+                        {
+                            prefix.Append(token.Text);
+                        }
+                        else
+                        {
+                            suffix.Append(token.Text);
+                        }
                         break;
                     case TokenType.OpenParen:
                         hasParens = true;
-                        if (!seenDigit) prefix.Append('(');
+                        if (!seenDigit)
+                        {
+                            prefix.Append('(');
+                        }
                         break;
                     case TokenType.CloseParen:
                         suffix.Append(')');
@@ -180,8 +218,14 @@ static class NumberFormatParser
             var trailingCommas = 0;
             for (var i = trimmed.Length - 1; i >= 0; i--)
             {
-                if (trimmed[i] == ',') trailingCommas++;
-                else break;
+                if (trimmed[i] == ',')
+                {
+                    trailingCommas++;
+                }
+                else
+                {
+                    break;
+                }
             }
             if (trailingCommas > 0 && !hasThousands)
             {
@@ -312,8 +356,16 @@ static class NumberFormatParser
                     for (var j = i + len; j < section.Length; j++)
                     {
                         var nc = section[j];
-                        if (nc is ':' or ' ') continue;
-                        if (nc is 's' or 'S') { isMinute = true; break; }
+                        if (nc is ':' or ' ')
+                        {
+                            continue;
+                        }
+
+                        if (nc is 's' or 'S')
+                        {
+                            isMinute = true;
+                            break;
+                        }
                         break;
                     }
                 }

@@ -29,8 +29,15 @@ class AggregateFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        if (funcArg.IsError) return funcArg;
-        if (optsArg.IsError) return optsArg;
+        if (funcArg.IsError)
+        {
+            return funcArg;
+        }
+
+        if (optsArg.IsError)
+        {
+            return optsArg;
+        }
 
         var func = funcArg.GetValueOrDefault<int?>();
         var opts = optsArg.GetValueOrDefault<int?>();
@@ -69,7 +76,10 @@ class AggregateFunction : FormulaFunction
                 continue;
             }
 
-            if (!cell.IsEmpty) nonEmptyCount++;
+            if (!cell.IsEmpty)
+            {
+                nonEmptyCount++;
+            }
 
             if (cell.Type == CellDataType.Number)
             {
