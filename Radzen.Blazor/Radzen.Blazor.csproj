@@ -58,7 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Radzen.MSBuild" Version="*" PrivateAssets="All" />
+    <PackageReference Include="Radzen.MSBuild" Version="0.0.6" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
