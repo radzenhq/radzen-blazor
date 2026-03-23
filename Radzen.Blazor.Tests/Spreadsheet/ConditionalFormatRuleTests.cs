@@ -2,6 +2,7 @@ using Xunit;
 
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet.Tests;
+#nullable enable
 
 public class ConditionalFormatRuleTests
 {
@@ -74,7 +75,7 @@ public class ConditionalFormatRuleTests
         // Verify rule was added
         var result = sheet.ConditionalFormats.Calculate(sheet.Cells[0, 0]);
         Assert.NotNull(result);
-        Assert.True(result.Bold);
+        Assert.True(result?.Bold);
 
         command.Unexecute();
 
