@@ -1,16 +1,19 @@
-<RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
-    <RadzenStack Gap="0.25rem">
-        <RadzenText TextStyle="TextStyle.Caption">Grid Shape</RadzenText>
-        <RadzenSelectBar @bind-Value="gridShape" TValue="SpiderChartGridShape" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
-            <Items>
-                <RadzenSelectBarItem Text="Polygon" Value="SpiderChartGridShape.Polygon" />
-                <RadzenSelectBarItem Text="Circle" Value="SpiderChartGridShape.Circular" />
-            </Items>
-        </RadzenSelectBar>
-    </RadzenStack>
-</RadzenCard>
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Gap="0.25rem">
+                <RadzenText TextStyle="TextStyle.Caption">Grid Shape</RadzenText>
+                <RadzenSelectBar @bind-Value="gridShape" TValue="SpiderChartGridShape" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                    <Items>
+                        <RadzenSelectBarItem Text="Polygon" Value="SpiderChartGridShape.Polygon" />
+                        <RadzenSelectBarItem Text="Circle" Value="SpiderChartGridShape.Circular" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
 
-<RadzenSpiderChart GridShape="@gridShape" Style="width: 100%; height: 500px;">
+    <RadzenSpiderChart GridShape="@gridShape" Style="width: 100%; height: 500px;">
     <RadzenSpiderSeries TItem="SkillData"
                         Data="@aliceData"
                         CategoryProperty="@nameof(SkillData.Skill)"
@@ -21,7 +24,8 @@
                         CategoryProperty="@nameof(SkillData.Skill)"
                         ValueProperty="@nameof(SkillData.Score)"
                         Title="Bob" />
-</RadzenSpiderChart>
+    </RadzenSpiderChart>
+</RadzenStack>
 
 @code {
     SpiderChartGridShape gridShape = SpiderChartGridShape.Polygon;
