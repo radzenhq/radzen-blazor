@@ -2765,8 +2765,8 @@ window.Radzen = {
         labels[0].textContent = formatLabel(start);
         labels[1].textContent = formatLabel(end);
         // Flip label direction when near edges
-        labels[0].className = 'rz-range-navigator-label ' + (start < 0.1 ? 'rz-range-navigator-label-right' : 'rz-range-navigator-label-left');
-        labels[1].className = 'rz-range-navigator-label ' + (end > 0.9 ? 'rz-range-navigator-label-left' : 'rz-range-navigator-label-right');
+        labels[0].className = 'rz-range-navigator-label ' + (start < 0.1 ? 'rz-range-navigator-label-end' : 'rz-range-navigator-label-start');
+        labels[1].className = 'rz-range-navigator-label ' + (end > 0.9 ? 'rz-range-navigator-label-start' : 'rz-range-navigator-label-end');
       }
     }
 
@@ -2776,10 +2776,16 @@ window.Radzen = {
       start = currentStart;
       end = currentEnd;
       var win = ref.querySelector('.rz-range-navigator-window');
-      var shadeLeft = ref.querySelector('.rz-range-navigator-shade-left');
-      var shadeRight = ref.querySelector('.rz-range-navigator-shade-right');
+      var shadeLeft = ref.querySelector('.rz-range-navigator-shade-start');
+      var shadeRight = ref.querySelector('.rz-range-navigator-shade-end');
       if (win) {
-        win.style.left = (start * 100) + '%';
+        if (isRTL()) {
+          win.style.right = (start * 100) + '%';
+          win.style.left = 'auto';
+        } else {
+          win.style.left = (start * 100) + '%';
+          win.style.right = 'auto';
+        }
         win.style.width = ((end - start) * 100) + '%';
       }
       if (shadeLeft) shadeLeft.style.width = (start * 100) + '%';

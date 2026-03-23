@@ -193,6 +193,19 @@
   --rz-chart-tooltip-item-hover-background-color: #{$chart-tooltip-item-hover-background-color};
   --rz-chart-marker-stroke: #{$chart-marker-stroke};
 
+  /* Range Navigator */
+  --rz-range-navigator-height: #{$range-navigator-height};
+  --rz-range-navigator-compact-height: #{$range-navigator-compact-height};
+  --rz-range-navigator-border-radius: #{$range-navigator-border-radius};
+  --rz-range-navigator-border: #{$range-navigator-border};
+  --rz-range-navigator-shade-background-color: #{$range-navigator-shade-background-color};
+  --rz-range-navigator-shade-opacity: #{$range-navigator-shade-opacity};
+  --rz-range-navigator-handle-width: #{$range-navigator-handle-width};
+  --rz-range-navigator-handle-border-radius: #{$range-navigator-handle-border-radius};
+  --rz-range-navigator-handle-background-color: #{$range-navigator-handle-background-color};
+  --rz-range-navigator-handle-hover-background-color: #{$range-navigator-handle-hover-background-color};
+  --rz-range-navigator-handle-height: #{$range-navigator-handle-height};
+
   /* Chat */
   --rz-chat-background-color: #{$rz-chat-background-color};
   --rz-chat-border: #{$rz-chat-border};
