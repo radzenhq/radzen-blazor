@@ -8,7 +8,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Represents a list of cell data originating from a rectangular range, carrying its row/column dimensions.
 /// </summary>
-public class RangeList : List<CellData>
+internal class RangeList : List<CellData>
 {
     private readonly Worksheet sheet;
     internal Worksheet Worksheet => sheet;

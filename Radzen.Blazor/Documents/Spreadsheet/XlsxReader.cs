@@ -567,7 +567,7 @@ static class XlsxReader
             if (!string.IsNullOrEmpty(refAttribute))
             {
                 var range = RangeRef.Parse(refAttribute);
-                sheet.AutoFilter = new AutoFilter(sheet, range);
+                sheet.AutoFilter.Range = range;
 
                 // Load filter columns
                 var filterColumns = autoFilterElement.Elements(sNs + "filterColumn").ToList();
