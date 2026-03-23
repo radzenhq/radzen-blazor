@@ -62,19 +62,51 @@ public partial class Worksheet
 
     private static int CompareDescending((object? key, List<Cell> cells) x, (object? key, List<Cell> cells) y)
     {
-        if (x.key is null && y.key is null) return 0;
-        if (x.key is null) return 1;
-        if (y.key is null) return -1;
+        if (x.key is null && y.key is null)
+        {
+            return 0;
+        }
+
+        if (x.key is null)
+        {
+            return 1;
+        }
+
+        if (y.key is null)
+        {
+            return -1;
+        }
+
         return Compare(y.key, x.key);
     }
 
     private static int Compare(object? x, object? y)
     {
-        if (x is null && y is null) return 0;
-        if (x is null) return 1;
-        if (y is null) return -1;
-        if (x is double dx && y is double dy) return dx.CompareTo(dy);
-        if (x is string sx && y is string sy) return string.Compare(sx, sy, StringComparison.OrdinalIgnoreCase);
+        if (x is null && y is null)
+        {
+            return 0;
+        }
+
+        if (x is null)
+        {
+            return 1;
+        }
+
+        if (y is null)
+        {
+            return -1;
+        }
+
+        if (x is double dx && y is double dy)
+        {
+            return dx.CompareTo(dy);
+        }
+
+        if (x is string sx && y is string sy)
+        {
+            return string.Compare(sx, sy, StringComparison.OrdinalIgnoreCase);
+        }
+
         return string.Compare(x.ToString(), y.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 }

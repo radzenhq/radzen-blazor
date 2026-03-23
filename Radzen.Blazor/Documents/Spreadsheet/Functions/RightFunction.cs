@@ -30,7 +30,10 @@ class RightFunction : TextExtractFunctionBase
         }
 
         var start = text.Length - count;
-        if (start < 0) start = 0;
+        if (start < 0)
+        {
+            start = 0;
+        }
 
         return Substring(text, start, count);
     }
