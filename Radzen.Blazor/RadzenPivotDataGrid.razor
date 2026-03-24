@@ -451,7 +451,7 @@
                     <form id="@($"pivot-filter-{currentFilterField.Property}-form")" @onsubmit="@(args => ApplyFilter(filterIconRefKey))" class="rz-grid-filter">
                         <span class="rz-grid-filter-label">@FilterText</span>
                         <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", FilterOperatorAriaLabel + GetFilterOperatorText(currentFilterField.GetSecondFilterOperator()) }})"
-                                        @onclick:preventDefault="true" Data="@(GetFilterOperators(currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@currentFilterField.GetFilterOperator()" Change="@(args => SetFilterOperator(currentFilterField, (FilterOperator)args))" />
+                                        @onclick:preventDefault="true" Data="@(GetFilterOperators(currentFilterField).Select(t => new DropDownItem<FilterOperator> { Text = GetFilterOperatorText(t), Value = t }))" TextProperty="Text" ValueProperty="Value" TValue="FilterOperator?" Value="@currentFilterField.GetFilterOperator()" Change="@(args => SetFilterOperator(currentFilterField, (FilterOperator)args))" />
                         @if (currentFilterField.FilterValueTemplate != null)
                         {
                             @currentFilterField.FilterValueTemplate(currentFilterField)
@@ -483,9 +483,9 @@
                         }
 
                         <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + LogicalOperatorAriaLabel + (currentFilterField.GetLogicalFilterOperator() == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText) }})"
-                                        Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator?" Value="@currentFilterField.GetLogicalFilterOperator()" Change="@(args => SetLogicalFilterOperator(currentFilterField, (LogicalFilterOperator)args))" />
+                                        Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new DropDownItem<LogicalFilterOperator> { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator?" Value="@currentFilterField.GetLogicalFilterOperator()" Change="@(args => SetLogicalFilterOperator(currentFilterField, (LogicalFilterOperator)args))" />
 
-                        <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SecondFilterOperatorAriaLabel + GetFilterOperatorText(currentFilterField.GetSecondFilterOperator()) }})" @onclick:preventDefault="true" Data="@(GetFilterOperators(currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@currentFilterField.GetSecondFilterOperator()" Change="@(args => SetSecondFilterOperator(currentFilterField, (FilterOperator)args))" />
+                        <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SecondFilterOperatorAriaLabel + GetFilterOperatorText(currentFilterField.GetSecondFilterOperator()) }})" @onclick:preventDefault="true" Data="@(GetFilterOperators(currentFilterField).Select(t => new DropDownItem<FilterOperator> { Text = GetFilterOperatorText(t), Value = t }))" TextProperty="Text" ValueProperty="Value" TValue="FilterOperator?" Value="@currentFilterField.GetSecondFilterOperator()" Change="@(args => SetSecondFilterOperator(currentFilterField, (FilterOperator)args))" />
                         @if (currentFilterField.SecondFilterValueTemplate != null)
                         {
                             @currentFilterField.SecondFilterValueTemplate(currentFilterField)

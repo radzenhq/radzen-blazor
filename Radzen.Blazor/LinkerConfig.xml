@@ -3,4 +3,14 @@
   <assembly fullname="System.Core">
     <type fullname="System.Linq.Queryable" preserve="all" />
   </assembly>
+  <assembly fullname="System.Linq.Expressions">
+    <type fullname="System.Linq.Expressions.Expression" preserve="all" />
+    <type fullname="System.Linq.Expressions.ExpressionVisitor" preserve="all" />
+  </assembly>
+  <assembly fullname="Microsoft.CSharp">
+    <type fullname="Microsoft.CSharp.RuntimeBinder.*" preserve="all" />
+  </assembly>
+  <assembly fullname="Radzen.Blazor">
+    <type fullname="Radzen.DropDownItem`1" preserve="all" />
+  </assembly>
 </linker>
