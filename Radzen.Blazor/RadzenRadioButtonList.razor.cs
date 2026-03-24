@@ -4,6 +4,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace Radzen.Blazor
     ///                         TextProperty="Name" ValueProperty="Id" DisabledProperty="IsDisabled" /&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
     {
         string ItemClass(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")

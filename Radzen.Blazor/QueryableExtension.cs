@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Radzen
@@ -17,12 +18,15 @@ namespace Radzen
     /// </summary>
     public static class QueryableExtension
     {
+        private const string ReflectionWarning = TrimMessages.DynamicLinqReflection;
+
         static Expression notNullCheck(Expression property) => Nullable.GetUnderlyingType(property.Type) != null || property.Type == typeof(string) ?
             Expression.Coalesce(property, property.Type == typeof(string) ? Expression.Constant(string.Empty) : Expression.Constant(null, property.Type)) : property;
 
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable Select(this IQueryable source, string propertyName)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -44,6 +48,7 @@ namespace Radzen
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable Select(this IQueryable source, IEnumerable<string> propertyNames)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -75,6 +80,7 @@ namespace Radzen
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable<T> Select<T>(this IQueryable<T> source, IEnumerable<string> propertyNames)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -104,6 +110,7 @@ namespace Radzen
         /// <summary>
         /// Projects each element of a sequence to an IEnumerable and flattens the resulting sequences into one sequence.
         /// </summary>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable SelectMany(this IQueryable source, string propertyName)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -132,6 +139,7 @@ namespace Radzen
         /// <summary>
         /// Projects each element of a sequence to an IEnumerable and flattens the resulting sequences into one sequence.
         /// </summary>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable<GroupResult> GroupByMany<T>(this IQueryable<T> source, string[] properties)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -145,6 +153,7 @@ namespace Radzen
             return GroupByMany(source, expressions, 0);
         }
 
+        [RequiresUnreferencedCode(ReflectionWarning)]
         private static IQueryable<GroupResult> GroupByMany<T>(IQueryable<T> source, Expression<Func<T, object>>[] expressions, int index)
         {
             if (index < expressions.Length - 1)
@@ -190,6 +199,7 @@ namespace Radzen
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
         /// <returns>A <see cref="IQueryable{T}"/> whose elements are sorted according to the specified <paramref name="selector"/>.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string? selector = null)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -230,6 +240,7 @@ namespace Radzen
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
         /// <returns>A <see cref="IQueryable"/> whose elements are sorted according to the specified <paramref name="selector"/>.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable OrderBy(this IQueryable source, string? selector = null)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -274,6 +285,7 @@ namespace Radzen
         /// </summary>
         /// <param name="source">The <see cref="IQueryable"/> to return the first element of.</param>
         /// <returns>default if source is empty; otherwise, the first element in source.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static dynamic FirstOrDefault(this IQueryable source)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -291,6 +303,7 @@ namespace Radzen
         /// </summary>
         /// <param name="source">The <see cref="IQueryable"/> to return the last element of.</param>
         /// <returns>default if source is empty; otherwise, the last element in source.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static dynamic LastOrDefault(this IQueryable source)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -309,6 +322,7 @@ namespace Radzen
         /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be converted.</param>
         /// <param name="type">The type to convert the elements of source to.</param>
         /// <returns>An <see cref="IQueryable"/> that contains each element of the source sequence converted to the specified type.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable Cast(this IQueryable source, Type type)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -329,6 +343,7 @@ namespace Radzen
         /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be summed.</param>
         /// <param name="type">The type to cast the elements of source to.</param>
         /// <returns>The result.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static dynamic Sum(this IQueryable source, Type type)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -348,6 +363,7 @@ namespace Radzen
         /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be used for average calculation.</param>
         /// <param name="type">The type to cast the elements of source to.</param>
         /// <returns>The result.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static dynamic Average(this IQueryable source, Type type)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -371,6 +387,7 @@ namespace Radzen
         /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be used to get the minimum value.</param>
         /// <param name="type">The type to cast the elements of source to.</param>
         /// <returns>The result.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static dynamic Min(this IQueryable source, Type type)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -391,6 +408,7 @@ namespace Radzen
         /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be used to get the maximum value.</param>
         /// <param name="type">The type to cast the elements of source to.</param>
         /// <returns>The result.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static dynamic Max(this IQueryable source, Type type)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -410,6 +428,7 @@ namespace Radzen
         /// </summary>
         /// <param name="source">The sequence to remove duplicate elements from.</param>
         /// <returns>An <see cref="IQueryable"/> that contains distinct elements from the source sequence.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable Distinct(this IQueryable source)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -428,6 +447,7 @@ namespace Radzen
         /// <summary>
         /// Filters using the specified filter descriptors.
         /// </summary>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable Where(
             this IQueryable source,
             IEnumerable<FilterDescriptor> filters,
@@ -455,6 +475,7 @@ namespace Radzen
         /// <summary>
         /// Filters using the specified filter descriptors.
         /// </summary>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable<T> Where<T>(this IQueryable<T> source, IEnumerable<FilterDescriptor> filters,
             LogicalFilterOperator logicalFilterOperator, FilterCaseSensitivity filterCaseSensitivity)
         {
@@ -493,6 +514,7 @@ namespace Radzen
             return source.Where(lambda);
         }
 
+        [RequiresUnreferencedCode(ReflectionWarning)]
         internal static Expression GetNestedPropertyExpression(Expression expression, string property, Type? type = null)
         {
             ArgumentNullException.ThrowIfNull(expression);
@@ -647,6 +669,7 @@ namespace Radzen
             return member;
         }
 
+        [RequiresUnreferencedCode(ReflectionWarning)]
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)
         {
             Type? valueType = filter.FilterValue != null ? filter.FilterValue.GetType() : null;
@@ -882,6 +905,7 @@ namespace Radzen
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>IList.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IList ToList(IQueryable query)
         {
             ArgumentNullException.ThrowIfNull(query);
@@ -907,6 +931,7 @@ namespace Radzen
         /// <typeparam name="T"></typeparam>
         /// <param name="columns">The columns.</param>
         /// <returns>System.String.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static string ToFilterString<T>(this IEnumerable<RadzenDataGridColumn<T>> columns) where T : notnull
         {
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
@@ -990,6 +1015,7 @@ namespace Radzen
         /// <typeparam name="T">The type that is being filtered</typeparam>
         /// <param name="dataFilter">The RadzenDataFilter component</param>
         /// <returns>A Linq-compatible filter string</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static string ToFilterString<T>(this RadzenDataFilter<T> dataFilter)
         {
             ArgumentNullException.ThrowIfNull(dataFilter);
@@ -1042,7 +1068,8 @@ namespace Radzen
         /// <param name="logicalFilterOperator">The LogicalFilterOperator</param>
         /// <param name="filterCaseSensitivity">The FilterCaseSensitivity</param>
         /// <returns>A Linq-compatible filter string</returns>
-        public static string ToFilterString<T>(this IEnumerable<CompositeFilterDescriptor> filters, 
+        [RequiresUnreferencedCode(ReflectionWarning)]
+        public static string ToFilterString<T>(this IEnumerable<CompositeFilterDescriptor> filters,
             LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And,
             FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)
         {
@@ -1096,6 +1123,7 @@ namespace Radzen
         /// <param name="filterValue">The specific value to filter by</param>
         /// <param name="columnFilterOperator">The operator used to compare to <paramref name="filterValue"/></param>
         /// <returns>System.String.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         internal static string GetColumnODataFilter<T>(RadzenDataGridColumn<T> column, object? filterValue, FilterOperator columnFilterOperator) where T : notnull
         {
         var filterProperty = column.GetFilterProperty();
@@ -1289,6 +1317,7 @@ namespace Radzen
         /// <typeparam name="T"></typeparam>
         /// <param name="columns">The columns.</param>
         /// <returns>System.String.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static string ToODataFilterString<T>(this IEnumerable<RadzenDataGridColumn<T>> columns) where T : notnull
         {
             var columnsWithFilter = GetFilterableColumns(columns);
@@ -1357,6 +1386,7 @@ namespace Radzen
         /// <param name="source">The source.</param>
         /// <param name="columns">The columns.</param>
         /// <returns>IQueryable&lt;T&gt;.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable<T> Where<T>(this IQueryable<T> source, IEnumerable<RadzenDataGridColumn<T>> columns) where T : notnull
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -1412,6 +1442,7 @@ namespace Radzen
         /// <param name="source">The source.</param>
         /// <param name="dataFilter">The DataFilter.</param>
         /// <returns>IQueryable&lt;T&gt;.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable<T> Where<T>(this IQueryable<T> source, RadzenDataFilter<T> dataFilter)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -1462,6 +1493,7 @@ namespace Radzen
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns>IQueryable&lt;T&gt;.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable<T> Where<T>(this IQueryable<T> source, IEnumerable<CompositeFilterDescriptor> filters, LogicalFilterOperator logicalFilterOperator, FilterCaseSensitivity filterCaseSensitivity)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -1508,6 +1540,7 @@ namespace Radzen
             return source;
         }
 
+        [RequiresUnreferencedCode(ReflectionWarning)]
         private static void AddWhereExpression<T>(ParameterExpression parameter, CompositeFilterDescriptor filter, ref List<Expression> filterExpressions, FilterCaseSensitivity filterCaseSensitivity)
         {
             if (filter.Filters != null)
@@ -1574,6 +1607,7 @@ namespace Radzen
         /// <param name="op">The StringFilterOperator.</param>
         /// <param name="cs">The FilterCaseSensitivity.</param>
         /// <returns>IQueryable&lt;T&gt;.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static IQueryable Where(this IQueryable source, string property, string? value, StringFilterOperator op, FilterCaseSensitivity cs)
         {
             ArgumentNullException.ThrowIfNull(source);
@@ -1651,6 +1685,7 @@ namespace Radzen
         /// </summary>
         /// <param name="dataFilter">The DataFilter.</param>
         /// <returns>System.String.</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static string ToODataFilterString<T>(this RadzenDataFilter<T> dataFilter)
         {
             ArgumentNullException.ThrowIfNull(dataFilter);
@@ -1691,6 +1726,7 @@ namespace Radzen
         /// <param name="logicalFilterOperator">The LogicalFilterOperator</param>
         /// <param name="filterCaseSensitivity">The FilterCaseSensitivity</param>
         /// <returns>A OData-compatible filter string</returns>
+        [RequiresUnreferencedCode(ReflectionWarning)]
         public static string ToODataFilterString<T>(this IEnumerable<CompositeFilterDescriptor> filters,
             LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And,
             FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)
@@ -1720,7 +1756,8 @@ namespace Radzen
             return "";
         }
 
-        private static void AddODataExpression<T>(Func<CompositeFilterDescriptor, bool> canFilter, 
+        [RequiresUnreferencedCode(ReflectionWarning)]
+        private static void AddODataExpression<T>(Func<CompositeFilterDescriptor, bool> canFilter,
             CompositeFilterDescriptor filter, ref List<string> filterExpressions, 
             LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And,
             FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)

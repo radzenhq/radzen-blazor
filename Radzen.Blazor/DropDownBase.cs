@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,6 +38,7 @@ namespace Radzen
         List<object>? virtualItems;
         int virtualStartIndex;
 
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
             var data = Data != null ? Data.Cast<object>() : Enumerable.Empty<object>();
@@ -292,6 +294,8 @@ namespace Radzen
         /// The selected item
         /// </summary>
         protected object? selectedItem;
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2055, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
         Type GetItemType(IEnumerable items)
         {
             var firstType = items.Cast<object>().FirstOrDefault()?.GetType() ?? typeof(object);
@@ -308,6 +312,11 @@ namespace Radzen
         /// <summary>
         /// Selects all.
         /// </summary>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.CollectionTypePreserved)]
         protected virtual async System.Threading.Tasks.Task SelectAll()
         {
             if (Disabled || View == null)
@@ -448,6 +457,8 @@ namespace Radzen
         }
 
         /// <inheritdoc/>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
@@ -492,6 +503,10 @@ namespace Radzen
             }
         }
 
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2060, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.DataTypePreserved)]
         Func<object, object?> GetGetter(string propertyName, Type type)
         {
             if (propertyName?.Contains('[', StringComparison.Ordinal) == true)
@@ -529,6 +544,7 @@ namespace Radzen
         /// <param name="item">The item.</param>
         /// <param name="property">The property.</param>
         /// <returns>System.Object.</returns>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         public virtual object? GetItemOrValueFromProperty(object? item, string property)
         {
             if (item != null)
@@ -693,6 +709,8 @@ namespace Radzen
         /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         /// <param name="shouldSelectOnChange">Should select item on item change with keyboard.</param>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
         protected virtual async Task HandleKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool isFilter = false, bool? shouldSelectOnChange = null)
         {
             ArgumentNullException.ThrowIfNull(args);
@@ -1252,6 +1270,7 @@ namespace Radzen
         /// Gets the view.
         /// </summary>
         /// <value>The view.</value>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         protected override IEnumerable? View
         {
             get
@@ -1310,6 +1329,10 @@ namespace Radzen
         /// </summary>
         /// <param name="item">The item.</param>
         /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.DataTypePreserved)]
         public async Task SelectItem(object? item, bool raiseChange = true)
         {
             if (disabledPropertyGetter != null && item != null && disabledPropertyGetter(item) as bool? == true)
@@ -1423,6 +1446,7 @@ namespace Radzen
             return internalValue;
         }
 
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         internal void UpdateSelectedItems(object item)
         {
             if (!string.IsNullOrEmpty(ValueProperty))
@@ -1451,6 +1475,8 @@ namespace Radzen
         /// Selects the item from value.
         /// </summary>
         /// <param name="value">The value.</param>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
         protected virtual void SelectItemFromValue(object? value)
         {
             var view = LoadData.HasDelegate ? Data : View;
@@ -1565,6 +1591,11 @@ namespace Radzen
         
         private class DefaultCollectionAssignment
         {
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2055, Justification = TrimMessages.DataTypePreserved)]
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.DataTypePreserved)]
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.CollectionTypePreserved)]
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2090, Justification = TrimMessages.DataTypePreserved)]
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.DataTypePreserved)]
             public virtual async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> valueChanged)
             {
                 if (typeof(IList).IsAssignableFrom(typeof(T)))
@@ -1633,6 +1664,11 @@ namespace Radzen
             private readonly System.Reflection.MethodInfo? addMethod;
             private readonly System.Reflection.MethodInfo? removeMethod;
 
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2055, Justification = TrimMessages.CollectionTypePreserved)]
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.CollectionTypePreserved)]
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.CollectionTypePreserved)]
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.CollectionTypePreserved)]
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2090, Justification = TrimMessages.CollectionTypePreserved)]
             public ReferenceGenericCollectionAssignment(T originalCollection)
             {
                 this.originalCollection = originalCollection;
@@ -1656,6 +1692,7 @@ namespace Radzen
                 }
             }
 
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.CollectionTypePreserved)]
             public override async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> valueChanged)
             {
                 if (!canHandle || originalCollection == null)
@@ -1681,6 +1718,7 @@ namespace Radzen
                 await valueChanged.InvokeAsync(originalCollection);
             }
 
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.CollectionTypePreserved)]
             public override T? GetCleared()
             {
                 if (canHandle && originalCollection != null)

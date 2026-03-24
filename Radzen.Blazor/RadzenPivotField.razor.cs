@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -11,6 +12,8 @@ namespace Radzen.Blazor
     /// Base component for RadzenPivotDataGrid Rows, Columns and Aggregates.
     /// </summary>
     /// <typeparam name="TItem">The type of the PivotDataGrid item.</typeparam>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenPivotField<TItem> : ComponentBase, IDisposable
     {
         /// <summary>

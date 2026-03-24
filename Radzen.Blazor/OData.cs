@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
@@ -79,6 +80,7 @@ namespace Radzen
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns><c>true</c> if the specified type is complex; otherwise, <c>false</c>.</returns>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.ODataTypePreserved)]
         static bool IsComplex(Type type)
         {
             ArgumentNullException.ThrowIfNull(type);
@@ -115,7 +117,13 @@ namespace Radzen
         /// <param name="value">The value.</param>
         /// <param name="options">The options.</param>
         /// <returns>System.String.</returns>
-        public static string Serialize<TValue>(TValue value, JsonSerializerOptions? options = null)
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.ODataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.ODataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.ODataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.ODataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.ODataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.ODataTypePreserved)]
+        public static string Serialize<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(TValue value, JsonSerializerOptions? options = null)
         {
             if (options == null)
             {
@@ -139,6 +147,9 @@ namespace Radzen
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="JsonConverter{T}" />
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.ODataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.ODataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.ODataTypePreserved)]
     public class ComplexPropertiesConverter<T> : JsonConverter<T>
     {
         /// <summary>

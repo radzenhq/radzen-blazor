@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Class EnumExtensions.
     /// </summary>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.EnumTypePreserved)]
     public static class EnumExtensions
     {
         /// <summary>
@@ -21,6 +23,7 @@ namespace Radzen.Blazor
         /// <see cref="DisplayAttribute.GetDescription"/>, then <see cref="DisplayAttribute.GetName"/>,
         /// then <see cref="System.ComponentModel.DescriptionAttribute.Description"/>, then <see cref="Enum.ToString()"/>.
         /// </summary>
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.EnumTypePreserved)]
         public static string GetDisplayDescription(this Enum enumValue, Func<string, string>? translationFunction = null)
         {
             ArgumentNullException.ThrowIfNull(enumValue);
@@ -53,7 +56,8 @@ namespace Radzen.Blazor
         /// <summary>
         /// Converts Enum to IEnumerable of Value/Text.
         /// </summary>
-        public static IEnumerable<object> EnumAsKeyValuePair(Type enumType, Func<string, string>? translationFunction = null)
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.EnumTypePreserved)]
+        public static IEnumerable<object> EnumAsKeyValuePair([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType, Func<string, string>? translationFunction = null)
         {
             ArgumentNullException.ThrowIfNull(enumType);
 
