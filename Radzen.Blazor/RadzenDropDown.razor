@@ -8,7 +8,7 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null"
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()"
          role="combobox" aria-haspopup="listbox" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@ListId" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
          aria-label="@(!Multiple && selectedItem != null ? GetItemOrValueFromProperty(selectedItem, TextProperty ?? string.Empty) : EmptyAriaLabel)"
          @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
@@ -176,7 +176,7 @@
                         <div class="rz-multiselect-filter-container">
                             <input id="@SearchID" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-inputtext" role="combobox" type="text"
                                    aria-controls="@ListId" aria-haspopup="listbox" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-autocomplete="list"
-                                   onclick="Radzen.preventDefaultAndStopPropagation(event)" aria-label="@SearchAriaLabel"
+                                   aria-label="@SearchAriaLabel"
                                    @ref="@search" @oninput="@OnFilterInput"
                                    @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" @onkeydown:preventDefault="@preventFilterKeydown" value="@(searchText ?? string.Empty)" autocomplete="@FilterAutoCompleteType" />
                             <span class="notranslate rz-multiselect-filter-icon rzi rzi-search"></span>

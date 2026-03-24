@@ -10,6 +10,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_StyleParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 
@@ -24,6 +25,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_TextParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 
@@ -38,6 +40,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_IconParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 
@@ -52,6 +55,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_IconAndTextParameters()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 
@@ -71,6 +75,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_ImageParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 
@@ -85,6 +90,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_ImageAndTextParameters()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 
@@ -105,6 +111,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_ButtonContent()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             RenderFragment buttonContent = (builder) => builder.AddMarkupContent(0, "<strong>Custom button content</strong>");
 
@@ -121,6 +128,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_DisabledParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 
@@ -133,6 +141,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenSplitButton>();
 
@@ -145,6 +154,7 @@ namespace Radzen.Blazor.Tests
         public void SplitButton_Raises_ClickEvent()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 

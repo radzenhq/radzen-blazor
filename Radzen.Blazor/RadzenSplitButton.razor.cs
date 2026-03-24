@@ -262,6 +262,20 @@ namespace Radzen.Blazor
             return Disabled ? "rz-splitbutton rz-buttonset rz-state-disabled" : "rz-splitbutton rz-buttonset";
         }
 
+        IJSObjectReference? _jsRef;
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender && Visible && JSRuntime != null)
+            {
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createSplitButton", Element, PopupID);
+            }
+        }
+
         /// <inheritdoc />
         public override void Dispose()
         {
@@ -271,6 +285,9 @@ namespace Radzen.Blazor
             {
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
             }
+
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
 
             GC.SuppressFinalize(this);
         }

@@ -340,6 +340,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass() => GetClassList("rz-autocomplete").ToString();
 
+        IJSObjectReference? _jsRef;
+        bool _jsParamsChanged;
+
         /// <inheritdoc />
         public override void Dispose()
         {
@@ -349,6 +352,9 @@ namespace Radzen.Blazor
             {
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
             }
+
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
 
             GC.SuppressFinalize(this);
         }
@@ -360,11 +366,25 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="firstRender">if set to <c>true</c> is first render.</param>
         /// <returns>Task.</returns>
-        protected override Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             this.firstRender = firstRender;
 
-            return base.OnAfterRenderAsync(firstRender);
+            await base.OnAfterRenderAsync(firstRender);
+
+            if ((firstRender || _jsParamsChanged) && Visible && JSRuntime != null)
+            {
+                _jsParamsChanged = false;
+
+                if (_jsRef != null)
+                {
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                }
+
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createAutoComplete", Element, PopupID, OpenOnFocus);
+            }
         }
 
         /// <inheritdoc />
@@ -376,6 +396,11 @@ namespace Radzen.Blazor
             {
                 var visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
                 shouldClose = !visible;
+            }
+
+            if (parameters.DidParameterChange(nameof(OpenOnFocus), OpenOnFocus))
+            {
+                _jsParamsChanged = true;
             }
 
             if (parameters.DidParameterChange(nameof(SelectedItem), SelectedItem))

@@ -7,17 +7,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy"
-          content="base-uri 'self';
-        default-src 'self' unsafe-inline http://localhost:* ws://localhost:*;
-        connect-src 'self' https: wss: http://localhost:* ws://localhost:*;
-        img-src data: https:;
-        object-src 'none';
-        script-src 'self' 'unsafe-eval' 'unsafe-inline' http://localhost:* cdnjs.cloudflare.com cdn.syndication.twimg.com platform.linkedin.com www.linkedin.com analytics.radzen.com maps.googleapis.com unpkg.com;
-        style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com maps.googleapis.com fonts.googleapis.com fonts.gstatic.com;
-        font-src 'self' data: cdnjs.cloudflare.com maps.googleapis.com fonts.googleapis.com fonts.gstatic.com;
-        frame-src www.youtube.com platform.twitter.com platform.linkedin.com www.linkedin.com;
-        upgrade-insecure-requests;">
     <base href="/" />
     <link href="css/site.css" rel="stylesheet" />
     <HeadOutlet @rendermode="InteractiveServer" />
@@ -47,31 +36,9 @@
     <script async src="js/highlight.pack.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.min.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
     <script defer data-domain="blazor.radzen.com" src="https://analytics.radzen.com/js/plausible.js"></script>
-    <script>var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' } }</script>
+    <script src="js/demos.js"></script>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.nls.js"></script>
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.js"></script>
-    <script>
-        var instances = {};
-        function createEditor(element, id, ref, options) {
-            var instance = monaco.editor.create(element, options);
-            var subscription = instance.onDidChangeModelContent(function () {
-                ref.invokeMethodAsync('OnChangeAsync', instance.getValue()).catch(function () {});
-            });
-            var originalDispose = instance.dispose.bind(instance);
-            instance.dispose = function () {
-                if (subscription) { subscription.dispose(); subscription = null; }
-                delete instances[id];
-                originalDispose();
-            };
-            instances[id] = instance;
-            return instance;
-        }
-
-        function copy(id) {
-            var text = instances[id].getValue();
-            navigator.clipboard.writeText(text);
-        }
-    </script>
 </body>
 </html>

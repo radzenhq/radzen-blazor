@@ -4344,3 +4344,220 @@ Radzen.chatScrollToBottom = function(container) {
   if (!container) return;
   container.scrollTop = container.scrollHeight;
 };
+
+Radzen.noop = function() {};
+Radzen.getCookies = function() {
+  return document.cookie;
+};
+Radzen.setCookie = function(cookie) {
+  document.cookie = cookie;
+};
+Radzen.scrollToTop = function(elementId) {
+  try { var el = document.getElementById(elementId); if (el) el.scrollTop = 0; } catch(e) {}
+};
+Radzen.scrollIntoView = function(selector) {
+  var el = document.querySelector(selector);
+  if (el) el.scrollIntoView();
+};
+Radzen.delayedFocus = function(elementId, delay) {
+  setTimeout(function() { var el = document.getElementById(elementId); if (el) el.focus(); }, delay || 200);
+};
+Radzen.invokeRadzenCallback = function(key) {
+  var fn = Radzen[key];
+  if (typeof fn === 'function') fn();
+};
+Radzen.chatScrollAfterRender = function(selector, delay) {
+  setTimeout(function() {
+    var container = document.querySelector(selector);
+    if (container) container.scrollTop = container.scrollHeight;
+  }, delay || 100);
+};
+Radzen.createAutoComplete = function(el, popupId, openOnFocus) {
+  if (!el) return null;
+  var input = el.querySelector('input.rz-autocomplete-input, textarea.rz-autocomplete-input');
+  var list = el.querySelector('.rz-autocomplete-list');
+  if (!input) return null;
+  function onInput() { Radzen.openPopup(input.parentNode, popupId, true); }
+  function onFocus() { Radzen.openPopup(input.parentNode, popupId, true); }
+  function clearActive() { Radzen.activeElement = null; }
+  input.addEventListener('input', onInput);
+  input.addEventListener('blur', clearActive);
+  if (openOnFocus) input.addEventListener('focus', onFocus);
+  if (list) list.addEventListener('mousedown', clearActive);
+  return { dispose: function() {
+    input.removeEventListener('input', onInput);
+    input.removeEventListener('blur', clearActive);
+    if (openOnFocus) input.removeEventListener('focus', onFocus);
+    if (list) list.removeEventListener('mousedown', clearActive);
+  }};
+};
+Radzen.createDataGrid = function(el) {
+  if (!el) return null;
+  function onClick(e) {
+    var label = e.target.closest('.rz-cell-filter-label');
+    if (label) { e.preventDefault(); }
+    var btn = e.target.closest('button[aria-haspopup][aria-controls]');
+    if (btn && el.contains(btn) && label && label.contains(btn) && btn.getAttribute('aria-controls')) {
+      Radzen.togglePopup(btn.parentNode, btn.getAttribute('aria-controls'));
+    }
+  }
+  function onMousedown(e) {
+    var btn = e.target.closest('.rz-apply-filter');
+    if (btn) { Radzen.blur(btn, e); }
+  }
+  el.addEventListener('click', onClick);
+  el.addEventListener('mousedown', onMousedown);
+  return { dispose: function() {
+    el.removeEventListener('click', onClick);
+    el.removeEventListener('mousedown', onMousedown);
+  }};
+};
+Radzen.createDropDown = function(el) {
+  if (!el) return null;
+  function onMousedown() { Radzen.activeElement = null; }
+  function onFilterClick(e) {
+    var input = e.target.closest('.rz-multiselect-filter-container input');
+    if (input) { e.preventDefault(); e.stopPropagation(); }
+  }
+  el.addEventListener('mousedown', onMousedown);
+  el.addEventListener('click', onFilterClick, true);
+  return { dispose: function() {
+    el.removeEventListener('mousedown', onMousedown);
+    el.removeEventListener('click', onFilterClick, true);
+  }};
+};
+Radzen.createFileInput = function(el) {
+  if (!el) return null;
+  var choose = el.querySelector('.rz-fileupload-choose');
+  var fileInput = el.querySelector('input[type=file]');
+  function onKeydown(e) {
+    if (e.keyCode === 32 || e.keyCode === 13) {
+      e.preventDefault();
+      var child = choose.firstElementChild;
+      if (child) child.click();
+    }
+  }
+  function onStopKeydown(e) { e.stopPropagation(); }
+  function onChange(e) { Radzen.uploadInputChange(e, null, false, false, true); }
+  if (choose) choose.addEventListener('keydown', onKeydown);
+  if (fileInput) {
+    fileInput.addEventListener('keydown', onStopKeydown);
+    fileInput.addEventListener('change', onChange);
+  }
+  return { dispose: function() {
+    if (choose) choose.removeEventListener('keydown', onKeydown);
+    if (fileInput) {
+      fileInput.removeEventListener('keydown', onStopKeydown);
+      fileInput.removeEventListener('change', onChange);
+    }
+  }};
+};
+Radzen.createMask = function(el, id, mask, pattern, charPattern) {
+  if (!el) return null;
+  function onInput() { Radzen.mask(id, mask, pattern, charPattern); }
+  el.addEventListener('input', onInput);
+  return { dispose: function() { el.removeEventListener('input', onInput); }};
+};
+Radzen.createNumeric = function(el, isInteger, separator, min, max, isNullable) {
+  if (!el) return null;
+  var input = el.querySelector('.rz-numeric-input');
+  if (!input) return null;
+  function onKeypress(e) { Radzen.numericKeyPress(e, isInteger, separator); }
+  function onBlur(e) { Radzen.numericOnInput(e, min, max, isNullable); }
+  function onPaste(e) { Radzen.numericOnPaste(e, min, max); }
+  input.addEventListener('keypress', onKeypress);
+  if (min !== null || max !== null) {
+    input.addEventListener('blur', onBlur);
+    input.addEventListener('paste', onPaste);
+  }
+  return { dispose: function() {
+    input.removeEventListener('keypress', onKeypress);
+    input.removeEventListener('blur', onBlur);
+    input.removeEventListener('paste', onPaste);
+  }};
+};
+Radzen.createProfileMenu = function(el) {
+  if (!el) return null;
+  var toggle = el.querySelector('.rz-navigation-item-wrapper');
+  if (!toggle) return null;
+  function onClick() { Radzen.toggleMenuItem(toggle); }
+  toggle.addEventListener('click', onClick);
+  return { dispose: function() { toggle.removeEventListener('click', onClick); }};
+};
+Radzen.createSplitButton = function(el, popupId) {
+  if (!el) return null;
+  var btn = el.querySelector('.rz-splitbutton-menubutton');
+  if (!btn) return null;
+  function onClick() { if (popupId) Radzen.togglePopup(btn.parentNode, popupId); }
+  btn.addEventListener('click', onClick);
+  return { dispose: function() { btn.removeEventListener('click', onClick); }};
+};
+Radzen.createMenu = function(el, clickToOpen) {
+  if (!el) return null;
+  function onClick(e) {
+    var item = e.target.closest('.rz-navigation-item-wrapper');
+    if (!item || !el.contains(item)) return;
+    var navItem = item.closest('.rz-navigation-item');
+    var hasChildren = navItem && navItem.querySelector('.rz-navigation-menu');
+    if (clickToOpen || hasChildren) {
+      Radzen.toggleMenuItem(item);
+    } else {
+      Radzen.toggleMenuItem(item, e, false);
+    }
+  }
+  el.addEventListener('click', onClick);
+  var hoverItems = [];
+  if (!clickToOpen) {
+    el.querySelectorAll('.rz-navigation-item').forEach(function(navItem) {
+      if (!navItem.querySelector('.rz-navigation-menu')) return;
+      var li = navItem.closest('li') || navItem;
+      function onEnter(e) { Radzen.toggleMenuItem(li, e, true, false); }
+      function onLeave(e) { Radzen.toggleMenuItem(li, e, false, false); }
+      li.addEventListener('mouseenter', onEnter);
+      li.addEventListener('mouseleave', onLeave);
+      hoverItems.push({ el: li, onEnter: onEnter, onLeave: onLeave });
+    });
+  }
+  return { dispose: function() {
+    el.removeEventListener('click', onClick);
+    hoverItems.forEach(function(h) {
+      h.el.removeEventListener('mouseenter', h.onEnter);
+      h.el.removeEventListener('mouseleave', h.onLeave);
+    });
+  }};
+};
+Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, stream) {
+  if (!el) return null;
+  var choose = el.querySelector('.rz-fileupload-choose');
+  var fileInput = el.querySelector('input[type=file]');
+  function onKeydown(e) {
+    if (e.keyCode === 32 || e.keyCode === 13) {
+      e.preventDefault();
+      var child = choose.firstElementChild;
+      if (child) child.click();
+    }
+  }
+  function onStopKeydown(e) { e.stopPropagation(); }
+  function onChange(e) {
+    Radzen.uploadInputChange(e, url, auto, multiple, true, parameterName, method, stream);
+  }
+  function onImgError() { this.style.display = 'none'; }
+  if (choose) choose.addEventListener('keydown', onKeydown);
+  if (fileInput) {
+    fileInput.addEventListener('keydown', onStopKeydown);
+    if (url) fileInput.addEventListener('change', onChange);
+  }
+  el.querySelectorAll('.rz-fileupload-row img').forEach(function(img) {
+    img.addEventListener('error', onImgError);
+  });
+  return { dispose: function() {
+    if (choose) choose.removeEventListener('keydown', onKeydown);
+    if (fileInput) {
+      fileInput.removeEventListener('keydown', onStopKeydown);
+      if (url) fileInput.removeEventListener('change', onChange);
+    }
+    el.querySelectorAll('.rz-fileupload-row img').forEach(function(img) {
+      img.removeEventListener('error', onImgError);
+    });
+  }};
+};
