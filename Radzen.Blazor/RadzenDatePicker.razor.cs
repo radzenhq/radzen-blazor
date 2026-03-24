@@ -1620,6 +1620,7 @@ namespace Radzen.Blazor
         }
 
         bool firstRender;
+        IJSObjectReference? _jsRef;
 
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -1630,7 +1631,7 @@ namespace Radzen.Blazor
 
             if (Visible && !Disabled && !ReadOnly && !Inline && PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createDatePicker", Element, PopupID, Reference, nameof(OnPopupClose));
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createDatePicker", Element, PopupID, Reference, nameof(OnPopupClose));
             }
         }
 
@@ -1654,9 +1655,11 @@ namespace Radzen.Blazor
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
-                if (UniqueID != null)
+                if (_jsRef != null)
                 {
-                    JSRuntime.InvokeVoid("Radzen.destroyDatePicker", UniqueID, Element);
+                    _jsRef.InvokeVoidAsync("dispose");
+                    _jsRef.DisposeAsync();
+                    _jsRef = null;
                 }
             }
 

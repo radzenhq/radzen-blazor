@@ -374,7 +374,13 @@ namespace Radzen.Blazor
             {
                 if (Visible && JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference, shortcuts.Keys);
+                    if (_jsRef != null)
+                    {
+                        await _jsRef.InvokeVoidAsync("dispose");
+                        await _jsRef.DisposeAsync();
+                    }
+
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference, shortcuts.Keys);
                 }
             }
 
@@ -482,9 +488,11 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (visibleChanged && !firstRender && !Visible && JSRuntime != null)
+            if (visibleChanged && !firstRender && !Visible && _jsRef != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.destroyEditor", ContentEditable);
+                await _jsRef.InvokeVoidAsync("dispose");
+                await _jsRef.DisposeAsync();
+                _jsRef = null;
             }
         }
 
@@ -494,15 +502,15 @@ namespace Radzen.Blazor
             return GetClassList("rz-html-editor").ToString();
         }
 
+        IJSObjectReference? _jsRef;
+
         /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
 
-            if (Visible && IsJSRuntimeAvailable && JSRuntime != null)
-            {
-                JSRuntime.InvokeVoid("Radzen.destroyEditor", ContentEditable);
-            }
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
 
             GC.SuppressFinalize(this);
         }

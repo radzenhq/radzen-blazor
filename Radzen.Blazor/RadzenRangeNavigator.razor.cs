@@ -367,11 +367,11 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (JSRuntime != null && !firstRender)
+            if (IsJSRuntimeAvailable)
             {
                 try
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.destroyRangeNavigator", Element);
+                    JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
                 }
                 catch
                 {
