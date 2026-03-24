@@ -29,6 +29,29 @@ namespace Radzen.Blazor
             return "rz-menu rz-profile-menu";
         }
 
+        IJSObjectReference? _jsRef;
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender && Visible && JSRuntime != null)
+            {
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createProfileMenu", Element);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
+
         /// <summary>
         /// Gets or sets the template.
         /// </summary>

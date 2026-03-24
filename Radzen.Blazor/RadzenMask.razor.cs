@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -129,21 +130,53 @@ namespace Radzen.Blazor
             return GetClassList("rz-textbox").ToString();
         }
 
+        IJSObjectReference? _jsRef;
+        bool _jsParamsChanged;
+
         /// <inheritdoc />
-        protected override string? GetId()
+        public override async Task SetParametersAsync(ParameterView parameters)
         {
-            return Name ?? base.GetId();
+            if (parameters.DidParameterChange(nameof(Mask), Mask) ||
+                parameters.DidParameterChange(nameof(Pattern), Pattern) ||
+                parameters.DidParameterChange(nameof(CharacterPattern), CharacterPattern))
+            {
+                _jsParamsChanged = true;
+            }
+
+            await base.SetParametersAsync(parameters);
         }
 
         /// <inheritdoc />
-        protected override void OnAfterRender(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            base.OnAfterRender(firstRender);
+            await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender && JSRuntime != null)
+            if ((firstRender || _jsParamsChanged) && JSRuntime != null)
             {
-                JSRuntime.InvokeVoidAsync("eval", $"Radzen.mask('{GetId()}', '{Mask}', '{Pattern}', '{CharacterPattern}')");
+                _jsParamsChanged = false;
+
+                await JSRuntime.InvokeVoidAsync("Radzen.mask", GetId(), Mask, Pattern, CharacterPattern);
+                if (!Immediate)
+                {
+                    if (_jsRef != null)
+                    {
+                        await _jsRef.InvokeVoidAsync("dispose");
+                        await _jsRef.DisposeAsync();
+                    }
+
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createMask", Element, GetId(), Mask, Pattern, CharacterPattern);
+                }
             }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
+            GC.SuppressFinalize(this);
         }
     }
 }
