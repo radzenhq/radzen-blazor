@@ -29,7 +29,7 @@
         var target = Target;
         var max = Max;
 
-        var fill = Fill ?? "var(--rz-text-color)";
+        var fill = Fill ?? $"var(--rz-series-{chart.Series.IndexOf(this) + 1})";
         var stroke = Stroke;
         var targetStroke = TargetStroke ?? "var(--rz-text-title-color)";
 
