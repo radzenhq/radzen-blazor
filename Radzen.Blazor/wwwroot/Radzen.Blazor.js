@@ -767,6 +767,14 @@ window.Radzen = {
 
       Radzen.updateMap(id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language);
     });
+
+    return {
+      dispose: function () {
+        if (Radzen[id] && Radzen[id].instance) {
+          delete Radzen[id].instance;
+        }
+      }
+    };
   },
   updateMap: function (id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language) {
     var api = function () {
@@ -841,11 +849,6 @@ window.Radzen = {
         }
     });
   },
-  destroyMap: function (id) {
-    if (Radzen[id].instance) {
-      delete Radzen[id].instance;
-    }
-  },
  focusSecurityCode: function (el) {
     if (!el) return;
     var firstInput = el.querySelector('.rz-security-code-input');
@@ -853,25 +856,6 @@ window.Radzen = {
         setTimeout(function () { firstInput.focus() }, 500);
     }
  },
-  destroySecurityCode: function (id, el) {
-    if (!Radzen[id]) return;
-
-    var inputs = el.getElementsByTagName('input');
-
-    if (Radzen[id].keyPress && Radzen[id].keyDown && Radzen[id].paste) {
-        var isAndroid = navigator.userAgent.match(/Android/i);
-        for (var i = 0; i < inputs.length; i++) {
-            inputs[i].removeEventListener(isAndroid ? 'textInput' : 'keypress', Radzen[id].keyPress);
-            inputs[i].removeEventListener('keydown', Radzen[id].keyDown);
-            inputs[i].removeEventListener('paste', Radzen[id].paste);
-        }
-        delete Radzen[id].keyPress;
-        delete Radzen[id].keyDown;
-        delete Radzen[id].paste;
-    }
-
-    Radzen[id] = null;
-  },
   createSecurityCode: function (id, ref, el, isNumber) {
       if (!el || !ref) return;
 
@@ -968,6 +952,27 @@ window.Radzen = {
           Radzen[id].inputs[i].addEventListener('keydown', Radzen[id].keyDown);
           Radzen[id].inputs[i].addEventListener('paste', Radzen[id].paste);
       }
+
+      return {
+          dispose: function () {
+              if (!Radzen[id]) return;
+
+              var inputs = el.getElementsByTagName('input');
+
+              if (Radzen[id].keyPress && Radzen[id].keyDown && Radzen[id].paste) {
+                  for (var i = 0; i < inputs.length; i++) {
+                      inputs[i].removeEventListener(isAndroid ? 'textInput' : 'keypress', Radzen[id].keyPress);
+                      inputs[i].removeEventListener('keydown', Radzen[id].keyDown);
+                      inputs[i].removeEventListener('paste', Radzen[id].paste);
+                  }
+                  delete Radzen[id].keyPress;
+                  delete Radzen[id].keyDown;
+                  delete Radzen[id].paste;
+              }
+
+              Radzen[id] = null;
+          }
+      };
   },
   createSlider: function (
     id,
@@ -1077,27 +1082,28 @@ window.Radzen = {
     parent.addEventListener('touchstart', Radzen[id].mouseDownHandler, {
       passive: true
     });
-  },
-  destroySlider: function (id, parent) {
-    if (!Radzen[id]) return;
 
-    if (Radzen[id].mouseMoveHandler) {
-      document.removeEventListener('mousemove', Radzen[id].mouseMoveHandler);
-      document.removeEventListener('touchmove', Radzen[id].mouseMoveHandler);
-      delete Radzen[id].mouseMoveHandler;
-    }
-    if (Radzen[id].mouseUpHandler) {
-      document.removeEventListener('mouseup', Radzen[id].mouseUpHandler);
-      document.removeEventListener('touchend', Radzen[id].mouseUpHandler);
-      delete Radzen[id].mouseUpHandler;
-    }
-    if (Radzen[id].mouseDownHandler) {
-      parent.removeEventListener('mousedown', Radzen[id].mouseDownHandler);
-      parent.removeEventListener('touchstart', Radzen[id].mouseDownHandler);
-      delete Radzen[id].mouseDownHandler;
-    }
+    return { dispose: function() {
+      if (!Radzen[id]) return;
 
-    Radzen[id] = null;
+      if (Radzen[id].mouseMoveHandler) {
+        document.removeEventListener('mousemove', Radzen[id].mouseMoveHandler);
+        document.removeEventListener('touchmove', Radzen[id].mouseMoveHandler);
+        delete Radzen[id].mouseMoveHandler;
+      }
+      if (Radzen[id].mouseUpHandler) {
+        document.removeEventListener('mouseup', Radzen[id].mouseUpHandler);
+        document.removeEventListener('touchend', Radzen[id].mouseUpHandler);
+        delete Radzen[id].mouseUpHandler;
+      }
+      if (Radzen[id].mouseDownHandler) {
+        parent.removeEventListener('mousedown', Radzen[id].mouseDownHandler);
+        parent.removeEventListener('touchstart', Radzen[id].mouseDownHandler);
+        delete Radzen[id].mouseDownHandler;
+      }
+
+      Radzen[id] = null;
+    }};
   },
   prepareDrag: function (el) {
     if (el) {
@@ -1840,19 +1846,6 @@ window.Radzen = {
         clearTimeout(Radzen[id + 'duration']);
     }
   },
-  destroyDatePicker(id) {
-      var el = document.getElementById(id);
-      if (!el) return;
-
-      var button = el.querySelector('.rz-datepicker-trigger');
-      if (button) {
-          button.onclick = null;
-      }
-      var input = el.querySelector('.rz-inputtext');
-      if (input) {
-          input.onclick = null;
-      }
-  },
   createDatePicker(el, popupId, instance, callback) {
       if(!el) return;
       var handler = function (e, condition) {
@@ -1874,6 +1867,17 @@ window.Radzen = {
               handler(e, e.currentTarget.classList.contains('rz-input-trigger') && !e.currentTarget.classList.contains('rz-readonly'));
           };
       }
+
+      return {
+          dispose: function () {
+              if (button) {
+                  button.onclick = null;
+              }
+              if (input) {
+                  input.onclick = null;
+              }
+          }
+      };
   },
   findPopup: function (id) {
     var popups = [];
@@ -3064,30 +3068,28 @@ window.Radzen = {
     });
     ref.navResizeObserver.observe(ref);
 
+    ref._radzenDispose = function () {
+      if (ref.navMouseDown) {
+        ref.removeEventListener('mousedown', ref.navMouseDown);
+        ref.removeEventListener('touchstart', ref.navMouseDown);
+        delete ref.navMouseDown;
+      }
+      if (ref.navMouseMove) {
+        document.removeEventListener('mousemove', ref.navMouseMove);
+        document.removeEventListener('touchmove', ref.navMouseMove);
+        delete ref.navMouseMove;
+      }
+      if (ref.navMouseUp) {
+        document.removeEventListener('mouseup', ref.navMouseUp);
+        document.removeEventListener('touchend', ref.navMouseUp);
+        delete ref.navMouseUp;
+      }
+      if (ref.navResizeObserver) {
+        ref.navResizeObserver.disconnect();
+        delete ref.navResizeObserver;
+      }
+    };
     return [width, height];
-  },
-
-  destroyRangeNavigator: function (ref) {
-    if (!ref) return;
-    if (ref.navMouseDown) {
-      ref.removeEventListener('mousedown', ref.navMouseDown);
-      ref.removeEventListener('touchstart', ref.navMouseDown);
-      delete ref.navMouseDown;
-    }
-    if (ref.navMouseMove) {
-      document.removeEventListener('mousemove', ref.navMouseMove);
-      document.removeEventListener('touchmove', ref.navMouseMove);
-      delete ref.navMouseMove;
-    }
-    if (ref.navMouseUp) {
-      document.removeEventListener('mouseup', ref.navMouseUp);
-      document.removeEventListener('touchend', ref.navMouseUp);
-      delete ref.navMouseUp;
-    }
-    if (ref.navResizeObserver) {
-      ref.navResizeObserver.disconnect();
-      delete ref.navResizeObserver;
-    }
   },
 
   updateRangeNavigatorLabels: function (ref, isDate, inputStart, inputEnd) {
@@ -3103,6 +3105,12 @@ window.Radzen = {
       delete ref._gaugeRTLObserver;
     }
     this.destroyResizable(ref);
+  },
+  disposeElement: function (ref) {
+    if (ref && ref._radzenDispose) {
+      ref._radzenDispose();
+      delete ref._radzenDispose;
+    }
   },
   destroyResizable: function (ref) {
     if (ref.resizeObserver) {
@@ -3128,9 +3136,10 @@ window.Radzen = {
       window.addEventListener('resize', ref.resizeHandler);
     }
 
+    var self = this;
+    ref._radzenDispose = function () { self.destroyResizable(ref); };
     var rect = ref.getBoundingClientRect();
-
-    return {width: rect.width, height: rect.height};
+    return { width: rect.width, height: rect.height };
   },
   createChart: function (ref, instance) {
     var inside = false;
@@ -3381,16 +3390,21 @@ window.Radzen = {
     ref._chartRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
     try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
 
-    return this.createResizable(ref, instance);
+    this.createResizable(ref, instance);
+    var self = this;
+    ref._radzenDispose = function () { self.destroyChart(ref); };
+    var rect = ref.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
   },
   createGauge: function (ref, instance) {
-    var result = this.createResizable(ref, instance);
+    this.createResizable(ref, instance);
     ref._gaugeRTLObserver = new MutationObserver(function () {
       try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
     });
     ref._gaugeRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
     try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
-    return result;
+    var rect = ref.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
   },
   innerHTML: function (ref, value) {
     if (value != undefined) {
@@ -3598,6 +3612,18 @@ window.Radzen = {
     ref.addEventListener('click', ref.clickListener);
     document.addEventListener('selectionchange', ref.selectionChangeListener);
     document.execCommand('styleWithCSS', false, true);
+    return {
+      dispose: function () {
+        if (ref) {
+          ref.removeEventListener('input', ref.inputListener);
+          ref.removeEventListener('paste', ref.pasteListener);
+          ref.removeEventListener('drop', ref.dropListener);
+          ref.removeEventListener('keydown', ref.keydownListener);
+          ref.removeEventListener('click', ref.clickListener);
+          document.removeEventListener('selectionchange', ref.selectionChangeListener);
+        }
+      }
+    };
   },
   saveSelection: function (ref) {
     if (!ref) return;
@@ -3667,16 +3693,6 @@ window.Radzen = {
       }
       return result;
     }, { innerText: selection.toString(), innerHTML: innerHTML });
-  },
-  destroyEditor: function (ref) {
-    if (ref) {
-      ref.removeEventListener('input', ref.inputListener);
-      ref.removeEventListener('paste', ref.pasteListener);
-      ref.removeEventListener('drop', ref.dropListener);
-      ref.removeEventListener('keydown', ref.keydownListener);
-      ref.removeEventListener('click', ref.clickListener);
-      document.removeEventListener('selectionchange', ref.selectionChangeListener);
-    }
   },
   startDrag: function (ref, instance, handler) {
     if (!ref) {

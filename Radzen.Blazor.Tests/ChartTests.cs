@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
-using Radzen.Blazor.Rendering;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,7 +22,7 @@ public class ChartTests
     {
         using var ctx = new TestContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-        ctx.JSInterop.Setup<Rect>("Radzen.createChart", _ => true).SetResult(new Rect {Left = 0, Top = 0, Width = 200, Height = 200});
+        ctx.JSInterop.Setup<Radzen.Blazor.Rendering.Rect>("Radzen.createChart", _ => true).SetResult(new Radzen.Blazor.Rendering.Rect { Left = 0, Top = 0, Width = 200, Height = 200 });
         ctx.Services.AddScoped<TooltipService>();
         ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
         ctx.RenderComponent<RadzenChartTooltip>();
