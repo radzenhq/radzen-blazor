@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -16,6 +17,7 @@ namespace Radzen;
 /// <summary>
 /// Service for interacting with AI chat models to get completions with conversation memory.
 /// </summary>
+[UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
 public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServiceOptions> options) : IAIChatService
 {
     private readonly Dictionary<string, ConversationSession> sessions = new();

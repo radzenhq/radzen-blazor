@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Radzen.Blazor
     /// RadzenSankeyDiagram component.
     /// </summary>
     /// <typeparam name="TItem">The type of data item.</typeparam>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenSankeyDiagram<TItem> : RadzenComponent
     {
         /// <summary>

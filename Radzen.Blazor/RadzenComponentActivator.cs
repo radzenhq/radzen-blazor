@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen
@@ -49,7 +50,10 @@ namespace Radzen
         /// <param name="componentType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public IComponent CreateInstance(Type componentType)
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2055, Justification = TrimMessages.ComponentTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.ComponentTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.ComponentTypePreserved)]
+        public IComponent CreateInstance([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type componentType)
         {
             ArgumentNullException.ThrowIfNull(componentType);
 

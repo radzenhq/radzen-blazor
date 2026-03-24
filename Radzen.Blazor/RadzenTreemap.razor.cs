@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -10,6 +11,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// A standalone treemap chart component that displays hierarchical data as nested rectangles.
     /// </summary>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenTreemap : RadzenComponent
     {
         /// <summary>
