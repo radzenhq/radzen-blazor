@@ -25,7 +25,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ColumnSeries_ColumnHeights_ReflectDataValues()
+        public async System.Threading.Tasks.Task ColumnSeries_ColumnHeights_ReflectDataValues()
         {
             using var ctx = CreateChartContext();
 
@@ -35,6 +35,8 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
                     .Add(x => x.Fill, "#336699")
                     .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             var markup = chart.Markup;
             // B=20 (max) -> column top at y=0, ends at y=236 (baseline)

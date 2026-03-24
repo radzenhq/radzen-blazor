@@ -1059,9 +1059,9 @@ namespace Radzen.Blazor
 
             if (visibleChanged && !firstRender)
             {
-                if (Visible == false && JSRuntime != null)
+                if (Visible == false)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.destroyChart", Element);
+                    await JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
                 }
             }
         }
@@ -1114,9 +1114,9 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (Visible && IsJSRuntimeAvailable && JSRuntime != null)
+            if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoid("Radzen.destroyChart", Element);
+                JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
             }
 
             GC.SuppressFinalize(this);
