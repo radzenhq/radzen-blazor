@@ -48,6 +48,17 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenUpload : RadzenComponent
     {
+        IJSObjectReference? _jsRef;
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
+
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
@@ -239,9 +250,22 @@ namespace Radzen.Blazor
         private bool firstRender = true;
 
         /// <inheritdoc />
+        bool _jsParamsChanged;
+
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+            if (parameters.DidParameterChange(nameof(Url), Url) ||
+                parameters.DidParameterChange(nameof(Auto), Auto) ||
+                parameters.DidParameterChange(nameof(Multiple), Multiple) ||
+                parameters.DidParameterChange(nameof(ParameterName), ParameterName) ||
+                parameters.DidParameterChange(nameof(Method), Method) ||
+                parameters.DidParameterChange(nameof(Stream), Stream))
+            {
+                _jsParamsChanged = true;
+            }
 
             await base.SetParametersAsync(parameters);
 
@@ -261,13 +285,29 @@ namespace Radzen.Blazor
 
             this.firstRender = firstRender;
 
-            if (firstRender || visibleChanged)
+            if (firstRender || visibleChanged || _jsParamsChanged)
             {
                 visibleChanged = false;
 
                 if (Visible && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Name ?? GetId());
+
+                    if (_jsParamsChanged || firstRender)
+                    {
+                        _jsParamsChanged = false;
+
+                        if (_jsRef != null)
+                        {
+                            await _jsRef.InvokeVoidAsync("dispose");
+                            await _jsRef.DisposeAsync();
+                        }
+
+                        _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                            "Radzen.createUpload", Element,
+                            !string.IsNullOrEmpty(Url) ? Url : null, Auto, Multiple,
+                            ParameterName, Method, Stream);
+                    }
                 }
             }
         }

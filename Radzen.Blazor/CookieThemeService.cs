@@ -82,7 +82,7 @@ namespace Radzen
         {
             try
             {
-                var cookies = await jsRuntime.InvokeAsync<string>("eval", "document.cookie");
+                var cookies = await jsRuntime.InvokeAsync<string>("Radzen.getCookies");
 
                 var themeCookie = cookies?.Split("; ").Select(x =>
                 {
@@ -119,7 +119,7 @@ namespace Radzen
                 cookie += "; Secure";
             }
 
-            _ = jsRuntime.InvokeVoidAsync("eval", $"document.cookie = \"{cookie}\"");
+            _ = jsRuntime.InvokeVoidAsync("Radzen.setCookie", cookie);
         }
 
         /// <inheritdoc />

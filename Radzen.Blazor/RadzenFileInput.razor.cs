@@ -41,6 +41,17 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenFileInput<TValue> : FormComponent<TValue>
     {
+        IJSObjectReference? _jsRef;
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
+
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
@@ -197,6 +208,8 @@ namespace Radzen.Blazor
                 if (Visible && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Name ?? GetId());
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createFileInput", Element);
                 }
             }
         }

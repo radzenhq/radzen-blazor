@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
@@ -74,6 +75,40 @@ namespace Radzen.Blazor
                                                                      .Add("rz-menu-closed", Responsive && !IsOpen)
                                                                      .Add("rz-menu-flyout", Flyout)
                                                                      .ToString();
+
+        IJSObjectReference? _jsRef;
+        bool _clickToOpenChanged;
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(ClickToOpen), ClickToOpen))
+            {
+                _clickToOpenChanged = true;
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if ((firstRender || _clickToOpenChanged) && Visible && JSRuntime != null)
+            {
+                _clickToOpenChanged = false;
+
+                if (_jsRef != null)
+                {
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                }
+
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createMenu", Element, ClickToOpen);
+            }
+        }
 
         void OnToggle()
         {
@@ -309,6 +344,8 @@ namespace Radzen.Blazor
             {
                 NavigationManager.LocationChanged -= OnLocationChanged;
             }
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
             GC.SuppressFinalize(this);
         }
 

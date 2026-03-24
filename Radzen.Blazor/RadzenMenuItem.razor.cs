@@ -217,11 +217,9 @@ namespace Radzen.Blazor
             {
                 if (Parent.ClickToOpen || ChildContent != null)
                 {
-                    events.Add("onclick", "Radzen.toggleMenuItem(this)");
                 }
                 else
                 {
-                    events.Add("onclick", "Radzen.toggleMenuItem(this, event, false)");
                 }
             }
 

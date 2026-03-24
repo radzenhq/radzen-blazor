@@ -12,9 +12,9 @@
         <span class=@ChooseClass tabindex="@(Disabled ? "-1" : $"{TabIndex}")" role="button"
               aria-disabled="@(Disabled ? "true" : "false")" aria-label="@ChooseText"
               aria-controls="@(Name ?? GetId())"
-              onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
-            <input id="@(Name ?? GetId())" @attributes="InputAttributes" tabindex="-1" disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept" onkeydown="event.stopPropagation()"
-                onchange="Radzen.uploadInputChange(event, null, false, false, true)" />
+              >
+            <input id="@(Name ?? GetId())" @attributes="InputAttributes" tabindex="-1" disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept"
+                />
             <span class="rz-button-text">@ChooseText</span>
         </span>
     </div>

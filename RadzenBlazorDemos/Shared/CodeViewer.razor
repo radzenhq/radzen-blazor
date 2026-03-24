@@ -135,7 +135,7 @@
         {
             error = null;
             isBusy = true;
-            await JSRuntime.InvokeVoidAsync("eval", $"instances['{monaco.Id}'].updateOptions({{domReadOnly: true, readOnly: true }})");
+            await JSRuntime.InvokeVoidAsync("updateEditorOptions", monaco.Id, new { domReadOnly = true, readOnly = true });
 
             await Task.Yield();
 
@@ -153,6 +153,6 @@
         }
 
         isBusy = false;
-        await JSRuntime.InvokeVoidAsync("eval", $"instances['{monaco.Id}'].updateOptions({{domReadOnly: false, readOnly: false }})");
+        await JSRuntime.InvokeVoidAsync("updateEditorOptions", monaco.Id, new { domReadOnly = false, readOnly = false });
     }
 }

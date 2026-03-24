@@ -10,6 +10,7 @@ namespace Radzen.Blazor.Tests
         public void ProfileMenuItem_Renders_TextParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
             {
@@ -28,6 +29,7 @@ namespace Radzen.Blazor.Tests
         public void ProfileMenuItem_Renders_IconParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
             {
@@ -47,6 +49,7 @@ namespace Radzen.Blazor.Tests
         public void ProfileMenuItem_Template_OverridesText()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
             {
@@ -75,6 +78,7 @@ namespace Radzen.Blazor.Tests
         public void ProfileMenuItem_Renders_TemplateWithSwitch()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
             {
@@ -101,6 +105,7 @@ namespace Radzen.Blazor.Tests
         public void ProfileMenuItem_Renders_PathParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
             {

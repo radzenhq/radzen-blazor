@@ -121,7 +121,7 @@
 
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("eval", $"console.log('Page {Name} render time is {(DateTime.Now - start).TotalMilliseconds} ms')");
+            await JSRuntime.InvokeVoidAsync("console.log", $"Page {Name} render time is {(DateTime.Now - start).TotalMilliseconds} ms");
         }
     }
 

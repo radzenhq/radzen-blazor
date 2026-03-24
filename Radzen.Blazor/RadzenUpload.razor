@@ -10,7 +10,7 @@
     <div class="rz-fileupload-buttonbar">
         <span class="@ChooseClassList" tabindex="@(Disabled ? -1 : 0)" role="button" aria-label="@ChooseText"
               aria-disabled="@(Disabled ? "true" : "false")" aria-controls="@(Name ?? GetId())"
-              onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
+              >
             @RenderInput()
             @if (!string.IsNullOrEmpty(Icon))
             {
@@ -29,7 +29,7 @@
                 <div class="rz-fileupload-row" style="margin-bottom: 10px">
                     @if (!string.IsNullOrEmpty(file.Url))
                     {
-                    <div><img src="@file.Url" width="50px" onerror="this.style.display='none';" alt="@ImageAlternateText"></div>
+                    <div><img src="@file.Url" width="50px" alt="@ImageAlternateText"></div>
                     }
                     <div>@file.Name</div>
                     <div>@(file.Size / 1024) KB</div>
@@ -54,13 +54,13 @@
             <text>
                 @if(!string.IsNullOrEmpty(Url))
                 {
-                    <input id="@(Name ?? GetId())" @ref="@fileUpload" @attributes="InputAttributes" type="file" multiple="@Multiple" accept="@Accept" disabled="@Disabled" 
-                        onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true, '@ParameterName', '@Method', @(Stream ? "true" : "false"))" tabindex="-1" onkeydown="event.stopPropagation()"/>
+                    <input id="@(Name ?? GetId())" @ref="@fileUpload" @attributes="InputAttributes" type="file" multiple="@Multiple" accept="@Accept" disabled="@Disabled"
+                        tabindex="-1"/>
                 }
                 else
                 {
-                    <Microsoft.AspNetCore.Components.Forms.InputFile id="@(Name ?? GetId())" @attributes="InputAttributes" multiple="@Multiple" accept="@Accept" disabled="@Disabled" 
-                        tabindex="-1" onkeydown="event.stopPropagation()" OnChange="@OnInputChange" />
+                    <Microsoft.AspNetCore.Components.Forms.InputFile id="@(Name ?? GetId())" @attributes="InputAttributes" multiple="@Multiple" accept="@Accept" disabled="@Disabled"
+                        tabindex="-1" OnChange="@OnInputChange" />
                 }
             </text>
             };
