@@ -92,6 +92,49 @@ forwardingOptions.KnownIPNetworks.Clear();
 forwardingOptions.KnownProxies.Clear();
 
 app.UseForwardedHeaders(forwardingOptions);
+
+// Content Security Policy
+var relaxedCspPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+{
+    "/datagrid-rowreorder",
+    "/datagrid-rowdragbetween",
+    "/datagrid-rowdrag-scheduler",
+    "/tree-dragdrop",
+};
+
+var baseCsp = string.Join("; ",
+    "base-uri 'self'",
+    "default-src 'self' http://localhost:* ws://localhost:*",
+    "connect-src 'self' https: wss: http://localhost:* ws://localhost:*",
+    "img-src data: https:",
+    "object-src 'none'",
+    "script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' http://localhost:* cdnjs.cloudflare.com cdn.syndication.twimg.com platform.linkedin.com www.linkedin.com analytics.radzen.com maps.googleapis.com unpkg.com",
+    "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com maps.googleapis.com fonts.googleapis.com fonts.gstatic.com",
+    "font-src 'self' data: cdnjs.cloudflare.com maps.googleapis.com fonts.googleapis.com fonts.gstatic.com",
+    "frame-src www.youtube.com platform.twitter.com platform.linkedin.com www.linkedin.com",
+    "worker-src 'self' blob:",
+    "upgrade-insecure-requests");
+
+var relaxedCsp = string.Join("; ",
+    "base-uri 'self'",
+    "default-src 'self' http://localhost:* ws://localhost:*",
+    "connect-src 'self' https: wss: http://localhost:* ws://localhost:*",
+    "img-src data: https:",
+    "object-src 'none'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' http://localhost:* cdnjs.cloudflare.com cdn.syndication.twimg.com platform.linkedin.com www.linkedin.com analytics.radzen.com maps.googleapis.com unpkg.com",
+    "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com maps.googleapis.com fonts.googleapis.com fonts.gstatic.com",
+    "font-src 'self' data: cdnjs.cloudflare.com maps.googleapis.com fonts.googleapis.com fonts.gstatic.com",
+    "frame-src www.youtube.com platform.twitter.com platform.linkedin.com www.linkedin.com",
+    "worker-src 'self' blob:",
+    "upgrade-insecure-requests");
+
+app.Use(async (context, next) =>
+{
+    var csp = relaxedCspPaths.Contains(context.Request.Path.Value) ? relaxedCsp : baseCsp;
+    context.Response.Headers["Content-Security-Policy"] = csp;
+    await next();
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

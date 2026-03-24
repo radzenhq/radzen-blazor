@@ -327,7 +327,7 @@
                             }
                             else
                             {
-                                <span class="rz-cell-filter-label" style="height:35px; width:100%;" onclick="event.preventDefault()">
+                                <span class="rz-cell-filter-label" style="height:35px; width:100%;">
                                     @if (column.FilterPropertyType != null && PropertyAccess.IsDate(column.FilterPropertyType))
                                     {
                                         if (filterMode == FilterMode.Simple)
@@ -335,7 +335,7 @@
                                             <button type="button" tabindex="-1" aria-label="@FilterToggleAriaLabel" aria-controls="@($"{PopupID}{column.GetFilterProperty()}")"
                                                     aria-haspopup="dialog" aria-expanded="false"
                                                     class="rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-base rz-shade-default @(column.HasActiveFilter() ? "rz-grid-filter-active" : "")"
-                                                    onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
+                                                    >
                                                 <i class="notranslate rzi">date_range</i>
                                             </button>
                                             <span>

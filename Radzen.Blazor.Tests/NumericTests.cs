@@ -12,6 +12,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_CssClasses()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -26,6 +27,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_ValueParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -40,6 +42,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Respect_MinParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -64,6 +67,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Respect_Nullable_With_MinParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -95,6 +99,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
@@ -118,6 +123,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_StyleParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -132,6 +138,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -145,6 +152,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_NameParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -159,6 +167,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_TabIndexParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -173,6 +182,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_PlaceholderParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -187,6 +197,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_DisabledParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -200,6 +211,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_ReadOnlyParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -214,6 +226,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_AutoCompleteParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -243,6 +256,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Renders_TypedAutoCompleteParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -272,6 +286,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
@@ -292,6 +307,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Raises_ChangeEvent_OnBackspace_When_Immediate()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -316,6 +332,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenNumeric<double?>>(parameters =>
@@ -339,6 +356,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
@@ -359,6 +377,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Raises_ChangedAndValueChangedEventOnStepUp()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -395,6 +414,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
@@ -429,6 +449,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_UpDown_Rendered()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
@@ -443,6 +464,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_UpDown_NotRenderedIfHidden()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>(ComponentParameter.CreateParameter(nameof(RadzenNumeric<double>.ShowUpDown), false));
 
@@ -457,6 +479,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Formatted()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             double valueToTest = 100.234;
             string format = "0.00";
@@ -484,6 +507,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             string format = "0.000";
@@ -506,6 +530,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Uses_ConvertValue()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -531,6 +556,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Supports_TypeConverter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var valueToTest = new Dollars(100.234m);
             string format = "0.00";
@@ -548,6 +574,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Supports_TypeConverterWithCulture()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var valueToTest = new Dollars(100.234m);
             string format = "0.00";
@@ -567,6 +594,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Supports_EmptyString()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var valueToTest = "";
             string format = "0.00";
@@ -586,6 +614,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Supports_ValueString()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var valueToTest = "12.50";
             string format = "0.00";
@@ -605,6 +634,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Supports_ValueStringEsCLCulture()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var valueToTest = "12,50";
             string format = "0.00";
@@ -624,6 +654,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Supports_ValueStringEnUSCulture()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var valueToTest = "12.50";
             string format = "0.00";
@@ -643,6 +674,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Supports_IComparable()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -671,6 +703,7 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = ctx.RenderComponent<RadzenNumeric<float>>(
@@ -692,6 +725,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Format_WithOptionalDecimals_PreservesValue_CommaCulture()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
@@ -716,6 +750,7 @@ namespace Radzen.Blazor.Tests
         public void Numeric_Supports_IFormattable()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var valueToTest = new Temperature(60.23m);
             const string format = "F";

@@ -18,7 +18,7 @@ else
 {
     if (Item?.ChildContent != null)
     {
-        <li style=@Style @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true, false)" onmouseleave="Radzen.toggleMenuItem(this, event, false, false)"
+        <li style=@Style @attributes="@Attributes"
             role="menuitem" tabindex="@(Item?.Disabled == true ? -1 : 0)" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
             aria-haspopup="menu" aria-controls="@Item?.SubmenuId" aria-expanded="false" @onkeydown="OnKeyDown">
             @ChildContent

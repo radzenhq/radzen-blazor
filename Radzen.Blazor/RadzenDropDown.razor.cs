@@ -33,6 +33,8 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
+        IJSObjectReference? _jsRef;
+
         bool isOpen;
 
         bool stopKeydownPropagation = true;
@@ -342,6 +344,12 @@ namespace Radzen.Blazor
                         await JSRuntime.InvokeVoidAsync("Radzen.preventArrows", Element);
                     }
 
+                    if (JSRuntime != null)
+                    {
+                        _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                            "Radzen.createDropDown", Element);
+                    }
+
                     if (reload)
                     {
                         StateHasChanged();
@@ -443,6 +451,9 @@ namespace Radzen.Blazor
             {
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
             }
+
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
 
             GC.SuppressFinalize(this);
         }

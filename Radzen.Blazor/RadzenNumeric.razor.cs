@@ -63,6 +63,41 @@ namespace Radzen.Blazor
             return GetClassList("rz-numeric").ToString();
         }
 
+        IJSObjectReference? _jsRef;
+        bool _jsParamsChanged;
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if ((firstRender || _jsParamsChanged) && Visible && JSRuntime != null)
+            {
+                _jsParamsChanged = false;
+
+                if (_jsRef != null)
+                {
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                }
+
+                var minArg = Min.HasValue ? (object)Min.Value.ToString(CultureInfo.InvariantCulture) : null;
+                var maxArg = Max.HasValue ? (object)Max.Value.ToString(CultureInfo.InvariantCulture) : null;
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createNumeric", Element, IsInteger(),
+                    Culture.NumberFormat.NumberDecimalSeparator, minArg, maxArg, IsNullable);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
+
         string GetInputCssClass()
         {
             var textAlignName = Enum.GetName<TextAlign>(TextAlign)?.ToLowerInvariant() ?? "left";
@@ -563,6 +598,11 @@ namespace Radzen.Blazor
         {
             bool minChanged = parameters.DidParameterChange(nameof(Min), Min);
             bool maxChanged = parameters.DidParameterChange(nameof(Max), Max);
+
+            if (minChanged || maxChanged)
+            {
+                _jsParamsChanged = true;
+            }
 
             await base.SetParametersAsync(parameters);
 

@@ -34,7 +34,7 @@
 
     void OnDrag(System.Drawing.Point point)
     {
-        JSRuntime.InvokeVoidAsync("eval", $"console.log('Dialog drag. Left:{point.X}, Top:{point.Y}')");
+        JSRuntime.InvokeVoidAsync("console.log", $"Dialog drag. Left:{point.X}, Top:{point.Y}");
 
         if(Settings == null)
         {
@@ -49,7 +49,7 @@
 
     void OnResize(System.Drawing.Size size)
     {
-        JSRuntime.InvokeVoidAsync("eval", $"console.log('Dialog resize. Width:{size.Width}, Height:{size.Height}')");
+        JSRuntime.InvokeVoidAsync("console.log", $"Dialog resize. Width:{size.Width}, Height:{size.Height}");
 
         if(Settings == null)
         {
