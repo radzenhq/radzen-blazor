@@ -313,7 +313,7 @@ namespace Radzen.Blazor
             if ((firstRender || !Width.HasValue || !Height.HasValue) && JSRuntime != null)
             {
                 var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", Element, Reference);
-                
+
                 if (!Width.HasValue && rect.Width > 0)
                 {
                     Width = rect.Width;
@@ -640,15 +640,7 @@ namespace Radzen.Blazor
         {
             if (IsJSRuntimeAvailable)
             {
-                if (JSRuntime == null) return;
-                try
-                {
-                    _ = JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", Element);
-                }
-                catch (Exception)
-                {
-                    // Ignore errors during disposal
-                }
+                JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
             }
 
             base.Dispose();

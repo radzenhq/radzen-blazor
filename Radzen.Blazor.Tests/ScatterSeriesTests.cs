@@ -7,7 +7,7 @@ namespace Radzen.Blazor.Tests
     public class ScatterSeriesTests
     {
         [Fact]
-        public void ScatterSeries_Renders_CirclePerDataPoint()
+        public async System.Threading.Tasks.Task ScatterSeries_Renders_CirclePerDataPoint()
         {
             using var ctx = CreateChartContext();
 
@@ -16,6 +16,8 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
                     .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             Assert.Contains("rz-scatter-series rz-series-0", chart.Markup);
             // 3 data points = 3 circle markers
@@ -25,7 +27,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ScatterSeries_CirclePositions_ReflectDataValues()
+        public async System.Threading.Tasks.Task ScatterSeries_CirclePositions_ReflectDataValues()
         {
             using var ctx = CreateChartContext();
 
@@ -34,6 +36,8 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
                     .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             // A=10 -> cy=236 (bottom), B=20 -> cy=0 (top), C=15 -> cy=118 (mid)
             Assert.Contains(@"cy=""236""", chart.Markup);

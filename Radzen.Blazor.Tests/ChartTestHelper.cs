@@ -11,9 +11,11 @@ namespace Radzen.Blazor.Tests
             var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.Setup<Rect>("Radzen.createChart", _ => true)
-                .SetResult(new Rect { Left = 0, Top = 0, Width = 400, Height = 300 });
+                .SetResult(new Rect { Left = 0, Top = 0, Width = 200, Height = 200 });
             ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
-                .SetResult(new Rect { Left = 0, Top = 0, Width = 400, Height = 300 });
+                .SetResult(new Rect { Left = 0, Top = 0, Width = 200, Height = 200 });
+            ctx.JSInterop.Setup<double[]>("Radzen.createRangeNavigator", _ => true)
+                .SetResult(new double[] { 200, 200 });
             ctx.Services.AddScoped<TooltipService>();
             return ctx;
         }

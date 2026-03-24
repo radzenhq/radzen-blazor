@@ -813,6 +813,17 @@ namespace Radzen.Blazor
         }
         
         /// <inheritdoc />
+        public override void Dispose()
+        {
+            if (IsJSRuntimeAvailable)
+            {
+                JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
+            }
+
+            base.Dispose();
+        }
+
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return $"rz-spider-chart rz-scheme-{ColorScheme.ToString().ToLowerInvariant()}";
