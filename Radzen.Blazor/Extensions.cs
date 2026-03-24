@@ -62,7 +62,7 @@ namespace Radzen.Blazor
             ArgumentNullException.ThrowIfNull(enumType);
 
             Type underlyingType = Enum.GetUnderlyingType(enumType);
-            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new { Value = Convert.ChangeType(val, underlyingType, CultureInfo.InvariantCulture), Text = val.GetDisplayDescription(translationFunction) });
+            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new DropDownItem<object> { Value = Convert.ChangeType(val, underlyingType, CultureInfo.InvariantCulture), Text = val.GetDisplayDescription(translationFunction) });
         }
 
         /// <summary>
