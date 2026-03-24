@@ -7,7 +7,7 @@ namespace Radzen.Blazor.Tests
     public class LineSeriesTests
     {
         [Fact]
-        public void LineSeries_Renders_PathWithCorrectYCoordinates()
+        public async System.Threading.Tasks.Task LineSeries_Renders_PathWithCorrectYCoordinates()
         {
             using var ctx = CreateChartContext();
 
@@ -17,6 +17,8 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
                     .Add(x => x.Stroke, "#FF0000")
                     .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             // Values: A=10(min=bottom,y=236), B=20(max=top,y=0), C=15(mid,y=118)
             Assert.Contains("rz-line-series rz-series-0", chart.Markup);
@@ -41,7 +43,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void LineSeries_ValueAxis_RendersTicksForDataRange()
+        public async System.Threading.Tasks.Task LineSeries_ValueAxis_RendersTicksForDataRange()
         {
             using var ctx = CreateChartContext();
 
@@ -50,6 +52,8 @@ namespace Radzen.Blazor.Tests
                     .Add(x => x.CategoryProperty, nameof(DataItem.Category))
                     .Add(x => x.ValueProperty, nameof(DataItem.Value))
                     .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
             Assert.Contains("rz-value-axis", chart.Markup);
             Assert.Contains(">10</text>", chart.Markup);

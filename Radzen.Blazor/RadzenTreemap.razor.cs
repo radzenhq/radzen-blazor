@@ -304,6 +304,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override void Dispose()
         {
+            if (IsJSRuntimeAvailable)
+            {
+                JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
+            }
+
             base.Dispose();
             reference?.Dispose();
         }
