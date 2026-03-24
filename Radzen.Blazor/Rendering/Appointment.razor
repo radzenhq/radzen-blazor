@@ -152,11 +152,21 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (jsRef != null)
+        try
         {
-            await jsRef.InvokeVoidAsync("dispose");
-            await jsRef.DisposeAsync();
+            if (jsRef != null)
+            {
+                await jsRef.InvokeVoidAsync("dispose");
+                await jsRef.DisposeAsync();
+            }
         }
-        dotnetRef?.Dispose();
+        catch (JSDisconnectedException)
+        {
+        }
+        finally
+        {
+            dotnetRef?.Dispose();
+        }
+
     }
 }
