@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -39,6 +40,7 @@ namespace Radzen.Blazor
     /// &lt;RadzenDataAnnotationValidator Component="Name" MessageSeparator=" | " /&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.ModelTypePreserved)]
     public class RadzenDataAnnotationValidator : ValidatorBase
     {
         /// <summary>
@@ -65,6 +67,10 @@ namespace Radzen.Blazor
         public IServiceProvider? ServiceProvider { get; set; }
 
         /// <inheritdoc />
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.ModelTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.ModelTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.ModelTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.ModelTypePreserved)]
         protected override bool Validate(IRadzenFormComponent component)
         {
             ArgumentNullException.ThrowIfNull(component);

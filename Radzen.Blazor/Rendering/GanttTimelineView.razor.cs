@@ -1,13 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Radzen.Blazor
+namespace Radzen.Blazor.Rendering
 {
     /// <summary>
-    /// RadzenDataGridGroupRow.
+    /// GanttTimelineView component.
     /// </summary>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenDataGridGroupRow<TItem> where TItem : notnull
+    public partial class GanttTimelineView<TItem> where TItem : notnull
     {
     }
 }
-

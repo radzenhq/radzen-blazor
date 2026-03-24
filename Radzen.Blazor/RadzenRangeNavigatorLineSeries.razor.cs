@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
@@ -10,6 +11,8 @@ namespace Radzen.Blazor
     /// Renders a filled area with a line stroke inside a <see cref="RadzenRangeNavigator" />.
     /// </summary>
     /// <typeparam name="TItem">The type of the data items.</typeparam>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenRangeNavigatorLineSeries<TItem> : ComponentBase, IRangeNavigatorSeries, IDisposable
     {
         /// <summary>

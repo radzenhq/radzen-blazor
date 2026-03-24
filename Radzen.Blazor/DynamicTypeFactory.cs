@@ -1,9 +1,12 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
+using Radzen;
 
 static class DynamicTypeFactory
 {
+    [RequiresUnreferencedCode(TrimMessages.DynamicTypeGeneration)]
     public static Type CreateType(string typeName, string[] propertyNames, Type[] propertyTypes)
     {
         if (propertyNames.Length != propertyTypes.Length)

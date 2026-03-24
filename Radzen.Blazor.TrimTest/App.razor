@@ -1,0 +1,43 @@
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenButton Text="Test" />
+<RadzenTextBox @bind-Value="@text" />
+<RadzenDropDown TValue="string" Data="@items" @bind-Value="@selected" />
+<RadzenDataGrid TItem="DataItem" Data="@data" AllowFiltering="true" AllowSorting="true">
+    <Columns>
+        <RadzenDataGridColumn TItem="DataItem" Property="Name" Title="Name" />
+        <RadzenDataGridColumn TItem="DataItem" Property="Value" Title="Value" />
+        <RadzenDataGridColumn TItem="DataItem" Property="Category" Title="Category" />
+        <RadzenDataGridColumn TItem="DataItem" Property="Active" Title="Active" />
+        <RadzenDataGridColumn TItem="DataItem" Property="Created" Title="Created" FormatString="{0:d}" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    string text = "";
+    string selected = "";
+    string[] items = ["A", "B", "C"];
+    DataItem[] data =
+    [
+        new() { Name = "Alice", Value = 42, Category = "A", Active = true, Created = new DateTime(2024, 1, 15) },
+        new() { Name = "Bob", Value = 87, Category = "B", Active = false, Created = new DateTime(2024, 3, 22) },
+        new() { Name = "Charlie", Value = 15, Category = "A", Active = true, Created = new DateTime(2024, 5, 10) },
+        new() { Name = "Diana", Value = 63, Category = "C", Active = true, Created = new DateTime(2024, 7, 4) },
+        new() { Name = "Eve", Value = 29, Category = "B", Active = false, Created = new DateTime(2024, 8, 18) },
+        new() { Name = "Frank", Value = 94, Category = "A", Active = true, Created = new DateTime(2024, 9, 1) },
+        new() { Name = "Grace", Value = 51, Category = "C", Active = false, Created = new DateTime(2024, 10, 30) },
+        new() { Name = "Henry", Value = 78, Category = "B", Active = true, Created = new DateTime(2024, 11, 12) },
+        new() { Name = "Ivy", Value = 36, Category = "A", Active = true, Created = new DateTime(2024, 12, 25) },
+        new() { Name = "Jack", Value = 100, Category = "C", Active = false, Created = new DateTime(2025, 1, 7) },
+    ];
+
+    class DataItem
+    {
+        public string Name { get; set; } = "";
+        public int Value { get; set; }
+        public string Category { get; set; } = "";
+        public bool Active { get; set; }
+        public DateTime Created { get; set; }
+    }
+}

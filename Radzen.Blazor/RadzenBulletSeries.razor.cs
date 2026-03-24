@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace Radzen.Blazor
     /// Renders horizontally like <see cref="RadzenBarSeries{TItem}"/>.
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the series.</typeparam>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenBulletSeries<TItem> : CartesianSeries<TItem>
     {
         /// <summary>

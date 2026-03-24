@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 
@@ -9,6 +10,7 @@ namespace Radzen;
 /// <summary>
 /// Converts values to different types. Used internally.
 /// </summary>
+[UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
 public static class ConvertType
 {
     /// <summary>

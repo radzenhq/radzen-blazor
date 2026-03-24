@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.RenderTree;
 using Radzen.Blazor.Markdown;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 
@@ -45,6 +46,7 @@ namespace Radzen.Blazor;
 /// &lt;RadzenMarkdown AutoLinkHeadingDepth="3" Text=@readme /&gt;
 /// </code>
 /// </example>
+[UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
 public partial class RadzenMarkdown : RadzenComponent
 {
     /// <summary>
