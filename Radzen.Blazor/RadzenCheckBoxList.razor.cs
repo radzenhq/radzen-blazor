@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,6 +41,7 @@ namespace Radzen.Blazor
     ///                      TextProperty="Name" ValueProperty="Id" Orientation="Orientation.Horizontal" /&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>
     {
         string ItemClass(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
