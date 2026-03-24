@@ -263,8 +263,7 @@ namespace Radzen.Blazor
 
                 if (!string.IsNullOrEmpty(id) && JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("eval",
-                        "setTimeout(function(){ document.getElementById('" + id + "').focus(); }, 200)");
+                    await JSRuntime.InvokeVoidAsync("Radzen.delayedFocus", id, 200);
                 }
             }
             else if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
