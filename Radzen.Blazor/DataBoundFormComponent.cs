@@ -5,6 +5,7 @@ using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -19,6 +20,10 @@ namespace Radzen
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="Radzen.RadzenComponent" />
     /// <seealso cref="Radzen.IRadzenFormComponent" />
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
     public class DataBoundFormComponent<T> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>

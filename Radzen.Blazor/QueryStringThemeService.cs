@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
@@ -33,6 +34,7 @@ namespace Radzen
     /// <summary>
     /// Persist the current theme in the query string. Requires <see cref="ThemeService" /> to be registered in the DI container.
     /// </summary>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.ThemeTypePreserved)]
     public class QueryStringThemeService : IDisposable
     {
         private readonly NavigationManager navigationManager;

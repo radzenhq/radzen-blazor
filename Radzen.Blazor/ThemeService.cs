@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Radzen
@@ -378,6 +379,7 @@ namespace Radzen
         /// </summary>
         public string? Theme
         {
+            [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.ThemeTypePreserved)]
             get
             {
                 if (theme == null)
@@ -467,6 +469,7 @@ namespace Radzen
                 }
             }
         }
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.AssemblyMetadataPreserved)]
         private static readonly string? Version = typeof(ThemeService).Assembly.GetName().Version?.ToString();
 
         internal string Href => $"{Path}/{Theme}-base.css?v={Version}";

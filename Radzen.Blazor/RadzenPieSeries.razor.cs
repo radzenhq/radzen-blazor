@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenChart&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenPieSeries<TItem> : CartesianSeries<TItem>
     {
         /// <summary>

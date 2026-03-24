@@ -4,6 +4,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace Radzen.Blazor
     /// Displays and manages a collection of chips with optional selection and removal.
     /// </summary>
     /// <typeparam name="TValue">The selected value type. Use IEnumerable for multiple selection mode.</typeparam>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenChipList<TValue> : FormComponent<TValue>, IRadzenChipList
     {
         /// <summary>

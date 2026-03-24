@@ -1,16 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Radzen;
 
 /// <summary>
 /// Serializes LINQ Expression Trees into C# string representations.
 /// </summary>
+[UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
 public class ExpressionSerializer : ExpressionVisitor
 {
     private readonly StringBuilder _sb = new StringBuilder();

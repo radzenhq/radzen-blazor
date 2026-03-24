@@ -1,4 +1,5 @@
-﻿using Radzen;
+﻿using System.Diagnostics.CodeAnalysis;
+using Radzen;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
@@ -7,6 +8,8 @@ namespace System.Linq.Dynamic.Core
     /// <summary>
     /// Class DynamicExtensions used to replace System.Linq.Dynamic.Core library.
     /// </summary>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
     public static class DynamicExtensions
     {
         static readonly Func<string, Type?> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies()

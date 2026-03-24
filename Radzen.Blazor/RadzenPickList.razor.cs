@@ -4,6 +4,7 @@ using Radzen;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -15,6 +16,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenPickList component.
     /// </summary>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenPickList<TItem> : RadzenComponent
     {
         /// <summary>
