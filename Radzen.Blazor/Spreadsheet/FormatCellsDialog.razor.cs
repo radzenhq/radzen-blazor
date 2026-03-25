@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
 
+using Radzen.Blazor;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -36,6 +37,11 @@ public partial class FormatCellsDialog : ComponentBase
     /// </summary>
     [Inject]
     public DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     private NumberFormatCategory selectedCategory = NumberFormatCategory.General;
     private string customFormatCode = "General";

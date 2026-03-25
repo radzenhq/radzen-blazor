@@ -1,14 +1,15 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenSplitButton Icon="view_column" Text="Freeze panes" Click=@OnFreezeClick ButtonStyle="ButtonStyle.Base" Disabled=@IsDisabled>
+<RadzenSplitButton Icon="view_column" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezePanes)) ?? "Freeze panes") Click=@OnFreezeClick ButtonStyle="ButtonStyle.Base" Disabled=@IsDisabled>
     <ChildContent>
-        <RadzenSplitButtonItem Text="Freeze Top Row" Value="row" Icon="view_column" />
-        <RadzenSplitButtonItem Text="Freeze Selected Rows" Value="rows" Icon="view_column" />
-        <RadzenSplitButtonItem Text="Freeze First Column" Value="column" Icon="view_column" />
-        <RadzenSplitButtonItem Text="Freeze Selected Columns" Value="columns" Icon="view_column" />
-        <RadzenSplitButtonItem Text="Unfreeze" Value="unfreeze" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeTopRow)) ?? "Freeze Top Row") Value="row" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedRows)) ?? "Freeze Selected Rows") Value="rows" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeFirstColumn)) ?? "Freeze First Column") Value="column" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedColumns)) ?? "Freeze Selected Columns") Value="columns" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Unfreeze)) ?? "Unfreeze") Value="unfreeze" Icon="view_column" />
     </ChildContent>
 </RadzenSplitButton>
 
@@ -17,6 +18,9 @@
 
     [Parameter]
     public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
 
     private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
 
