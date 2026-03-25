@@ -1,0 +1,47 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnUndoAsync Icon="undo" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public UndoRedoStack? Commands { get; set; }
+
+    private bool IsDisabled => Commands is null || !Commands.CanUndo;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Commands is not null)
+        {
+            Commands.Changed -= OnCommandsChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Commands is not null)
+        {
+            Commands.Changed += OnCommandsChanged;
+        }
+    }
+
+    private void OnCommandsChanged()
+    {
+        StateHasChanged();
+    }
+
+    private void OnUndoAsync()
+    {
+        Commands?.Undo();
+    }
+
+    public void Dispose()
+    {
+        if (Commands is not null)
+        {
+            Commands.Changed -= OnCommandsChanged;
+        }
+    }
+} 

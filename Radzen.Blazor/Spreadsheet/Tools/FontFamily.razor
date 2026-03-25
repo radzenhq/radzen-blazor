@@ -1,0 +1,85 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenDropDown @bind-Value=@CurrentFontFamily Data=@FontFamilies
+    Disabled=@IsDisabled Style="width: 140px" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private static readonly List<string> FontFamilies =
+    [
+        "Arial",
+        "Aptos Narrow",
+        "Calibri",
+        "Cambria",
+        "Courier New",
+        "Georgia",
+        "Segoe UI",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana"
+    ];
+
+    private string CurrentFontFamily
+    {
+        get
+        {
+            if (Worksheet?.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.FontFamily ?? "Aptos Narrow";
+            }
+            return "Aptos Narrow";
+        }
+        set
+        {
+            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+            {
+                if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+                {
+                    var fontFamily = value == "Aptos Narrow" ? null : value;
+                    var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithFontFamily(fontFamily));
+                    Spreadsheet?.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+}

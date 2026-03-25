@@ -1,0 +1,29 @@
+@using Microsoft.AspNetCore.Components
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="20px">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowRowsWhere)) />
+        <RadzenLabel Text=@fieldName />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
+        <RadzenDropDown @bind-Value=@selectedOperator Data=@availableOperators TextProperty="Text" ValueProperty="Value"
+            Placeholder=@L(nameof(RadzenStrings.Spreadsheet_SelectOperator)) />
+        <RadzenTextBox @bind-Value=@filterValue Placeholder=@L(nameof(RadzenStrings.Spreadsheet_EnterValue)) Style="flex: 1" />
+    </RadzenStack>
+
+    <RadzenSelectBar @bind-Value=@logicalOperator Data=@logicalOperators TextProperty="Text" ValueProperty="Value" />
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
+        <RadzenDropDown @bind-Value=@secondOperator Data=@availableOperators TextProperty="Text"
+            ValueProperty="Value" Placeholder=@L(nameof(RadzenStrings.Spreadsheet_SelectOperator)) />
+        <RadzenTextBox @bind-Value=@secondFilterValue Placeholder=@L(nameof(RadzenStrings.Spreadsheet_EnterValue)) Style="flex:1" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
+    </RadzenStack>
+</RadzenStack>

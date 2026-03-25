@@ -1,0 +1,51 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="1rem" Style="padding: 1rem">
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_URL))>
+        <RadzenTextBox @bind-Value=@Url Style="width: 100%" />
+    </RadzenFormField>
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_DisplayText))>
+        <RadzenTextBox @bind-Value=@DisplayText Style="width: 100%" />
+    </RadzenFormField>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public string Url { get; set; } = "";
+
+    [Parameter]
+    public string DisplayText { get; set; } = "";
+
+    [Inject]
+    public DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
+    private void OnOk()
+    {
+        if (!string.IsNullOrWhiteSpace(Url))
+        {
+            DialogService.Close(new Hyperlink
+            {
+                Url = Url,
+                DisplayText = string.IsNullOrWhiteSpace(DisplayText) ? null : DisplayText
+            });
+        }
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close(null);
+    }
+}

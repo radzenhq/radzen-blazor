@@ -1,0 +1,75 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenDropDown @bind-Value=@CurrentFontSize Data=@FontSizes
+    Disabled=@IsDisabled Style="width: 65px" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private static readonly List<double> FontSizes =
+    [
+        8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 36, 48, 72
+    ];
+
+    private double CurrentFontSize
+    {
+        get
+        {
+            if (Worksheet?.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.FontSize ?? 11;
+            }
+            return 11;
+        }
+        set
+        {
+            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+            {
+                if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+                {
+                    double? fontSize = value == 11 ? null : value;
+                    var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithFontSize(fontSize));
+                    Spreadsheet?.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+}

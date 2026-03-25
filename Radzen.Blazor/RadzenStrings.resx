@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute name="xml:space" use="optional" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Spreadsheet: Tab names -->
+  <data name="Spreadsheet_FileTab" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="Spreadsheet_HomeTab" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Spreadsheet_FormatTab" xml:space="preserve">
+    <value>Format</value>
+  </data>
+  <data name="Spreadsheet_InsertTab" xml:space="preserve">
+    <value>Insert</value>
+  </data>
+  <data name="Spreadsheet_ViewTab" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="Spreadsheet_DataTab" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <!-- Spreadsheet: Common buttons -->
+  <data name="Spreadsheet_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Spreadsheet_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <!-- Spreadsheet: Format Cells dialog trigger -->
+  <data name="Spreadsheet_FormatCells" xml:space="preserve">
+    <value>Format Cells...</value>
+  </data>
+  <!-- Spreadsheet: Sheet tab actions -->
+  <data name="Spreadsheet_Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Spreadsheet_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Spreadsheet_MoveLeft" xml:space="preserve">
+    <value>Move Left</value>
+  </data>
+  <data name="Spreadsheet_MoveRight" xml:space="preserve">
+    <value>Move Right</value>
+  </data>
+  <!-- Spreadsheet: CellMenu -->
+  <data name="Spreadsheet_SortAscending" xml:space="preserve">
+    <value>Sort ascending</value>
+  </data>
+  <data name="Spreadsheet_SortDescending" xml:space="preserve">
+    <value>Sort descending</value>
+  </data>
+  <data name="Spreadsheet_ClearFilter" xml:space="preserve">
+    <value>Clear Filter</value>
+  </data>
+  <data name="Spreadsheet_CustomFilter" xml:space="preserve">
+    <value>Custom filter...</value>
+  </data>
+  <data name="Spreadsheet_SelectAll" xml:space="preserve">
+    <value>(Select All)</value>
+  </data>
+  <data name="Spreadsheet_Blank" xml:space="preserve">
+    <value>(Blank)</value>
+  </data>
+  <!-- Spreadsheet: Context menu -->
+  <data name="Spreadsheet_Cut" xml:space="preserve">
+    <value>Cut</value>
+  </data>
+  <data name="Spreadsheet_Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="Spreadsheet_Paste" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="Spreadsheet_ClearContents" xml:space="preserve">
+    <value>Clear Contents</value>
+  </data>
+  <data name="Spreadsheet_ContextSortAscending" xml:space="preserve">
+    <value>Sort Ascending</value>
+  </data>
+  <data name="Spreadsheet_ContextSortDescending" xml:space="preserve">
+    <value>Sort Descending</value>
+  </data>
+  <data name="Spreadsheet_InsertRowAbove" xml:space="preserve">
+    <value>Insert Row Above</value>
+  </data>
+  <data name="Spreadsheet_InsertRowBelow" xml:space="preserve">
+    <value>Insert Row Below</value>
+  </data>
+  <data name="Spreadsheet_DeleteRow" xml:space="preserve">
+    <value>Delete Row</value>
+  </data>
+  <data name="Spreadsheet_HideRow" xml:space="preserve">
+    <value>Hide Row</value>
+  </data>
+  <data name="Spreadsheet_UnhideRow" xml:space="preserve">
+    <value>Unhide Row</value>
+  </data>
+  <data name="Spreadsheet_InsertColumnBefore" xml:space="preserve">
+    <value>Insert Column Before</value>
+  </data>
+  <data name="Spreadsheet_InsertColumnAfter" xml:space="preserve">
+    <value>Insert Column After</value>
+  </data>
+  <data name="Spreadsheet_DeleteColumn" xml:space="preserve">
+    <value>Delete Column</value>
+  </data>
+  <data name="Spreadsheet_HideColumn" xml:space="preserve">
+    <value>Hide Column</value>
+  </data>
+  <data name="Spreadsheet_UnhideColumn" xml:space="preserve">
+    <value>Unhide Column</value>
+  </data>
+  <!-- Spreadsheet: Dialog titles -->
+  <data name="Spreadsheet_RenameSheetTitle" xml:space="preserve">
+    <value>Rename Sheet</value>
+  </data>
+  <data name="Spreadsheet_CustomFilterTitle" xml:space="preserve">
+    <value>Custom Filter</value>
+  </data>
+  <data name="Spreadsheet_FormatCellsTitle" xml:space="preserve">
+    <value>Format Cells</value>
+  </data>
+  <data name="Spreadsheet_InsertHyperlinkTitle" xml:space="preserve">
+    <value>Insert Hyperlink</value>
+  </data>
+  <data name="Spreadsheet_ConditionalFormattingTitle" xml:space="preserve">
+    <value>Conditional Formatting</value>
+  </data>
+  <data name="Spreadsheet_DataValidationTitle" xml:space="preserve">
+    <value>Data Validation</value>
+  </data>
+  <data name="Spreadsheet_InformationTitle" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Spreadsheet_WarningTitle" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Spreadsheet_InvalidValueTitle" xml:space="preserve">
+    <value>Invalid Value</value>
+  </data>
+  <!-- Spreadsheet: Validation messages -->
+  <data name="Spreadsheet_DoYouWantToContinue" xml:space="preserve">
+    <value>Do you want to continue?</value>
+  </data>
+  <data name="Spreadsheet_NameCannotBeEmpty" xml:space="preserve">
+    <value>Name cannot be empty.</value>
+  </data>
+  <data name="Spreadsheet_SheetNameAlreadyExists" xml:space="preserve">
+    <value>A sheet named '{0}' already exists.</value>
+  </data>
+  <data name="Spreadsheet_DefaultValidationError" xml:space="preserve">
+    <value>The value you entered is not valid.</value>
+  </data>
+  <!-- Spreadsheet: FilterDialog -->
+  <data name="Spreadsheet_ShowRowsWhere" xml:space="preserve">
+    <value>Show rows where:</value>
+  </data>
+  <data name="Spreadsheet_SelectOperator" xml:space="preserve">
+    <value>Select operator...</value>
+  </data>
+  <data name="Spreadsheet_EnterValue" xml:space="preserve">
+    <value>Enter value...</value>
+  </data>
+  <data name="Spreadsheet_ColumnFormat" xml:space="preserve">
+    <value>Column {0}</value>
+  </data>
+  <data name="Spreadsheet_FilterEquals" xml:space="preserve">
+    <value>equals</value>
+  </data>
+  <data name="Spreadsheet_FilterDoesNotEqual" xml:space="preserve">
+    <value>does not equal</value>
+  </data>
+  <data name="Spreadsheet_FilterGreaterThan" xml:space="preserve">
+    <value>is greater than</value>
+  </data>
+  <data name="Spreadsheet_FilterGreaterThanOrEqual" xml:space="preserve">
+    <value>is greater than or equal to</value>
+  </data>
+  <data name="Spreadsheet_FilterLessThan" xml:space="preserve">
+    <value>is less than</value>
+  </data>
+  <data name="Spreadsheet_FilterLessThanOrEqual" xml:space="preserve">
+    <value>is less than or equal to</value>
+  </data>
+  <data name="Spreadsheet_FilterBeginsWith" xml:space="preserve">
+    <value>begins with</value>
+  </data>
+  <data name="Spreadsheet_FilterDoesNotBeginWith" xml:space="preserve">
+    <value>does not begin with</value>
+  </data>
+  <data name="Spreadsheet_FilterEndsWith" xml:space="preserve">
+    <value>ends with</value>
+  </data>
+  <data name="Spreadsheet_FilterDoesNotEndWith" xml:space="preserve">
+    <value>does not end with</value>
+  </data>
+  <data name="Spreadsheet_FilterContains" xml:space="preserve">
+    <value>contains</value>
+  </data>
+  <data name="Spreadsheet_FilterDoesNotContain" xml:space="preserve">
+    <value>does not contain</value>
+  </data>
+  <data name="Spreadsheet_FilterIsEmpty" xml:space="preserve">
+    <value>is empty</value>
+  </data>
+  <data name="Spreadsheet_FilterIsNotEmpty" xml:space="preserve">
+    <value>is not empty</value>
+  </data>
+  <data name="Spreadsheet_FilterAnd" xml:space="preserve">
+    <value>AND</value>
+  </data>
+  <data name="Spreadsheet_FilterOr" xml:space="preserve">
+    <value>OR</value>
+  </data>
+  <!-- Spreadsheet: FormatCellsDialog -->
+  <data name="Spreadsheet_Sample" xml:space="preserve">
+    <value>Sample</value>
+  </data>
+  <data name="Spreadsheet_DecimalPlaces" xml:space="preserve">
+    <value>Decimal places:</value>
+  </data>
+  <data name="Spreadsheet_UseThousandsSeparator" xml:space="preserve">
+    <value>Use 1000 separator</value>
+  </data>
+  <data name="Spreadsheet_Symbol" xml:space="preserve">
+    <value>Symbol:</value>
+  </data>
+  <data name="Spreadsheet_Type" xml:space="preserve">
+    <value>Type:</value>
+  </data>
+  <data name="Spreadsheet_FormatCode" xml:space="preserve">
+    <value>Format code:</value>
+  </data>
+  <!-- Spreadsheet: ConditionalFormat tool -->
+  <data name="Spreadsheet_Conditional" xml:space="preserve">
+    <value>Conditional</value>
+  </data>
+  <data name="Spreadsheet_GreaterThanMenu" xml:space="preserve">
+    <value>Greater Than...</value>
+  </data>
+  <data name="Spreadsheet_LessThanMenu" xml:space="preserve">
+    <value>Less Than...</value>
+  </data>
+  <data name="Spreadsheet_BetweenMenu" xml:space="preserve">
+    <value>Between...</value>
+  </data>
+  <data name="Spreadsheet_EqualToMenu" xml:space="preserve">
+    <value>Equal To...</value>
+  </data>
+  <data name="Spreadsheet_TextContainsMenu" xml:space="preserve">
+    <value>Text Contains...</value>
+  </data>
+  <!-- Spreadsheet: ConditionalFormatDialog -->
+  <data name="Spreadsheet_RuleType" xml:space="preserve">
+    <value>Rule Type</value>
+  </data>
+  <data name="Spreadsheet_Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="Spreadsheet_Minimum" xml:space="preserve">
+    <value>Minimum</value>
+  </data>
+  <data name="Spreadsheet_Maximum" xml:space="preserve">
+    <value>Maximum</value>
+  </data>
+  <data name="Spreadsheet_Text" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="Spreadsheet_BackgroundColor" xml:space="preserve">
+    <value>Background Color</value>
+  </data>
+  <data name="Spreadsheet_TextColor" xml:space="preserve">
+    <value>Text Color</value>
+  </data>
+  <data name="Spreadsheet_RuleGreaterThan" xml:space="preserve">
+    <value>Greater Than</value>
+  </data>
+  <data name="Spreadsheet_RuleLessThan" xml:space="preserve">
+    <value>Less Than</value>
+  </data>
+  <data name="Spreadsheet_RuleBetween" xml:space="preserve">
+    <value>Between</value>
+  </data>
+  <data name="Spreadsheet_RuleEqualTo" xml:space="preserve">
+    <value>Equal To</value>
+  </data>
+  <data name="Spreadsheet_RuleTextContains" xml:space="preserve">
+    <value>Text Contains</value>
+  </data>
+  <!-- Spreadsheet: DataValidation tool -->
+  <data name="Spreadsheet_Validation" xml:space="preserve">
+    <value>Validation</value>
+  </data>
+  <data name="Spreadsheet_DataValidationMenu" xml:space="preserve">
+    <value>Data Validation...</value>
+  </data>
+  <data name="Spreadsheet_ClearValidation" xml:space="preserve">
+    <value>Clear Validation</value>
+  </data>
+  <!-- Spreadsheet: DataValidationDialog -->
+  <data name="Spreadsheet_ValidationType" xml:space="preserve">
+    <value>Validation Type</value>
+  </data>
+  <data name="Spreadsheet_Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="Spreadsheet_Formula" xml:space="preserve">
+    <value>Formula</value>
+  </data>
+  <data name="Spreadsheet_ValuesCommaSeparated" xml:space="preserve">
+    <value>Values (comma separated)</value>
+  </data>
+  <data name="Spreadsheet_AllowBlank" xml:space="preserve">
+    <value>Allow blank</value>
+  </data>
+  <data name="Spreadsheet_ErrorAlert" xml:space="preserve">
+    <value>Error Alert</value>
+  </data>
+  <data name="Spreadsheet_Style" xml:space="preserve">
+    <value>Style</value>
+  </data>
+  <data name="Spreadsheet_Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Spreadsheet_Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Spreadsheet_InputPrompt" xml:space="preserve">
+    <value>Input Prompt</value>
+  </data>
+  <data name="Spreadsheet_ShowInputMessage" xml:space="preserve">
+    <value>Show input message when cell is selected</value>
+  </data>
+  <data name="Spreadsheet_ValidationWholeNumber" xml:space="preserve">
+    <value>Whole Number</value>
+  </data>
+  <data name="Spreadsheet_ValidationDecimal" xml:space="preserve">
+    <value>Decimal</value>
+  </data>
+  <data name="Spreadsheet_ValidationList" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="Spreadsheet_ValidationDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Spreadsheet_ValidationTime" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Spreadsheet_ValidationTextLength" xml:space="preserve">
+    <value>Text Length</value>
+  </data>
+  <data name="Spreadsheet_ValidationCustom" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="Spreadsheet_OperatorBetween" xml:space="preserve">
+    <value>Between</value>
+  </data>
+  <data name="Spreadsheet_OperatorNotBetween" xml:space="preserve">
+    <value>Not Between</value>
+  </data>
+  <data name="Spreadsheet_OperatorEqualTo" xml:space="preserve">
+    <value>Equal To</value>
+  </data>
+  <data name="Spreadsheet_OperatorNotEqualTo" xml:space="preserve">
+    <value>Not Equal To</value>
+  </data>
+  <data name="Spreadsheet_OperatorGreaterThan" xml:space="preserve">
+    <value>Greater Than</value>
+  </data>
+  <data name="Spreadsheet_OperatorLessThan" xml:space="preserve">
+    <value>Less Than</value>
+  </data>
+  <data name="Spreadsheet_OperatorGreaterThanOrEqual" xml:space="preserve">
+    <value>Greater Than or Equal</value>
+  </data>
+  <data name="Spreadsheet_OperatorLessThanOrEqual" xml:space="preserve">
+    <value>Less Than or Equal</value>
+  </data>
+  <data name="Spreadsheet_ErrorStyleStop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="Spreadsheet_ErrorStyleWarning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Spreadsheet_ErrorStyleInformation" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <!-- Spreadsheet: Freeze tool -->
+  <data name="Spreadsheet_FreezePanes" xml:space="preserve">
+    <value>Freeze panes</value>
+  </data>
+  <data name="Spreadsheet_FreezeTopRow" xml:space="preserve">
+    <value>Freeze Top Row</value>
+  </data>
+  <data name="Spreadsheet_FreezeSelectedRows" xml:space="preserve">
+    <value>Freeze Selected Rows</value>
+  </data>
+  <data name="Spreadsheet_FreezeFirstColumn" xml:space="preserve">
+    <value>Freeze First Column</value>
+  </data>
+  <data name="Spreadsheet_FreezeSelectedColumns" xml:space="preserve">
+    <value>Freeze Selected Columns</value>
+  </data>
+  <data name="Spreadsheet_Unfreeze" xml:space="preserve">
+    <value>Unfreeze</value>
+  </data>
+  <!-- Spreadsheet: MergeCells tool -->
+  <data name="Spreadsheet_MergeAndCenter" xml:space="preserve">
+    <value>Merge &amp;&amp; Center</value>
+  </data>
+  <data name="Spreadsheet_MergeCells" xml:space="preserve">
+    <value>Merge Cells</value>
+  </data>
+  <data name="Spreadsheet_UnmergeCells" xml:space="preserve">
+    <value>Unmerge Cells</value>
+  </data>
+  <!-- Spreadsheet: CellBorders tool -->
+  <data name="Spreadsheet_AllBorders" xml:space="preserve">
+    <value>All Borders</value>
+  </data>
+  <data name="Spreadsheet_OutsideBorders" xml:space="preserve">
+    <value>Outside Borders</value>
+  </data>
+  <data name="Spreadsheet_TopBorder" xml:space="preserve">
+    <value>Top Border</value>
+  </data>
+  <data name="Spreadsheet_BottomBorder" xml:space="preserve">
+    <value>Bottom Border</value>
+  </data>
+  <data name="Spreadsheet_LeftBorder" xml:space="preserve">
+    <value>Left Border</value>
+  </data>
+  <data name="Spreadsheet_RightBorder" xml:space="preserve">
+    <value>Right Border</value>
+  </data>
+  <data name="Spreadsheet_NoBorder" xml:space="preserve">
+    <value>No Border</value>
+  </data>
+  <!-- Spreadsheet: DataFormat tool -->
+  <data name="Spreadsheet_FormatGeneral" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Spreadsheet_FormatNumber" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="Spreadsheet_FormatCurrency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="Spreadsheet_FormatAccounting" xml:space="preserve">
+    <value>Accounting</value>
+  </data>
+  <data name="Spreadsheet_FormatPercentage" xml:space="preserve">
+    <value>Percentage</value>
+  </data>
+  <data name="Spreadsheet_FormatScientific" xml:space="preserve">
+    <value>Scientific</value>
+  </data>
+  <data name="Spreadsheet_FormatDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Spreadsheet_FormatTime" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Spreadsheet_FormatText" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <!-- Spreadsheet: HyperlinkDialog -->
+  <data name="Spreadsheet_URL" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Spreadsheet_DisplayText" xml:space="preserve">
+    <value>Display Text</value>
+  </data>
+  <!-- Spreadsheet: IncreaseDecimals / DecreaseDecimals tooltips -->
+  <data name="Spreadsheet_IncreaseDecimalPlaces" xml:space="preserve">
+    <value>Increase decimal places</value>
+  </data>
+  <data name="Spreadsheet_DecreaseDecimalPlaces" xml:space="preserve">
+    <value>Decrease decimal places</value>
+  </data>
+</root>

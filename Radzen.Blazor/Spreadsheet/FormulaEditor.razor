@@ -1,0 +1,9 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<div class="rz-spreadsheet-formula-editor">
+    <SheetEditor tabindex="-1" @bind-Value=@Editor.Value Focus=@(this.AsNonRenderingEventHandler(OnFocus))
+        Worksheet=@Worksheet Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync)) />
+</div>

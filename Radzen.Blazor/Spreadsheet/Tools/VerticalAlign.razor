@@ -1,0 +1,74 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenSelectBar @bind-Value=@CurrentVerticalAlign Disabled=@IsDisabled>
+    <Items>
+        <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Top Icon="align_vertical_top" />
+        <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Middle Icon="align_vertical_center" />
+        <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Bottom Icon="align_vertical_bottom" />
+    </Items>
+</RadzenSelectBar>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private Radzen.VerticalAlign CurrentVerticalAlign
+    {
+        get
+        {
+            if (Worksheet?.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.VerticalAlign;
+            }
+            return Radzen.VerticalAlign.Top;
+        }
+        set
+        {
+            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+            {
+                if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+                {
+                    var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithVerticalAlign(value));
+                    Spreadsheet?.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+} 

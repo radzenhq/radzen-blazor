@@ -1,0 +1,24 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+
+@{
+#pragma warning disable IL2111
+}
+
+@if (Editor.Mode != EditMode.None)
+{
+<div class=@className style=@cellStyle>
+    @if (customEditorType is not null)
+    {
+        <DynamicComponent Type=@customEditorType Parameters=@GetEditorParameters() />
+    }
+    else
+    {
+        <SheetEditor @bind-Value=@Editor.Value AutoFocus=@(Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
+            Worksheet=@Worksheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
+    }
+</div>
+}

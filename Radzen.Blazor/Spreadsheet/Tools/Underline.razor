@@ -1,0 +1,9 @@
+@using Radzen.Documents.Spreadsheet
+@inherits FormatToggleToolBase
+
+<RadzenToggleButton @bind-Value=@IsToggled Icon="format_underlined" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" />
+
+@code {
+    protected override bool GetValue(Format format) => format.Underline;
+    protected override Format WithValue(Format format, bool value) => format.WithUnderline(value);
+}

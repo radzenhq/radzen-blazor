@@ -1,0 +1,59 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenButton Text=".0-" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Click=@OnClick title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DecreaseDecimalPlaces)) ?? "Decrease decimal places") />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private void OnClick()
+    {
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+        {
+            if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+            {
+                var newFormat = NumberFormat.AdjustDecimals(cell.Format.NumberFormat, -1);
+                var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(newFormat));
+                Spreadsheet?.Execute(command);
+            }
+        }
+    }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+}

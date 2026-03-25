@@ -1,0 +1,26 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="0" Style="max-height: 200px; overflow-y: auto; padding: 0.25rem 0">
+    @foreach (var item in Items)
+    {
+        <div class="rz-menu-item" style="padding: 0.25rem 0.5rem; cursor: pointer" @onclick="() => OnSelect(item)">
+            @item
+        </div>
+    }
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public IReadOnlyList<string> Items { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<string> ValueSelected { get; set; }
+
+    private async Task OnSelect(string value)
+    {
+        await ValueSelected.InvokeAsync(value);
+    }
+}

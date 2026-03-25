@@ -1,0 +1,9 @@
+@using Radzen.Documents.Spreadsheet
+@inherits FormatToggleToolBase
+
+<RadzenToggleButton @bind-Value=@IsToggled Icon="format_italic" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" />
+
+@code {
+    protected override bool GetValue(Format format) => format.Italic;
+    protected override Format WithValue(Format format, bool value) => format.WithItalic(value);
+}

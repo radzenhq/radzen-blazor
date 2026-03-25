@@ -1,0 +1,135 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenSplitButton Icon="view_column" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezePanes)) ?? "Freeze panes") Click=@OnFreezeClick ButtonStyle="ButtonStyle.Base" Disabled=@IsDisabled>
+    <ChildContent>
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeTopRow)) ?? "Freeze Top Row") Value="row" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedRows)) ?? "Freeze Selected Rows") Value="rows" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeFirstColumn)) ?? "Freeze First Column") Value="column" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedColumns)) ?? "Freeze Selected Columns") Value="columns" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Unfreeze)) ?? "Unfreeze") Value="unfreeze" Icon="view_column" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    private void OnFreezeClick(RadzenSplitButtonItem? item)
+    {
+        switch (item?.Value)
+        {
+            case null:
+                FreezePanes();
+                break;
+            case "row":
+                FreezeTopRow();
+                break;
+            case "rows":
+                FreezeRows();
+                break;
+            case "column":
+                FreezeFirstColumn();
+                break;
+            case "columns":
+                FreezeColumns();
+                break;
+            case "range":
+                FreezePanes();
+                break;
+            case "unfreeze":
+                Unfreeze();
+                break;
+        }
+    }
+
+    private void FreezeFirstColumn()
+    {
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+        {
+            Worksheet.Rows.Frozen = 0;
+            Worksheet.Columns.Frozen = 1;
+        }
+    }
+
+    private void FreezeTopRow()
+    {
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+        {
+            Worksheet.Rows.Frozen = 1;
+            Worksheet.Columns.Frozen = 0;
+        }
+    }
+
+    private void FreezeRows()
+    {
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+        {
+            var frozenRows = Worksheet.Selection.Cell.Row;
+            Worksheet.Rows.Frozen = frozenRows;
+        }
+    }
+
+    private void FreezeColumns()
+    {
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+        {
+            Worksheet.Columns.Frozen = Worksheet.Selection.Cell.Column;
+        }
+    }
+
+    private void FreezePanes()
+    {
+        if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+        {
+            Worksheet.Rows.Frozen = Worksheet.Selection.Cell.Row;
+            Worksheet.Columns.Frozen = Worksheet.Selection.Cell.Column;
+        }
+    }
+
+    private void Unfreeze()
+    {
+        if (Worksheet is not null)
+        {
+            Worksheet.Rows.Frozen = 0;
+            Worksheet.Columns.Frozen = 0;
+        }
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+} 

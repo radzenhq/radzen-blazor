@@ -1,0 +1,9 @@
+@using Radzen.Documents.Spreadsheet
+@inherits FormatToggleToolBase
+
+<RadzenToggleButton @bind-Value=@IsToggled Icon="wrap_text" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" />
+
+@code {
+    protected override bool GetValue(Format format) => format.WrapText;
+    protected override Format WithValue(Format format, bool value) => format.WithWrapText(value);
+}

@@ -1,0 +1,44 @@
+@using Radzen.Documents.Spreadsheet
+@using Radzen.Blazor.Rendering
+
+<li class="@Class">
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        <div class="rz-navigation-item-wrapper" @onclick=@OnClickAsync>
+            <div class="rz-navigation-item-link">
+                <i class="notranslate rzi rz-navigation-item-icon">@Icon</i>
+                <span class="rz-navigation-item-text">@Text</span>
+            </div>
+        </div>
+    }
+</li>
+@code {
+    [Parameter]
+    public EventCallback Click { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] 
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? Text { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private string Class => ClassList.Create("rz-navigation-item").AddDisabled(Disabled).ToString();
+
+    private async Task OnClickAsync()
+    {
+        if (!Disabled)
+        {
+            await Click.InvokeAsync(null);
+        }
+    }
+}

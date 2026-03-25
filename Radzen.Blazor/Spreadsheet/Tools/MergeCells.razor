@@ -1,0 +1,56 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSplitButton Click=@OnClick Icon="merge_type" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+    <ChildContent>
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_MergeAndCenter)) ?? "Merge && Center") Value="merge-center" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_MergeCells)) ?? "Merge Cells") Value="merge" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_UnmergeCells)) ?? "Unmerge Cells") Value="unmerge" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    private void OnClick(RadzenSplitButtonItem? item)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var value = item?.Value;
+
+        switch (value)
+        {
+            case "merge-center":
+            case null:
+            {
+                var command = new MergeCellsCommand(Worksheet, Worksheet.Selection.Range, center: true);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+            case "merge":
+            {
+                var command = new MergeCellsCommand(Worksheet, Worksheet.Selection.Range);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+            case "unmerge":
+            {
+                var command = new UnmergeCellsCommand(Worksheet, Worksheet.Selection.Cell);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+        }
+    }
+}

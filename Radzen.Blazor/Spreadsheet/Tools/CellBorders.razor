@@ -1,0 +1,86 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSplitButton Click=@OnClick Icon="border_all" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+    <ChildContent>
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AllBorders)) ?? "All Borders") Value="all" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_OutsideBorders)) ?? "Outside Borders") Value="outside" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_TopBorder)) ?? "Top Border") Value="top" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_BottomBorder)) ?? "Bottom Border") Value="bottom" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_LeftBorder)) ?? "Left Border") Value="left" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_RightBorder)) ?? "Right Border") Value="right" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_NoBorder)) ?? "No Border") Value="none" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    private void OnClick(RadzenSplitButtonItem? item)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var value = item?.Value;
+        var range = Worksheet.Selection.Range;
+        var border = new BorderStyle();
+
+        switch (value)
+        {
+            case "all":
+            case null:
+            {
+                var command = new AllBordersCommand(Worksheet, range, border);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+            case "outside":
+            {
+                var command = new BorderCommand(Worksheet, range, border, border, border, border);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+            case "top":
+            {
+                var command = new BorderCommand(Worksheet, range, top: border, right: null, bottom: null, left: null);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+            case "bottom":
+            {
+                var command = new BorderCommand(Worksheet, range, top: null, right: null, bottom: border, left: null);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+            case "left":
+            {
+                var command = new BorderCommand(Worksheet, range, top: null, right: null, bottom: null, left: border);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+            case "right":
+            {
+                var command = new BorderCommand(Worksheet, range, top: null, right: border, bottom: null, left: null);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+            case "none":
+            {
+                var command = new NoBordersCommand(Worksheet, range);
+                Spreadsheet?.Execute(command);
+                break;
+            }
+        }
+    }
+}

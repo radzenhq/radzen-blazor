@@ -1,0 +1,31 @@
+@using Radzen.Documents.Spreadsheet
+@using Microsoft.JSInterop
+@using Radzen.Blazor.Rendering
+@inject IJSRuntime JSRuntime;
+<div class="rz-spreadsheet-editor" @attributes=@Attributes>
+    <div class="rz-spreadsheet-editor-input" spellcheck="false" @ref=@element contenteditable></div>
+    <SheetEditorHighlight Value=@value />
+</div>
+<Popup @ref=@popup class="rz-spreadsheet-highlight-popup" Close="OnPopupClose">
+@if (functionHint is not null)
+{
+    <FunctionHint ArgumentIndex=@functionHint.ArgumentIndex Function=@functionHint.Function />
+}
+
+@if (functions.Count > 0)
+    {
+        <ul class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
+            @for (int i = 0; i < functions.Count; i++)
+            {
+                if (i == selectedIndex)
+                {
+                    <li class="rz-autocomplete-item rz-state-highlight" role="option">@(functions[i])</li>
+                }
+                else
+                {
+                    <li class="rz-autocomplete-item" role="option">@(functions[i])</li>
+                }
+            }
+        </ul>
+    }
+</Popup>

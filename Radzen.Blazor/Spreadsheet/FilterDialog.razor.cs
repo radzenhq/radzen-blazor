@@ -1,0 +1,400 @@
+using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
+
+using Radzen.Blazor;
+using Radzen.Documents.Spreadsheet;
+namespace Radzen.Blazor.Spreadsheet;
+
+#nullable enable
+
+/// <summary>
+/// Dialog for filtering data in a spreadsheet.
+/// </summary>
+public partial class FilterDialog : ComponentBase
+{
+    enum FilterOperator
+    {
+        None,
+        Equals,
+        NotEquals,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual,
+        BeginsWith,
+        DoesNotBeginWith,
+        EndsWith,
+        DoesNotEndWith,
+        Contains,
+        DoesNotContain,
+        IsEmpty,
+        IsNotEmpty
+    }
+
+    class FilterOperatorOption
+    {
+        public string Text { get; set; } = "";
+        public FilterOperator Value { get; set; }
+    }
+
+    class LogicalOperatorOption
+    {
+        public string Text { get; set; } = "";
+        public LogicalFilterOperator Value { get; set; }
+    }
+
+    /// <summary>
+    /// The sheet containing the data to filter.
+    /// </summary>
+    [Parameter]
+    public Worksheet Worksheet { get; set; } = default!;
+
+    /// <summary>
+    /// The column index to filter.
+    /// </summary>
+    [Parameter]
+    public int Column { get; set; }
+
+    /// <summary>
+    /// The row index where the filter was triggered.
+    /// </summary>
+    [Parameter]
+    public int Row { get; set; }
+
+    /// <summary>
+    /// The dialog service instance.
+    /// </summary>
+    [Inject]
+    public DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
+    /// <summary>
+    /// Optional existing filter criterion to populate default values.
+    /// </summary>
+    [Parameter]
+    public FilterCriterion? Filter { get; set; }
+
+    private FilterOperator selectedOperator = FilterOperator.Equals;
+    private string filterValue = "";
+    private LogicalFilterOperator logicalOperator = LogicalFilterOperator.And;
+    private FilterOperator secondOperator = FilterOperator.None;
+    private string secondFilterValue = "";
+    private List<FilterOperatorOption> availableOperators = [];
+    private List<LogicalOperatorOption> logicalOperators = [];
+    private string fieldName = "";
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        InitializeFieldName();
+        InitializeAvailableOperators();
+        InitializeLogicalOperators();
+
+        selectedOperator = FilterOperator.Equals;
+        secondOperator = FilterOperator.None;
+
+        if (Filter is not null)
+        {
+            var visitor = new FilterCriterionVisitor(Column);
+            Filter.Accept(visitor);
+            PopulateFromVisitor(visitor);
+        }
+    }
+
+    private void InitializeFieldName()
+    {
+        var dataTable = GetCurrentTable();
+        var autoFilter = GetCurrentAutoFilter();
+        var rangeToUse = RangeRef.Invalid;
+        if (dataTable is not null)
+        {
+            rangeToUse = dataTable.Range;
+        }
+        else if (autoFilter?.Range is not null)
+        {
+            rangeToUse = autoFilter.Range.Value;
+        }
+        if (rangeToUse != RangeRef.Invalid)
+        {
+            var headerCell = Worksheet.Cells[rangeToUse.Start.Row, Column];
+            var headerText = headerCell.GetValueAsString();
+            fieldName = string.IsNullOrEmpty(headerText) ? string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_ColumnFormat)), Column + 1) : headerText;
+        }
+        else
+        {
+            fieldName = string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_ColumnFormat)), Column + 1);
+        }
+    }
+
+    private void InitializeAvailableOperators()
+    {
+        availableOperators = [
+            new FilterOperatorOption { Text = "", Value = FilterOperator.None },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterEquals)), Value = FilterOperator.Equals },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterDoesNotEqual)), Value = FilterOperator.NotEquals },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterGreaterThan)), Value = FilterOperator.GreaterThan },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterGreaterThanOrEqual)), Value = FilterOperator.GreaterThanOrEqual },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterLessThan)), Value = FilterOperator.LessThan },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterLessThanOrEqual)), Value = FilterOperator.LessThanOrEqual },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterBeginsWith)), Value = FilterOperator.BeginsWith },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterDoesNotBeginWith)), Value = FilterOperator.DoesNotBeginWith },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterEndsWith)), Value = FilterOperator.EndsWith },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterDoesNotEndWith)), Value = FilterOperator.DoesNotEndWith },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterContains)), Value = FilterOperator.Contains },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterDoesNotContain)), Value = FilterOperator.DoesNotContain },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterIsEmpty)), Value = FilterOperator.IsEmpty },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterIsNotEmpty)), Value = FilterOperator.IsNotEmpty }
+        ];
+    }
+
+    private void InitializeLogicalOperators()
+    {
+        logicalOperators = [
+            new LogicalOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterAnd)), Value = LogicalFilterOperator.And },
+            new LogicalOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterOr)), Value = LogicalFilterOperator.Or }
+        ];
+    }
+
+    private void OnOk()
+    {
+        var filter = CreateFilter();
+        DialogService.Close(filter);
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close();
+    }
+
+    private SheetFilter? CreateFilter()
+    {
+        var dataTable = GetCurrentTable();
+        var autoFilter = GetCurrentAutoFilter();
+
+        RangeRef rangeToUse = RangeRef.Invalid;
+
+        if (dataTable is not null)
+        {
+            rangeToUse = dataTable.Range;
+        }
+        else if (autoFilter?.Range is not null)
+        {
+            rangeToUse = autoFilter.Range.Value;
+        }
+
+        if (rangeToUse == RangeRef.Invalid)
+        {
+            return null;
+        }
+
+        FilterCriterion criterion;
+
+        if (secondOperator != FilterOperator.None)
+        {
+            var criterion1 = CreateCriterion(Column, selectedOperator, filterValue);
+            var criterion2 = CreateCriterion(Column, secondOperator, secondFilterValue);
+
+            if (logicalOperator == LogicalFilterOperator.And)
+            {
+                criterion = new AndCriterion { Criteria = [criterion1, criterion2] };
+            }
+            else
+            {
+                criterion = new OrCriterion { Criteria = [criterion1, criterion2] };
+            }
+        }
+        else
+        {
+            criterion = CreateCriterion(Column, selectedOperator, filterValue);
+        }
+
+        return new SheetFilter(criterion, rangeToUse);
+    }
+
+    private static FilterCriterion CreateCriterion(int column, FilterOperator operatorType, string value)
+    {
+        return operatorType switch
+        {
+            FilterOperator.Equals => new EqualToCriterion { Column = column, Value = value },
+            FilterOperator.NotEquals => new NotEqualToCriterion { Column = column, Value = value },
+            FilterOperator.GreaterThan => new GreaterThanCriterion { Column = column, Value = value },
+            FilterOperator.GreaterThanOrEqual => new GreaterThanOrEqualCriterion { Column = column, Value = value },
+            FilterOperator.LessThan => new LessThanCriterion { Column = column, Value = value },
+            FilterOperator.LessThanOrEqual => new LessThanOrEqualCriterion { Column = column, Value = value },
+            FilterOperator.BeginsWith => new StartsWithCriterion { Column = column, Value = value },
+            FilterOperator.DoesNotBeginWith => new DoesNotStartWithCriterion { Column = column, Value = value },
+            FilterOperator.EndsWith => new EndsWithCriterion { Column = column, Value = value },
+            FilterOperator.DoesNotEndWith => new DoesNotEndWithCriterion { Column = column, Value = value },
+            FilterOperator.Contains => new ContainsCriterion { Column = column, Value = value },
+            FilterOperator.DoesNotContain => new DoesNotContainCriterion { Column = column, Value = value },
+            FilterOperator.IsEmpty => new IsNullCriterion { Column = column },
+            FilterOperator.IsNotEmpty => new NotEqualToCriterion { Column = column, Value = null },
+            _ => new EqualToCriterion { Column = column, Value = value }
+        };
+    }
+
+    private Table? GetCurrentTable()
+    {
+        foreach (var table in Worksheet.Tables)
+        {
+            if (table.Range.Contains(Row, Column))
+            {
+                return table;
+            }
+        }
+        return null;
+    }
+
+    private AutoFilter? GetCurrentAutoFilter()
+    {
+        if (Worksheet.AutoFilter.Range is not null && Worksheet.AutoFilter.Range.Value.Contains(Row, Column))
+        {
+            return Worksheet.AutoFilter;
+        }
+        return null;
+    }
+
+    private void PopulateFromVisitor(FilterCriterionVisitor visitor)
+    {
+        if (visitor.Criteria.Count > 0)
+        {
+            var firstCriterion = visitor.Criteria[0];
+            selectedOperator = firstCriterion.Operator;
+            filterValue = firstCriterion.Value ?? "";
+
+            if (visitor.Criteria.Count > 1)
+            {
+                var secondCriterion = visitor.Criteria[1];
+                secondOperator = secondCriterion.Operator;
+                secondFilterValue = secondCriterion.Value ?? "";
+                logicalOperator = visitor.LogicalOperator;
+            }
+        }
+    }
+
+    private class FilterCriterionVisitor(int column) : FilterCriterionVisitorBase
+    {
+        public List<(FilterOperator Operator, string? Value)> Criteria { get; } = [];
+        public LogicalFilterOperator LogicalOperator { get; set; } = LogicalFilterOperator.And;
+
+        public override void Visit(OrCriterion criterion)
+        {
+            LogicalOperator = LogicalFilterOperator.Or;
+            base.Visit(criterion);
+        }
+
+        public override void Visit(AndCriterion criterion)
+        {
+            LogicalOperator = LogicalFilterOperator.And;
+            base.Visit(criterion);
+        }
+
+        public override void Visit(EqualToCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.Equals, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(GreaterThanCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.GreaterThan, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(IsNullCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.IsEmpty, null));
+            }
+        }
+
+        public override void Visit(LessThanCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.LessThan, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(GreaterThanOrEqualCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.GreaterThanOrEqual, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(LessThanOrEqualCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.LessThanOrEqual, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(NotEqualToCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.NotEquals, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(StartsWithCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.BeginsWith, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(DoesNotStartWithCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.DoesNotBeginWith, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(EndsWithCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.EndsWith, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(DoesNotEndWithCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.DoesNotEndWith, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(ContainsCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.Contains, criterion.Value?.ToString()));
+            }
+        }
+
+        public override void Visit(DoesNotContainCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.DoesNotContain, criterion.Value?.ToString()));
+            }
+        }
+    }
+}

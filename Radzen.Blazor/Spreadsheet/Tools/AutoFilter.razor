@@ -1,0 +1,119 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenToggleButton @bind-Value=@IsAutoFilterEnabled Icon="filter_list" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private bool IsAutoFilterEnabled
+    {
+        get
+        {
+            if (Worksheet is null) return false;
+
+            // Check if we're in a data table
+            var dataTable = GetCurrentTable();
+            if (dataTable is not null)
+            {
+                return dataTable.ShowFilterButton;
+            }
+
+            // Check if sheet has auto filter
+            return Worksheet.AutoFilter.Range is not null;
+        }
+        set
+        {
+            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+            {
+                // Check if we're in a data table
+                var dataTable = GetCurrentTable();
+                if (dataTable is not null)
+                {
+                    var dataTableIndex = GetTableIndex(dataTable);
+                    if (dataTableIndex >= 0)
+                    {
+                        var command = new TableFilterCommand(Worksheet, dataTableIndex);
+                        Spreadsheet?.Execute(command);
+                    }
+                }
+                else
+                {
+                    // Apply to sheet selection range
+                    var command = new SheetAutoFilterCommand(Worksheet, Worksheet.Selection.Range);
+                    Spreadsheet?.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    private Table? GetCurrentTable()
+    {
+        if (Worksheet?.Tables is null) return null;
+
+        var selectedCell = Worksheet.Selection.Cell;
+        if (selectedCell == CellRef.Invalid) return null;
+
+        foreach (var table in Worksheet.Tables)
+        {
+            if (table.Range.Contains(selectedCell.Row, selectedCell.Column))
+            {
+                return table;
+            }
+        }
+
+        return null;
+    }
+
+    private int GetTableIndex(Table table)
+    {
+        if (Worksheet?.Tables is null) return -1;
+
+        for (int i = 0; i < Worksheet.Tables.Count; i++)
+        {
+            if (Worksheet.Tables[i] == table)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+} 
