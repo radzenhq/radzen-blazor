@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @using Radzen.Blazor.Spreadsheet.Tools
@@ -12,13 +13,13 @@
     <CascadingValue TValue="ISpreadsheet" Value=this IsFixed="true">
         <RadzenTabs SelectedIndex="1">
             <Tabs>
-                <RadzenTabsItem Text="File">
+                <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FileTab))>
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <Open WorkbookChanged=@OnWorkbookChangedAsync />
                         <Save Workbook=@workbook FileName=@ExportFileName />
                     </RadzenStack>
                 </RadzenTabsItem>
-                <RadzenTabsItem Text="Home">
+                <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_HomeTab))>
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <Undo Commands=@ActiveView?.Commands />
@@ -48,17 +49,17 @@
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
-                <RadzenTabsItem Text="Format">
+                <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatTab))>
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <DataFormat Worksheet=@Worksheet />
                         <IncreaseDecimals Worksheet=@Worksheet />
                         <DecreaseDecimals Worksheet=@Worksheet />
-                        <RadzenButton Text="Format Cells..." Click=@OnFormatCellsAsync
+                        <RadzenButton Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatCells)) Click=@OnFormatCellsAsync
                             ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
                             Disabled=@(Worksheet?.Selection.Cell == CellRef.Invalid) />
                     </RadzenStack>
                 </RadzenTabsItem>
-                <RadzenTabsItem Text="Insert">
+                <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_InsertTab))>
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <DeleteRow Worksheet=@Worksheet />
@@ -76,12 +77,12 @@
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
-                <RadzenTabsItem Text="View">
+                <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_ViewTab))>
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <Freeze Worksheet=@Worksheet />
                     </RadzenStack>
                 </RadzenTabsItem>
-                <RadzenTabsItem Text="Data">
+                <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_DataTab))>
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <AutoFilter Worksheet=@Worksheet />
                         <DataValidation Worksheet=@Worksheet />
@@ -144,10 +145,10 @@
                                     Variant="Variant.Text"
                                     Size="ButtonSize.ExtraSmall">
                                     <ChildContent>
-                                        <RadzenSplitButtonItem Text="Rename" Value="rename" Icon="edit" />
-                                        <RadzenSplitButtonItem Text="Delete" Value="delete" Icon="delete" Disabled=@(workbook.Sheets.Count <= 1) />
-                                        <RadzenSplitButtonItem Text="Move Left" Value="move-left" Icon="chevron_left" Disabled=@(workbook.IndexOf(sheet) == 0) />
-                                        <RadzenSplitButtonItem Text="Move Right" Value="move-right" Icon="chevron_right" Disabled=@(workbook.IndexOf(sheet) == workbook.Sheets.Count - 1) />
+                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_Rename)) Value="rename" Icon="edit" />
+                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_Delete)) Value="delete" Icon="delete" Disabled=@(workbook.Sheets.Count <= 1) />
+                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_MoveLeft)) Value="move-left" Icon="chevron_left" Disabled=@(workbook.IndexOf(sheet) == 0) />
+                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_MoveRight)) Value="move-right" Icon="chevron_right" Disabled=@(workbook.IndexOf(sheet) == workbook.Sheets.Count - 1) />
                                     </ChildContent>
                                 </RadzenSplitButton>
                             </Template>

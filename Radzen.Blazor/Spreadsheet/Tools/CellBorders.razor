@@ -1,15 +1,16 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
 <RadzenSplitButton Click=@OnClick Icon="border_all" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
-        <RadzenSplitButtonItem Text="All Borders" Value="all" />
-        <RadzenSplitButtonItem Text="Outside Borders" Value="outside" />
-        <RadzenSplitButtonItem Text="Top Border" Value="top" />
-        <RadzenSplitButtonItem Text="Bottom Border" Value="bottom" />
-        <RadzenSplitButtonItem Text="Left Border" Value="left" />
-        <RadzenSplitButtonItem Text="Right Border" Value="right" />
-        <RadzenSplitButtonItem Text="No Border" Value="none" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AllBorders)) ?? "All Borders") Value="all" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_OutsideBorders)) ?? "Outside Borders") Value="outside" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_TopBorder)) ?? "Top Border") Value="top" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_BottomBorder)) ?? "Bottom Border") Value="bottom" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_LeftBorder)) ?? "Left Border") Value="left" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_RightBorder)) ?? "Right Border") Value="right" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_NoBorder)) ?? "No Border") Value="none" />
     </ChildContent>
 </RadzenSplitButton>
 

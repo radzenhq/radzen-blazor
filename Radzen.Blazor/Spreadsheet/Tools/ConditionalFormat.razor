@@ -1,14 +1,15 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @inject DialogService DialogService
 
-<RadzenSplitButton Click=@OnClickAsync Icon="format_color_fill" Text="Conditional" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+<RadzenSplitButton Click=@OnClickAsync Icon="format_color_fill" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Conditional)) ?? "Conditional") Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
-        <RadzenSplitButtonItem Text="Greater Than..." Value="greater" />
-        <RadzenSplitButtonItem Text="Less Than..." Value="less" />
-        <RadzenSplitButtonItem Text="Between..." Value="between" />
-        <RadzenSplitButtonItem Text="Equal To..." Value="equal" />
-        <RadzenSplitButtonItem Text="Text Contains..." Value="text" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_GreaterThanMenu)) ?? "Greater Than...") Value="greater" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_LessThanMenu)) ?? "Less Than...") Value="less" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_BetweenMenu)) ?? "Between...") Value="between" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_EqualToMenu)) ?? "Equal To...") Value="equal" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_TextContainsMenu)) ?? "Text Contains...") Value="text" />
     </ChildContent>
 </RadzenSplitButton>
 
@@ -39,7 +40,7 @@
             _ => ConditionalFormatRuleType.GreaterThan
         };
 
-        var result = await DialogService.OpenAsync<ConditionalFormatDialog>("Conditional Formatting",
+        var result = await DialogService.OpenAsync<ConditionalFormatDialog>(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ConditionalFormattingTitle)) ?? "Conditional Formatting",
             new Dictionary<string, object?>
             {
                 { "RuleType", ruleType }

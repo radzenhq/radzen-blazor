@@ -1,3 +1,4 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
@@ -14,17 +15,18 @@
     [CascadingParameter]
     public ISpreadsheet? Spreadsheet { get; set; }
 
-    private static readonly List<FormatOption> FormatOptions =
+    private List<FormatOption>? formatOptions;
+    private List<FormatOption> FormatOptions => formatOptions ??=
     [
-        new("General", "General"),
-        new("Number", "#,##0.00"),
-        new("Currency", "$#,##0.00"),
-        new("Accounting", "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)"),
-        new("Percentage", "0%"),
-        new("Scientific", "0.00E+00"),
-        new("Date", "mm/dd/yyyy"),
-        new("Time", "h:mm AM/PM"),
-        new("Text", "@")
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatGeneral)) ?? "General", "General"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatNumber)) ?? "Number", "#,##0.00"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatCurrency)) ?? "Currency", "$#,##0.00"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatAccounting)) ?? "Accounting", "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatPercentage)) ?? "Percentage", "0%"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatScientific)) ?? "Scientific", "0.00E+00"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatDate)) ?? "Date", "mm/dd/yyyy"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatTime)) ?? "Time", "h:mm AM/PM"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatText)) ?? "Text", "@")
     ];
 
     private string CurrentFormat

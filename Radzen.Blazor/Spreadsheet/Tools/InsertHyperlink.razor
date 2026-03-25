@@ -1,3 +1,4 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @inject DialogService DialogService
@@ -29,7 +30,7 @@
         var url = existing?.Url ?? "";
         var displayText = existing?.DisplayText ?? cell?.Value?.ToString() ?? "";
 
-        var result = await DialogService.OpenAsync<HyperlinkDialog>("Insert Hyperlink",
+        var result = await DialogService.OpenAsync<HyperlinkDialog>(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertHyperlinkTitle)) ?? "Insert Hyperlink",
             new Dictionary<string, object?>
             {
                 { "Url", url },

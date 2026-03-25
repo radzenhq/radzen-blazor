@@ -1,46 +1,47 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
 <RadzenStack Gap="1rem" Style="padding: 1rem; min-width: 350px">
-    <RadzenFormField Text="Rule Type">
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_RuleType))>
         <RadzenDropDown @bind-Value=@RuleType Data=@RuleTypes TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
     </RadzenFormField>
 
     @if (RuleType == ConditionalFormatRuleType.GreaterThan || RuleType == ConditionalFormatRuleType.LessThan || RuleType == ConditionalFormatRuleType.EqualTo)
     {
-        <RadzenFormField Text="Value">
+        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Value))>
             <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
         </RadzenFormField>
     }
 
     @if (RuleType == ConditionalFormatRuleType.Between)
     {
-        <RadzenFormField Text="Minimum">
+        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum))>
             <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
         </RadzenFormField>
-        <RadzenFormField Text="Maximum">
+        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum))>
             <RadzenTextBox @bind-Value=@Value2 Style="width: 100%" />
         </RadzenFormField>
     }
 
     @if (RuleType == ConditionalFormatRuleType.TextContains)
     {
-        <RadzenFormField Text="Text">
+        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Text))>
             <RadzenTextBox @bind-Value=@Value1 Style="width: 100%" />
         </RadzenFormField>
     }
 
-    <RadzenFormField Text="Background Color">
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_BackgroundColor))>
         <RadzenColorPicker @bind-Value=@BackgroundColor Style="width: 100%" />
     </RadzenFormField>
 
-    <RadzenFormField Text="Text Color">
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_TextColor))>
         <RadzenColorPicker @bind-Value=@TextColor Style="width: 100%" />
     </RadzenFormField>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Text="OK" Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
-        <RadzenButton Text="Cancel" Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
     </RadzenStack>
 </RadzenStack>
 
@@ -48,6 +49,11 @@
 #nullable enable
     [Inject]
     public DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     [Parameter]
     public ConditionalFormatRuleType RuleType { get; set; } = ConditionalFormatRuleType.GreaterThan;
@@ -57,13 +63,14 @@
     private string BackgroundColor { get; set; } = "#FFEB9C";
     private string TextColor { get; set; } = "#9C5700";
 
-    private static readonly List<DropDownItem<ConditionalFormatRuleType>> RuleTypes =
+    private List<DropDownItem<ConditionalFormatRuleType>>? ruleTypes;
+    private List<DropDownItem<ConditionalFormatRuleType>> RuleTypes => ruleTypes ??=
     [
-        new("Greater Than", ConditionalFormatRuleType.GreaterThan),
-        new("Less Than", ConditionalFormatRuleType.LessThan),
-        new("Between", ConditionalFormatRuleType.Between),
-        new("Equal To", ConditionalFormatRuleType.EqualTo),
-        new("Text Contains", ConditionalFormatRuleType.TextContains)
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleGreaterThan)), ConditionalFormatRuleType.GreaterThan),
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleLessThan)), ConditionalFormatRuleType.LessThan),
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleBetween)), ConditionalFormatRuleType.Between),
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleEqualTo)), ConditionalFormatRuleType.EqualTo),
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleTextContains)), ConditionalFormatRuleType.TextContains)
     ];
 
     private void OnOk()

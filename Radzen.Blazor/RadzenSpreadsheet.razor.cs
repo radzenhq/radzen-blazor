@@ -50,6 +50,13 @@ public interface ISpreadsheet
     /// Gets whether there is a command to redo.
     /// </summary>
     bool CanRedo { get; }
+
+    /// <summary>
+    /// Returns a localized string for the specified key.
+    /// </summary>
+    /// <param name="key">The resource key.</param>
+    /// <returns>The localized string.</returns>
+    string Localize(string key);
 }
 
 /// <summary>
@@ -235,7 +242,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             .Select(s => s.Name)
             .ToList();
 
-        var name = await DialogService.OpenAsync<Spreadsheet.RenameSheetDialog>("Rename Sheet",
+        var name = await DialogService.OpenAsync<Spreadsheet.RenameSheetDialog>(Localize(nameof(RadzenStrings.Spreadsheet_RenameSheetTitle)),
             new Dictionary<string, object?> { { "Name", sheet.Name }, { "ExistingNames", existingNames } },
             new DialogOptions { Width = "300px" });
 
@@ -461,7 +468,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 parameters.Add(nameof(FilterDialog.Filter), existingFilter);
             }
 
-            var result = await DialogService.OpenAsync<FilterDialog>("Custom Filter", parameters, new DialogOptions
+            var result = await DialogService.OpenAsync<FilterDialog>(Localize(nameof(RadzenStrings.Spreadsheet_CustomFilterTitle)), parameters, new DialogOptions
             {
                 Width = "600px",
             });
@@ -487,7 +494,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             };
 
             var result = await DialogService.OpenAsync<FormatCellsDialog>(
-                "Format Cells", parameters, new DialogOptions { Width = "600px", Height = "480px" });
+                Localize(nameof(RadzenStrings.Spreadsheet_FormatCellsTitle)), parameters, new DialogOptions { Width = "600px", Height = "480px" });
 
             if (result is string formatCode)
             {
@@ -540,15 +547,15 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     switch (errorStyle)
                     {
                         case DataValidationErrorStyle.Information:
-                            await DialogService.Alert(error, "Information");
+                            await DialogService.Alert(error, Localize(nameof(RadzenStrings.Spreadsheet_InformationTitle)));
                             // Accept the value despite validation failure
                             Editor!.Cell.ClearValidationErrors();
                             break;
 
                         case DataValidationErrorStyle.Warning:
                             var confirmed = await DialogService.Confirm(
-                                error + Environment.NewLine + Environment.NewLine + "Do you want to continue?",
-                                "Warning");
+                                error + Environment.NewLine + Environment.NewLine + Localize(nameof(RadzenStrings.Spreadsheet_DoYouWantToContinue)),
+                                Localize(nameof(RadzenStrings.Spreadsheet_WarningTitle)));
 
                             if (confirmed == true)
                             {
@@ -563,7 +570,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                             break;
 
                         default: // Stop
-                            await DialogService.Alert(error, "Invalid Value");
+                            await DialogService.Alert(error, Localize(nameof(RadzenStrings.Spreadsheet_InvalidValueTitle)));
                             command.Unexecute();
                             Editor!.Cancel();
                             result = false;
@@ -747,12 +754,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
         {
-            new() { Text = "Cut", Value = "cut", Icon = "content_cut" },
-            new() { Text = "Copy", Value = "copy", Icon = "content_copy" },
-            new() { Text = "Paste", Value = "paste", Icon = "content_paste" },
-            new() { Text = "Clear Contents", Value = "clear", Icon = "clear" },
-            new() { Text = "Sort Ascending", Value = "sort-ascending", Icon = "arrow_upward" },
-            new() { Text = "Sort Descending", Value = "sort-descending", Icon = "arrow_downward" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ClearContents)), Value = "clear", Icon = "clear" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ContextSortAscending)), Value = "sort-ascending", Icon = "arrow_upward" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ContextSortDescending)), Value = "sort-descending", Icon = "arrow_downward" },
         }, menuArgs => OnContextMenuItemClick(menuArgs, row, column));
     }
 
@@ -777,14 +784,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
         {
-            new() { Text = "Cut", Value = "cut", Icon = "content_cut" },
-            new() { Text = "Copy", Value = "copy", Icon = "content_copy" },
-            new() { Text = "Paste", Value = "paste", Icon = "content_paste" },
-            new() { Text = "Insert Row Above", Value = "insert-row-before", Icon = "north" },
-            new() { Text = "Insert Row Below", Value = "insert-row-after", Icon = "south" },
-            new() { Text = "Delete Row", Value = "delete-row", Icon = "delete" },
-            new() { Text = "Hide Row", Value = "hide-row", Icon = "visibility_off" },
-            new() { Text = "Unhide Row", Value = "unhide-row", Icon = "visibility" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertRowAbove)), Value = "insert-row-before", Icon = "north" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertRowBelow)), Value = "insert-row-after", Icon = "south" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteRow)), Value = "delete-row", Icon = "delete" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideRow)), Value = "hide-row", Icon = "visibility_off" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideRow)), Value = "unhide-row", Icon = "visibility" },
         }, menuArgs => OnRowContextMenuItemClick(menuArgs, row));
     }
 
@@ -809,14 +816,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
         {
-            new() { Text = "Cut", Value = "cut", Icon = "content_cut" },
-            new() { Text = "Copy", Value = "copy", Icon = "content_copy" },
-            new() { Text = "Paste", Value = "paste", Icon = "content_paste" },
-            new() { Text = "Insert Column Before", Value = "insert-column-before", Icon = "west" },
-            new() { Text = "Insert Column After", Value = "insert-column-after", Icon = "east" },
-            new() { Text = "Delete Column", Value = "delete-column", Icon = "delete" },
-            new() { Text = "Hide Column", Value = "hide-column", Icon = "visibility_off" },
-            new() { Text = "Unhide Column", Value = "unhide-column", Icon = "visibility" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnBefore)), Value = "insert-column-before", Icon = "west" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnAfter)), Value = "insert-column-after", Icon = "east" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteColumn)), Value = "delete-column", Icon = "delete" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideColumn)), Value = "hide-column", Icon = "visibility_off" },
+            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideColumn)), Value = "unhide-column", Icon = "visibility" },
         }, menuArgs => OnColumnContextMenuItemClick(menuArgs, column));
     }
 
