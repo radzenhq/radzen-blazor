@@ -4,6 +4,10 @@
 @using Radzen.Documents.Spreadsheet
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 
+@{
+#pragma warning disable IL2111
+}
+
 @if (Editor.Mode != EditMode.None)
 {
 <div class=@className style=@cellStyle>
