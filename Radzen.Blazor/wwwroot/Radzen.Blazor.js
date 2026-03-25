@@ -16,6 +16,18 @@ if (!Element.prototype.closest) {
   };
 }
 
+// Suppress "DotNetObjectReference already disposed" promise rejections during component teardown.
+function suppressDisposed(promise) {
+  if (promise && typeof promise.catch === 'function') {
+    promise.catch(function () { });
+  }
+}
+window.addEventListener('unhandledrejection', function (e) {
+  if (e.reason && e.reason.message && e.reason.message.indexOf('DotNetObjectReference') !== -1) {
+    e.preventDefault();
+  }
+});
+
 var resolveCallbacks = [];
 var rejectCallbacks = [];
 var radzenRecognition;
@@ -116,7 +128,7 @@ window.Radzen = {
      var el = document.getElementById(id);
      if (el) {
         var handler = function (e) {
-            try { ref.invokeMethodAsync('RadzenComponent.RaiseMouseEnter'); } catch { }
+            try { suppressDisposed(ref.invokeMethodAsync('RadzenComponent.RaiseMouseEnter')); } catch { }
         };
         Radzen[id + 'mouseenter'] = handler;
         el.addEventListener('mouseenter', handler, false);
@@ -126,7 +138,7 @@ window.Radzen = {
      var el = document.getElementById(id);
      if (el) {
         var handler = function (e) {
-            try { ref.invokeMethodAsync('RadzenComponent.RaiseMouseLeave'); } catch { }
+            try { suppressDisposed(ref.invokeMethodAsync('RadzenComponent.RaiseMouseLeave')); } catch { }
         };
         Radzen[id + 'mouseleave'] = handler;
         el.addEventListener('mouseleave', handler, false);
@@ -537,7 +549,7 @@ window.Radzen = {
         }
 
         var eventType = drag.mode === 'move' ? 'move' : 'resize';
-        config.dotnetRef.invokeMethodAsync('OnGanttBarInteractionEnd', drag.index, eventType, newStartMs, newEndMs);
+        try { suppressDisposed(config.dotnetRef.invokeMethodAsync('OnGanttBarInteractionEnd', drag.index, eventType, newStartMs, newEndMs)); } catch { }
       }
 
       drag = null;
@@ -882,7 +894,7 @@ window.Radzen = {
                   var code = Radzen[id].inputs.map(i => i.value).join('').trim();
                   hidden.value = code;
 
-                  try { ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', code); } catch { }
+                  try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', code)); } catch { }
 
                   Radzen[id].inputs[Radzen[id].inputs.length - 1].focus();
               }
@@ -922,7 +934,7 @@ window.Radzen = {
           var value = Radzen[id].inputs.map(i => i.value).join('').trim();
           hidden.value = value;
 
-          try { ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value); } catch { }
+          try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value)); } catch { }
 
           var index = Radzen[id].inputs.indexOf(e.currentTarget);
           if (index < Radzen[id].inputs.length - 1) {
@@ -938,7 +950,7 @@ window.Radzen = {
               var value = Radzen[id].inputs.map(i => i.value).join('').trim();
               hidden.value = value;
 
-              try { ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value); } catch { }
+              try { suppressDisposed(ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value)); } catch { }
 
               var index = Radzen[id].inputs.indexOf(e.currentTarget);
               if (index > 0) {
@@ -1552,7 +1564,7 @@ window.Radzen = {
 
       uploadComponent.files = Array.from(fileInput.files);
       uploadComponent.localFiles = files;
-      try { uploadComponent.invokeMethodAsync('RadzenUpload.OnChange', files); } catch { }
+      try { suppressDisposed(uploadComponent.invokeMethodAsync('RadzenUpload.OnChange', files)); } catch { }
     }
 
     for (var i = 0; i < fileInput.files.length; i++) {
@@ -1991,7 +2003,7 @@ window.Radzen = {
           tooltipContent.classList.add('rz-top-tooltip-content');
             position = 'top';
             if (instance && callback) {
-                try { instance.invokeMethodAsync(callback, position); } catch { }
+                try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
             }
         }
       }
@@ -2009,7 +2021,7 @@ window.Radzen = {
           tooltipContent.classList.add('rz-left-tooltip-content');
           position = 'left';
           if (instance && callback) {
-              try { instance.invokeMethodAsync(callback, position); } catch { }
+              try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
           }
         }
       }
@@ -2027,7 +2039,7 @@ window.Radzen = {
           tooltipContent.classList.add('rz-right-tooltip-content');
           position = 'right';
           if (instance && callback) {
-              try { instance.invokeMethodAsync(callback, position); } catch { }
+              try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
           }
         }
       }
@@ -2266,9 +2278,9 @@ window.Radzen = {
 
     if (instance && callback) {
         if (callback.includes('RadzenTooltip')) {
-            try { instance.invokeMethodAsync(callback, null); } catch { }
+            try { suppressDisposed(instance.invokeMethodAsync(callback, null)); } catch { }
         } else {
-            try { instance.invokeMethodAsync(callback); } catch { }
+            try { suppressDisposed(instance.invokeMethodAsync(callback)); } catch { }
         }
     }
     Radzen.popups = (Radzen.popups || []).filter(function (obj) {
@@ -2500,7 +2512,7 @@ window.Radzen = {
                             lastDialog.parentElement.style.left = left + 'px';
                             lastDialog.parentElement.style.top = top + 'px';
 
-                            try { dialog.invokeMethodAsync('RadzenDialog.OnDrag', top, left); } catch { }
+                            try { suppressDisposed(dialog.invokeMethodAsync('RadzenDialog.OnDrag', top, left)); } catch { }
                         };
 
                         var stop = function () {
@@ -3062,7 +3074,7 @@ window.Radzen = {
         var w = entry.contentRect.width;
         var h = entry.contentRect.height;
         if (w > 0) {
-          try { instance.invokeMethodAsync('OnResize', w, h); } catch (ex) {}
+          try { suppressDisposed(instance.invokeMethodAsync('OnResize', w, h)); } catch (ex) {}
         }
       }
     });
@@ -3126,7 +3138,7 @@ window.Radzen = {
     ref.resizeHandler = function () {
       var rect = ref.getBoundingClientRect();
 
-      try { instance.invokeMethodAsync('Resize', rect.width, rect.height); } catch { }
+      try { suppressDisposed(instance.invokeMethodAsync('Resize', rect.width, rect.height)); } catch { }
     };
 
     if (window.ResizeObserver) {
@@ -3148,7 +3160,7 @@ window.Radzen = {
         var rect = ref.getBoundingClientRect();
         var x = e.clientX - rect.left;
         var y = e.clientY - rect.top;
-        try { instance.invokeMethodAsync('MouseMove', x, y); } catch { }
+        try { suppressDisposed(instance.invokeMethodAsync('MouseMove', x, y)); } catch { }
      }
     }, 100);
     ref.mouseEnterHandler = function () {
@@ -3159,14 +3171,14 @@ window.Radzen = {
             return;
         }
         inside = false;
-        try { instance.invokeMethodAsync('MouseMove', -1, -1); } catch { }
+        try { suppressDisposed(instance.invokeMethodAsync('MouseMove', -1, -1)); } catch { }
     };
     ref.clickHandler = function (e) {
       var rect = ref.getBoundingClientRect();
       var x = e.clientX - rect.left;
       var y = e.clientY - rect.top;
       if (!e.target.closest('.rz-marker') && !e.target.closest('.rz-legend-item')) {
-        try { instance.invokeMethodAsync('Click', x, y); } catch { }
+        try { suppressDisposed(instance.invokeMethodAsync('Click', x, y)); } catch { }
       }
     };
 
@@ -3176,7 +3188,7 @@ window.Radzen = {
       var rect = ref.getBoundingClientRect();
       var x = e.clientX - rect.left;
       var delta = e.deltaY > 0 ? 1 : -1;
-      try { instance.invokeMethodAsync('OnWheel', x, delta); } catch {}
+      try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, delta)); } catch {}
     };
 
     ref.addEventListener('mouseenter', ref.mouseEnterHandler);
@@ -3257,7 +3269,7 @@ window.Radzen = {
       var newPos = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartPos + deltaPercent));
       setThumbPos(thumb, newPos);
       var position = newPos / 100;
-      try { instance.invokeMethodAsync('OnPan', position); } catch {}
+      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
     };
     document.addEventListener('mousemove', ref.scrollbarMoveHandler);
 
@@ -3275,7 +3287,7 @@ window.Radzen = {
       var clickX = isChartRTL() ? trackRect.right - e.clientX : e.clientX - trackRect.left;
       var thumbWidth = thumb.offsetWidth;
       var position = Math.max(0, Math.min(1 - thumbWidth / track.offsetWidth, (clickX - thumbWidth / 2) / track.offsetWidth));
-      try { instance.invokeMethodAsync('OnPan', position); } catch {}
+      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
     });
 
     // Touch support for scrollbar drag
@@ -3300,7 +3312,7 @@ window.Radzen = {
       var newPos = Math.max(0, Math.min(100 - parseFloat(thumb.style.width), dragStartPos + deltaPercent));
       setThumbPos(thumb, newPos);
       var position = newPos / 100;
-      try { instance.invokeMethodAsync('OnPan', position); } catch {}
+      try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
       e.preventDefault();
     };
     document.addEventListener('touchmove', ref.scrollbarTouchMoveHandler, { passive: false });
@@ -3345,10 +3357,10 @@ window.Radzen = {
         var x = midX - rect.left;
         var ratio = currentDistance / pinchStartDistance;
         if (ratio > 1.05) {
-          try { instance.invokeMethodAsync('OnWheel', x, -1); } catch {}
+          try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, -1)); } catch {}
           pinchStartDistance = currentDistance;
         } else if (ratio < 0.95) {
-          try { instance.invokeMethodAsync('OnWheel', x, 1); } catch {}
+          try { suppressDisposed(instance.invokeMethodAsync('OnWheel', x, 1)); } catch {}
           pinchStartDistance = currentDistance;
         }
         e.preventDefault();
@@ -3366,7 +3378,7 @@ window.Radzen = {
         var deltaPercent = (isChartRTL() ? dx : -dx) / chartWidth * 100;
         var newPos = Math.max(0, Math.min(100 - thumbWidth, currentPos + deltaPercent));
         var position = newPos / 100;
-        try { instance.invokeMethodAsync('OnPan', position); } catch {}
+        try { suppressDisposed(instance.invokeMethodAsync('OnPan', position)); } catch {}
         touchPanStartX = e.touches[0].clientX;
         e.preventDefault();
       }
@@ -3385,10 +3397,10 @@ window.Radzen = {
 
     // RTL detection
     ref._chartRTLObserver = new MutationObserver(function () {
-      try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+      try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
     });
     ref._chartRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
-    try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+    try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
 
     this.createResizable(ref, instance);
     var self = this;
@@ -3399,10 +3411,10 @@ window.Radzen = {
   createGauge: function (ref, instance) {
     this.createResizable(ref, instance);
     ref._gaugeRTLObserver = new MutationObserver(function () {
-      try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+      try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
     });
     ref._gaugeRTLObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['dir'] });
-    try { instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl'); } catch (e) { }
+    try { suppressDisposed(instance.invokeMethodAsync('SetRTL', document.documentElement.dir === 'rtl')); } catch (e) { }
     var rect = ref.getBoundingClientRect();
     return { width: rect.width, height: rect.height };
   },
@@ -3447,7 +3459,7 @@ window.Radzen = {
   mediaQuery: function(query, instance) {
     if (instance) {
       function callback(event) {
-          try { instance.invokeMethodAsync('OnChange', event.matches); } catch { }
+          try { suppressDisposed(instance.invokeMethodAsync('OnChange', event.matches)); } catch { }
       };
       var query = matchMedia(query);
       this.mediaQueries[instance._id] = function() {
@@ -3465,7 +3477,7 @@ window.Radzen = {
   },
   createEditor: function (ref, uploadUrl, paste, instance, shortcuts) {
     ref.inputListener = function () {
-      try { instance.invokeMethodAsync('OnChange', ref.innerHTML); } catch { }
+      try { suppressDisposed(instance.invokeMethodAsync('OnChange', ref.innerHTML)); } catch { }
     };
     ref.keydownListener = function (e) {
       var key = '';
@@ -3482,7 +3494,7 @@ window.Radzen = {
 
       if (shortcuts.includes(key)) {
         e.preventDefault();
-        try { instance.invokeMethodAsync('ExecuteShortcutAsync', key); } catch { }
+        try { suppressDisposed(instance.invokeMethodAsync('ExecuteShortcutAsync', key)); } catch { }
       }
     };
 
@@ -3508,7 +3520,7 @@ window.Radzen = {
 
     ref.selectionChangeListener = function () {
       if (document.activeElement == ref) {
-        try { instance.invokeMethodAsync('OnSelectionChange'); } catch { }
+        try { suppressDisposed(instance.invokeMethodAsync('OnSelectionChange')); } catch { }
       }
     };
     ref.handleInsert = function (e, transfer, hasDelegate) {
@@ -3546,9 +3558,9 @@ window.Radzen = {
               } else {
                 document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
               }
-              try { instance.invokeMethodAsync('OnUploadComplete', xhr.responseText); } catch { }
+              try { suppressDisposed(instance.invokeMethodAsync('OnUploadComplete', xhr.responseText)); } catch { }
             } else {
-              try { instance.invokeMethodAsync('OnError', xhr.responseText); } catch { }
+              try { suppressDisposed(instance.invokeMethodAsync('OnError', xhr.responseText)); } catch { }
             }
           }
         }
@@ -3699,11 +3711,11 @@ window.Radzen = {
         return { left: 0, top: 0, width: 0, height: 0 };
     }
     ref.mouseMoveHandler = function (e) {
-      try { instance.invokeMethodAsync(handler, { clientX: e.clientX, clientY: e.clientY }); } catch { }
+      try { suppressDisposed(instance.invokeMethodAsync(handler, { clientX: e.clientX, clientY: e.clientY })); } catch { }
     };
     ref.touchMoveHandler = function (e) {
       if (e.targetTouches[0] && ref.contains(e.targetTouches[0].target)) {
-        try { instance.invokeMethodAsync(handler, { clientX: e.targetTouches[0].clientX, clientY: e.targetTouches[0].clientY }); } catch { }
+        try { suppressDisposed(instance.invokeMethodAsync(handler, { clientX: e.targetTouches[0].clientX, clientY: e.targetTouches[0].clientY })); } catch { }
       }
     };
     ref.mouseUpHandler = function (e) {
@@ -4184,10 +4196,10 @@ window.Radzen = {
                 let current = event.results[event.results.length - 1][0]
                 let result = current.transcript;
 
-                try { componentRef.invokeMethodAsync("OnResult", result); } catch { }
+                try { suppressDisposed(componentRef.invokeMethodAsync("OnResult", result)); } catch { }
             };
             radzenRecognition.onend = function (event) {
-                try { componentRef.invokeMethodAsync("StopRecording"); } catch { }
+                try { suppressDisposed(componentRef.invokeMethodAsync("StopRecording")); } catch { }
                 radzenRecognition = null;
             };
             radzenRecognition.start();
@@ -4318,7 +4330,7 @@ window.Radzen = {
     createDraggable: function(element, ref, onDragStart) {
       function handleDragStart(e) {
         e.dataTransfer.setData('', e.target.id);
-        try { ref.invokeMethodAsync(onDragStart); } catch { }
+        try { suppressDisposed(ref.invokeMethodAsync(onDragStart)); } catch { }
       }
       element.draggable = true;
       element.addEventListener('dragstart', handleDragStart);
@@ -4338,7 +4350,7 @@ Radzen.registerFabMenu = function(element, dotnet){
   }
   const handler = function(e){
     if(!element.contains(e.target)){
-      try { dotnet.invokeMethodAsync('CloseAsync'); } catch { }
+      try { suppressDisposed(dotnet.invokeMethodAsync('CloseAsync')); } catch { }
     }
   };
   element.__rzOutsideClickHandler = handler;
