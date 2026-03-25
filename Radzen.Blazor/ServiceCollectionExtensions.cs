@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Radzen;
 
@@ -19,6 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<TooltipService>();
         services.AddScoped<ContextMenuService>();
         services.AddScoped<ThemeService>();
+        services.TryAddScoped(sp => new Localizer(sp.GetService<ILocalizer>()));
         services.AddAIChatService();
 
         return services;

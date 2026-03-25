@@ -1,15 +1,16 @@
+@using Radzen.Blazor
 @using Radzen.Documents.Spreadsheet
 @using Microsoft.AspNetCore.Components.Web
 @using Radzen.Blazor.Rendering
 <ul class="rz-menu rz-spreadsheet-cell-menu">
-    <CellMenuItem Text="Sort ascending" Icon="sort" Click=@OnSortAscendingAsync />
-    <CellMenuItem Text="Sort descending" Icon="sort" Click=@OnSortDescendingAsync />
-    <CellMenuItem Text="Clear Filter" Icon="filter_alt_off" Click=@OnClearFilterAsync Disabled=@(!HasFilterApplied()) />
-    <CellMenuItem Text="Custom filter..." Icon="filter_alt" Click=@OnCustomFilterAsync />
+    <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_SortAscending)) ?? "Sort ascending") Icon="sort" Click=@OnSortAscendingAsync />
+    <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_SortDescending)) ?? "Sort descending") Icon="sort" Click=@OnSortDescendingAsync />
+    <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ClearFilter)) ?? "Clear Filter") Icon="filter_alt_off" Click=@OnClearFilterAsync Disabled=@(!HasFilterApplied()) />
+    <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CustomFilter)) ?? "Custom filter...") Icon="filter_alt" Click=@OnCustomFilterAsync />
     <div class="rz-spreadsheet-cell-menu-filter">
         <CellMenuItem>
             <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" />
-            <RadzenLabel Text="(Select All)" />
+            <RadzenLabel Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_SelectAll)) ?? "(Select All)") />
         </CellMenuItem>
         @foreach (var item in LoadAvailableValues())
         {
@@ -22,12 +23,12 @@
         {
             <CellMenuItem>
                 <RadzenCheckBox TValue="bool" Value=@IsBlankSelected() Change=@OnBlankSelectionChanged />
-                <RadzenLabel Text="(Blank)" />
+                <RadzenLabel Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Blank)) ?? "(Blank)") />
             </CellMenuItem>
         }
     </div>
     <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End">
-        <RadzenButton Text="OK" Click=@OnApplyFilterAsync ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Disabled=@(!CanApplyFilter()) />
-        <RadzenButton Text="Cancel" Click=@OnCancelFilterAsync ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
+        <RadzenButton Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_OK)) ?? "OK") Click=@OnApplyFilterAsync ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Disabled=@(!CanApplyFilter()) />
+        <RadzenButton Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Cancel)) ?? "Cancel") Click=@OnCancelFilterAsync ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
     </RadzenStack>
 </ul>

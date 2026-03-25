@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 
+using Radzen.Blazor;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -66,6 +67,11 @@ public partial class FilterDialog : ComponentBase
     [Inject]
     public DialogService DialogService { get; set; } = default!;
 
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
     /// <summary>
     /// Optional existing filter criterion to populate default values.
     /// </summary>
@@ -116,11 +122,11 @@ public partial class FilterDialog : ComponentBase
         {
             var headerCell = Worksheet.Cells[rangeToUse.Start.Row, Column];
             var headerText = headerCell.GetValueAsString();
-            fieldName = string.IsNullOrEmpty(headerText) ? $"Column {Column + 1}" : headerText;
+            fieldName = string.IsNullOrEmpty(headerText) ? string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_ColumnFormat)), Column + 1) : headerText;
         }
         else
         {
-            fieldName = $"Column {Column + 1}";
+            fieldName = string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_ColumnFormat)), Column + 1);
         }
     }
 
@@ -128,28 +134,28 @@ public partial class FilterDialog : ComponentBase
     {
         availableOperators = [
             new FilterOperatorOption { Text = "", Value = FilterOperator.None },
-            new FilterOperatorOption { Text = "equals", Value = FilterOperator.Equals },
-            new FilterOperatorOption { Text = "does not equal", Value = FilterOperator.NotEquals },
-            new FilterOperatorOption { Text = "is greater than", Value = FilterOperator.GreaterThan },
-            new FilterOperatorOption { Text = "is greater than or equal to", Value = FilterOperator.GreaterThanOrEqual },
-            new FilterOperatorOption { Text = "is less than", Value = FilterOperator.LessThan },
-            new FilterOperatorOption { Text = "is less than or equal to", Value = FilterOperator.LessThanOrEqual },
-            new FilterOperatorOption { Text = "begins with", Value = FilterOperator.BeginsWith },
-            new FilterOperatorOption { Text = "does not begin with", Value = FilterOperator.DoesNotBeginWith },
-            new FilterOperatorOption { Text = "ends with", Value = FilterOperator.EndsWith },
-            new FilterOperatorOption { Text = "does not end with", Value = FilterOperator.DoesNotEndWith },
-            new FilterOperatorOption { Text = "contains", Value = FilterOperator.Contains },
-            new FilterOperatorOption { Text = "does not contain", Value = FilterOperator.DoesNotContain },
-            new FilterOperatorOption { Text = "is empty", Value = FilterOperator.IsEmpty },
-            new FilterOperatorOption { Text = "is not empty", Value = FilterOperator.IsNotEmpty }
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterEquals)), Value = FilterOperator.Equals },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterDoesNotEqual)), Value = FilterOperator.NotEquals },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterGreaterThan)), Value = FilterOperator.GreaterThan },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterGreaterThanOrEqual)), Value = FilterOperator.GreaterThanOrEqual },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterLessThan)), Value = FilterOperator.LessThan },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterLessThanOrEqual)), Value = FilterOperator.LessThanOrEqual },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterBeginsWith)), Value = FilterOperator.BeginsWith },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterDoesNotBeginWith)), Value = FilterOperator.DoesNotBeginWith },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterEndsWith)), Value = FilterOperator.EndsWith },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterDoesNotEndWith)), Value = FilterOperator.DoesNotEndWith },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterContains)), Value = FilterOperator.Contains },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterDoesNotContain)), Value = FilterOperator.DoesNotContain },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterIsEmpty)), Value = FilterOperator.IsEmpty },
+            new FilterOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterIsNotEmpty)), Value = FilterOperator.IsNotEmpty }
         ];
     }
 
     private void InitializeLogicalOperators()
     {
         logicalOperators = [
-            new LogicalOperatorOption { Text = "AND", Value = LogicalFilterOperator.And },
-            new LogicalOperatorOption { Text = "OR", Value = LogicalFilterOperator.Or }
+            new LogicalOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterAnd)), Value = LogicalFilterOperator.And },
+            new LogicalOperatorOption { Text = L(nameof(RadzenStrings.Spreadsheet_FilterOr)), Value = LogicalFilterOperator.Or }
         ];
     }
 

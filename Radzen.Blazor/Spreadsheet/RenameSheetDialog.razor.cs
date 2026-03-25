@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Components;
 
+using Radzen.Blazor;
 namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
@@ -29,13 +30,18 @@ public partial class RenameSheetDialog : ComponentBase
     [Inject]
     public DialogService DialogService { get; set; } = default!;
 
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
     private string? error;
 
     private void OnOk()
     {
         if (string.IsNullOrWhiteSpace(Name))
         {
-            error = "Name cannot be empty.";
+            error = L(nameof(RadzenStrings.Spreadsheet_NameCannotBeEmpty));
             return;
         }
 
@@ -43,7 +49,7 @@ public partial class RenameSheetDialog : ComponentBase
         {
             if (string.Equals(existing, Name, StringComparison.OrdinalIgnoreCase))
             {
-                error = $"A sheet named '{Name}' already exists.";
+                error = string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_SheetNameAlreadyExists)), Name);
                 return;
             }
         }
