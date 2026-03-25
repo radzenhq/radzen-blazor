@@ -1,11 +1,12 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @inject DialogService DialogService
 
-<RadzenSplitButton Click=@OnClickAsync Icon="rule" Text="Validation" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+<RadzenSplitButton Click=@OnClickAsync Icon="rule" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Validation)) ?? "Validation") Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
-        <RadzenSplitButtonItem Text="Data Validation..." Value="validate" />
-        <RadzenSplitButtonItem Text="Clear Validation" Value="clear" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationMenu)) ?? "Data Validation...") Value="validate" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ClearValidation)) ?? "Clear Validation") Value="clear" />
     </ChildContent>
 </RadzenSplitButton>
 
@@ -36,7 +37,7 @@
             return;
         }
 
-        var result = await DialogService.OpenAsync<DataValidationDialog>("Data Validation");
+        var result = await DialogService.OpenAsync<DataValidationDialog>(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationTitle)) ?? "Data Validation");
 
         if (result is DataValidationRule rule)
         {

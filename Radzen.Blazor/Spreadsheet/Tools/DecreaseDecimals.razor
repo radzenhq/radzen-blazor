@@ -1,8 +1,9 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenButton Text=".0-" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Click=@OnClick title="Decrease decimal places" />
+<RadzenButton Text=".0-" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Click=@OnClick title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DecreaseDecimalPlaces)) ?? "Decrease decimal places") />
 
 @code {
 #nullable enable
