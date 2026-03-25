@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Components
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
@@ -8,14 +9,14 @@
 
     <RadzenStack Orientation="Orientation.Vertical" Gap="12px" Style="flex: 1">
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            <RadzenLabel Text="Sample" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Sample)) />
             <RadzenTextBox Value=@preview ReadOnly="true" Style="font-weight: bold" />
         </RadzenStack>
 
         @if (ShowDecimalPlaces)
         {
             <RadzenStack Orientation="Orientation.Horizontal" Gap="8px" AlignItems="AlignItems.Center">
-                <RadzenLabel Text="Decimal places:" />
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_DecimalPlaces)) />
                 <RadzenNumeric @bind-Value=@decimalPlaces Min="0" Max="30" Style="width: 80px"
                     Change=@OnOptionChanged TValue="int" />
             </RadzenStack>
@@ -26,14 +27,14 @@
             <RadzenStack Orientation="Orientation.Horizontal" Gap="8px" AlignItems="AlignItems.Center">
                 <RadzenCheckBox @bind-Value=@useThousandsSeparator TValue="bool"
                     Change=@OnOptionChanged />
-                <RadzenLabel Text="Use 1000 separator" />
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_UseThousandsSeparator)) />
             </RadzenStack>
         }
 
         @if (ShowCurrencySymbol)
         {
             <RadzenStack Orientation="Orientation.Horizontal" Gap="8px" AlignItems="AlignItems.Center">
-                <RadzenLabel Text="Symbol:" />
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Symbol)) />
                 <RadzenDropDown @bind-Value=@currencySymbol Data=@FormatCodeBuilder.CurrencySymbols
                     Style="width: 80px" Change=@OnOptionChanged TValue="string" />
             </RadzenStack>
@@ -42,20 +43,20 @@
         @if (ShowPresetList)
         {
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                <RadzenLabel Text="Type:" />
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Type)) />
                 <RadzenListBox @bind-Value=@selectedPreset Data=@presets TextProperty="Item1" ValueProperty="Item2"
                     Style="height: 160px" TValue="string" Change=@OnPresetChanged />
             </RadzenStack>
         }
 
         <RadzenStack Orientation="Orientation.Horizontal" Gap="8px" AlignItems="AlignItems.Center">
-            <RadzenLabel Text="Format code:" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_FormatCode)) />
             <RadzenTextBox @bind-Value=@customFormatCode Style="flex: 1" Change=@OnFormatCodeChanged />
         </RadzenStack>
     </RadzenStack>
 </RadzenStack>
 
 <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End" Style="margin-top: 16px">
-    <RadzenButton Text="OK" Click=@OnOk ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
-    <RadzenButton Text="Cancel" Click=@OnCancel ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
+    <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+    <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
 </RadzenStack>

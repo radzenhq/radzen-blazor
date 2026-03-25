@@ -1,16 +1,17 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
 <RadzenStack Gap="1rem" Style="padding: 1rem">
-    <RadzenFormField Text="URL">
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_URL))>
         <RadzenTextBox @bind-Value=@Url Style="width: 100%" />
     </RadzenFormField>
-    <RadzenFormField Text="Display Text">
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_DisplayText))>
         <RadzenTextBox @bind-Value=@DisplayText Style="width: 100%" />
     </RadzenFormField>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Text="OK" Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
-        <RadzenButton Text="Cancel" Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
     </RadzenStack>
 </RadzenStack>
 
@@ -25,6 +26,11 @@
 
     [Inject]
     public DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     private void OnOk()
     {

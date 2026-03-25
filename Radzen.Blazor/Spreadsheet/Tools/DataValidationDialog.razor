@@ -1,27 +1,28 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
 <RadzenStack Gap="1rem" Style="padding: 1rem; min-width: 400px">
-    <RadzenFormField Text="Validation Type">
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ValidationType))>
         <RadzenDropDown @bind-Value=@ValidationType Data=@ValidationTypes TextProperty="Name" ValueProperty="Value" Style="width: 100%" Change=@OnTypeChanged />
     </RadzenFormField>
 
     @if (ValidationType != DataValidationType.List && ValidationType != DataValidationType.Custom)
     {
-        <RadzenFormField Text="Operator">
+        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Operator))>
             <RadzenDropDown @bind-Value=@Operator Data=@Operators TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
         </RadzenFormField>
     }
 
     @if (ValidationType == DataValidationType.Custom)
     {
-        <RadzenFormField Text="Formula">
+        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Formula))>
             <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
         </RadzenFormField>
     }
     else if (ValidationType == DataValidationType.List)
     {
-        <RadzenFormField Text="Values (comma separated)">
+        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ValuesCommaSeparated))>
             <RadzenTextArea @bind-Value=@Formula1 Rows="3" Style="width: 100%" />
         </RadzenFormField>
     }
@@ -29,28 +30,28 @@
     {
         @if (ValidationType == DataValidationType.Date)
         {
-            <RadzenFormField Text="Minimum">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum))>
                 <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
             </RadzenFormField>
-            <RadzenFormField Text="Maximum">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum))>
                 <RadzenDatePicker @bind-Value=@Formula2Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
             </RadzenFormField>
         }
         else if (ValidationType == DataValidationType.Time)
         {
-            <RadzenFormField Text="Minimum">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum))>
                 <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
             </RadzenFormField>
-            <RadzenFormField Text="Maximum">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum))>
                 <RadzenDatePicker @bind-Value=@Formula2Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
             </RadzenFormField>
         }
         else
         {
-            <RadzenFormField Text="Minimum">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum))>
                 <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
             </RadzenFormField>
-            <RadzenFormField Text="Maximum">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum))>
                 <RadzenTextBox @bind-Value=@Formula2 Style="width: 100%" />
             </RadzenFormField>
         }
@@ -59,59 +60,59 @@
     {
         @if (ValidationType == DataValidationType.Date)
         {
-            <RadzenFormField Text="Value">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Value))>
                 <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
             </RadzenFormField>
         }
         else if (ValidationType == DataValidationType.Time)
         {
-            <RadzenFormField Text="Value">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Value))>
                 <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
             </RadzenFormField>
         }
         else
         {
-            <RadzenFormField Text="Value">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Value))>
                 <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
             </RadzenFormField>
         }
     }
 
     <RadzenCheckBox @bind-Value=@AllowBlank TValue="bool" />
-    <RadzenLabel Text="Allow blank" Component="AllowBlank" Style="margin-left: 0.5rem" />
+    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_AllowBlank)) Component="AllowBlank" Style="margin-left: 0.5rem" />
 
-    <RadzenFieldset Text="Error Alert">
+    <RadzenFieldset Text=@L(nameof(RadzenStrings.Spreadsheet_ErrorAlert))>
         <RadzenStack Gap="0.5rem">
-            <RadzenFormField Text="Style">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Style))>
                 <RadzenDropDown @bind-Value=@ErrorStyle Data=@ErrorStyles TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
             </RadzenFormField>
-            <RadzenFormField Text="Title">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Title))>
                 <RadzenTextBox @bind-Value=@ErrorTitle Style="width: 100%" />
             </RadzenFormField>
-            <RadzenFormField Text="Message">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Message))>
                 <RadzenTextArea @bind-Value=@ErrorMessage Rows="2" Style="width: 100%" />
             </RadzenFormField>
         </RadzenStack>
     </RadzenFieldset>
 
-    <RadzenFieldset Text="Input Prompt">
+    <RadzenFieldset Text=@L(nameof(RadzenStrings.Spreadsheet_InputPrompt))>
         <RadzenStack Gap="0.5rem">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                 <RadzenCheckBox @bind-Value=@ShowInputMessage TValue="bool" />
-                <RadzenLabel Text="Show input message when cell is selected" />
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowInputMessage)) />
             </RadzenStack>
-            <RadzenFormField Text="Title">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Title))>
                 <RadzenTextBox @bind-Value=@PromptTitle Style="width: 100%" />
             </RadzenFormField>
-            <RadzenFormField Text="Message">
+            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Message))>
                 <RadzenTextArea @bind-Value=@PromptMessage Rows="2" Style="width: 100%" />
             </RadzenFormField>
         </RadzenStack>
     </RadzenFieldset>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Text="OK" Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
-        <RadzenButton Text="Cancel" Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
     </RadzenStack>
 </RadzenStack>
 
@@ -120,6 +121,11 @@
     [Inject]
     public DialogService DialogService { get; set; } = default!;
 
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
     private DataValidationType ValidationType { get; set; } = DataValidationType.WholeNumber;
     private DataValidationOperator Operator { get; set; } = DataValidationOperator.Between;
     private string Formula1 { get; set; } = "";
@@ -127,41 +133,49 @@
     private bool AllowBlank { get; set; } = true;
     private DataValidationErrorStyle ErrorStyle { get; set; } = DataValidationErrorStyle.Stop;
     private string ErrorTitle { get; set; } = "";
-    private string ErrorMessage { get; set; } = "The value you entered is not valid.";
+    private string ErrorMessage { get; set; } = "";
     private bool ShowInputMessage { get; set; }
     private string PromptTitle { get; set; } = "";
     private string PromptMessage { get; set; } = "";
     private DateTime? Formula1Date { get; set; }
     private DateTime? Formula2Date { get; set; }
 
-    private static readonly List<DropDownItem<DataValidationType>> ValidationTypes =
+    protected override void OnInitialized()
+    {
+        ErrorMessage = L(nameof(RadzenStrings.Spreadsheet_DefaultValidationError));
+    }
+
+    private List<DropDownItem<DataValidationType>>? validationTypes;
+    private List<DropDownItem<DataValidationType>> ValidationTypes => validationTypes ??=
     [
-        new("Whole Number", DataValidationType.WholeNumber),
-        new("Decimal", DataValidationType.Decimal),
-        new("List", DataValidationType.List),
-        new("Date", DataValidationType.Date),
-        new("Time", DataValidationType.Time),
-        new("Text Length", DataValidationType.TextLength),
-        new("Custom", DataValidationType.Custom)
+        new(L(nameof(RadzenStrings.Spreadsheet_ValidationWholeNumber)), DataValidationType.WholeNumber),
+        new(L(nameof(RadzenStrings.Spreadsheet_ValidationDecimal)), DataValidationType.Decimal),
+        new(L(nameof(RadzenStrings.Spreadsheet_ValidationList)), DataValidationType.List),
+        new(L(nameof(RadzenStrings.Spreadsheet_ValidationDate)), DataValidationType.Date),
+        new(L(nameof(RadzenStrings.Spreadsheet_ValidationTime)), DataValidationType.Time),
+        new(L(nameof(RadzenStrings.Spreadsheet_ValidationTextLength)), DataValidationType.TextLength),
+        new(L(nameof(RadzenStrings.Spreadsheet_ValidationCustom)), DataValidationType.Custom)
     ];
 
-    private static readonly List<DropDownItem<DataValidationOperator>> AllOperators =
+    private List<DropDownItem<DataValidationOperator>>? allOperators;
+    private List<DropDownItem<DataValidationOperator>> AllOperators => allOperators ??=
     [
-        new("Between", DataValidationOperator.Between),
-        new("Not Between", DataValidationOperator.NotBetween),
-        new("Equal To", DataValidationOperator.Equal),
-        new("Not Equal To", DataValidationOperator.NotEqual),
-        new("Greater Than", DataValidationOperator.GreaterThan),
-        new("Less Than", DataValidationOperator.LessThan),
-        new("Greater Than or Equal", DataValidationOperator.GreaterThanOrEqual),
-        new("Less Than or Equal", DataValidationOperator.LessThanOrEqual)
+        new(L(nameof(RadzenStrings.Spreadsheet_OperatorBetween)), DataValidationOperator.Between),
+        new(L(nameof(RadzenStrings.Spreadsheet_OperatorNotBetween)), DataValidationOperator.NotBetween),
+        new(L(nameof(RadzenStrings.Spreadsheet_OperatorEqualTo)), DataValidationOperator.Equal),
+        new(L(nameof(RadzenStrings.Spreadsheet_OperatorNotEqualTo)), DataValidationOperator.NotEqual),
+        new(L(nameof(RadzenStrings.Spreadsheet_OperatorGreaterThan)), DataValidationOperator.GreaterThan),
+        new(L(nameof(RadzenStrings.Spreadsheet_OperatorLessThan)), DataValidationOperator.LessThan),
+        new(L(nameof(RadzenStrings.Spreadsheet_OperatorGreaterThanOrEqual)), DataValidationOperator.GreaterThanOrEqual),
+        new(L(nameof(RadzenStrings.Spreadsheet_OperatorLessThanOrEqual)), DataValidationOperator.LessThanOrEqual)
     ];
 
-    private static readonly List<DropDownItem<DataValidationErrorStyle>> ErrorStyles =
+    private List<DropDownItem<DataValidationErrorStyle>>? errorStyles;
+    private List<DropDownItem<DataValidationErrorStyle>> ErrorStyles => errorStyles ??=
     [
-        new("Stop", DataValidationErrorStyle.Stop),
-        new("Warning", DataValidationErrorStyle.Warning),
-        new("Information", DataValidationErrorStyle.Information)
+        new(L(nameof(RadzenStrings.Spreadsheet_ErrorStyleStop)), DataValidationErrorStyle.Stop),
+        new(L(nameof(RadzenStrings.Spreadsheet_ErrorStyleWarning)), DataValidationErrorStyle.Warning),
+        new(L(nameof(RadzenStrings.Spreadsheet_ErrorStyleInformation)), DataValidationErrorStyle.Information)
     ];
 
     private List<DropDownItem<DataValidationOperator>> Operators => AllOperators;
@@ -211,7 +225,7 @@
             AllowBlank = AllowBlank,
             ErrorStyle = ErrorStyle,
             ErrorTitle = string.IsNullOrEmpty(ErrorTitle) ? null : ErrorTitle,
-            Error = string.IsNullOrEmpty(ErrorMessage) ? "The value you entered is not valid." : ErrorMessage,
+            Error = string.IsNullOrEmpty(ErrorMessage) ? L(nameof(RadzenStrings.Spreadsheet_DefaultValidationError)) : ErrorMessage,
             ShowErrorMessage = true,
             ShowInputMessage = ShowInputMessage,
             PromptTitle = string.IsNullOrEmpty(PromptTitle) ? null : PromptTitle,

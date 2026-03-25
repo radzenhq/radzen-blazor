@@ -1,11 +1,12 @@
+@using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
 <RadzenSplitButton Click=@OnClick Icon="merge_type" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
-        <RadzenSplitButtonItem Text="Merge && Center" Value="merge-center" />
-        <RadzenSplitButtonItem Text="Merge Cells" Value="merge" />
-        <RadzenSplitButtonItem Text="Unmerge Cells" Value="unmerge" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_MergeAndCenter)) ?? "Merge && Center") Value="merge-center" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_MergeCells)) ?? "Merge Cells") Value="merge" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_UnmergeCells)) ?? "Unmerge Cells") Value="unmerge" />
     </ChildContent>
 </RadzenSplitButton>
 

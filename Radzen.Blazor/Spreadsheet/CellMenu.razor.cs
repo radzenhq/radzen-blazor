@@ -14,6 +14,12 @@ namespace Radzen.Blazor.Spreadsheet;
 public partial class CellMenu : ComponentBase
 {
     /// <summary>
+    /// The parent spreadsheet component.
+    /// </summary>
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    /// <summary>
     /// Represents the sheet containing the cell menu.
     /// </summary>
     [Parameter]

@@ -10,7 +10,7 @@ public class FormatCellsDialogTests : TestContext
     public FormatCellsDialogTests()
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
-        Services.AddScoped<DialogService>();
+        Services.AddRadzenComponents();
     }
 
     private IRenderedComponent<FormatCellsDialog> RenderDialog(
