@@ -743,8 +743,8 @@ public class DataValidationTests
             Operator = DataValidationOperator.GreaterThan,
             Formula1 = "0",
             ShowInputMessage = true,
-            PromptTitle = "Test Title",
-            Prompt = "Test Prompt"
+            InputTitle = "Test Title",
+            InputMessage = "Test Prompt"
         };
         sheet.Validation.Add(range, rule);
 
@@ -753,8 +753,8 @@ public class DataValidationTests
         Assert.Single(validators);
         var found = Assert.IsType<DataValidationRule>(validators[0]);
         Assert.True(found.ShowInputMessage);
-        Assert.Equal("Test Title", found.PromptTitle);
-        Assert.Equal("Test Prompt", found.Prompt);
+        Assert.Equal("Test Title", found.InputTitle);
+        Assert.Equal("Test Prompt", found.InputMessage);
     }
 
     // Custom formula with cross-cell reference
@@ -855,8 +855,8 @@ public class DataValidationTests
             Operator = DataValidationOperator.GreaterThan,
             Formula1 = "0",
             ShowInputMessage = true,
-            PromptTitle = "Enter a number",
-            Prompt = "Please enter a positive number"
+            InputTitle = "Enter a number",
+            InputMessage = "Please enter a positive number"
         };
         sheet.Validation.Add(range, rule);
 
@@ -866,8 +866,8 @@ public class DataValidationTests
         var validators = loadedSheet.Validation.GetValidators(range);
         var loadedRule = Assert.IsType<DataValidationRule>(validators[0]);
         Assert.True(loadedRule.ShowInputMessage);
-        Assert.Equal("Enter a number", loadedRule.PromptTitle);
-        Assert.Equal("Please enter a positive number", loadedRule.Prompt);
+        Assert.Equal("Enter a number", loadedRule.InputTitle);
+        Assert.Equal("Please enter a positive number", loadedRule.InputMessage);
     }
 
     // Custom formula relative reference tests
