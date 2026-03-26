@@ -995,6 +995,152 @@ public class DataValidationTests
         Assert.Empty(rule.ListItems);
     }
 
+    // Stop style: after Unexecute restores a valid value, clearing errors removes the indicator
+
+    [Fact]
+    public void Stop_AfterUnexecute_ClearValidationErrors_RemovesIndicator()
+    {
+        var sheet = new Worksheet(10, 10);
+        var view = new SheetView(sheet);
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.Between,
+            Formula1 = "1",
+            Formula2 = "100",
+            ErrorStyle = DataValidationErrorStyle.Stop
+        };
+        sheet.Validation.Add(range, rule);
+        sheet.Cells[0, 0].Value = 50;
+        sheet.Selection.Select(new CellRef(0, 0), range);
+
+        // Edit to an invalid value
+        view.Editor.StartEdit(new CellRef(0, 0), "200");
+        var command = new AcceptEditCommand(view);
+        var valid = command.Execute();
+
+        Assert.False(valid);
+        Assert.True(sheet.Cells[0, 0].HasValidationErrors);
+
+        // Simulate Stop behavior: Unexecute + ClearValidationErrors + Cancel
+        command.Unexecute();
+        sheet.Cells[0, 0].ClearValidationErrors();
+        view.Editor.Cancel();
+
+        Assert.Equal(50.0, sheet.Cells[0, 0].Value);
+        Assert.False(sheet.Cells[0, 0].HasValidationErrors);
+        Assert.Equal(EditMode.None, view.Editor.Mode);
+    }
+
+    // Warning rejected: same as Stop — value reverted, errors cleared
+
+    [Fact]
+    public void Warning_Rejected_AfterUnexecute_ClearValidationErrors_RemovesIndicator()
+    {
+        var sheet = new Worksheet(10, 10);
+        var view = new SheetView(sheet);
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "0",
+            ErrorStyle = DataValidationErrorStyle.Warning
+        };
+        sheet.Validation.Add(range, rule);
+        sheet.Cells[0, 0].Value = 5;
+        sheet.Selection.Select(new CellRef(0, 0), range);
+
+        // Edit to an invalid value
+        view.Editor.StartEdit(new CellRef(0, 0), "-5");
+        var command = new AcceptEditCommand(view);
+        var valid = command.Execute();
+
+        Assert.False(valid);
+        Assert.True(sheet.Cells[0, 0].HasValidationErrors);
+
+        // Simulate Warning rejected: Unexecute + ClearValidationErrors + Cancel
+        command.Unexecute();
+        sheet.Cells[0, 0].ClearValidationErrors();
+        view.Editor.Cancel();
+
+        Assert.Equal(5.0, sheet.Cells[0, 0].Value);
+        Assert.False(sheet.Cells[0, 0].HasValidationErrors);
+        Assert.Equal(EditMode.None, view.Editor.Mode);
+    }
+
+    // Warning confirmed: invalid value kept, errors preserved for indicator
+
+    [Fact]
+    public void Warning_Confirmed_KeepsInvalidValue_PreservesValidationErrors()
+    {
+        var sheet = new Worksheet(10, 10);
+        var view = new SheetView(sheet);
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "0",
+            ErrorStyle = DataValidationErrorStyle.Warning
+        };
+        sheet.Validation.Add(range, rule);
+        sheet.Cells[0, 0].Value = 5;
+        sheet.Selection.Select(new CellRef(0, 0), range);
+
+        // Edit to an invalid value
+        view.Editor.StartEdit(new CellRef(0, 0), "-5");
+        var command = new AcceptEditCommand(view);
+        var valid = command.Execute();
+
+        Assert.False(valid);
+        Assert.True(sheet.Cells[0, 0].HasValidationErrors);
+
+        // Simulate Warning confirmed: EndEdit only, do NOT clear errors
+        view.Editor.EndEdit();
+
+        Assert.Equal(-5.0, sheet.Cells[0, 0].Value);
+        Assert.True(sheet.Cells[0, 0].HasValidationErrors);
+        Assert.Equal(EditMode.None, view.Editor.Mode);
+    }
+
+    // Information: invalid value kept, errors preserved for indicator
+
+    [Fact]
+    public void Information_KeepsInvalidValue_PreservesValidationErrors()
+    {
+        var sheet = new Worksheet(10, 10);
+        var view = new SheetView(sheet);
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(0, 0));
+        var rule = new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.Between,
+            Formula1 = "1",
+            Formula2 = "100",
+            ErrorStyle = DataValidationErrorStyle.Information
+        };
+        sheet.Validation.Add(range, rule);
+        sheet.Cells[0, 0].Value = 50;
+        sheet.Selection.Select(new CellRef(0, 0), range);
+
+        // Edit to an invalid value
+        view.Editor.StartEdit(new CellRef(0, 0), "200");
+        var command = new AcceptEditCommand(view);
+        var valid = command.Execute();
+
+        Assert.False(valid);
+        Assert.True(sheet.Cells[0, 0].HasValidationErrors);
+
+        // Simulate Information: EndEdit only, do NOT clear errors
+        view.Editor.EndEdit();
+
+        Assert.Equal(200.0, sheet.Cells[0, 0].Value);
+        Assert.True(sheet.Cells[0, 0].HasValidationErrors);
+        Assert.Equal(EditMode.None, view.Editor.Mode);
+    }
+
     private static Workbook SaveAndLoad(Workbook workbook)
     {
         using var stream = new System.IO.MemoryStream();
