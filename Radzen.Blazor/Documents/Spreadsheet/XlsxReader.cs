@@ -650,7 +650,7 @@ static class XlsxReader
                     sheet.Cells[address.Row, address.Column].Hyperlink = new Hyperlink
                     {
                         Url = url,
-                        DisplayText = display
+                        Text = display
                     };
                 }
             }
