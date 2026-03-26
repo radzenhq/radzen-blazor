@@ -45,6 +45,7 @@ public partial class CellEditor : ComponentBase, IDisposable
     public Dictionary<string, SpreadsheetCellType>? CellTypes { get; set; }
 
     private string? cellStyle;
+    private string? editorStyle;
     private string? className;
     private Type? customEditorType;
 
@@ -113,9 +114,13 @@ public partial class CellEditor : ComponentBase, IDisposable
             rect.AppendStyle(sb);
 
             cell = Worksheet.Cells[address];
-            cell.ApplyFormat(sb);
 
             cellStyle = StringBuilderCache.GetStringAndRelease(sb);
+
+            var fontSb = StringBuilderCache.Acquire();
+            cell.GetEffectiveFormat()?.AppendFontStyle(fontSb);
+            var fontStyle = StringBuilderCache.GetStringAndRelease(fontSb);
+            editorStyle = fontStyle.Length > 0 ? fontStyle : null;
         }
         else
         {
