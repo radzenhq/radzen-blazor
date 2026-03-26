@@ -331,6 +331,11 @@ $form-field-helper-padding: 0 0.5rem !default;
     inset-inline-start: var(--rz-form-field-label-inset-inline-start);
     max-width: calc(100% - 1.5rem);
     transform: translate(0, -50%);
+
+    .rz-form-field-start ~ & {
+        inset-inline-start: calc(var(--rz-form-field-start-end-padding-inline) + 1.5rem + var(--rz-form-field-label-inset-inline-start));
+    }
+
     background-color: transparent;
     transition: inset-block-start var(--rz-transition),
                 transform var(--rz-transition), 
