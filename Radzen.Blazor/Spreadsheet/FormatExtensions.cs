@@ -115,6 +115,39 @@ internal static class FormatExtensions
         }
     }
 
+    internal static void AppendFontStyle(this Format format, StringBuilder sb)
+    {
+        ArgumentNullException.ThrowIfNull(sb);
+
+        if (format.Color is not null)
+        {
+            sb.Append("--rz-cell-color: ");
+            sb.Append(format.Color);
+            sb.Append(';');
+        }
+
+        if (format.BackgroundColor is not null)
+        {
+            sb.Append("background-color: ");
+            sb.Append(format.BackgroundColor);
+            sb.Append(';');
+        }
+
+        if (format.FontFamily is not null)
+        {
+            sb.Append("font-family: ");
+            sb.Append(format.FontFamily);
+            sb.Append(';');
+        }
+
+        if (format.FontSize is not null)
+        {
+            sb.Append("font-size: ");
+            sb.Append(format.FontSize.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            sb.Append("pt;");
+        }
+    }
+
     internal static void AppendCss(this BorderStyle border, StringBuilder sb, string side)
     {
         if (border.LineStyle == BorderLineStyle.None)
