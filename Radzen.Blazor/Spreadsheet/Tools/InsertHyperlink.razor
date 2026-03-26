@@ -28,13 +28,13 @@
 
         var existing = cell?.Hyperlink;
         var url = existing?.Url ?? "";
-        var displayText = existing?.DisplayText ?? cell?.Value?.ToString() ?? "";
+        var displayText = existing?.Text ?? cell?.Value?.ToString() ?? "";
 
         var result = await DialogService.OpenAsync<HyperlinkDialog>(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertHyperlinkTitle)) ?? "Insert Hyperlink",
             new Dictionary<string, object?>
             {
                 { "Url", url },
-                { "DisplayText", displayText }
+                { "Text", displayText }
             });
 
         if (result is Hyperlink hyperlink)

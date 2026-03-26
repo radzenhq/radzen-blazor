@@ -4,6 +4,7 @@ using Radzen;
 using Radzen.Blazor;
 using Xunit;
 
+#nullable enable
 namespace Radzen.Blazor.Tests;
 
 public class LocalizerTests
