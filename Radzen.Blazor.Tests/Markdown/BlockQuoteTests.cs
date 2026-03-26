@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Radzen.Blazor.Markdown.Tests;
+namespace Radzen.Documents.Markdown.Tests;
 
 public class BlockQuoteTests
 {

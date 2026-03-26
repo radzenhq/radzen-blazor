@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Xml;
 
-namespace Radzen.Blazor.Markdown.Tests;
+namespace Radzen.Documents.Markdown.Tests;
 
 public class XmlVisitor : NodeVisitorBase, IDisposable
 {

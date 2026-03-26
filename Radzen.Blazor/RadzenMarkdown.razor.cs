@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.RenderTree;
-using Radzen.Blazor.Markdown;
+using Radzen.Blazor.Rendering;
+using Radzen.Documents.Markdown;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
