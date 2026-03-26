@@ -364,6 +364,32 @@
     z-index: 4;
 }
 
+.rz-spreadsheet-validation-error {
+    position: absolute;
+    z-index: 1;
+    background: #fff0f0;
+    border: 1px solid var(--rz-form-error-color, #f44336);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    padding: 0.5rem;
+    max-width: 300px;
+    font-size: 0.85rem;
+    pointer-events: none;
+    border-radius: var(--rz-border-radius, 4px);
+}
+
+.rz-spreadsheet-validation-error-message {
+    color: var(--rz-form-error-color, #f44336);
+}
+
+.rz-spreadsheet-validation-error.rz-spreadsheet-frozen-row,
+.rz-spreadsheet-validation-error.rz-spreadsheet-frozen-column {
+    z-index: 3;
+}
+
+.rz-spreadsheet-validation-error.rz-spreadsheet-frozen-row.rz-spreadsheet-frozen-column {
+    z-index: 4;
+}
+
 .rz-spreadsheet-horizontal-splitter,
 .rz-spreadsheet-vertical-splitter {
     position: absolute;

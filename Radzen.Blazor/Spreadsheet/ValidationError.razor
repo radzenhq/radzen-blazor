@@ -1,0 +1,9 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+@if (visible && !string.IsNullOrEmpty(message))
+{
+    <div class=@className style=@style>
+        <div class="rz-spreadsheet-validation-error-message">@message</div>
+    </div>
+}
