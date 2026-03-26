@@ -9,6 +9,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_WithClassName()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>();
 
             Assert.Contains(@"rz-form-field", component.Markup);
@@ -18,6 +19,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_Text()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.Text, "Email Address");
@@ -31,6 +33,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_Variant_Outlined()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Outlined);
@@ -43,6 +46,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_Variant_Filled()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Filled);
@@ -55,6 +59,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_Variant_Flat()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Flat);
@@ -67,6 +72,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_Variant_Text()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.Variant, Variant.Text);
@@ -79,6 +85,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_AllowFloatingLabel_True()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.AllowFloatingLabel, true);
@@ -91,6 +98,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_AllowFloatingLabel_False()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.AllowFloatingLabel, false);
@@ -103,6 +111,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_Component_Attribute()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.Component, "email-input");
@@ -115,6 +124,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_Helper()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.Helper, builder => builder.AddContent(0, "Enter your email address"));
@@ -128,6 +138,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_Start()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.Start, builder => builder.AddMarkupContent(0, "<span>Start</span>"));
@@ -141,6 +152,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_End()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>(parameters =>
             {
                 parameters.Add(p => p.End, builder => builder.AddMarkupContent(0, "<span>End</span>"));
@@ -154,6 +166,7 @@ namespace Radzen.Blazor.Tests
         public void FormField_Renders_FormFieldContent()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenFormField>();
 
             Assert.Contains("rz-form-field-content", component.Markup);
