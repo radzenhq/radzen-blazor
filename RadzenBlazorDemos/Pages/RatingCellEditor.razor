@@ -1,0 +1,26 @@
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenRating Value=@currentRating Change="OnRatingChanged" />
+
+@code {
+    [Parameter]
+    public SpreadsheetCellEditContext Context { get; set; } = default!;
+
+    int currentRating;
+
+    protected override void OnInitialized()
+    {
+        currentRating = Context.Cell.Value switch
+        {
+            double d => (int)Math.Clamp(d, 0, 5),
+            int i => Math.Clamp(i, 0, 5),
+            _ => 0
+        };
+    }
+
+    async Task OnRatingChanged(int rating)
+    {
+        currentRating = rating;
+        await Context.CommitAsync(rating);
+    }
+}

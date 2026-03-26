@@ -1,0 +1,164 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    class ColorScaleRule : ConditionalFormatBase
+    {
+        public double Min { get; set; }
+        public double Max { get; set; }
+
+        public override Format GetFormat(Cell cell)
+        {
+            if (cell.Value is double d || (cell.Value is int i && (d = i) == i))
+            {
+                var ratio = Math.Clamp((d - Min) / (Max - Min), 0, 1);
+                var r = (int)(255 * (1 - ratio));
+                var g = (int)(200 + 55 * ratio);
+                var b = (int)(200 * (1 - ratio));
+                return new Format { BackgroundColor = $"#{r:X2}{g:X2}{b:X2}" };
+            }
+            return null;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Conditional Formatting", 35, 12);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 160;
+        for (int i = 1; i < 12; i++) sheet.Columns[i] = 80;
+
+        var sectionFormat = new Format { Bold = true, FontSize = 12 };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center };
+
+        var random = new Random(42);
+
+        // --- Section 1: Greater Than ---
+        sheet.Cells["A1"].Value = "Greater Than 75";
+        sheet.Cells["A1"].Format = sectionFormat;
+        sheet.Cells["A2"].Value = "Values > 75 are highlighted in green";
+        sheet.Cells["A2"].Format = new Format { Italic = true, Color = "#757575" };
+        for (int i = 0; i < 8; i++)
+        {
+            sheet.Cells[2, i + 1].Value = random.Next(10, 100);
+            sheet.Cells[2, i + 1].Format = new Format { TextAlign = TextAlign.Center };
+        }
+        sheet.ConditionalFormats.Add(RangeRef.Parse("B3:I3"), new GreaterThanRule
+        {
+            Value = 75,
+            Format = new Format { BackgroundColor = "#c8e6c9", Bold = true }
+        });
+
+        // --- Section 2: Less Than ---
+        sheet.Cells["A5"].Value = "Less Than 25";
+        sheet.Cells["A5"].Format = sectionFormat;
+        sheet.Cells["A6"].Value = "Values < 25 are highlighted in red";
+        sheet.Cells["A6"].Format = new Format { Italic = true, Color = "#757575" };
+        for (int i = 0; i < 8; i++)
+        {
+            sheet.Cells[6, i + 1].Value = random.Next(5, 80);
+            sheet.Cells[6, i + 1].Format = new Format { TextAlign = TextAlign.Center };
+        }
+        sheet.ConditionalFormats.Add(RangeRef.Parse("B7:I7"), new LessThanRule
+        {
+            Value = 25,
+            Format = new Format { BackgroundColor = "#ffcdd2", Color = "#c62828" }
+        });
+
+        // --- Section 3: Between ---
+        sheet.Cells["A9"].Value = "Between 40 and 60";
+        sheet.Cells["A9"].Format = sectionFormat;
+        sheet.Cells["A10"].Value = "Values in range are highlighted in yellow";
+        sheet.Cells["A10"].Format = new Format { Italic = true, Color = "#757575" };
+        for (int i = 0; i < 8; i++)
+        {
+            sheet.Cells[10, i + 1].Value = random.Next(20, 90);
+            sheet.Cells[10, i + 1].Format = new Format { TextAlign = TextAlign.Center };
+        }
+        sheet.ConditionalFormats.Add(RangeRef.Parse("B11:I11"), new BetweenRule
+        {
+            Minimum = 40,
+            Maximum = 60,
+            Format = new Format { BackgroundColor = "#fff9c4" }
+        });
+
+        // --- Section 4: Equal To ---
+        sheet.Cells["A13"].Value = "Equal To 'Pass'";
+        sheet.Cells["A13"].Format = sectionFormat;
+        sheet.Cells["A14"].Value = "Cells containing 'Pass' are highlighted";
+        sheet.Cells["A14"].Format = new Format { Italic = true, Color = "#757575" };
+        string[] grades = { "Pass", "Fail", "Pass", "Pass", "Fail", "Pass", "Fail", "Pass" };
+        for (int i = 0; i < grades.Length; i++)
+        {
+            sheet.Cells[14, i + 1].Value = grades[i];
+            sheet.Cells[14, i + 1].Format = new Format { TextAlign = TextAlign.Center };
+        }
+        sheet.ConditionalFormats.Add(RangeRef.Parse("B15:I15"), new EqualToRule
+        {
+            Value = "Pass",
+            Format = new Format { BackgroundColor = "#c8e6c9", Color = "#2e7d32", Bold = true }
+        });
+        sheet.ConditionalFormats.Add(RangeRef.Parse("B15:I15"), new EqualToRule
+        {
+            Value = "Fail",
+            Format = new Format { BackgroundColor = "#ffcdd2", Color = "#c62828", Bold = true }
+        });
+
+        // --- Section 5: Text Contains ---
+        sheet.Cells["A17"].Value = "Text Contains 'error'";
+        sheet.Cells["A17"].Format = sectionFormat;
+        sheet.Cells["A18"].Value = "Cells containing 'error' are highlighted in red";
+        sheet.Cells["A18"].Format = new Format { Italic = true, Color = "#757575" };
+        string[] messages = { "OK", "error: timeout", "OK", "warning", "error: null", "OK", "error: 404", "success" };
+        for (int i = 0; i < messages.Length; i++)
+        {
+            sheet.Cells[18, i + 1].Value = messages[i];
+        }
+        sheet.ConditionalFormats.Add(RangeRef.Parse("B19:I19"), new TextContainsRule
+        {
+            Text = "error",
+            Format = new Format { BackgroundColor = "#ffcdd2", Color = "#c62828", Bold = true }
+        });
+
+        // --- Section 6: Top N ---
+        sheet.Cells["A21"].Value = "Top 3 Values";
+        sheet.Cells["A21"].Format = sectionFormat;
+        sheet.Cells["A22"].Value = "Top 3 highest values are highlighted in blue";
+        sheet.Cells["A22"].Format = new Format { Italic = true, Color = "#757575" };
+        for (int i = 0; i < 8; i++)
+        {
+            sheet.Cells[22, i + 1].Value = random.Next(100, 1000);
+            sheet.Cells[22, i + 1].Format = new Format { TextAlign = TextAlign.Center };
+        }
+        sheet.ConditionalFormats.Add(RangeRef.Parse("B23:I23"), new Top10Rule
+        {
+            Count = 3,
+            Format = new Format { BackgroundColor = "#bbdefb", Color = "#1565c0", Bold = true }
+        });
+
+        // --- Section 7: Color Scale (Custom Rule) ---
+        sheet.Cells["A25"].Value = "Color Scale (Custom)";
+        sheet.Cells["A25"].Format = sectionFormat;
+        sheet.Cells["A26"].Value = "Gradient: red (low) to green (high)";
+        sheet.Cells["A26"].Format = new Format { Italic = true, Color = "#757575" };
+        sheet.Cells["B26"].Value = "Score"; sheet.Cells["B26"].Format = headerFormat;
+        for (int i = 0; i < 8; i++)
+        {
+            sheet.Cells[26 + i, 1].Value = (i + 1) * 12.5;
+            sheet.Cells[26 + i, 1].Format = new Format { TextAlign = TextAlign.Center };
+        }
+        sheet.ConditionalFormats.Add(RangeRef.Parse("B27:B34"), new ColorScaleRule
+        {
+            Min = 0,
+            Max = 100
+        });
+
+        sheet.EndUpdate();
+    }
+}

@@ -1,0 +1,208 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Validation", 30, 10);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 180;
+        sheet.Columns[1] = 150;
+        sheet.Columns[2] = 200;
+
+        var titleFormat = new Format { Bold = true, FontSize = 12, BackgroundColor = "#1565c0", Color = "#ffffff" };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd" };
+        var labelFormat = new Format { Bold = true };
+        var noteFormat = new Format { Color = "#757575", Italic = true };
+
+        // Title
+        sheet.MergedCells.Add(RangeRef.Parse("A1:C1"));
+        sheet.Cells["A1"].Value = "Data Validation Examples";
+        sheet.Cells["A1"].Format = titleFormat;
+
+        sheet.Cells["A2"].Value = "Rule Type"; sheet.Cells["A2"].Format = headerFormat;
+        sheet.Cells["B2"].Value = "Input Cell"; sheet.Cells["B2"].Format = headerFormat;
+        sheet.Cells["C2"].Value = "Description"; sheet.Cells["C2"].Format = headerFormat;
+
+        // 1. Whole Number (Between) - Stop
+        sheet.Cells["A3"].Value = "Whole Number (1-100)";
+        sheet.Cells["A3"].Format = labelFormat;
+        sheet.Cells["C3"].Value = "Enter a whole number between 1 and 100";
+        sheet.Cells["C3"].Format = noteFormat;
+        sheet.Validation.Add(RangeRef.Parse("B3"), new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.Between,
+            Formula1 = "1",
+            Formula2 = "100",
+            ErrorStyle = DataValidationErrorStyle.Stop,
+            Error = "Please enter a whole number between 1 and 100.",
+            ErrorTitle = "Invalid Number",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Whole Number",
+            Prompt = "Enter a number from 1 to 100."
+        });
+        sheet.Cells["B3"].Value = 50;
+
+        // 2. Decimal (Greater Than) - Warning
+        sheet.Cells["A5"].Value = "Decimal (> 0)";
+        sheet.Cells["A5"].Format = labelFormat;
+        sheet.Cells["C5"].Value = "Enter a positive decimal number (warning only)";
+        sheet.Cells["C5"].Format = noteFormat;
+        sheet.Validation.Add(RangeRef.Parse("B5"), new DataValidationRule
+        {
+            Type = DataValidationType.Decimal,
+            Operator = DataValidationOperator.GreaterThan,
+            Formula1 = "0",
+            ErrorStyle = DataValidationErrorStyle.Warning,
+            Error = "Value should be greater than 0.",
+            ErrorTitle = "Warning",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Positive Decimal",
+            Prompt = "Enter a positive number. Invalid values show a warning."
+        });
+        sheet.Cells["B5"].Value = 3.14;
+
+        // 3. List (Comma-separated)
+        sheet.Cells["A7"].Value = "List (Dropdown)";
+        sheet.Cells["A7"].Format = labelFormat;
+        sheet.Cells["C7"].Value = "Select from: Yes, No, Maybe";
+        sheet.Cells["C7"].Format = noteFormat;
+        sheet.Validation.Add(RangeRef.Parse("B7"), new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "Yes,No,Maybe",
+            Error = "Please select from the dropdown list.",
+            ShowErrorMessage = true
+        });
+
+        // 4. List (From cell range)
+        sheet.Cells["A9"].Value = "List (From Range)";
+        sheet.Cells["A9"].Format = labelFormat;
+        sheet.Cells["C9"].Value = "Dropdown populated from cells E3:E7";
+        sheet.Cells["C9"].Format = noteFormat;
+
+        // Source values for list
+        sheet.Cells["E2"].Value = "Colors";
+        sheet.Cells["E2"].Format = headerFormat;
+        sheet.Cells["E3"].Value = "Red";
+        sheet.Cells["E4"].Value = "Green";
+        sheet.Cells["E5"].Value = "Blue";
+        sheet.Cells["E6"].Value = "Yellow";
+        sheet.Cells["E7"].Value = "Purple";
+
+        sheet.Validation.Add(RangeRef.Parse("B9"), new DataValidationRule
+        {
+            Type = DataValidationType.List,
+            Formula1 = "=$E$3:$E$7",
+            Error = "Please select a color from the list.",
+            ShowErrorMessage = true
+        });
+
+        // 5. Date (Between)
+        sheet.Cells["A11"].Value = "Date (2024-2025)";
+        sheet.Cells["A11"].Format = labelFormat;
+        sheet.Cells["C11"].Value = "Enter a date between Jan 2024 and Dec 2025";
+        sheet.Cells["C11"].Format = noteFormat;
+        sheet.Validation.Add(RangeRef.Parse("B11"), new DataValidationRule
+        {
+            Type = DataValidationType.Date,
+            Operator = DataValidationOperator.Between,
+            Formula1 = "45292", // 2024-01-01
+            Formula2 = "45657", // 2024-12-31
+            Error = "Please enter a date in 2024.",
+            ErrorTitle = "Invalid Date",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Date Range",
+            Prompt = "Enter a date in the year 2024."
+        });
+        sheet.Cells["B11"].Value = 45474.0; // 2024-06-15
+        sheet.Cells["B11"].Format = new Format { NumberFormat = "yyyy-mm-dd" };
+
+        // 6. Text Length (Max 10)
+        sheet.Cells["A13"].Value = "Text Length (max 10)";
+        sheet.Cells["A13"].Format = labelFormat;
+        sheet.Cells["C13"].Value = "Maximum 10 characters allowed";
+        sheet.Cells["C13"].Format = noteFormat;
+        sheet.Validation.Add(RangeRef.Parse("B13"), new DataValidationRule
+        {
+            Type = DataValidationType.TextLength,
+            Operator = DataValidationOperator.LessThanOrEqual,
+            Formula1 = "10",
+            Error = "Text must be 10 characters or less.",
+            ErrorTitle = "Too Long",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Short Text",
+            Prompt = "Enter up to 10 characters."
+        });
+        sheet.Cells["B13"].Value = "Hello";
+
+        // 7. Custom Formula
+        sheet.Cells["A15"].Value = "Custom (B15 > B3)";
+        sheet.Cells["A15"].Format = labelFormat;
+        sheet.Cells["C15"].Value = "Value must be greater than the Whole Number cell above";
+        sheet.Cells["C15"].Format = noteFormat;
+        sheet.Validation.Add(RangeRef.Parse("B15"), new DataValidationRule
+        {
+            Type = DataValidationType.Custom,
+            Formula1 = "=B15>B3",
+            Error = "Value must be greater than the value in B3.",
+            ErrorTitle = "Custom Rule Failed",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Custom Formula",
+            Prompt = "Enter a value greater than the Whole Number cell (B3)."
+        });
+        sheet.Cells["B15"].Value = 75;
+
+        // 8. Information style
+        sheet.Cells["A17"].Value = "Info Style (1-50)";
+        sheet.Cells["A17"].Format = labelFormat;
+        sheet.Cells["C17"].Value = "Information only - any value is accepted";
+        sheet.Cells["C17"].Format = noteFormat;
+        sheet.Validation.Add(RangeRef.Parse("B17"), new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.Between,
+            Formula1 = "1",
+            Formula2 = "50",
+            ErrorStyle = DataValidationErrorStyle.Information,
+            Error = "Value is outside the recommended range of 1-50.",
+            ErrorTitle = "Information",
+            ShowErrorMessage = true,
+            ShowInputMessage = true,
+            PromptTitle = "Info Validation",
+            Prompt = "Recommended range: 1-50. Any value is accepted."
+        });
+        sheet.Cells["B17"].Value = 25;
+
+        // Pre-populate an invalid value to show error indicator
+        sheet.Cells["A19"].Value = "Invalid Value Example";
+        sheet.Cells["A19"].Format = labelFormat;
+        sheet.Cells["C19"].Value = "Cell B19 has value 200 but rule requires 1-100";
+        sheet.Cells["C19"].Format = noteFormat;
+        sheet.Validation.Add(RangeRef.Parse("B19"), new DataValidationRule
+        {
+            Type = DataValidationType.WholeNumber,
+            Operator = DataValidationOperator.Between,
+            Formula1 = "1",
+            Formula2 = "100",
+            Error = "Number must be between 1 and 100.",
+            ShowErrorMessage = true
+        });
+        sheet.Cells["B19"].Value = 200;
+        sheet.Cells["B19"].Validate();
+
+        sheet.EndUpdate();
+    }
+}

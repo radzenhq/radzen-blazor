@@ -1,0 +1,36 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+@inherits DbContextPage
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var employees = dbContext.Employees.AsQueryable();
+
+        var columnMappings = new IColumnMapping<Employee>[]
+        {
+            new ColumnMapping<Employee, int>("ID", e => e.EmployeeID),
+            new ColumnMapping<Employee, string>("First Name", e => e.FirstName),
+            new ColumnMapping<Employee, string>("Last Name", e => e.LastName),
+            new ColumnMapping<Employee, string>("Title", e => e.Title),
+            new ColumnMapping<Employee, string>("City", e => e.City),
+            new ColumnMapping<Employee, string>("Country", e => e.Country),
+        };
+
+        var dataSheet = new DataSheet<Employee>(employees, columnMappings);
+        dataSheet.Name = "Employees";
+
+        workbook = new Workbook();
+        workbook.AddSheet(dataSheet);
+    }
+}

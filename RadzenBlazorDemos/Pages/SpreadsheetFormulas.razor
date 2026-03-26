@@ -1,0 +1,243 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Formulas", 60, 20);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 130;
+        sheet.Columns[1] = 200;
+        sheet.Columns[2] = 120;
+
+        var sectionFormat = new Format { Bold = true, FontSize = 12, BackgroundColor = "#1565c0", Color = "#ffffff" };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd" };
+        var formulaFormat = new Format { Color = "#1565c0", FontFamily = "Courier New" };
+
+        // Source data in columns E-F
+        sheet.Columns[4] = 80;
+        sheet.Columns[5] = 80;
+        sheet.Cells["E1"].Value = "Data";
+        sheet.Cells["E1"].Format = headerFormat;
+        double[] data = { 10, 25, 30, 15, 45, 8, 50, 12 };
+        for (int i = 0; i < data.Length; i++)
+        {
+            sheet.Cells[i + 1, 4].Value = data[i];
+        }
+
+        // =============================================
+        // MATH FUNCTIONS
+        // =============================================
+        int row = 0;
+        sheet.MergedCells.Add(RangeRef.Parse("A1:C1"));
+        sheet.Cells[row, 0].Value = "Math Functions";
+        sheet.Cells[row, 0].Format = sectionFormat;
+
+        row = 1;
+        sheet.Cells[row, 0].Value = "Function"; sheet.Cells[row, 0].Format = headerFormat;
+        sheet.Cells[row, 1].Value = "Formula"; sheet.Cells[row, 1].Format = headerFormat;
+        sheet.Cells[row, 2].Value = "Result"; sheet.Cells[row, 2].Format = headerFormat;
+
+        var mathFormulas = new FormulaExample[]
+        {
+            new() { Name = "SUM", Formula = "=SUM(E2:E9)" },
+            new() { Name = "AVERAGE", Formula = "=AVERAGE(E2:E9)" },
+            new() { Name = "MIN", Formula = "=MIN(E2:E9)" },
+            new() { Name = "MAX", Formula = "=MAX(E2:E9)" },
+            new() { Name = "COUNT", Formula = "=COUNT(E2:E9)" },
+            new() { Name = "ROUND", Formula = "=ROUND(AVERAGE(E2:E9), 1)" },
+            new() { Name = "INT", Formula = "=INT(AVERAGE(E2:E9))" },
+            new() { Name = "RANDBETWEEN", Formula = "=RANDBETWEEN(1, 100)" },
+        };
+
+        for (int i = 0; i < mathFormulas.Length; i++)
+        {
+            row = i + 2;
+            sheet.Cells[row, 0].Value = mathFormulas[i].Name;
+            sheet.Cells[row, 1].Value = mathFormulas[i].Formula;
+            sheet.Cells[row, 1].Format = formulaFormat;
+            sheet.Cells[row, 2].Formula = mathFormulas[i].Formula;
+        }
+
+        // =============================================
+        // LOGICAL FUNCTIONS
+        // =============================================
+        row = 11;
+        sheet.MergedCells.Add(RangeRef.Parse("A12:C12"));
+        sheet.Cells[row, 0].Value = "Logical Functions";
+        sheet.Cells[row, 0].Format = sectionFormat;
+
+        row = 12;
+        sheet.Cells[row, 0].Value = "Function"; sheet.Cells[row, 0].Format = headerFormat;
+        sheet.Cells[row, 1].Value = "Formula"; sheet.Cells[row, 1].Format = headerFormat;
+        sheet.Cells[row, 2].Value = "Result"; sheet.Cells[row, 2].Format = headerFormat;
+
+        var logicalFormulas = new FormulaExample[]
+        {
+            new() { Name = "IF", Formula = "=IF(E2>20, \"High\", \"Low\")" },
+            new() { Name = "AND", Formula = "=AND(E2>5, E2<50)" },
+            new() { Name = "OR", Formula = "=OR(E2>100, E3>20)" },
+            new() { Name = "NOT", Formula = "=NOT(E2>100)" },
+            new() { Name = "IFERROR", Formula = "=IFERROR(E2/0, \"Error\")" },
+            new() { Name = "IFS", Formula = "=IFS(E2>40, \"A\", E2>20, \"B\", E2>0, \"C\")" },
+        };
+
+        for (int i = 0; i < logicalFormulas.Length; i++)
+        {
+            row = 13 + i;
+            sheet.Cells[row, 0].Value = logicalFormulas[i].Name;
+            sheet.Cells[row, 1].Value = logicalFormulas[i].Formula;
+            sheet.Cells[row, 1].Format = formulaFormat;
+            sheet.Cells[row, 2].Formula = logicalFormulas[i].Formula;
+        }
+
+        // =============================================
+        // TEXT FUNCTIONS
+        // =============================================
+        row = 20;
+        sheet.MergedCells.Add(RangeRef.Parse("A21:C21"));
+        sheet.Cells[row, 0].Value = "Text Functions";
+        sheet.Cells[row, 0].Format = sectionFormat;
+
+        // Source text
+        sheet.Cells["E21"].Value = "Source";
+        sheet.Cells["E21"].Format = headerFormat;
+        sheet.Cells["E22"].Value = "Hello World";
+
+        row = 21;
+        sheet.Cells[row, 0].Value = "Function"; sheet.Cells[row, 0].Format = headerFormat;
+        sheet.Cells[row, 1].Value = "Formula"; sheet.Cells[row, 1].Format = headerFormat;
+        sheet.Cells[row, 2].Value = "Result"; sheet.Cells[row, 2].Format = headerFormat;
+
+        var textFormulas = new FormulaExample[]
+        {
+            new() { Name = "UPPER", Formula = "=UPPER(E22)" },
+            new() { Name = "LOWER", Formula = "=LOWER(E22)" },
+            new() { Name = "LEN", Formula = "=LEN(E22)" },
+            new() { Name = "LEFT", Formula = "=LEFT(E22, 5)" },
+            new() { Name = "RIGHT", Formula = "=RIGHT(E22, 5)" },
+            new() { Name = "MID", Formula = "=MID(E22, 7, 5)" },
+            new() { Name = "TRIM", Formula = "=TRIM(\"  spaces  \")" },
+            new() { Name = "CONCAT", Formula = "=CONCAT(E22, \"!\")" },
+        };
+
+        for (int i = 0; i < textFormulas.Length; i++)
+        {
+            row = 22 + i;
+            sheet.Cells[row, 0].Value = textFormulas[i].Name;
+            sheet.Cells[row, 1].Value = textFormulas[i].Formula;
+            sheet.Cells[row, 1].Format = formulaFormat;
+            sheet.Cells[row, 2].Formula = textFormulas[i].Formula;
+        }
+
+        // =============================================
+        // DATE FUNCTIONS
+        // =============================================
+        row = 31;
+        sheet.MergedCells.Add(RangeRef.Parse("A32:C32"));
+        sheet.Cells[row, 0].Value = "Date Functions";
+        sheet.Cells[row, 0].Format = sectionFormat;
+
+        row = 32;
+        sheet.Cells[row, 0].Value = "Function"; sheet.Cells[row, 0].Format = headerFormat;
+        sheet.Cells[row, 1].Value = "Formula"; sheet.Cells[row, 1].Format = headerFormat;
+        sheet.Cells[row, 2].Value = "Result"; sheet.Cells[row, 2].Format = headerFormat;
+
+        var dateFormulas = new FormulaExample[]
+        {
+            new() { Name = "TODAY", Formula = "=TODAY()", NumberFormat = "yyyy-mm-dd" },
+            new() { Name = "NOW", Formula = "=NOW()", NumberFormat = "yyyy-mm-dd hh:mm" },
+            new() { Name = "DATE", Formula = "=DATE(2025, 6, 15)", NumberFormat = "yyyy-mm-dd" },
+            new() { Name = "DAY", Formula = "=DAY(TODAY())" },
+            new() { Name = "MONTH", Formula = "=MONTH(TODAY())" },
+            new() { Name = "YEAR", Formula = "=YEAR(TODAY())" },
+        };
+
+        for (int i = 0; i < dateFormulas.Length; i++)
+        {
+            row = 33 + i;
+            sheet.Cells[row, 0].Value = dateFormulas[i].Name;
+            sheet.Cells[row, 1].Value = dateFormulas[i].Formula;
+            sheet.Cells[row, 1].Format = formulaFormat;
+            sheet.Cells[row, 2].Formula = dateFormulas[i].Formula;
+            if (!string.IsNullOrEmpty(dateFormulas[i].NumberFormat))
+            {
+                sheet.Cells[row, 2].Format = new Format { NumberFormat = dateFormulas[i].NumberFormat };
+            }
+        }
+
+        // =============================================
+        // LOOKUP FUNCTIONS
+        // =============================================
+        row = 40;
+        sheet.MergedCells.Add(RangeRef.Parse("A41:C41"));
+        sheet.Cells[row, 0].Value = "Lookup Functions";
+        sheet.Cells[row, 0].Format = sectionFormat;
+
+        // Lookup table in H-J
+        sheet.Columns[7] = 80;
+        sheet.Columns[8] = 100;
+        sheet.Columns[9] = 80;
+        sheet.Cells["H41"].Value = "ID"; sheet.Cells["H41"].Format = headerFormat;
+        sheet.Cells["I41"].Value = "Product"; sheet.Cells["I41"].Format = headerFormat;
+        sheet.Cells["J41"].Value = "Price"; sheet.Cells["J41"].Format = headerFormat;
+
+        var lookupData = new LookupProduct[]
+        {
+            new() { Id = 101, Name = "Laptop", Price = 999.99 },
+            new() { Id = 102, Name = "Monitor", Price = 349.99 },
+            new() { Id = 103, Name = "Keyboard", Price = 79.99 },
+            new() { Id = 104, Name = "Mouse", Price = 39.99 },
+            new() { Id = 105, Name = "Headset", Price = 129.99 },
+        };
+        for (int i = 0; i < lookupData.Length; i++)
+        {
+            sheet.Cells[41 + i, 7].Value = lookupData[i].Id;
+            sheet.Cells[41 + i, 8].Value = lookupData[i].Name;
+            sheet.Cells[41 + i, 9].Value = lookupData[i].Price;
+        }
+
+        row = 41;
+        sheet.Cells[row, 0].Value = "Function"; sheet.Cells[row, 0].Format = headerFormat;
+        sheet.Cells[row, 1].Value = "Formula"; sheet.Cells[row, 1].Format = headerFormat;
+        sheet.Cells[row, 2].Value = "Result"; sheet.Cells[row, 2].Format = headerFormat;
+
+        var lookupFormulas = new FormulaExample[]
+        {
+            new() { Name = "VLOOKUP", Formula = "=VLOOKUP(103, H42:J46, 2, FALSE)" },
+            new() { Name = "INDEX/MATCH", Formula = "=INDEX(I42:I46, MATCH(104, H42:H46, 0))" },
+            new() { Name = "XLOOKUP", Formula = "=XLOOKUP(105, H42:H46, I42:I46)" },
+        };
+
+        for (int i = 0; i < lookupFormulas.Length; i++)
+        {
+            row = 42 + i;
+            sheet.Cells[row, 0].Value = lookupFormulas[i].Name;
+            sheet.Cells[row, 1].Value = lookupFormulas[i].Formula;
+            sheet.Cells[row, 1].Format = formulaFormat;
+            sheet.Cells[row, 2].Formula = lookupFormulas[i].Formula;
+        }
+
+        sheet.EndUpdate();
+    }
+
+    class FormulaExample
+    {
+        public string Name { get; set; }
+        public string Formula { get; set; }
+        public string NumberFormat { get; set; }
+    }
+
+    class LookupProduct
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public double Price { get; set; }
+    }
+}
