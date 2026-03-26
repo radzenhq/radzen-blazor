@@ -1,0 +1,79 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook CellTypes=@cellTypes style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    Dictionary<string, SpreadsheetCellType> cellTypes = new()
+    {
+        ["progress"] = SpreadsheetCellType.Create<ProgressCellRenderer>(),
+        ["rating"] = SpreadsheetCellType.Create<RatingCellRenderer, RatingCellEditor>()
+    };
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Custom Cells", 15, 6);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 180;
+        sheet.Columns[1] = 100;
+        sheet.Columns[2] = 200;
+        sheet.Columns[3] = 150;
+
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
+
+        // Headers
+        sheet.Cells["A1"].Value = "Task";
+        sheet.Cells["A1"].Format = headerFormat;
+        sheet.Cells["B1"].Value = "Status";
+        sheet.Cells["B1"].Format = headerFormat;
+        sheet.Cells["C1"].Value = "Progress";
+        sheet.Cells["C1"].Format = headerFormat;
+        sheet.Cells["D1"].Value = "Rating";
+        sheet.Cells["D1"].Format = headerFormat;
+
+        // Task data
+        var tasks = new ProjectTask[]
+        {
+            new() { Name = "Design mockups", Status = "Done", Progress = 100, Rating = 5 },
+            new() { Name = "API development", Status = "In Progress", Progress = 75, Rating = 4 },
+            new() { Name = "Database schema", Status = "Done", Progress = 100, Rating = 5 },
+            new() { Name = "Frontend layout", Status = "In Progress", Progress = 60, Rating = 3 },
+            new() { Name = "Unit tests", Status = "In Progress", Progress = 45, Rating = 4 },
+            new() { Name = "Documentation", Status = "Pending", Progress = 20, Rating = 2 },
+            new() { Name = "Code review", Status = "Pending", Progress = 10, Rating = 1 },
+            new() { Name = "Deployment", Status = "Not Started", Progress = 0, Rating = 0 },
+            new() { Name = "Performance tuning", Status = "In Progress", Progress = 55, Rating = 3 },
+            new() { Name = "User testing", Status = "Pending", Progress = 15, Rating = 2 },
+        };
+
+        for (int i = 0; i < tasks.Length; i++)
+        {
+            int r = i + 1;
+            sheet.Cells[r, 0].Value = tasks[i].Name;
+            sheet.Cells[r, 1].Value = tasks[i].Status;
+            sheet.Cells[r, 2].Value = (double)tasks[i].Progress;
+            sheet.Cells[r, 3].Value = (double)tasks[i].Rating;
+        }
+
+        // Assign custom types to ranges
+        sheet.Cells.SetCustomType(RangeRef.Parse("C2:C11"), "progress");
+        sheet.Cells.SetCustomType(RangeRef.Parse("D2:D11"), "rating");
+
+        // Freeze header row
+        sheet.Rows.Frozen = 1;
+
+        sheet.EndUpdate();
+    }
+
+    class ProjectTask
+    {
+        public string Name { get; set; }
+        public string Status { get; set; }
+        public int Progress { get; set; }
+        public int Rating { get; set; }
+    }
+}

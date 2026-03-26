@@ -1,0 +1,56 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Inventory", 100, 26);
+
+        sheet.BeginUpdate();
+
+        // Freeze first row and first column
+        sheet.Rows.Frozen = 1;
+        sheet.Columns.Frozen = 1;
+
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
+        var labelFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd" };
+
+        // Column headers
+        string[] headers = { "Product", "SKU", "Category", "Price", "Stock", "Reorder Level", "Supplier", "Location", "Weight (kg)", "Rating" };
+        sheet.Columns[0] = 150;
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[0, i].Value = headers[i];
+            sheet.Cells[0, i].Format = headerFormat;
+            if (i > 0) sheet.Columns[i] = 110;
+        }
+
+        // Sample data
+        string[] categories = { "Electronics", "Furniture", "Office", "Kitchen", "Sports" };
+        string[] suppliers = { "Acme Corp", "Global Trade", "TechParts Inc", "Quality Goods", "FastShip Ltd" };
+        string[] locations = { "Warehouse A", "Warehouse B", "Warehouse C", "Store Front", "Distribution Center" };
+        var random = new Random(42);
+
+        for (int row = 1; row < 100; row++)
+        {
+            sheet.Cells[row, 0].Value = $"Product {row}";
+            sheet.Cells[row, 0].Format = labelFormat;
+            sheet.Cells[row, 1].Value = $"SKU-{1000 + row}";
+            sheet.Cells[row, 2].Value = categories[random.Next(categories.Length)];
+            sheet.Cells[row, 3].Value = Math.Round(random.NextDouble() * 500 + 10, 2);
+            sheet.Cells[row, 3].Format = new Format { NumberFormat = "$#,##0.00" };
+            sheet.Cells[row, 4].Value = random.Next(0, 500);
+            sheet.Cells[row, 5].Value = random.Next(10, 100);
+            sheet.Cells[row, 6].Value = suppliers[random.Next(suppliers.Length)];
+            sheet.Cells[row, 7].Value = locations[random.Next(locations.Length)];
+            sheet.Cells[row, 8].Value = Math.Round(random.NextDouble() * 20 + 0.1, 1);
+            sheet.Cells[row, 9].Value = Math.Round(random.NextDouble() * 4 + 1, 1);
+        }
+
+        sheet.EndUpdate();
+    }
+}

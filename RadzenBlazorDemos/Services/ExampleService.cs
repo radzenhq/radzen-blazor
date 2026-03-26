@@ -238,11 +238,107 @@ namespace RadzenBlazorDemos
         new Example
         {
             Name = "Spreadsheet",
+            New = true,
             Icon = "\ue3ec",
-            Path = "spreadsheet",
-            Title = "Blazor Spreadsheet Component | Free UI Components by Radzen",
-            Description = "The Radzen Blazor Spreadsheet component allows you to create and edit spreadsheets in your Blazor applications.",
-            Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" }
+            Children = new []
+            {
+                new Example
+                {
+                    Name = "Overview",
+                    Path = "spreadsheet",
+                    Title = "Blazor Spreadsheet Component | Free UI Components by Radzen",
+                    Description = "Blazor Spreadsheet component with Excel-like editing, formulas, formatting, filtering, sorting, cell validation, conditional formatting, frozen panes, XLSX import/export, and more.",
+                    Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" }
+                },
+                new Example
+                {
+                    Name = "Import & Export",
+                    Path = "spreadsheet-import-export",
+                    Title = "Blazor Spreadsheet Import & Export | Free UI Components by Radzen",
+                    Description = "Load and save XLSX files with the Radzen Blazor Spreadsheet component.",
+                    Tags = new [] { "spreadsheet", "import", "export", "xlsx", "save", "load", "file" }
+                },
+                new Example
+                {
+                    Name = "Formulas",
+                    Path = "spreadsheet-formulas",
+                    Title = "Blazor Spreadsheet Formulas | Free UI Components by Radzen",
+                    Description = "Use 70+ built-in formula functions including SUM, AVERAGE, VLOOKUP, IF, and more.",
+                    Tags = new [] { "spreadsheet", "formula", "function", "sum", "average", "vlookup", "if", "calculate" }
+                },
+                new Example
+                {
+                    Name = "Cell Formatting",
+                    Path = "spreadsheet-cell-formatting",
+                    Title = "Blazor Spreadsheet Cell Formatting | Free UI Components by Radzen",
+                    Description = "Apply fonts, colors, alignment, number formats, borders, and text styles to spreadsheet cells.",
+                    Tags = new [] { "spreadsheet", "format", "font", "color", "alignment", "number", "style", "border" }
+                },
+                new Example
+                {
+                    Name = "Filtering & Sorting",
+                    Path = "spreadsheet-filtering-sorting",
+                    Title = "Blazor Spreadsheet Filtering & Sorting | Free UI Components by Radzen",
+                    Description = "Filter and sort spreadsheet data using auto-filter and sort operations.",
+                    Tags = new [] { "spreadsheet", "filter", "sort", "autofilter", "data" }
+                },
+                new Example
+                {
+                    Name = "Data Validation",
+                    Path = "spreadsheet-data-validation",
+                    Title = "Blazor Spreadsheet Data Validation | Free UI Components by Radzen",
+                    Description = "Add validation rules to cells including number ranges, lists, dates, and custom formulas.",
+                    Tags = new [] { "spreadsheet", "validation", "rule", "list", "number", "date", "custom" }
+                },
+                new Example
+                {
+                    Name = "Conditional Formatting",
+                    Path = "spreadsheet-conditional-formatting",
+                    Title = "Blazor Spreadsheet Conditional Formatting | Free UI Components by Radzen",
+                    Description = "Apply conditional formatting rules to highlight cells based on their values.",
+                    Tags = new [] { "spreadsheet", "conditional", "formatting", "highlight", "rule", "color" }
+                },
+                new Example
+                {
+                    Name = "Frozen Panes",
+                    Path = "spreadsheet-frozen-panes",
+                    Title = "Blazor Spreadsheet Frozen Panes | Free UI Components by Radzen",
+                    Description = "Freeze rows and columns to keep headers visible while scrolling.",
+                    Tags = new [] { "spreadsheet", "freeze", "frozen", "panes", "rows", "columns", "scroll" }
+                },
+                new Example
+                {
+                    Name = "Images & Hyperlinks",
+                    Path = "spreadsheet-images-hyperlinks",
+                    Title = "Blazor Spreadsheet Images & Hyperlinks | Free UI Components by Radzen",
+                    Description = "Insert and manage images and hyperlinks in spreadsheet cells.",
+                    Tags = new [] { "spreadsheet", "image", "hyperlink", "link", "picture" }
+                },
+                new Example
+                {
+                    Name = "Merge Cells",
+                    Path = "spreadsheet-merge-cells-borders",
+                    Title = "Blazor Spreadsheet Merge Cells | Free UI Components by Radzen",
+                    Description = "Merge cells to create headers and build form layouts in the spreadsheet.",
+                    Tags = new [] { "spreadsheet", "merge", "cells", "layout" }
+                },
+                new Example
+                {
+                    Name = "Custom Cell Types",
+                    Path = "spreadsheet-custom-cell-types",
+                    Title = "Blazor Spreadsheet Custom Cell Types | Free UI Components by Radzen",
+                    Description = "Create custom cell renderers and editors for the Radzen Blazor Spreadsheet.",
+                    Tags = new [] { "spreadsheet", "custom", "cell", "type", "renderer", "editor" }
+                },
+                new Example
+                {
+                    Name = "Data Binding",
+                    Path = "spreadsheet-data-binding",
+                    Title = "Blazor Spreadsheet Data Binding | Free UI Components by Radzen",
+                    Description = "Bind the Radzen Blazor Spreadsheet to data using DataSheet with IQueryable.",
+                    Tags = new [] { "spreadsheet", "data", "binding", "datasheet", "iqueryable" }
+                },
+            }
         },
         new Example
         {

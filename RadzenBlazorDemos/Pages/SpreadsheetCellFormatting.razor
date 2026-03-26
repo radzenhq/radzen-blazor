@@ -1,0 +1,210 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Formatting", 45, 10);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 140;
+        for (int i = 1; i < 10; i++) sheet.Columns[i] = 120;
+
+        // --- Text Styles ---
+        sheet.Cells["A1"].Value = "Text Styles";
+        sheet.Cells["A1"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A2"].Value = "Bold";
+        sheet.Cells["A2"].Format = new Format { Bold = true };
+        sheet.Cells["B2"].Value = "Italic";
+        sheet.Cells["B2"].Format = new Format { Italic = true };
+        sheet.Cells["C2"].Value = "Underline";
+        sheet.Cells["C2"].Format = new Format { Underline = true };
+        sheet.Cells["D2"].Value = "Strikethrough";
+        sheet.Cells["D2"].Format = new Format { Strikethrough = true };
+        sheet.Cells["E2"].Value = "Bold + Italic";
+        sheet.Cells["E2"].Format = new Format { Bold = true, Italic = true };
+
+        // --- Font Families ---
+        sheet.Cells["A4"].Value = "Font Families";
+        sheet.Cells["A4"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A5"].Value = "Arial";
+        sheet.Cells["A5"].Format = new Format { FontFamily = "Arial" };
+        sheet.Cells["B5"].Value = "Courier New";
+        sheet.Cells["B5"].Format = new Format { FontFamily = "Courier New" };
+        sheet.Cells["C5"].Value = "Georgia";
+        sheet.Cells["C5"].Format = new Format { FontFamily = "Georgia" };
+        sheet.Cells["D5"].Value = "Verdana";
+        sheet.Cells["D5"].Format = new Format { FontFamily = "Verdana" };
+
+        // --- Font Sizes ---
+        sheet.Cells["A7"].Value = "Font Sizes";
+        sheet.Cells["A7"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A8"].Value = "8pt";
+        sheet.Cells["A8"].Format = new Format { FontSize = 8 };
+        sheet.Cells["B8"].Value = "10pt";
+        sheet.Cells["B8"].Format = new Format { FontSize = 10 };
+        sheet.Cells["C8"].Value = "14pt";
+        sheet.Cells["C8"].Format = new Format { FontSize = 14 };
+        sheet.Cells["D8"].Value = "18pt";
+        sheet.Cells["D8"].Format = new Format { FontSize = 18 };
+        sheet.Rows[7] = 30;
+
+        // --- Colors ---
+        sheet.Cells["A10"].Value = "Colors";
+        sheet.Cells["A10"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A11"].Value = "Red Text";
+        sheet.Cells["A11"].Format = new Format { Color = "#e53935" };
+        sheet.Cells["B11"].Value = "Blue Text";
+        sheet.Cells["B11"].Format = new Format { Color = "#1e88e5" };
+        sheet.Cells["C11"].Value = "Green Text";
+        sheet.Cells["C11"].Format = new Format { Color = "#43a047" };
+
+        sheet.Cells["A12"].Value = "Red Background";
+        sheet.Cells["A12"].Format = new Format { BackgroundColor = "#ffcdd2" };
+        sheet.Cells["B12"].Value = "Blue Background";
+        sheet.Cells["B12"].Format = new Format { BackgroundColor = "#bbdefb" };
+        sheet.Cells["C12"].Value = "Green Background";
+        sheet.Cells["C12"].Format = new Format { BackgroundColor = "#c8e6c9" };
+        sheet.Cells["D12"].Value = "Yellow Background";
+        sheet.Cells["D12"].Format = new Format { BackgroundColor = "#fff9c4" };
+
+        // --- Alignment ---
+        sheet.Cells["A14"].Value = "Alignment";
+        sheet.Cells["A14"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A15"].Value = "Left";
+        sheet.Cells["A15"].Format = new Format { TextAlign = TextAlign.Left };
+        sheet.Cells["B15"].Value = "Center";
+        sheet.Cells["B15"].Format = new Format { TextAlign = TextAlign.Center };
+        sheet.Cells["C15"].Value = "Right";
+        sheet.Cells["C15"].Format = new Format { TextAlign = TextAlign.Right };
+
+        sheet.Rows[16] = 60;
+        sheet.Cells["A17"].Value = "Top";
+        sheet.Cells["A17"].Format = new Format { VerticalAlign = VerticalAlign.Top };
+        sheet.Cells["B17"].Value = "Center";
+        sheet.Cells["B17"].Format = new Format { VerticalAlign = VerticalAlign.Middle };
+        sheet.Cells["C17"].Value = "Bottom";
+        sheet.Cells["C17"].Format = new Format { VerticalAlign = VerticalAlign.Bottom };
+
+        // --- Text Wrapping ---
+        sheet.Cells["A19"].Value = "Text Wrap";
+        sheet.Cells["A19"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Rows[19] = 50;
+        sheet.Cells["A20"].Value = "This is a long text that will wrap within the cell when wrap text is enabled.";
+        sheet.Cells["A20"].Format = new Format { WrapText = true };
+        sheet.Cells["B20"].Value = "This text will not wrap and will overflow.";
+
+        // --- Number Formats ---
+        sheet.Cells["A22"].Value = "Number Formats";
+        sheet.Cells["A22"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A23"].Value = "Currency";
+        sheet.Cells["B23"].Value = 1234.56;
+        sheet.Cells["B23"].Format = new Format { NumberFormat = "$#,##0.00" };
+
+        sheet.Cells["A24"].Value = "Percentage";
+        sheet.Cells["B24"].Value = 0.856;
+        sheet.Cells["B24"].Format = new Format { NumberFormat = "0.0%" };
+
+        sheet.Cells["A25"].Value = "Date";
+        sheet.Cells["B25"].Value = 45747.0; // Excel serial date for 2025-03-25
+        sheet.Cells["B25"].Format = new Format { NumberFormat = "yyyy-mm-dd" };
+
+        sheet.Cells["A26"].Value = "Thousands";
+        sheet.Cells["B26"].Value = 1500000;
+        sheet.Cells["B26"].Format = new Format { NumberFormat = "#,##0" };
+
+        sheet.Cells["A27"].Value = "Accounting";
+        sheet.Cells["B27"].Value = -4500.00;
+        sheet.Cells["B27"].Format = new Format { NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)" };
+
+        sheet.Cells["A28"].Value = "Scientific";
+        sheet.Cells["B28"].Value = 0.000123;
+        sheet.Cells["B28"].Format = new Format { NumberFormat = "0.00E+00" };
+
+        // --- Border Styles ---
+        sheet.Cells["A30"].Value = "Border Styles";
+        sheet.Cells["A30"].Format = new Format { Bold = true, FontSize = 12 };
+
+        var borderStyles = new BorderSample[]
+        {
+            new() { Name = "Thin", LineStyle = BorderLineStyle.Thin },
+            new() { Name = "Medium", LineStyle = BorderLineStyle.Medium },
+            new() { Name = "Thick", LineStyle = BorderLineStyle.Thick },
+            new() { Name = "Dashed", LineStyle = BorderLineStyle.Dashed },
+            new() { Name = "Dotted", LineStyle = BorderLineStyle.Dotted },
+            new() { Name = "Double", LineStyle = BorderLineStyle.Double },
+        };
+
+        for (int i = 0; i < borderStyles.Length; i++)
+        {
+            var border = new BorderStyle { LineStyle = borderStyles[i].LineStyle };
+            sheet.Cells[31, i].Value = borderStyles[i].Name;
+            sheet.Cells[31, i].Format = new Format
+            {
+                TextAlign = TextAlign.Center,
+                VerticalAlign = VerticalAlign.Middle,
+                BorderTop = border.Clone(),
+                BorderRight = border.Clone(),
+                BorderBottom = border.Clone(),
+                BorderLeft = border.Clone()
+            };
+        }
+        sheet.Rows[31] = 36;
+
+        // --- Colored Borders ---
+        sheet.Cells["A34"].Value = "Colored Borders";
+        sheet.Cells["A34"].Format = new Format { Bold = true, FontSize = 12 };
+
+        var colors = new ColorSample[]
+        {
+            new() { Name = "Red", Color = "#e53935" },
+            new() { Name = "Blue", Color = "#1e88e5" },
+            new() { Name = "Green", Color = "#43a047" },
+            new() { Name = "Orange", Color = "#fb8c00" },
+            new() { Name = "Purple", Color = "#8e24aa" },
+        };
+
+        for (int i = 0; i < colors.Length; i++)
+        {
+            var border = new BorderStyle { LineStyle = BorderLineStyle.Medium, Color = colors[i].Color };
+            sheet.Cells[35, i].Value = colors[i].Name;
+            sheet.Cells[35, i].Format = new Format
+            {
+                TextAlign = TextAlign.Center,
+                VerticalAlign = VerticalAlign.Middle,
+                Color = colors[i].Color,
+                BorderTop = border.Clone(),
+                BorderRight = border.Clone(),
+                BorderBottom = border.Clone(),
+                BorderLeft = border.Clone()
+            };
+        }
+        sheet.Rows[35] = 36;
+
+        sheet.EndUpdate();
+    }
+
+    class BorderSample
+    {
+        public string Name { get; set; }
+        public BorderLineStyle LineStyle { get; set; }
+    }
+
+    class ColorSample
+    {
+        public string Name { get; set; }
+        public string Color { get; set; }
+    }
+}
