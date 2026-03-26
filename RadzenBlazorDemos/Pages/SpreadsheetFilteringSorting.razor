@@ -1,0 +1,91 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Employees", 25, 8);
+
+        sheet.BeginUpdate();
+
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
+
+        // Column headers
+        string[] headers = { "Name", "Department", "Salary", "Start Date", "City", "Rating" };
+        sheet.Columns[0] = 140;
+        sheet.Columns[1] = 120;
+        sheet.Columns[2] = 100;
+        sheet.Columns[3] = 110;
+        sheet.Columns[4] = 110;
+        sheet.Columns[5] = 80;
+
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[0, i].Value = headers[i];
+            sheet.Cells[0, i].Format = headerFormat;
+        }
+
+        // Employee data
+        var employees = new EmployeeRecord[]
+        {
+            new() { Name = "Alice Johnson", Department = "Engineering", Salary = 95000, StartDate = 44927, City = "New York", Rating = 5 },
+            new() { Name = "Bob Smith", Department = "Marketing", Salary = 72000, StartDate = 44562, City = "Chicago", Rating = 4 },
+            new() { Name = "Carol Davis", Department = "Engineering", Salary = 105000, StartDate = 44197, City = "San Francisco", Rating = 5 },
+            new() { Name = "David Wilson", Department = "Sales", Salary = 68000, StartDate = 45108, City = "Boston", Rating = 3 },
+            new() { Name = "Eva Martinez", Department = "Engineering", Salary = 98000, StartDate = 44743, City = "New York", Rating = 4 },
+            new() { Name = "Frank Brown", Department = "Marketing", Salary = 76000, StartDate = 45292, City = "Chicago", Rating = 4 },
+            new() { Name = "Grace Lee", Department = "Sales", Salary = 82000, StartDate = 44378, City = "San Francisco", Rating = 5 },
+            new() { Name = "Henry Taylor", Department = "Engineering", Salary = 110000, StartDate = 43832, City = "Boston", Rating = 5 },
+            new() { Name = "Iris Wang", Department = "Marketing", Salary = 69000, StartDate = 45473, City = "New York", Rating = 3 },
+            new() { Name = "Jack Miller", Department = "Sales", Salary = 71000, StartDate = 44562, City = "Chicago", Rating = 4 },
+            new() { Name = "Karen White", Department = "Engineering", Salary = 102000, StartDate = 44013, City = "San Francisco", Rating = 5 },
+            new() { Name = "Leo Garcia", Department = "Sales", Salary = 74000, StartDate = 44927, City = "Boston", Rating = 3 },
+            new() { Name = "Mia Anderson", Department = "Marketing", Salary = 80000, StartDate = 44197, City = "New York", Rating = 4 },
+            new() { Name = "Noah Thomas", Department = "Engineering", Salary = 115000, StartDate = 43647, City = "Chicago", Rating = 5 },
+            new() { Name = "Olivia Jackson", Department = "Sales", Salary = 67000, StartDate = 45292, City = "San Francisco", Rating = 3 },
+            new() { Name = "Peter Harris", Department = "Marketing", Salary = 73000, StartDate = 44743, City = "Boston", Rating = 4 },
+            new() { Name = "Quinn Martin", Department = "Engineering", Salary = 99000, StartDate = 44378, City = "New York", Rating = 4 },
+            new() { Name = "Rachel Clark", Department = "Sales", Salary = 78000, StartDate = 45108, City = "Chicago", Rating = 4 },
+            new() { Name = "Sam Robinson", Department = "Engineering", Salary = 108000, StartDate = 44013, City = "San Francisco", Rating = 5 },
+            new() { Name = "Tina Lewis", Department = "Marketing", Salary = 71000, StartDate = 45473, City = "Boston", Rating = 3 },
+        };
+
+        var salaryFormat = new Format { NumberFormat = "$#,##0" };
+        var dateFormat = new Format { NumberFormat = "yyyy-mm-dd" };
+
+        for (int i = 0; i < employees.Length; i++)
+        {
+            int r = i + 1;
+            sheet.Cells[r, 0].Value = employees[i].Name;
+            sheet.Cells[r, 1].Value = employees[i].Department;
+            sheet.Cells[r, 2].Value = employees[i].Salary;
+            sheet.Cells[r, 2].Format = salaryFormat;
+            sheet.Cells[r, 3].Value = employees[i].StartDate;
+            sheet.Cells[r, 3].Format = dateFormat;
+            sheet.Cells[r, 4].Value = employees[i].City;
+            sheet.Cells[r, 5].Value = employees[i].Rating;
+        }
+
+        // Enable auto-filter on the table range
+        sheet.AddTable(RangeRef.Parse("A1:F21"));
+
+        // Freeze header row
+        sheet.Rows.Frozen = 1;
+
+        sheet.EndUpdate();
+    }
+
+    class EmployeeRecord
+    {
+        public string Name { get; set; }
+        public string Department { get; set; }
+        public double Salary { get; set; }
+        public double StartDate { get; set; }
+        public string City { get; set; }
+        public int Rating { get; set; }
+    }
+}

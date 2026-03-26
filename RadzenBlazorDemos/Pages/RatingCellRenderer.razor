@@ -1,0 +1,15 @@
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenRating Value=@Rating ReadOnly="true" />
+
+@code {
+    [Parameter]
+    public SpreadsheetCellRenderContext Context { get; set; } = default!;
+
+    int Rating => Context.Cell.Value switch
+    {
+        double d => (int)Math.Clamp(d, 0, 5),
+        int i => Math.Clamp(i, 0, 5),
+        _ => 0
+    };
+}

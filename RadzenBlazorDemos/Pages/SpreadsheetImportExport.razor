@@ -1,0 +1,103 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@using System.IO
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-mb-4">
+    <RadzenUpload Change="OnFileSelected" Accept=".xlsx" ChooseText="Import XLSX" Icon="upload_file" Auto="false" />
+    <RadzenButton Text="Export to XLSX" Icon="download" Click="ExportToXlsx" />
+</RadzenStack>
+
+<RadzenSpreadsheet @bind-Workbook=@workbook ExportFileName="spreadsheet-export.xlsx" style="height: 500px" />
+
+@code {
+    Workbook workbook;
+
+    protected override void OnInitialized()
+    {
+        workbook = CreateSampleWorkbook();
+    }
+
+    Workbook CreateSampleWorkbook()
+    {
+        var wb = new Workbook();
+        var sheet = wb.AddSheet("Sample Data", 30, 10);
+
+        sheet.BeginUpdate();
+
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
+        var currencyFormat = new Format { NumberFormat = "$#,##0.00" };
+
+        string[] headers = { "Product", "Category", "Q1 Sales", "Q2 Sales", "Total" };
+        sheet.Columns[0] = 140;
+        sheet.Columns[1] = 110;
+        for (int i = 2; i < 5; i++) sheet.Columns[i] = 100;
+
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[0, i].Value = headers[i];
+            sheet.Cells[0, i].Format = headerFormat;
+        }
+
+        var products = new ProductSales[]
+        {
+            new() { Name = "Laptop Pro", Category = "Electronics", Q1 = 45200, Q2 = 52100 },
+            new() { Name = "Ultra Monitor", Category = "Electronics", Q1 = 18500, Q2 = 21300 },
+            new() { Name = "Ergo Keyboard", Category = "Accessories", Q1 = 8200, Q2 = 7600 },
+            new() { Name = "Wireless Mouse", Category = "Accessories", Q1 = 5400, Q2 = 6100 },
+            new() { Name = "Noise Cancel Headset", Category = "Audio", Q1 = 12300, Q2 = 14500 },
+            new() { Name = "USB Dock", Category = "Electronics", Q1 = 22100, Q2 = 25400 },
+            new() { Name = "Office Chair", Category = "Furniture", Q1 = 15800, Q2 = 17200 },
+            new() { Name = "Standing Desk", Category = "Furniture", Q1 = 28500, Q2 = 31200 },
+        };
+
+        for (int i = 0; i < products.Length; i++)
+        {
+            int r = i + 1;
+            sheet.Cells[r, 0].Value = products[i].Name;
+            sheet.Cells[r, 1].Value = products[i].Category;
+            sheet.Cells[r, 2].Value = products[i].Q1;
+            sheet.Cells[r, 2].Format = currencyFormat;
+            sheet.Cells[r, 3].Value = products[i].Q2;
+            sheet.Cells[r, 3].Format = currencyFormat;
+            sheet.Cells[r, 4].Formula = $"=C{r + 1}+D{r + 1}";
+            sheet.Cells[r, 4].Format = new Format { Bold = true, NumberFormat = "$#,##0.00" };
+        }
+
+        sheet.Rows.Frozen = 1;
+        sheet.EndUpdate();
+
+        return wb;
+    }
+
+    async Task OnFileSelected(UploadChangeEventArgs args)
+    {
+        var file = args.Files.FirstOrDefault();
+        if (file == null) return;
+
+        using var stream = new MemoryStream();
+        await file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(stream);
+        stream.Position = 0;
+        workbook = Workbook.LoadFromStream(stream);
+    }
+
+    async Task ExportToXlsx()
+    {
+        if (workbook == null) return;
+
+        using var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "spreadsheet-export.xlsx", streamRef);
+    }
+
+    class ProductSales
+    {
+        public string Name { get; set; }
+        public string Category { get; set; }
+        public double Q1 { get; set; }
+        public double Q2 { get; set; }
+    }
+}

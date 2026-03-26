@@ -1,0 +1,15 @@
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenProgressBar Value=@Percent ShowValue="true" Style="height: 20px; width: 100%" />
+
+@code {
+    [Parameter]
+    public SpreadsheetCellRenderContext Context { get; set; } = default!;
+
+    double Percent => Context.Cell.Value switch
+    {
+        double d => Math.Clamp(d, 0, 100),
+        int i => Math.Clamp(i, 0, 100),
+        _ => 0
+    };
+}

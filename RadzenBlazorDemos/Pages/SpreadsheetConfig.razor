@@ -1,139 +1,88 @@
-@using Radzen.Blazor.Spreadsheet;
-@using Radzen.Documents.Spreadsheet;
-@using System.IO
-@inject IJSRuntime JSRuntime
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
 
-<RadzenSpreadsheet Workbook=@workbook style="height: 500px" />
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
 
 @code {
-    #nullable enable
-    Worksheet sheet = new Worksheet(40, 40);
-
     Workbook workbook = new Workbook();
-
-    class MyFormat : ConditionalFormatBase
-    {
-        public override Format? GetFormat(Cell cell)
-        {
-            if (cell.Data.GetValueOrDefault<double>() > 3)
-            {
-                return new Format { BackgroundColor = "lightgreen" };
-            }
-
-            return null;
-        }
-    }
 
     protected override void OnInitialized()
     {
-        workbook.AddSheet(sheet);
+        var sheet = workbook.AddSheet("Sales Report", 50, 26);
 
         sheet.BeginUpdate();
-        sheet.AddTable(RangeRef.Parse("A1:F10"));
-        sheet.Rows.Frozen = 3;
-        sheet.Columns.Frozen = 2;
-        sheet.MergedCells.Add(RangeRef.Parse("A1:D1"));
-        sheet.MergedCells.Add(RangeRef.Parse("C3:D3"));
-        sheet.Cells["A1"].Value = "Hello";
-        sheet.Cells["B2"].Formula = "=A1";
-        sheet.Cells["C3"].Value = 42;
-        sheet.Cells["D3"].Value = "world";
-        sheet.Cells["A5"].Value = "world";
-        sheet.Cells["F1"].Value = 3;
-        sheet.Cells["F2"].Value = 4;
-        //sheet.Cells["F3"].Value = 2;
-        sheet.Cells["F4"].Value = 5;
-        sheet.Selection.Select(RangeRef.Parse("A1:B2"));
-        sheet.Validation.Add(RangeRef.Parse("E1:E10"), new NumberValidator());
 
-        // Data validation: whole number between 1 and 100
-        sheet.Cells["H1"].Value = "Number (1-100)";
-        sheet.Validation.Add(RangeRef.Parse("H4:H10"), new DataValidationRule
+        var headerFormat = new Format { Bold = true, FontSize = 14, TextAlign = TextAlign.Center, BackgroundColor = "#1e88e5", Color = "#ffffff" };
+        var columnHeaderFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center, BorderBottom = new BorderStyle { LineStyle = BorderLineStyle.Medium } };
+        var currencyFormat = new Format { NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right };
+        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9", BorderTop = new BorderStyle { LineStyle = BorderLineStyle.Double } };
+        var grandTotalFormat = new Format { Bold = true, FontSize = 12, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9", BorderTop = new BorderStyle { LineStyle = BorderLineStyle.Double } };
+
+        // Title row
+        sheet.MergedCells.Add(RangeRef.Parse("A1:G1"));
+        sheet.Cells["A1"].Value = "Quarterly Sales Report 2025";
+        sheet.Cells["A1"].Format = headerFormat;
+        sheet.Rows[0] = 36;
+
+        // Column headers
+        string[] headers = { "Product", "Q1", "Q2", "Q3", "Q4", "Total", "% of Total" };
+        for (int i = 0; i < headers.Length; i++)
         {
-            Type = DataValidationType.WholeNumber,
-            Operator = DataValidationOperator.Between,
-            Formula1 = "1",
-            Formula2 = "100",
-            Error = "Please enter a whole number between 1 and 100.",
-            ShowErrorMessage = true
-        });
+            sheet.Cells[1, i].Value = headers[i];
+            sheet.Cells[1, i].Format = columnHeaderFormat;
+        }
+        sheet.Columns[0] = 140;
+        for (int i = 1; i <= 5; i++) sheet.Columns[i] = 100;
+        sheet.Columns[6] = 90;
 
-        // Data validation: list dropdown
-        sheet.Cells["I1"].Value = "Status";
-        sheet.Validation.Add(RangeRef.Parse("I4:I10"), new DataValidationRule
+        // Product data
+        string[] products = { "Laptops", "Monitors", "Keyboards", "Headsets", "Webcams", "Mice", "Cables", "Docking Stations", "Speakers", "Software Licenses" };
+        double[,] sales = {
+            { 45200, 52100, 48700, 61300 },
+            { 18500, 21300, 19800, 24600 },
+            { 8200, 7600, 9100, 11400 },
+            { 12300, 14500, 13200, 16800 },
+            { 6700, 8200, 7500, 9100 },
+            { 5400, 6100, 5800, 7200 },
+            { 3200, 2900, 3500, 4100 },
+            { 22100, 25400, 23800, 29600 },
+            { 4800, 5600, 5200, 6500 },
+            { 31000, 35200, 33500, 42000 }
+        };
+
+        for (int row = 0; row < products.Length; row++)
         {
-            Type = DataValidationType.List,
-            Formula1 = "Yes,No,Maybe",
-            Error = "Please select from the list.",
-            ShowErrorMessage = true
-        });
+            int r = row + 2;
+            sheet.Cells[r, 0].Value = products[row];
+            for (int q = 0; q < 4; q++)
+            {
+                sheet.Cells[r, q + 1].Value = sales[row, q];
+                sheet.Cells[r, q + 1].Format = currencyFormat;
+            }
+            // Total formula
+            var rowNum = r + 1;
+            sheet.Cells[r, 5].Formula = $"=SUM(B{rowNum}:E{rowNum})";
+            sheet.Cells[r, 5].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right };
+            // % of Total formula
+            sheet.Cells[r, 6].Formula = $"=F{rowNum}/F13";
+            sheet.Cells[r, 6].Format = new Format { NumberFormat = "0.0%", TextAlign = TextAlign.Right };
+        }
 
-        // Put an invalid value in H4 to demonstrate error indicator
-        sheet.Cells["H4"].Value = 200;
-        sheet.Cells["H4"].Validate();
-
-        // Put a valid value in H5
-        sheet.Cells["H5"].Value = 50;
-        sheet.Cells["H5"].Validate();
-
-        // Warning-style validation in J column
-        sheet.Cells["J1"].Value = "Warning (>0)";
-        sheet.Validation.Add(RangeRef.Parse("J4:J10"), new DataValidationRule
+        // Grand total row (row 13, 1-indexed row 14)
+        sheet.Cells["A13"].Value = "Grand Total";
+        sheet.Cells["A13"].Format = new Format { Bold = true, FontSize = 12, BackgroundColor = "#c8e6c9" };
+        for (int col = 1; col <= 5; col++)
         {
-            Type = DataValidationType.WholeNumber,
-            Operator = DataValidationOperator.GreaterThan,
-            Formula1 = "0",
-            ErrorStyle = DataValidationErrorStyle.Warning,
-            Error = "Value should be greater than 0.",
-            ShowErrorMessage = true,
-            ShowInputMessage = true,
-            PromptTitle = "Warning validation",
-            Prompt = "Enter a number greater than 0. Invalid values will show a warning."
-        });
+            var colLetter = (char)('A' + col);
+            sheet.Cells[12, col].Formula = $"=SUM({colLetter}3:{colLetter}12)";
+            sheet.Cells[12, col].Format = grandTotalFormat;
+        }
+        sheet.Cells["G13"].Value = 1.0;
+        sheet.Cells["G13"].Format = new Format { Bold = true, FontSize = 12, NumberFormat = "0.0%", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9" };
 
-        // Information-style validation in K column
-        sheet.Cells["K1"].Value = "Info (1-50)";
-        sheet.Validation.Add(RangeRef.Parse("K4:K10"), new DataValidationRule
-        {
-            Type = DataValidationType.WholeNumber,
-            Operator = DataValidationOperator.Between,
-            Formula1 = "1",
-            Formula2 = "50",
-            ErrorStyle = DataValidationErrorStyle.Information,
-            Error = "Value is outside the recommended range of 1-50.",
-            ShowErrorMessage = true,
-            ShowInputMessage = true,
-            PromptTitle = "Information validation",
-            Prompt = "Enter a number between 1 and 50. Values outside this range are allowed."
-        });
+        // Freeze header rows
+        sheet.Rows.Frozen = 2;
 
-        // Custom formula validation in L column (relative refs: shifts per row)
-        sheet.Cells["L1"].Value = "Custom (>H)";
-        sheet.Validation.Add(RangeRef.Parse("L4:L10"), new DataValidationRule
-        {
-            Type = DataValidationType.Custom,
-            Formula1 = "=L4>H4",
-            Error = "Value must be greater than the corresponding H column value.",
-            ShowErrorMessage = true,
-            ShowInputMessage = true,
-            PromptTitle = "Custom formula",
-            Prompt = "Enter a value greater than the value in column H."
-        });
-
-        // List from cell range in M column (reads items from N1:N3)
-        sheet.Cells["M1"].Value = "Color";
-        sheet.Cells["N1"].Value = "Red";
-        sheet.Cells["N2"].Value = "Green";
-        sheet.Cells["N3"].Value = "Blue";
-        sheet.Validation.Add(RangeRef.Parse("M4:M10"), new DataValidationRule
-        {
-            Type = DataValidationType.List,
-            Formula1 = "=$N$1:$N$3",
-            Error = "Please select a color from the list.",
-            ShowErrorMessage = true
-        });
-
-        sheet.ConditionalFormats.Add(RangeRef.Parse("A1:F10"), new MyFormat());
         sheet.EndUpdate();
     }
 }
