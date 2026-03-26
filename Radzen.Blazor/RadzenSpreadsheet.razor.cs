@@ -548,8 +548,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     {
                         case DataValidationErrorStyle.Information:
                             await DialogService.Alert(error, Localize(nameof(RadzenStrings.Spreadsheet_InformationTitle)));
-                            // Accept the value despite validation failure
-                            Editor!.Cell.ClearValidationErrors();
+                            // Accept the value despite validation failure - keep validation errors to show indicator
+                            Editor!.EndEdit();
                             break;
 
                         case DataValidationErrorStyle.Warning:
@@ -559,11 +559,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                             if (confirmed == true)
                             {
-                                Editor!.Cell.ClearValidationErrors();
+                                // Accept the value despite validation failure - keep validation errors to show indicator
+                                Editor!.EndEdit();
                             }
                             else
                             {
                                 command.Unexecute();
+                                Editor!.Cell.ClearValidationErrors();
                                 Editor!.Cancel();
                                 result = false;
                             }
@@ -572,6 +574,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                         default: // Stop
                             await DialogService.Alert(error, Localize(nameof(RadzenStrings.Spreadsheet_InvalidValueTitle)));
                             command.Unexecute();
+                            Editor!.Cell.ClearValidationErrors();
                             Editor!.Cancel();
                             result = false;
                             break;
