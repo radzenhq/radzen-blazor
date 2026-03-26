@@ -1,5 +1,6 @@
 using Radzen.Blazor.Rendering;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
@@ -73,8 +74,32 @@ namespace Radzen.Blazor
     /// &lt;/RadzenFormField&gt;
     /// </code>
     /// </example>
-    public partial class RadzenFormField : RadzenComponent
+    public partial class RadzenFormField : RadzenComponent, IAsyncDisposable
     {
+        private IJSObjectReference? _jsRef;
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                _jsRef = await JSRuntime!.InvokeAsync<IJSObjectReference>("Radzen.createFormField", Element);
+            }
+        }
+
+        /// <inheritdoc />
+        public async ValueTask DisposeAsync()
+        {
+            if (_jsRef != null)
+            {
+                try { await _jsRef.InvokeVoidAsync("dispose"); } catch { }
+                try { await _jsRef.DisposeAsync(); } catch { }
+                _jsRef = null;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the input component to wrap.
         /// Place the input component (RadzenTextBox, RadzenDropDown, etc.) here.
