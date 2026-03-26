@@ -105,14 +105,14 @@ public class DataValidationRule : ICellValidator
     public string Error { get; set; } = "The value you entered is not valid.";
 
     /// <summary>
-    /// Gets or sets the input prompt title.
+    /// Gets or sets the input message title.
     /// </summary>
-    public string? PromptTitle { get; set; }
+    public string? InputTitle { get; set; }
 
     /// <summary>
-    /// Gets or sets the input prompt message.
+    /// Gets or sets the input message.
     /// </summary>
-    public string? Prompt { get; set; }
+    public string? InputMessage { get; set; }
 
     /// <summary>
     /// Gets or sets whether to show the input message.
