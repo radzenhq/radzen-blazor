@@ -46,8 +46,8 @@
             ErrorTitle = "Invalid Number",
             ShowErrorMessage = true,
             ShowInputMessage = true,
-            PromptTitle = "Whole Number",
-            Prompt = "Enter a number from 1 to 100."
+            InputTitle = "Whole Number",
+            InputMessage = "Enter a number from 1 to 100."
         });
         sheet.Cells["B3"].Value = 50;
 
@@ -66,8 +66,8 @@
             ErrorTitle = "Warning",
             ShowErrorMessage = true,
             ShowInputMessage = true,
-            PromptTitle = "Positive Decimal",
-            Prompt = "Enter a positive number. Invalid values show a warning."
+            InputTitle = "Positive Decimal",
+            InputMessage = "Enter a positive number. Invalid values show a warning."
         });
         sheet.Cells["B5"].Value = 3.14;
 
@@ -122,8 +122,8 @@
             ErrorTitle = "Invalid Date",
             ShowErrorMessage = true,
             ShowInputMessage = true,
-            PromptTitle = "Date Range",
-            Prompt = "Enter a date in the year 2024."
+            InputTitle = "Date Range",
+            InputMessage = "Enter a date in the year 2024."
         });
         sheet.Cells["B11"].Value = 45474.0; // 2024-06-15
         sheet.Cells["B11"].Format = new Format { NumberFormat = "yyyy-mm-dd" };
@@ -142,8 +142,8 @@
             ErrorTitle = "Too Long",
             ShowErrorMessage = true,
             ShowInputMessage = true,
-            PromptTitle = "Short Text",
-            Prompt = "Enter up to 10 characters."
+            InputTitle = "Short Text",
+            InputMessage = "Enter up to 10 characters."
         });
         sheet.Cells["B13"].Value = "Hello";
 
@@ -160,8 +160,8 @@
             ErrorTitle = "Custom Rule Failed",
             ShowErrorMessage = true,
             ShowInputMessage = true,
-            PromptTitle = "Custom Formula",
-            Prompt = "Enter a value greater than the Whole Number cell (B3)."
+            InputTitle = "Custom Formula",
+            InputMessage = "Enter a value greater than the Whole Number cell (B3)."
         });
         sheet.Cells["B15"].Value = 75;
 
@@ -181,8 +181,8 @@
             ErrorTitle = "Information",
             ShowErrorMessage = true,
             ShowInputMessage = true,
-            PromptTitle = "Info Validation",
-            Prompt = "Recommended range: 1-50. Any value is accepted."
+            InputTitle = "Info Validation",
+            InputMessage = "Recommended range: 1-50. Any value is accepted."
         });
         sheet.Cells["B17"].Value = 25;
 

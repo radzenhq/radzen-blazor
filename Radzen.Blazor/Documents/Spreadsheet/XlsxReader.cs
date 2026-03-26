@@ -1031,8 +1031,8 @@ static class XlsxReader
                 AllowBlank = allowBlankAttr != "0",
                 Error = errorAttr ?? "The value you entered is not valid.",
                 ErrorTitle = errorTitleAttr,
-                Prompt = promptAttr,
-                PromptTitle = promptTitleAttr,
+                InputMessage = promptAttr,
+                InputTitle = promptTitleAttr,
                 ShowErrorMessage = showErrorMessageAttr == "1",
                 ShowInputMessage = showInputMessageAttr == "1",
                 ErrorStyle = errorStyle

@@ -1142,14 +1142,14 @@ class XlsxWriter(Workbook workbook)
                         element.Add(new XAttribute("error", rule.Error));
                     }
 
-                    if (!string.IsNullOrEmpty(rule.PromptTitle))
+                    if (!string.IsNullOrEmpty(rule.InputTitle))
                     {
-                        element.Add(new XAttribute("promptTitle", rule.PromptTitle));
+                        element.Add(new XAttribute("promptTitle", rule.InputTitle));
                     }
 
-                    if (!string.IsNullOrEmpty(rule.Prompt))
+                    if (!string.IsNullOrEmpty(rule.InputMessage))
                     {
-                        element.Add(new XAttribute("prompt", rule.Prompt));
+                        element.Add(new XAttribute("prompt", rule.InputMessage));
                     }
 
                     var errorStyleStr = rule.ErrorStyle switch
