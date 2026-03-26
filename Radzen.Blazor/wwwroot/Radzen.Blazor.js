@@ -1830,7 +1830,7 @@ window.Radzen = {
 
     var isRTL = Radzen.isRTL(popup);
 
-    if (isRTL && (!position || position == 'bottom' || position == 'top')) {
+    if (isRTL && parent && (!position || position == 'bottom' || position == 'top')) {
       left = parentRect.right - rect.width;
     }
 

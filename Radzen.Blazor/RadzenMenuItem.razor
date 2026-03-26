@@ -57,7 +57,7 @@
         </div>
         @if (ChildContent != null)
         {
-            <ul id="@($"{GetId()}-submenu")" class="rz-navigation-menu" role="menu" style="display: none" data-flyout="@(Parent?.Flyout == true && ParentItem != null ? "true" : null)">
+            <ul id="@($"{GetId()}-submenu")" class="rz-navigation-menu" role="menu" style="display: none" data-flyout="@(Parent?.Flyout == true ? "true" : null)">
                 <CascadingValue Value=this>
                     @ChildContent
                 </CascadingValue>

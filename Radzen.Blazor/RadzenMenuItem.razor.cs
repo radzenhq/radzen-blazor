@@ -113,7 +113,7 @@ namespace Radzen.Blazor
 
         internal string? SubmenuId => ChildContent != null ? $"{GetId()}-submenu" : null;
 
-        internal string ArrowIcon => ParentItem != null && Parent?.Flyout == true
+        internal string ArrowIcon => Parent?.Flyout == true
             ? "keyboard_arrow_right"
             : "keyboard_arrow_down";
 

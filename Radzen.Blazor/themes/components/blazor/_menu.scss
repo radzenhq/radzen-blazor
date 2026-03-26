@@ -333,11 +333,37 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
     }
   }
 
-  .rz-navigation-menu .rz-navigation-item-icon-children {
-    &.rz-state-expanded,
-    &.rz-state-collapsed {
-      transform: rotate(0);
+  .rz-navigation-item-link .rz-navigation-item-icon-children {
+    transition: none;
+
+    &, &.rz-state-expanded, &.rz-state-collapsed {
+      transform: none;
     }
+  }
+}
+
+// Context menu flyout: first-level submenus should also fly out to the side
+.rz-context-menu .rz-menu-flyout:not(.rz-profile-menu) {
+  > .rz-navigation-item > .rz-navigation-menu {
+    inset-inline-start: 100%;
+    top: 0;
+    min-width: max-content;
+    z-index: 4;
+
+    &[data-flyout-flip] {
+      inset-inline-start: auto;
+      inset-inline-end: 100%;
+    }
+
+    .rz-navigation-item-link {
+      margin-inline-start: 0;
+    }
+  }
+}
+
+*[dir="rtl"] .rz-menu-flyout:not(.rz-profile-menu) .rz-navigation-item-link .rz-navigation-item-icon-children {
+  &, &.rz-state-expanded, &.rz-state-collapsed {
+    transform: scaleX(-1);
   }
 }
 
