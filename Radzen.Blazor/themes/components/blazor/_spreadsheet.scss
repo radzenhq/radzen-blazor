@@ -201,6 +201,7 @@
 .rz-spreadsheet-cell-editor {
     position: absolute;
     z-index: 1;
+    background: var(--rz-base-background-color);
 }
 
 .rz-spreadsheet-cell-editor .rz-spreadsheet-editor {
@@ -231,10 +232,11 @@
     inset: 0;
     pointer-events: none;
     z-index: 1;
+    color: var(--rz-cell-color, inherit);
 }
 
 .rz-number-highlight {
-    color: #098658;
+    color: var(--rz-cell-color, #098658);
     font-weight: 500;
 }
 
@@ -252,12 +254,12 @@
 }
 
 .rz-operator-highlight {
-    color: #000000;
+    color: var(--rz-cell-color, #000000);
     font-weight: 500;
 }
 
 .rz-default-highlight {
-    color: #000000;
+    color: var(--rz-cell-color, #000000);
 }
 
 .rz-spreadsheet-highlight-popup {
