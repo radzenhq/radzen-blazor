@@ -504,9 +504,9 @@ class XlsxWriter(Workbook workbook)
                     new XAttribute("ref", cellRef),
                     new XAttribute(rNs + "id", relId));
 
-                if (cell.Hyperlink.DisplayText is not null)
+                if (cell.Hyperlink.Text is not null)
                 {
-                    hyperlinkElement.Add(new XAttribute("display", cell.Hyperlink.DisplayText));
+                    hyperlinkElement.Add(new XAttribute("display", cell.Hyperlink.Text));
                 }
 
                 hyperlinksElement.Add(hyperlinkElement);
