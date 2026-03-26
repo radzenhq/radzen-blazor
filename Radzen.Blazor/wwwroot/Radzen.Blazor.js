@@ -5039,3 +5039,14 @@ Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
 Radzen.scrollElementTo = (scrollable, left, top) => {
   scrollable.scrollTo({ top: top, left: left });
 };
+Radzen.createFormField = function(el) {
+  if (!el) return null;
+  function onFocusIn() { el.classList.add('rz-state-focused'); }
+  function onFocusOut() { el.classList.remove('rz-state-focused'); }
+  el.addEventListener('focusin', onFocusIn);
+  el.addEventListener('focusout', onFocusOut);
+  return { dispose: function() {
+    el.removeEventListener('focusin', onFocusIn);
+    el.removeEventListener('focusout', onFocusOut);
+  }};
+};

@@ -118,7 +118,7 @@
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) @ondragover:preventDefault @ondrop=@(args => @OnDrop(dayOfWeek))>
                             <div class="rz-slot-title">
                                 @calendar.GetDayOfMonth(dayOfWeek)
                                 @if (excessCounts.TryGetValue(dayOfWeek, out var excess))
@@ -132,7 +132,7 @@
                     }
                     else
                     {
-                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
+                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth) @ondragover:preventDefault @ondrop=@(args => @OnDrop(dayOfWeek))>
                             <div class="rz-slot-title">
                             </div>
                         </div>
