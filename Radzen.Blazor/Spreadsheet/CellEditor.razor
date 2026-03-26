@@ -18,7 +18,7 @@
     else
     {
         <SheetEditor @bind-Value=@Editor.Value AutoFocus=@(Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
-            Worksheet=@Worksheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
+            Worksheet=@Worksheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) style=@editorStyle />
     }
 </div>
 }
