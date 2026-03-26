@@ -271,4 +271,8 @@ public class MockVirtualGridContext : IVirtualGridContext
 
     public IEnumerable<RangeInfo> GetRanges(RangeRef range) =>
         view != null ? view.GetRanges(range) : [new RangeInfo { Range = range }];
-} 
+
+#pragma warning disable CS0067
+    public event Action? Scrolled;
+#pragma warning restore CS0067
+}
