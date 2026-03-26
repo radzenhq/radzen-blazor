@@ -8,9 +8,9 @@ using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
 /// <summary>
-/// Renders a data validation input prompt near the selected cell.
+/// Renders a validation error popup near the selected cell when it has validation errors.
 /// </summary>
-public partial class InputPrompt : IDisposable
+public partial class ValidationError : IDisposable
 {
     /// <summary>
     /// Gets or sets the sheet.
@@ -25,11 +25,10 @@ public partial class InputPrompt : IDisposable
     public IVirtualGridContext Context { get; set; } = default!;
 
     private bool visible;
-    private CellRef cell = CellRef.Invalid;
-    private string? title;
     private string? message;
     private string? style;
     private string? className;
+    private CellRef cell = CellRef.Invalid;
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -60,7 +59,6 @@ public partial class InputPrompt : IDisposable
     private void OnSelectionChanged()
     {
         visible = false;
-        title = null;
         message = null;
         cell = CellRef.Invalid;
 
@@ -69,22 +67,13 @@ public partial class InputPrompt : IDisposable
             var address = Worksheet.Selection.Cell;
 
             if (address != CellRef.Invalid
-                && !(Worksheet.Cells.TryGet(address.Row, address.Column, out var cellData) && cellData.HasValidationErrors))
+                && Worksheet.Cells.TryGet(address.Row, address.Column, out var cellData)
+                && cellData.HasValidationErrors)
             {
-                var validators = Worksheet.Validation.GetValidatorsForCell(address);
-
-                foreach (var v in validators)
-                {
-                    if (v is DataValidationRule rule && rule.ShowInputMessage)
-                    {
-                        title = rule.InputTitle;
-                        message = rule.InputMessage;
-                        visible = true;
-                        cell = address;
-                        Render();
-                        break;
-                    }
-                }
+                message = string.Join(Environment.NewLine, cellData.ValidationErrors);
+                visible = true;
+                cell = address;
+                Render();
             }
         }
 
@@ -113,7 +102,7 @@ public partial class InputPrompt : IDisposable
         var top = rect.Top + rect.Height + 2;
         style = $"transform: translate({left.ToPx()}, {top.ToPx()});";
 
-        className = ClassList.Create("rz-spreadsheet-input-prompt")
+        className = ClassList.Create("rz-spreadsheet-validation-error")
             .Add("rz-spreadsheet-frozen-column", Worksheet is not null && cell.Column < Worksheet.Columns.Frozen)
             .Add("rz-spreadsheet-frozen-row", Worksheet is not null && cell.Row < Worksheet.Rows.Frozen)
             .ToString();
