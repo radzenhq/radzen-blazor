@@ -100,7 +100,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private VirtualGrid? grid;
     private Popup? cellMenuPopup;
     private Popup? validationListPopup;
-    private Spreadsheet.InputPrompt? inputPrompt;
     private int cellMenuRow = -1;
     private int cellMenuColumn = -1;
     private int validationListRow = -1;
@@ -510,7 +509,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Worksheet is not null)
         {
             var address = Worksheet.Selection.Move(rowOffset, columnOffset);
-            inputPrompt?.Show(address);
             await ScrollToAsync(address);
         }
     }
@@ -564,8 +562,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                             }
                             else
                             {
-                                command.Unexecute();
                                 Editor!.Cell.ClearValidationErrors();
+                                command.Unexecute();
                                 Editor!.Cancel();
                                 result = false;
                             }
@@ -573,8 +571,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                         default: // Stop
                             await DialogService.Alert(error, Localize(nameof(RadzenStrings.Spreadsheet_InvalidValueTitle)));
-                            command.Unexecute();
                             Editor!.Cell.ClearValidationErrors();
+                            command.Unexecute();
                             Editor!.Cancel();
                             result = false;
                             break;
@@ -605,7 +603,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 var address = Worksheet.Selection.Cycle(rowOffset, columnOffset);
 
                 await ScrollToAsync(address);
-                inputPrompt?.Show(address);
             }
         }
     }
@@ -1016,8 +1013,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             }
 
-            inputPrompt?.Show(address);
-
             if (grid is not null)
             {
                 var capture = new PointerCapture
@@ -1341,8 +1336,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 await ScrollToAsync(address);
 
-                inputPrompt?.Hide();
-
                 Editor!.StartEdit(address, cell.GetValue());
             }
         }
@@ -1409,7 +1402,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (char.IsLetterOrDigit(ch) || char.IsPunctuation(ch) || char.IsSymbol(ch) || char.IsSeparator(ch))
         {
-            inputPrompt?.Hide();
             Editor?.StartEdit(Worksheet!.Selection.Cell, ch.ToString());
         }
     }
