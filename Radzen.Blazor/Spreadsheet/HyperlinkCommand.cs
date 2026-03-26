@@ -24,9 +24,9 @@ public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyper
 
         cell.Hyperlink = hyperlink?.Clone();
 
-        if (hyperlink is not null && !string.IsNullOrEmpty(hyperlink.DisplayText))
+        if (hyperlink is not null && !string.IsNullOrEmpty(hyperlink.Text))
         {
-            cell.Value = hyperlink.DisplayText;
+            cell.Value = hyperlink.Text;
         }
         else if (hyperlink is not null && (cell.Value is null || string.IsNullOrEmpty(cell.Value.ToString())))
         {

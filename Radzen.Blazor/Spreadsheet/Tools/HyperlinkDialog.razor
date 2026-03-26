@@ -7,7 +7,7 @@
         <RadzenTextBox @bind-Value=@Url Style="width: 100%" />
     </RadzenFormField>
     <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_DisplayText))>
-        <RadzenTextBox @bind-Value=@DisplayText Style="width: 100%" />
+        <RadzenTextBox @bind-Value=@Text Style="width: 100%" />
     </RadzenFormField>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
@@ -22,7 +22,7 @@
     public string Url { get; set; } = "";
 
     [Parameter]
-    public string DisplayText { get; set; } = "";
+    public string Text { get; set; } = "";
 
     [Inject]
     public DialogService DialogService { get; set; } = default!;
@@ -39,7 +39,7 @@
             DialogService.Close(new Hyperlink
             {
                 Url = Url,
-                DisplayText = string.IsNullOrWhiteSpace(DisplayText) ? null : DisplayText
+                Text = string.IsNullOrWhiteSpace(Text) ? null : Text
             });
         }
     }
