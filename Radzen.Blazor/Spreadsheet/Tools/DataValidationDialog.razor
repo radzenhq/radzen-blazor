@@ -102,10 +102,10 @@
                 <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowInputMessage)) />
             </RadzenStack>
             <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Title))>
-                <RadzenTextBox @bind-Value=@PromptTitle Style="width: 100%" />
+                <RadzenTextBox @bind-Value=@InputTitle Style="width: 100%" />
             </RadzenFormField>
             <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Message))>
-                <RadzenTextArea @bind-Value=@PromptMessage Rows="2" Style="width: 100%" />
+                <RadzenTextArea @bind-Value=@InputMessage Rows="2" Style="width: 100%" />
             </RadzenFormField>
         </RadzenStack>
     </RadzenFieldset>
@@ -135,8 +135,8 @@
     private string ErrorTitle { get; set; } = "";
     private string ErrorMessage { get; set; } = "";
     private bool ShowInputMessage { get; set; }
-    private string PromptTitle { get; set; } = "";
-    private string PromptMessage { get; set; } = "";
+    private string InputTitle { get; set; } = "";
+    private string InputMessage { get; set; } = "";
     private DateTime? Formula1Date { get; set; }
     private DateTime? Formula2Date { get; set; }
 
@@ -228,8 +228,8 @@
             Error = string.IsNullOrEmpty(ErrorMessage) ? L(nameof(RadzenStrings.Spreadsheet_DefaultValidationError)) : ErrorMessage,
             ShowErrorMessage = true,
             ShowInputMessage = ShowInputMessage,
-            PromptTitle = string.IsNullOrEmpty(PromptTitle) ? null : PromptTitle,
-            Prompt = string.IsNullOrEmpty(PromptMessage) ? null : PromptMessage
+            InputTitle = string.IsNullOrEmpty(InputTitle) ? null : InputTitle,
+            InputMessage = string.IsNullOrEmpty(InputMessage) ? null : InputMessage
         };
 
         DialogService.Close(rule);

@@ -49,8 +49,8 @@ public partial class InputPrompt : ComponentBase
             {
                 if (v is DataValidationRule rule && rule.ShowInputMessage)
                 {
-                    title = rule.PromptTitle;
-                    message = rule.Prompt;
+                    title = rule.InputTitle;
+                    message = rule.InputMessage;
                     visible = true;
                     cell = address;
                     break;
