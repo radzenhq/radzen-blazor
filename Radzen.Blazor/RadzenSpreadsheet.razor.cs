@@ -348,6 +348,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
+    private string? GetValidationListValue()
+    {
+        if (Worksheet != null && validationListRow >= 0 && validationListColumn >= 0
+            && Worksheet.Cells.TryGet(validationListRow, validationListColumn, out var cell))
+        {
+            return cell.Value?.ToString();
+        }
+
+        return null;
+    }
+
     private async Task OnValidationListValueSelectedAsync(string value)
     {
         if (Worksheet != null && validationListRow >= 0 && validationListColumn >= 0)
