@@ -139,6 +139,10 @@ public interface IVirtualGridContext
     /// Splits a range into regions based on frozen pane boundaries for rendering.
     /// </summary>
     IEnumerable<RangeInfo> GetRanges(RangeRef range);
+    /// <summary>
+    /// Occurs when the grid scrolls.
+    /// </summary>
+    event Action? Scrolled;
 }
 
 /// <summary>
@@ -241,6 +245,9 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     [Parameter]
     public RenderFragment<IVirtualGridContext>? ChildContent { get; set; }
 
+    /// <inheritdoc/>
+    public event Action? Scrolled;
+
     /// <summary>
     /// Invoked by JS interop to notify the component about scroll events in the virtual grid.
     /// </summary>
@@ -248,6 +255,8 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     public void OnScroll(double scrollX, double scrollY)
     {
         Render(scrollX, scrollY);
+
+        Scrolled?.Invoke();
     }
 
     /// <summary>
