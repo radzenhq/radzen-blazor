@@ -124,7 +124,7 @@
     border: 1px solid #fff;
     box-sizing: border-box;
     cursor: crosshair;
-    z-index: 5;
+    z-index: 1;
     pointer-events: auto;
 }
 
@@ -133,7 +133,7 @@
     pointer-events: none;
     box-sizing: border-box;
     background: rgba(37, 140, 251, 0.08);
-    z-index: 2;
+    z-index: 1;
 }
 
 .rz-spreadsheet-autofill-range-top {
@@ -154,7 +154,11 @@
 
 .rz-spreadsheet-autofill-handle.rz-spreadsheet-frozen-row,
 .rz-spreadsheet-autofill-handle.rz-spreadsheet-frozen-column {
-    z-index: 5;
+    z-index: 3;
+}
+
+.rz-spreadsheet-autofill-handle.rz-spreadsheet-frozen-row.rz-spreadsheet-frozen-column {
+    z-index: 4;
 }
 
 .rz-spreadsheet-autofill-range.rz-spreadsheet-frozen-row,
