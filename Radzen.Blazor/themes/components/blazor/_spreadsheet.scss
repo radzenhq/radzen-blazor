@@ -340,7 +340,7 @@
 .rz-spreadsheet-input-prompt {
     position: absolute;
     z-index: 1;
-    background: var(--rz-base-background-color, #ffffd0);
+    background: #ffffd0;
     border: 1px solid var(--rz-border-color, #e0e0e0);
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     padding: 0.5rem;
@@ -476,6 +476,10 @@
     position: absolute;
     overflow: hidden;
     width: 300px;
+    background: var(--rz-base-background-color);
+    border: 1px solid var(--rz-border-color);
+    border-radius: var(--rz-border-radius);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
 .rz-spreadsheet-cell-chevron {
