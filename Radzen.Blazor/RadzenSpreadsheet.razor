@@ -166,10 +166,10 @@
                          CustomFilter=@OnCellMenuCustomFilterAsync />
             }
         </Popup>
-        <Popup @ref=@validationListPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
+        <Popup @ref=@validationListPopup class="rz-spreadsheet-cell-popup" Lazy="true">
             @if (validationListItems.Count > 0)
             {
-                <ValidationListPopup Items=@validationListItems ValueSelected=@OnValidationListValueSelectedAsync />
+                <ValidationListPopup Items=@validationListItems Value=@GetValidationListValue() ValueSelected=@OnValidationListValueSelectedAsync />
             }
         </Popup>
         </CascadingValue>

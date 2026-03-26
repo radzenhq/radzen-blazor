@@ -1,20 +1,26 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
-<RadzenStack Gap="0" Style="max-height: 200px; overflow-y: auto; padding: 0.25rem 0">
-    @foreach (var item in Items)
-    {
-        <div class="rz-menu-item" style="padding: 0.25rem 0.5rem; cursor: pointer" @onclick="() => OnSelect(item)">
-            @item
-        </div>
-    }
-</RadzenStack>
+<div class="rz-dropdown-items-wrapper" style="max-height: 200px">
+    <div class="rz-dropdown-items">
+        @foreach (var item in Items)
+        {
+            var selected = string.Equals(item, Value, StringComparison.OrdinalIgnoreCase);
+            <div class="rz-dropdown-item @(selected ? "rz-state-highlight" : "")" @onclick="() => OnSelect(item)">
+                @item
+            </div>
+        }
+    </div>
+</div>
 
 @code {
 #nullable enable
 
     [Parameter]
     public IReadOnlyList<string> Items { get; set; } = [];
+
+    [Parameter]
+    public string? Value { get; set; }
 
     [Parameter]
     public EventCallback<string> ValueSelected { get; set; }
