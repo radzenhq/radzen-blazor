@@ -270,13 +270,13 @@ public class FormatNewFeaturesTests
         sheet.Cells[0, 0].Hyperlink = new Hyperlink
         {
             Url = "https://example.com",
-            DisplayText = "Click here"
+            Text = "Click here"
         };
 
         var reimported = RoundTrip(workbook);
         Assert.NotNull(reimported.Sheets[0].Cells[0, 0].Hyperlink);
         Assert.Equal("https://example.com", reimported.Sheets[0].Cells[0, 0].Hyperlink!.Url);
-        Assert.Equal("Click here", reimported.Sheets[0].Cells[0, 0].Hyperlink!.DisplayText);
+        Assert.Equal("Click here", reimported.Sheets[0].Cells[0, 0].Hyperlink!.Text);
     }
 
     private static Workbook RoundTrip(Workbook workbook)
