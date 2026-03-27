@@ -17,6 +17,11 @@ public class Workbook
     /// </summary>
     public IReadOnlyList<Worksheet> Sheets => sheets;
 
+    /// <summary>
+    /// Gets or sets the workbook protection settings.
+    /// </summary>
+    public WorkbookProtection Protection { get; set; } = new();
+
     internal Workbook(Worksheet sheet)
     {
         AddSheet(sheet);
