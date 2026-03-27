@@ -13,9 +13,9 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Writes a <see cref="Workbook"/> to a stream in the Open XML Spreadsheet format (XLSX).
 /// </summary>
-class XlsxWriter(Workbook workbook)
+class XlsxWriter(Workbook sourceWorkbook)
 {
-    private readonly IReadOnlyList<Worksheet> sheets = workbook.Sheets;
+    private readonly IReadOnlyList<Worksheet> sheets = sourceWorkbook.Sheets;
 
     public void Write(Stream stream)
     {
@@ -35,7 +35,7 @@ class XlsxWriter(Workbook workbook)
     }
 
     private record struct FontKey(string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize);
-    private record struct CellStyleKey(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId);
+    private record struct CellStyleKey(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden);
     private record struct BorderKey(string? TopStyle, string? TopColor, string? RightStyle, string? RightColor, string? BottomStyle, string? BottomColor, string? LeftStyle, string? LeftColor);
 
     private class StyleTracker
@@ -444,6 +444,9 @@ class XlsxWriter(Workbook workbook)
         // Add data validations
         AddDataValidations(sheet, sheetDoc);
 
+        // Add sheet protection
+        AddSheetProtection(sheet, sheetDoc);
+
         // Add hyperlinks
         var hyperlinkRels = AddHyperlinks(sheet, sheetDoc);
 
@@ -696,7 +699,7 @@ class XlsxWriter(Workbook workbook)
         var numFmtId = GetOrCreateNumberFormat(cell, styleTracker);
         var borderId = GetOrCreateBorderStyle(cell, styleTracker);
 
-        var styleKey = new CellStyleKey(fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId);
+        var styleKey = new CellStyleKey(fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId, cell.Format.Locked, cell.Format.FormulaHidden);
 
         if (!styleTracker.CellStyles.TryGetValue(styleKey, out int styleId))
         {
@@ -921,6 +924,22 @@ class XlsxWriter(Workbook workbook)
             var alignmentElement = CreateAlignmentElement(cell);
             xfElement.Add(alignmentElement);
             xfElement.Add(new XAttribute("applyAlignment", "1"));
+        }
+
+        // Add protection if not default
+        if (cell.Format.Locked is not null || cell.Format.FormulaHidden is not null)
+        {
+            var protectionElement = new XElement(XName.Get("protection", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"));
+            if (cell.Format.Locked is not null)
+            {
+                protectionElement.Add(new XAttribute("locked", cell.Format.Locked.Value ? "1" : "0"));
+            }
+            if (cell.Format.FormulaHidden is not null)
+            {
+                protectionElement.Add(new XAttribute("hidden", cell.Format.FormulaHidden.Value ? "1" : "0"));
+            }
+            xfElement.Add(protectionElement);
+            xfElement.Add(new XAttribute("applyProtection", "1"));
         }
 
         styleTracker.CellXfsElement.Add(xfElement);
@@ -1319,7 +1338,63 @@ class XlsxWriter(Workbook workbook)
                 new XAttribute(XName.Get("id", "http://schemas.openxmlformats.org/officeDocument/2006/relationships"), relId)));
         }
 
+        // Add workbook protection
+        var wp = sourceWorkbook.Protection;
+        if (wp.LockStructure || wp.PasswordHash is not null || wp.HashValue is not null)
+        {
+            var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+            var wpElement = new XElement(XName.Get("workbookProtection", ns));
+            if (wp.LockStructure) wpElement.Add(new XAttribute("lockStructure", "1"));
+            if (wp.PasswordHash is not null) wpElement.Add(new XAttribute("workbookPassword", wp.PasswordHash));
+            if (wp.AlgorithmName is not null) wpElement.Add(new XAttribute("workbookAlgorithmName", wp.AlgorithmName));
+            if (wp.HashValue is not null) wpElement.Add(new XAttribute("workbookHashValue", wp.HashValue));
+            if (wp.SaltValue is not null) wpElement.Add(new XAttribute("workbookSaltValue", wp.SaltValue));
+            if (wp.SpinCount is not null) wpElement.Add(new XAttribute("workbookSpinCount", wp.SpinCount.Value.ToString(CultureInfo.InvariantCulture)));
+            sheetsElement.AddBeforeSelf(wpElement);
+        }
+
         using var entry = archive.CreateEntry("xl/workbook.xml").Open();
         workbook.Save(entry);
+    }
+
+    private static void AddSheetProtection(Worksheet sheet, XDocument sheetDoc)
+    {
+        var p = sheet.Protection;
+        if (!p.IsProtected && p.PasswordHash is null && p.HashValue is null)
+        {
+            return;
+        }
+
+        var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+        var element = new XElement(XName.Get("sheetProtection", ns));
+
+        if (p.IsProtected) element.Add(new XAttribute("sheet", "1"));
+
+        // XLSX: attribute absent or "1" = forbidden; write "0" to allow
+        if (p.AllowFormatCells) element.Add(new XAttribute("formatCells", "0"));
+        if (p.AllowFormatRows) element.Add(new XAttribute("formatRows", "0"));
+        if (p.AllowFormatColumns) element.Add(new XAttribute("formatColumns", "0"));
+        if (p.AllowInsertColumns) element.Add(new XAttribute("insertColumns", "0"));
+        if (p.AllowInsertRows) element.Add(new XAttribute("insertRows", "0"));
+        if (p.AllowInsertHyperlinks) element.Add(new XAttribute("insertHyperlinks", "0"));
+        if (p.AllowDeleteColumns) element.Add(new XAttribute("deleteColumns", "0"));
+        if (p.AllowDeleteRows) element.Add(new XAttribute("deleteRows", "0"));
+        if (p.AllowSort) element.Add(new XAttribute("sort", "0"));
+        if (p.AllowAutoFilter) element.Add(new XAttribute("autoFilter", "0"));
+
+        // selectLockedCells/selectUnlockedCells: write "1" if forbidden
+        if (!p.AllowSelectLockedCells) element.Add(new XAttribute("selectLockedCells", "1"));
+        if (!p.AllowSelectUnlockedCells) element.Add(new XAttribute("selectUnlockedCells", "1"));
+
+        // Password hashes
+        if (p.PasswordHash is not null) element.Add(new XAttribute("password", p.PasswordHash));
+        if (p.AlgorithmName is not null) element.Add(new XAttribute("algorithmName", p.AlgorithmName));
+        if (p.HashValue is not null) element.Add(new XAttribute("hashValue", p.HashValue));
+        if (p.SaltValue is not null) element.Add(new XAttribute("saltValue", p.SaltValue));
+        if (p.SpinCount is not null) element.Add(new XAttribute("spinCount", p.SpinCount.Value.ToString(CultureInfo.InvariantCulture)));
+
+        // Insert after sheetData per ECMA-376 element order
+        var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", ns));
+        sheetData!.AddAfterSelf(element);
     }
 }
