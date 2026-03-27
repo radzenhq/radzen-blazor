@@ -246,9 +246,10 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Overview",
                     Path = "spreadsheet",
-                    Title = "Blazor Spreadsheet Component | Free UI Components by Radzen",
-                    Description = "Blazor Spreadsheet component with Excel-like editing, formulas, formatting, filtering, sorting, cell validation, conditional formatting, frozen panes, XLSX import/export, and more.",
-                    Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" }
+                    Title = "Free Open-Source Blazor Spreadsheet Component | Radzen",
+                    Description = "Free open-source Blazor Spreadsheet component with Excel-like editing, 70+ formulas, cell formatting, filtering, sorting, data validation, conditional formatting, frozen panes, XLSX import/export, clipboard, autofill, undo/redo, multiple sheets, virtualization, custom cell types, and data binding.",
+                    Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" },
+                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ]
                 },
                 new Example
                 {
@@ -337,6 +338,33 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Spreadsheet Data Binding | Free UI Components by Radzen",
                     Description = "Bind the Radzen Blazor Spreadsheet to data using DataSheet with IQueryable.",
                     Tags = new [] { "spreadsheet", "data", "binding", "datasheet", "iqueryable" }
+                },
+                new Example
+                {
+                    Name = "Multiple Sheets",
+                    Path = "spreadsheet-multiple-sheets",
+                    Title = "Blazor Spreadsheet Multiple Sheets | Free UI Components by Radzen",
+                    Description = "Work with multiple worksheets and use cross-sheet references to aggregate data across sheets.",
+                    Tags = new [] { "spreadsheet", "sheets", "worksheets", "tabs", "cross-sheet", "reference" },
+                    New = true
+                },
+                new Example
+                {
+                    Name = "Large Data",
+                    Path = "spreadsheet-large-data",
+                    Title = "Blazor Spreadsheet Large Data | Free UI Components by Radzen",
+                    Description = "Virtualized spreadsheet with 10,000 rows and formula calculations for smooth scrolling performance.",
+                    Tags = new [] { "spreadsheet", "performance", "virtualization", "large", "data", "virtual", "scrolling" },
+                    New = true
+                },
+                new Example
+                {
+                    Name = "Templates",
+                    Path = "spreadsheet-templates",
+                    Title = "Blazor Spreadsheet Templates | Free UI Components by Radzen",
+                    Description = "Real-world spreadsheet templates: annual budget tracker and weekly timesheet with formulas and conditional formatting.",
+                    Tags = new [] { "spreadsheet", "template", "budget", "timesheet", "invoice", "financial", "planning" },
+                    New = true
                 },
             }
         },
