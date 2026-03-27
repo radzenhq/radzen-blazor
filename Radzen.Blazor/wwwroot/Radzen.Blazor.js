@@ -4449,18 +4449,18 @@ class Spreadsheet {
       if (!(await this.dotNetRef.invokeMethodAsync('OnColumnPointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
         removeEventListener('pointermove', this.onColumnPointerMove);
       }
-    } else if (e.target.matches('.rz-spreadsheet-image-resize-handle')) {
+    } else if (e.target.matches('.rz-spreadsheet-resize-handle')) {
       const direction = e.target.dataset.direction;
-      addEventListener('pointermove', this.onImageResizeMove);
-      addEventListener('pointerup', this.onImageResizeUp);
-      if (!(await this.dotNetRef.invokeMethodAsync('OnImageResizePointerDownAsync', { direction, pointer: this.toEventArgs(e) }))) {
-        removeEventListener('pointermove', this.onImageResizeMove);
-        removeEventListener('pointerup', this.onImageResizeUp);
+      addEventListener('pointermove', this.onDrawingResizeMove);
+      addEventListener('pointerup', this.onDrawingResizeUp);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnDrawingResizePointerDownAsync', { direction, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onDrawingResizeMove);
+        removeEventListener('pointerup', this.onDrawingResizeUp);
       }
       e.preventDefault();
       e.stopPropagation();
-    } else if (e.target.closest('.rz-spreadsheet-image')) {
-      // Image clicks are handled by Blazor event handlers directly
+    } else if (e.target.closest('.rz-spreadsheet-image') || e.target.closest('.rz-spreadsheet-chart')) {
+      // Image and chart clicks are handled by Blazor event handlers directly
       return;
     } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
       const column = +e.target.dataset.column;
@@ -4626,14 +4626,14 @@ class Spreadsheet {
     removeEventListener('pointerup', this.onRowResizeUp);
   }
 
-  onImageResizeMove = (e) => {
-    this.invokeAsync('OnImageResizePointerMoveAsync', e);
+  onDrawingResizeMove = (e) => {
+    this.invokeAsync('OnDrawingResizePointerMoveAsync', e);
   }
 
-  onImageResizeUp = (e) => {
-    this.invokeAsync('OnImageResizePointerUpAsync', e);
-    removeEventListener('pointermove', this.onImageResizeMove);
-    removeEventListener('pointerup', this.onImageResizeUp);
+  onDrawingResizeUp = (e) => {
+    this.invokeAsync('OnDrawingResizePointerUpAsync', e);
+    removeEventListener('pointermove', this.onDrawingResizeMove);
+    removeEventListener('pointerup', this.onDrawingResizeUp);
   }
 
   onAutofillPointerMove = (e) => {

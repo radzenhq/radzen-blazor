@@ -128,6 +128,62 @@ public partial class Worksheet
 
     internal bool RemoveImage(SheetImage image) { var removed = images.Remove(image); if (removed) ImagesChanged?.Invoke(); return removed; }
 
+    private readonly List<SheetChart> charts = [];
+
+    /// <summary>
+    /// Gets the list of charts associated with the sheet.
+    /// </summary>
+    public IReadOnlyList<SheetChart> Charts => charts;
+
+    private SheetChart? selectedChart;
+
+    /// <summary>
+    /// Gets or sets the currently selected chart.
+    /// </summary>
+    public SheetChart? SelectedChart
+    {
+        get => selectedChart;
+        set
+        {
+            if (selectedChart != value)
+            {
+                selectedChart = value;
+                SelectedChartChanged?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Occurs when the selected chart changes.
+    /// </summary>
+    internal event Action? SelectedChartChanged;
+
+    internal event Action? ChartsChanged;
+
+    /// <summary>
+    /// Adds a chart to the sheet.
+    /// </summary>
+    public void AddChart(SheetChart chart) { charts.Add(chart); ChartsChanged?.Invoke(); }
+
+    /// <summary>
+    /// Removes a chart from the sheet.
+    /// </summary>
+    public bool RemoveChart(SheetChart chart)
+    {
+        var removed = charts.Remove(chart);
+        if (removed)
+        {
+            if (selectedChart == chart)
+            {
+                SelectedChart = null;
+            }
+
+            ChartsChanged?.Invoke();
+        }
+
+        return removed;
+    }
+
     private readonly HashSet<int> filteredColumns = [];
 
     /// <summary>

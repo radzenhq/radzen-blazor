@@ -7,7 +7,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// <summary>
 /// Specifies the anchor mode for a sheet image.
 /// </summary>
-public enum ImageAnchorMode
+public enum DrawingAnchorMode
 {
     /// <summary>
     /// The image is anchored to two cells (from and to).
@@ -65,7 +65,7 @@ public class SheetImage
     /// <summary>
     /// Gets or sets the anchor mode.
     /// </summary>
-    public ImageAnchorMode AnchorMode { get; set; }
+    public DrawingAnchorMode AnchorMode { get; set; }
 
     /// <summary>
     /// Gets or sets the starting anchor position.
