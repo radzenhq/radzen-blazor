@@ -17,8 +17,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <param name="order">The sort order (ascending or descending).</param>
 /// <param name="keyIndex">The column index to sort by.</param>
 /// <param name="skipHeaderRow">If true, skips the first row (header) when sorting.</param>
-public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int keyIndex, bool skipHeaderRow = false) : ICommand
+public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int keyIndex, bool skipHeaderRow = false) : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.Sort;
+
     private readonly Worksheet sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
     private readonly RangeRef range = range;
     private readonly SortOrder order = order;

@@ -8,8 +8,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents a command to toggle auto filter on a sheet.
 /// </summary>
-public class SheetAutoFilterCommand : ICommand
+public class SheetAutoFilterCommand : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.AutoFilter;
+
     private readonly Worksheet sheet;
     private readonly RangeRef range;
     private readonly RangeRef? previousRange;

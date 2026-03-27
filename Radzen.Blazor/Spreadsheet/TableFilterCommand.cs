@@ -8,8 +8,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents a command to toggle filter button on a table.
 /// </summary>
-public class TableFilterCommand : ICommand
+public class TableFilterCommand : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.AutoFilter;
+
     private readonly Worksheet sheet;
     private readonly int tableIndex;
     private readonly bool previousShowFilterButton;

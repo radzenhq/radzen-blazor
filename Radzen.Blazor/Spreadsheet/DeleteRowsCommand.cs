@@ -6,8 +6,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command that deletes a contiguous range of rows and supports undo via snapshot.
 /// </summary>
-public class DeleteRowsCommand : SheetSnapshotCommandBase
+public class DeleteRowsCommand : SheetSnapshotCommandBase, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.DeleteRows;
+
     private readonly int startRowIndex;
     private readonly int endRowIndex;
 

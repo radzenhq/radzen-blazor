@@ -6,8 +6,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command that inserts a single row BEFORE the specified row index and supports undo via snapshot.
 /// </summary>
-public class InsertRowBeforeCommand : SheetSnapshotCommandBase
+public class InsertRowBeforeCommand : SheetSnapshotCommandBase, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.InsertRows;
+
     private readonly int rowIndex;
 
     /// <summary>

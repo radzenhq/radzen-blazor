@@ -4,8 +4,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents a command to remove a filter from a sheet, supporting undo and redo operations.
 /// </summary>
-public class RemoveFilterCommand(Worksheet sheet, SheetFilter filter) : ICommand
+public class RemoveFilterCommand(Worksheet sheet, SheetFilter filter) : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.AutoFilter;
+
     private readonly Worksheet sheet = sheet;
     private readonly SheetFilter filter = filter;
 
