@@ -370,6 +370,15 @@ namespace RadzenBlazorDemos
                     Description = "Protect sheets to prevent editing of locked cells while allowing input in unlocked cells with XLSX round-trip support.",
                     Tags = new [] { "spreadsheet", "protection", "locked", "unlock", "readonly", "security", "sheet" }
                 },
+                new Example
+                {
+                    New = true,
+                    Name = "Charts",
+                    Path = "spreadsheet-charts",
+                    Title = "Blazor Spreadsheet Charts - Embed Column, Bar, Line, Pie Charts in Spreadsheet | Radzen",
+                    Description = "Embed interactive charts in Blazor spreadsheet cells. Supports column, bar, line, area, pie, donut, and scatter charts with live data binding and XLSX import/export.",
+                    Tags = new [] { "spreadsheet", "chart", "charts", "graph", "visualization", "column chart", "bar chart", "line chart", "pie chart", "donut chart", "scatter chart", "area chart", "excel chart", "embedded chart", "data visualization", "xlsx", "dashboard" }
+                },
             }
         },
         new Example

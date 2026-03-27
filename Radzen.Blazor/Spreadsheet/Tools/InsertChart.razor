@@ -1,0 +1,53 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSplitButton ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+    Disabled=@IsDisabled Click=@OnClick
+    Icon="bar_chart" Text="Chart">
+    <ChildContent>
+        <RadzenSplitButtonItem Text="Column Chart" Value="column" Icon="bar_chart" />
+        <RadzenSplitButtonItem Text="Bar Chart" Value="bar" Icon="align_horizontal_left" />
+        <RadzenSplitButtonItem Text="Line Chart" Value="line" Icon="show_chart" />
+        <RadzenSplitButtonItem Text="Area Chart" Value="area" Icon="area_chart" />
+        <RadzenSplitButtonItem Text="Pie Chart" Value="pie" Icon="pie_chart" />
+        <RadzenSplitButtonItem Text="Donut Chart" Value="donut" Icon="donut_large" />
+        <RadzenSplitButtonItem Text="Scatter Chart" Value="scatter" Icon="scatter_plot" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+
+    private void OnClick(RadzenSplitButtonItem? item)
+    {
+        var chartType = item?.Value switch
+        {
+            "bar" => SpreadsheetChartType.Bar,
+            "line" => SpreadsheetChartType.Line,
+            "area" => SpreadsheetChartType.Area,
+            "pie" => SpreadsheetChartType.Pie,
+            "donut" => SpreadsheetChartType.Donut,
+            "scatter" => SpreadsheetChartType.Scatter,
+            _ => SpreadsheetChartType.Column
+        };
+
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var selection = Worksheet.Selection.Range;
+
+        var chart = ChartFactory.CreateFromSelection(Worksheet, selection, chartType);
+        var command = new InsertChartCommand(Worksheet, chart);
+        Spreadsheet?.Execute(command);
+    }
+}
