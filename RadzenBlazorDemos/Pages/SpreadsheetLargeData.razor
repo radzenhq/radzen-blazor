@@ -1,0 +1,82 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        const int rowCount = 10000;
+
+        var sheet = workbook.AddSheet("Sales Data", rowCount + 2, 10);
+
+        sheet.BeginUpdate();
+
+        sheet.Rows.Frozen = 1;
+
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
+        var currencyFormat = new Format { NumberFormat = "$#,##0.00" };
+        var numberFormat = new Format { NumberFormat = "#,##0" };
+        var dateFormat = new Format { NumberFormat = "yyyy-mm-dd" };
+        var percentFormat = new Format { NumberFormat = "0.0%" };
+
+        string[] headers = { "ID", "Date", "Region", "Product", "Category", "Quantity", "Unit Price", "Revenue", "Discount", "Profit Margin" };
+        double[] widths = { 60, 100, 100, 130, 100, 80, 100, 110, 80, 110 };
+
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[0, i].Value = headers[i];
+            sheet.Cells[0, i].Format = headerFormat;
+            sheet.Columns[i] = widths[i];
+        }
+
+        string[] regions = { "North America", "Europe", "Asia Pacific", "Latin America", "Middle East" };
+        string[] products = { "Laptop Pro", "Desktop Elite", "Tablet Air", "Monitor UHD", "Keyboard MX", "Mouse Precision", "Headset Pro", "Webcam HD", "Docking Station", "External SSD" };
+        string[] categories = { "Computers", "Computers", "Mobile", "Displays", "Peripherals", "Peripherals", "Audio", "Video", "Accessories", "Storage" };
+
+        var random = new Random(42);
+        var baseDate = new DateTime(2024, 1, 1);
+
+        for (int row = 1; row <= rowCount; row++)
+        {
+            var productIndex = random.Next(products.Length);
+            var quantity = random.Next(1, 200);
+            var unitPrice = Math.Round(random.NextDouble() * 900 + 50, 2);
+            var discount = Math.Round(random.NextDouble() * 0.3, 3);
+            var margin = Math.Round(random.NextDouble() * 0.4 + 0.1, 3);
+            var date = baseDate.AddDays(random.Next(0, 730));
+
+            sheet.Cells[row, 0].Value = (double)row;
+            sheet.Cells[row, 1].Value = date.ToOADate();
+            sheet.Cells[row, 1].Format = dateFormat;
+            sheet.Cells[row, 2].Value = regions[random.Next(regions.Length)];
+            sheet.Cells[row, 3].Value = products[productIndex];
+            sheet.Cells[row, 4].Value = categories[productIndex];
+            sheet.Cells[row, 5].Value = (double)quantity;
+            sheet.Cells[row, 5].Format = numberFormat;
+            sheet.Cells[row, 6].Value = unitPrice;
+            sheet.Cells[row, 6].Format = currencyFormat;
+            sheet.Cells[row, 7].Formula = $"=F{row + 1}*G{row + 1}";
+            sheet.Cells[row, 7].Format = currencyFormat;
+            sheet.Cells[row, 8].Value = discount;
+            sheet.Cells[row, 8].Format = percentFormat;
+            sheet.Cells[row, 9].Value = margin;
+            sheet.Cells[row, 9].Format = percentFormat;
+        }
+
+        // Summary row
+        int totalRow = rowCount + 1;
+        var totalFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9", NumberFormat = "$#,##0.00" };
+        var totalLabelFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9" };
+        sheet.Cells[totalRow, 0].Value = "Total";
+        sheet.Cells[totalRow, 0].Format = totalLabelFormat;
+        sheet.Cells[totalRow, 5].Formula = $"=SUM(F2:F{rowCount + 1})";
+        sheet.Cells[totalRow, 5].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9", NumberFormat = "#,##0" };
+        sheet.Cells[totalRow, 7].Formula = $"=SUM(H2:H{rowCount + 1})";
+        sheet.Cells[totalRow, 7].Format = totalFormat;
+
+        sheet.EndUpdate();
+    }
+}

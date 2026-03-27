@@ -1,0 +1,131 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd" };
+        var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#1565c0", Color = "#ffffff" };
+        var currencyFormat = new Format { NumberFormat = "#,##0.00" };
+        var totalFormat = new Format { Bold = true, NumberFormat = "#,##0.00", BackgroundColor = "#e8f5e9" };
+        var crossRefFormat = new Format { Bold = true, NumberFormat = "#,##0.00", Color = "#1565c0", BackgroundColor = "#fff3e0" };
+
+        // Q1 Sales sheet
+        var q1 = workbook.AddSheet("Q1 Sales", 20, 5);
+        q1.BeginUpdate();
+        q1.Columns[0] = 140;
+        q1.Columns[1] = 100;
+        q1.Columns[2] = 100;
+        q1.Columns[3] = 100;
+        q1.Rows.Frozen = 1;
+
+        q1.Cells["A1"].Value = "Product"; q1.Cells["A1"].Format = headerFormat;
+        q1.Cells["B1"].Value = "January"; q1.Cells["B1"].Format = headerFormat;
+        q1.Cells["C1"].Value = "February"; q1.Cells["C1"].Format = headerFormat;
+        q1.Cells["D1"].Value = "March"; q1.Cells["D1"].Format = headerFormat;
+
+        string[] products = { "Laptops", "Monitors", "Keyboards", "Mice", "Headsets" };
+        double[,] q1Data = {
+            { 45200, 38900, 52100 },
+            { 18500, 21300, 19800 },
+            { 5200, 4800, 6100 },
+            { 3100, 3600, 2900 },
+            { 8700, 9200, 7800 }
+        };
+
+        for (int i = 0; i < products.Length; i++)
+        {
+            q1.Cells[i + 1, 0].Value = products[i];
+            for (int j = 0; j < 3; j++)
+            {
+                q1.Cells[i + 1, j + 1].Value = q1Data[i, j];
+                q1.Cells[i + 1, j + 1].Format = currencyFormat;
+            }
+        }
+
+        q1.Cells["A7"].Value = "Total"; q1.Cells["A7"].Format = totalFormat;
+        q1.Cells["B7"].Formula = "=SUM(B2:B6)"; q1.Cells["B7"].Format = totalFormat;
+        q1.Cells["C7"].Formula = "=SUM(C2:C6)"; q1.Cells["C7"].Format = totalFormat;
+        q1.Cells["D7"].Formula = "=SUM(D2:D6)"; q1.Cells["D7"].Format = totalFormat;
+        q1.EndUpdate();
+
+        // Q2 Sales sheet
+        var q2 = workbook.AddSheet("Q2 Sales", 20, 5);
+        q2.BeginUpdate();
+        q2.Columns[0] = 140;
+        q2.Columns[1] = 100;
+        q2.Columns[2] = 100;
+        q2.Columns[3] = 100;
+        q2.Rows.Frozen = 1;
+
+        q2.Cells["A1"].Value = "Product"; q2.Cells["A1"].Format = headerFormat;
+        q2.Cells["B1"].Value = "April"; q2.Cells["B1"].Format = headerFormat;
+        q2.Cells["C1"].Value = "May"; q2.Cells["C1"].Format = headerFormat;
+        q2.Cells["D1"].Value = "June"; q2.Cells["D1"].Format = headerFormat;
+
+        double[,] q2Data = {
+            { 51400, 48700, 55300 },
+            { 22100, 24500, 20900 },
+            { 6800, 5900, 7200 },
+            { 4200, 3800, 4500 },
+            { 10100, 11300, 9600 }
+        };
+
+        for (int i = 0; i < products.Length; i++)
+        {
+            q2.Cells[i + 1, 0].Value = products[i];
+            for (int j = 0; j < 3; j++)
+            {
+                q2.Cells[i + 1, j + 1].Value = q2Data[i, j];
+                q2.Cells[i + 1, j + 1].Format = currencyFormat;
+            }
+        }
+
+        q2.Cells["A7"].Value = "Total"; q2.Cells["A7"].Format = totalFormat;
+        q2.Cells["B7"].Formula = "=SUM(B2:B6)"; q2.Cells["B7"].Format = totalFormat;
+        q2.Cells["C7"].Formula = "=SUM(C2:C6)"; q2.Cells["C7"].Format = totalFormat;
+        q2.Cells["D7"].Formula = "=SUM(D2:D6)"; q2.Cells["D7"].Format = totalFormat;
+        q2.EndUpdate();
+
+        // Summary sheet with cross-sheet references
+        var summary = workbook.AddSheet("Summary", 20, 5);
+        summary.BeginUpdate();
+        summary.Columns[0] = 140;
+        summary.Columns[1] = 120;
+        summary.Columns[2] = 120;
+        summary.Columns[3] = 120;
+        summary.Rows.Frozen = 1;
+
+        summary.Cells["A1"].Value = "Product"; summary.Cells["A1"].Format = headerFormat;
+        summary.Cells["B1"].Value = "Q1 Total"; summary.Cells["B1"].Format = headerFormat;
+        summary.Cells["C1"].Value = "Q2 Total"; summary.Cells["C1"].Format = headerFormat;
+        summary.Cells["D1"].Value = "H1 Total"; summary.Cells["D1"].Format = headerFormat;
+
+        for (int i = 0; i < products.Length; i++)
+        {
+            int row = i + 1;
+            summary.Cells[row, 0].Value = products[i];
+
+            // Cross-sheet references to Q1 and Q2 totals
+            summary.Cells[row, 1].Formula = $"=SUM('Q1 Sales'!B{row + 1}:D{row + 1})";
+            summary.Cells[row, 1].Format = crossRefFormat;
+
+            summary.Cells[row, 2].Formula = $"=SUM('Q2 Sales'!B{row + 1}:D{row + 1})";
+            summary.Cells[row, 2].Format = crossRefFormat;
+
+            // H1 total combines both quarters
+            summary.Cells[row, 3].Formula = $"=B{row + 1}+C{row + 1}";
+            summary.Cells[row, 3].Format = totalFormat;
+        }
+
+        summary.Cells["A7"].Value = "Total"; summary.Cells["A7"].Format = totalFormat;
+        summary.Cells["B7"].Formula = "=SUM(B2:B6)"; summary.Cells["B7"].Format = totalFormat;
+        summary.Cells["C7"].Formula = "=SUM(C2:C6)"; summary.Cells["C7"].Format = totalFormat;
+        summary.Cells["D7"].Formula = "=SUM(D2:D6)"; summary.Cells["D7"].Format = totalFormat;
+        summary.EndUpdate();
+    }
+}
