@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
+using Radzen.Blazor;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -786,22 +787,16 @@ static class XlsxReader
 
         foreach (var anchor in drawingDoc.Root!.Elements())
         {
-            ImageAnchorMode mode;
+            DrawingAnchorMode mode;
             if (anchor.Name == xdr + "twoCellAnchor")
             {
-                mode = ImageAnchorMode.TwoCellAnchor;
+                mode = DrawingAnchorMode.TwoCellAnchor;
             }
             else if (anchor.Name == xdr + "oneCellAnchor")
             {
-                mode = ImageAnchorMode.OneCellAnchor;
+                mode = DrawingAnchorMode.OneCellAnchor;
             }
             else
-            {
-                continue;
-            }
-
-            var pic = anchor.Element(xdr + "pic");
-            if (pic is null)
             {
                 continue;
             }
@@ -813,20 +808,16 @@ static class XlsxReader
                 continue;
             }
 
-            var image = new SheetImage
-            {
-                AnchorMode = mode,
-                From = from
-            };
+            CellAnchor? to = null;
+            long anchorWidth = 0, anchorHeight = 0;
 
-            if (mode == ImageAnchorMode.TwoCellAnchor)
+            if (mode == DrawingAnchorMode.TwoCellAnchor)
             {
-                var to = ParseCellAnchor(anchor.Element(xdr + "to"), xdr);
+                to = ParseCellAnchor(anchor.Element(xdr + "to"), xdr);
                 if (to is null)
                 {
                     continue;
                 }
-                image.To = to;
             }
             else
             {
@@ -835,13 +826,44 @@ static class XlsxReader
                 {
                     if (long.TryParse(ext.Attribute("cx")?.Value, out var cx))
                     {
-                        image.Width = cx;
+                        anchorWidth = cx;
                     }
                     if (long.TryParse(ext.Attribute("cy")?.Value, out var cy))
                     {
-                        image.Height = cy;
+                        anchorHeight = cy;
                     }
                 }
+            }
+
+            // Check for chart (graphicFrame)
+            var graphicFrame = anchor.Element(xdr + "graphicFrame");
+            if (graphicFrame is not null)
+            {
+                ParseChartFromGraphicFrame(archive, graphicFrame, drawingRelMap, drawingDir, rNs, a, sheet, mode, from, to, anchorWidth, anchorHeight);
+                continue;
+            }
+
+            // Check for image (pic)
+            var pic = anchor.Element(xdr + "pic");
+            if (pic is null)
+            {
+                continue;
+            }
+
+            var image = new SheetImage
+            {
+                AnchorMode = mode,
+                From = from
+            };
+
+            if (mode == DrawingAnchorMode.TwoCellAnchor)
+            {
+                image.To = to;
+            }
+            else
+            {
+                image.Width = anchorWidth;
+                image.Height = anchorHeight;
             }
 
             // Get image rId from blip
@@ -889,6 +911,303 @@ static class XlsxReader
 
             sheet.AddImage(image);
         }
+    }
+
+    private static void ParseChartFromGraphicFrame(
+        ZipArchive archive, XElement graphicFrame, Dictionary<string, string> drawingRelMap,
+        string drawingDir, XNamespace rNs, XNamespace a,
+        Worksheet sheet, DrawingAnchorMode mode, CellAnchor from, CellAnchor? to, long width, long height)
+    {
+        // Look for <a:graphic><a:graphicData uri="...chart..."><c:chart r:id="..."/></a:graphicData></a:graphic>
+        var graphic = graphicFrame.Element(a + "graphic");
+        var graphicData = graphic?.Element(a + "graphicData");
+        var uri = graphicData?.Attribute("uri")?.Value;
+
+        if (uri != "http://schemas.openxmlformats.org/drawingml/2006/chart")
+        {
+            return;
+        }
+
+        XNamespace c = "http://schemas.openxmlformats.org/drawingml/2006/chart";
+        var chartElement = graphicData?.Element(c + "chart");
+        var chartRelId = chartElement?.Attribute(rNs + "id")?.Value;
+
+        if (chartRelId is null || !drawingRelMap.TryGetValue(chartRelId, out var chartTarget))
+        {
+            return;
+        }
+
+        var chartPath = ResolvePath(drawingDir + "/", chartTarget);
+        var chartEntry = archive.GetEntry(chartPath);
+        if (chartEntry is null)
+        {
+            return;
+        }
+
+        using var chartStream = chartEntry.Open();
+        var chartDoc = XDocument.Load(chartStream);
+
+        var chart = ParseChart(chartDoc, c, a);
+        if (chart is null)
+        {
+            return;
+        }
+
+        chart.AnchorMode = mode;
+        chart.From = from;
+        chart.To = to;
+        chart.Width = width;
+        chart.Height = height;
+
+        // Parse name from graphicFrame
+        XNamespace xdr = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
+        var nvGraphicFramePr = graphicFrame.Element(xdr + "nvGraphicFramePr");
+        var cNvPr = nvGraphicFramePr?.Element(xdr + "cNvPr");
+        chart.Name = cNvPr?.Attribute("name")?.Value;
+
+        sheet.AddChart(chart);
+    }
+
+    private static SheetChart? ParseChart(XDocument chartDoc, XNamespace c, XNamespace a)
+    {
+        var chartSpace = chartDoc.Root;
+        if (chartSpace is null)
+        {
+            return null;
+        }
+
+        var chart = new SheetChart
+        {
+            RawChartXml = chartDoc.ToString()
+        };
+
+        var chartElement = chartSpace.Element(c + "chart");
+        if (chartElement is null)
+        {
+            chart.ChartType = SpreadsheetChartType.Unsupported;
+            return chart;
+        }
+
+        // Parse title
+        var titleElement = chartElement.Element(c + "title");
+        if (titleElement is not null)
+        {
+            chart.Title = ParseChartTitle(titleElement, c, a);
+        }
+
+        // Parse legend
+        var legendElement = chartElement.Element(c + "legend");
+        if (legendElement is not null)
+        {
+            chart.ShowLegend = true;
+            var legendPos = legendElement.Element(c + "legendPos")?.Attribute("val")?.Value;
+            chart.LegendPosition = legendPos switch
+            {
+                "t" => LegendPosition.Top,
+                "b" => LegendPosition.Bottom,
+                "l" => LegendPosition.Left,
+                "r" or "tr" => LegendPosition.Right,
+                _ => LegendPosition.Right
+            };
+        }
+
+        // Parse plot area
+        var plotArea = chartElement.Element(c + "plotArea");
+        if (plotArea is null)
+        {
+            chart.ChartType = SpreadsheetChartType.Unsupported;
+            return chart;
+        }
+
+        // Find chart type group element
+        foreach (var groupElement in plotArea.Elements())
+        {
+            var localName = groupElement.Name.LocalName;
+            var chartType = localName switch
+            {
+                "barChart" => ParseBarChartType(groupElement, c),
+                "lineChart" => SpreadsheetChartType.Line,
+                "areaChart" => ParseAreaChartType(groupElement, c),
+                "pieChart" => SpreadsheetChartType.Pie,
+                "doughnutChart" => SpreadsheetChartType.Donut,
+                "scatterChart" => SpreadsheetChartType.Scatter,
+                _ => (SpreadsheetChartType?)null
+            };
+
+            if (chartType is null)
+            {
+                continue;
+            }
+
+            chart.ChartType = chartType.Value;
+
+            // Parse series
+            foreach (var ser in groupElement.Elements(c + "ser"))
+            {
+                var series = ParseChartSeries(ser, c, a);
+                if (series is not null)
+                {
+                    chart.Series.Add(series);
+                }
+            }
+
+            break; // Use the first recognized chart type group
+        }
+
+        if (chart.Series.Count == 0 && chart.ChartType != SpreadsheetChartType.Unsupported)
+        {
+            chart.ChartType = SpreadsheetChartType.Unsupported;
+        }
+
+        return chart;
+    }
+
+    private static SpreadsheetChartType ParseBarChartType(XElement barChart, XNamespace c)
+    {
+        var barDir = barChart.Element(c + "barDir")?.Attribute("val")?.Value ?? "col";
+        var grouping = barChart.Element(c + "grouping")?.Attribute("val")?.Value ?? "clustered";
+
+        return (barDir, grouping) switch
+        {
+            ("bar", "stacked") => SpreadsheetChartType.StackedBar,
+            ("bar", "percentStacked") => SpreadsheetChartType.FullStackedBar,
+            ("bar", _) => SpreadsheetChartType.Bar,
+            (_, "stacked") => SpreadsheetChartType.StackedColumn,
+            (_, "percentStacked") => SpreadsheetChartType.FullStackedColumn,
+            _ => SpreadsheetChartType.Column
+        };
+    }
+
+    private static SpreadsheetChartType ParseAreaChartType(XElement areaChart, XNamespace c)
+    {
+        var grouping = areaChart.Element(c + "grouping")?.Attribute("val")?.Value ?? "standard";
+
+        return grouping switch
+        {
+            "stacked" => SpreadsheetChartType.StackedArea,
+            "percentStacked" => SpreadsheetChartType.FullStackedArea,
+            _ => SpreadsheetChartType.Area
+        };
+    }
+
+    private static string? ParseChartTitle(XElement titleElement, XNamespace c, XNamespace a)
+    {
+        // c:title > c:tx > c:rich > a:p > a:r > a:t
+        var tx = titleElement.Element(c + "tx");
+        var rich = tx?.Element(c + "rich");
+        if (rich is not null)
+        {
+            var result = new System.Text.StringBuilder();
+            foreach (var p in rich.Elements(a + "p"))
+            {
+                foreach (var r in p.Elements(a + "r"))
+                {
+                    var t = r.Element(a + "t")?.Value;
+                    if (t is not null)
+                    {
+                        result.Append(t);
+                    }
+                }
+            }
+            return result.Length > 0 ? result.ToString() : null;
+        }
+
+        // c:title > c:tx > c:strRef > c:strCache > c:pt > c:v
+        var strRef = tx?.Element(c + "strRef");
+        var strCache = strRef?.Element(c + "strCache");
+        var pt = strCache?.Element(c + "pt");
+        return pt?.Element(c + "v")?.Value;
+    }
+
+    private static ChartSeriesDefinition? ParseChartSeries(XElement ser, XNamespace c, XNamespace a)
+    {
+        var series = new ChartSeriesDefinition();
+
+        // Parse index
+        var idx = ser.Element(c + "idx")?.Attribute("val")?.Value;
+        if (idx is not null && int.TryParse(idx, out var index))
+        {
+            series.Index = index;
+        }
+
+        // Parse title
+        var tx = ser.Element(c + "tx");
+        if (tx is not null)
+        {
+            var strRef = tx.Element(c + "strRef");
+            if (strRef is not null)
+            {
+                series.Title = strRef.Element(c + "strCache")?.Element(c + "pt")?.Element(c + "v")?.Value;
+            }
+            else
+            {
+                series.Title = tx.Element(c + "v")?.Value;
+            }
+        }
+
+        // Parse categories
+        var cat = ser.Element(c + "cat");
+        if (cat is not null)
+        {
+            var strRef = cat.Element(c + "strRef");
+            var numRef = cat.Element(c + "numRef");
+            var refElement = strRef ?? numRef;
+
+            if (refElement is not null)
+            {
+                series.CategoryFormula = refElement.Element(c + "f")?.Value;
+
+                var cache = refElement.Element(c + "strCache") ?? refElement.Element(c + "numCache");
+                if (cache is not null)
+                {
+                    foreach (var pt in cache.Elements(c + "pt"))
+                    {
+                        series.CategoryCache.Add(pt.Element(c + "v")?.Value ?? "");
+                    }
+                }
+            }
+        }
+
+        // Parse values
+        var val = ser.Element(c + "val");
+        if (val is not null)
+        {
+            var numRef = val.Element(c + "numRef");
+            if (numRef is not null)
+            {
+                series.ValueFormula = numRef.Element(c + "f")?.Value;
+
+                var numCache = numRef.Element(c + "numCache");
+                if (numCache is not null)
+                {
+                    foreach (var pt in numCache.Elements(c + "pt"))
+                    {
+                        var v = pt.Element(c + "v")?.Value;
+                        if (v is not null && double.TryParse(v, System.Globalization.NumberStyles.Any,
+                            System.Globalization.CultureInfo.InvariantCulture, out var dv))
+                        {
+                            series.ValueCache.Add(dv);
+                        }
+                        else
+                        {
+                            series.ValueCache.Add(null);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Parse color from spPr > solidFill > srgbClr
+        var spPr = ser.Element(c + "spPr");
+        var solidFill = spPr?.Element(a + "solidFill");
+        var srgbClr = solidFill?.Element(a + "srgbClr");
+        var colorVal = srgbClr?.Attribute("val")?.Value;
+        if (colorVal is not null)
+        {
+            series.Color = $"#{colorVal}";
+        }
+
+        return series;
     }
 
     private static CellAnchor? ParseCellAnchor(XElement? element, XNamespace xdr)
