@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Radzen.Blazor;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -93,7 +92,7 @@ public class SheetChart
     /// <summary>
     /// Gets or sets the legend position.
     /// </summary>
-    public LegendPosition LegendPosition { get; set; }
+    public ChartLegendPosition LegendPosition { get; set; }
 
     /// <summary>
     /// Gets or sets the series definitions.
@@ -104,6 +103,21 @@ public class SheetChart
     /// Gets or sets the raw chart XML for lossless XLSX round-tripping.
     /// </summary>
     public string? RawChartXml { get; set; }
+}
+
+/// <summary>
+/// Specifies the legend position for a spreadsheet chart.
+/// </summary>
+public enum ChartLegendPosition
+{
+    /// <summary>Legend on the right.</summary>
+    Right,
+    /// <summary>Legend on the left.</summary>
+    Left,
+    /// <summary>Legend at the top.</summary>
+    Top,
+    /// <summary>Legend at the bottom.</summary>
+    Bottom
 }
 
 /// <summary>

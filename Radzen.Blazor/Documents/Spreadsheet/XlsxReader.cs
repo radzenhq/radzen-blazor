@@ -5,8 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
-using Radzen.Blazor;
-
 namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
@@ -1003,11 +1001,11 @@ static class XlsxReader
             var legendPos = legendElement.Element(c + "legendPos")?.Attribute("val")?.Value;
             chart.LegendPosition = legendPos switch
             {
-                "t" => LegendPosition.Top,
-                "b" => LegendPosition.Bottom,
-                "l" => LegendPosition.Left,
-                "r" or "tr" => LegendPosition.Right,
-                _ => LegendPosition.Right
+                "t" => ChartLegendPosition.Top,
+                "b" => ChartLegendPosition.Bottom,
+                "l" => ChartLegendPosition.Left,
+                "r" or "tr" => ChartLegendPosition.Right,
+                _ => ChartLegendPosition.Right
             };
         }
 

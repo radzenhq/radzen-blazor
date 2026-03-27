@@ -33,7 +33,7 @@ public static class ChartFactory
             Width = DefaultChartWidthEmu,
             Height = DefaultChartHeightEmu,
             ShowLegend = true,
-            LegendPosition = LegendPosition.Right
+            LegendPosition = ChartLegendPosition.Right
         };
 
         // Auto-detect: first column is categories, remaining columns are value series

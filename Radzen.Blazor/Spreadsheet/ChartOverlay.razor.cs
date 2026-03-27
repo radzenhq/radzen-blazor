@@ -260,7 +260,7 @@ public partial class ChartOverlay : ComponentBase, IDisposable
             if (chart.ShowLegend)
             {
                 chartBuilder.OpenComponent<RadzenLegend>(10002);
-                chartBuilder.AddAttribute(10003, "Position", chart.LegendPosition);
+                chartBuilder.AddAttribute(10003, "Position", MapLegendPosition(chart.LegendPosition));
                 chartBuilder.CloseComponent();
             }
         }));
@@ -286,6 +286,18 @@ public partial class ChartOverlay : ComponentBase, IDisposable
             SpreadsheetChartType.Donut => typeof(RadzenDonutSeries<ChartDataPoint>),
             SpreadsheetChartType.Scatter => typeof(RadzenScatterSeries<ChartDataPoint>),
             _ => null
+        };
+    }
+
+    private static LegendPosition MapLegendPosition(ChartLegendPosition position)
+    {
+        return position switch
+        {
+            ChartLegendPosition.Top => LegendPosition.Top,
+            ChartLegendPosition.Bottom => LegendPosition.Bottom,
+            ChartLegendPosition.Left => LegendPosition.Left,
+            ChartLegendPosition.Right => LegendPosition.Right,
+            _ => LegendPosition.Right
         };
     }
 
