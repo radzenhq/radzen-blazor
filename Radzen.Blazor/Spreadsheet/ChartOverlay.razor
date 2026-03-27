@@ -1,0 +1,58 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+@foreach (var chart in Worksheet.Charts)
+{
+    var chartRange = GetChartRange(chart);
+    var selected = Worksheet.SelectedChart == chart;
+    @foreach (var zone in Context.GetRanges(chartRange))
+    {
+        <div class=@GetClass(zone.FrozenRow, zone.FrozenColumn) style=@GetZoneStyle(chart, chartRange, zone) @onpointerdown=@(e => OnChartPointerDown(e, chart)) @onpointerdown:stopPropagation>
+            <div class="rz-spreadsheet-chart-clip">
+                <div class="rz-spreadsheet-chart-container" style=@GetChartContainerStyle(chart, chartRange, zone)>
+                    @if (chart.ChartType != SpreadsheetChartType.Unsupported)
+                    {
+                        @RenderChart(chart, chartRange)
+                    }
+                    else
+                    {
+                        <div class="rz-spreadsheet-chart-unsupported">Unsupported chart type</div>
+                    }
+                    @if (selected)
+                    {
+                        <div class=@GetSelectionClass(zone)></div>
+                    }
+                </div>
+            </div>
+            @if (selected)
+            {
+                @if (zone.Top && zone.Left)
+                {
+                    <div class="rz-spreadsheet-resize-handle rz-spreadsheet-resize-nw" style=@GetHandleStyle(chart, chartRange, zone, "nw") data-direction="nw"></div>
+                }
+                @if (zone.Top && zone.Right)
+                {
+                    <div class="rz-spreadsheet-resize-handle rz-spreadsheet-resize-n" style=@GetHandleStyle(chart, chartRange, zone, "n") data-direction="n"></div>
+                    <div class="rz-spreadsheet-resize-handle rz-spreadsheet-resize-ne" style=@GetHandleStyle(chart, chartRange, zone, "ne") data-direction="ne"></div>
+                }
+                @if (zone.Right && zone.Bottom)
+                {
+                    <div class="rz-spreadsheet-resize-handle rz-spreadsheet-resize-e" style=@GetHandleStyle(chart, chartRange, zone, "e") data-direction="e"></div>
+                    <div class="rz-spreadsheet-resize-handle rz-spreadsheet-resize-se" style=@GetHandleStyle(chart, chartRange, zone, "se") data-direction="se"></div>
+                }
+                @if (zone.Bottom && zone.Right)
+                {
+                    <div class="rz-spreadsheet-resize-handle rz-spreadsheet-resize-s" style=@GetHandleStyle(chart, chartRange, zone, "s") data-direction="s"></div>
+                }
+                @if (zone.Bottom && zone.Left)
+                {
+                    <div class="rz-spreadsheet-resize-handle rz-spreadsheet-resize-sw" style=@GetHandleStyle(chart, chartRange, zone, "sw") data-direction="sw"></div>
+                }
+                @if (zone.Left && zone.Bottom)
+                {
+                    <div class="rz-spreadsheet-resize-handle rz-spreadsheet-resize-w" style=@GetHandleStyle(chart, chartRange, zone, "w") data-direction="w"></div>
+                }
+            }
+        </div>
+    }
+}

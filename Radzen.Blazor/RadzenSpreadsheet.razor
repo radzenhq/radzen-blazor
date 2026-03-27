@@ -74,6 +74,7 @@
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <InsertHyperlink Worksheet=@Worksheet />
                             <InsertImage Worksheet=@Worksheet />
+                            <InsertChart Worksheet=@Worksheet />
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
@@ -122,6 +123,7 @@
                 <SelectionOverlay Worksheet=@Worksheet Context=@context />
                 <AutofillOverlay Worksheet=@Worksheet Context=@context AutofillRange=@autofillPreviewRange />
                 <ImageOverlay Worksheet=@Worksheet Context=@context />
+                <ChartOverlay Worksheet=@Worksheet Context=@context />
                 <CellEditor Worksheet=@Worksheet Editor=@Editor Context=@context />
                 @foreach (var table in Worksheet.Tables)
                 {

@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
+using Radzen.Blazor;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -65,12 +66,12 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute(XNamespace.Xmlns + "a", a.NamespaceName),
                 new XAttribute(XNamespace.Xmlns + "r", r.NamespaceName)));
 
-        var drawingRels = new List<(string Id, string Target)>();
-        var imageRelIndex = 1;
+        var drawingRels = new List<(string Id, string Target, string Type)>();
+        var relIndex = 1;
 
         foreach (var image in sheet.Images)
         {
-            var imageRelId = $"rId{imageRelIndex++}";
+            var imageRelId = $"rId{relIndex++}";
 
             var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image.Data));
             if (!mediaMap.TryGetValue(hash, out var mediaPath))
@@ -88,7 +89,7 @@ class XlsxWriter(Workbook sourceWorkbook)
 
             // Relative path from xl/drawings/ to xl/media/
             var relTarget = "../media/" + mediaPath.Split('/').Last();
-            drawingRels.Add((imageRelId, relTarget));
+            drawingRels.Add((imageRelId, relTarget, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"));
 
             // Build anchor element
             XElement anchorElement;
@@ -99,8 +100,8 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XElement(xdr + "rowOff", image.From.RowOffset.ToString(CultureInfo.InvariantCulture)));
 
             var cNvPr = new XElement(xdr + "cNvPr",
-                new XAttribute("id", imageRelIndex.ToString(CultureInfo.InvariantCulture)),
-                new XAttribute("name", image.Name ?? $"Image {imageRelIndex - 1}"));
+                new XAttribute("id", relIndex.ToString(CultureInfo.InvariantCulture)),
+                new XAttribute("name", image.Name ?? $"Image {relIndex - 1}"));
 
             if (image.Description is not null)
             {
@@ -119,7 +120,7 @@ class XlsxWriter(Workbook sourceWorkbook)
                     new XElement(a + "prstGeom", new XAttribute("prst", "rect"),
                         new XElement(a + "avLst"))));
 
-            if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To is not null)
+            if (image.AnchorMode == DrawingAnchorMode.TwoCellAnchor && image.To is not null)
             {
                 var toElement = new XElement(xdr + "to",
                     new XElement(xdr + "col", image.To.Column.ToString(CultureInfo.InvariantCulture)),
@@ -149,6 +150,73 @@ class XlsxWriter(Workbook sourceWorkbook)
             drawingDoc.Root!.Add(anchorElement);
         }
 
+        // Write chart anchors
+        var chartIndex = 1;
+        foreach (var chart in sheet.Charts)
+        {
+            var chartRelId = $"rId{relIndex++}";
+            var chartFileName = $"chart{drawingIndex}_{chartIndex}.xml";
+            var chartPath = $"xl/charts/{chartFileName}";
+
+            drawingRels.Add((chartRelId, $"../charts/{chartFileName}", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"));
+
+            // Build anchor element
+            var fromElement = new XElement(xdr + "from",
+                new XElement(xdr + "col", chart.From.Column.ToString(CultureInfo.InvariantCulture)),
+                new XElement(xdr + "colOff", chart.From.ColumnOffset.ToString(CultureInfo.InvariantCulture)),
+                new XElement(xdr + "row", chart.From.Row.ToString(CultureInfo.InvariantCulture)),
+                new XElement(xdr + "rowOff", chart.From.RowOffset.ToString(CultureInfo.InvariantCulture)));
+
+            XNamespace c = "http://schemas.openxmlformats.org/drawingml/2006/chart";
+
+            var graphicFrame = new XElement(xdr + "graphicFrame",
+                new XElement(xdr + "nvGraphicFramePr",
+                    new XElement(xdr + "cNvPr",
+                        new XAttribute("id", relIndex.ToString(CultureInfo.InvariantCulture)),
+                        new XAttribute("name", chart.Name ?? $"Chart {chartIndex}")),
+                    new XElement(xdr + "cNvGraphicFramePr")),
+                new XElement(xdr + "xfrm",
+                    new XElement(a + "off", new XAttribute("x", "0"), new XAttribute("y", "0")),
+                    new XElement(a + "ext", new XAttribute("cx", "0"), new XAttribute("cy", "0"))),
+                new XElement(a + "graphic",
+                    new XElement(a + "graphicData",
+                        new XAttribute("uri", "http://schemas.openxmlformats.org/drawingml/2006/chart"),
+                        new XElement(c + "chart",
+                            new XAttribute(XNamespace.Xmlns + "c", c.NamespaceName),
+                            new XAttribute(r + "id", chartRelId)))));
+
+            XElement chartAnchor;
+            if (chart.AnchorMode == DrawingAnchorMode.TwoCellAnchor && chart.To is not null)
+            {
+                var toElement = new XElement(xdr + "to",
+                    new XElement(xdr + "col", chart.To.Column.ToString(CultureInfo.InvariantCulture)),
+                    new XElement(xdr + "colOff", chart.To.ColumnOffset.ToString(CultureInfo.InvariantCulture)),
+                    new XElement(xdr + "row", chart.To.Row.ToString(CultureInfo.InvariantCulture)),
+                    new XElement(xdr + "rowOff", chart.To.RowOffset.ToString(CultureInfo.InvariantCulture)));
+
+                chartAnchor = new XElement(xdr + "twoCellAnchor",
+                    fromElement, toElement, graphicFrame,
+                    new XElement(xdr + "clientData"));
+            }
+            else
+            {
+                var extElement = new XElement(xdr + "ext",
+                    new XAttribute("cx", chart.Width.ToString(CultureInfo.InvariantCulture)),
+                    new XAttribute("cy", chart.Height.ToString(CultureInfo.InvariantCulture)));
+
+                chartAnchor = new XElement(xdr + "oneCellAnchor",
+                    fromElement, extElement, graphicFrame,
+                    new XElement(xdr + "clientData"));
+            }
+
+            drawingDoc.Root!.Add(chartAnchor);
+
+            // Save chart XML
+            SaveChartXml(archive, chart, chartPath);
+
+            chartIndex++;
+        }
+
         // Save drawing XML
         using (var entry = archive.CreateEntry($"xl/drawings/drawing{drawingIndex}.xml").Open())
         {
@@ -162,11 +230,11 @@ class XlsxWriter(Workbook sourceWorkbook)
             var drawingRelsDoc = new XDocument(
                 new XElement(XName.Get("Relationships", pkgNs)));
 
-            foreach (var (id, target) in drawingRels)
+            foreach (var (id, target, type) in drawingRels)
             {
                 drawingRelsDoc.Root!.Add(new XElement(XName.Get("Relationship", pkgNs),
                     new XAttribute("Id", id),
-                    new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"),
+                    new XAttribute("Type", type),
                     new XAttribute("Target", target)));
             }
 
@@ -175,6 +243,216 @@ class XlsxWriter(Workbook sourceWorkbook)
                 drawingRelsDoc.Save(relsEntry);
             }
         }
+    }
+
+    private static void SaveChartXml(ZipArchive archive, SheetChart chart, string chartPath)
+    {
+        XDocument chartDoc;
+
+        // If we have the original raw XML, write it back for lossless round-trip
+        if (!string.IsNullOrEmpty(chart.RawChartXml))
+        {
+            chartDoc = XDocument.Parse(chart.RawChartXml);
+        }
+        else
+        {
+            chartDoc = GenerateChartXml(chart);
+        }
+
+        using var entry = archive.CreateEntry(chartPath).Open();
+        chartDoc.Save(entry);
+    }
+
+    private static XDocument GenerateChartXml(SheetChart chart)
+    {
+        XNamespace c = "http://schemas.openxmlformats.org/drawingml/2006/chart";
+        XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
+        XNamespace r = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+
+        var plotArea = new XElement(c + "plotArea",
+            new XElement(c + "layout"));
+
+        // Create chart type group element
+        var groupElement = CreateChartGroupElement(chart, c);
+        if (groupElement is not null)
+        {
+            plotArea.Add(groupElement);
+        }
+
+        // Add axes for non-pie/donut charts
+        if (chart.ChartType != SpreadsheetChartType.Pie && chart.ChartType != SpreadsheetChartType.Donut)
+        {
+            plotArea.Add(new XElement(c + "catAx",
+                new XElement(c + "axId", new XAttribute("val", "1")),
+                new XElement(c + "scaling", new XElement(c + "orientation", new XAttribute("val", "minMax"))),
+                new XElement(c + "delete", new XAttribute("val", "0")),
+                new XElement(c + "axPos", new XAttribute("val", "b")),
+                new XElement(c + "crossAx", new XAttribute("val", "2"))));
+
+            plotArea.Add(new XElement(c + "valAx",
+                new XElement(c + "axId", new XAttribute("val", "2")),
+                new XElement(c + "scaling", new XElement(c + "orientation", new XAttribute("val", "minMax"))),
+                new XElement(c + "delete", new XAttribute("val", "0")),
+                new XElement(c + "axPos", new XAttribute("val", "l")),
+                new XElement(c + "crossAx", new XAttribute("val", "1"))));
+        }
+
+        var chartElement = new XElement(c + "chart");
+
+        if (!string.IsNullOrEmpty(chart.Title))
+        {
+            chartElement.Add(new XElement(c + "title",
+                new XElement(c + "tx",
+                    new XElement(c + "rich",
+                        new XElement(a + "bodyPr"),
+                        new XElement(a + "lstStyle"),
+                        new XElement(a + "p",
+                            new XElement(a + "r",
+                                new XElement(a + "t", chart.Title)))))));
+        }
+
+        chartElement.Add(new XElement(c + "autoTitleDeleted", new XAttribute("val", string.IsNullOrEmpty(chart.Title) ? "1" : "0")));
+        chartElement.Add(plotArea);
+
+        if (chart.ShowLegend)
+        {
+            var legendPos = chart.LegendPosition switch
+            {
+                LegendPosition.Top => "t",
+                LegendPosition.Bottom => "b",
+                LegendPosition.Left => "l",
+                LegendPosition.Right => "r",
+                _ => "r"
+            };
+
+            chartElement.Add(new XElement(c + "legend",
+                new XElement(c + "legendPos", new XAttribute("val", legendPos))));
+        }
+
+        chartElement.Add(new XElement(c + "plotVisOnly", new XAttribute("val", "1")));
+
+        return new XDocument(
+            new XElement(c + "chartSpace",
+                new XAttribute(XNamespace.Xmlns + "c", c.NamespaceName),
+                new XAttribute(XNamespace.Xmlns + "a", a.NamespaceName),
+                new XAttribute(XNamespace.Xmlns + "r", r.NamespaceName),
+                chartElement));
+    }
+
+    private static XElement? CreateChartGroupElement(SheetChart chart, XNamespace c)
+    {
+        var (elementName, barDir, grouping) = chart.ChartType switch
+        {
+            SpreadsheetChartType.Column => ("barChart", "col", "clustered"),
+            SpreadsheetChartType.Bar => ("barChart", "bar", "clustered"),
+            SpreadsheetChartType.StackedColumn => ("barChart", "col", "stacked"),
+            SpreadsheetChartType.StackedBar => ("barChart", "bar", "stacked"),
+            SpreadsheetChartType.FullStackedColumn => ("barChart", "col", "percentStacked"),
+            SpreadsheetChartType.FullStackedBar => ("barChart", "bar", "percentStacked"),
+            SpreadsheetChartType.Line => ("lineChart", (string?)null, "standard"),
+            SpreadsheetChartType.Area => ("areaChart", null, "standard"),
+            SpreadsheetChartType.StackedArea => ("areaChart", null, "stacked"),
+            SpreadsheetChartType.FullStackedArea => ("areaChart", null, "percentStacked"),
+            SpreadsheetChartType.Pie => ("pieChart", null, null),
+            SpreadsheetChartType.Donut => ("doughnutChart", null, null),
+            SpreadsheetChartType.Scatter => ("scatterChart", null, null),
+            _ => (null, null, null)
+        };
+
+        if (elementName is null)
+        {
+            return null;
+        }
+
+        var group = new XElement(c + elementName);
+
+        if (barDir is not null)
+        {
+            group.Add(new XElement(c + "barDir", new XAttribute("val", barDir)));
+        }
+
+        if (grouping is not null)
+        {
+            group.Add(new XElement(c + "grouping", new XAttribute("val", grouping)));
+        }
+
+        // Add series
+        foreach (var series in chart.Series)
+        {
+            var ser = new XElement(c + "ser",
+                new XElement(c + "idx", new XAttribute("val", series.Index.ToString(CultureInfo.InvariantCulture))),
+                new XElement(c + "order", new XAttribute("val", series.Index.ToString(CultureInfo.InvariantCulture))));
+
+            if (!string.IsNullOrEmpty(series.Title))
+            {
+                ser.Add(new XElement(c + "tx",
+                    new XElement(c + "strRef",
+                        new XElement(c + "strCache",
+                            new XElement(c + "ptCount", new XAttribute("val", "1")),
+                            new XElement(c + "pt", new XAttribute("idx", "0"),
+                                new XElement(c + "v", series.Title))))));
+            }
+
+            if (!string.IsNullOrEmpty(series.CategoryFormula))
+            {
+                var catRef = new XElement(c + "strRef",
+                    new XElement(c + "f", series.CategoryFormula));
+
+                if (series.CategoryCache.Count > 0)
+                {
+                    var cache = new XElement(c + "strCache",
+                        new XElement(c + "ptCount", new XAttribute("val", series.CategoryCache.Count.ToString(CultureInfo.InvariantCulture))));
+
+                    for (var i = 0; i < series.CategoryCache.Count; i++)
+                    {
+                        cache.Add(new XElement(c + "pt", new XAttribute("idx", i.ToString(CultureInfo.InvariantCulture)),
+                            new XElement(c + "v", series.CategoryCache[i])));
+                    }
+
+                    catRef.Add(cache);
+                }
+
+                ser.Add(new XElement(c + "cat", catRef));
+            }
+
+            if (!string.IsNullOrEmpty(series.ValueFormula))
+            {
+                var numRef = new XElement(c + "numRef",
+                    new XElement(c + "f", series.ValueFormula));
+
+                if (series.ValueCache.Count > 0)
+                {
+                    var cache = new XElement(c + "numCache",
+                        new XElement(c + "formatCode", "General"),
+                        new XElement(c + "ptCount", new XAttribute("val", series.ValueCache.Count.ToString(CultureInfo.InvariantCulture))));
+
+                    for (var i = 0; i < series.ValueCache.Count; i++)
+                    {
+                        var v = series.ValueCache[i];
+                        if (v.HasValue)
+                        {
+                            cache.Add(new XElement(c + "pt", new XAttribute("idx", i.ToString(CultureInfo.InvariantCulture)),
+                                new XElement(c + "v", v.Value.ToString(CultureInfo.InvariantCulture))));
+                        }
+                    }
+
+                    numRef.Add(cache);
+                }
+
+                ser.Add(new XElement(c + "val", numRef));
+            }
+
+            group.Add(ser);
+        }
+
+        // Add axis IDs for non-pie/donut
+        if (chart.ChartType != SpreadsheetChartType.Pie && chart.ChartType != SpreadsheetChartType.Donut)
+        {
+            group.Add(new XElement(c + "axId", new XAttribute("val", "1")));
+            group.Add(new XElement(c + "axId", new XAttribute("val", "2")));
+        }
+
+        return group;
     }
 
     private void SaveContentTypes(ZipArchive archive)
@@ -216,14 +494,21 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("ContentType", ExtensionToContentType(ext))));
         }
 
-        // Add drawing overrides
+        // Add drawing and chart overrides
         for (var i = 0; i < sheets.Count; i++)
         {
-            if (sheets[i].Images.Count > 0)
+            if (sheets[i].Images.Count > 0 || sheets[i].Charts.Count > 0)
             {
                 contentTypes.Root!.Add(new XElement(XName.Get("Override", ctNs),
                     new XAttribute("PartName", $"/xl/drawings/drawing{i + 1}.xml"),
                     new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.drawing+xml")));
+
+                for (var j = 0; j < sheets[i].Charts.Count; j++)
+                {
+                    contentTypes.Root!.Add(new XElement(XName.Get("Override", ctNs),
+                        new XAttribute("PartName", $"/xl/charts/chart{i + 1}_{j + 1}.xml"),
+                        new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.drawingml.chart+xml")));
+                }
             }
         }
 
@@ -457,8 +742,8 @@ class XlsxWriter(Workbook sourceWorkbook)
             sheetRelEntries.Add((id, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", url, true));
         }
 
-        // Add drawing reference if sheet has images
-        if (sheet.Images.Count > 0)
+        // Add drawing reference if sheet has images or charts
+        if (sheet.Images.Count > 0 || sheet.Charts.Count > 0)
         {
             var drawingRelId = $"rId{hyperlinkRels.Count + 1}";
             var drawingIndex = sheetId;
