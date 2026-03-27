@@ -1,0 +1,268 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        BuildSalesChartSheet();
+        BuildPieChartSheet();
+        BuildMultiSeriesSheet();
+    }
+
+    void BuildSalesChartSheet()
+    {
+        var sheet = workbook.AddSheet("Sales Dashboard", 30, 15);
+
+        sheet.BeginUpdate();
+
+        var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center };
+        var numberFormat = new Format { NumberFormat = "#,##0" };
+        var totalFormat = new Format { Bold = true, NumberFormat = "#,##0", BackgroundColor = "#e8f5e9" };
+
+        sheet.Columns[0] = 120;
+        sheet.Columns[1] = 100;
+        sheet.Columns[2] = 100;
+        sheet.Columns[3] = 100;
+        sheet.Columns[4] = 100;
+        sheet.Columns[5] = 100;
+
+        // Title
+        sheet.MergedCells.Add(RangeRef.Parse("A1:F1"));
+        sheet.Cells["A1"].Value = "Quarterly Sales Report";
+        sheet.Cells["A1"].Format = titleFormat;
+
+        // Headers
+        string[] headers = { "Region", "Q1", "Q2", "Q3", "Q4", "Total" };
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[1, i].Value = headers[i];
+            sheet.Cells[1, i].Format = headerFormat;
+        }
+
+        // Data
+        string[] regions = { "North America", "Europe", "Asia Pacific", "Latin America", "Middle East" };
+        int[][] sales = {
+            new[] { 45200, 52300, 48700, 61200 },
+            new[] { 38400, 41200, 39800, 44500 },
+            new[] { 29100, 35600, 42300, 48900 },
+            new[] { 15800, 18200, 21400, 24600 },
+            new[] { 12300, 14500, 16800, 19200 }
+        };
+
+        for (int i = 0; i < regions.Length; i++)
+        {
+            int row = 2 + i;
+            sheet.Cells[row, 0].Value = regions[i];
+            sheet.Cells[row, 0].Format = new Format { Bold = true };
+
+            for (int q = 0; q < 4; q++)
+            {
+                sheet.Cells[row, q + 1].Value = sales[i][q];
+                sheet.Cells[row, q + 1].Format = numberFormat;
+            }
+
+            sheet.Cells[row, 5].Formula = $"=SUM(B{row + 1}:E{row + 1})";
+            sheet.Cells[row, 5].Format = totalFormat;
+        }
+
+        // Totals row
+        int totalRow = 2 + regions.Length;
+        sheet.Cells[totalRow, 0].Value = "Total";
+        sheet.Cells[totalRow, 0].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9" };
+        for (int col = 1; col <= 5; col++)
+        {
+            var colLetter = (char)('A' + col);
+            sheet.Cells[totalRow, col].Formula = $"=SUM({colLetter}3:{colLetter}{totalRow})";
+            sheet.Cells[totalRow, col].Format = totalFormat;
+        }
+
+        // Insert a column chart
+        var columnChart = new SheetChart
+        {
+            ChartType = SpreadsheetChartType.Column,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
+            From = new CellAnchor { Row = 0, Column = 7 },
+            Width = 5715000, // ~600px
+            Height = 2857500, // ~300px
+            Title = "Quarterly Sales by Region",
+            ShowLegend = true,
+            LegendPosition = LegendPosition.Bottom
+        };
+
+        for (int q = 0; q < 4; q++)
+        {
+            columnChart.Series.Add(new ChartSeriesDefinition
+            {
+                Index = q,
+                Title = headers[q + 1],
+                CategoryFormula = $"'Sales Dashboard'!$A$3:$A${2 + regions.Length}",
+                ValueFormula = $"'Sales Dashboard'!${(char)('B' + q)}$3:${(char)('B' + q)}${2 + regions.Length}"
+            });
+        }
+
+        sheet.AddChart(columnChart);
+
+        sheet.Rows.Frozen = 2;
+        sheet.EndUpdate();
+    }
+
+    void BuildPieChartSheet()
+    {
+        var sheet = workbook.AddSheet("Market Share", 20, 12);
+
+        sheet.BeginUpdate();
+
+        var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#2e7d32", Color = "#ffffff", TextAlign = TextAlign.Center };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9" };
+        var percentFormat = new Format { NumberFormat = "0.0%" };
+
+        sheet.Columns[0] = 140;
+        sheet.Columns[1] = 120;
+        sheet.Columns[2] = 120;
+
+        // Title
+        sheet.MergedCells.Add(RangeRef.Parse("A1:C1"));
+        sheet.Cells["A1"].Value = "Browser Market Share 2025";
+        sheet.Cells["A1"].Format = titleFormat;
+
+        // Headers
+        sheet.Cells["A2"].Value = "Browser"; sheet.Cells["A2"].Format = headerFormat;
+        sheet.Cells["B2"].Value = "Share"; sheet.Cells["B2"].Format = headerFormat;
+        sheet.Cells["C2"].Value = "Percentage"; sheet.Cells["C2"].Format = headerFormat;
+
+        // Data
+        (string browser, double share)[] data = {
+            ("Chrome", 0.645),
+            ("Safari", 0.187),
+            ("Edge", 0.052),
+            ("Firefox", 0.032),
+            ("Opera", 0.025),
+            ("Other", 0.059)
+        };
+
+        for (int i = 0; i < data.Length; i++)
+        {
+            int row = 2 + i;
+            sheet.Cells[row, 0].Value = data[i].browser;
+            sheet.Cells[row, 1].Value = data[i].share;
+            sheet.Cells[row, 1].Format = percentFormat;
+            sheet.Cells[row, 2].Formula = $"=B{row + 1}";
+            sheet.Cells[row, 2].Format = percentFormat;
+        }
+
+        // Insert a pie chart
+        var pieChart = new SheetChart
+        {
+            ChartType = SpreadsheetChartType.Pie,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
+            From = new CellAnchor { Row = 0, Column = 4 },
+            Width = 4572000, // ~480px
+            Height = 3429000, // ~360px
+            Title = "Browser Market Share",
+            ShowLegend = true,
+            LegendPosition = LegendPosition.Right
+        };
+
+        pieChart.Series.Add(new ChartSeriesDefinition
+        {
+            Index = 0,
+            Title = "Market Share",
+            CategoryFormula = $"'Market Share'!$A$3:$A${2 + data.Length}",
+            ValueFormula = $"'Market Share'!$B$3:$B${2 + data.Length}"
+        });
+
+        sheet.AddChart(pieChart);
+
+        sheet.EndUpdate();
+    }
+
+    void BuildMultiSeriesSheet()
+    {
+        var sheet = workbook.AddSheet("Trends", 25, 12);
+
+        sheet.BeginUpdate();
+
+        var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#6a1b9a", Color = "#ffffff", TextAlign = TextAlign.Center };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#f3e5f5" };
+        var numberFormat = new Format { NumberFormat = "#,##0" };
+
+        sheet.Columns[0] = 100;
+        sheet.Columns[1] = 120;
+        sheet.Columns[2] = 120;
+        sheet.Columns[3] = 120;
+
+        // Title
+        sheet.MergedCells.Add(RangeRef.Parse("A1:D1"));
+        sheet.Cells["A1"].Value = "Monthly Revenue Trends";
+        sheet.Cells["A1"].Format = titleFormat;
+
+        // Headers
+        string[] headers = { "Month", "Product A", "Product B", "Product C" };
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[1, i].Value = headers[i];
+            sheet.Cells[1, i].Format = headerFormat;
+        }
+
+        // Monthly data
+        string[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        int[][] revenue = {
+            new[] { 12000, 8000, 5000 },
+            new[] { 13500, 8500, 5200 },
+            new[] { 14200, 9100, 5800 },
+            new[] { 15800, 9800, 6100 },
+            new[] { 16500, 10200, 6500 },
+            new[] { 17200, 11000, 7200 },
+            new[] { 18100, 11500, 7800 },
+            new[] { 19000, 12300, 8200 },
+            new[] { 18500, 12800, 8900 },
+            new[] { 20100, 13500, 9400 },
+            new[] { 21500, 14200, 10100 },
+            new[] { 23000, 15000, 10800 }
+        };
+
+        for (int i = 0; i < months.Length; i++)
+        {
+            int row = 2 + i;
+            sheet.Cells[row, 0].Value = months[i];
+            for (int p = 0; p < 3; p++)
+            {
+                sheet.Cells[row, p + 1].Value = revenue[i][p];
+                sheet.Cells[row, p + 1].Format = numberFormat;
+            }
+        }
+
+        // Insert a line chart
+        var lineChart = new SheetChart
+        {
+            ChartType = SpreadsheetChartType.Line,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
+            From = new CellAnchor { Row = 0, Column = 5 },
+            Width = 5715000,
+            Height = 2857500,
+            Title = "Revenue Trends",
+            ShowLegend = true,
+            LegendPosition = LegendPosition.Bottom
+        };
+
+        for (int p = 0; p < 3; p++)
+        {
+            lineChart.Series.Add(new ChartSeriesDefinition
+            {
+                Index = p,
+                Title = headers[p + 1],
+                CategoryFormula = $"Trends!$A$3:$A${2 + months.Length}",
+                ValueFormula = $"Trends!${(char)('B' + p)}$3:${(char)('B' + p)}${2 + months.Length}"
+            });
+        }
+
+        sheet.AddChart(lineChart);
+
+        sheet.EndUpdate();
+    }
+}

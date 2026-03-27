@@ -61,7 +61,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     private RangeRef GetImageRange(SheetImage image)
     {
-        if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To is not null)
+        if (image.AnchorMode == DrawingAnchorMode.TwoCellAnchor && image.To is not null)
         {
             return new RangeRef(
                 new CellRef(image.From.Row, image.From.Column),
@@ -101,7 +101,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
 
     private (double width, double height) GetImageDimensions(SheetImage image, RangeRef imageRange)
     {
-        if (image.AnchorMode == ImageAnchorMode.TwoCellAnchor && image.To is not null)
+        if (image.AnchorMode == DrawingAnchorMode.TwoCellAnchor && image.To is not null)
         {
             var fullRect = Context.GetRectangle(imageRange.Start.Row, imageRange.Start.Column, imageRange.End.Row, imageRange.End.Column);
             return (

@@ -39,7 +39,7 @@
         var address = Worksheet.Selection.Cell;
         var image = new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = address.Row, Column = address.Column },
             Width = 2000000,
             Height = 1500000,
