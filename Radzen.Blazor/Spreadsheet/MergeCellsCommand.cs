@@ -8,8 +8,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command to merge a range of cells.
 /// </summary>
-public class MergeCellsCommand(Worksheet sheet, RangeRef range, bool center = false) : ICommand
+public class MergeCellsCommand(Worksheet sheet, RangeRef range, bool center = false) : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.FormatCells;
+
     private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private readonly bool center = center;
