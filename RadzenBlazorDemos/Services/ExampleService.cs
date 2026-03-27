@@ -238,7 +238,6 @@ namespace RadzenBlazorDemos
         new Example
         {
             Name = "Spreadsheet",
-            New = true,
             Icon = "\ue3ec",
             Children = new []
             {
@@ -345,8 +344,7 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-multiple-sheets",
                     Title = "Blazor Spreadsheet Multiple Sheets | Free UI Components by Radzen",
                     Description = "Work with multiple worksheets and use cross-sheet references to aggregate data across sheets.",
-                    Tags = new [] { "spreadsheet", "sheets", "worksheets", "tabs", "cross-sheet", "reference" },
-                    New = true
+                    Tags = new [] { "spreadsheet", "sheets", "worksheets", "tabs", "cross-sheet", "reference" }
                 },
                 new Example
                 {
@@ -354,8 +352,7 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-large-data",
                     Title = "Blazor Spreadsheet Large Data | Free UI Components by Radzen",
                     Description = "Virtualized spreadsheet with 10,000 rows and formula calculations for smooth scrolling performance.",
-                    Tags = new [] { "spreadsheet", "performance", "virtualization", "large", "data", "virtual", "scrolling" },
-                    New = true
+                    Tags = new [] { "spreadsheet", "performance", "virtualization", "large", "data", "virtual", "scrolling" }
                 },
                 new Example
                 {
@@ -363,8 +360,15 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-templates",
                     Title = "Blazor Spreadsheet Templates | Free UI Components by Radzen",
                     Description = "Real-world spreadsheet templates: annual budget tracker and weekly timesheet with formulas and conditional formatting.",
-                    Tags = new [] { "spreadsheet", "template", "budget", "timesheet", "invoice", "financial", "planning" },
-                    New = true
+                    Tags = new [] { "spreadsheet", "template", "budget", "timesheet", "invoice", "financial", "planning" }
+                },
+                new Example
+                {
+                    Name = "Protection",
+                    Path = "spreadsheet-protection",
+                    Title = "Blazor Spreadsheet Protection | Free UI Components by Radzen",
+                    Description = "Protect sheets to prevent editing of locked cells while allowing input in unlocked cells with XLSX round-trip support.",
+                    Tags = new [] { "spreadsheet", "protection", "locked", "unlock", "readonly", "security", "sheet" }
                 },
             }
         },
