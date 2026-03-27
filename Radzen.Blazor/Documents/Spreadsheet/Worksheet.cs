@@ -78,6 +78,10 @@ public partial class Worksheet
     /// </summary>
     public ConditionalFormatStore ConditionalFormats { get; }
     /// <summary>
+    /// Gets or sets the sheet protection settings.
+    /// </summary>
+    public SheetProtection Protection { get; set; } = new();
+    /// <summary>
     /// Gets the name of the sheet.
     /// </summary>
     public string Name { get; set; } = "Worksheet1";
@@ -145,6 +149,19 @@ public partial class Worksheet
     {
         get => workbook ??= new Workbook(this);
         internal set => workbook = value;
+    }
+
+    /// <summary>
+    /// Returns true if the cell at the given address is editable (either protection is off or the cell is unlocked).
+    /// </summary>
+    public bool IsCellEditable(CellRef address)
+    {
+        if (!Protection.IsProtected)
+        {
+            return true;
+        }
+
+        return Cells.TryGet(address.Row, address.Column, out var cell) ? !cell.Format.IsLocked : false;
     }
 
     /// <summary>
