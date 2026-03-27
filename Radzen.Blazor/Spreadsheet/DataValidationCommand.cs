@@ -6,8 +6,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command to add a data validation rule to a range.
 /// </summary>
-public class DataValidationCommand(Worksheet sheet, RangeRef range, ICellValidator rule) : ICommand
+public class DataValidationCommand(Worksheet sheet, RangeRef range, ICellValidator rule) : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.FormatCells;
+
     private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private readonly ICellValidator rule = rule;

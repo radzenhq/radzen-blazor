@@ -6,8 +6,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command to add a conditional formatting rule to a range.
 /// </summary>
-public class ConditionalFormatCommand(Worksheet sheet, RangeRef range, ConditionalFormatBase rule) : ICommand
+public class ConditionalFormatCommand(Worksheet sheet, RangeRef range, ConditionalFormatBase rule) : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.FormatCells;
+
     private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private readonly ConditionalFormatBase rule = rule;

@@ -6,8 +6,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command that inserts a single column AFTER the specified index and supports undo via snapshot.
 /// </summary>
-public class InsertColumnAfterCommand : SheetSnapshotCommandBase
+public class InsertColumnAfterCommand : SheetSnapshotCommandBase, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.InsertColumns;
+
     private readonly int columnIndex;
 
     /// <summary>

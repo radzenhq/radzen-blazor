@@ -61,8 +61,11 @@ public abstract class RangeFormatCommandBase(Worksheet sheet, RangeRef range) : 
 /// Command to apply border styles to the edges of a range.
 /// </summary>
 public class BorderCommand(Worksheet sheet, RangeRef range, BorderStyle? top, BorderStyle? right, BorderStyle? bottom, BorderStyle? left)
-    : RangeFormatCommandBase(sheet, range)
+    : RangeFormatCommandBase(sheet, range), IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.FormatCells;
+
     /// <inheritdoc/>
     protected override Format ApplyFormat(Format current, CellRef cellRef)
     {
@@ -98,8 +101,11 @@ public class BorderCommand(Worksheet sheet, RangeRef range, BorderStyle? top, Bo
 /// Command to apply borders to all edges of all cells in a range.
 /// </summary>
 public class AllBordersCommand(Worksheet sheet, RangeRef range, BorderStyle style)
-    : RangeFormatCommandBase(sheet, range)
+    : RangeFormatCommandBase(sheet, range), IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.FormatCells;
+
     /// <inheritdoc/>
     protected override Format ApplyFormat(Format current, CellRef cellRef)
     {
@@ -118,8 +124,11 @@ public class AllBordersCommand(Worksheet sheet, RangeRef range, BorderStyle styl
 /// Command to clear all borders from cells in a range.
 /// </summary>
 public class NoBordersCommand(Worksheet sheet, RangeRef range)
-    : RangeFormatCommandBase(sheet, range)
+    : RangeFormatCommandBase(sheet, range), IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.FormatCells;
+
     /// <inheritdoc/>
     protected override Format ApplyFormat(Format current, CellRef cellRef)
     {
