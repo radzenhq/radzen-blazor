@@ -118,6 +118,28 @@ public class Format
     public bool WrapText { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the cell is locked when sheet protection is active.
+    /// Null means use the default (locked). Only takes effect when sheet protection is enabled.
+    /// </summary>
+    public bool? Locked { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the cell's formula is hidden in the formula bar when sheet protection is active.
+    /// Null means use the default (not hidden). Only takes effect when sheet protection is enabled.
+    /// </summary>
+    public bool? FormulaHidden { get; set; }
+
+    /// <summary>
+    /// Gets the effective locked state (true if Locked is null, since XLSX defaults to locked).
+    /// </summary>
+    public bool IsLocked => Locked ?? true;
+
+    /// <summary>
+    /// Gets the effective formula hidden state (false if FormulaHidden is null).
+    /// </summary>
+    public bool IsFormulaHidden => FormulaHidden ?? false;
+
+    /// <summary>
     /// Gets or sets the text alignment in the format.
     /// </summary>
     public TextAlign TextAlign { get; set; } = TextAlign.Left;
@@ -246,7 +268,9 @@ public class Format
         BorderLeft is null &&
         TextAlign == TextAlign.Left &&
         VerticalAlign == VerticalAlign.Top &&
-        string.IsNullOrEmpty(NumberFormat);
+        string.IsNullOrEmpty(NumberFormat) &&
+        Locked is null &&
+        FormulaHidden is null;
 
     /// <summary>
     /// Occurs when the format is changed, allowing for updates to be made to the UI or other components that depend on this format.
@@ -336,6 +360,16 @@ public class Format
         if (format.BorderLeft is not null)
         {
             merged.BorderLeft = format.BorderLeft.Clone();
+        }
+
+        if (format.Locked is not null)
+        {
+            merged.Locked = format.Locked;
+        }
+
+        if (format.FormulaHidden is not null)
+        {
+            merged.FormulaHidden = format.FormulaHidden;
         }
 
         return merged;
@@ -496,7 +530,29 @@ public class Format
             BorderTop = BorderTop?.Clone(),
             BorderRight = BorderRight?.Clone(),
             BorderBottom = BorderBottom?.Clone(),
-            BorderLeft = BorderLeft?.Clone()
+            BorderLeft = BorderLeft?.Clone(),
+            Locked = Locked,
+            FormulaHidden = FormulaHidden
         };
+    }
+
+    /// <summary>
+    /// Creates a copy of the current format with a new locked setting.
+    /// </summary>
+    public Format WithLocked(bool? locked)
+    {
+        var clone = Clone();
+        clone.Locked = locked;
+        return clone;
+    }
+
+    /// <summary>
+    /// Creates a copy of the current format with a new formula hidden setting.
+    /// </summary>
+    public Format WithFormulaHidden(bool? formulaHidden)
+    {
+        var clone = Clone();
+        clone.FormulaHidden = formulaHidden;
+        return clone;
     }
 }

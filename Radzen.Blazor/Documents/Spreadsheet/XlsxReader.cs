@@ -32,6 +32,8 @@ static class XlsxReader
             workbook.AddSheet(sheet);
         }
 
+        ParseWorkbookProtection(archive, workbook);
+
         return workbook;
     }
 
@@ -39,7 +41,7 @@ static class XlsxReader
     {
         var fontStyles = new Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)>();
         var fillColors = new Dictionary<int, string>();
-        var cellStyles = new Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId)>(0);
+        var cellStyles = new Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden)>(0);
         var numberFormats = new Dictionary<int, string>();
         var borderStyles = new Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)>();
 
@@ -165,7 +167,7 @@ static class XlsxReader
         Dictionary<int, string> fillColors,
         Dictionary<int, string> numberFormats,
         Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> borderStyles,
-        Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId)> cellStyles)
+        Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden)> cellStyles)
     {
         var cellXfs = stylesDoc.Descendants(stylesNs + "cellXfs").FirstOrDefault()?.Elements(stylesNs + "xf").ToList() ?? [];
         for (var i = 0; i < cellXfs.Count; i++)
@@ -188,13 +190,17 @@ static class XlsxReader
 
                 var (textAlign, verticalAlign, wrapText) = ParseAlignment(cellXfs[i], stylesNs, applyAlignment);
 
+                var applyProtection = cellXfs[i].Attribute("applyProtection")?.Value;
+                var (locked, formulaHidden) = ParseProtection(cellXfs[i], stylesNs, applyProtection);
+
                 if (applyFont == "1" && fontStyles.ContainsKey(fontIdValue) ||
                     applyFill == "1" && fillColors.ContainsKey(fillIdValue) ||
                     applyBorder == "1" && borderStyles.ContainsKey(borderIdValue) ||
                     applyAlignment == "1" ||
+                    applyProtection == "1" ||
                     numFmtId > 0)
                 {
-                    cellStyles[i] = (fontIdValue, fillIdValue, borderIdValue, textAlign, verticalAlign, wrapText, numFmtId);
+                    cellStyles[i] = (fontIdValue, fillIdValue, borderIdValue, textAlign, verticalAlign, wrapText, numFmtId, locked, formulaHidden);
                 }
             }
         }
@@ -231,6 +237,33 @@ static class XlsxReader
         }
 
         return (textAlign, verticalAlign, wrapText);
+    }
+
+    private static (bool? Locked, bool? FormulaHidden) ParseProtection(XElement cellXf, XNamespace stylesNs, string? applyProtection)
+    {
+        bool? locked = null;
+        bool? formulaHidden = null;
+
+        if (applyProtection == "1")
+        {
+            var protection = cellXf.Element(stylesNs + "protection");
+            if (protection is not null)
+            {
+                var lockedAttr = protection.Attribute("locked")?.Value;
+                if (lockedAttr is not null)
+                {
+                    locked = lockedAttr != "0";
+                }
+
+                var hiddenAttr = protection.Attribute("hidden")?.Value;
+                if (hiddenAttr is not null)
+                {
+                    formulaHidden = hiddenAttr == "1";
+                }
+            }
+        }
+
+        return (locked, formulaHidden);
     }
 
     private static List<string> ParseSharedStrings(ZipArchive archive)
@@ -324,6 +357,9 @@ static class XlsxReader
 
         // Parse drawings (images)
         ParseDrawings(archive, sheetInfo, sheetDoc, sNs, sheet);
+
+        // Parse sheet protection
+        ParseSheetProtection(sheetDoc, sNs, sheet);
 
         sheet.Name = sheetInfo.Name;
         return sheet;
@@ -536,6 +572,14 @@ static class XlsxReader
                 {
                     fmt.NumberFormat = formatCode;
                 }
+            }
+            if (style.Locked is not null)
+            {
+                fmt.Locked = style.Locked;
+            }
+            if (style.FormulaHidden is not null)
+            {
+                fmt.FormulaHidden = style.FormulaHidden;
             }
         }
     }
@@ -900,18 +944,88 @@ static class XlsxReader
         return string.Join("/", result);
     }
 
+    private static void ParseSheetProtection(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
+    {
+        var protElement = sheetDoc.Descendants(sNs + "sheetProtection").FirstOrDefault();
+        if (protElement is null)
+        {
+            return;
+        }
+
+        var p = sheet.Protection;
+        p.IsProtected = protElement.Attribute("sheet")?.Value == "1";
+
+        // XLSX: attribute absent or "1" = forbidden; "0" = allowed
+        p.AllowFormatCells = protElement.Attribute("formatCells")?.Value == "0";
+        p.AllowFormatRows = protElement.Attribute("formatRows")?.Value == "0";
+        p.AllowFormatColumns = protElement.Attribute("formatColumns")?.Value == "0";
+        p.AllowInsertColumns = protElement.Attribute("insertColumns")?.Value == "0";
+        p.AllowInsertRows = protElement.Attribute("insertRows")?.Value == "0";
+        p.AllowInsertHyperlinks = protElement.Attribute("insertHyperlinks")?.Value == "0";
+        p.AllowDeleteColumns = protElement.Attribute("deleteColumns")?.Value == "0";
+        p.AllowDeleteRows = protElement.Attribute("deleteRows")?.Value == "0";
+        p.AllowSort = protElement.Attribute("sort")?.Value == "0";
+        p.AllowAutoFilter = protElement.Attribute("autoFilter")?.Value == "0";
+
+        // selectLockedCells/selectUnlockedCells: "1" means forbidden, absent means allowed
+        p.AllowSelectLockedCells = protElement.Attribute("selectLockedCells")?.Value != "1";
+        p.AllowSelectUnlockedCells = protElement.Attribute("selectUnlockedCells")?.Value != "1";
+
+        // Password hashes (preserved for round-trip)
+        p.PasswordHash = protElement.Attribute("password")?.Value;
+        p.AlgorithmName = protElement.Attribute("algorithmName")?.Value;
+        p.HashValue = protElement.Attribute("hashValue")?.Value;
+        p.SaltValue = protElement.Attribute("saltValue")?.Value;
+        var spinCountAttr = protElement.Attribute("spinCount")?.Value;
+        if (spinCountAttr is not null && int.TryParse(spinCountAttr, NumberStyles.Integer, CultureInfo.InvariantCulture, out var sc))
+        {
+            p.SpinCount = sc;
+        }
+    }
+
+    private static void ParseWorkbookProtection(ZipArchive archive, Workbook workbook)
+    {
+        var entry = archive.GetEntry("xl/workbook.xml");
+        if (entry is null)
+        {
+            return;
+        }
+
+        using var stream = entry.Open();
+        var doc = XDocument.Load(stream);
+        var ns = doc.Root!.Name.Namespace;
+
+        var protElement = doc.Descendants(ns + "workbookProtection").FirstOrDefault();
+        if (protElement is null)
+        {
+            return;
+        }
+
+        var p = workbook.Protection;
+        p.LockStructure = protElement.Attribute("lockStructure")?.Value == "1";
+        p.PasswordHash = protElement.Attribute("workbookPassword")?.Value ?? protElement.Attribute("password")?.Value;
+        p.AlgorithmName = protElement.Attribute("workbookAlgorithmName")?.Value;
+        p.HashValue = protElement.Attribute("workbookHashValue")?.Value;
+        p.SaltValue = protElement.Attribute("workbookSaltValue")?.Value;
+        var spinCountAttr = protElement.Attribute("workbookSpinCount")?.Value;
+        if (spinCountAttr is not null && int.TryParse(spinCountAttr, NumberStyles.Integer, CultureInfo.InvariantCulture, out var sc))
+        {
+            p.SpinCount = sc;
+        }
+    }
+
     private class StyleInfo
     {
         public Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)> FontStyles { get; }
         public Dictionary<int, string> FillColors { get; }
-        public Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId)> CellStyles { get; }
+        public Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden)> CellStyles { get; }
         public Dictionary<int, string> NumberFormats { get; }
         public Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> BorderStyles { get; }
 
         public StyleInfo(
             Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)> fontStyles,
             Dictionary<int, string> fillColors,
-            Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId)> cellStyles,
+            Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden)> cellStyles,
             Dictionary<int, string> numberFormats,
             Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> borderStyles)
         {
