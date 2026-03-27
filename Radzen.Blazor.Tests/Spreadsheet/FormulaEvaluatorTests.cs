@@ -340,4 +340,34 @@ public class FormulaEvaluationTests
 
         Assert.Equal(10d, s1.Cells[0, 0].Data.GetValueOrDefault<double>());
     }
+
+    [Fact]
+    public void Evaluator_ShouldResolveQuotedSheetCellReference()
+    {
+        var wb = new Workbook();
+        var s1 = wb.AddSheet("Summary", 5, 5);
+        var s2 = wb.AddSheet("Q1 Sales", 5, 5);
+
+        s2.Cells[0, 0].Value = 100;
+
+        s1.Cells[0, 0].Formula = "='Q1 Sales'!A1";
+
+        Assert.Equal(100d, s1.Cells[0, 0].Data.GetValueOrDefault<double>());
+    }
+
+    [Fact]
+    public void Evaluator_ShouldResolveQuotedSheetRangeInFunction()
+    {
+        var wb = new Workbook();
+        var s1 = wb.AddSheet("Summary", 5, 5);
+        var s2 = wb.AddSheet("Q1 Sales", 5, 5);
+
+        s2.Cells[0, 1].Value = 10; // B1
+        s2.Cells[0, 2].Value = 20; // C1
+        s2.Cells[0, 3].Value = 30; // D1
+
+        s1.Cells[0, 0].Formula = "=SUM('Q1 Sales'!B1:D1)";
+
+        Assert.Equal(60d, s1.Cells[0, 0].Data.GetValueOrDefault<double>());
+    }
 }

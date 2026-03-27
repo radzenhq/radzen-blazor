@@ -141,4 +141,29 @@ public class FormulaLexerTests
         Assert.Equal(5, tokens[3].Start);
         Assert.Equal(7, tokens[3].End);
     }
+
+    [Fact]
+    public void FormulaLexer_ShouldParseQuotedSheetReference()
+    {
+        var tokens = FormulaLexer.Scan("='Q1 Sales'!A1");
+        Assert.Equal(FormulaTokenType.Equals, tokens[0].Type);
+        Assert.Equal(FormulaTokenType.CellIdentifier, tokens[1].Type);
+        Assert.Equal("Q1 Sales", tokens[1].Address.Worksheet);
+        Assert.Equal("A1", tokens[1].Address.ToString());
+    }
+
+    [Fact]
+    public void FormulaLexer_ShouldParseQuotedSheetRangeReference()
+    {
+        var tokens = FormulaLexer.Scan("=SUM('Q1 Sales'!B1:D1)");
+        Assert.Equal(FormulaTokenType.Equals, tokens[0].Type);
+        Assert.Equal(FormulaTokenType.Identifier, tokens[1].Type); // SUM
+        Assert.Equal(FormulaTokenType.OpenParen, tokens[2].Type);
+        Assert.Equal(FormulaTokenType.CellIdentifier, tokens[3].Type);
+        Assert.Equal("Q1 Sales", tokens[3].Address.Worksheet);
+        Assert.Equal("B1", tokens[3].Address.ToString());
+        Assert.Equal(FormulaTokenType.Colon, tokens[4].Type);
+        Assert.Equal(FormulaTokenType.CellIdentifier, tokens[5].Type);
+        Assert.Equal("D1", tokens[5].Address.ToString());
+    }
 }
