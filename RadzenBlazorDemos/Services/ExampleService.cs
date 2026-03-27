@@ -2000,6 +2000,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    New = true,
+                    Name = "SignaturePad",
+                    Path = "signature-pad",
+                    Description = "Demonstration and configuration of the Radzen Blazor SignaturePad component.",
+                    Icon = "\ue22b",
+                    Tags = new [] { "signature", "sign", "draw", "pen", "touch", "form", "input" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Chip Style", Anchor = "#chip-style" }, new () { Text = "Variant", Anchor = "#variant" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Icons", Anchor = "#icons" }, new () { Text = "Selected", Anchor = "#selected" }, new () { Text = "Disabled", Anchor = "#disabled" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Add / Remove", Anchor = "#add-remove" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Chip",
                     Path = "chip",

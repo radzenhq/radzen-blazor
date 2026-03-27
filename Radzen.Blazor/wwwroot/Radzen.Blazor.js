@@ -4152,7 +4152,6 @@ Radzen.chatScrollToBottom = function(container) {
   if (!container) return;
   container.scrollTop = container.scrollHeight;
 };
-
 Radzen.noop = function() {};
 Radzen.getCookies = function() {
   return document.cookie;
@@ -4828,4 +4827,137 @@ Radzen.createFormField = function(el) {
     el.removeEventListener('focusin', onFocusIn);
     el.removeEventListener('focusout', onFocusOut);
   }};
+};
+Radzen.createSignaturePad = function(element, ref, strokeColor, strokeWidth, disabled, initialValue) {
+  if (!element) return null;
+
+  var canvas = element.querySelector('canvas');
+  if (!canvas) return null;
+
+  var ctx = canvas.getContext('2d');
+  var drawing = false;
+  var paths = [];
+  var currentPath = [];
+
+  function syncSize() {
+    var rect = canvas.getBoundingClientRect();
+    var w = Math.round(rect.width);
+    var h = Math.round(rect.height);
+    if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
+      canvas.width = w;
+      canvas.height = h;
+      redraw();
+    }
+  }
+
+  function getPointerPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
+    };
+  }
+
+  function redraw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = strokeWidth;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (var i = 0; i < paths.length; i++) {
+      var path = paths[i];
+      if (path.length < 2) continue;
+      ctx.beginPath();
+      ctx.moveTo(path[0].x, path[0].y);
+      for (var j = 1; j < path.length; j++) {
+        ctx.lineTo(path[j].x, path[j].y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  function loadImage(dataUrl) {
+    if (!dataUrl) return;
+    var img = new Image();
+    img.onload = function() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = dataUrl;
+  }
+
+  syncSize();
+
+  if (initialValue) {
+    loadImage(initialValue);
+  }
+
+  var resizeObserver = new ResizeObserver(function() { syncSize(); });
+  resizeObserver.observe(canvas);
+
+  function onPointerDown(e) {
+    if (disabled) return;
+    drawing = true;
+    currentPath = [getPointerPos(e)];
+    canvas.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!drawing || disabled) return;
+    var pos = getPointerPos(e);
+    currentPath.push(pos);
+
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = strokeWidth;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (currentPath.length >= 2) {
+      ctx.beginPath();
+      ctx.moveTo(currentPath[currentPath.length - 2].x, currentPath[currentPath.length - 2].y);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+    e.preventDefault();
+  }
+
+  function onPointerUp(e) {
+    if (!drawing || disabled) return;
+    drawing = false;
+    if (currentPath.length > 0) {
+      paths.push(currentPath);
+      currentPath = [];
+    }
+    try { suppressDisposed(ref.invokeMethodAsync('RadzenSignaturePad.OnStrokeEnd', canvas.toDataURL('image/png'))); } catch (ex) { }
+    e.preventDefault();
+  }
+
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointercancel', onPointerUp);
+  canvas.style.touchAction = 'none';
+
+  return {
+    update: function(newStrokeColor, newStrokeWidth, newDisabled) {
+      strokeColor = newStrokeColor;
+      strokeWidth = newStrokeWidth;
+      disabled = newDisabled;
+      redraw();
+    },
+    clear: function() {
+      paths = [];
+      currentPath = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    dispose: function() {
+      resizeObserver.disconnect();
+      canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerUp);
+    }
+  };
 };

@@ -1103,6 +1103,15 @@
   --rz-security-code-input-font-weight: #{$rz-security-code-input-font-weight};
   --rz-security-code-input-line-height: #{$rz-security-code-input-line-height};
 
+  /* SignaturePad */
+  --rz-signature-pad-border: #{$rz-signature-pad-border};
+  --rz-signature-pad-border-radius: #{$rz-signature-pad-border-radius};
+  --rz-signature-pad-background-color: #{$rz-signature-pad-background-color};
+  --rz-signature-pad-placeholder-color: #{$rz-signature-pad-placeholder-color};
+  --rz-signature-pad-clear-color: #{$rz-signature-pad-clear-color};
+  --rz-signature-pad-clear-hover-color: #{$rz-signature-pad-clear-hover-color};
+
+
   /* SelectBar */
   --rz-selectbar-background-color: #{$selectbar-background-color};
   --rz-selectbar-color: #{$selectbar-color};
