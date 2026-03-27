@@ -378,6 +378,11 @@ class InlineParser
                 continue;
             }
 
+            if (TryParseEmoji(text, index, out index))
+            {
+                continue;
+            }
+
             buffer.Append(text[index]);
 
             index++;
@@ -508,6 +513,48 @@ class InlineParser
         }
 
         return false;
+    }
+
+    private bool TryParseEmoji(string text, int index, out int newIndex)
+    {
+        newIndex = index;
+
+        if (text[index] is not Colon)
+        {
+            return false;
+        }
+
+        var position = index + 1;
+
+        if (position >= text.Length || !(char.IsLetterOrDigit(text[position]) || text[position] is '+' or '-'))
+        {
+            return false;
+        }
+
+        while (position < text.Length && (char.IsLetterOrDigit(text[position]) || text[position] is '_' or '+' or '-'))
+        {
+            position++;
+        }
+
+        if (position >= text.Length || text[position] is not Colon)
+        {
+            return false;
+        }
+
+        var shortcode = text[(index + 1)..position];
+
+        if (!EmojiMapping.Emojis.TryGetValue(shortcode, out var emoji))
+        {
+            return false;
+        }
+
+        AddTextNode();
+
+        inlines.Add(new Text(emoji));
+
+        newIndex = position + 1;
+
+        return true;
     }
 
     internal static bool TryParseDestinationAndTitle(string text, int position, out string destination, out string title, out int newPosition)
