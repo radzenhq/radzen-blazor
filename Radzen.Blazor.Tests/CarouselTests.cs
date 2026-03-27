@@ -10,6 +10,7 @@ namespace Radzen.Blazor.Tests
         public void Carousel_Renders_WithClassName()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenCarousel>();
 
             Assert.Contains(@"rz-carousel", component.Markup);
@@ -61,6 +62,7 @@ namespace Radzen.Blazor.Tests
         public void Carousel_Renders_AllowNavigation_True()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.AllowNavigation, true);
@@ -74,6 +76,7 @@ namespace Radzen.Blazor.Tests
         public void Carousel_Renders_AllowNavigation_False()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.AllowNavigation, false);
@@ -149,6 +152,7 @@ namespace Radzen.Blazor.Tests
         public void Carousel_Renders_PagerOverlay_True()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.PagerOverlay, true);
@@ -161,6 +165,7 @@ namespace Radzen.Blazor.Tests
         public void Carousel_Renders_PagerOverlay_False()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
             {
                 parameters.Add(p => p.PagerOverlay, false);

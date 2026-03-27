@@ -328,6 +328,31 @@ namespace Radzen.Blazor
 
         System.Threading.Timer? timer;
 
+        ElementReference itemsElement;
+        IJSObjectReference? scrollDisposable;
+
+        /// <summary>
+        /// Called from JavaScript when the user scrolls the carousel items container.
+        /// </summary>
+        /// <param name="index">The index of the currently visible item.</param>
+        [JSInvokable("RadzenCarousel.OnScroll")]
+        public async Task OnScroll(int index)
+        {
+            if (index >= 0 && index <= items.Count - 1 && selectedIndex != index)
+            {
+                selectedIndex = index;
+                await SelectedIndexChanged.InvokeAsync(selectedIndex);
+                await Change.InvokeAsync(selectedIndex);
+
+                if (Auto)
+                {
+                    await Reset();
+                }
+
+                StateHasChanged();
+            }
+        }
+
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -338,6 +363,12 @@ namespace Radzen.Blazor
                 var ts = TimeSpan.FromMilliseconds(Interval + (AnimationDuration ?? 0));
                 timer = new System.Threading.Timer(state => InvokeAsync(Next),
                     null, Auto ? ts : Timeout.InfiniteTimeSpan, ts);
+
+                if (JSRuntime != null)
+                {
+                    scrollDisposable = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createCarousel", itemsElement, Reference);
+                }
             }
         }
 
@@ -350,6 +381,13 @@ namespace Radzen.Blazor
             {
                 timer.Dispose();
                 timer = null;
+            }
+
+            if (scrollDisposable != null)
+            {
+                try { scrollDisposable.InvokeVoidAsync("dispose"); } catch { }
+                try { scrollDisposable.DisposeAsync(); } catch { }
+                scrollDisposable = null;
             }
 
             GC.SuppressFinalize(this);

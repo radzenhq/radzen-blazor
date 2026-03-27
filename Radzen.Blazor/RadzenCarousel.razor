@@ -22,9 +22,9 @@
         <RadzenButton class="rz-carousel-next" Icon="@NextIcon" Text="@NextText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
             Click=@Next/>
         }
-        <ul class="rz-carousel-items" 
+        <ul @ref="itemsElement" class="rz-carousel-items"
                  @ontouchstart="OnTouchStart"
-                 @ontouchend="OnTouchEnd" 
+                 @ontouchend="OnTouchEnd"
                  @ontouchcancel="OnTouchCancel">
             @Items
         </ul>

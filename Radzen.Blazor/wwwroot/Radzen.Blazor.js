@@ -1101,6 +1101,24 @@ window.Radzen = {
     }
     requestAnimationFrame(step);
   },
+  createCarousel: function (container, ref) {
+    var scrollTimeout = null;
+    function handler() {
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(function () {
+            var children = container.children;
+            if (!children.length) return;
+            var itemWidth = children[0].offsetWidth;
+            if (itemWidth === 0) return;
+            var index = Math.round(container.scrollLeft / itemWidth);
+            if (index < 0) index = 0;
+            if (index >= children.length) index = children.length - 1;
+            try { ref.invokeMethodAsync('RadzenCarousel.OnScroll', index); } catch { }
+        }, 100);
+    }
+    container.addEventListener('scroll', handler, { passive: true });
+    return { dispose: function () { container.removeEventListener('scroll', handler); } };
+  },
   scrollIntoViewIfNeeded: function (ref, selector) {
     var el = selector ? ref.getElementsByClassName(selector)[0] : ref;
     if (el && el.scrollIntoViewIfNeeded) {
