@@ -6,8 +6,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command that deletes a contiguous range of columns and supports undo via snapshot.
 /// </summary>
-public class DeleteColumnsCommand : SheetSnapshotCommandBase
+public class DeleteColumnsCommand : SheetSnapshotCommandBase, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.DeleteColumns;
+
     private readonly int startColumnIndex;
     private readonly int endColumnIndex;
 

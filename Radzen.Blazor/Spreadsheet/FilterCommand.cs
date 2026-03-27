@@ -4,8 +4,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents a command to add a filter to a sheet, supporting undo and redo operations.
 /// </summary>
-public class FilterCommand(Worksheet sheet, SheetFilter filter) : ICommand
+public class FilterCommand(Worksheet sheet, SheetFilter filter) : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.AutoFilter;
+
     private readonly Worksheet sheet = sheet;
     private readonly SheetFilter filter = filter;
 

@@ -6,8 +6,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command to set or remove a hyperlink on a cell.
 /// </summary>
-public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyperlink) : ICommand
+public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyperlink) : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.InsertHyperlinks;
+
     private readonly Worksheet sheet = sheet;
     private readonly CellRef address = address;
     private readonly Hyperlink? hyperlink = hyperlink;
