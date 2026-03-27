@@ -135,7 +135,15 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private Editor? Editor => ActiveView?.Editor;
 
     /// <inheritdoc/>
-    public bool Execute(ICommand command) => ActiveView?.Commands.Execute(command) ?? false;
+    public bool Execute(ICommand command)
+    {
+        if (command is Spreadsheet.IProtectedCommand pc && Worksheet?.Protection.IsActionBlocked(pc.RequiredAction) == true)
+        {
+            return false;
+        }
+
+        return ActiveView?.Commands.Execute(command) ?? false;
+    }
 
     /// <inheritdoc/>
     public void Undo() => ActiveView?.Commands.Undo();
@@ -177,7 +185,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         await AcceptAsync();
 
-        if (workbook is null)
+        if (workbook is null || workbook.Protection.LockStructure)
         {
             return;
         }
@@ -215,7 +223,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         await AcceptAsync();
 
-        if (workbook is null || workbook.Sheets.Count <= 1)
+        if (workbook is null || workbook.Sheets.Count <= 1 || workbook.Protection.LockStructure)
         {
             return;
         }
@@ -236,6 +244,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnRenameSheetAsync(Worksheet sheet)
     {
+        if (workbook?.Protection.LockStructure == true)
+        {
+            return;
+        }
+
         var existingNames = workbook!.Sheets
             .Where(s => s != sheet)
             .Select(s => s.Name)
@@ -253,7 +266,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void OnMoveSheetLeft(Worksheet sheet)
     {
-        if (workbook is null)
+        if (workbook is null || workbook.Protection.LockStructure)
         {
             return;
         }
@@ -277,7 +290,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void OnMoveSheetRight(Worksheet sheet)
     {
-        if (workbook is null)
+        if (workbook is null || workbook.Protection.LockStructure)
         {
             return;
         }
@@ -735,7 +748,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnPasteAsync(string text)
     {
-        if (Worksheet is not null)
+        if (Worksheet is not null && Worksheet.IsCellEditable(Worksheet.Selection.Cell))
         {
             clipboard.Paste(Worksheet, Worksheet.Selection.Cell, text);
         }
@@ -960,7 +973,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task PasteFromClipboardAsync()
     {
-        if (Worksheet is null)
+        if (Worksheet is null || !Worksheet.IsCellEditable(Worksheet.Selection.Cell))
         {
             return;
         }

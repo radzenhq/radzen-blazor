@@ -5,8 +5,11 @@ using System.Collections.Generic;
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
-class ClearContentsCommand(Worksheet sheet, RangeRef range) : ICommand
+class ClearContentsCommand(Worksheet sheet, RangeRef range) : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.EditCell;
+
     private readonly Dictionary<CellRef, (object? value, string? formula)> snapshot = [];
 
     public bool Execute()

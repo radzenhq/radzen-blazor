@@ -21,8 +21,11 @@ enum AutofillDirection
 /// Command that fills a target range by repeating a source range pattern.
 /// Supports numeric series, date series, formula adjustment, and plain copy.
 /// </summary>
-class AutofillCommand : ICommand
+class AutofillCommand : ICommand, IProtectedCommand
 {
+    /// <inheritdoc/>
+    public SheetAction RequiredAction => SheetAction.EditCell;
+
     /// <summary>
     /// Computes the autofill target range from the source selection and the cell the user dragged to.
     /// Constrains to the dominant axis (vertical or horizontal).

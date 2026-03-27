@@ -103,6 +103,11 @@ public class Editor(Worksheet sheet)
     /// <param name="mode"></param>
     public void StartEdit(CellRef address, string? value, EditMode mode = EditMode.Cell)
     {
+        if (!sheet.IsCellEditable(address))
+        {
+            return;
+        }
+
         Address = address;
 
         Mode = mode;
