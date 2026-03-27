@@ -5,8 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
-using Radzen.Blazor;
-
 namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
@@ -318,10 +316,10 @@ class XlsxWriter(Workbook sourceWorkbook)
         {
             var legendPos = chart.LegendPosition switch
             {
-                LegendPosition.Top => "t",
-                LegendPosition.Bottom => "b",
-                LegendPosition.Left => "l",
-                LegendPosition.Right => "r",
+                ChartLegendPosition.Top => "t",
+                ChartLegendPosition.Bottom => "b",
+                ChartLegendPosition.Left => "l",
+                ChartLegendPosition.Right => "r",
                 _ => "r"
             };
 
