@@ -1,0 +1,69 @@
+$rz-signature-pad-border: var(--rz-input-border) !default;
+$rz-signature-pad-border-radius: var(--rz-input-border-radius) !default;
+$rz-signature-pad-background-color: var(--rz-base-background-color) !default;
+$rz-signature-pad-placeholder-color: var(--rz-text-disabled-color) !default;
+$rz-signature-pad-clear-color: var(--rz-text-secondary-color) !default;
+$rz-signature-pad-clear-hover-color: var(--rz-text-color) !default;
+
+.rz-signature-pad {
+  box-sizing: border-box;
+  display: inline-flex;
+  position: relative;
+  border: var(--rz-signature-pad-border);
+  border-radius: var(--rz-signature-pad-border-radius);
+  background-color: var(--rz-signature-pad-background-color);
+  overflow: hidden;
+
+  &:focus-within {
+    outline: var(--rz-input-focus-shadow);
+  }
+
+  &.rz-state-disabled {
+    opacity: var(--rz-input-disabled-opacity, 0.6);
+    pointer-events: none;
+  }
+
+  &.rz-state-readonly {
+    pointer-events: none;
+  }
+}
+
+.rz-signature-pad-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+
+  .rz-state-disabled &,
+  .rz-state-readonly & {
+    cursor: default;
+  }
+}
+
+.rz-signature-pad-clear {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--rz-signature-pad-clear-color);
+  line-height: 1;
+  border-radius: var(--rz-border-radius);
+
+  &:hover {
+    color: var(--rz-signature-pad-clear-hover-color);
+  }
+}
+
+.rz-signature-pad-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--rz-signature-pad-placeholder-color);
+  pointer-events: none;
+  user-select: none;
+  font-style: italic;
+}
