@@ -271,6 +271,13 @@ namespace Radzen.Blazor
         public bool AllowNavigation { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the user can scroll or swipe through carousel items. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if scrolling/swiping is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowScroll { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the buttons style
         /// </summary>
         /// <value>The buttons style.</value>
@@ -338,6 +345,8 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenCarousel.OnScroll")]
         public async Task OnScroll(int index)
         {
+            if (!AllowScroll) return;
+
             if (index >= 0 && index <= items.Count - 1 && selectedIndex != index)
             {
                 selectedIndex = index;
@@ -398,6 +407,8 @@ namespace Radzen.Blazor
 
         void OnTouchStart(TouchEventArgs args)
         {
+            if (!AllowScroll) return;
+
             x = args.Touches[0].ClientX;
             y = args.Touches[0].ClientY;
         }

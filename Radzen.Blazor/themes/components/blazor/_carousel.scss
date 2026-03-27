@@ -77,6 +77,12 @@ $rz-carousel-border-radius: var(--rz-card-border-radius) !default;
     }
 }
 
+.rz-carousel-no-scroll {
+    overflow-x: hidden;
+    touch-action: none;
+    scroll-snap-type: none;
+}
+
 .rz-carousel-item {
     margin: 0;
     padding: 0;
