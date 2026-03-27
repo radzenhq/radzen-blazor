@@ -107,10 +107,9 @@ namespace Radzen.Blazor.Tests
 
             var markup = component.Markup;
 
-            // Top-level item should still have keyboard_arrow_down
-            Assert.Contains("keyboard_arrow_down", markup);
-            // Nested item with children should have keyboard_arrow_right
+            // All flyout items with children should have keyboard_arrow_right
             Assert.Contains("keyboard_arrow_right", markup);
+            Assert.DoesNotContain("keyboard_arrow_down", markup);
         }
 
         [Fact]
