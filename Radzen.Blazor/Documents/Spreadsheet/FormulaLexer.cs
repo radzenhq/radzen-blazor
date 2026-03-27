@@ -323,6 +323,9 @@ internal class FormulaLexer(string expression, bool strict = true)
             case '$':
                 // Absolute reference marker is part of identifiers like $A$1
                 return ScanIdentifier();
+            case '\'':
+                // Quoted sheet name reference like 'Q1 Sales'!A1
+                return ScanQuotedSheetReference();
 
         }
 
@@ -829,6 +832,66 @@ internal class FormulaLexer(string expression, bool strict = true)
                     throw new InvalidOperationException($"Unexpected character '{Peek()}' at position {position}.");
             }
         }
+    }
+
+    private FormulaToken ScanQuotedSheetReference()
+    {
+        var startOffset = position;
+
+        // Skip opening quote
+        Advance(1);
+
+        // Read until closing quote
+        var sheetNameStart = position;
+        while (position < expression.Length && Peek() != '\'')
+        {
+            Advance(1);
+        }
+
+        var sheetName = expression[sheetNameStart..position];
+
+        // Skip closing quote
+        if (position < expression.Length && Peek() == '\'')
+        {
+            Advance(1);
+        }
+
+        // Expect '!' after closing quote
+        if (position < expression.Length && Peek() == '!')
+        {
+            Advance(1);
+
+            // Now scan the cell reference part (e.g. A1, $B$2)
+            var cellRefStart = position;
+            while (position < expression.Length)
+            {
+                var ch = Peek();
+                if (ch is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z') or (>= '0' and <= '9') or '$')
+                {
+                    Advance(1);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            var cellRefText = expression[cellRefStart..position];
+
+            if (CellRef.TryParse(cellRefText, out var cellRef))
+            {
+                var fullValue = expression[startOffset..position];
+                cellRef = cellRef with { Worksheet = sheetName };
+
+                return new FormulaToken(FormulaTokenType.CellIdentifier, fullValue)
+                {
+                    Address = cellRef
+                };
+            }
+        }
+
+        // Fallback: return as unknown token
+        return new FormulaToken(FormulaTokenType.Unknown, expression[startOffset..position]);
     }
 
     private static FormulaToken CreateIdentifierToken(string value, bool hasLetters, bool hasNumbers)
