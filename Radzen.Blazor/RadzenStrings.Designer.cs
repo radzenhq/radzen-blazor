@@ -221,6 +221,8 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_SeriesColor { get { return ResourceManager.GetString("Spreadsheet_SeriesColor", resourceCulture); } }
         public static string Spreadsheet_CategoryRange { get { return ResourceManager.GetString("Spreadsheet_CategoryRange", resourceCulture); } }
         public static string Spreadsheet_ValueRange { get { return ResourceManager.GetString("Spreadsheet_ValueRange", resourceCulture); } }
+        public static string Spreadsheet_SeriesTitle { get { return ResourceManager.GetString("Spreadsheet_SeriesTitle", resourceCulture); } }
+        public static string Spreadsheet_AddSeries { get { return ResourceManager.GetString("Spreadsheet_AddSeries", resourceCulture); } }
         public static string Spreadsheet_InsertHyperlink { get { return ResourceManager.GetString("Spreadsheet_InsertHyperlink", resourceCulture); } }
         public static string Spreadsheet_InsertImage { get { return ResourceManager.GetString("Spreadsheet_InsertImage", resourceCulture); } }
         public static string Spreadsheet_InsertChart { get { return ResourceManager.GetString("Spreadsheet_InsertChart", resourceCulture); } }
