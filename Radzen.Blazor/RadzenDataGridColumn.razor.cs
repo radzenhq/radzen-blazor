@@ -1375,9 +1375,9 @@ namespace Radzen.Blazor
         {
             var fo = GetFilterOperator() == FilterOperator.Custom
                 ? FilterOperator.Custom
-                : typeof(System.Collections.IEnumerable).IsAssignableFrom(FilterPropertyType)
+                : QueryableExtension.IsEnumerable(FilterPropertyType)
                     ? !string.IsNullOrEmpty(FilterProperty) && FilterProperty != Property ? FilterOperator.In : FilterOperator.Contains
-                    : default(FilterOperator);
+                    : FilterPropertyType == typeof(string) ? FilterOperator.Contains : default(FilterOperator);
 
             if (FilterOperators?.Contains(fo) == true || FilterOperators == null)
             {
