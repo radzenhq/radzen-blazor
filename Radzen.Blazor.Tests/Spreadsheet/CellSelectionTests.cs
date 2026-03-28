@@ -247,12 +247,13 @@ public class CellSelectionTests : TestContext
     }
 }
 
+#nullable enable
 public class MockVirtualGridContext : IVirtualGridContext
 {
     private readonly Dictionary<(int Row, int Column), PixelRectangle> rectangle = [];
-    private SheetView view;
+    private SheetView? view;
 
-    public MockVirtualGridContext(Worksheet sheet = null)
+    public MockVirtualGridContext(Worksheet? sheet = null)
     {
         if (sheet != null)
         {
