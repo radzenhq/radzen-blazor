@@ -171,11 +171,12 @@ public class ImageOverlayTests : TestContext
     }
 }
 
+#nullable enable
 public class ImageMockContext : IVirtualGridContext
 {
-    private SheetView view;
+    private SheetView? view;
 
-    public ImageMockContext(Worksheet sheet = null)
+    public ImageMockContext(Worksheet? sheet = null)
     {
         if (sheet != null)
         {
