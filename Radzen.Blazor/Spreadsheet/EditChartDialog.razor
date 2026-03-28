@@ -18,26 +18,31 @@
         <RadzenDropDown @bind-Value=@legendPosition Data=@legendPositions TextProperty="Text" ValueProperty="Value"
             Disabled=@(!showLegend) Style="width: 100%" />
     </RadzenFormField>
-    @if (seriesEntries.Count > 0)
-    {
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
         <RadzenText TextStyle="TextStyle.Subtitle1" Text=@L(nameof(RadzenStrings.Spreadsheet_Series)) />
-        @foreach (var entry in seriesEntries)
-        {
-            <RadzenFieldset Text=@(entry.Title ?? $"Series {entry.Index + 1}")>
-                <RadzenStack Gap="0.5rem">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_SeriesColor)) Style="min-width: 100px" />
-                        <RadzenColorPicker @bind-Value=@entry.Color ShowHSV=false ShowRGBA=false ShowButton=false />
-                    </RadzenStack>
-                    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange))>
-                        <RadzenTextBox @bind-Value=@entry.CategoryFormula Style="width: 100%" />
+        <RadzenButton Icon="add" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click=@OnAddSeries
+            title=@L(nameof(RadzenStrings.Spreadsheet_AddSeries)) />
+    </RadzenStack>
+    @foreach (var entry in seriesEntries)
+    {
+        <RadzenFieldset Text=@(entry.Title ?? $"Series {entry.Index + 1}")>
+            <RadzenStack Gap="0.5rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_SeriesTitle)) Style="flex: 1">
+                        <RadzenTextBox @bind-Value=@entry.Title Style="width: 100%" />
                     </RadzenFormField>
-                    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange))>
-                        <RadzenTextBox @bind-Value=@entry.ValueFormula Style="width: 100%" />
-                    </RadzenFormField>
+                    <RadzenColorPicker @bind-Value=@entry.Color ShowHSV=false ShowRGBA=false ShowButton=false />
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Size="ButtonSize.Small"
+                        Click=@(() => OnRemoveSeries(entry)) Disabled=@(seriesEntries.Count <= 1) />
                 </RadzenStack>
-            </RadzenFieldset>
-        }
+                <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange))>
+                    <RadzenTextBox @bind-Value=@entry.CategoryFormula Style="width: 100%" />
+                </RadzenFormField>
+                <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange))>
+                    <RadzenTextBox @bind-Value=@entry.ValueFormula Style="width: 100%" />
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenFieldset>
     }
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Style="padding: 1rem; border-top: 1px solid var(--rz-border-color)">
@@ -121,12 +126,30 @@
         }
     }
 
+    private void OnAddSeries()
+    {
+        seriesEntries.Add(new SeriesEntry
+        {
+            Index = seriesEntries.Count,
+            Title = $"Series {seriesEntries.Count + 1}"
+        });
+    }
+
+    private void OnRemoveSeries(SeriesEntry entry)
+    {
+        seriesEntries.Remove(entry);
+        for (int i = 0; i < seriesEntries.Count; i++)
+        {
+            seriesEntries[i].Index = i;
+        }
+    }
+
     private void OnOk()
     {
         var states = new List<EditChartSeriesState>();
         foreach (var entry in seriesEntries)
         {
-            states.Add(new EditChartSeriesState(entry.Color, entry.CategoryFormula, entry.ValueFormula));
+            states.Add(new EditChartSeriesState(entry.Title, entry.Color, entry.CategoryFormula, entry.ValueFormula));
         }
 
         DialogService.Close(new EditChartState(chartType, title, showLegend, legendPosition, states));
