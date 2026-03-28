@@ -19,7 +19,8 @@ public class DeleteColumnsCommand : SheetSnapshotCommandBase, IProtectedCommand
     /// </summary>
     public DeleteColumnsCommand(Worksheet sheet, int startColumnIndex, int endColumnIndex) : base(sheet)
     {
-        if (startColumnIndex < 0 || endColumnIndex < startColumnIndex || endColumnIndex >= sheet.ColumnCount)
+        if (startColumnIndex < 0 || endColumnIndex < startColumnIndex || endColumnIndex >= sheet.ColumnCount
+            || endColumnIndex - startColumnIndex + 1 >= sheet.ColumnCount)
         {
             throw new ArgumentOutOfRangeException(nameof(startColumnIndex));
         }
