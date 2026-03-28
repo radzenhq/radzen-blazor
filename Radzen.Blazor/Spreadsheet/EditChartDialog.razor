@@ -2,7 +2,8 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
-<RadzenStack Gap="1rem" Style="padding: 1rem">
+<RadzenStack Gap="0" Style="max-height: 70vh; display: flex; flex-direction: column">
+<RadzenStack Gap="1rem" Style="padding: 1rem; overflow-y: auto; flex: 1">
     <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ChartType))>
         <RadzenDropDown @bind-Value=@chartType Data=@chartTypes TextProperty="Text" ValueProperty="Value" Style="width: 100%" />
     </RadzenFormField>
@@ -38,7 +39,8 @@
             </RadzenFieldset>
         }
     }
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Style="padding: 1rem; border-top: 1px solid var(--rz-border-color)">
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
     </RadzenStack>
