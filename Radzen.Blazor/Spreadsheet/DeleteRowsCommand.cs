@@ -19,7 +19,8 @@ public class DeleteRowsCommand : SheetSnapshotCommandBase, IProtectedCommand
     /// </summary>
     public DeleteRowsCommand(Worksheet sheet, int startRowIndex, int endRowIndex) : base(sheet)
     {
-        if (startRowIndex < 0 || endRowIndex < startRowIndex || endRowIndex >= sheet.RowCount)
+        if (startRowIndex < 0 || endRowIndex < startRowIndex || endRowIndex >= sheet.RowCount
+            || endRowIndex - startRowIndex + 1 >= sheet.RowCount)
         {
             throw new ArgumentOutOfRangeException(nameof(startRowIndex));
         }
