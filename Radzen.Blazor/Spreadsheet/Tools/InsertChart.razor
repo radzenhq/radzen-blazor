@@ -1,5 +1,6 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetToolBase
 
 <RadzenSplitButton ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
     Disabled=@IsDisabled Click=@OnClick
@@ -16,16 +17,6 @@
 </RadzenSplitButton>
 
 @code {
-#nullable enable
-
-    [Parameter]
-    public Worksheet? Worksheet { get; set; }
-
-    [CascadingParameter]
-    public ISpreadsheet? Spreadsheet { get; set; }
-
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
-
     private void OnClick(RadzenSplitButtonItem? item)
     {
         var chartType = item?.Value switch
