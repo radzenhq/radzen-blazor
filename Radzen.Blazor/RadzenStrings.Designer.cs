@@ -210,5 +210,8 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_DisplayText { get { return ResourceManager.GetString("Spreadsheet_DisplayText", resourceCulture); } }
         public static string Spreadsheet_IncreaseDecimalPlaces { get { return ResourceManager.GetString("Spreadsheet_IncreaseDecimalPlaces", resourceCulture); } }
         public static string Spreadsheet_DecreaseDecimalPlaces { get { return ResourceManager.GetString("Spreadsheet_DecreaseDecimalPlaces", resourceCulture); } }
+        public static string Spreadsheet_InsertHyperlink { get { return ResourceManager.GetString("Spreadsheet_InsertHyperlink", resourceCulture); } }
+        public static string Spreadsheet_InsertImage { get { return ResourceManager.GetString("Spreadsheet_InsertImage", resourceCulture); } }
+        public static string Spreadsheet_InsertChart { get { return ResourceManager.GetString("Spreadsheet_InsertChart", resourceCulture); } }
     }
 }
