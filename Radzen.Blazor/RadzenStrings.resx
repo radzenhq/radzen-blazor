@@ -553,6 +553,12 @@
   <data name="Spreadsheet_ValueRange" xml:space="preserve">
     <value>Value Range</value>
   </data>
+  <data name="Spreadsheet_SeriesTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Spreadsheet_AddSeries" xml:space="preserve">
+    <value>Add Series</value>
+  </data>
   <!-- Spreadsheet: Insert tab tooltips -->
   <data name="Spreadsheet_InsertHyperlink" xml:space="preserve">
     <value>Insert Hyperlink</value>
