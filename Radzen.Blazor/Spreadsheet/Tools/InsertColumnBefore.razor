@@ -1,18 +1,8 @@
-@using Radzen
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetToolBase
 <RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnInsertColumnBeforeClick Icon="add_column_left" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
 @code {
-#nullable enable
-
-    [Parameter]
-    public Worksheet? Worksheet { get; set; }
-
-    [CascadingParameter]
-    public ISpreadsheet? Spreadsheet { get; set; }
-
-    private bool IsDisabled => Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid;
-
     private void OnInsertColumnBeforeClick()
     {
         if (Worksheet is null)
@@ -22,5 +12,3 @@
         Spreadsheet?.Execute(new InsertColumnBeforeCommand(Worksheet, Worksheet.Selection.Range.Start.Column));
     }
 }
-
-
