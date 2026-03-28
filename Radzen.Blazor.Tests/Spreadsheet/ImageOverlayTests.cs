@@ -160,7 +160,7 @@ public class ImageOverlayTests : TestContext
     {
         return new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = row, Column = column },
             Width = 1000000,
             Height = 1000000,

@@ -26,7 +26,7 @@ public class DeleteSelectedTests
 
         var image = new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 0, Column = 0 },
             Width = 100,
             Height = 100,

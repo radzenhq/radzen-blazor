@@ -177,7 +177,7 @@ public class ImageTests
     public void ResizeImageCommand_OneCellAnchor_Execute_UpdatesSize()
     {
         var image = CreateTestImage();
-        image.AnchorMode = ImageAnchorMode.OneCellAnchor;
+        image.AnchorMode = DrawingAnchorMode.OneCellAnchor;
         image.Width = 1000;
         image.Height = 2000;
         var command = new ResizeImageCommand(image, 3000, 4000);
@@ -192,7 +192,7 @@ public class ImageTests
     public void ResizeImageCommand_OneCellAnchor_Unexecute_RestoresSize()
     {
         var image = CreateTestImage();
-        image.AnchorMode = ImageAnchorMode.OneCellAnchor;
+        image.AnchorMode = DrawingAnchorMode.OneCellAnchor;
         image.Width = 1000;
         image.Height = 2000;
         var command = new ResizeImageCommand(image, 3000, 4000);
@@ -244,7 +244,7 @@ public class ImageTests
 
         var image = new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 2, Column = 3, RowOffset = 12345, ColumnOffset = 67890 },
             Width = 2000000,
             Height = 1500000,
@@ -259,7 +259,7 @@ public class ImageTests
 
         Assert.Single(reimportedSheet.Images);
         var reimportedImage = reimportedSheet.Images[0];
-        Assert.Equal(ImageAnchorMode.OneCellAnchor, reimportedImage.AnchorMode);
+        Assert.Equal(DrawingAnchorMode.OneCellAnchor, reimportedImage.AnchorMode);
         Assert.Equal(2, reimportedImage.From.Row);
         Assert.Equal(3, reimportedImage.From.Column);
         Assert.Equal(12345, reimportedImage.From.RowOffset);
@@ -279,7 +279,7 @@ public class ImageTests
 
         var image = new SheetImage
         {
-            AnchorMode = ImageAnchorMode.TwoCellAnchor,
+            AnchorMode = DrawingAnchorMode.TwoCellAnchor,
             From = new CellAnchor { Row = 1, Column = 2, RowOffset = 100, ColumnOffset = 200 },
             To = new CellAnchor { Row = 5, Column = 6, RowOffset = 300, ColumnOffset = 400 },
             Data = PngBytes,
@@ -291,7 +291,7 @@ public class ImageTests
         var reimported = ExportAndReimport(workbook);
         var reimportedImage = reimported.Sheets[0].Images[0];
 
-        Assert.Equal(ImageAnchorMode.TwoCellAnchor, reimportedImage.AnchorMode);
+        Assert.Equal(DrawingAnchorMode.TwoCellAnchor, reimportedImage.AnchorMode);
         Assert.Equal(1, reimportedImage.From.Row);
         Assert.Equal(2, reimportedImage.From.Column);
         Assert.Equal(100, reimportedImage.From.RowOffset);
@@ -314,7 +314,7 @@ public class ImageTests
         {
             sheet.AddImage(new SheetImage
             {
-                AnchorMode = ImageAnchorMode.OneCellAnchor,
+                AnchorMode = DrawingAnchorMode.OneCellAnchor,
                 From = new CellAnchor { Row = i, Column = i },
                 Width = 1000000,
                 Height = 1000000,
@@ -350,7 +350,7 @@ public class ImageTests
 
         sheet.AddImage(new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 0, Column = 0 },
             Width = 1000000,
             Height = 1000000,
@@ -373,7 +373,7 @@ public class ImageTests
         // Add two images with the same data
         sheet.AddImage(new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 0, Column = 0 },
             Width = 1000000,
             Height = 1000000,
@@ -384,7 +384,7 @@ public class ImageTests
 
         sheet.AddImage(new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 5, Column = 5 },
             Width = 1000000,
             Height = 1000000,
@@ -412,7 +412,7 @@ public class ImageTests
 
         sheet.AddImage(new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 0, Column = 0 },
             Width = 1000000,
             Height = 1000000,
@@ -434,7 +434,7 @@ public class ImageTests
 
         sheet.AddImage(new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 0, Column = 0 },
             Width = 1000000,
             Height = 1000000,
@@ -456,7 +456,7 @@ public class ImageTests
 
         sheet.AddImage(new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 2, Column = 1 },
             Width = 2000000,
             Height = 1500000,
@@ -476,7 +476,7 @@ public class ImageTests
     {
         return new SheetImage
         {
-            AnchorMode = ImageAnchorMode.OneCellAnchor,
+            AnchorMode = DrawingAnchorMode.OneCellAnchor,
             From = new CellAnchor { Row = 0, Column = 0 },
             Width = 1000000,
             Height = 1000000,
@@ -490,7 +490,7 @@ public class ImageTests
     {
         return new SheetImage
         {
-            AnchorMode = ImageAnchorMode.TwoCellAnchor,
+            AnchorMode = DrawingAnchorMode.TwoCellAnchor,
             From = new CellAnchor { Row = 0, Column = 0, RowOffset = 10, ColumnOffset = 20 },
             To = new CellAnchor { Row = 5, Column = 5, RowOffset = 30, ColumnOffset = 40 },
             Data = PngBytes,
