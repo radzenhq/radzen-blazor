@@ -1,6 +1,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetToolBase
 
 <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button"
     Disabled=@IsDisabled Size="ButtonSize.Small">
@@ -9,16 +10,6 @@
 </RadzenButton>
 
 @code {
-#nullable enable
-
-    [Parameter]
-    public Worksheet? Worksheet { get; set; }
-
-    [CascadingParameter]
-    public ISpreadsheet? Spreadsheet { get; set; }
-
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
-
     private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
     {
         if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
