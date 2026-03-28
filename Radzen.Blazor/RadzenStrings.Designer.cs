@@ -210,6 +210,17 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_DisplayText { get { return ResourceManager.GetString("Spreadsheet_DisplayText", resourceCulture); } }
         public static string Spreadsheet_IncreaseDecimalPlaces { get { return ResourceManager.GetString("Spreadsheet_IncreaseDecimalPlaces", resourceCulture); } }
         public static string Spreadsheet_DecreaseDecimalPlaces { get { return ResourceManager.GetString("Spreadsheet_DecreaseDecimalPlaces", resourceCulture); } }
+        public static string Spreadsheet_EditChart { get { return ResourceManager.GetString("Spreadsheet_EditChart", resourceCulture); } }
+        public static string Spreadsheet_DeleteChart { get { return ResourceManager.GetString("Spreadsheet_DeleteChart", resourceCulture); } }
+        public static string Spreadsheet_EditChartTitle { get { return ResourceManager.GetString("Spreadsheet_EditChartTitle", resourceCulture); } }
+        public static string Spreadsheet_ChartType { get { return ResourceManager.GetString("Spreadsheet_ChartType", resourceCulture); } }
+        public static string Spreadsheet_ChartTitle { get { return ResourceManager.GetString("Spreadsheet_ChartTitle", resourceCulture); } }
+        public static string Spreadsheet_ShowLegend { get { return ResourceManager.GetString("Spreadsheet_ShowLegend", resourceCulture); } }
+        public static string Spreadsheet_LegendPosition { get { return ResourceManager.GetString("Spreadsheet_LegendPosition", resourceCulture); } }
+        public static string Spreadsheet_Series { get { return ResourceManager.GetString("Spreadsheet_Series", resourceCulture); } }
+        public static string Spreadsheet_SeriesColor { get { return ResourceManager.GetString("Spreadsheet_SeriesColor", resourceCulture); } }
+        public static string Spreadsheet_CategoryRange { get { return ResourceManager.GetString("Spreadsheet_CategoryRange", resourceCulture); } }
+        public static string Spreadsheet_ValueRange { get { return ResourceManager.GetString("Spreadsheet_ValueRange", resourceCulture); } }
         public static string Spreadsheet_InsertHyperlink { get { return ResourceManager.GetString("Spreadsheet_InsertHyperlink", resourceCulture); } }
         public static string Spreadsheet_InsertImage { get { return ResourceManager.GetString("Spreadsheet_InsertImage", resourceCulture); } }
         public static string Spreadsheet_InsertChart { get { return ResourceManager.GetString("Spreadsheet_InsertChart", resourceCulture); } }

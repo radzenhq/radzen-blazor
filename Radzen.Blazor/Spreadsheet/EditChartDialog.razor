@@ -1,0 +1,146 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="1rem" Style="padding: 1rem">
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ChartType))>
+        <RadzenDropDown @bind-Value=@chartType Data=@chartTypes TextProperty="Text" ValueProperty="Value" Style="width: 100%" />
+    </RadzenFormField>
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ChartTitle))>
+        <RadzenTextBox @bind-Value=@title Style="width: 100%" />
+    </RadzenFormField>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenCheckBox @bind-Value=@showLegend TValue="bool" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowLegend)) />
+    </RadzenStack>
+    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_LegendPosition))>
+        <RadzenDropDown @bind-Value=@legendPosition Data=@legendPositions TextProperty="Text" ValueProperty="Value"
+            Disabled=@(!showLegend) Style="width: 100%" />
+    </RadzenFormField>
+    @if (seriesEntries.Count > 0)
+    {
+        <RadzenText TextStyle="TextStyle.Subtitle1" Text=@L(nameof(RadzenStrings.Spreadsheet_Series)) />
+        @foreach (var entry in seriesEntries)
+        {
+            <RadzenFieldset Text=@(entry.Title ?? $"Series {entry.Index + 1}")>
+                <RadzenStack Gap="0.5rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_SeriesColor)) Style="min-width: 100px" />
+                        <RadzenColorPicker @bind-Value=@entry.Color ShowHSV=false ShowRGBA=false ShowButton=false />
+                    </RadzenStack>
+                    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange))>
+                        <RadzenTextBox @bind-Value=@entry.CategoryFormula Style="width: 100%" />
+                    </RadzenFormField>
+                    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange))>
+                        <RadzenTextBox @bind-Value=@entry.ValueFormula Style="width: 100%" />
+                    </RadzenFormField>
+                </RadzenStack>
+            </RadzenFieldset>
+        }
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public SpreadsheetChartType ChartType { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public bool ShowLegend { get; set; }
+
+    [Parameter]
+    public ChartLegendPosition LegendPosition { get; set; }
+
+    [Parameter]
+    public List<ChartSeriesDefinition> Series { get; set; } = [];
+
+    [Inject]
+    DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
+    private SpreadsheetChartType chartType;
+    private string? title;
+    private bool showLegend;
+    private ChartLegendPosition legendPosition;
+    private List<SeriesEntry> seriesEntries = [];
+
+    private static readonly List<object> chartTypes =
+    [
+        new { Text = "Column", Value = SpreadsheetChartType.Column },
+        new { Text = "Bar", Value = SpreadsheetChartType.Bar },
+        new { Text = "Stacked Column", Value = SpreadsheetChartType.StackedColumn },
+        new { Text = "Stacked Bar", Value = SpreadsheetChartType.StackedBar },
+        new { Text = "Line", Value = SpreadsheetChartType.Line },
+        new { Text = "Area", Value = SpreadsheetChartType.Area },
+        new { Text = "Stacked Area", Value = SpreadsheetChartType.StackedArea },
+        new { Text = "Pie", Value = SpreadsheetChartType.Pie },
+        new { Text = "Donut", Value = SpreadsheetChartType.Donut },
+        new { Text = "Scatter", Value = SpreadsheetChartType.Scatter },
+    ];
+
+    private static readonly List<object> legendPositions =
+    [
+        new { Text = "Right", Value = ChartLegendPosition.Right },
+        new { Text = "Left", Value = ChartLegendPosition.Left },
+        new { Text = "Top", Value = ChartLegendPosition.Top },
+        new { Text = "Bottom", Value = ChartLegendPosition.Bottom },
+    ];
+
+    protected override void OnInitialized()
+    {
+        chartType = ChartType;
+        title = Title;
+        showLegend = ShowLegend;
+        legendPosition = LegendPosition;
+
+        seriesEntries = [];
+        for (int i = 0; i < Series.Count; i++)
+        {
+            seriesEntries.Add(new SeriesEntry
+            {
+                Index = i,
+                Title = Series[i].Title,
+                Color = Series[i].Color,
+                CategoryFormula = Series[i].CategoryFormula,
+                ValueFormula = Series[i].ValueFormula
+            });
+        }
+    }
+
+    private void OnOk()
+    {
+        var states = new List<EditChartSeriesState>();
+        foreach (var entry in seriesEntries)
+        {
+            states.Add(new EditChartSeriesState(entry.Color, entry.CategoryFormula, entry.ValueFormula));
+        }
+
+        DialogService.Close(new EditChartState(chartType, title, showLegend, legendPosition, states));
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close(null);
+    }
+
+    private class SeriesEntry
+    {
+        public int Index { get; set; }
+        public string? Title { get; set; }
+        public string? Color { get; set; }
+        public string? CategoryFormula { get; set; }
+        public string? ValueFormula { get; set; }
+    }
+}

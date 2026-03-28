@@ -519,6 +519,40 @@
   <data name="Spreadsheet_DecreaseDecimalPlaces" xml:space="preserve">
     <value>Decrease decimal places</value>
   </data>
+  <!-- Spreadsheet: Chart context menu and edit dialog -->
+  <data name="Spreadsheet_EditChart" xml:space="preserve">
+    <value>Edit Chart...</value>
+  </data>
+  <data name="Spreadsheet_DeleteChart" xml:space="preserve">
+    <value>Delete Chart</value>
+  </data>
+  <data name="Spreadsheet_EditChartTitle" xml:space="preserve">
+    <value>Edit Chart</value>
+  </data>
+  <data name="Spreadsheet_ChartType" xml:space="preserve">
+    <value>Chart Type</value>
+  </data>
+  <data name="Spreadsheet_ChartTitle" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Spreadsheet_ShowLegend" xml:space="preserve">
+    <value>Show Legend</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition" xml:space="preserve">
+    <value>Legend Position</value>
+  </data>
+  <data name="Spreadsheet_Series" xml:space="preserve">
+    <value>Series</value>
+  </data>
+  <data name="Spreadsheet_SeriesColor" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="Spreadsheet_CategoryRange" xml:space="preserve">
+    <value>Category Range</value>
+  </data>
+  <data name="Spreadsheet_ValueRange" xml:space="preserve">
+    <value>Value Range</value>
+  </data>
   <!-- Spreadsheet: Insert tab tooltips -->
   <data name="Spreadsheet_InsertHyperlink" xml:space="preserve">
     <value>Insert Hyperlink</value>

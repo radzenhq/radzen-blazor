@@ -32,6 +32,21 @@ public partial class ChartOverlay : ComponentBase, IDisposable
     [Parameter]
     public IVirtualGridContext Context { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the spreadsheet instance.
+    /// </summary>
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    [Inject]
+    ContextMenuService ContextMenuService { get; set; } = default!;
+
+    [Inject]
+    DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -205,6 +220,63 @@ public partial class ChartOverlay : ComponentBase, IDisposable
         Worksheet.SelectedChart = chart;
         Worksheet.Selection.Clear();
         StateHasChanged();
+    }
+
+    private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
+    private void OnChartContextMenu(MouseEventArgs e, SheetChart chart)
+    {
+        Worksheet.SelectedChart = chart;
+        Worksheet.Selection.Clear();
+
+        ContextMenuService.Open(e, new List<ContextMenuItem>
+        {
+            new() { Text = L(nameof(RadzenStrings.Spreadsheet_EditChart)), Value = "edit-chart", Icon = "edit" },
+            new() { Text = L(nameof(RadzenStrings.Spreadsheet_DeleteChart)), Value = "delete-chart", Icon = "delete" },
+        }, args => OnChartContextMenuItemClick(args, chart));
+
+        StateHasChanged();
+    }
+
+    private void OnChartContextMenuItemClick(MenuItemEventArgs args, SheetChart chart)
+    {
+        ContextMenuService.Close();
+
+        switch (args.Value?.ToString())
+        {
+            case "edit-chart":
+                _ = InvokeAsync(() => OpenEditChartDialogAsync(chart));
+                break;
+            case "delete-chart":
+                Spreadsheet?.Execute(new DeleteChartCommand(Worksheet, chart));
+                break;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task OpenEditChartDialogAsync(SheetChart chart)
+    {
+        var parameters = new Dictionary<string, object?>
+        {
+            { nameof(EditChartDialog.ChartType), chart.ChartType },
+            { nameof(EditChartDialog.Title), chart.Title },
+            { nameof(EditChartDialog.ShowLegend), chart.ShowLegend },
+            { nameof(EditChartDialog.LegendPosition), chart.LegendPosition },
+            { nameof(EditChartDialog.Series), chart.Series },
+        };
+
+        var result = await DialogService.OpenAsync<EditChartDialog>(
+            L(nameof(RadzenStrings.Spreadsheet_EditChartTitle)),
+            parameters,
+            new DialogOptions { Width = "480px" });
+
+        if (result is EditChartState newState)
+        {
+            Spreadsheet?.Execute(new EditChartCommand(chart, newState));
+            seriesCache.Remove(chart);
+            StateHasChanged();
+        }
     }
 
     private static bool IsStrokeSeries(SpreadsheetChartType chartType) =>
