@@ -4,7 +4,8 @@
 
 <RadzenSplitButton ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
     Disabled=@IsDisabled Click=@OnClick
-    Icon="bar_chart" Text="Chart">
+    Icon="bar_chart" Text="Chart"
+    title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertChart)) ?? "Insert Chart")>
     <ChildContent>
         <RadzenSplitButtonItem Text="Column Chart" Value="column" Icon="bar_chart" />
         <RadzenSplitButtonItem Text="Bar Chart" Value="bar" Icon="align_horizontal_left" />
