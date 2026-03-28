@@ -8,7 +8,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents the editable state of a single chart series.
 /// </summary>
-public record EditChartSeriesState(string? Color, string? CategoryFormula, string? ValueFormula);
+public record EditChartSeriesState(string? Title, string? Color, string? CategoryFormula, string? ValueFormula);
 
 /// <summary>
 /// Represents the editable state of a chart.
@@ -33,6 +33,23 @@ public class EditChartCommand(SheetChart chart, EditChartState newState) : IComm
     private readonly List<EditChartSeriesState> oldSeriesStates = [];
     private string? oldRawChartXml;
 
+    private static List<ChartSeriesDefinition> ToSeriesList(List<EditChartSeriesState> states)
+    {
+        var list = new List<ChartSeriesDefinition>();
+        for (int i = 0; i < states.Count; i++)
+        {
+            list.Add(new ChartSeriesDefinition
+            {
+                Title = states[i].Title,
+                Color = states[i].Color,
+                CategoryFormula = states[i].CategoryFormula,
+                ValueFormula = states[i].ValueFormula,
+                Index = i
+            });
+        }
+        return list;
+    }
+
     /// <inheritdoc/>
     public bool Execute()
     {
@@ -45,7 +62,7 @@ public class EditChartCommand(SheetChart chart, EditChartState newState) : IComm
         oldSeriesStates.Clear();
         foreach (var s in chart.Series)
         {
-            oldSeriesStates.Add(new EditChartSeriesState(s.Color, s.CategoryFormula, s.ValueFormula));
+            oldSeriesStates.Add(new EditChartSeriesState(s.Title, s.Color, s.CategoryFormula, s.ValueFormula));
         }
 
         chart.ChartType = newState.ChartType;
@@ -53,13 +70,7 @@ public class EditChartCommand(SheetChart chart, EditChartState newState) : IComm
         chart.ShowLegend = newState.ShowLegend;
         chart.LegendPosition = newState.LegendPosition;
         chart.RawChartXml = null;
-
-        for (int i = 0; i < chart.Series.Count && i < newState.SeriesStates.Count; i++)
-        {
-            chart.Series[i].Color = newState.SeriesStates[i].Color;
-            chart.Series[i].CategoryFormula = newState.SeriesStates[i].CategoryFormula;
-            chart.Series[i].ValueFormula = newState.SeriesStates[i].ValueFormula;
-        }
+        chart.Series = ToSeriesList(newState.SeriesStates);
 
         return true;
     }
@@ -72,12 +83,6 @@ public class EditChartCommand(SheetChart chart, EditChartState newState) : IComm
         chart.ShowLegend = oldShowLegend;
         chart.LegendPosition = oldLegendPosition;
         chart.RawChartXml = oldRawChartXml;
-
-        for (int i = 0; i < chart.Series.Count && i < oldSeriesStates.Count; i++)
-        {
-            chart.Series[i].Color = oldSeriesStates[i].Color;
-            chart.Series[i].CategoryFormula = oldSeriesStates[i].CategoryFormula;
-            chart.Series[i].ValueFormula = oldSeriesStates[i].ValueFormula;
-        }
+        chart.Series = ToSeriesList(oldSeriesStates);
     }
 }
