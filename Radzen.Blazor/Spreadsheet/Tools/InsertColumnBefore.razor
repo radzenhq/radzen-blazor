@@ -1,7 +1,8 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @inherits SpreadsheetToolBase
-<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnInsertColumnBeforeClick Icon="add_column_left" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnInsertColumnBeforeClick Icon="add_column_left" ButtonType="ButtonType.Button" Disabled=@IsDisabled
+    title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnBefore)) ?? "Insert Column Before") />
 @code {
     private void OnInsertColumnBeforeClick()
     {

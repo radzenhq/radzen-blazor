@@ -519,4 +519,14 @@
   <data name="Spreadsheet_DecreaseDecimalPlaces" xml:space="preserve">
     <value>Decrease decimal places</value>
   </data>
+  <!-- Spreadsheet: Insert tab tooltips -->
+  <data name="Spreadsheet_InsertHyperlink" xml:space="preserve">
+    <value>Insert Hyperlink</value>
+  </data>
+  <data name="Spreadsheet_InsertImage" xml:space="preserve">
+    <value>Insert Image</value>
+  </data>
+  <data name="Spreadsheet_InsertChart" xml:space="preserve">
+    <value>Insert Chart</value>
+  </data>
 </root>
