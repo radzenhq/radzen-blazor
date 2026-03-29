@@ -1176,8 +1176,24 @@ namespace Radzen
             {
                 var enumerableValue = ((IEnumerable)(filterValue != null ? filterValue : Enumerable.Empty<object>())).AsQueryable();
 
+                var elementType = enumerableValue.ElementType;
+                var isOData = column.Grid.IsOData();
+                var isDateTimeElement = isOData && (elementType == typeof(DateTime) || elementType == typeof(DateTime?)
+                    || elementType == typeof(DateTimeOffset) || elementType == typeof(DateTimeOffset?));
+                var isDateOnlyElement = isOData && (elementType == typeof(DateOnly) || elementType == typeof(DateOnly?));
+
+                Func<object, string> formatElement = item =>
+                {
+                    if (item is DateTimeOffset dto) return dto.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
+                    if (item is DateTime dt) return dt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
+                    if (item is DateOnly d) return d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    return item?.ToString() ?? "";
+                };
+
                 var enumerableValueAsString = "(" + String.Join(",",
-                        (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"'{i}'").Cast<object>() : enumerableValue.Cast<object>())) + ")";
+                        elementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"'{i}'").Cast<object>()
+                        : (isDateTimeElement || isDateOnlyElement) ? enumerableValue.Cast<object>().Select(i => (object)formatElement(i))
+                        : enumerableValue.Cast<object>()) + ")";
 
                 var enumerableValueAsStringOrForAny = String.Join(" or ",
                     (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>()
@@ -1185,10 +1201,18 @@ namespace Radzen
 
                 if (enumerableValue.Cast<object>().Any() && columnFilterOperator == FilterOperator.Contains)
                 {
+                    if (isDateTimeElement || isDateOnlyElement)
+                    {
+                        return "(" + string.Join(" or ", enumerableValue.Cast<object>().Select(i => $"{property} eq {formatElement(i)}")) + ")";
+                    }
                     return $"{property} in {enumerableValueAsString}";
                 }
                 else if (enumerableValue.Cast<object>().Any() && columnFilterOperator == FilterOperator.DoesNotContain)
                 {
+                    if (isDateTimeElement || isDateOnlyElement)
+                    {
+                        return "(" + string.Join(" and ", enumerableValue.Cast<object>().Select(i => $"{property} ne {formatElement(i)}")) + ")";
+                    }
                     return $"not({property} in {enumerableValueAsString})";
                 }
                 else if (enumerableValue.Cast<object>().Any() && columnFilterOperator == FilterOperator.In)
