@@ -292,6 +292,27 @@ else
                 query = query.Select(property).Distinct().Cast<object>().OrderBy(i => i);
             }
 
+            if (Column.Grid.IsVirtualizationAllowed())
+            {
+                var currentFilterValue = hasPendingCheckBoxFilter ? pendingCheckBoxFilterValue : Column.GetFilterValue();
+                if (currentFilterValue is IEnumerable checkedValues)
+                {
+                    var checkedList = checkedValues.Cast<object>().ToList();
+                    if (checkedList.Count > 0)
+                    {
+                        var allValues = query.Cast<object>().ToList();
+                        foreach (var checkedValue in checkedList)
+                        {
+                            if (!allValues.Any(v => object.Equals(v, checkedValue)))
+                            {
+                                allValues.Add(checkedValue);
+                            }
+                        }
+                        query = allValues.OrderBy(i => i).AsQueryable();
+                    }
+                }
+            }
+
             filterValuesCount = query.Cast<object>().Count();
 
             if(loadDataArgs.Skip != null)
