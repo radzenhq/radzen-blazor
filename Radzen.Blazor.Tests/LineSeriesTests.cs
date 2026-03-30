@@ -143,6 +143,33 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public async System.Threading.Tasks.Task LineSeries_NoCategoryProperty_UsesIndexForXAxis()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenLineSeries<DataItem>>(s => s
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            // Without CategoryProperty the X axis should use indices 0, 1, 2
+            Assert.Contains(">0</text>", chart.Markup);
+            Assert.Contains(">1</text>", chart.Markup);
+            Assert.Contains(">2</text>", chart.Markup);
+
+            // The line series path (inside rz-line-series group) should have three distinct, increasing X coordinates
+            var seriesMatch = System.Text.RegularExpressions.Regex.Match(chart.Markup, @"rz-line-series[\s\S]*?d=""(M\s+[\d.]+\s+[\d.]+\s+L\s+[\d.]+\s+[\d.]+\s+L\s+[\d.]+\s+[\d.]+)");
+            Assert.True(seriesMatch.Success, "Should find line series path with M and two L commands");
+            var pathMatch = System.Text.RegularExpressions.Regex.Match(seriesMatch.Groups[1].Value, @"M\s+([\d.]+)\s+[\d.]+\s+L\s+([\d.]+)\s+[\d.]+\s+L\s+([\d.]+)\s+[\d.]+");
+            var x0 = double.Parse(pathMatch.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+            var x1 = double.Parse(pathMatch.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture);
+            var x2 = double.Parse(pathMatch.Groups[3].Value, System.Globalization.CultureInfo.InvariantCulture);
+            Assert.True(x0 < x1 && x1 < x2, $"X coordinates should be distinct and increasing: {x0}, {x1}, {x2}");
+        }
+
+        [Fact]
         public void LineSeries_Multiple_RendersDistinctSeriesGroups()
         {
             using var ctx = CreateChartContext();

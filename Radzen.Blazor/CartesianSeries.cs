@@ -60,9 +60,14 @@ namespace Radzen.Blazor
 
             if (scale is OrdinalScale ordinal)
             {
-                Func<TItem, object> category = String.IsNullOrEmpty(CategoryProperty) ? (item) => string.Empty : PropertyAccess.Getter<TItem, object>(CategoryProperty);
+                if (String.IsNullOrEmpty(CategoryProperty))
+                {
+                    return (item) => Items.IndexOf(item);
+                }
 
-                return (item) => ordinal.Data?.IndexOf(category(item)) ?? -1;
+                var ordinalCategory = PropertyAccess.Getter<TItem, object>(CategoryProperty);
+
+                return (item) => ordinal.Data?.IndexOf(ordinalCategory(item)) ?? -1;
             }
 
             return (item) => Items.IndexOf(item);
@@ -309,9 +314,12 @@ namespace Radzen.Blazor
         /// </summary>
         protected virtual IList<object> GetCategories()
         {
-            Func<TItem, object> category = String.IsNullOrEmpty(CategoryProperty) ? (item) => string.Empty : PropertyAccess.Getter<TItem, object>(CategoryProperty);
+            if (String.IsNullOrEmpty(CategoryProperty))
+            {
+                return Items.Select((item, index) => (object)index).ToList();
+            }
 
-            return Items.Select(category).ToList();
+            return Items.Select(PropertyAccess.Getter<TItem, object>(CategoryProperty)).ToList();
         }
 
         /// <inheritdoc />
