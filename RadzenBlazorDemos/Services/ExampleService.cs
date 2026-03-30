@@ -372,7 +372,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    New = true,
                     Name = "Charts",
                     Path = "spreadsheet-charts",
                     Title = "Blazor Spreadsheet Charts - Embed Column, Bar, Line, Pie Charts in Spreadsheet | Radzen",
