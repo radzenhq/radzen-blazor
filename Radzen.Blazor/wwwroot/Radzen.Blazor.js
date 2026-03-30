@@ -4681,8 +4681,10 @@ class Spreadsheet {
       e.preventDefault();
       e.stopPropagation();
     } else if (e.target.closest('.rz-spreadsheet-image') || e.target.closest('.rz-spreadsheet-chart')) {
-      // Image and chart clicks are handled by Blazor event handlers directly
-      return;
+      addEventListener('pointermove', this.onDrawingMoveMove);
+      addEventListener('pointerup', this.onDrawingMoveUp);
+      this.dotNetRef.invokeMethodAsync('OnDrawingMovePointerDownAsync', this.toEventArgs(e));
+      e.preventDefault();
     } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
       const column = +e.target.dataset.column;
         addEventListener('pointermove', this.onColumnResizeMove);
@@ -4855,6 +4857,16 @@ class Spreadsheet {
     this.invokeAsync('OnDrawingResizePointerUpAsync', e);
     removeEventListener('pointermove', this.onDrawingResizeMove);
     removeEventListener('pointerup', this.onDrawingResizeUp);
+  }
+
+  onDrawingMoveMove = (e) => {
+    this.invokeAsync('OnDrawingMovePointerMoveAsync', e);
+  }
+
+  onDrawingMoveUp = (e) => {
+    this.invokeAsync('OnDrawingMovePointerUpAsync', e);
+    removeEventListener('pointermove', this.onDrawingMoveMove);
+    removeEventListener('pointerup', this.onDrawingMoveUp);
   }
 
   onAutofillPointerMove = (e) => {
