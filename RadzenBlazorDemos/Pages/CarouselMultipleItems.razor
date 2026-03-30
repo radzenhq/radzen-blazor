@@ -1,0 +1,49 @@
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Items per page
+                <RadzenNumeric @bind-Value=@itemsPerPage Min="1" Max="6" aria-label="items per page" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Auto-cycle
+                <RadzenSwitch @bind-Value="@auto" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "auto-cycle" }})" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenCarousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="4000"
+        ItemsPerPage="@itemsPerPage" PagerOverlay="false" Style="height: 400px;">
+        <Items>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/1.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/2.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/3.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/4.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/5.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/6.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/7.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/8.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+        </Items>
+    </RadzenCarousel>
+</RadzenStack>
+
+@code {
+    int itemsPerPage = 3;
+    bool auto = false;
+    int selectedIndex;
+}

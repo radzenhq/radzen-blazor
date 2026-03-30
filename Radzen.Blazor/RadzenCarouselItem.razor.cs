@@ -59,6 +59,10 @@ namespace Radzen.Blazor
             GC.SuppressFinalize(this);
         }
 
+        string? ItemStyle => Carousel != null && Carousel.ItemsPerPage > 1
+            ? $"flex: 0 0 calc(100% / {Carousel.ItemsPerPage}); width: calc(100% / {Carousel.ItemsPerPage})"
+            : null;
+
         int itemIndex;
         internal ElementReference element;
     }

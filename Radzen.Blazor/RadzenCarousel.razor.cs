@@ -104,14 +104,34 @@ namespace Radzen.Blazor
             await GoTo(index);
         }
 
+        int PageCount => ItemsPerPage > 1 ? (int)Math.Ceiling((double)items.Count / ItemsPerPage) : items.Count;
+
+        int ActivePage => ItemsPerPage > 1 ? selectedIndex / ItemsPerPage : selectedIndex;
+
         async Task Prev()
         {
-            await Navigate(selectedIndex == 0 ? items.Count - 1 : selectedIndex - 1);
+            if (ItemsPerPage > 1)
+            {
+                var prevIndex = selectedIndex - ItemsPerPage;
+                await Navigate(prevIndex < 0 ? (PageCount - 1) * ItemsPerPage : prevIndex);
+            }
+            else
+            {
+                await Navigate(selectedIndex == 0 ? items.Count - 1 : selectedIndex - 1);
+            }
         }
 
         async Task Next()
         {
-            await Navigate(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1);
+            if (ItemsPerPage > 1)
+            {
+                var nextIndex = selectedIndex + ItemsPerPage;
+                await Navigate(nextIndex >= items.Count ? 0 : nextIndex);
+            }
+            else
+            {
+                await Navigate(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1);
+            }
         }
 
         async Task GoTo(int index)
@@ -269,6 +289,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if previous/next navigation is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowNavigation { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the number of items visible at the same time. Set to <c>1</c> by default.
+        /// </summary>
+        /// <value>The number of items per page.</value>
+        [Parameter]
+        public int ItemsPerPage { get; set; } = 1;
 
         /// <summary>
         /// Gets or sets a value indicating whether the user can scroll or swipe through carousel items. Set to <c>true</c> by default.

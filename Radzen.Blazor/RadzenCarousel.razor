@@ -8,10 +8,11 @@
         @if(AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
         {
         <RadzenStack class="rz-carousel-pager rz-carousel-pager-top" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" role="list">
-            @foreach (var item in items)
+            @for (var p = 0; p < PageCount; p++)
             {
-                var index = items.IndexOf(item);
-                <button type="button" role="listitem" @onclick="@(args => Navigate(index))" class="rz-carousel-pager-button @(index == selectedIndex ? "rz-state-active" : "")" aria-label="@string.Format(PagerButtonAriaLabelFormat, index + 1)"></button>
+                var pageIndex = p;
+                var itemIndex = pageIndex * ItemsPerPage;
+                <button type="button" role="listitem" @onclick="@(args => Navigate(itemIndex))" class="rz-carousel-pager-button @(pageIndex == ActivePage ? "rz-state-active" : "")" aria-label="@string.Format(PagerButtonAriaLabelFormat, pageIndex + 1)"></button>
             }
         </RadzenStack>
         }
@@ -31,10 +32,11 @@
         @if(AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
         <RadzenStack class="rz-carousel-pager rz-carousel-pager-bottom" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" role="list">
-            @foreach (var item in items)
+            @for (var p = 0; p < PageCount; p++)
             {
-                var index = items.IndexOf(item);
-                <button type="button" role="listitem" @onclick="@(args => Navigate(index))" class="rz-carousel-pager-button @(index == selectedIndex ? "rz-state-active" : "")" aria-label="@string.Format(PagerButtonAriaLabelFormat, index + 1)"></button>
+                var pageIndex = p;
+                var itemIndex = pageIndex * ItemsPerPage;
+                <button type="button" role="listitem" @onclick="@(args => Navigate(itemIndex))" class="rz-carousel-pager-button @(pageIndex == ActivePage ? "rz-state-active" : "")" aria-label="@string.Format(PagerButtonAriaLabelFormat, pageIndex + 1)"></button>
             }
         </RadzenStack>
         }
