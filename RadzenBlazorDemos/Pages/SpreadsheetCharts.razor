@@ -1,7 +1,7 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
-<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+<RadzenSpreadsheet Workbook=@workbook style="height: 800px" />
 
 @code {
     Workbook workbook = new Workbook();
@@ -81,12 +81,12 @@
             sheet.Cells[totalRow, col].Format = totalFormat;
         }
 
-        // Insert a column chart
+        // Insert a column chart below the table
         var columnChart = new SheetChart
         {
             ChartType = SpreadsheetChartType.Column,
             AnchorMode = DrawingAnchorMode.OneCellAnchor,
-            From = new CellAnchor { Row = 0, Column = 7 },
+            From = new CellAnchor { Row = totalRow + 2, Column = 0 },
             Width = 5715000, // ~600px
             Height = 2857500, // ~300px
             Title = "Quarterly Sales by Region",
@@ -155,12 +155,12 @@
             sheet.Cells[row, 2].Format = percentFormat;
         }
 
-        // Insert a pie chart
+        // Insert a pie chart below the table
         var pieChart = new SheetChart
         {
             ChartType = SpreadsheetChartType.Pie,
             AnchorMode = DrawingAnchorMode.OneCellAnchor,
-            From = new CellAnchor { Row = 0, Column = 4 },
+            From = new CellAnchor { Row = 2 + data.Length + 1, Column = 0 },
             Width = 4572000, // ~480px
             Height = 3429000, // ~360px
             Title = "Browser Market Share",
@@ -237,12 +237,12 @@
             }
         }
 
-        // Insert a line chart
+        // Insert a line chart below the table
         var lineChart = new SheetChart
         {
             ChartType = SpreadsheetChartType.Line,
             AnchorMode = DrawingAnchorMode.OneCellAnchor,
-            From = new CellAnchor { Row = 0, Column = 5 },
+            From = new CellAnchor { Row = 2 + months.Length + 1, Column = 0 },
             Width = 5715000,
             Height = 2857500,
             Title = "Revenue Trends",
