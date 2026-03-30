@@ -282,14 +282,18 @@ else
                                     Column.Grid.allColumns.Where(c => c != Column));
             }
 
+            List<object> materializedValues;
+
             if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
             {
-                query = query.SelectMany(property).Select(Column.FilterProperty).Distinct().Cast<object>().OrderBy(i => i);
-                propertyType = query.ElementType;
+                var distinctQuery = query.SelectMany(property).Select(Column.FilterProperty).Distinct();
+                materializedValues = QueryableExtension.ToList(distinctQuery).Cast<object>().ToList();
+                propertyType = materializedValues.FirstOrDefault()?.GetType() ?? propertyType;
             }
             else
             {
-                query = query.Select(property).Distinct().Cast<object>().OrderBy(i => i);
+                var distinctQuery = query.Select(property).Distinct();
+                materializedValues = QueryableExtension.ToList(distinctQuery).Cast<object>().ToList();
             }
 
             if (Column.Grid.IsVirtualizationAllowed())
@@ -297,36 +301,33 @@ else
                 var currentFilterValue = hasPendingCheckBoxFilter ? pendingCheckBoxFilterValue : Column.GetFilterValue();
                 if (currentFilterValue is IEnumerable checkedValues)
                 {
-                    var checkedList = checkedValues.Cast<object>().ToList();
-                    if (checkedList.Count > 0)
+                    foreach (var checkedValue in checkedValues.Cast<object>())
                     {
-                        var allValues = query.Cast<object>().ToList();
-                        foreach (var checkedValue in checkedList)
+                        if (!materializedValues.Any(v => object.Equals(v, checkedValue)))
                         {
-                            if (!allValues.Any(v => object.Equals(v, checkedValue)))
-                            {
-                                allValues.Add(checkedValue);
-                            }
+                            materializedValues.Add(checkedValue);
                         }
-                        query = allValues.OrderBy(i => i).AsQueryable();
                     }
                 }
             }
 
-            filterValuesCount = query.Cast<object>().Count();
+            materializedValues.Sort();
+
+            filterValuesCount = materializedValues.Count;
+
+            IEnumerable<object> result = materializedValues;
 
             if(loadDataArgs.Skip != null)
             {
-                query = query.Cast<object>().Skip(loadDataArgs.Skip.Value);
+                result = result.Skip(loadDataArgs.Skip.Value);
             }
 
             if(loadDataArgs.Top != null)
             {
-                query = query.Cast<object>().Take(loadDataArgs.Top.Value);
+                result = result.Take(loadDataArgs.Top.Value);
             }
 
-            filterValues = await Task.FromResult(Column.Grid.childData.Any() ?
-                query.Cast<object>().ToList().AsQueryable().Cast(propertyType!) : query.Cast(propertyType!));
+            filterValues = result.ToList().AsQueryable().Cast(propertyType!);
 
             if (!Column.AllowCheckBoxListVirtualization)
             {
@@ -383,7 +384,7 @@ else
         }
 
         pendingCheckBoxFilterValue = enumerable.Cast<object>().Any()
-            ? propertyType != null ? enumerable.AsQueryable().Cast(propertyType) : enumerable
+            ? propertyType != null ? QueryableExtension.ToList(enumerable.AsQueryable().Cast(propertyType)) : enumerable
             : null;
     }
 
