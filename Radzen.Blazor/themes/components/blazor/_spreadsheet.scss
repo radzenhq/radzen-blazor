@@ -583,6 +583,7 @@
         object-fit: fill;
         display: block;
         pointer-events: auto;
+        cursor: grab;
     }
 
     .rz-spreadsheet-selection-range {
@@ -636,6 +637,7 @@
     overflow: hidden;
     background: var(--rz-base-background-color, #fff);
     pointer-events: auto;
+    cursor: grab;
 
     .rz-spreadsheet-selection-range {
         position: absolute;

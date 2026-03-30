@@ -1596,6 +1596,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         public long OriginalHeight { get; set; }
     }
 
+    class DrawingMoveCapture
+    {
+        public SheetImage? Image { get; set; }
+        public SheetChart? Chart { get; set; }
+        public double StartX { get; set; }
+        public double StartY { get; set; }
+        public CellAnchor OriginalFrom { get; set; } = default!;
+        public CellAnchor? OriginalTo { get; set; }
+    }
+
     /// <summary>
     /// Invoked by JS interop when a drawing resize handle is pressed.
     /// </summary>
@@ -1740,6 +1750,165 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         activeCapture = null;
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when a drawing body is pressed to start a move.
+    /// </summary>
+    [JSInvokable]
+    public Task OnDrawingMovePointerDownAsync(PointerEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        if (Worksheet is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        DrawingMoveCapture? capture = null;
+
+        if (Worksheet.SelectedImage is SheetImage image)
+        {
+            capture = new DrawingMoveCapture { Image = image, OriginalFrom = image.From.Clone(), OriginalTo = image.To?.Clone() };
+        }
+        else if (Worksheet.SelectedChart is SheetChart chart)
+        {
+            capture = new DrawingMoveCapture { Chart = chart, OriginalFrom = chart.From.Clone(), OriginalTo = chart.To?.Clone() };
+        }
+
+        if (capture is not null)
+        {
+            capture.StartX = args.ClientX;
+            capture.StartY = args.ClientY;
+            activeCapture = capture;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void NormalizeAnchor(CellAnchor anchor)
+    {
+        if (Worksheet is null) return;
+
+        while (anchor.ColumnOffset < 0 && anchor.Column > 0)
+        {
+            anchor.Column--;
+            anchor.ColumnOffset += (long)(Worksheet.Columns[anchor.Column] * EmuPerPixel);
+        }
+
+        while (anchor.Column < Worksheet.ColumnCount - 1)
+        {
+            var colWidthEmu = (long)(Worksheet.Columns[anchor.Column] * EmuPerPixel);
+            if (anchor.ColumnOffset < colWidthEmu) break;
+            anchor.ColumnOffset -= colWidthEmu;
+            anchor.Column++;
+        }
+
+        while (anchor.RowOffset < 0 && anchor.Row > 0)
+        {
+            anchor.Row--;
+            anchor.RowOffset += (long)(Worksheet.Rows[anchor.Row] * EmuPerPixel);
+        }
+
+        while (anchor.Row < Worksheet.RowCount - 1)
+        {
+            var rowHeightEmu = (long)(Worksheet.Rows[anchor.Row] * EmuPerPixel);
+            if (anchor.RowOffset < rowHeightEmu) break;
+            anchor.RowOffset -= rowHeightEmu;
+            anchor.Row++;
+        }
+
+        if (anchor.ColumnOffset < 0) anchor.ColumnOffset = 0;
+        if (anchor.RowOffset < 0) anchor.RowOffset = 0;
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the pointer moves while dragging a drawing.
+    /// </summary>
+    [JSInvokable]
+    public Task OnDrawingMovePointerMoveAsync(PointerEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        if (activeCapture is not DrawingMoveCapture capture || Worksheet is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var deltaXEmu = (long)((args.ClientX - capture.StartX) * EmuPerPixel);
+        var deltaYEmu = (long)((args.ClientY - capture.StartY) * EmuPerPixel);
+
+        CellAnchor? from = null;
+        CellAnchor? to = null;
+
+        if (capture.Image is SheetImage image)
+        {
+            from = image.From;
+            to = image.To;
+        }
+        else if (capture.Chart is SheetChart chart)
+        {
+            from = chart.From;
+            to = chart.To;
+        }
+
+        if (from is not null)
+        {
+            from.Column = capture.OriginalFrom.Column;
+            from.ColumnOffset = capture.OriginalFrom.ColumnOffset + deltaXEmu;
+            from.Row = capture.OriginalFrom.Row;
+            from.RowOffset = capture.OriginalFrom.RowOffset + deltaYEmu;
+            NormalizeAnchor(from);
+        }
+
+        if (to is not null && capture.OriginalTo is not null)
+        {
+            to.Column = capture.OriginalTo.Column;
+            to.ColumnOffset = capture.OriginalTo.ColumnOffset + deltaXEmu;
+            to.Row = capture.OriginalTo.Row;
+            to.RowOffset = capture.OriginalTo.RowOffset + deltaYEmu;
+            NormalizeAnchor(to);
+        }
+
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the pointer is released after moving a drawing.
+    /// </summary>
+    [JSInvokable]
+    public Task OnDrawingMovePointerUpAsync(PointerEventArgs args)
+    {
+        if (activeCapture is not DrawingMoveCapture capture || Worksheet is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (capture.Image is SheetImage image)
+        {
+            var finalFrom = image.From.Clone();
+            var finalTo = image.To?.Clone();
+
+            image.From = capture.OriginalFrom.Clone();
+            if (capture.OriginalTo is not null) image.To = capture.OriginalTo.Clone();
+
+            Execute(new MoveImageCommand(image, finalFrom, finalTo));
+        }
+        else if (capture.Chart is SheetChart chart)
+        {
+            var finalFrom = chart.From.Clone();
+            var finalTo = chart.To?.Clone();
+
+            chart.From = capture.OriginalFrom.Clone();
+            if (capture.OriginalTo is not null) chart.To = capture.OriginalTo.Clone();
+
+            Execute(new MoveChartCommand(chart, finalFrom, finalTo));
+        }
+
+        activeCapture = null;
+        StateHasChanged();
         return Task.CompletedTask;
     }
 
