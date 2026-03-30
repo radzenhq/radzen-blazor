@@ -6,13 +6,14 @@
 
 @{
     var points = new Dictionary<AppointmentData, double>();
+    var calendar = (Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar;
     // StartDate can be shifted one extra week earlier to render a full header row.
     // Derive the base year from the scheduler's CurrentDate + StartMonth instead of StartDate.AddDays(7).Year
     // (which can incorrectly yield the previous year for StartMonth=January when the week starts on Sunday).
     var startMonthNumber = (int)StartMonth + 1; // Month enum is 0-based
     var startyear = Scheduler != null
-        ? Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Date.Month < startMonthNumber ? -1 : 0)
-        : StartDate.AddDays(7).Year;
+        ? calendar.GetYear(Scheduler.CurrentDate.Date) + (calendar.GetMonth(Scheduler.CurrentDate.Date) < startMonthNumber ? -1 : 0)
+        : calendar.GetYear(StartDate.AddDays(7));
     DateTime date = StartDate;
     DateTime realstart = StartDate;
     int daysinmonth;
@@ -38,8 +39,8 @@
     {
         int offSetMonth = ((month + (int)StartMonth) % 12) + 1;
         int curYear = startyear + (offSetMonth <= month ? 1 : 0);
-        realstart = new DateTime(curYear, offSetMonth, 1);
-        daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
+        realstart = new DateTime(curYear, offSetMonth, 1, calendar);
+        daysinmonth = calendar.GetDaysInMonth(curYear, offSetMonth);
         date = realstart.StartOfMonth().StartOfWeek(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture);
         var startMonth = realstart;
         var excessCounts = new Dictionary<DateTime, int>();
@@ -53,7 +54,7 @@
                     var appointments = AppointmentsInRange(start, end);
                     var excessCount = appointments.Count() - MaxAppointmentsInSlot;
                     var existingTops = ExistingTops(points, appointments.Take(MaxAppointmentsInSlot));
-                    if (start.Month == offSetMonth)
+                    if (calendar.GetMonth(start) == offSetMonth)
                     {
                         @foreach (var item in appointments.Take(MaxAppointmentsInSlot))
                         {
@@ -110,16 +111,16 @@
                 {
                     string dayType = "";
                     var dayOfWeek = date.AddDays(day);
-                    bool slotInMonth = dayOfWeek.Month == offSetMonth;
+                    bool slotInMonth = calendar.GetMonth(dayOfWeek) == offSetMonth;
 
                     dayType = dayOfWeek.DayOfWeek == DayOfWeek.Saturday || dayOfWeek.DayOfWeek == DayOfWeek.Sunday ? "rz-weekend" : "";
-                    dayType = dayOfWeek.Month != offSetMonth ? "rz-other-month" : dayType;
+                    dayType = !slotInMonth ? "rz-other-month" : dayType;
 
                     @if (slotInMonth)
                     {
                         <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
                             <div class="rz-slot-title">
-                                @dayOfWeek.Day
+                                @calendar.GetDayOfMonth(dayOfWeek)
                                 @if (excessCounts.TryGetValue(dayOfWeek, out var excess))
                                 {
                                     var listDate = dayOfWeek;
@@ -302,8 +303,11 @@
         {
             var newDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
 
-            var firstDate = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
-            var lastDate = new DateTime(CurrentDate.Year, CurrentDate.Month, DateTime.DaysInMonth(CurrentDate.Year, CurrentDate.Month));
+            var cal = (Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar;
+            var calYear = cal.GetYear(CurrentDate);
+            var calMonth = cal.GetMonth(CurrentDate);
+            var firstDate = new DateTime(calYear, calMonth, 1, cal);
+            var lastDate = new DateTime(calYear, calMonth, cal.GetDaysInMonth(calYear, calMonth), cal);
 
             if(newDate < firstDate)
             {
@@ -325,7 +329,8 @@
         {
             CurrentMonth = Math.Clamp(CurrentMonth + (key == "ArrowUp" ? -1 : 1), 0, 11);
 
-            CurrentDate = new DateTime(CurrentDate.Year, CurrentMonth + 1, 1);
+            var navCal = (Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar;
+            CurrentDate = new DateTime(navCal.GetYear(CurrentDate), CurrentMonth + 1, 1, navCal);
 
             preventKeyPress = true;
             stopKeydownPropagation = true;

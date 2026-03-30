@@ -439,18 +439,41 @@ namespace Radzen.Blazor
 
         void UpdateYearsAndMonths(DateTime? min, DateTime? max)
         {
-            YearFrom = min.HasValue ? min.Value.Year : int.Parse(YearRange.Split(':').First(), CultureInfo.InvariantCulture);
-            YearTo = max.HasValue ? max.Value.Year : int.Parse(YearRange.Split(':').Last(), CultureInfo.InvariantCulture);
-            months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture?.DateTimeFormat?.GetMonthName(i) ?? string.Empty, Value = i }).ToList();
+            var calendar = Culture.Calendar;
+
+            if (min.HasValue)
+            {
+                YearFrom = calendar.GetYear(min.Value);
+            }
+            else
+            {
+                var gregorianYearFrom = int.Parse(YearRange.Split(':').First(), CultureInfo.InvariantCulture);
+                YearFrom = calendar.GetYear(new DateTime(Math.Max(gregorianYearFrom, calendar.MinSupportedDateTime.Year), 1, 1));
+            }
+
+            if (max.HasValue)
+            {
+                YearTo = calendar.GetYear(max.Value);
+            }
+            else
+            {
+                var gregorianYearTo = int.Parse(YearRange.Split(':').Last(), CultureInfo.InvariantCulture);
+                YearTo = calendar.GetYear(new DateTime(Math.Min(gregorianYearTo, calendar.MaxSupportedDateTime.Year), 1, 1));
+            }
+
+            var monthsInYear = calendar.GetMonthsInYear(calendar.GetYear(CurrentDate == default(DateTime) ? DateTime.Today : CurrentDate));
+            months = Enumerable.Range(1, monthsInYear).Select(i => new NameValue() { Name = Culture?.DateTimeFormat?.GetMonthName(i) ?? string.Empty, Value = i }).ToList();
             years = YearFrom <= YearTo ? Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
                 .Select(i => new NameValue() { Name = YearFormatter != null ? YearFormatter(i) : null, Value = i }).ToList() : Enumerable.Empty<NameValue>().ToList();
         }
 
-        private string FormatYear(int year)
-        {
-            year = Culture.Calendar.GetYear(new DateTime(year, 1, 1));
+        private int GetCalendarYear(DateTime date) => Culture.Calendar.GetYear(date);
+        private int GetCalendarMonth(DateTime date) => Culture.Calendar.GetMonth(date);
+        private int GetCalendarDayOfMonth(DateTime date) => Culture.Calendar.GetDayOfMonth(date);
 
-            var date = new DateTime(year, 1, 1, Culture.Calendar);
+        private string FormatYear(int calendarYear)
+        {
+            var date = new DateTime(calendarYear, 1, 1, Culture.Calendar);
 
             return date.ToString(YearFormat, Culture);
         }
@@ -796,7 +819,10 @@ namespace Radzen.Blazor
                     return DateTime.MinValue;
                 }
 
-                var firstDayOfTheMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+                var calendar = Culture.Calendar;
+                var calYear = calendar.GetYear(CurrentDate);
+                var calMonth = calendar.GetMonth(CurrentDate);
+                var firstDayOfTheMonth = new DateTime(calYear, calMonth, 1, calendar);
 
                 if (firstDayOfTheMonth == DateTime.MinValue)
                 {
@@ -1038,11 +1064,11 @@ namespace Radzen.Blazor
             }
             else
             {
-                valid = DateTime.TryParseExact(inputValue, DateFormat, null, DateTimeStyles.None, out value);
+                valid = DateTime.TryParseExact(inputValue, DateFormat, Culture, DateTimeStyles.None, out value);
 
                 if (!valid)
                 {
-                    valid = DateTime.TryParse(inputValue, out value);
+                    valid = DateTime.TryParse(inputValue, Culture, DateTimeStyles.None, out value);
                 }
             }
 
@@ -1536,18 +1562,28 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        private void SetMonth(int month)
+        private void SetMonth(int calendarMonth)
         {
-            var currentValue = CurrentDate;
-            var newValue = new DateTime(currentValue.Year, month, Math.Min(currentValue.Day, DateTime.DaysInMonth(currentValue.Year, month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
+            var calendar = Culture.Calendar;
+            var calYear = calendar.GetYear(CurrentDate);
+            var calDay = Math.Min(calendar.GetDayOfMonth(CurrentDate), calendar.GetDaysInMonth(calYear, calendarMonth));
+            var newValue = new DateTime(calYear, calendarMonth, calDay, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second, calendar);
 
             CurrentDate = newValue;
         }
 
-        private void SetYear(int year)
+        private void SetYear(int calendarYear)
         {
-            var currentValue = CurrentDate;
-            var newValue = new DateTime(year, currentValue.Month, Math.Min(currentValue.Day, DateTime.DaysInMonth(year, currentValue.Month)), currentValue.Hour, currentValue.Minute, currentValue.Second);
+            var calendar = Culture.Calendar;
+            var calMonth = calendar.GetMonth(CurrentDate);
+
+            if (calMonth > calendar.GetMonthsInYear(calendarYear))
+            {
+                calMonth = calendar.GetMonthsInYear(calendarYear);
+            }
+
+            var calDay = Math.Min(calendar.GetDayOfMonth(CurrentDate), calendar.GetDaysInMonth(calendarYear, calMonth));
+            var newValue = new DateTime(calendarYear, calMonth, calDay, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second, calendar);
 
             CurrentDate = newValue;
         }
@@ -1706,7 +1742,7 @@ namespace Radzen.Blazor
         {
             var list = ClassList.Create()
                                .Add("rz-state-default", !forCell)
-                               .Add("rz-calendar-other-month", CurrentDate.Month != date.Month)
+                               .Add("rz-calendar-other-month", GetCalendarMonth(CurrentDate) != GetCalendarMonth(date))
                                .Add("rz-state-active", !forCell && (Multiple ? selectedDates.Any(d => d.Date == date.Date) : (DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)))
                                .Add("rz-calendar-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-focused", !forCell && FocusedDate.Date.CompareTo(date.Date) == 0)

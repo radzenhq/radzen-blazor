@@ -57,7 +57,7 @@
                         <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" role="button" tabindex="0"
                              @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation
                              @onkeydown="@(args => OnDayHeaderKeyDown(args, dayOfWeek))">
-                            @dayOfWeek.Day
+                            @((Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar.GetDayOfMonth(dayOfWeek))
                             @if (slot.Hidden > 0)
                             {
                                 <button type="button" class="rz-event-list-btn" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); }) @onclick:stopPropagation>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</button>

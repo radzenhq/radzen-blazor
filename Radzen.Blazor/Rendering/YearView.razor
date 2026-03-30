@@ -5,14 +5,15 @@
 
 @{
     var points = new Dictionary<AppointmentData, double>();
+    var calendar = (Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar;
 
     // StartDate can be shifted one extra week earlier to render a full header row.
     // Derive the base year from the scheduler's CurrentDate + StartMonth instead of StartDate.AddDays(7).Year
     // (which can incorrectly yield the previous year for StartMonth=January when the week starts on Sunday).
     var startMonthNumber = (int)StartMonth + 1; // Month enum is 0-based
     var year = Scheduler != null
-        ? Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Date.Month < startMonthNumber ? -1 : 0)
-        : StartDate.AddDays(7).Year;
+        ? calendar.GetYear(Scheduler.CurrentDate.Date) + (calendar.GetMonth(Scheduler.CurrentDate.Date) < startMonthNumber ? -1 : 0)
+        : calendar.GetYear(StartDate.AddDays(7));
 
     DateTime date = StartDate.AddDays(7);
     DateTime realstart = StartDate;
@@ -26,8 +27,8 @@
     {
         int offSetMonth = ((month + (int)StartMonth) % 12) + 1;
         int curYear = year + (offSetMonth <= month ? 1 : 0);
-        realstart = new DateTime(curYear, offSetMonth, 1);
-        daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
+        realstart = new DateTime(curYear, offSetMonth, 1, calendar);
+        daysinmonth = calendar.GetDaysInMonth(curYear, offSetMonth);
         date = realstart.StartOfMonth().StartOfWeek(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture);
         var currentDate = date;
         var currentMonth = month;
@@ -62,11 +63,11 @@
                                 var day = date.AddDays((row * 7) + col);
                                 var appointments = AppointmentsInRange(day, day.AddDays(1));
                                 var excessCount = appointments.Count();
-                                string classname = $"rz-slot-title {(day.Month != offSetMonth ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")} {(day == CurrentDate && month == CurrentMonth ? " rz-state-focused" : "")}".Trim();
+                                string classname = $"rz-slot-title {(calendar.GetMonth(day) != offSetMonth ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")} {(day == CurrentDate && month == CurrentMonth ? " rz-state-focused" : "")}".Trim();
 
                                     <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot") role="button" tabindex="0" @onkeydown="@(args => OnDayKeyDown(args, day, appointments))">
                                         <div class="@classname">
-                                            @day.Day
+                                            @calendar.GetDayOfMonth(day)
                                         </div>
                                     </div>
                                 }
