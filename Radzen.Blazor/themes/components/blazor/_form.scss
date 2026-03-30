@@ -25,6 +25,7 @@ $validator-transform: translateY(12px) !default;
 
 .rz-message-popup {
   position: absolute;
+  z-index: 1;
   background-color: var(--rz-validator-background-color);
   transform: var(--rz-validator-transform);
   box-shadow: var(--rz-validator-shadow);
