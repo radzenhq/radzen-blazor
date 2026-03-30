@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Radzen.Blazor.Markdown;
+namespace Radzen.Documents.Markdown;
 
 static class EmojiMapping
 {
