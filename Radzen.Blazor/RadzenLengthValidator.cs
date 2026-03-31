@@ -52,7 +52,7 @@ namespace Radzen.Blazor
             ArgumentNullException.ThrowIfNull(component);
             string? value = component.GetValue() as string;
 
-            if (Min.HasValue && (string.IsNullOrEmpty(value) || value.Length < Min))
+            if (Min.HasValue && (value == null || value.Length < Min))
             {
                 return false;
             }
