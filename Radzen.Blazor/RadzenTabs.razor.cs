@@ -334,6 +334,8 @@ namespace Radzen.Blazor
 
         async Task OnKeyPress(KeyboardEventArgs args)
         {
+            shouldRender = true;
+
             var key = args.Code != null ? args.Code : args.Key;
 
             var item = tabs.ElementAtOrDefault(focusedIndex) ?? tabs.FirstOrDefault();
@@ -366,6 +368,7 @@ namespace Radzen.Blazor
             }
             else
             {
+                shouldRender = preventKeyPress || stopKeydownPropagation;
                 preventKeyPress = false;
                 stopKeydownPropagation = false;
             }
