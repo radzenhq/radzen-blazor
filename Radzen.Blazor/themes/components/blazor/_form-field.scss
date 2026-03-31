@@ -338,9 +338,10 @@ $form-field-helper-padding: 0 0.5rem !default;
 
     background-color: transparent;
     transition: inset-block-start var(--rz-transition),
-                transform var(--rz-transition), 
+                inset-inline-start var(--rz-transition),
+                transform var(--rz-transition),
                 color var(--rz-transition),
-                font-size var(--rz-transition), 
+                font-size var(--rz-transition),
                 max-width var(--rz-transition);
 
     &:last-child {
@@ -376,6 +377,7 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-fileupload ~ &,
     .rz-state-empty:has(.rz-placeholder) ~ &,
     .rz-form-field.rz-state-focused & {
+        inset-inline-start: var(--rz-form-field-label-inset-inline-start);
         inset-inline-end: auto;
         inset-block-start: var(--rz-form-field-label-floating-top);
         padding-block-start: 0;
