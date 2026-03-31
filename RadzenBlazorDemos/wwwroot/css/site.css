@@ -683,6 +683,12 @@ svg.illustration {
 
 
 .playground .code-editor {
-    height: 100%; 
+    height: 100%;
     width: 100%;
+}
+
+@media (max-width: 768px) {
+    .rz-tabview-nav {
+        flex-wrap: wrap;
+    }
 }
