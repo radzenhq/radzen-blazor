@@ -134,10 +134,12 @@ namespace Radzen.Blazor
         /// If already at the last step, this method does nothing. Respects CanChange validation.
         /// </summary>
         /// <returns>A task representing the asynchronous navigation operation.</returns>
-        public async System.Threading.Tasks.Task NextStep()
+        public virtual async System.Threading.Tasks.Task NextStep()
         {
             if (!IsLastVisibleStep())
             {
+                var currentStep = steps.ElementAtOrDefault(SelectedIndex);
+
                 var nextIndex = SelectedIndex + 1;
                 while (nextIndex < steps.Count)
                 {
@@ -151,6 +153,11 @@ namespace Radzen.Blazor
                 }
 
                 await SelectStepFromIndex(nextIndex);
+
+                if (SelectedIndex == nextIndex && currentStep != null)
+                {
+                    await currentStep.OnNextStep.InvokeAsync();
+                }
             }
         }
 
@@ -159,10 +166,12 @@ namespace Radzen.Blazor
         /// If already at the first step, this method does nothing. Respects CanChange validation.
         /// </summary>
         /// <returns>A task representing the asynchronous navigation operation.</returns>
-        public async System.Threading.Tasks.Task PrevStep()
+        public virtual async System.Threading.Tasks.Task PrevStep()
         {
             if (!IsFirstVisibleStep())
             {
+                var currentStep = steps.ElementAtOrDefault(SelectedIndex);
+
                 var prevIndex = SelectedIndex - 1;
                 while (prevIndex >= 0)
                 {
@@ -176,6 +185,11 @@ namespace Radzen.Blazor
                 }
 
                 await SelectStepFromIndex(prevIndex);
+
+                if (SelectedIndex == prevIndex && currentStep != null)
+                {
+                    await currentStep.OnPreviousStep.InvokeAsync();
+                }
             }
         }
 
@@ -362,7 +376,10 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AllowStepSelect { get; set; } = true;
 
-        List<RadzenStepsItem> steps = new List<RadzenStepsItem>();
+        /// <summary>
+        /// The collection of steps.
+        /// </summary>
+        protected List<RadzenStepsItem> steps = new List<RadzenStepsItem>();
 
         /// <summary>
         /// Adds the step.
@@ -414,7 +431,12 @@ namespace Radzen.Blazor
             return SelectedIndex == index;
         }
 
-        internal async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
+        /// <summary>
+        /// Selects the specified step.
+        /// </summary>
+        /// <param name="step">The step to select.</param>
+        /// <param name="raiseChange">Whether to raise change events.</param>
+        protected internal virtual async System.Threading.Tasks.Task SelectStep(RadzenStepsItem step, bool raiseChange = false)
         {
             var newIndex = steps.IndexOf(step);
 

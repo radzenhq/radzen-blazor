@@ -71,6 +71,18 @@ namespace Radzen.Blazor
         /// Gets or sets the aria-label attribute of the previous button.
         /// </summary>
         public string? PreviousAriaLabel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback that is invoked when navigating to the next step from this step.
+        /// </summary>
+        [Parameter]
+        public EventCallback OnNextStep { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback that is invoked when navigating to the previous step from this step.
+        /// </summary>
+        [Parameter]
+        public EventCallback OnPreviousStep { get; set; }
         
         /// <summary>
         /// Gets or sets the template.
