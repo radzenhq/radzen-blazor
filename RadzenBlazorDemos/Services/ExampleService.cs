@@ -1122,7 +1122,7 @@ namespace RadzenBlazorDemos
                 new Example
                 {
 
-                    Toc = [ new () { Text = "Pager Density", Anchor = "#pager-density" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Allow Reload", Anchor = "#allow-reload" }, new () { Text = "Pager Density", Anchor = "#pager-density" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Pager",
                     Path = "pager",
                     Description = "Demonstration and configuration of the Radzen Blazor Pager component.",

@@ -46,6 +46,32 @@ namespace Radzen.Blazor
                                                                      .ToString();
 
         /// <summary>
+        /// Gets or sets a value indicating whether the reload button is shown.
+        /// </summary>
+        /// <value><c>true</c> if the reload button is visible; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool AllowReload { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pager's reload button's title attribute.
+        /// </summary>
+        [Parameter]
+        public string ReloadTitle { get; set; } = "Reload";
+
+        /// <summary>
+        /// Gets or sets the pager's reload button's aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string ReloadAriaLabel { get; set; } = "Reload current page.";
+
+        /// <summary>
+        /// Gets or sets the reload callback.
+        /// </summary>
+        /// <value>The reload callback.</value>
+        [Parameter]
+        public EventCallback PageReload { get; set; }
+
+        /// <summary>
         /// Gets or sets the pager's first page button's title attribute.
         /// </summary>
         [Parameter]
@@ -411,6 +437,12 @@ namespace Radzen.Blazor
             {
                 focusedIndex = focusedIndex - 2;
             }
+        }
+
+        async Task OnReloadClick()
+        {
+            await PageReload.InvokeAsync();
+            await PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
         }
 
         internal void ChangeState()

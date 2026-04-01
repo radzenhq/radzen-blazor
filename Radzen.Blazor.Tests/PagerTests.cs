@@ -156,5 +156,72 @@ namespace Radzen.Blazor.Tests
             var nextPageButton = component.Find("button.rz-pager-next");
             Assert.True(nextPageButton.HasAttribute("disabled"));
         }
+
+        [Fact]
+        public void RadzenPager_Does_Not_Render_Reload_Button_By_Default()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            {
+                parameters.Add<int>(p => p.PageSize, 10);
+                parameters.Add<int>(p => p.Count, 100);
+            });
+
+            Assert.DoesNotContain("rz-pager-reload", component.Markup);
+        }
+
+        [Fact]
+        public void RadzenPager_Renders_Reload_Button_When_AllowReload_Is_True()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            {
+                parameters.Add<int>(p => p.PageSize, 10);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<bool>(p => p.AllowReload, true);
+            });
+
+            Assert.Contains("rz-pager-reload", component.Markup);
+            var reloadButton = component.Find("button.rz-pager-reload");
+            Assert.Equal("Reload", reloadButton.GetAttribute("title"));
+            Assert.Equal("Reload current page.", reloadButton.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public async Task RadzenPager_Reload_Button_Fires_PageReload_And_PageChanged()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var reloadFired = false;
+            PagerEventArgs pageChangedArgs = null;
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            {
+                parameters.Add<int>(p => p.PageSize, 10);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<bool>(p => p.AllowReload, true);
+                parameters.Add(p => p.PageReload, () => { reloadFired = true; });
+                parameters.Add(p => p.PageChanged, (PagerEventArgs args) => { pageChangedArgs = args; });
+            });
+
+            await component.InvokeAsync(() => component.Instance.GoToPage(2));
+
+            var reloadButton = component.Find("button.rz-pager-reload");
+            await component.InvokeAsync(() => reloadButton.Click());
+
+            Assert.True(reloadFired);
+            Assert.NotNull(pageChangedArgs);
+            Assert.Equal(20, pageChangedArgs.Skip);
+            Assert.Equal(10, pageChangedArgs.Top);
+            Assert.Equal(2, pageChangedArgs.PageIndex);
+        }
     }
 }

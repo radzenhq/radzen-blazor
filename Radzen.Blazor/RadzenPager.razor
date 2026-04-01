@@ -59,6 +59,15 @@
                     <span class="notranslate rz-pager-icon rzi rzi-step-forward"></span>
                 </button>
             </li>
+            @if(AllowReload)
+            {
+                <li class="rz-pager-item">
+                    <button id="@(GetId() + "rl")" type="button" tabindex="-1" class="rz-pager-reload rz-pager-element"
+                            @onclick="@OnReloadClick" aria-label="@ReloadAriaLabel" title="@ReloadTitle">
+                        <span class="notranslate rz-pager-icon rz-pager-reload-icon rzi rzi-reload"></span>
+                    </button>
+                </li>
+            }
         </ul>
 
         @if(PageSizeOptions != null && PageSizeOptions.Any())

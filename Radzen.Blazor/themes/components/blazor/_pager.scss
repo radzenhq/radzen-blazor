@@ -98,10 +98,20 @@ $pager-button-size: "%button-md" !default;
     }
   }
 
+  .rzi-reload {
+    &:before {
+      content: 'refresh';
+    }
+  }
+
   /* Right-to-left arrow icons */
   *[dir="rtl"] & {
     .rz-pager-icon {
       transform: rotate(180deg);
+    }
+
+    .rz-pager-reload-icon {
+      transform: none;
     }
   }
 
@@ -197,6 +207,12 @@ $pager-button-size: "%button-md" !default;
 
 .rz-pager-last,
 .rz-pager-next {
+  background-color: var(--rz-pager-next-button-background-color);
+  color: var(--rz-pager-next-button-color);
+  border-radius: var(--rz-pager-button-border-radius);
+}
+
+.rz-pager-reload {
   background-color: var(--rz-pager-next-button-background-color);
   color: var(--rz-pager-next-button-color);
   border-radius: var(--rz-pager-button-border-radius);
