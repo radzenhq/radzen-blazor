@@ -1,0 +1,27 @@
+<RadzenStack Gap="1rem" class="rz-p-sm-12">
+    <RadzenAccordion RenderMode="AccordionRenderMode.Client"
+                    Collapse=@(args => Change(args, "Accordion", "collapsed"))
+                    Expand=@(args => Change(args, "Accordion", "expanded"))>
+        <Items>
+            <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
+                Details for Orders
+            </RadzenAccordionItem>
+            <RadzenAccordionItem Text="Employees" Icon="account_box">
+                Details for Employees
+            </RadzenAccordionItem>
+            <RadzenAccordionItem Text="Customers" Icon="accessibility">
+                Details for Customers
+            </RadzenAccordionItem>
+        </Items>
+    </RadzenAccordion>
+
+    <EventConsole @ref=@console />
+</RadzenStack>
+
+@code {
+    EventConsole console;
+    void Change(object value, string name, string action)
+    {
+        console.Log($"{name} item with index {value} {action}");
+    }
+}

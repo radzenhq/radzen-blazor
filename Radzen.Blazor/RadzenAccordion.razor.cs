@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,15 @@ namespace Radzen.Blazor
         /// <value><c>true</c> to allow multiple items expanded; <c>false</c> for single-item expansion. Default is <c>false</c>.</value>
         [Parameter]
         public bool Multiple { get; set; }
+
+        /// <summary>
+        /// Gets or sets the render mode of the accordion.
+        /// When set to <see cref="AccordionRenderMode.Server"/> (default), the component re-renders on every expand/collapse.
+        /// When set to <see cref="AccordionRenderMode.Client"/>, all items are rendered and expand/collapse is handled with JavaScript.
+        /// </summary>
+        /// <value>The render mode. Default is <see cref="AccordionRenderMode.Server"/>.</value>
+        [Parameter]
+        public AccordionRenderMode RenderMode { get; set; } = AccordionRenderMode.Server;
 
         /// <summary>
         /// Gets or sets the zero-based index of the currently expanded item.
@@ -220,6 +230,12 @@ namespace Radzen.Blazor
         {
             if(item.Disabled) return;
 
+            if (RenderMode == AccordionRenderMode.Client && accordionJs != null && value == null)
+            {
+                await SelectItemOnClient(item);
+                return;
+            }
+
             await CollapseAll(item);
 
             var itemIndex = items.IndexOf(item);
@@ -250,16 +266,27 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task ExpandAll()
         {
-            foreach (var item in items.Where(i => i.Visible && !i.Disabled))
+            var visibleItems = items.Where(i => i.Visible && !i.Disabled).ToList();
+
+            foreach (var item in visibleItems)
             {
                 if (!item.GetSelected())
                 {
+                    if (RenderMode == AccordionRenderMode.Client && accordionJs != null)
+                    {
+                        var visibleIndex = items.Where(i => i.Visible).ToList().IndexOf(item);
+                        await accordionJs.InvokeVoidAsync("toggle", visibleIndex, true);
+                    }
+
                     await item.SetSelected(true);
                     await Expand.InvokeAsync(items.IndexOf(item));
                 }
             }
 
-            StateHasChanged();
+            if (RenderMode != AccordionRenderMode.Client)
+            {
+                StateHasChanged();
+            }
         }
 
         /// <summary>
@@ -267,16 +294,27 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task CollapseAll()
         {
-            foreach (var item in items.Where(i => i.Visible && !i.Disabled))
+            var visibleItems = items.Where(i => i.Visible && !i.Disabled).ToList();
+
+            foreach (var item in visibleItems)
             {
                 if (item.GetSelected())
                 {
+                    if (RenderMode == AccordionRenderMode.Client && accordionJs != null)
+                    {
+                        var visibleIndex = items.Where(i => i.Visible).ToList().IndexOf(item);
+                        await accordionJs.InvokeVoidAsync("toggle", visibleIndex, false);
+                    }
+
                     await item.SetSelected(false);
                     await Collapse.InvokeAsync(items.IndexOf(item));
                 }
             }
 
-            StateHasChanged();
+            if (RenderMode != AccordionRenderMode.Client)
+            {
+                StateHasChanged();
+            }
         }
 
         async System.Threading.Tasks.Task CollapseAll(RadzenAccordionItem item)
@@ -292,6 +330,76 @@ namespace Radzen.Blazor
                     }
                 }
             }
+        }
+
+        IJSObjectReference? accordionJs;
+        bool shouldRender = true;
+        bool renderModeNeedsInit;
+
+        /// <inheritdoc />
+        protected override bool ShouldRender()
+        {
+            return shouldRender;
+        }
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if ((firstRender || renderModeNeedsInit) && RenderMode == AccordionRenderMode.Client && JSRuntime != null)
+            {
+                renderModeNeedsInit = false;
+                accordionJs = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createAccordion", Element, Multiple);
+            }
+        }
+
+        internal async Task SelectItemOnClient(RadzenAccordionItem item)
+        {
+            if (item.Disabled || accordionJs == null) return;
+
+            var visibleItems = items.Where(i => i.Visible).ToList();
+            var visibleIndex = visibleItems.IndexOf(item);
+            if (visibleIndex < 0) return;
+
+            var expanded = !item.GetSelected();
+
+            await accordionJs.InvokeVoidAsync("toggle", visibleIndex, expanded);
+
+            shouldRender = false;
+
+            if (!Multiple)
+            {
+                foreach (var i in items.Where(i => i != item && i.Visible && !i.Disabled))
+                {
+                    if (i.GetSelected())
+                    {
+                        await i.SetSelected(false);
+                        await Collapse.InvokeAsync(items.IndexOf(i));
+                    }
+                }
+            }
+
+            var itemIndex = items.IndexOf(item);
+
+            if (expanded)
+            {
+                await Expand.InvokeAsync(itemIndex);
+            }
+            else
+            {
+                await Collapse.InvokeAsync(itemIndex);
+            }
+
+            await item.SetSelected(expanded);
+
+            if (!Multiple)
+            {
+                await SelectedIndexChanged.InvokeAsync(itemIndex);
+            }
+
+            shouldRender = true;
         }
 
         internal int focusedIndex = -1;
@@ -338,6 +446,25 @@ namespace Radzen.Blazor
         {
             _itemRefreshPending = false;
 
+            if (parameters.DidParameterChange(nameof(Multiple), Multiple) && accordionJs != null)
+            {
+                await accordionJs.InvokeVoidAsync("setMultiple", parameters.GetValueOrDefault<bool>(nameof(Multiple)));
+            }
+
+            var renderModeChanged = parameters.DidParameterChange(nameof(RenderMode), RenderMode);
+            if (renderModeChanged)
+            {
+                var newRenderMode = parameters.GetValueOrDefault<AccordionRenderMode>(nameof(RenderMode));
+
+                if (newRenderMode == AccordionRenderMode.Server && accordionJs != null)
+                {
+                    try { await accordionJs.InvokeVoidAsync("dispose"); } catch { }
+                    accordionJs = null;
+                }
+
+                renderModeNeedsInit = newRenderMode == AccordionRenderMode.Client && accordionJs == null;
+            }
+
             if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
             {
                 var item = items.Where(i => i.Visible).ElementAtOrDefault(parameters.GetValueOrDefault<int>(nameof(SelectedIndex)));
@@ -346,7 +473,7 @@ namespace Radzen.Blazor
                     await SelectItem(item);
                 }
             }
-            
+
             await base.SetParametersAsync(parameters);
         }
 
@@ -356,6 +483,17 @@ namespace Radzen.Blazor
             focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
 
             base.OnInitialized();
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            if (accordionJs != null)
+            {
+                try { accordionJs.InvokeVoidAsync("dispose"); } catch { }
+            }
         }
     }
 }

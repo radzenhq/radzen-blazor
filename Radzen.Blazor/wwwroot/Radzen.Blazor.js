@@ -638,6 +638,60 @@ window.Radzen = {
         }
     }
   },
+  createAccordion: function (el, multiple) {
+    function getItems() {
+        var headers = [];
+        var expanders = [];
+        for (var i = 0; i < el.children.length; i++) {
+            var child = el.children[i];
+            if (child.classList.contains('rz-accordion-header')) {
+                headers.push(child);
+            } else if (child.classList.contains('rz-expander')) {
+                expanders.push(child);
+            }
+        }
+        return { headers: headers, expanders: expanders };
+    }
+
+    function toggleItem(index, expanded) {
+        var items = getItems();
+        if (index < 0 || index >= items.headers.length) return;
+
+        if (!multiple) {
+            for (var i = 0; i < items.headers.length; i++) {
+                if (i !== index) {
+                    var btn = items.headers[i].querySelector('button');
+                    var icon = items.headers[i].querySelector('.rz-accordion-toggle-icon');
+                    if (btn) btn.setAttribute('aria-expanded', 'false');
+                    if (icon) {
+                        icon.classList.remove('rz-state-expanded');
+                        icon.classList.add('rz-state-collapsed');
+                    }
+                    items.expanders[i].classList.remove('rz-state-expanded');
+                    items.expanders[i].classList.add('rz-state-collapsed');
+                    items.expanders[i].setAttribute('aria-hidden', 'true');
+                }
+            }
+        }
+
+        var button = items.headers[index].querySelector('button');
+        var toggleIcon = items.headers[index].querySelector('.rz-accordion-toggle-icon');
+        if (button) button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        if (toggleIcon) {
+            toggleIcon.classList.remove(expanded ? 'rz-state-collapsed' : 'rz-state-expanded');
+            toggleIcon.classList.add(expanded ? 'rz-state-expanded' : 'rz-state-collapsed');
+        }
+        items.expanders[index].classList.remove(expanded ? 'rz-state-collapsed' : 'rz-state-expanded');
+        items.expanders[index].classList.add(expanded ? 'rz-state-expanded' : 'rz-state-collapsed');
+        items.expanders[index].setAttribute('aria-hidden', expanded ? 'false' : 'true');
+    }
+
+    return {
+        toggle: function (index, expanded) { toggleItem(index, expanded); },
+        setMultiple: function (value) { multiple = value; },
+        dispose: function () { }
+    };
+  },
   loadGoogleMaps: function (defaultView, apiKey, resolve, reject, language) {
     resolveCallbacks.push(resolve);
     rejectCallbacks.push(reject);
