@@ -1,0 +1,48 @@
+<RadzenStack Gap="2rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenText TextStyle="TextStyle.Body1">Transition:</RadzenText>
+        <RadzenDropDown @bind-Value="transition" Data="transitions" TextProperty="Text" ValueProperty="Value" Style="width: 150px;" />
+        <RadzenText TextStyle="TextStyle.Body1">Duration (ms):</RadzenText>
+        <RadzenNumeric @bind-Value="duration" Min="100" Max="2000" Step="50" Style="width: 120px;" />
+    </RadzenStack>
+    <RadzenSteps Transition="@transition" TransitionDuration="@duration">
+        <Steps>
+            <RadzenStepsItem Text="Personal Info">
+                <RadzenStack Gap="1rem" class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Enter your personal information</RadzenText>
+                    <RadzenTextBox Placeholder="First name" />
+                    <RadzenTextBox Placeholder="Last name" />
+                    <RadzenTextBox Placeholder="Email" />
+                </RadzenStack>
+            </RadzenStepsItem>
+            <RadzenStepsItem Text="Address">
+                <RadzenStack Gap="1rem" class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Enter your address</RadzenText>
+                    <RadzenTextBox Placeholder="Street" />
+                    <RadzenTextBox Placeholder="City" />
+                    <RadzenTextBox Placeholder="Zip code" />
+                </RadzenStack>
+            </RadzenStepsItem>
+            <RadzenStepsItem Text="Confirmation">
+                <RadzenStack Gap="1rem" class="rz-p-4">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Review and confirm</RadzenText>
+                    <RadzenText>Please review your information and click submit.</RadzenText>
+                </RadzenStack>
+            </RadzenStepsItem>
+        </Steps>
+    </RadzenSteps>
+</RadzenStack>
+
+@code {
+    StepsTransition transition = StepsTransition.Fade;
+    int duration = 1000;
+
+    record TransitionOption(string Text, StepsTransition Value);
+
+    List<TransitionOption> transitions = new()
+    {
+        new("None", StepsTransition.None),
+        new("Fade", StepsTransition.Fade),
+        new("Slide", StepsTransition.Slide),
+    };
+}

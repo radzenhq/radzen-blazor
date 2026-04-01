@@ -156,17 +156,55 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
 }
 
 
+@keyframes rz-steps-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rz-steps-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.rz-steps-fade {
+  animation: rz-steps-fade-in var(--rz-steps-transition-duration, 300ms) ease-out;
+}
+
+.rz-steps-slide {
+  animation: rz-steps-slide-in var(--rz-steps-transition-duration, 300ms) ease-out;
+}
+
 *[dir="rtl"] {
   .rz-steps-prev {
     .rzi:before {
       content: 'navigate_next';
     }
   }
-  
+
   .rz-steps-next {
     .rzi:before {
       content: 'navigate_before';
     }
   }
-  
+
+  @keyframes rz-steps-slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 }

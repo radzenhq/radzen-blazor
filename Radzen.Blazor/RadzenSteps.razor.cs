@@ -61,6 +61,22 @@ namespace Radzen.Blazor
         public bool ShowStepsButtons { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets the transition animation used when switching between steps.
+        /// </summary>
+        /// <value>The transition type. Default is <see cref="StepsTransition.None"/> (no animation).</value>
+        [Parameter]
+        public StepsTransition Transition { get; set; } = StepsTransition.None;
+
+        /// <summary>
+        /// Gets or sets the duration of the transition animation in milliseconds.
+        /// </summary>
+        /// <value>The animation duration in milliseconds. Default is <c>300</c>.</value>
+        [Parameter]
+        public int TransitionDuration { get; set; } = 300;
+
+        int transitionKey;
+
+        /// <summary>
         /// Gets or sets the edit context.
         /// </summary>
         /// <value>The edit context.</value>
@@ -458,6 +474,7 @@ namespace Radzen.Blazor
 
             if (valid || newIndex < SelectedIndex)
             {
+                transitionKey++;
                 SelectedIndex = newIndex;
 
                 if (raiseChange)
@@ -472,6 +489,26 @@ namespace Radzen.Blazor
         internal void SelectFirst()
         {
             SelectedIndex = 0;
+        }
+
+        string GetContentCssClass()
+        {
+            return Transition switch
+            {
+                StepsTransition.Fade => "rz-widget-content rz-steps-fade",
+                StepsTransition.Slide => "rz-widget-content rz-steps-slide",
+                _ => "rz-widget-content"
+            };
+        }
+
+        string GetTransitionStyle()
+        {
+            if (Transition != StepsTransition.None)
+            {
+                return $"--rz-steps-transition-duration: {TransitionDuration}ms";
+            }
+
+            return string.Empty;
         }
 
         /// <inheritdoc />

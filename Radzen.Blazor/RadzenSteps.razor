@@ -50,7 +50,7 @@
         {
             @if (IsSelected(i, step))
             {
-                <div class="rz-widget-content" role="tabpanel" id="@($"{GetId()}-panel-{i}")" aria-labelledby="@(GetId() + i.ToString() + "s")">
+                <div @key="transitionKey" class="@GetContentCssClass()" style="@GetTransitionStyle()" role="tabpanel" id="@($"{GetId()}-panel-{i}")" aria-labelledby="@(GetId() + i.ToString() + "s")">
                     @if (step.ChildContent != null)
                     {
                         @step.ChildContent

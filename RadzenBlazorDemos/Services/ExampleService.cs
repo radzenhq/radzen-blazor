@@ -1558,12 +1558,12 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "CanChange event", Anchor = "#canchange-event" } ],
+                    Toc = [ new () { Text = "Transition", Anchor = "#transition" }, new () { Text = "CanChange event", Anchor = "#canchange-event" } ],
                     Name = "Steps",
                     Description = "Blazor Steps component to guide users through a process with numbered steps representing each stage.",
                     Path = "steps",
                     Icon = "\ue8be",
-                    Tags = new [] { "step", "steps", "wizard" }
+                    Tags = new [] { "step", "steps", "wizard", "transition", "animation" }
                 },
                 new Example
                 {
