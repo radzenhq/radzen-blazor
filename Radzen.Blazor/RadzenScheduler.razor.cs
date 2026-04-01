@@ -168,6 +168,27 @@ namespace Radzen.Blazor
         public bool ShowHeader { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the previous and next navigation buttons are visible. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if the navigation buttons are visible; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowNavigationButtons { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the today button is visible. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if the today button is visible; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowTodayButton { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the date title is visible. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if the date title is visible; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowDateTitle { get; set; } = true;
+
+        /// <summary>
         /// A callback that will be invoked when the user clicks a slot in the current view. Commonly used to add new appointments.
         /// </summary>
         /// <example>
