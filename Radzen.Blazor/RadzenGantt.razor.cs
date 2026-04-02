@@ -1024,6 +1024,13 @@ namespace Radzen.Blazor
         #endregion
 
         /// <inheritdoc />
+        /// <inheritdoc />
+        protected override async Task AddContextMenu()
+        {
+            await Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
         protected override string GetComponentCssClass() => "rz-gantt";
 
         #region Timeline Building
