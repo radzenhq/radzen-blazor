@@ -122,12 +122,14 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
+        private string? ariaLabel;
+
         /// <summary>
         /// Gets or sets the menu aria label text.
         /// </summary>
         /// <value>The menu aria label text.</value>
         [Parameter]
-        public string AriaLabel { get; set; } = "Menu";
+        public string AriaLabel { get => ariaLabel ?? Localize(nameof(RadzenStrings.Menu_AriaLabel)); set => ariaLabel = value; }
 
         [Inject]
         NavigationManager? NavigationManager { get; set; }
@@ -315,11 +317,13 @@ namespace Radzen.Blazor
             }
         }
 
+        private string? toggleAriaLabel;
+
         /// <summary>
         /// Gets or sets the add button aria-label attribute.
         /// </summary>
         [Parameter]
-        public string ToggleAriaLabel { get; set; } = "Toggle";
+        public string ToggleAriaLabel { get => toggleAriaLabel ?? Localize(nameof(RadzenStrings.Menu_ToggleAriaLabel)); set => toggleAriaLabel = value; }
 
         /// <inheritdoc />
         protected override void OnInitialized()

@@ -30,13 +30,15 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenLink : RadzenComponent
     {
+        private string? imageAlternateText;
+
         /// <summary>
         /// Gets or sets the alternate text for the image when using the <see cref="Image"/> property.
         /// Provides accessibility text for screen readers when an image is used instead of an icon.
         /// </summary>
         /// <value>The image alternate text. Default is "image".</value>
         [Parameter]
-        public string ImageAlternateText { get; set; } = "image";
+        public string ImageAlternateText { get => imageAlternateText ?? Localize(nameof(RadzenStrings.Link_ImageAlternateText)); set => imageAlternateText = value; }
 
         /// <summary>
         /// Gets or sets custom child content to render as the link content.

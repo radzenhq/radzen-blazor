@@ -53,12 +53,14 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment? ButtonContent { get; set; }
 
+        private string? imageAlternateText;
+
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string ImageAlternateText { get; set; } = "image";
+        public string ImageAlternateText { get => imageAlternateText ?? Localize(nameof(RadzenStrings.SplitButton_ImageAlternateText)); set => imageAlternateText = value; }
 
         /// <summary>
         /// Gets or sets the text.
@@ -150,11 +152,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AlwaysOpenPopup { get; set; }
 
+        private string? openAriaLabel;
+
         /// <summary>
         /// Gets or sets the open button aria-label attribute.
         /// </summary>
         [Parameter]
-        public string OpenAriaLabel { get; set; } = "Open";
+        public string OpenAriaLabel { get => openAriaLabel ?? Localize(nameof(RadzenStrings.SplitButton_OpenAriaLabel)); set => openAriaLabel = value; }
 
         /// <summary>
         /// Gets or sets the icon of the drop down.
@@ -384,10 +388,12 @@ namespace Radzen.Blazor
             return GetId();
         }
 
+        private string? buttonAriaLabel;
+
         /// <summary>
         /// Gets or sets the add button aria-label attribute.
         /// </summary>
         [Parameter]
-        public string ButtonAriaLabel { get; set; } = "Button";
+        public string ButtonAriaLabel { get => buttonAriaLabel ?? Localize(nameof(RadzenStrings.SplitButton_ButtonAriaLabel)); set => buttonAriaLabel = value; }
     }
 }

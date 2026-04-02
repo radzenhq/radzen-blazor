@@ -52,13 +52,15 @@ namespace Radzen.Blazor
         [Parameter]
         public override string Text { get; set; } = string.Empty;
 
+        private string? messageSeparator;
+
         /// <summary>
         /// Gets or sets the text used to join multiple validation error messages.
         /// When multiple data annotation attributes fail (e.g., both Required and StringLength), their messages are combined with this separator.
         /// </summary>
         /// <value>The message separator text. Default is " and ".</value>
         [Parameter]
-        public string MessageSeparator { get; set; } = " and ";
+        public string MessageSeparator { get => messageSeparator ?? Localize(nameof(RadzenStrings.DataAnnotationValidator_MessageSeparator)); set => messageSeparator = value; }
 
         /// <summary>
         /// Service provider injected from the Dependency Injection (DI) container.

@@ -54,29 +54,37 @@ namespace Radzen.Blazor
         [Parameter]
         public string? Title { get; set; }
 
+        private string? placeholder;
+
         /// <summary>
         /// Gets or sets the placeholder text for the input field.
         /// </summary>
         [Parameter]
-        public string Placeholder { get; set; } = "Type your message...";
+        public string Placeholder { get => placeholder ?? Localize(nameof(RadzenStrings.AIChat_Placeholder)); set => placeholder = value; }
+
+        private string? emptyMessage;
 
         /// <summary>
         /// Gets or sets the message displayed when there are no messages.
         /// </summary>
         [Parameter]
-        public string EmptyMessage { get; set; } = "No messages yet. Start a conversation!";
+        public string EmptyMessage { get => emptyMessage ?? Localize(nameof(RadzenStrings.AIChat_EmptyMessage)); set => emptyMessage = value; }
+
+        private string? userAvatarText;
 
         /// <summary>
         /// Gets or sets the text displayed in the user avatar.
         /// </summary>
         [Parameter]
-        public string UserAvatarText { get; set; } = "U";
+        public string UserAvatarText { get => userAvatarText ?? Localize(nameof(RadzenStrings.AIChat_UserAvatarText)); set => userAvatarText = value; }
+
+        private string? assistantAvatarText;
 
         /// <summary>
         /// Gets or sets the text displayed in the assistant avatar.
         /// </summary>
         [Parameter]
-        public string AssistantAvatarText { get; set; } = "AI";
+        public string AssistantAvatarText { get => assistantAvatarText ?? Localize(nameof(RadzenStrings.AIChat_AssistantAvatarText)); set => assistantAvatarText = value; }
 
         /// <summary>
         /// Gets or sets the model name.

@@ -36,12 +36,14 @@ namespace Radzen.Blazor
         [Parameter]
         public int? MaxAppointmentsInSlot { get; set; }
 
+        private string? moreText;
+
         /// <summary>
         /// Specifies the text displayed when there are more appointments in a slot than <see cref="MaxAppointmentsInSlot" />.
         /// </summary>
         /// <value>The more text. Set to <c>"+ {0} more"</c> by default.</value>
         [Parameter]
-        public string MoreText { get; set; } = "+ {0} more";
+        public string MoreText { get => moreText ?? Localize(nameof(RadzenStrings.MonthView_MoreText)); set => moreText = value; }
 
         /// <inheritdoc />
         public override DateTime StartDate

@@ -121,26 +121,32 @@ namespace Radzen.Blazor
         [Parameter]
         public int SelectedIndex { get; set; }
 
+        private string? todayText;
+
         /// <summary>
         /// Gets or sets the text of the today button. Set to <c>Today</c> by default.
         /// </summary>
         /// <value>The today text.</value>
         [Parameter]
-        public string TodayText { get; set; } = "Today";
+        public string TodayText { get => todayText ?? Localize(nameof(RadzenStrings.Scheduler_TodayText)); set => todayText = value; }
+
+        private string? nextText;
 
         /// <summary>
         /// Gets or sets the text of the next button. Set to <c>Next</c> by default.
         /// </summary>
         /// <value>The next text.</value>
         [Parameter]
-        public string NextText { get; set; } = "Next";
+        public string NextText { get => nextText ?? Localize(nameof(RadzenStrings.Scheduler_NextText)); set => nextText = value; }
+
+        private string? prevText;
 
         /// <summary>
         /// Gets or sets the text of the previous button. Set to <c>Previous</c> by default.
         /// </summary>
         /// <value>The previous text.</value>
         [Parameter]
-        public string PrevText { get; set; } = "Previous";
+        public string PrevText { get => prevText ?? Localize(nameof(RadzenStrings.Scheduler_PrevText)); set => prevText = value; }
 
         /// <summary>
         /// Gets or sets the initial date displayed by the selected view. Set to <c>DateTime.Today</c> by default.

@@ -59,26 +59,32 @@ namespace Radzen.Blazor
         [Parameter]
         public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
+        private string? chooseText;
+
         /// <summary>
         /// Gets or sets the choose button text.
         /// </summary>
         /// <value>The choose button text.</value>
         [Parameter]
-        public string ChooseText { get; set; } = "Choose";
+        public string ChooseText { get => chooseText ?? Localize(nameof(RadzenStrings.FileInput_ChooseText)); set => chooseText = value; }
+
+        private string? deleteText;
 
         /// <summary>
         /// Gets or sets the delete button text.
         /// </summary>
         /// <value>The delete button text.</value>
         [Parameter]
-        public string DeleteText { get; set; } = "Delete";
+        public string DeleteText { get => deleteText ?? Localize(nameof(RadzenStrings.FileInput_DeleteText)); set => deleteText = value; }
+
+        private string? imageAlternateText;
 
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string ImageAlternateText { get; set; } = "image";
+        public string ImageAlternateText { get => imageAlternateText ?? Localize(nameof(RadzenStrings.FileInput_ImageAlternateText)); set => imageAlternateText = value; }
 
         /// <summary>
         /// Gets or sets the title.
