@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using Radzen.Blazor;
 
 namespace Radzen
 {
@@ -251,33 +252,41 @@ namespace Radzen
         [Parameter]
         public string? DisabledProperty { get; set; }
 
+        private string? removeChipTitle;
+
         /// <summary>
         /// Gets or sets the remove chip button title.
         /// </summary>
         /// <value>The remove chip button title.</value>
         [Parameter]
-        public string RemoveChipTitle { get; set; } = "Remove";
+        public string RemoveChipTitle { get => removeChipTitle ?? Localize(nameof(RadzenStrings.DropDown_RemoveChipTitle)); set => removeChipTitle = value; }
+
+        private string? clearAriaLabel;
 
         /// <summary>
         /// Gets or sets the clear button aria label text.
         /// </summary>
         /// <value>The clear button aria label text.</value>
         [Parameter]
-        public string ClearAriaLabel { get; set; } = "Clear";
+        public string ClearAriaLabel { get => clearAriaLabel ?? Localize(nameof(RadzenStrings.DropDown_ClearAriaLabel)); set => clearAriaLabel = value; }
+
+        private string? searchAriaLabel;
 
         /// <summary>
         /// Gets or sets the search aria label text.
         /// </summary>
         /// <value>The search aria label text.</value>
         [Parameter]
-        public string SearchAriaLabel { get; set; } = "Search";
+        public string SearchAriaLabel { get => searchAriaLabel ?? Localize(nameof(RadzenStrings.DropDown_SearchAriaLabel)); set => searchAriaLabel = value; }
+
+        private string? emptyAriaLabel;
 
         /// <summary>
         /// Gets or sets the empty value aria label text.
         /// </summary>
         /// <value>The empty value aria label text.</value>
         [Parameter]
-        public string EmptyAriaLabel { get; set; } = "Empty";
+        public string EmptyAriaLabel { get => emptyAriaLabel ?? Localize(nameof(RadzenStrings.DropDown_EmptyAriaLabel)); set => emptyAriaLabel = value; }
 
         /// <summary>
         /// Gets or sets the selected item changed.

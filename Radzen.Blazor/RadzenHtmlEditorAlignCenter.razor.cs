@@ -20,10 +20,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "justifyCenter";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Align center"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Align center";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorAlignCenter_Title)); set => title = value; }
     }
 }

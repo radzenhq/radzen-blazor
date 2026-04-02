@@ -29,59 +29,77 @@ namespace Radzen.Blazor
             public string? Height { get; set; }
         }
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Insert image"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Insert image";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorImage_Title)); set => title = value; }
+
+        private string? selectText;
 
         /// <summary>
         /// Specifies the text of the label suggesting the user to select a file for upload. Set to <c>"Select image file to upload"</c> by default.
         /// </summary>
         [Parameter]
-        public string SelectText { get; set; } = "Select image file to upload";
+        public string SelectText { get => selectText ?? Localize(nameof(RadzenStrings.HtmlEditorImage_SelectText)); set => selectText = value; }
+
+        private string? uploadChooseText;
 
         /// <summary>
         /// Specifies the text of the upload label. Set to <c>"Browse"</c> by default.
         /// </summary>
         [Parameter]
-        public string UploadChooseText { get; set; } = "Browse";
+        public string UploadChooseText { get => uploadChooseText ?? Localize(nameof(RadzenStrings.HtmlEditorImage_UploadChooseText)); set => uploadChooseText = value; }
+
+        private string? urlText;
 
         /// <summary>
         /// Specifies the text of the label suggesting the user to enter a web address. Set to <c>"or enter a web address"</c> by default.
         /// </summary>
         [Parameter]
-        public string UrlText { get; set; } = "or enter a web address";
+        public string UrlText { get => urlText ?? Localize(nameof(RadzenStrings.HtmlEditorImage_UrlText)); set => urlText = value; }
+
+        private string? altText;
 
         /// <summary>
         /// Specifies the text of the label suggesting the user to enter a alternative text (<c>alt</c>) for the image. Set to <c>"Alternative text"</c> by default.
         /// </summary>
         [Parameter]
-        public string AltText { get; set; } = "Alternative text";
+        public string AltText { get => altText ?? Localize(nameof(RadzenStrings.HtmlEditorImage_AltText)); set => altText = value; }
+
+        private string? okText;
 
         /// <summary>
         /// Specifies the text of button which inserts the image. Set to <c>"OK"</c> by default.
         /// </summary>
         [Parameter]
-        public string OkText { get; set; } = "OK";
+        public string OkText { get => okText ?? Localize(nameof(RadzenStrings.HtmlEditorImage_OkText)); set => okText = value; }
+
+        private string? cancelText;
 
         /// <summary>
         /// Specifies the text of button which cancels image insertion and closes the dialog. Set to <c>"Cancel"</c> by default.
         /// </summary>
         [Parameter]
-        public string CancelText { get; set; } = "Cancel";
+        public string CancelText { get => cancelText ?? Localize(nameof(RadzenStrings.HtmlEditorImage_CancelText)); set => cancelText = value; }
+
+        private string? widthText;
 
         /// <summary>
         /// Specifies the text of label for image width. Set to <c>"Image Width"</c> by default.
         /// </summary>
         [Parameter]
-        public string WidthText { get; set; } = "Image Width";
+        public string WidthText { get => widthText ?? Localize(nameof(RadzenStrings.HtmlEditorImage_WidthText)); set => widthText = value; }
+
+        private string? heightText;
 
         /// <summary>
         /// Specifies the text of label for image height. Set to <c>"Image Height"</c> by default.
         /// </summary>
         [Parameter]
-        public string HeightText { get; set; } = "Image Height";
+        public string HeightText { get => heightText ?? Localize(nameof(RadzenStrings.HtmlEditorImage_HeightText)); set => heightText = value; }
 
         /// <summary>
         /// Specifies whether to show the image width section. Set it to false to hide it. Default value is true.

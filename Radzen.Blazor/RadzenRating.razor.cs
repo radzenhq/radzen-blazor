@@ -42,13 +42,17 @@ namespace Radzen.Blazor
         [Parameter]
         public int Stars { get; set; } = 5;
 
+        private string? clearAriaLabel;
+
         /// <summary>
         /// Gets or sets the accessible label text for the clear rating action.
         /// Used by screen readers to announce the clear/reset rating button functionality.
         /// </summary>
         /// <value>The ARIA label for clearing the rating. Default is "Clear".</value>
         [Parameter]
-        public string ClearAriaLabel { get; set; } = "Clear";
+        public string ClearAriaLabel { get => clearAriaLabel ?? Localize(nameof(RadzenStrings.Rating_ClearAriaLabel)); set => clearAriaLabel = value; }
+
+        private string? rateAriaLabel;
 
         /// <summary>
         /// Gets or sets the accessible label text template for rating actions.
@@ -56,7 +60,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The ARIA label for rating actions. Default is "Rate".</value>
         [Parameter]
-        public string RateAriaLabel { get; set; } = "Rate";
+        public string RateAriaLabel { get => rateAriaLabel ?? Localize(nameof(RadzenStrings.Rating_RateAriaLabel)); set => rateAriaLabel = value; }
 
         /// <summary>
         /// Gets or sets whether the rating is read-only and cannot be changed by user interaction.

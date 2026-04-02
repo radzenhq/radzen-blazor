@@ -73,12 +73,14 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowIcon { get; set; } = true;
 
+        private string? toggleAriaLabel;
+
         /// <summary>
         /// Gets or sets the toggle aria label text.
         /// </summary>
         /// <value>The toggle aria label text.</value>
         [Parameter]
-        public string ToggleAriaLabel { get; set; } = "Profile menu";
+        public string ToggleAriaLabel { get => toggleAriaLabel ?? Localize(nameof(RadzenStrings.ProfileMenu_ToggleAriaLabel)); set => toggleAriaLabel = value; }
 
         string contentStyle = "display:none;position:absolute;z-index:1;";
 

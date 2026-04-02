@@ -45,19 +45,23 @@ namespace Radzen.Blazor
 
         private string CurrentIcon => recording ? StopIcon : Icon;
 
+        private string? title;
+
         /// <summary>
         /// Gets or sets the message displayed when user hovers the button and it is not recording.
         /// </summary>
         /// <value>The message.</value>
         [Parameter]
-        public string Title { get; set; } = "Press to start speech recognition";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.SpeechToTextButton_Title)); set => title = value; }
+
+        private string? stopTitle;
 
         /// <summary>
         /// Gets or sets the message displayed when user hovers the button and it is recording.
         /// </summary>
         /// <value>The message.</value>
         [Parameter]
-        public string StopTitle { get; set; } = "Press to stop speech recognition";
+        public string StopTitle { get => stopTitle ?? Localize(nameof(RadzenStrings.SpeechToTextButton_StopTitle)); set => stopTitle = value; }
 
         private string CurrentTitle => recording ? StopTitle : Title;
 

@@ -2,6 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Radzen.Blazor;
 
 namespace Radzen.Blazor
 {
@@ -10,6 +13,19 @@ namespace Radzen.Blazor
     /// </summary>
     public abstract class RadzenHtmlEditorButtonBase : ComponentBase, IDisposable
     {
+        [Inject]
+        private IServiceProvider Services { get; set; } = default!;
+
+        private Localizer? localizer;
+
+        internal Localizer Localizer => localizer ??=
+            Services.GetService<Localizer>() ?? Localizer.Default;
+
+        /// <summary>
+        /// Gets a localized string for the specified resource key.
+        /// </summary>
+        public string Localize(string key) => Localizer.Get(key, CultureInfo.CurrentUICulture);
+
         /// <summary>
         /// The RadzenHtmlEditor component which this tool is part of.
         /// </summary>

@@ -351,29 +351,37 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment<TItem>? TaskTemplate { get; set; }
 
+        private string? todayText;
+
         /// <summary>
         /// Text for the "Today" navigation button. Default is <c>"Today"</c>.
         /// </summary>
         [Parameter]
-        public string TodayText { get; set; } = "Today";
+        public string TodayText { get => todayText ?? Localize(nameof(RadzenStrings.Gantt_TodayText)); set => todayText = value; }
+
+        private string? prevText;
 
         /// <summary>
         /// Tooltip for the "Previous" navigation button. Default is <c>"Previous"</c>.
         /// </summary>
         [Parameter]
-        public string PrevText { get; set; } = "Previous";
+        public string PrevText { get => prevText ?? Localize(nameof(RadzenStrings.Gantt_PrevText)); set => prevText = value; }
+
+        private string? nextText;
 
         /// <summary>
         /// Tooltip for the "Next" navigation button. Default is <c>"Next"</c>.
         /// </summary>
         [Parameter]
-        public string NextText { get; set; } = "Next";
+        public string NextText { get => nextText ?? Localize(nameof(RadzenStrings.Gantt_NextText)); set => nextText = value; }
+
+        private string? zoomToFitText;
 
         /// <summary>
         /// Tooltip for the "Zoom to fit" navigation button. Default is <c>"Zoom to fit"</c>.
         /// </summary>
         [Parameter]
-        public string ZoomToFitText { get; set; } = "Zoom to fit";
+        public string ZoomToFitText { get => zoomToFitText ?? Localize(nameof(RadzenStrings.Gantt_ZoomToFitText)); set => zoomToFitText = value; }
 
         #endregion
 
@@ -493,11 +501,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowEmptyMessage { get; set; } = true;
 
+        private string? emptyText;
+
         /// <summary>
         /// Gets or sets the empty text.
         /// </summary>
         [Parameter]
-        public string EmptyText { get; set; } = "No records to display.";
+        public string EmptyText { get => emptyText ?? Localize(nameof(RadzenStrings.Gantt_EmptyText)); set => emptyText = value; }
 
         /// <summary>
         /// Gets or sets whether loading indicator is shown.
@@ -563,119 +573,157 @@ namespace Radzen.Blazor
 
         #region DataGrid Proxied Filter Text
 
+        private string? filterText;
+
         /// <summary>
         /// Filter text.
         /// </summary>
         [Parameter]
-        public string FilterText { get; set; } = "Filter";
+        public string FilterText { get => filterText ?? Localize(nameof(RadzenStrings.Gantt_FilterText)); set => filterText = value; }
+
+        private string? andOperatorText;
 
         /// <summary>
         /// And operator text.
         /// </summary>
         [Parameter]
-        public string AndOperatorText { get; set; } = "And";
+        public string AndOperatorText { get => andOperatorText ?? Localize(nameof(RadzenStrings.Gantt_AndOperatorText)); set => andOperatorText = value; }
+
+        private string? orOperatorText;
 
         /// <summary>
         /// Or operator text.
         /// </summary>
         [Parameter]
-        public string OrOperatorText { get; set; } = "Or";
+        public string OrOperatorText { get => orOperatorText ?? Localize(nameof(RadzenStrings.Gantt_OrOperatorText)); set => orOperatorText = value; }
+
+        private string? applyFilterText;
 
         /// <summary>
         /// Apply filter text.
         /// </summary>
         [Parameter]
-        public string ApplyFilterText { get; set; } = "Apply";
+        public string ApplyFilterText { get => applyFilterText ?? Localize(nameof(RadzenStrings.Gantt_ApplyFilterText)); set => applyFilterText = value; }
+
+        private string? clearFilterText;
 
         /// <summary>
         /// Clear filter text.
         /// </summary>
         [Parameter]
-        public string ClearFilterText { get; set; } = "Clear";
+        public string ClearFilterText { get => clearFilterText ?? Localize(nameof(RadzenStrings.Gantt_ClearFilterText)); set => clearFilterText = value; }
+
+        private string? equalsText;
 
         /// <summary>
         /// Equals text.
         /// </summary>
         [Parameter]
-        public string EqualsText { get; set; } = "Equals";
+        public string EqualsText { get => equalsText ?? Localize(nameof(RadzenStrings.Gantt_EqualsText)); set => equalsText = value; }
+
+        private string? notEqualsText;
 
         /// <summary>
         /// Not equals text.
         /// </summary>
         [Parameter]
-        public string NotEqualsText { get; set; } = "Not equals";
+        public string NotEqualsText { get => notEqualsText ?? Localize(nameof(RadzenStrings.Gantt_NotEqualsText)); set => notEqualsText = value; }
+
+        private string? lessThanText;
 
         /// <summary>
         /// Less than text.
         /// </summary>
         [Parameter]
-        public string LessThanText { get; set; } = "Less than";
+        public string LessThanText { get => lessThanText ?? Localize(nameof(RadzenStrings.Gantt_LessThanText)); set => lessThanText = value; }
+
+        private string? lessThanOrEqualsText;
 
         /// <summary>
         /// Less than or equals text.
         /// </summary>
         [Parameter]
-        public string LessThanOrEqualsText { get; set; } = "Less than or equals";
+        public string LessThanOrEqualsText { get => lessThanOrEqualsText ?? Localize(nameof(RadzenStrings.Gantt_LessThanOrEqualsText)); set => lessThanOrEqualsText = value; }
+
+        private string? greaterThanText;
 
         /// <summary>
         /// Greater than text.
         /// </summary>
         [Parameter]
-        public string GreaterThanText { get; set; } = "Greater than";
+        public string GreaterThanText { get => greaterThanText ?? Localize(nameof(RadzenStrings.Gantt_GreaterThanText)); set => greaterThanText = value; }
+
+        private string? greaterThanOrEqualsText;
 
         /// <summary>
         /// Greater than or equals text.
         /// </summary>
         [Parameter]
-        public string GreaterThanOrEqualsText { get; set; } = "Greater than or equals";
+        public string GreaterThanOrEqualsText { get => greaterThanOrEqualsText ?? Localize(nameof(RadzenStrings.Gantt_GreaterThanOrEqualsText)); set => greaterThanOrEqualsText = value; }
+
+        private string? containsText;
 
         /// <summary>
         /// Contains text.
         /// </summary>
         [Parameter]
-        public string ContainsText { get; set; } = "Contains";
+        public string ContainsText { get => containsText ?? Localize(nameof(RadzenStrings.Gantt_ContainsText)); set => containsText = value; }
+
+        private string? doesNotContainText;
 
         /// <summary>
         /// Does not contain text.
         /// </summary>
         [Parameter]
-        public string DoesNotContainText { get; set; } = "Does not contain";
+        public string DoesNotContainText { get => doesNotContainText ?? Localize(nameof(RadzenStrings.Gantt_DoesNotContainText)); set => doesNotContainText = value; }
+
+        private string? startsWithText;
 
         /// <summary>
         /// Starts with text.
         /// </summary>
         [Parameter]
-        public string StartsWithText { get; set; } = "Starts with";
+        public string StartsWithText { get => startsWithText ?? Localize(nameof(RadzenStrings.Gantt_StartsWithText)); set => startsWithText = value; }
+
+        private string? endsWithText;
 
         /// <summary>
         /// Ends with text.
         /// </summary>
         [Parameter]
-        public string EndsWithText { get; set; } = "Ends with";
+        public string EndsWithText { get => endsWithText ?? Localize(nameof(RadzenStrings.Gantt_EndsWithText)); set => endsWithText = value; }
+
+        private string? isNullText;
 
         /// <summary>
         /// Is null text.
         /// </summary>
         [Parameter]
-        public string IsNullText { get; set; } = "Is null";
+        public string IsNullText { get => isNullText ?? Localize(nameof(RadzenStrings.Gantt_IsNullText)); set => isNullText = value; }
+
+        private string? isNotNullText;
 
         /// <summary>
         /// Is not null text.
         /// </summary>
         [Parameter]
-        public string IsNotNullText { get; set; } = "Is not null";
+        public string IsNotNullText { get => isNotNullText ?? Localize(nameof(RadzenStrings.Gantt_IsNotNullText)); set => isNotNullText = value; }
+
+        private string? isEmptyText;
 
         /// <summary>
         /// Is empty text.
         /// </summary>
         [Parameter]
-        public string IsEmptyText { get; set; } = "Is empty";
+        public string IsEmptyText { get => isEmptyText ?? Localize(nameof(RadzenStrings.Gantt_IsEmptyText)); set => isEmptyText = value; }
+
+        private string? isNotEmptyText;
 
         /// <summary>
         /// Is not empty text.
         /// </summary>
         [Parameter]
-        public string IsNotEmptyText { get; set; } = "Is not empty";
+        public string IsNotEmptyText { get => isNotEmptyText ?? Localize(nameof(RadzenStrings.Gantt_IsNotEmptyText)); set => isNotEmptyText = value; }
 
         #endregion
 

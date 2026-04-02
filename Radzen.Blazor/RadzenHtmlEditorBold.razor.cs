@@ -20,11 +20,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "bold";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Bold"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Bold";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorBold_Title)); set => title = value; }
 
         /// <summary>
         /// Specifies the shortcut for the command. Set to <c>"Ctrl+B"</c> by default.

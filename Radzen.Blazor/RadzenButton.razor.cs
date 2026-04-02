@@ -53,13 +53,15 @@ namespace Radzen.Blazor
         [Parameter]
         public string Text { get; set; } = "";
 
+        private string? imageAlternateText;
+
         /// <summary>
         /// Gets or sets the alternate text for the button's image.
         /// This is used as the alt attribute when an <see cref="Image"/> is specified, improving accessibility.
         /// </summary>
         /// <value>The image alternate text. Default is "button".</value>
         [Parameter]
-        public string ImageAlternateText { get; set; } = "button";
+        public string ImageAlternateText { get => imageAlternateText ?? Localize(nameof(RadzenStrings.Button_ImageAlternateText)); set => imageAlternateText = value; }
 
         /// <summary>
         /// Gets or sets the Material icon name to be displayed in the button.

@@ -52,7 +52,7 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowEmptyMessage { get; set; }
 
-        private string emptyText = "No records to display.";
+        private string? emptyText;
         /// <summary>
         /// Gets or sets the text message displayed when the data source is empty.
         /// Only shown if <see cref="ShowEmptyMessage"/> is true and no <see cref="EmptyTemplate"/> is specified.
@@ -61,7 +61,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string EmptyText
         {
-            get { return emptyText; }
+            get { return emptyText ?? Localize(nameof(RadzenStrings.DataList_EmptyText)); }
             set
             {
                 if (value != emptyText)

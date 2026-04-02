@@ -81,11 +81,13 @@ namespace Radzen.Blazor
         [Parameter]
         public int TabIndex { get; set; }
 
+        private string? removeChipTitle;
+
         /// <summary>
         /// Gets or sets the title used by the close button for accessibility.
         /// </summary>
         [Parameter]
-        public string RemoveChipTitle { get; set; } = "Remove";
+        public string RemoveChipTitle { get => removeChipTitle ?? Localize(nameof(RadzenStrings.Chip_RemoveChipTitle)); set => removeChipTitle = value; }
 
         /// <summary>
         /// Gets or sets the callback invoked when the chip is clicked.

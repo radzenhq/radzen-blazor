@@ -49,12 +49,14 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AllowClear { get; set; } = true;
 
+        private string? clearAriaLabel;
+
         /// <summary>
         /// Gets or sets the accessible label text for the clear button.
         /// </summary>
         /// <value>The ARIA label for clearing the signature. Default is "Clear".</value>
         [Parameter]
-        public string ClearAriaLabel { get; set; } = "Clear";
+        public string ClearAriaLabel { get => clearAriaLabel ?? Localize(nameof(RadzenStrings.SignaturePad_ClearAriaLabel)); set => clearAriaLabel = value; }
 
         IJSObjectReference? _jsRef;
         bool _needsUpdate;

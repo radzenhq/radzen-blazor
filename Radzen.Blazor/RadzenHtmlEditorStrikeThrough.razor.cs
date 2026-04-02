@@ -20,10 +20,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "strikeThrough";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Strikethrough"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Strikethrough";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorStrikeThrough_Title)); set => title = value; }
     }
 }

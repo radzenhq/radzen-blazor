@@ -223,23 +223,29 @@ namespace Radzen.Blazor
         [Parameter]
         public string? Title { get; set; }
 
+        private string? placeholder;
+
         /// <summary>
         /// Gets or sets the placeholder text for the input field.
         /// </summary>
         [Parameter]
-        public string Placeholder { get; set; } = "Type your message...";
+        public string Placeholder { get => placeholder ?? Localize(nameof(RadzenStrings.Chat_Placeholder)); set => placeholder = value; }
+
+        private string? emptyMessage;
 
         /// <summary>
         /// Gets or sets the message displayed when there are no messages.
         /// </summary>
         [Parameter]
-        public string EmptyMessage { get; set; } = "No messages yet. Start a conversation!";
+        public string EmptyMessage { get => emptyMessage ?? Localize(nameof(RadzenStrings.Chat_EmptyMessage)); set => emptyMessage = value; }
+
+        private string? newMessagesText;
 
         /// <summary>
         /// Gets or sets the text displayed on the new messages indicator button.
         /// </summary>
         [Parameter]
-        public string NewMessagesText { get; set; } = "New messages";
+        public string NewMessagesText { get => newMessagesText ?? Localize(nameof(RadzenStrings.Chat_NewMessagesText)); set => newMessagesText = value; }
 
         /// <summary>
         /// Gets or sets the format used to render the timestamp shown next to each message. Defaults to <c>"HH:mm"</c>.

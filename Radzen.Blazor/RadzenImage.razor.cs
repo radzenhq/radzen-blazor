@@ -38,6 +38,8 @@ namespace Radzen.Blazor
         [Parameter]
         public string? Path { get; set; }
 
+        private string? alternateText;
+
         /// <summary>
         /// Gets or sets the alternate text describing the image for accessibility and when the image fails to load.
         /// This text is read by screen readers and displayed if the image cannot be shown.
@@ -45,7 +47,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The image alternate text. Default is "image".</value>
         [Parameter]
-        public string AlternateText { get; set; } = "image";
+        public string AlternateText { get => alternateText ?? Localize(nameof(RadzenStrings.Image_AlternateText)); set => alternateText = value; }
 
         /// <summary>
         /// Gets or sets the callback invoked when the image is clicked.

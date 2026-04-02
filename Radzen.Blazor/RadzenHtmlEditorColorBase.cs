@@ -39,41 +39,53 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowButton { get; set; } = true;
 
+        private string? hexText;
+
         /// <summary>
         /// Sets <see cref="RadzenColorPicker.HexText" /> of the built-in RadzenColorPicker.
         /// </summary>
         [Parameter]
-        public string HexText { get; set; } = "Hex";
+        public string HexText { get => hexText ?? Localize(nameof(RadzenStrings.HtmlEditorColor_HexText)); set => hexText = value; }
+
+        private string? redText;
 
         /// <summary>
         /// Sets <see cref="RadzenColorPicker.RedText" /> of the built-in RadzenColorPicker.
         /// </summary>
         [Parameter]
-        public string RedText { get; set; } = "R";
+        public string RedText { get => redText ?? Localize(nameof(RadzenStrings.HtmlEditorColor_RedText)); set => redText = value; }
+
+        private string? greenText;
 
         /// <summary>
         /// Sets <see cref="RadzenColorPicker.GreenText" /> of the built-in RadzenColorPicker.
         /// </summary>
         [Parameter]
-        public string GreenText { get; set; } = "G";
+        public string GreenText { get => greenText ?? Localize(nameof(RadzenStrings.HtmlEditorColor_GreenText)); set => greenText = value; }
+
+        private string? blueText;
 
         /// <summary>
         /// Sets <see cref="RadzenColorPicker.BlueText" /> of the built-in RadzenColorPicker.
         /// </summary>
         [Parameter]
-        public string BlueText { get; set; } = "B";
+        public string BlueText { get => blueText ?? Localize(nameof(RadzenStrings.HtmlEditorColor_BlueText)); set => blueText = value; }
+
+        private string? alphaText;
 
         /// <summary>
         /// Sets <see cref="RadzenColorPicker.AlphaText" /> of the built-in RadzenColorPicker.
         /// </summary>
         [Parameter]
-        public string AlphaText { get; set; } = "A";
+        public string AlphaText { get => alphaText ?? Localize(nameof(RadzenStrings.HtmlEditorColor_AlphaText)); set => alphaText = value; }
+
+        private string? buttonText;
 
         /// <summary>
         /// Sets <see cref="RadzenColorPicker.ButtonText" /> of the built-in RadzenColorPicker.
         /// </summary>
         [Parameter]
-        public string ButtonText { get; set; } = "OK";
+        public string ButtonText { get => buttonText ?? Localize(nameof(RadzenStrings.HtmlEditorColor_ButtonText)); set => buttonText = value; }
 
 
         /// <summary>

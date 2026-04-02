@@ -20,10 +20,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "outdent";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Outdent"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Outdent";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorOutdent_Title)); set => title = value; }
     }
 }

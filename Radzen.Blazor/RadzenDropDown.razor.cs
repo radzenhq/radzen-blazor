@@ -267,12 +267,14 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Chips { get; set; }
 
+        private string? selectedItemsText;
+
         /// <summary>
         /// Gets or sets the selected items text.
         /// </summary>
         /// <value>The selected items text.</value>
         [Parameter]
-        public string SelectedItemsText { get; set; } = "items selected";
+        public string SelectedItemsText { get => selectedItemsText ?? Localize(nameof(RadzenStrings.DropDown_SelectedItemsText)); set => selectedItemsText = value; }
 
         /// <summary>
         /// Gets or sets the select all text.
