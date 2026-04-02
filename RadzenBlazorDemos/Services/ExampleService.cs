@@ -55,6 +55,17 @@ namespace RadzenBlazorDemos
             Icon = "\ue92c",
             Tags = new[] { "keyboard", "accessibility", "standard", "508", "wai-aria", "wcag", "shortcut"}
         },
+        new Example
+        {
+            Toc = [ new () { Text = "How it works", Anchor = "#how-it-works" }, new () { Text = "ILocalizer", Anchor = "#ilocalizer" }, new () { Text = "Satellite assemblies", Anchor = "#satellite-assemblies" }, new () { Text = "Parameter override", Anchor = "#parameter-override" }, new () { Text = "Resource keys", Anchor = "#resource-keys" }, new () { Text = "Culture resolution", Anchor = "#culture" }, new () { Text = "Priority order", Anchor = "#priority" } ],
+            Name = "Localization",
+            New = true,
+            Path = "/localization",
+            Title = "Blazor Localization | Free UI Components by Radzen",
+            Description = "How to localize Radzen Blazor Components using resource files, satellite assemblies, or the ILocalizer interface.",
+            Icon = "\ue8e2",
+            Tags = new[] { "localization", "globalization", "culture", "translation", "language", "i18n", "l10n", "resource", "resx", "satellite" }
+        },
 
         new Example
         {

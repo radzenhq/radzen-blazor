@@ -1,0 +1,224 @@
+@page "/localization"
+
+<PageTitle>Blazor Localization | Free UI Components by Radzen</PageTitle>
+<HeadContent>
+    <meta name="description" content="How to localize Radzen Blazor Components using resource files, satellite assemblies, or the ILocalizer interface.">
+</HeadContent>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Localization
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">
+    Radzen Blazor Components support resource-based localization out of the box. All user-facing text (labels, tooltips, ARIA labels, filter operators, paging text, etc.) can be translated using .NET's standard localization infrastructure.
+</RadzenText>
+
+<RadzenText Anchor="localization#how-it-works" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    How it works
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    Every localizable string property in Radzen components falls back to a resource key in <code>RadzenStrings.resx</code> when not explicitly set. The lookup goes through the <code>Localizer</code> class which checks for a custom <code>ILocalizer</code> implementation first, then falls back to the embedded resource file. This means:
+</RadzenText>
+<ul class="rz-text-body1">
+    <li>The default English text works without any configuration.</li>
+    <li>Setting a property value directly (the existing approach) still overrides everything.</li>
+    <li>You can provide translations for all components at once via <code>ILocalizer</code> or satellite assemblies.</li>
+</ul>
+
+<RadzenText Anchor="localization#ilocalizer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Option 1: ILocalizer (recommended)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    Implement the <code>ILocalizer</code> interface and register it in the DI container to provide translations for all components.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-4 rz-mb-2">
+    1. Create a class that implements <code>ILocalizer</code>:
+</RadzenText>
+<pre>
+<code>
+using System.Globalization;
+using Radzen;
+using Radzen.Blazor;
+
+public class CustomLocalizer : ILocalizer
+{
+    // Use a dictionary, database, JSON file, or any other source for translations
+    private static readonly Dictionary&lt;string, Dictionary&lt;string, string&gt;&gt; Translations = new()
+    {
+        ["de"] = new()
+        {
+            [nameof(RadzenStrings.Pager_FirstPageTitle)] = "Erste Seite",
+            [nameof(RadzenStrings.Pager_PrevPageTitle)] = "Vorherige Seite",
+            [nameof(RadzenStrings.Pager_NextPageTitle)] = "N&auml;chste Seite",
+            [nameof(RadzenStrings.Pager_LastPageTitle)] = "Letzte Seite",
+            [nameof(RadzenStrings.Pager_PageSizeText)] = "Eintr&auml;ge pro Seite",
+            [nameof(RadzenStrings.Pager_PagingSummaryFormat)] = "Seite {0} von {1} ({2} Eintr&auml;ge)",
+            [nameof(RadzenStrings.DataGrid_FilterText)] = "Filtern",
+            [nameof(RadzenStrings.DataGrid_AndOperatorText)] = "Und",
+            [nameof(RadzenStrings.DataGrid_OrOperatorText)] = "Oder",
+            [nameof(RadzenStrings.DataGrid_ApplyFilterText)] = "&Uuml;bernehmen",
+            [nameof(RadzenStrings.DataGrid_ClearFilterText)] = "L&ouml;schen",
+            [nameof(RadzenStrings.DataGrid_EqualsText)] = "Gleich",
+            [nameof(RadzenStrings.DataGrid_ContainsText)] = "Enth&auml;lt",
+            [nameof(RadzenStrings.DataGrid_StartsWithText)] = "Beginnt mit",
+            [nameof(RadzenStrings.DataGrid_EndsWithText)] = "Endet mit",
+            // ... add more translations as needed
+        }
+    };
+
+    public string? Get(string key, CultureInfo culture)
+    {
+        var lang = culture.TwoLetterISOLanguageName;
+
+        if (Translations.TryGetValue(lang, out var strings)
+            &amp;&amp; strings.TryGetValue(key, out var value))
+        {
+            return value;
+        }
+
+        return null; // Fall back to the built-in default
+    }
+}
+</code>
+</pre>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-4 rz-mb-2">
+    2. Register it in <code>Program.cs</code> <strong>before</strong> <code>AddRadzenComponents()</code>:
+</RadzenText>
+<pre>
+<code>
+builder.Services.AddScoped&lt;ILocalizer, CustomLocalizer&gt;();
+builder.Services.AddRadzenComponents();
+</code>
+</pre>
+<RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter" AllowClose="false" class="rz-mt-4">
+    Return <code>null</code> from <code>ILocalizer.Get()</code> for any key you don't want to translate. The component will automatically fall back to the built-in English default.
+</RadzenAlert>
+
+<RadzenText Anchor="localization#satellite-assemblies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Option 2: Satellite assemblies
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    You can provide culture-specific <code>.resx</code> files that .NET compiles into satellite assemblies. This is the standard .NET localization mechanism.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-4 rz-mb-2">
+    1. Create a resource file named <code>RadzenStrings.[culture].resx</code> (e.g. <code>RadzenStrings.de.resx</code>) in your project.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">
+    2. Add the translated values using the same resource keys (e.g. <code>Pager_FirstPageTitle</code>, <code>DataGrid_FilterText</code>). You only need to include the keys you want to translate.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">
+    3. Configure the resource file in your <code>.csproj</code> to use the <code>Radzen.Blazor.RadzenStrings</code> resource name:
+</RadzenText>
+<pre>
+<code>
+&lt;ItemGroup&gt;
+  &lt;EmbeddedResource Include="RadzenStrings.de.resx"
+                    LogicalName="Radzen.Blazor.RadzenStrings.de.resources" /&gt;
+&lt;/ItemGroup&gt;
+</code>
+</pre>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-4">
+    The <code>ResourceManager</code> will automatically load the correct culture at runtime based on <code>CultureInfo.CurrentUICulture</code>.
+</RadzenText>
+
+<RadzenText Anchor="localization#parameter-override" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Option 3: Parameter override (per-instance)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    You can still set localized text directly on individual component instances. This takes the highest priority and overrides both resource files and <code>ILocalizer</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-4 rz-mb-8">
+    This example shows a German login form using direct parameter values:
+</RadzenText>
+<RadzenExample ComponentName="Login" Example="LoginLocalization">
+    <LoginLocalization />
+</RadzenExample>
+
+<RadzenText Anchor="localization#resource-keys" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Resource keys
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    Resource keys follow the convention <code>ComponentName_PropertyName</code>. Use <code>nameof(RadzenStrings.Key)</code> for compile-time safety. Below are some common examples:
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Text="DataGrid" class="rz-pt-6" />
+<div class="rz-data-list rz-datalist rz-datalist-striped" style="max-height: 300px; overflow: auto;">
+    <table style="width:100%">
+        <thead><tr><th style="padding: 8px 12px">Key</th><th style="padding: 8px 12px">Default</th></tr></thead>
+        <tbody>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_FilterText</code></td><td style="padding: 4px 12px">Filter</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_EqualsText</code></td><td style="padding: 4px 12px">Equals</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_ContainsText</code></td><td style="padding: 4px 12px">Contains</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_StartsWithText</code></td><td style="padding: 4px 12px">Starts with</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_EndsWithText</code></td><td style="padding: 4px 12px">Ends with</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_AndOperatorText</code></td><td style="padding: 4px 12px">And</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_OrOperatorText</code></td><td style="padding: 4px 12px">Or</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_ApplyFilterText</code></td><td style="padding: 4px 12px">Apply</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_ClearFilterText</code></td><td style="padding: 4px 12px">Clear</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_GroupPanelText</code></td><td style="padding: 4px 12px">Drag a column header here and drop it to group by that column</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_ColumnsText</code></td><td style="padding: 4px 12px">Columns</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_ExpandAllTitle</code></td><td style="padding: 4px 12px">Expand all</td></tr>
+            <tr><td style="padding: 4px 12px"><code>DataGrid_CollapseAllTitle</code></td><td style="padding: 4px 12px">Collapse all</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Text="Pager" class="rz-pt-6" />
+<div class="rz-data-list rz-datalist rz-datalist-striped" style="max-height: 300px; overflow: auto;">
+    <table style="width:100%">
+        <thead><tr><th style="padding: 8px 12px">Key</th><th style="padding: 8px 12px">Default</th></tr></thead>
+        <tbody>
+            <tr><td style="padding: 4px 12px"><code>Pager_FirstPageTitle</code></td><td style="padding: 4px 12px">First page</td></tr>
+            <tr><td style="padding: 4px 12px"><code>Pager_PrevPageTitle</code></td><td style="padding: 4px 12px">Previous page</td></tr>
+            <tr><td style="padding: 4px 12px"><code>Pager_NextPageTitle</code></td><td style="padding: 4px 12px">Next page</td></tr>
+            <tr><td style="padding: 4px 12px"><code>Pager_LastPageTitle</code></td><td style="padding: 4px 12px">Last page</td></tr>
+            <tr><td style="padding: 4px 12px"><code>Pager_PageSizeText</code></td><td style="padding: 4px 12px">items per page</td></tr>
+            <tr><td style="padding: 4px 12px"><code>Pager_PagingSummaryFormat</code></td><td style="padding: 4px 12px">Page {0} of {1} ({2} items)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" Text="Other components" class="rz-pt-6" />
+<RadzenText TextStyle="TextStyle.Body1">
+    All localizable resource keys are defined in <code>RadzenStrings</code>. Use your IDE's autocomplete with <code>nameof(RadzenStrings.)</code> to discover all available keys. The naming convention is <code>ComponentName_PropertyName</code>, for example:
+</RadzenText>
+<ul class="rz-text-body1">
+    <li><code>Login_LoginText</code>, <code>Login_UserText</code>, <code>Login_PasswordText</code></li>
+    <li><code>Upload_ChooseText</code>, <code>Upload_DeleteText</code></li>
+    <li><code>DatePicker_ToggleAriaLabel</code>, <code>DatePicker_PrevMonthAriaLabel</code></li>
+    <li><code>Scheduler_TodayText</code>, <code>Scheduler_NextText</code>, <code>Scheduler_PrevText</code></li>
+    <li><code>ColorPicker_HexText</code>, <code>ColorPicker_ButtonText</code></li>
+    <li><code>HtmlEditorBold_Title</code>, <code>HtmlEditorImage_Title</code></li>
+    <li><code>Gantt_TodayText</code>, <code>Gantt_FilterText</code></li>
+</ul>
+
+<RadzenText Anchor="localization#culture" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Culture resolution
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    Each Radzen component resolves the UI culture in this order:
+</RadzenText>
+<ol class="rz-text-body1">
+    <li>The component's own <code>UICulture</code> parameter (if explicitly set).</li>
+    <li>A <code>DefaultUICulture</code> cascading value from a parent component.</li>
+    <li><code>CultureInfo.CurrentUICulture</code> (the thread default).</li>
+</ol>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mt-4">
+    To set the culture for all components in your app, configure <code>CultureInfo.DefaultThreadCurrentUICulture</code> in <code>Program.cs</code>:
+</RadzenText>
+<pre>
+<code>
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("de");
+</code>
+</pre>
+
+<RadzenText Anchor="localization#priority" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Priority order
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    When a component renders a localizable string, the value is resolved in this order (highest priority first):
+</RadzenText>
+<ol class="rz-text-body1">
+    <li><strong>Parameter value</strong> &mdash; explicitly set on the component instance.</li>
+    <li><strong>ILocalizer</strong> &mdash; custom translations registered in DI.</li>
+    <li><strong>RadzenStrings.resx</strong> &mdash; built-in resource file (supports satellite assemblies).</li>
+    <li><strong>Key itself</strong> &mdash; if the key is not found in any source, the key string is returned as-is (fallback).</li>
+</ol>
