@@ -2,6 +2,9 @@ using System;
 using Radzen;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Radzen.Blazor;
 
 namespace Radzen.Blazor
 {
@@ -10,6 +13,19 @@ namespace Radzen.Blazor
     /// </summary>
     public abstract class SchedulerViewBase : ComponentBase, ISchedulerView, IDisposable
     {
+        [Inject]
+        private IServiceProvider Services { get; set; } = default!;
+
+        private Localizer? localizer;
+
+        internal Localizer Localizer => localizer ??=
+            Services.GetService<Localizer>() ?? Localizer.Default;
+
+        /// <summary>
+        /// Gets a localized string for the specified resource key.
+        /// </summary>
+        public string Localize(string key) => Localizer.Get(key, CultureInfo.CurrentUICulture);
+
         /// <summary>
         /// Gets the title of the view. It is displayed in the RadzenScheduler title area.
         /// </summary>

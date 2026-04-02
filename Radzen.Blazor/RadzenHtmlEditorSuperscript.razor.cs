@@ -20,10 +20,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "superscript";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Superscript"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Superscript";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorSuperscript_Title)); set => title = value; }
     }
 }

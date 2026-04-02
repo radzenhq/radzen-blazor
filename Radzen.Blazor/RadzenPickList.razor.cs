@@ -165,12 +165,14 @@ namespace Radzen.Blazor
         [Parameter]
         public string? SelectAllText { get; set; }
 
+        private string? emptyText;
+
         /// <summary>
         /// Gets or sets the empty text shown when a list has no items.
         /// </summary>
         /// <value>The empty text.</value>
         [Parameter]
-        public string EmptyText { get; set; } = "No records to display.";
+        public string EmptyText { get => emptyText ?? Localize(nameof(RadzenStrings.PickList_EmptyText)); set => emptyText = value; }
 
         /// <summary>
         /// Gets or sets the empty text shown when the source list has no items. Overrides <see cref="EmptyText"/>.
@@ -305,33 +307,41 @@ namespace Radzen.Blazor
         [Parameter]
         public ButtonSize ButtonSize { get; set; } = ButtonSize.Medium;
 
+        private string? sourceToTargetTitle;
+
         /// <summary>
         /// Gets or sets the source to target title
         /// </summary>
         /// <value>The source to target title.</value>
         [Parameter]
-        public string SourceToTargetTitle { get; set; } = "Move all items from source to target collection";
+        public string SourceToTargetTitle { get => sourceToTargetTitle ?? Localize(nameof(RadzenStrings.PickList_SourceToTargetTitle)); set => sourceToTargetTitle = value; }
+
+        private string? selectedSourceToTargetTitle;
 
         /// <summary>
         /// Gets or sets the selected source to target title
         /// </summary>
         /// <value>The selected source to target title.</value>
         [Parameter]
-        public string SelectedSourceToTargetTitle { get; set; } = "Move all selected source items to target collection";
+        public string SelectedSourceToTargetTitle { get => selectedSourceToTargetTitle ?? Localize(nameof(RadzenStrings.PickList_SelectedSourceToTargetTitle)); set => selectedSourceToTargetTitle = value; }
+
+        private string? targetToSourceTitle;
 
         /// <summary>
         /// Gets or sets the target to source title
         /// </summary>
         /// <value>The target to source title.</value>
         [Parameter]
-        public string TargetToSourceTitle { get; set; } = "Move all items from target to source collection";
+        public string TargetToSourceTitle { get => targetToSourceTitle ?? Localize(nameof(RadzenStrings.PickList_TargetToSourceTitle)); set => targetToSourceTitle = value; }
+
+        private string? selectedTargetToSourceTitle;
 
         /// <summary>
         /// Gets or sets the selected target to source  title
         /// </summary>
         /// <value>The selected target to source title.</value>
         [Parameter]
-        public string SelectedTargetToSourceTitle { get; set; } = "Move selected target items to source collection";
+        public string SelectedTargetToSourceTitle { get => selectedTargetToSourceTitle ?? Localize(nameof(RadzenStrings.PickList_SelectedTargetToSourceTitle)); set => selectedTargetToSourceTitle = value; }
 
         /// <summary>
         /// Gets or sets the source to target icon

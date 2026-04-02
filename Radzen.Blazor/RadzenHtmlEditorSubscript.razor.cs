@@ -21,10 +21,12 @@ namespace Radzen.Blazor
         protected override string CommandName => "subscript";
 
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Subscript"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Subscript";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorSubscript_Title)); set => title = value; }
     }
 }

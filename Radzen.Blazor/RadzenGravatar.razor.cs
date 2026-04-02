@@ -41,13 +41,15 @@ namespace Radzen.Blazor
         [Parameter]
         public string? Email { get; set; }
 
+        private string? alternateText;
+
         /// <summary>
         /// Gets or sets the alternate text describing the avatar for accessibility.
         /// This text is read by screen readers and displayed if the image fails to load.
         /// </summary>
         /// <value>The image alternate text. Default is "gravatar".</value>
         [Parameter]
-        public string AlternateText { get; set; } = "gravatar";
+        public string AlternateText { get => alternateText ?? Localize(nameof(RadzenStrings.Gravatar_AlternateText)); set => alternateText = value; }
 
         /// <summary>
         /// Gets or sets the size of the avatar image in pixels (both width and height).

@@ -101,11 +101,13 @@ namespace Radzen.Blazor
         [Parameter]
         public ChipSize Size { get; set; } = ChipSize.Medium;
 
+        private string? removeChipTitle;
+
         /// <summary>
         /// Gets or sets the close button accessible title.
         /// </summary>
         [Parameter]
-        public string RemoveChipTitle { get; set; } = "Remove";
+        public string RemoveChipTitle { get => removeChipTitle ?? Localize(nameof(RadzenStrings.ChipList_RemoveChipTitle)); set => removeChipTitle = value; }
 
         /// <summary>
         /// Gets or sets the callback invoked when a chip remove action is requested.

@@ -20,10 +20,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "insertUnorderedList";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Bullet list"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Bullet list";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorUnorderedList_Title)); set => title = value; }
     }
 }

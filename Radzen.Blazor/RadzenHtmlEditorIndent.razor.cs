@@ -20,10 +20,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "indent";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Indent"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Indent";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorIndent_Title)); set => title = value; }
     }
 }

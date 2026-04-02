@@ -10,11 +10,13 @@ namespace Radzen.Blazor
     public partial class RadzenHtmlEditorSource
     {
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"View source"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "View source";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorSource_Title)); set => title = value; }
 
     }
 }

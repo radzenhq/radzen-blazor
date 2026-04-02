@@ -37,10 +37,12 @@ namespace Radzen.Blazor
             return "rz-sidebar-toggle";
         }
 
+        private string? toggleAriaLabel;
+
         /// <summary>
         /// Gets or sets the add button aria-label attribute.
         /// </summary>
         [Parameter]
-        public string ToggleAriaLabel { get; set; } = "Toggle";
+        public string ToggleAriaLabel { get => toggleAriaLabel ?? Localize(nameof(RadzenStrings.SidebarToggle_ToggleAriaLabel)); set => toggleAriaLabel = value; }
     }
 }
