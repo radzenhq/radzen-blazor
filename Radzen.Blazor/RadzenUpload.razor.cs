@@ -59,12 +59,14 @@ namespace Radzen.Blazor
             GC.SuppressFinalize(this);
         }
 
+        private string? imageAlternateText;
+
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string ImageAlternateText { get; set; } = "image";
+        public string ImageAlternateText { get => imageAlternateText ?? Localize(nameof(RadzenStrings.Upload_ImageAlternateText)); set => imageAlternateText = value; }
 
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
@@ -92,19 +94,23 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Auto { get; set; } = true;
 
-        /// <summary>
-        /// Gets or sets the choose button text.
-        /// </summary>
-        /// <value>The choose button text.</value>
-        [Parameter]
-        public string ChooseText { get; set; } = "Choose";
+        private string? chooseText;
 
         /// <summary>
         /// Gets or sets the choose button text.
         /// </summary>
         /// <value>The choose button text.</value>
         [Parameter]
-        public string DeleteText { get; set; } = "Delete";
+        public string ChooseText { get => chooseText ?? Localize(nameof(RadzenStrings.Upload_ChooseText)); set => chooseText = value; }
+
+        private string? deleteText;
+
+        /// <summary>
+        /// Gets or sets the choose button text.
+        /// </summary>
+        /// <value>The choose button text.</value>
+        [Parameter]
+        public string DeleteText { get => deleteText ?? Localize(nameof(RadzenStrings.Upload_DeleteText)); set => deleteText = value; }
 
         /// <summary>
         /// Gets or sets the URL.

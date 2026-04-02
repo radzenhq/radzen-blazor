@@ -156,24 +156,30 @@ namespace Radzen.Blazor
         [Parameter]
         public string? Placeholder { get; set; }
 
+        private string? togglePopupAriaLabel;
+
         /// <summary>
         /// Specifies the aria label for the toggle popup button.
         /// </summary>
         [Parameter]
-        public string TogglePopupAriaLabel { get; set; } = "Toggle popup";
+        public string TogglePopupAriaLabel { get => togglePopupAriaLabel ?? Localize(nameof(RadzenStrings.TimeSpanPicker_TogglePopupAriaLabel)); set => togglePopupAriaLabel = value; }
+
+        private string? popupAriaLabel;
 
         /// <summary>
         /// Specifies the aria label for the popup.
         /// </summary>
         [Parameter]
-        public string PopupAriaLabel { get; set; } = "Time span picker";
+        public string PopupAriaLabel { get => popupAriaLabel ?? Localize(nameof(RadzenStrings.TimeSpanPicker_PopupAriaLabel)); set => popupAriaLabel = value; }
+
+        private string? clearAriaLabel;
 
         /// <summary>
         /// Gets or sets the clear button aria label text.
         /// </summary>
         /// <value>The clear button aria label text.</value>
         [Parameter]
-        public string ClearAriaLabel { get; set; } = "Clear";
+        public string ClearAriaLabel { get => clearAriaLabel ?? Localize(nameof(RadzenStrings.TimeSpanPicker_ClearAriaLabel)); set => clearAriaLabel = value; }
         #endregion
 
         #region Parameters: panel config
@@ -248,23 +254,29 @@ namespace Radzen.Blazor
         #endregion
 
         #region Parameters: panel texts
+        private string? confirmationButtonText;
+
         /// <summary>
         /// Specifies the text of the confirmation button. Used only if <see cref="ShowConfirmationButton"/> is <code>true</code>.
         /// </summary>
         [Parameter]
-        public string ConfirmationButtonText { get; set; } = "OK";
+        public string ConfirmationButtonText { get => confirmationButtonText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_ConfirmationButtonText)); set => confirmationButtonText = value; }
+
+        private string? positiveButtonText;
 
         /// <summary>
         /// Specifies the text of the positive value button.
         /// </summary>
         [Parameter]
-        public string PositiveButtonText { get; set; } = "+";
+        public string PositiveButtonText { get => positiveButtonText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_PositiveButtonText)); set => positiveButtonText = value; }
+
+        private string? negativeButtonText;
 
         /// <summary>
         /// Specifies the text of the negative value button.
         /// </summary>
         [Parameter]
-        public string NegativeButtonText { get; set; } = "−";
+        public string NegativeButtonText { get => negativeButtonText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_NegativeButtonText)); set => negativeButtonText = value; }
 
         /// <summary>
         /// Specifies the text displayed next to the fields in the panel when the value is positive and there's no sign picker.
@@ -272,47 +284,61 @@ namespace Radzen.Blazor
         [Parameter]
         public string PositiveValueText { get; set; } = string.Empty;
 
+        private string? negativeValueText;
+
         /// <summary>
         /// Specifies the text displayed next to the fields in the panel when the value is negative and there's no sign picker.
         /// </summary>
         [Parameter]
-        public string NegativeValueText { get; set; } = "−";
+        public string NegativeValueText { get => negativeValueText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_NegativeValueText)); set => negativeValueText = value; }
+
+        private string? daysUnitText;
 
         /// <summary>
         /// Specifies the days label text.
         /// </summary>
         [Parameter]
-        public string DaysUnitText { get; set; } = "Days";
+        public string DaysUnitText { get => daysUnitText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_DaysUnitText)); set => daysUnitText = value; }
+
+        private string? hoursUnitText;
 
         /// <summary>
         /// Specifies the hours label text.
         /// </summary>
         [Parameter]
-        public string HoursUnitText { get; set; } = "Hours";
+        public string HoursUnitText { get => hoursUnitText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_HoursUnitText)); set => hoursUnitText = value; }
+
+        private string? minutesUnitText;
 
         /// <summary>
         /// Specifies the minutes label text.
         /// </summary>
         [Parameter]
-        public string MinutesUnitText { get; set; } = "Minutes";
+        public string MinutesUnitText { get => minutesUnitText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_MinutesUnitText)); set => minutesUnitText = value; }
+
+        private string? secondsUnitText;
 
         /// <summary>
         /// Specifies the seconds label text.
         /// </summary>
         [Parameter]
-        public string SecondsUnitText { get; set; } = "Seconds";
+        public string SecondsUnitText { get => secondsUnitText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_SecondsUnitText)); set => secondsUnitText = value; }
+
+        private string? millisecondsUnitText;
 
         /// <summary>
         /// Specifies the milliseconds label text.
         /// </summary>
         [Parameter]
-        public string MillisecondsUnitText { get; set; } = "Milliseconds";
+        public string MillisecondsUnitText { get => millisecondsUnitText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_MillisecondsUnitText)); set => millisecondsUnitText = value; }
+
+        private string? microsecondsUnitText;
 
         /// <summary>
         /// Specifies the microseconds label text.
         /// </summary>
         [Parameter]
-        public string MicrosecondsUnitText { get; set; } = "Microseconds";
+        public string MicrosecondsUnitText { get => microsecondsUnitText ?? Localize(nameof(RadzenStrings.TimeSpanPicker_MicrosecondsUnitText)); set => microsecondsUnitText = value; }
         #endregion
 
         #region Parameters: other config

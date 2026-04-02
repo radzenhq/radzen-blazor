@@ -35,12 +35,14 @@ namespace Radzen.Blazor
             return "rz-navigation-item";
         }
 
+        private string? imageAlternateText;
+
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string ImageAlternateText { get; set; } = "image";
+        public string ImageAlternateText { get => imageAlternateText ?? Localize(nameof(RadzenStrings.ProfileMenuItem_ImageAlternateText)); set => imageAlternateText = value; }
 
         /// <summary>
         /// Gets or sets the target.

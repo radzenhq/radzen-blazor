@@ -66,82 +66,104 @@ namespace Radzen.Blazor
         // Holds selected dates when Multiple is true
         List<DateTime> selectedDates = new List<DateTime>();
 
+        private string? calendarWeekTitle;
+
         /// <summary>
         /// Gets or sets the previous month aria label text.
         /// </summary>
         /// <value>The previous month aria label text.</value>
         [Parameter]
-        public string CalendarWeekTitle { get; set; } = "#";
+        public string CalendarWeekTitle { get => calendarWeekTitle ?? Localize(nameof(RadzenStrings.DatePicker_CalendarWeekTitle)); set => calendarWeekTitle = value; }
+
+        private string? toggleAriaLabel;
 
         /// <summary>
         /// Gets or sets the toggle popup aria label text.
         /// </summary>
         /// <value>The toggle popup aria label text.</value>
         [Parameter]
-        public string ToggleAriaLabel { get; set; } = "Toggle";
+        public string ToggleAriaLabel { get => toggleAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_ToggleAriaLabel)); set => toggleAriaLabel = value; }
+
+        private string? popupAriaLabel;
 
         /// <summary>
         /// Gets or sets the popup aria label text.
         /// </summary>
         /// <value>The popup aria label text.</value>
         [Parameter]
-        public string PopupAriaLabel { get; set; } = "Date picker";
+        public string PopupAriaLabel { get => popupAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_PopupAriaLabel)); set => popupAriaLabel = value; }
+
+        private string? clearAriaLabel;
 
         /// <summary>
         /// Gets or sets the clear button aria label text.
         /// </summary>
         /// <value>The clear button aria label text.</value>
         [Parameter]
-        public string ClearAriaLabel { get; set; } = "Clear";
+        public string ClearAriaLabel { get => clearAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_ClearAriaLabel)); set => clearAriaLabel = value; }
+
+        private string? hourAriaLabel;
 
         /// <summary>
         /// Gets or sets the hour input aria label text.
         /// </summary>
         /// <value>The hour input aria label text.</value>
         [Parameter]
-        public string HourAriaLabel { get; set; } = "Hour";
+        public string HourAriaLabel { get => hourAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_HourAriaLabel)); set => hourAriaLabel = value; }
+
+        private string? minutesAriaLabel;
 
         /// <summary>
         /// Gets or sets the minutes input aria label text.
         /// </summary>
         /// <value>The minutes input aria label text.</value>
         [Parameter]
-        public string MinutesAriaLabel { get; set; } = "Minutes";
+        public string MinutesAriaLabel { get => minutesAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_MinutesAriaLabel)); set => minutesAriaLabel = value; }
+
+        private string? secondsAriaLabel;
 
         /// <summary>
         /// Gets or sets the seconds input aria label text.
         /// </summary>
         /// <value>The seconds input aria label text.</value>
         [Parameter]
-        public string SecondsAriaLabel { get; set; } = "Seconds";
+        public string SecondsAriaLabel { get => secondsAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_SecondsAriaLabel)); set => secondsAriaLabel = value; }
+
+        private string? okAriaLabel;
 
         /// <summary>
         /// Gets or sets the OK button aria label text.
         /// </summary>
         /// <value>The OK button aria label text.</value>
         [Parameter]
-        public string OkAriaLabel { get; set; } = "Ok";
+        public string OkAriaLabel { get => okAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_OkAriaLabel)); set => okAriaLabel = value; }
+
+        private string? prevMonthAriaLabel;
 
         /// <summary>
         /// Gets or sets the previous month aria label text.
         /// </summary>
         /// <value>The previous month aria label text.</value>
         [Parameter]
-        public string PrevMonthAriaLabel { get; set; } = "Previous month";
+        public string PrevMonthAriaLabel { get => prevMonthAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_PrevMonthAriaLabel)); set => prevMonthAriaLabel = value; }
+
+        private string? nextMonthAriaLabel;
 
         /// <summary>
         /// Gets or sets the next month aria label text.
         /// </summary>
         /// <value>The next month aria label text.</value>
         [Parameter]
-        public string NextMonthAriaLabel { get; set; } = "Next month";
+        public string NextMonthAriaLabel { get => nextMonthAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_NextMonthAriaLabel)); set => nextMonthAriaLabel = value; }
+
+        private string? toggleAmPmAriaLabel;
 
         /// <summary>
         /// Gets or sets the toggle Am/Pm aria label text.
         /// </summary>
         /// <value>The toggle Am/Pm aria label text.</value>
         [Parameter]
-        public string ToggleAmPmAriaLabel { get; set; } = "Toggle Am/Pm";
+        public string ToggleAmPmAriaLabel { get => toggleAmPmAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_ToggleAmPmAriaLabel)); set => toggleAmPmAriaLabel = value; }
 
         /// <summary>
         /// Gets or sets the suffix appended to a day cell's aria label when the date is today.

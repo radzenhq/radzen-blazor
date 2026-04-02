@@ -178,12 +178,14 @@ namespace Radzen.Blazor
             }
         }
 
+        private string? emptyText;
+
         /// <summary>
         /// Gets or sets the empty text shown when Data is empty.
         /// </summary>
         /// <value>The empty text.</value>
         [Parameter]
-        public string EmptyText { get; set; } = "No records to display.";
+        public string EmptyText { get => emptyText ?? Localize(nameof(RadzenStrings.ListBox_EmptyText)); set => emptyText = value; }
 
         /// <summary>
         /// Gets or sets the empty template shown when Data is empty.
