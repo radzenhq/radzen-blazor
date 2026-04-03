@@ -219,8 +219,25 @@ namespace Radzen.Blazor
         DateTime? _valueBeforeTimeEdit;
         bool _hasUncommittedTimeChange;
 
+        DateTime ClampToMinMax(DateTime value)
+        {
+            if (Min.HasValue && value < Min.Value)
+            {
+                return Min.Value;
+            }
+
+            if (Max.HasValue && value > Max.Value)
+            {
+                return Max.Value;
+            }
+
+            return value;
+        }
+
         async Task UpdateValueFromTime(DateTime newValue)
         {
+            newValue = ClampToMinMax(newValue);
+
             if (ShowTimeOkButton)
             {
                 if (!_hasUncommittedTimeChange)
@@ -573,7 +590,18 @@ namespace Radzen.Blazor
 
         DateRenderEventArgs DateAttributes(DateTime value)
         {
-            var args = new DateRenderEventArgs() { Date = value, Disabled = (Min.HasValue && value < Min.Value) || (Max.HasValue && value > Max.Value) };
+            bool disabled;
+
+            if (ShowTime)
+            {
+                disabled = (Min.HasValue && value.Date < Min.Value.Date) || (Max.HasValue && value.Date > Max.Value.Date);
+            }
+            else
+            {
+                disabled = (Min.HasValue && value < Min.Value) || (Max.HasValue && value > Max.Value);
+            }
+
+            var args = new DateRenderEventArgs() { Date = value, Disabled = disabled };
 
             if (DateRender != null)
             {
@@ -1468,12 +1496,12 @@ namespace Radzen.Blazor
             }
             else if (ShowTimeOkButton)
             {
-                CurrentDate = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                CurrentDate = ClampToMinMax(new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second));
                 await OnOkClick(!ShowTime);
             }
             else
             {
-                var v = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                var v = ClampToMinMax(new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second));
                 if (v != DateTimeValue)
                 {
                     DateTimeValue = v;

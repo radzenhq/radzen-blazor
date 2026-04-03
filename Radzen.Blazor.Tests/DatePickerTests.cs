@@ -1378,5 +1378,50 @@ namespace Radzen.Blazor.Tests
             Assert.False(string.IsNullOrEmpty(formattedValue));
             Assert.Contains("2567", formattedValue);
         }
+
+        [Fact]
+        public void DatePicker_ShowTime_MinToday_DoesNotDisableToday()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var today = DateTime.Now;
+            var min = new DateTime(today.Year, today.Month, today.Day, 14, 0, 0);
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.Value, today);
+                parameters.Add(p => p.ShowTime, true);
+                parameters.Add(p => p.Min, min);
+            });
+
+            // Find today's cell - it should not have rz-state-disabled
+            var todayCell = component.FindAll("td span.rz-calendar-today");
+            Assert.NotEmpty(todayCell);
+            Assert.DoesNotContain("rz-state-disabled", todayCell.First().ClassName);
+        }
+
+        [Fact]
+        public void DatePicker_NoShowTime_MinToday_DisablesToday()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var today = DateTime.Now;
+            var min = new DateTime(today.Year, today.Month, today.Day, 14, 0, 0);
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.Value, today);
+                parameters.Add(p => p.Min, min);
+            });
+
+            // Without ShowTime, today should be disabled since midnight < 14:00
+            var todayCell = component.FindAll("td span.rz-calendar-today");
+            Assert.NotEmpty(todayCell);
+            Assert.Contains("rz-state-disabled", todayCell.First().ClassName);
+        }
     }
 }
