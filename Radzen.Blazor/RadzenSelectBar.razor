@@ -24,7 +24,7 @@
                 @onclick="@(args => SelectItem(item))"
                 @attributes="item.Attributes" style="@item.Style" class=@ButtonClass(item)
                 aria-label="@item.Text" aria-pressed="@(IsSelected(item)? "true" : "false")"
-                disabled="@(Disabled || item.Disabled)">
+                disabled="@(Disabled || item.Disabled)" tabindex="-1">
                 @if (item.Template != null)
                 {
                     @item.Template(item)
