@@ -901,6 +901,42 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_Immediate_TimeChange_ImmediatelyCommits()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var changeCount = 0;
+            DateTime? lastChangeValue = null;
+            DateTime? lastValueChanged = null;
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
+            {
+                parameters.Add(p => p.ShowTime, true);
+                parameters.Add(p => p.ShowTimeOkButton, true);
+                parameters.Add(p => p.Immediate, true);
+                parameters.Add(p => p.Value, new DateTime(2024, 6, 15, 10, 30, 0));
+                parameters.Add(p => p.Change, args => { changeCount++; lastChangeValue = args; });
+                parameters.Add(p => p.ValueChanged, args => { lastValueChanged = args; });
+            });
+
+            component.Find(".rz-hour-picker .rz-numeric-up").Click();
+
+            Assert.Equal(1, changeCount);
+            Assert.NotNull(lastChangeValue);
+            Assert.Equal(11, lastChangeValue.Value.Hour);
+            Assert.NotNull(lastValueChanged);
+            Assert.Equal(11, lastValueChanged.Value.Hour);
+
+            component.Find(".rz-minute-picker .rz-numeric-up").Click();
+
+            Assert.Equal(2, changeCount);
+            Assert.Equal(31, lastChangeValue.Value.Minute);
+            Assert.Equal(31, lastValueChanged.Value.Minute);
+        }
+
+        [Fact]
         public void DatePicker_WithoutOkButton_DayClick_ImmediatelyCommits()
         {
             using var ctx = new TestContext();

@@ -238,7 +238,7 @@ namespace Radzen.Blazor
         {
             newValue = ClampToMinMax(newValue);
 
-            if (ShowTimeOkButton)
+            if (ShowTimeOkButton && !Immediate)
             {
                 if (!_hasUncommittedTimeChange)
                 {
