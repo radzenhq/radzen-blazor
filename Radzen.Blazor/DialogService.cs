@@ -143,13 +143,7 @@ namespace Radzen
                 throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
             }
 
-            var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.NonPublic);
-            if (method == null)
-            {
-                throw new InvalidOperationException("OpenDialog method not found.");
-            }
-
-            method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters!, options! });
+            OpenDialog(title, componentType, parameters, options);
         }
 
         /// <summary>
@@ -204,13 +198,7 @@ namespace Radzen
             var task = new TaskCompletionSource<dynamic?>();
             tasks.Add(task);
 
-            var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.NonPublic);
-            if (method == null)
-            {
-                throw new InvalidOperationException("OpenDialog method not found.");
-            }
-
-            method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters!, options! });
+            OpenDialog(title, componentType, parameters, options);
 
             return task.Task;
         }
@@ -442,6 +430,11 @@ namespace Radzen
 
         internal void OpenDialog<T>(string? title, Dictionary<string, object?>? parameters, DialogOptions? options)
         {
+            OpenDialog(title, typeof(T), parameters, options);
+        }
+
+        internal void OpenDialog(string? title, Type componentType, Dictionary<string, object?>? parameters, DialogOptions? options)
+        {
             // Validate and set default values for the dialog options
             options ??= new();
             parameters ??= new Dictionary<string, object?>();
@@ -457,7 +450,7 @@ namespace Radzen
             options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? options.WrapperCssClass : "";
             options.ContentCssClass = !String.IsNullOrEmpty(options.ContentCssClass) ? options.ContentCssClass : "";
 
-            OnOpen?.Invoke(title, typeof(T), parameters, options);
+            OnOpen?.Invoke(title, componentType, parameters, options);
         }
 
         /// <summary>
