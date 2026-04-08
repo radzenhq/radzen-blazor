@@ -1827,7 +1827,7 @@ namespace Radzen.Blazor
                 await ClosePopup();
                 await FocusAsync();
             }
-            else if (key == "Tab")
+            else if (key == "Tab" && !ShowTime)
             {
                 preventKeyPress = false;
                 stopKeydownPropagation = false;

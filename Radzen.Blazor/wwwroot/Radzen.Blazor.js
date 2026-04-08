@@ -2108,8 +2108,18 @@ window.Radzen = {
         if (e.key === 'Escape' || e.key === 'Esc') {
             Radzen.closePopup(id, instance, callback, e);
         }
-        if (e.key === 'Tab' && parent) {
+        if (e.key === 'Tab' && parent && (popup.classList.contains('rz-dropdown-panel') || popup.classList.contains('rz-multiselect-panel'))) {
             e.preventDefault();
+        }
+        if (e.key === 'Tab' && !e.shiftKey) {
+            var timepicker = popup.querySelector('.rz-timepicker');
+            if (timepicker) {
+                var focusable = Radzen.getFocusableElements(timepicker);
+                var last = focusable[focusable.length - 1];
+                if (last && document.activeElement === last) {
+                    Radzen.closePopup(id, instance, callback, e);
+                }
+            }
         }
     };
     popup.addEventListener('keydown', popup.__escapeHandler, true);

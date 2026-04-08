@@ -102,7 +102,7 @@
                                                 var dateArgs = DateAttributes(date);
 
                                                 <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)"
-                                                    role="button" tabindex="@(Disabled || dateArgs.Disabled ? "-1" : "0")"
+                                                    role="button" tabindex="-1"
                                                     @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })"
                                                     @onkeydown="@(args => OnDayKeyDown(args, date, dateArgs))">
                                                     <span class=@GetDayCssClass(date, dateArgs, false)>@GetCalendarDayOfMonth(date)</span>
