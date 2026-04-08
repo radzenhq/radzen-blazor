@@ -10,8 +10,7 @@
     <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass"
         scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))
         aria-sort="@(Grid.AllowSorting && Column.Sortable ? (Column.GetSortOrder() == SortOrder.Ascending ? "ascending" : Column.GetSortOrder() == SortOrder.Descending ? "descending" : "none") : null)">
-        <div @onclick='@((args) => Grid.OnSort(args, Column))' @onkeydown="OnSortKeyPressed"
-             role="@(Grid.AllowSorting && Column.Sortable ? "button" : null)">
+        <div @onclick='@((args) => Grid.OnSort(args, Column))'>
             @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
             {
                 <span id="@(Grid.getColumnUniqueId(ColumnIndex) + "-drag")" class="rz-column-drag"
@@ -528,16 +527,6 @@ else
     {
         var additionalStyle = Column.HasActiveFilter() ? "rz-grid-filter-active" : "";
         return $"notranslate rzi rz-grid-filter-icon {additionalStyle}";
-    }
-
-    private Task OnSortKeyPressed(KeyboardEventArgs args)
-    {
-        var key = args.Code ?? args.Key;
-        if (key == "Enter")
-        {
-            return Grid.OnSort(args, Column);
-        }
-        return Task.CompletedTask;
     }
 
     protected override void OnParametersSet()
