@@ -1,0 +1,71 @@
+@inherits DbContextPage
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
+    <RadzenLabel id="AutoCompleteComboBoxLabel" Text="Select company" Component="AutoCompleteComboBox" />
+    <div style="position: relative; display: flex; width: 100%; max-width: 400px;">
+        <RadzenAutoComplete @bind-Value=@typedText
+                            Data=@companyNames
+                            OpenOnFocus="true"
+                            MinLength="0"
+                            FilterDelay="100"
+                            FilterOperator="StringFilterOperator.Contains"
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            Change=@OnChange
+                            Style="width: 100%;"
+                            InputAttributes="@inputAttributes"
+                            Name="AutoCompleteComboBox"
+                            aria-labelledby="AutoCompleteComboBoxLabel" />
+        <div class="rz-dropdown-trigger rz-corner-right" style="pointer-events: none;">
+            <span class="notranslate rz-dropdown-trigger-icon rzi rzi-chevron-down"></span>
+        </div>
+    </div>
+</RadzenStack>
+
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mt-4" TextAlign="TextAlign.Center">
+    Committed value: <strong>@committedValue</strong>
+</RadzenText>
+
+@code {
+    // The committed value — only ever set to a string that exists in the data source.
+    string committedValue = "Around the Horn";
+
+    // What the user is currently typing. Two-way bound to the AutoComplete.
+    string typedText = "Around the Horn";
+
+    IEnumerable<string> companyNames = Array.Empty<string>();
+
+    // Reserve room for the chevron on the right edge of the input.
+    readonly IReadOnlyDictionary<string, object> inputAttributes =
+        new Dictionary<string, object> { { "style", "padding-right: 2rem;" } };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        companyNames = dbContext.Customers
+            .Select(c => c.CompanyName)
+            .Distinct()
+            .ToList();
+    }
+
+    // Fires when the user picks an item from the popup OR leaves the input (blur/Enter).
+    // Restrict-to-list: if the typed text matches an item, commit it; otherwise revert.
+    void OnChange(object value)
+    {
+        var text = value as string;
+
+        var match = companyNames.FirstOrDefault(c =>
+            string.Equals(c, text, StringComparison.OrdinalIgnoreCase));
+
+        if (match != null)
+        {
+            committedValue = match;
+            typedText = match; // normalize casing
+        }
+        else
+        {
+            // Reject free text — snap back to the last valid value.
+            typedText = committedValue;
+        }
+    }
+}

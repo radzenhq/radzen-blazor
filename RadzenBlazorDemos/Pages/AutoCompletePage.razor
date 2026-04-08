@@ -107,6 +107,16 @@
     <AutoCompleteOpenOnFocus />
 </RadzenExample>
 
+<RadzenText Anchor="autocomplete#combo-box" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    ComboBox (restrict to list)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Combine <code>OpenOnFocus</code> with a <code>Change</code> handler that validates the typed value against the data source to make the AutoComplete behave like a combo box: type to filter, but only values that exist in the list are accepted. A dropdown chevron is added with the same <code>rz-dropdown-trigger</code> markup the <strong>DropDown</strong> uses so it matches the surrounding theme.
+</RadzenText>
+<RadzenExample ComponentName="AutoComplete" Example="AutoCompleteComboBox">
+    <AutoCompleteComboBox />
+</RadzenExample>
+
 <RadzenText Anchor="autocomplete#disabled-autocomplete" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Disabled AutoComplete
 </RadzenText>
