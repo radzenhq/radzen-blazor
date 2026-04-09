@@ -17,14 +17,32 @@ namespace Radzen.Blazor
     public static class EnumExtensions
     {
         /// <summary>
-        /// Gets enum description.
+        /// Gets the display text for an enum value. Resolution order:
+        /// <see cref="DisplayAttribute.GetDescription"/>, then <see cref="DisplayAttribute.GetName"/>,
+        /// then <see cref="System.ComponentModel.DescriptionAttribute.Description"/>, then <see cref="Enum.ToString()"/>.
         /// </summary>
         public static string GetDisplayDescription(this Enum enumValue, Func<string, string>? translationFunction = null)
         {
             ArgumentNullException.ThrowIfNull(enumValue);
             var enumValueAsString = enumValue.ToString();
             var val = enumValue.GetType().GetMember(enumValueAsString).FirstOrDefault();
-            var enumVal = val?.GetCustomAttribute<DisplayAttribute>()?.GetDescription() ?? enumValueAsString;
+
+            string? enumVal = null;
+            if (val != null)
+            {
+                var displayAttr = val.GetCustomAttribute<DisplayAttribute>();
+                if (displayAttr != null)
+                {
+                    enumVal = displayAttr.GetDescription() ?? displayAttr.GetName();
+                }
+
+                if (enumVal == null)
+                {
+                    enumVal = val.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>()?.Description;
+                }
+            }
+
+            enumVal ??= enumValueAsString;
 
             if (translationFunction != null)
                 return translationFunction(enumVal);
