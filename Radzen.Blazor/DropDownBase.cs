@@ -538,7 +538,6 @@ namespace Radzen
                     return enumValue.ToString();
                 }
 
-
                 if (property == TextProperty)
                 {
                     return textPropertyGetter != null ? textPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
