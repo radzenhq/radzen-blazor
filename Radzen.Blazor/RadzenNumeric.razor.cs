@@ -32,6 +32,23 @@ namespace Radzen.Blazor
     /// <code>
     /// &lt;RadzenNumeric @bind-Value=@optionalValue TValue="int?" ShowUpDown="false" Placeholder="Optional" /&gt;
     /// </code>
+    /// Suppressing the default ArrowUp/ArrowDown increment behavior via the <see cref="KeyDown" /> event
+    /// (e.g. to allow custom keyboard navigation between inputs):
+    /// <code>
+    /// &lt;RadzenNumeric @bind-Value=@value TValue="int" KeyDown=@OnKeyDown /&gt;
+    /// @code {
+    ///     int value;
+    ///     void OnKeyDown(NumericKeyboardEventArgs args)
+    ///     {
+    ///         var key = args.OriginalEvent.Code ?? args.OriginalEvent.Key;
+    ///         if (key == "ArrowUp" || key == "ArrowDown")
+    ///         {
+    ///             args.PreventDefault();
+    ///             // custom logic: focus next/previous input, etc.
+    ///         }
+    ///     }
+    /// }
+    /// </code>
     /// </example>
     public partial class RadzenNumeric<TValue> : FormComponentWithAutoComplete<TValue>
     {
@@ -577,13 +594,29 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets an event callback raised when a key is pressed while the input is focused.
+        /// Call <see cref="NumericKeyboardEventArgs.PreventDefault" /> on the argument to suppress the built-in
+        /// ArrowUp/ArrowDown increment/decrement behavior and allow custom key handling (e.g. navigating to
+        /// the next/previous input).
+        /// </summary>
+        [Parameter]
+        public EventCallback<NumericKeyboardEventArgs> KeyDown { get; set; }
+
         bool preventKeyPress;
         bool stopKeydownPropagation;
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "ArrowUp" || key == "ArrowDown")
+            NumericKeyboardEventArgs? keyDownArgs = null;
+            if (KeyDown.HasDelegate)
+            {
+                keyDownArgs = new NumericKeyboardEventArgs { OriginalEvent = args };
+                await KeyDown.InvokeAsync(keyDownArgs);
+            }
+
+            if ((key == "ArrowUp" || key == "ArrowDown") && keyDownArgs?.IsDefaultPrevented != true)
             {
                 stopKeydownPropagation = true;
                 preventKeyPress = true;

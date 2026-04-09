@@ -730,5 +730,88 @@ namespace Radzen.Blazor.Tests
             var input = component.Find("input").GetAttribute("value");
             input.MarkupMatches(valueToTest.ToString(format));
         }
+
+        [Fact]
+        public void Numeric_Raises_KeyDownEvent()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<int>>(parameters => parameters.Add(p => p.Value, 5));
+
+            NumericKeyboardEventArgs raised = null;
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.KeyDown, args => { raised = args; }));
+
+            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "ArrowUp", Code = "ArrowUp" });
+
+            Assert.NotNull(raised);
+            Assert.Equal("ArrowUp", raised.OriginalEvent.Code);
+            Assert.False(raised.IsDefaultPrevented);
+        }
+
+        [Fact]
+        public void Numeric_KeyDown_PreventDefault_Suppresses_ArrowUp_Increment()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<int>>(parameters => parameters.Add(p => p.Value, 5));
+
+            var changeRaised = false;
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.KeyDown, args => args.PreventDefault())
+                .Add(p => p.Change, _ => changeRaised = true));
+
+            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "ArrowUp", Code = "ArrowUp" });
+
+            Assert.False(changeRaised);
+            Assert.Equal(5, component.Instance.Value);
+        }
+
+        [Fact]
+        public void Numeric_KeyDown_PreventDefault_Suppresses_ArrowDown_Decrement()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<int>>(parameters => parameters.Add(p => p.Value, 5));
+
+            var changeRaised = false;
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.KeyDown, args => args.PreventDefault())
+                .Add(p => p.Change, _ => changeRaised = true));
+
+            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "ArrowDown", Code = "ArrowDown" });
+
+            Assert.False(changeRaised);
+            Assert.Equal(5, component.Instance.Value);
+        }
+
+        [Fact]
+        public void Numeric_KeyDown_Without_PreventDefault_Still_Increments_On_ArrowUp()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenNumeric<int>>(parameters => parameters.Add(p => p.Value, 5));
+
+            var changeRaised = false;
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.KeyDown, _ => { })
+                .Add(p => p.Change, _ => changeRaised = true));
+
+            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "ArrowUp", Code = "ArrowUp" });
+
+            Assert.True(changeRaised);
+            Assert.Equal(6, component.Instance.Value);
+        }
     }
 }
