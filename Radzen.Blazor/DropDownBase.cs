@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Radzen
@@ -523,8 +524,20 @@ namespace Radzen
                 var enumValue = item as Enum;
                 if (enumValue != null)
                 {
-                    return Radzen.Blazor.EnumExtensions.GetDisplayDescription(enumValue);
+                    var field = enumValue.GetType().GetField(enumValue.ToString());
+                    if (field != null)
+                    {
+                        var displayAttr = field.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>();
+                        if (displayAttr != null)
+                            return displayAttr.Name ?? displayAttr.GetDescription() ?? enumValue.ToString();
+
+                        var descAttr = field.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
+                        if (descAttr != null)
+                            return descAttr.Description;
+                    }
+                    return enumValue.ToString();
                 }
+
 
                 if (property == TextProperty)
                 {
