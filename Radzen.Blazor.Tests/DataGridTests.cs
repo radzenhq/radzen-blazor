@@ -45,6 +45,36 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"rz-grid-table-striped", component.Markup);
         }
 
+        [Fact]
+        public void DataGrid_Respects_ShowHeaderParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "MyId");
+                    builder.CloseComponent();
+                });
+            });
+
+            // Default: header is visible
+            Assert.NotEmpty(component.FindAll("thead tr"));
+            Assert.Contains("MyId", component.Markup);
+
+            // ShowHeader=false hides the column header row
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ShowHeader, false));
+
+            Assert.Empty(component.FindAll("thead tr"));
+            Assert.DoesNotContain("MyId", component.Markup);
+        }
+
         // Columns tests
         [Fact]
         public void DataGrid_Renders_ColumnPropertyParameter()

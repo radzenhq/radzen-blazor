@@ -103,6 +103,8 @@
                 </colgroup>
                 }
                 <thead>
+                    @if (ShowHeader)
+                    {
                     @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                     {
                         <tr>
@@ -158,6 +160,7 @@
                                 <RadzenDataGridHeaderCell @key=column RowIndex="@i" Grid="@this" Column="@column" ColumnIndex="@columnIndex" CssClass="@($"rz-unselectable-text {sortableClass} {column.HeaderCssClass} {getFrozenColumnClass(column, visibleColumns)} {getCompositeCellCSSClass(column)} {getColumnAlignClass(column)}".Trim())" Attributes="@(cellAttr)" />
                             }
                         </tr>
+                    }
                     }
                     @if (FilterRowActive)
                     {
