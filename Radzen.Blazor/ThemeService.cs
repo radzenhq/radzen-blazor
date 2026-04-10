@@ -404,6 +404,11 @@ namespace Radzen
         /// Specify if the theme should be right-to-left.
         /// </summary>
         public bool? RightToLeft { get; private set; }
+        
+        /// <summary>
+        /// Custom css path. If set, it overwrites the default path.
+        /// </summary>
+        public string? CssPath { get; private set; }
 
         /// <summary>
         /// Raised when the theme changes.
@@ -473,7 +478,11 @@ namespace Radzen
 
         internal string WcagHref => $"{Path}/{Theme}-wcag.css?v={Version}";
 
-        private string Path => Embedded ? $"_content/Radzen.Blazor/css" : "css";
+        private string Path => Embedded 
+            ? $"_content/Radzen.Blazor/css" 
+            : !string.IsNullOrEmpty(CssPath) 
+                ? CssPath 
+                : "css";
 
         internal bool Embedded => Theme switch
         {
@@ -516,6 +525,15 @@ namespace Radzen
                 RightToLeft = rightToLeft,
                 TriggerChange = true
             });
+        }
+
+        /// <summary>
+        /// Sets a specific css path to the theme service.
+        /// </summary>
+        /// <param name="cssPath">New css path to look for themes.</param>
+        public void SetCssPath(string? cssPath)
+        {
+            CssPath = cssPath;
         }
     }
 }
