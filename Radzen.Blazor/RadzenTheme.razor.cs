@@ -20,10 +20,16 @@ namespace Radzen.Blazor
         public string? Theme { get; set; }
 
         /// <summary>
-        /// When set to true the icon font will be preloadd.
+        /// When set to true the icon font will be preloaded.
         /// </summary>
         [Parameter]
         public bool PreloadIconFont { get; set; } = true;
+
+        /// <summary>
+        /// Custom css path. If set, it overwrites the default path.
+        /// </summary>
+        [Parameter]
+        public string? CssPath { get; set; }
 
         /// <summary>
         /// Enables WCAG contrast requirements. If set to true additional CSS file will be loaded.
@@ -52,6 +58,7 @@ namespace Radzen.Blazor
         {
             persistentComponentState = ServiceProvider.GetService<PersistentComponentState>();
 
+            ThemeService.SetCssPath(CssPath);
             theme = ThemeService.Theme ?? GetCurrentTheme();
             wcag = ThemeService.Wcag ?? Wcag;
 
