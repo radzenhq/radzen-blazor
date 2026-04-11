@@ -3173,12 +3173,14 @@ window.Radzen = {
           }
 
           grid.removeEventListener('mousemove', Radzen[id + 'move']);
+          grid.removeEventListener('touchmove', Radzen[id + 'touchmove']);
           grid.removeEventListener('click', Radzen[id + 'end']);
           document.removeEventListener('mouseup', Radzen[id + 'end']);
           document.removeEventListener('touchend', Radzen[id + 'end']);
 
           Radzen[id + 'end'] = null;
           Radzen[id + 'move'] = null;
+          Radzen[id + 'touchmove'] = null;
       }
       grid.removeEventListener('click', Radzen[id + 'end']);
       grid.addEventListener('click', Radzen[id + 'end']);
@@ -3206,6 +3208,14 @@ window.Radzen = {
       }
       grid.removeEventListener('mousemove', Radzen[id + 'move']);
       grid.addEventListener('mousemove', Radzen[id + 'move']);
+
+      Radzen[id + 'touchmove'] = function (e) {
+          if (e.touches && e.touches[0]) {
+              Radzen[id + 'move']({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+          }
+      }
+      grid.removeEventListener('touchmove', Radzen[id + 'touchmove']);
+      grid.addEventListener('touchmove', Radzen[id + 'touchmove'], { passive: true });
   },
   stopColumnResize: function (id, grid, columnIndex) {
     var el = document.getElementById(id + '-resizer');
