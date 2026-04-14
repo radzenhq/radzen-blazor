@@ -2201,8 +2201,9 @@ window.Radzen = {
     if (!preventFocusRestore &&
         (Radzen.activeElement && Radzen.activeElement == document.activeElement ||
         Radzen.activeElement && document.activeElement == document.body ||
+        Radzen.activeElement && popup && popup.contains(document.activeElement) ||
         Radzen.activeElement && document.activeElement &&
-            (document.activeElement.classList.contains('rz-dropdown-filter') || 
+            (document.activeElement.classList.contains('rz-dropdown-filter') ||
              document.activeElement.classList.contains('rz-lookup-search-input') ||
              document.activeElement.classList.contains('rz-multiselect-filter-container') ||
              document.activeElement.closest('.rz-multiselect-filter-container') !== null))) {
