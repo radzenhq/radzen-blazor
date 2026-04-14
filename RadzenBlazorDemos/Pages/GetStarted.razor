@@ -18,9 +18,7 @@ attribute of the component to be set to one of the following values: <code>Inter
 More info is available in the <RadzenLink Text="rendering mode article" Path="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0" target="_blank" /> from the official Blazor documentation.
             </RadzenAlert>
             <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
-                If you have upgraded your application to .NET 8, .NET 9 or .NET 10 follow the getting started instructions for the version you initially used - e.g.
-                <RadzenLink Path="get-started/net7-server" Text=".NET 7" />.
-These instructions assume the new application layout which uses rendering modes and was introduced with .NET 8.
+These instructions assume the application layout which uses rendering modes and was introduced with .NET 8.
             </RadzenAlert>
             @Installation(CurrentVersion)
             @Import(CurrentVersion)
@@ -53,26 +51,6 @@ These instructions assume the new application layout which uses rendering modes 
             </RadzenAlert>
         @Next
         </div>
-        </RadzenTabsItem>
-        <RadzenTabsItem Text=".NET 7 Server">
-            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
-            @Installation(CurrentVersion)
-            @Import(CurrentVersion)
-            @IncludeTheme(("_Host.cshtml", "ServerPrerendered", CurrentVersion))
-            @IncludeJavaScript(("_Host.cshtml", CurrentVersion))
-            @UseComponent(CurrentVersion)
-            @Additional(CurrentVersion)
-            </div>
-        </RadzenTabsItem>
-        <RadzenTabsItem Text=".NET 7 WebAssembly (hosted)">
-            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
-            @Installation(CurrentVersion)
-            @Import(CurrentVersion)
-            @IncludeTheme(("_Host.cshtml", "WebAssemblyPrerendered", CurrentVersion))
-            @IncludeJavaScript(("_Host.cshtml", CurrentVersion))
-            @UseComponent(CurrentVersion)
-            @Additional(CurrentVersion)
-            </div>
         </RadzenTabsItem>
         <RadzenTabsItem Text="WebAssembly (standalone)">
             <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
@@ -123,7 +101,7 @@ These instructions assume the new application layout which uses rendering modes 
 </RadzenTabs>
 
 @code {
-    private static readonly string[] versions = ["net9", "net7-server", "net7-wasm", "wasm", "csp"];
+    private static readonly string[] versions = ["net9", "wasm", "csp"];
 
     private int selectedIndex = 0;
 
@@ -189,26 +167,6 @@ These instructions assume the new application layout which uses rendering modes 
 </code>
 </pre>
         </text>;
-
-    RenderFragment<(string file, string renderMode, string version)> IncludeTheme = args =>
-        @<text>
-        <RadzenText Anchor="@($"get-started/{args.version}#theme")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">3. Include a theme</RadzenText>
-        <RadzenText>
-            Open <code>@(args.file)</code> and add this code within the <code>&lt;head&gt;</code> element:
-        </RadzenText>
-<pre class="rz-p-4">
-<code>&lt;component type="typeof(RadzenTheme)" render-mode="@(args.renderMode)" param-Theme="@@("material")" /&gt;
-</code>
-</pre>
-        <RadzenText>
-            Open the <code>Program.cs</code> file and include:
-        </RadzenText>
-<pre class="rz-p-4">
-<code>builder.Services.AddRadzenComponents();
-</code>
-</pre>
-        </text>;
-
 
     RenderFragment<string> UseComponent = version =>
         @<text>

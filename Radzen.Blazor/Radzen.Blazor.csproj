@@ -6,7 +6,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <TargetFrameworks>net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <RazorLangVersion>7.0</RazorLangVersion>
     <LangVersion>latest</LangVersion>
     <OutputType>Library</OutputType>
@@ -37,8 +37,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
