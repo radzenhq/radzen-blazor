@@ -10,6 +10,7 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null"
          role="combobox" aria-haspopup="listbox" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@ListId" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
+         aria-label="@(!Multiple && selectedItem != null ? GetItemOrValueFromProperty(selectedItem, TextProperty ?? string.Empty) : EmptyAriaLabel)"
          @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown" id="@GetId()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         <div class="rz-helper-hidden-accessible">

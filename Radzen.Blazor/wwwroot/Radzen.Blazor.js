@@ -1181,6 +1181,18 @@ window.Radzen = {
         el.scrollIntoView();
     }
   },
+  updateActiveDescendant: function (ul, li, index) {
+    var combobox = ul ? ul.closest('[role="combobox"]') : null;
+    if (li && ul) {
+      var itemId = ul.id + '-' + index;
+      li.id = itemId;
+      if (combobox) {
+        combobox.setAttribute('aria-activedescendant', itemId);
+      }
+    } else if (combobox) {
+      combobox.removeAttribute('aria-activedescendant');
+    }
+  },
   selectListItem: function (input, ul, index) {
     if (!input || !ul) return;
 
@@ -1201,6 +1213,9 @@ window.Radzen = {
     ) {
       childNodes[ul.nextSelectedIndex].classList.add('rz-state-highlight');
       childNodes[ul.nextSelectedIndex].scrollIntoView({block:'nearest'});
+      Radzen.updateActiveDescendant(ul, childNodes[ul.nextSelectedIndex], ul.nextSelectedIndex);
+    } else {
+      Radzen.updateActiveDescendant(ul, null, -1);
     }
   },
   focusListItem: function (input, ul, isDown, startIndex) {
@@ -1241,6 +1256,9 @@ window.Radzen = {
     ) {
       childNodes[ul.nextSelectedIndex].classList.add('rz-state-highlight');
       Radzen.scrollIntoViewIfNeeded(childNodes[ul.nextSelectedIndex]);
+      Radzen.updateActiveDescendant(ul, childNodes[ul.nextSelectedIndex], ul.nextSelectedIndex);
+    } else {
+      Radzen.updateActiveDescendant(ul, null, -1);
     }
 
     return ul.nextSelectedIndex;
@@ -1292,6 +1310,9 @@ window.Radzen = {
       if (relativeIndex >= 0 && relativeIndex < lis.length) {
         lis[relativeIndex].classList.add('rz-state-highlight');
         lis[relativeIndex].scrollIntoView({ block: 'nearest' });
+        Radzen.updateActiveDescendant(ul, lis[relativeIndex], absoluteIndex);
+      } else {
+        Radzen.updateActiveDescendant(ul, null, -1);
       }
     }
 
@@ -2146,6 +2167,10 @@ window.Radzen = {
     var popupInfo = (Radzen.popups || []).find(function (p) { return p.id === id; });
     if (popupInfo && popupInfo.parent) {
       Radzen.setPopupAriaExpanded(popupInfo.parent, id, false);
+      var combobox = popupInfo.parent.closest('[role="combobox"]');
+      if (combobox) {
+        combobox.removeAttribute('aria-activedescendant');
+      }
     }
     if (popup.style.display == 'none') {
         var popups = Radzen.findPopup(id);
