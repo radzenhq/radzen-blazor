@@ -40,7 +40,7 @@ static class XlsxReader
     {
         var fontStyles = new Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)>();
         var fillColors = new Dictionary<int, string>();
-        var cellStyles = new Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden)>(0);
+        var cellStyles = new Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden, bool QuotePrefix)>(0);
         var numberFormats = new Dictionary<int, string>();
         var borderStyles = new Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)>();
 
@@ -166,7 +166,7 @@ static class XlsxReader
         Dictionary<int, string> fillColors,
         Dictionary<int, string> numberFormats,
         Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> borderStyles,
-        Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden)> cellStyles)
+        Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden, bool QuotePrefix)> cellStyles)
     {
         var cellXfs = stylesDoc.Descendants(stylesNs + "cellXfs").FirstOrDefault()?.Elements(stylesNs + "xf").ToList() ?? [];
         for (var i = 0; i < cellXfs.Count; i++)
@@ -180,6 +180,7 @@ static class XlsxReader
             var applyAlignment = cellXfs[i].Attribute("applyAlignment")?.Value;
             var numFmtIdAttr = cellXfs[i].Attribute("numFmtId")?.Value;
             var numFmtId = numFmtIdAttr is not null ? int.Parse(numFmtIdAttr, CultureInfo.InvariantCulture) : 0;
+            var quotePrefix = cellXfs[i].Attribute("quotePrefix")?.Value == "1";
 
             if (fontId is not null && fillId is not null)
             {
@@ -197,9 +198,10 @@ static class XlsxReader
                     applyBorder == "1" && borderStyles.ContainsKey(borderIdValue) ||
                     applyAlignment == "1" ||
                     applyProtection == "1" ||
-                    numFmtId > 0)
+                    numFmtId > 0 ||
+                    quotePrefix)
                 {
-                    cellStyles[i] = (fontIdValue, fillIdValue, borderIdValue, textAlign, verticalAlign, wrapText, numFmtId, locked, formulaHidden);
+                    cellStyles[i] = (fontIdValue, fillIdValue, borderIdValue, textAlign, verticalAlign, wrapText, numFmtId, locked, formulaHidden, quotePrefix);
                 }
             }
         }
@@ -579,6 +581,10 @@ static class XlsxReader
             if (style.FormulaHidden is not null)
             {
                 fmt.FormulaHidden = style.FormulaHidden;
+            }
+            if (style.QuotePrefix)
+            {
+                sheet.Cells[address.Row, address.Column].QuotePrefix = true;
             }
         }
     }
@@ -1335,14 +1341,14 @@ static class XlsxReader
     {
         public Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)> FontStyles { get; }
         public Dictionary<int, string> FillColors { get; }
-        public Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden)> CellStyles { get; }
+        public Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden, bool QuotePrefix)> CellStyles { get; }
         public Dictionary<int, string> NumberFormats { get; }
         public Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> BorderStyles { get; }
 
         public StyleInfo(
             Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize)> fontStyles,
             Dictionary<int, string> fillColors,
-            Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden)> cellStyles,
+            Dictionary<int, (int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden, bool QuotePrefix)> cellStyles,
             Dictionary<int, string> numberFormats,
             Dictionary<int, (BorderStyle? Top, BorderStyle? Right, BorderStyle? Bottom, BorderStyle? Left)> borderStyles)
         {

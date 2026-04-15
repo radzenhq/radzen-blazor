@@ -60,7 +60,7 @@
         {
             row = i + 2;
             sheet.Cells[row, 0].Value = mathFormulas[i].Name;
-            sheet.Cells[row, 1].Value = mathFormulas[i].Formula;
+            sheet.Cells[row, 1].SetValue("'" + mathFormulas[i].Formula);
             sheet.Cells[row, 1].Format = formulaFormat;
             sheet.Cells[row, 2].Formula = mathFormulas[i].Formula;
         }
@@ -92,7 +92,7 @@
         {
             row = 13 + i;
             sheet.Cells[row, 0].Value = logicalFormulas[i].Name;
-            sheet.Cells[row, 1].Value = logicalFormulas[i].Formula;
+            sheet.Cells[row, 1].SetValue("'" + logicalFormulas[i].Formula);
             sheet.Cells[row, 1].Format = formulaFormat;
             sheet.Cells[row, 2].Formula = logicalFormulas[i].Formula;
         }
@@ -131,7 +131,7 @@
         {
             row = 22 + i;
             sheet.Cells[row, 0].Value = textFormulas[i].Name;
-            sheet.Cells[row, 1].Value = textFormulas[i].Formula;
+            sheet.Cells[row, 1].SetValue("'" + textFormulas[i].Formula);
             sheet.Cells[row, 1].Format = formulaFormat;
             sheet.Cells[row, 2].Formula = textFormulas[i].Formula;
         }
@@ -163,7 +163,7 @@
         {
             row = 33 + i;
             sheet.Cells[row, 0].Value = dateFormulas[i].Name;
-            sheet.Cells[row, 1].Value = dateFormulas[i].Formula;
+            sheet.Cells[row, 1].SetValue("'" + dateFormulas[i].Formula);
             sheet.Cells[row, 1].Format = formulaFormat;
             sheet.Cells[row, 2].Formula = dateFormulas[i].Formula;
             if (!string.IsNullOrEmpty(dateFormulas[i].NumberFormat))
@@ -219,7 +219,7 @@
         {
             row = 42 + i;
             sheet.Cells[row, 0].Value = lookupFormulas[i].Name;
-            sheet.Cells[row, 1].Value = lookupFormulas[i].Formula;
+            sheet.Cells[row, 1].SetValue("'" + lookupFormulas[i].Formula);
             sheet.Cells[row, 1].Format = formulaFormat;
             sheet.Cells[row, 2].Formula = lookupFormulas[i].Formula;
         }

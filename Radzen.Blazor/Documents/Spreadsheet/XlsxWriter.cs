@@ -34,7 +34,7 @@ class XlsxWriter(Workbook sourceWorkbook)
     }
 
     private record struct FontKey(string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize);
-    private record struct CellStyleKey(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden);
+    private record struct CellStyleKey(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden, bool QuotePrefix);
     private record struct BorderKey(string? TopStyle, string? TopColor, string? RightStyle, string? RightColor, string? BottomStyle, string? BottomColor, string? LeftStyle, string? LeftColor);
 
     private class StyleTracker
@@ -972,7 +972,7 @@ class XlsxWriter(Workbook sourceWorkbook)
 
     private static bool HasCellFormatting(Cell cell)
     {
-        return !cell.Format.IsDefault || cell.ValueType == CellDataType.Date;
+        return !cell.Format.IsDefault || cell.ValueType == CellDataType.Date || cell.QuotePrefix;
     }
 
     private int GetOrCreateCellStyle(Cell cell, StyleTracker styleTracker)
@@ -982,7 +982,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         var numFmtId = GetOrCreateNumberFormat(cell, styleTracker);
         var borderId = GetOrCreateBorderStyle(cell, styleTracker);
 
-        var styleKey = new CellStyleKey(fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId, cell.Format.Locked, cell.Format.FormulaHidden);
+        var styleKey = new CellStyleKey(fontId, fillId, borderId, cell.Format.TextAlign, cell.Format.VerticalAlign, cell.Format.WrapText, numFmtId, cell.Format.Locked, cell.Format.FormulaHidden, cell.QuotePrefix);
 
         if (!styleTracker.CellStyles.TryGetValue(styleKey, out int styleId))
         {
@@ -1225,6 +1225,12 @@ class XlsxWriter(Workbook sourceWorkbook)
             xfElement.Add(new XAttribute("applyProtection", "1"));
         }
 
+        if (cell.QuotePrefix)
+        {
+            xfElement.Add(new XAttribute("quotePrefix", "1"));
+            xfElement.Add(new XAttribute("applyQuotePrefix", "1"));
+        }
+
         styleTracker.CellXfsElement.Add(xfElement);
         styleTracker.CellXfsElement.Attribute("count")!.Value = (styleTracker.CellStyles.Count + 1).ToString(CultureInfo.InvariantCulture);
     }
@@ -1303,7 +1309,7 @@ class XlsxWriter(Workbook sourceWorkbook)
                     break;
 
                 case CellDataType.String:
-                    var strValue = cell.GetValue() ?? string.Empty;
+                    var strValue = cell.Value as string ?? cell.Value?.ToString() ?? string.Empty;
                     if (!sharedStrings.TryGetValue(strValue, out var index))
                     {
                         index = sharedStrings.Count;
