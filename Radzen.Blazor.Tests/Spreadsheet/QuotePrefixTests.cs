@@ -117,6 +117,54 @@ public class QuotePrefixTests
     }
 
     [Fact]
+    public void Value_DirectAssignment_ClearsQuotePrefix()
+    {
+        sheet.Cells["A1"].SetValue("'=SUM(B1:B2)");
+        sheet.Cells["A1"].Value = "plain";
+
+        Assert.False(sheet.Cells["A1"].QuotePrefix);
+    }
+
+    [Fact]
+    public void Formula_DirectAssignment_ClearsQuotePrefix()
+    {
+        sheet.Cells["A1"].SetValue("'=SUM(B1:B2)");
+        sheet.Cells["A1"].Formula = "=B1";
+
+        Assert.False(sheet.Cells["A1"].QuotePrefix);
+    }
+
+    [Fact]
+    public void Clone_PreservesQuotePrefix()
+    {
+        sheet.Cells["A1"].SetValue("'=SUM(B1:B2)");
+        var clone = sheet.Cells["A1"].Clone();
+
+        Assert.True(clone.QuotePrefix);
+        Assert.Equal("=SUM(B1:B2)", clone.Value);
+    }
+
+    [Fact]
+    public void CopyFrom_PreservesQuotePrefix()
+    {
+        sheet.Cells["A1"].SetValue("'=SUM(B1:B2)");
+        sheet.Cells["A2"].CopyFrom(sheet.Cells["A1"]);
+
+        Assert.True(sheet.Cells["A2"].QuotePrefix);
+        Assert.Equal("=SUM(B1:B2)", sheet.Cells["A2"].Value);
+    }
+
+    [Fact]
+    public void CopyFrom_OverwritesPriorQuotePrefix()
+    {
+        sheet.Cells["A1"].SetValue("plain");
+        sheet.Cells["A2"].SetValue("'=SUM(B1:B2)");
+        sheet.Cells["A2"].CopyFrom(sheet.Cells["A1"]);
+
+        Assert.False(sheet.Cells["A2"].QuotePrefix);
+    }
+
+    [Fact]
     public void RoundTrip_QuotePrefix_Preserved()
     {
         var workbook = new Workbook();
