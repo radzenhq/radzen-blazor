@@ -9,7 +9,9 @@ Supports .NET 10, Blazor Server, Blazor WebAssembly, and .NET MAUI Blazor Hybrid
 
 [Online Demos](https://blazor.radzen.com) · [Documentation](https://blazor.radzen.com/docs) · [Get Started](https://blazor.radzen.com/get-started)
 
- [![License - MIT](https://img.shields.io/github/license/radzenhq/radzen-blazor?logo=github&style=for-the-badge)](https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE)[![NuGet Downloads](https://img.shields.io/nuget/dt/Radzen.Blazor?color=%232694F9&label=nuget%20downloads&logo=nuget&style=for-the-badge) ](https://www.nuget.org/packages/Radzen.Blazor)![Last Commit](https://img.shields.io/github/last-commit/radzenhq/radzen-blazor?logo=github&style=for-the-badge) [![Github Contributors](https://img.shields.io/github/contributors/radzenhq/radzen-blazor?logo=github&style=for-the-badge) ](https://github.com/radzenhq/radzen-blazor/graphs/contributors)[![Radzen Blazor Components - Online Demos](https://img.shields.io/badge/demos-online-brightgreen?color=%232694F9&logo=blazor&style=for-the-badge) ](https://blazor.radzen.com)[![Radzen Blazor Components - Documentation](https://img.shields.io/badge/docs-online-brightgreen?color=%232694F9&logo=blazor&style=for-the-badge)](https://blazor.radzen.com/docs)
+If Radzen Blazor is useful to you, a ⭐ on GitHub helps other Blazor developers find it.
+
+ [![GitHub Stars](https://img.shields.io/github/stars/radzenhq/radzen-blazor?logo=github&style=for-the-badge)](https://github.com/radzenhq/radzen-blazor/stargazers)[![License - MIT](https://img.shields.io/github/license/radzenhq/radzen-blazor?logo=github&style=for-the-badge)](https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE)[![NuGet Downloads](https://img.shields.io/nuget/dt/Radzen.Blazor?color=%232694F9&label=nuget%20downloads&logo=nuget&style=for-the-badge) ](https://www.nuget.org/packages/Radzen.Blazor)![Last Commit](https://img.shields.io/github/last-commit/radzenhq/radzen-blazor?logo=github&style=for-the-badge) [![Github Contributors](https://img.shields.io/github/contributors/radzenhq/radzen-blazor?logo=github&style=for-the-badge) ](https://github.com/radzenhq/radzen-blazor/graphs/contributors)[![Radzen Blazor Components - Online Demos](https://img.shields.io/badge/demos-online-brightgreen?color=%232694F9&logo=blazor&style=for-the-badge) ](https://blazor.radzen.com)[![Radzen Blazor Components - Documentation](https://img.shields.io/badge/docs-online-brightgreen?color=%232694F9&logo=blazor&style=for-the-badge)](https://blazor.radzen.com/docs)
 
 ## Quick start
 
@@ -47,15 +49,19 @@ For the full setup guide including render modes and dialog/notification configur
 
 ## Components
 
-**Data** — DataGrid, DataList, PivotDataGrid, Pager, Tree, Scheduler, Charts, GaugeCharts
+**AI** — AIChat, Chat, Markdown, SpeechToTextButton
 
-**Forms** — TextBox, TextArea, Password, Numeric, DatePicker, TimePicker, ColorPicker, Dropdown, AutoComplete, ListBox, CheckBox, RadioButtonList, Switch, Slider, Rating, FileInput, HtmlEditor
+**Data** — DataGrid, DataList, PivotDataGrid, DataFilter, PickList, Pager, Tree, Scheduler, Gantt, Timeline, Charts (Line, Bar, Column, Area, Pie, Donut, Scatter, Bubble, Spider/Radar), SankeyDiagram, GaugeCharts (Radial, Linear, Arc)
 
-**Layout** — Card, Panel, Tabs, Accordion, Splitter, Steps, Dialog, Fieldset
+**Forms** — TextBox, TextArea, Password, Numeric, Mask, DatePicker, TimePicker, ColorPicker, Dropdown, AutoComplete, ListBox, CheckBox, RadioButtonList, Switch, Slider, Rating, FileInput, SecurityCode, HtmlEditor
 
-**Navigation** — Menu, ContextMenu, PanelMenu, Breadcrumb, Link, TreeView
+**Layout** — Card, Panel, Tabs, Accordion, Splitter, Steps, Dialog, Fieldset, Stack, Row/Column, Sidebar
 
-**Feedback** — Notification, Alert, ProgressBar, Badge, Tooltip, Skeleton
+**Navigation** — Menu, ContextMenu, PanelMenu, Breadcrumb, Link, TreeView, FabMenu, ProfileMenu
+
+**Feedback** — Notification, Alert, ProgressBar, Badge, Tooltip, Skeleton, Chip, ChipList, AppearanceToggle
+
+**Utility** — QRCode, Barcode, Gravatar, GoogleMap, DropZone (drag-and-drop)
 
 **Theming** — 10 built-in themes with light and dark variants. Free themes: Material, Standard, Default, Humanistic, Software. Premium themes (included with [Radzen Blazor Pro](https://www.radzen.com/pricing)): Material 3, Fluent. Full CSS variable customization and a built-in theme service for runtime switching.
 
@@ -89,6 +95,7 @@ Visit the [Radzen Community forum](https://forum.radzen.com/) — 400+ active we
 For dedicated support and additional productivity tools, the [Radzen Blazor Pro subscription](https://www.radzen.com/pricing) includes:
 - **Radzen Blazor Studio** — standalone Blazor IDE that provides WYSIWYG design canvas, database scaffolding, CRUD wizards, app templates, and deployment to IIS/Azure
 - **Radzen Blazor for Visual Studio** — Blazor tooling integrated into Visual Studio 2026
+- **Radzen Blazor MCP** — cloud-hosted MCP server that gives AI coding assistants (Cursor, Claude Code, GitHub Copilot, VS Code, Visual Studio, JetBrains) real-time access to Radzen component docs, APIs, and ready-made templates
 - **Premium themes** and theme customization tools
 - **Dedicated support** with guaranteed 24-hour response time and priority fixes
 
