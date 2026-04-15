@@ -116,6 +116,7 @@ public class Cell
         set
         {
             Data = new CellData(value);
+            QuotePrefix = false;
 
             Worksheet.OnCellValueChanged(this);
         }
@@ -171,21 +172,19 @@ public class Cell
     {
         if (value is not null && value.StartsWith('\''))
         {
-            QuotePrefix = true;
             if (Formula is not null)
             {
                 Formula = null;
             }
             Value = value[1..];
+            QuotePrefix = true;
         }
         else if (value?.StartsWith('=') == true && value != "=")
         {
-            QuotePrefix = false;
             Formula = value;
         }
         else
         {
-            QuotePrefix = false;
             Value = value;
         }
     }
@@ -223,6 +222,10 @@ public class Cell
         {
             formula = value;
             FormulaSyntaxTree = value is not null ? FormulaParser.Parse(value) : null;
+            if (value is not null)
+            {
+                QuotePrefix = false;
+            }
             Worksheet.OnCellFormulaChanged(this);
         }
     }

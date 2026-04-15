@@ -498,9 +498,6 @@ static class XlsxReader
 
         var cellType = (string?)cellElem.Attribute("t") ?? "n";
 
-        // Apply cell style if present
-        ApplyCellStyle(cellElem, sheet, address, styleInfo);
-
         if (formulaElem is not null)
         {
             var formulaValue = formulaElem.Value;
@@ -520,6 +517,8 @@ static class XlsxReader
 
             sheet.Cells[address.Row, address.Column].Value = value;
         }
+
+        ApplyCellStyle(cellElem, sheet, address, styleInfo);
     }
 
     private static void ApplyCellStyle(XElement cellElem, Worksheet sheet, CellRef address, StyleInfo styleInfo)
