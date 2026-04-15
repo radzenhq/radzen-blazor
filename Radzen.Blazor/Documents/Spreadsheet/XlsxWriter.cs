@@ -1309,7 +1309,7 @@ class XlsxWriter(Workbook sourceWorkbook)
                     break;
 
                 case CellDataType.String:
-                    var strValue = cell.Value as string ?? cell.Value?.ToString() ?? string.Empty;
+                    var strValue = cell.Value as string ?? string.Empty;
                     if (!sharedStrings.TryGetValue(strValue, out var index))
                     {
                         index = sharedStrings.Count;
