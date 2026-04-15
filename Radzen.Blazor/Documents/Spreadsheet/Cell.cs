@@ -52,6 +52,7 @@ public class Cell
     {
         Data = new CellData(Value),
         Formula = Formula,
+        QuotePrefix = QuotePrefix,
         Hyperlink = Hyperlink?.Clone()
     };
 
@@ -63,6 +64,7 @@ public class Cell
         ArgumentNullException.ThrowIfNull(other);
         Data = other.Data;
         Formula = other.Formula;
+        QuotePrefix = other.QuotePrefix;
 
         format?.Changed -= OnFormatChanged;
 
@@ -129,13 +131,20 @@ public class Cell
             return Formula;
         }
 
-        return Value switch
+        var text = Value switch
         {
             null => null,
             CellError error => error.ToString(),
             string str => str,
             _ => Value.ToString()
         };
+
+        if (QuotePrefix && text is not null)
+        {
+            return "'" + text;
+        }
+
+        return text;
     }
 
     /// <summary>
@@ -154,17 +163,29 @@ public class Cell
 
     /// <summary>
     /// Sets the value of the cell based on a string input.
-    /// If the string starts with '=', it is treated as a formula.
-    /// Otherwise, it attempts to parse the string as a number or keeps it as a string.
+    /// A leading apostrophe escapes the value — the apostrophe is stripped,
+    /// the remainder is stored as text, and <see cref="QuotePrefix"/> is set.
+    /// Otherwise, a string starting with '=' is treated as a formula.
     /// </summary>
     public void SetValue(string? value)
     {
-        if (value?.StartsWith('=') == true && value != "=")
+        if (value is not null && value.StartsWith('\''))
         {
+            QuotePrefix = true;
+            if (Formula is not null)
+            {
+                Formula = null;
+            }
+            Value = value[1..];
+        }
+        else if (value?.StartsWith('=') == true && value != "=")
+        {
+            QuotePrefix = false;
             Formula = value;
         }
         else
         {
+            QuotePrefix = false;
             Value = value;
         }
     }
@@ -182,6 +203,13 @@ public class Cell
     public CellDataType ValueType => Data.Type;
 
     internal FormulaSyntaxTree? FormulaSyntaxTree { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the cell value was entered with
+    /// a leading apostrophe and should be treated as literal text even if it
+    /// looks like a formula. Mirrors Excel's <c>quotePrefix</c> cell flag.
+    /// </summary>
+    public bool QuotePrefix { get; set; }
 
     private string? formula;
 
