@@ -19,12 +19,12 @@
 
         var columnMappings = new IColumnMapping<Employee>[]
         {
-            new ColumnMapping<Employee, int>("ID", e => e.EmployeeID),
-            new ColumnMapping<Employee, string>("First Name", e => e.FirstName),
-            new ColumnMapping<Employee, string>("Last Name", e => e.LastName),
-            new ColumnMapping<Employee, string>("Title", e => e.Title),
-            new ColumnMapping<Employee, string>("City", e => e.City),
-            new ColumnMapping<Employee, string>("Country", e => e.Country),
+            ColumnMapping.Create("ID", (Employee e) => e.EmployeeID),
+            ColumnMapping.Create("First Name", (Employee e) => e.FirstName),
+            ColumnMapping.Create("Last Name", (Employee e) => e.LastName),
+            ColumnMapping.Create("Title", (Employee e) => e.Title),
+            ColumnMapping.Create("City", (Employee e) => e.City),
+            ColumnMapping.Create("Country", (Employee e) => e.Country),
         };
 
         var dataSheet = new DataSheet<Employee>(employees, columnMappings);
