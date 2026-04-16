@@ -1,4 +1,4 @@
-<RadzenTemplateForm Data=@model>
+<RadzenTemplateForm Data=@model class="rz-p-0 rz-p-md-12">
     <RadzenStack Gap="1.5rem">
         <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
             <RadzenLabel Component="EmailRequiredInput">
@@ -32,7 +32,7 @@
             <RadzenTextBox Name="PhoneInput" @bind-Value=@model.Phone Style="width: 100%; max-width: 400px;" />
         </RadzenStack>
 
-        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit Form" />
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit Form" Style="width: 100%; max-width: 400px;" />
     </RadzenStack>
 </RadzenTemplateForm>
 

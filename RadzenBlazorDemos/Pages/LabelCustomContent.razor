@@ -1,9 +1,9 @@
-<RadzenStack Gap="1.5rem">
+<RadzenStack Gap="1.5rem" class="rz-p-0 rz-p-md-12">
     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
         <RadzenLabel Component="UsernameInput">
             <RadzenIcon Icon="person" class="rz-mr-1" /> Username
         </RadzenLabel>
-        <RadzenTextBox Name="UsernameInput" @bind-Value=@username />
+        <RadzenTextBox Name="UsernameInput" @bind-Value=@username Style="width: 100%; max-width: 300px;" />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
