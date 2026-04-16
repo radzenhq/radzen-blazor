@@ -3216,5 +3216,38 @@ namespace Radzen.Blazor.Tests
             // Even with Count=0, the inserted row should be visible
             Assert.DoesNotContain("rz-datatable-emptymessage", component.Markup);
         }
+
+        [Fact]
+        public void DataGrid_Reset_DoesNotInfinitelyCallLoadData_WhenColumnHasSortOrder()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var loadDataCallCount = 0;
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 }, new { Id = 3 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "ID");
+                    builder.AddAttribute(3, "SortOrder", SortOrder.Descending);
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowSorting, true);
+                parameterBuilder.Add<EventCallback<LoadDataArgs>>(p => p.LoadData,
+                    new EventCallback<LoadDataArgs>(null, (LoadDataArgs args) => { loadDataCallCount++; }));
+            });
+
+            loadDataCallCount = 0;
+
+            component.InvokeAsync(() => component.Instance.Reset());
+            component.Render();
+
+            Assert.True(loadDataCallCount <= 2, $"LoadData was called {loadDataCallCount} times, expected at most 2 (indicating possible infinite loop)");
+        }
     }
 }

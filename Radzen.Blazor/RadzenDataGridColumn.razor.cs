@@ -1013,6 +1013,7 @@ namespace Radzen.Blazor
             {
                 var newSortOrder = parameters.GetValueOrDefault<SortOrder?>(nameof(SortOrder));
                 sortOrder = new SortOrder?[] { newSortOrder };
+                SortOrder = newSortOrder;
 
                 if (Grid != null)
                 {
