@@ -7,11 +7,92 @@
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     Track and review changes to Radzen Blazor Components v11
 </RadzenText>
-<RadzenText Anchor="changelog#v11-radzenmarkdown" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
-    RadzenMarkdown
+<RadzenText Anchor="changelog#v11-breaking" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Breaking changes
 </RadzenText>
 <ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> .NET 7 support has been removed. The library now targets .NET 8, .NET 9, and .NET 10.</li>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> The Markdown parser namespace has changed from <code>Radzen.Blazor.Markdown</code> to <code>Radzen.Documents.Markdown</code>. Update <code>using</code> directives accordingly.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Empty <code>CategoryProperty</code> in chart series will no longer fall back to the row index.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v11-new-components" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    New Components
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="RadzenSpreadsheet" Path="/spreadsheet" /> - a full-featured spreadsheet component with XLSX import/export, formula engine, formatting, filtering, sorting, conditional formatting, data validation, charts, and more.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="RadzenSignaturePad" Path="/signature-pad" /> - a signature pad component for capturing handwritten signatures.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v11-spreadsheet" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadzenSpreadsheet
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Formula engine with 80+ Excel-compatible functions including math, text, date/time, lookup, statistical, and logical functions.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> XLSX import and export with full round-trip support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Cell formatting: bold, italic, underline, font color, background color, text alignment, vertical alignment, and number formats (including scientific and accounting).</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Format Cells dialog for advanced formatting options.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Filtering and sorting with undo support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Conditional formatting rules.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Frozen panes (rows and columns).</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Cell, row header, and column header context menus.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Undo and redo with keyboard shortcuts.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Insert and delete rows and columns.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Merged cells support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Column and row resizing.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Data validation with input prompts and error alerts.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Floating images with interactive resize via drag handles.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Autofill feature for extending cell values and patterns.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Multiple sheet (worksheet) support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Sheet and workbook protection.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Embedded chart support with chart context menu and Edit Chart dialog.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Custom cell type support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Localization service for all spreadsheet UI strings.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Address-aware copy, cut, and paste operations.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Drag-to-move support for charts and images.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Data binding support.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v11-charts" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Charts
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> New chart series types: Candlestick, OHLC, Waterfall, Horizontal Waterfall, Range Column, Range Bar, Range Area, Range Step Area, Box Plot, Bullet, Pyramid, Heatmap, Treemap, Funnel, Radar Column, Step Line, Step Area, Stacked Line, Full Stacked Column, Full Stacked Bar, Full Stacked Area, Full Stacked Line, and High-Low.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="Range Navigator" Path="/range-navigator" /> component for interactive range selection on chart data.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="Chart Gallery" Path="/chart-gallery" /> page showcasing all available chart types.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Pan and zoom support for interactive data exploration.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> RTL (right-to-left) support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Series and legend hover effects.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Multiple axes support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Logarithmic and indexed axis types.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Axis crossing and inverted axis support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Trendline support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Drill-down support.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Spider chart now supports polar chart configurations.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Pie and Donut series <code>RadiusProperty</code> and <code>ExplodeOffset</code> properties.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Range Navigator compact mode and axis support.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v11-localization" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Localization
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Localization unified to resource-based approach across all components.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v11-label" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadzenLabel
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Added <code>TextStyle</code> property to RadzenLabel.</li>
+</ul>
+
+<RadzenText Anchor="changelog#v11-trimming" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Trimming and CSP
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Feature" /> Trimming support added for reduced publish size.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Content Security Policy (CSP) compatibility improvements across components.</li>
 </ul>
 
 <RadzenText Anchor="changelog#v10" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
