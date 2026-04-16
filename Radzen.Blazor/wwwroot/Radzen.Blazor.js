@@ -2681,36 +2681,51 @@ window.Radzen = {
           children.classList.add('rz-open');
           children.classList.remove('rz-close');
 
+          var isRtl = getComputedStyle(item).direction === 'rtl';
+          var el = item.parentElement;
+          var scrollParent = null;
+          while (el && el !== document.body) {
+            var s = getComputedStyle(el);
+            if (s.overflowX === 'auto' || s.overflowX === 'scroll' || s.overflowX === 'hidden') {
+              scrollParent = el;
+              break;
+            }
+            el = el.parentElement;
+          }
+
           if (children.hasAttribute('data-flyout')) {
             children.removeAttribute('data-flyout-flip');
-            var childWidth = children.offsetWidth || 0;
+            var childRect = children.getBoundingClientRect();
             var itemRect = item.getBoundingClientRect();
-            var isRtl = getComputedStyle(item).direction === 'rtl';
-            var el = item.parentElement;
-            var scrollParent = null;
-            while (el && el !== document.body) {
-              var s = getComputedStyle(el);
-              if (s.overflowX === 'auto' || s.overflowX === 'scroll' || s.overflowX === 'hidden') {
-                scrollParent = el;
-                break;
-              }
-              el = el.parentElement;
-            }
             if (isRtl) {
               var leftBoundary = scrollParent ? scrollParent.getBoundingClientRect().left : 0;
-              if (itemRect.left - childWidth < leftBoundary) {
+              if (itemRect.left - childRect.width < leftBoundary) {
                 children.setAttribute('data-flyout-flip', '');
               }
             } else {
               var rightBoundary = scrollParent ? scrollParent.getBoundingClientRect().right : document.documentElement.clientWidth;
-              if (itemRect.right + childWidth > rightBoundary) {
+              if (itemRect.right + childRect.width > rightBoundary) {
                 children.setAttribute('data-flyout-flip', '');
               }
             }
           }
+
+          // Shift dropdown left/right if it overflows the scroll parent or viewport
+          children.style.insetInlineStart = children.style.insetInlineStart || '';
+          var childRect = children.getBoundingClientRect();
+          var rightBoundary = scrollParent ? scrollParent.getBoundingClientRect().right : document.documentElement.clientWidth;
+          var leftBoundary = scrollParent ? scrollParent.getBoundingClientRect().left : 0;
+          if (!isRtl && childRect.right > rightBoundary) {
+            var offset = parseFloat(children.style.insetInlineStart) || 0;
+            children.style.insetInlineStart = (offset + rightBoundary - childRect.right) + 'px';
+          } else if (isRtl && childRect.left < leftBoundary) {
+            var offset = parseFloat(children.style.insetInlineStart) || 0;
+            children.style.insetInlineStart = (offset + leftBoundary - childRect.left) + 'px';
+          }
         } else {
           children.onanimationend = function () {
             children.style.display = 'none';
+            children.style.insetInlineStart = '';
             children.onanimationend = null;
           }
           children.classList.remove('rz-open');

@@ -203,12 +203,11 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
 
   .rz-navigation-menu {
     list-style: none;
-    overflow: hidden;
     position: absolute;
     padding-block: var(--rz-context-menu-padding-block);
     padding-inline: var(--rz-context-menu-padding-inline);
     margin: 0;
-    min-width: 100%;
+    min-width: max-content;
     box-shadow: var(--rz-context-menu-box-shadow);
     z-index: 3;
     border-radius: var(--rz-menu-border-radius);
