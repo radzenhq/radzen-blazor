@@ -730,6 +730,38 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_WeekdayHeaders_HaveFullDayNameAriaLabel()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var culture = new CultureInfo("en-US");
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameter =>
+            {
+                parameter.Add(p => p.Culture, culture);
+            });
+
+            var headers = component.FindAll(".rz-calendar-view thead th[scope='col']");
+            Assert.Equal(7, headers.Count);
+
+            var firstDay = (int)culture.DateTimeFormat.FirstDayOfWeek;
+            for (int i = 0; i < 7; i++)
+            {
+                var dayIndex = (firstDay + i) % 7;
+                var expectedFull = culture.DateTimeFormat.DayNames[dayIndex];
+                var expectedAbbr = culture.DateTimeFormat.AbbreviatedDayNames[dayIndex];
+
+                Assert.Equal(expectedFull, headers[i].GetAttribute("aria-label"));
+                Assert.Equal(expectedFull, headers[i].GetAttribute("abbr"));
+
+                var visibleSpan = headers[i].QuerySelector("span[aria-hidden='true']");
+                Assert.NotNull(visibleSpan);
+                Assert.Equal(expectedAbbr, visibleSpan.TextContent);
+            }
+        }
+
+        [Fact]
         public void DatePicker_ShowCalendarWeekWithCustomTitle_TitleCorrectlyRendered()
         {
             using var ctx = new TestContext();

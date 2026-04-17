@@ -72,10 +72,10 @@
                                                 <span>@CalendarWeekTitle</span>
                                             </th>
                                         }
-                                        @foreach (var day in ShiftedAbbreviatedDayNames)
+                                        @foreach (var day in ShiftedDayNames)
                                         {
-                                            <th scope="col">
-                                                <span>@day</span>
+                                            <th scope="col" abbr="@day.Full" aria-label="@day.Full">
+                                                <span aria-hidden="true">@day.Abbreviated</span>
                                             </th>
                                         }
                                     </tr>

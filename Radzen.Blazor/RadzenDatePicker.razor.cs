@@ -873,6 +873,17 @@ namespace Radzen.Blazor
             }
         }
 
+        IEnumerable<(string Abbreviated, string Full)> ShiftedDayNames
+        {
+            get
+            {
+                for (int current = (int)Culture.DateTimeFormat.FirstDayOfWeek, to = current + 7; current < to; current++)
+                {
+                    yield return (Culture.DateTimeFormat.AbbreviatedDayNames[current % 7], Culture.DateTimeFormat.DayNames[current % 7]);
+                }
+            }
+        }
+
         /// <summary>
         /// Gets a value indicating whether this instance is bound (ValueChanged callback has delegate).
         /// </summary>
