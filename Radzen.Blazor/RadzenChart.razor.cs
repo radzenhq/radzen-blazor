@@ -1114,9 +1114,9 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (IsJSRuntimeAvailable)
+            if (IsJSRuntimeAvailable && JSRuntime != null)
             {
-                JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
+                JSRuntime.InvokeVoid("Radzen.disposeElement", Element);
             }
 
             GC.SuppressFinalize(this);
