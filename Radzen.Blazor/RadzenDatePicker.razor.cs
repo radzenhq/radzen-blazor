@@ -1938,8 +1938,8 @@ namespace Radzen.Blazor
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
                 if (_jsRef != null)
                 {
-                    _jsRef.InvokeVoidAsync("dispose");
-                    _jsRef.DisposeAsync();
+                    _jsRef.InvokeVoid("dispose");
+                    _jsRef.DisposeFireAndForget();
                     _jsRef = null;
                 }
             }

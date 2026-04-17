@@ -75,11 +75,18 @@ namespace Radzen
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            parameters = parameters.TryGetValue("aria-autocomplete", out ariaAutoComplete) ?
-                ParameterView.FromDictionary(parameters
-                    .ToDictionary().Where(i => i.Key != "aria-autocomplete").ToDictionary(i => i.Key, i => i.Value)
-                    .ToDictionary(i => i.Key, i => (object?)i.Value))
-                : parameters;
+            if (parameters.TryGetValue("aria-autocomplete", out ariaAutoComplete))
+            {
+                var filtered = new Dictionary<string, object?>();
+                foreach (var p in parameters)
+                {
+                    if (p.Name != "aria-autocomplete")
+                    {
+                        filtered[p.Name] = p.Value;
+                    }
+                }
+                parameters = ParameterView.FromDictionary(filtered);
+            }
 
             await base.SetParametersAsync(parameters).ConfigureAwait(false);
         }
