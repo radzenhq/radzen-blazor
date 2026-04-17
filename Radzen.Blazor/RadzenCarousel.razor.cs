@@ -423,8 +423,8 @@ namespace Radzen.Blazor
 
             if (scrollDisposable != null)
             {
-                try { scrollDisposable.InvokeVoidAsync("dispose"); } catch { }
-                try { scrollDisposable.DisposeAsync(); } catch { }
+                scrollDisposable.InvokeVoid("dispose");
+                scrollDisposable.DisposeFireAndForget();
                 scrollDisposable = null;
             }
 

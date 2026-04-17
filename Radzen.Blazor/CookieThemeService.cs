@@ -119,7 +119,7 @@ namespace Radzen
                 cookie += "; Secure";
             }
 
-            _ = jsRuntime.InvokeVoidAsync("Radzen.setCookie", cookie);
+            jsRuntime.InvokeVoid("Radzen.setCookie", cookie);
         }
 
         /// <inheritdoc />

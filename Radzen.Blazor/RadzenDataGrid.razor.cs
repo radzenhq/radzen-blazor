@@ -2607,7 +2607,8 @@ namespace Radzen.Blazor
 
         internal Func<TItem, object>? keyPropertyGetter;
         /// <summary>
-        /// Compares two items
+        /// Compares two items for equality. When <see cref="KeyProperty"/> is set the comparison uses the key value
+        /// (null-safe — both-null keys are equal, one-null is not), otherwise falls back to <see cref="object.Equals(object)"/>.
         /// </summary>
         /// <param name="item">The first item</param>
         /// <param name="otherItem">The second item</param>
@@ -2616,7 +2617,7 @@ namespace Radzen.Blazor
         {
             if (item == null && otherItem == null) return true;
             if (item == null || otherItem == null) return false;
-            return keyPropertyGetter != null ? keyPropertyGetter(item).Equals(keyPropertyGetter(otherItem)) : item.Equals(otherItem);
+            return keyPropertyGetter != null ? Equals(keyPropertyGetter(item), keyPropertyGetter(otherItem)) : item.Equals(otherItem);
         }
 
         internal bool? allGroupsExpanded;

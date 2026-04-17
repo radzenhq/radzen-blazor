@@ -367,19 +367,28 @@ namespace Radzen
         {
             if (IsJSRuntimeAvailable && JSRuntime != null && !string.IsNullOrEmpty(UniqueID))
             {
-                if (ContextMenu.HasDelegate)
+                try
                 {
-                    JSRuntime.InvokeVoid("Radzen.removeContextMenu", UniqueID);
-                }
+                    if (ContextMenu.HasDelegate)
+                    {
+                        JSRuntime.InvokeVoid("Radzen.removeContextMenu", UniqueID);
+                    }
 
-                if (MouseEnter.HasDelegate)
-                {
-                    JSRuntime.InvokeVoid("Radzen.removeMouseEnter", UniqueID);
-                }
+                    if (MouseEnter.HasDelegate)
+                    {
+                        JSRuntime.InvokeVoid("Radzen.removeMouseEnter", UniqueID);
+                    }
 
-                if (MouseLeave.HasDelegate)
+                    if (MouseLeave.HasDelegate)
+                    {
+                        JSRuntime.InvokeVoid("Radzen.removeMouseLeave", UniqueID);
+                    }
+                }
+                catch (JSDisconnectedException)
                 {
-                    JSRuntime.InvokeVoid("Radzen.removeMouseLeave", UniqueID);
+                }
+                catch (InvalidOperationException)
+                {
                 }
             }
         }
@@ -396,19 +405,28 @@ namespace Radzen
 
             if (IsJSRuntimeAvailable && JSRuntime != null && !string.IsNullOrEmpty(UniqueID))
             {
-                if (ContextMenu.HasDelegate)
+                try
                 {
-                    JSRuntime.InvokeVoid("Radzen.removeContextMenu", UniqueID);
-                }
+                    if (ContextMenu.HasDelegate)
+                    {
+                        JSRuntime.InvokeVoid("Radzen.removeContextMenu", UniqueID);
+                    }
 
-                if (MouseEnter.HasDelegate)
-                {
-                    JSRuntime.InvokeVoid("Radzen.removeMouseEnter", UniqueID);
-                }
+                    if (MouseEnter.HasDelegate)
+                    {
+                        JSRuntime.InvokeVoid("Radzen.removeMouseEnter", UniqueID);
+                    }
 
-                if (MouseLeave.HasDelegate)
+                    if (MouseLeave.HasDelegate)
+                    {
+                        JSRuntime.InvokeVoid("Radzen.removeMouseLeave", UniqueID);
+                    }
+                }
+                catch (JSDisconnectedException)
                 {
-                    JSRuntime.InvokeVoid("Radzen.removeMouseLeave", UniqueID);
+                }
+                catch (InvalidOperationException)
+                {
                 }
             }
 
@@ -428,18 +446,20 @@ namespace Radzen
 
                 if (!String.IsNullOrEmpty(Style))
                 {
-                    foreach (var pair in Style.Split(';'))
+                    foreach (var pair in Style.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                     {
-                        var keyAndValue = pair.Split(':');
-                        if (keyAndValue.Length == 2)
+                        var colon = pair.IndexOf(':', StringComparison.Ordinal);
+                        if (colon > 0 && colon < pair.Length - 1)
                         {
-                            var key = keyAndValue[0].Trim();
-                            var value = keyAndValue[1].Trim();
+                            var key = pair.Substring(0, colon).TrimEnd();
+                            var value = pair.Substring(colon + 1).TrimStart();
 
-                            currentStyle[key] = value;
+                            if (key.Length > 0 && value.Length > 0)
+                            {
+                                currentStyle[key] = value;
+                            }
                         }
                     }
-
                 }
 
                 return currentStyle;

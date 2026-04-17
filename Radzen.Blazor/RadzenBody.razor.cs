@@ -117,7 +117,7 @@ namespace Radzen.Blazor
 
                 if (string.IsNullOrEmpty(uri.Fragment))
                 {
-                    _ = JSRuntime.InvokeVoidAsync("Radzen.scrollToTop", GetId());
+                    JSRuntime.InvokeVoid("Radzen.scrollToTop", GetId());
                 }
             }
         }
