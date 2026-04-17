@@ -333,10 +333,14 @@ namespace Radzen
                 return;
             }
 
-            if (selectedItems.Count != View.Cast<object>().ToList().Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true).Count())
+            var enabledItems = View.Cast<object>()
+                .Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true)
+                .ToList();
+
+            if (selectedItems.Count != enabledItems.Count)
             {
                 selectedItems.Clear();
-                selectedItems = View.Cast<object>().ToList().Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true).ToHashSet(ItemComparer);
+                selectedItems = enabledItems.ToHashSet(ItemComparer);
             }
             else
             {
@@ -376,7 +380,7 @@ namespace Radzen
 
         internal bool IsAllSelected()
         {
-            List<object> notDisabledItemsInList = View != null ? View.Cast<object>().ToList()
+            List<object> notDisabledItemsInList = View != null ? View.Cast<object>()
                 .Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true)
                 .ToList() : new List<object>();
 

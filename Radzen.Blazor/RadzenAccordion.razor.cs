@@ -492,7 +492,9 @@ namespace Radzen.Blazor
 
             if (accordionJs != null)
             {
-                try { accordionJs.InvokeVoidAsync("dispose"); } catch { }
+                accordionJs.InvokeVoid("dispose");
+                accordionJs.DisposeFireAndForget();
+                accordionJs = null;
             }
         }
     }
