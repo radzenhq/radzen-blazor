@@ -55,9 +55,15 @@
         var instances = {};
         function createEditor(element, id, ref, options) {
             var instance = monaco.editor.create(element, options);
-            instance.onDidChangeModelContent(function () {
-                ref.invokeMethodAsync('OnChangeAsync', instance.getValue());
+            var subscription = instance.onDidChangeModelContent(function () {
+                ref.invokeMethodAsync('OnChangeAsync', instance.getValue()).catch(function () {});
             });
+            var originalDispose = instance.dispose.bind(instance);
+            instance.dispose = function () {
+                if (subscription) { subscription.dispose(); subscription = null; }
+                delete instances[id];
+                originalDispose();
+            };
             instances[id] = instance;
             return instance;
         }
