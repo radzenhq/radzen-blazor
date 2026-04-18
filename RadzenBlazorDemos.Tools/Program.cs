@@ -117,7 +117,9 @@ class Program
             Directory.CreateDirectory(mdDir);
 
             GenerateComponentPages(categories, pagesPath, xmlDocs, typeMap, mdDir);
-            GenerateIndex(categories, Path.Combine(outputDir, "llms.txt"), xmlDocs);
+            var llmsTxtPath = Path.Combine(outputDir, "llms.txt");
+            GenerateIndex(categories, llmsTxtPath, xmlDocs);
+            File.Copy(llmsTxtPath, Path.Combine(mdDir, "index.md"), overwrite: true);
             GenerateSitemap(categories, pagesPath, outputDir);
 
             var apiCount = Directory.Exists(Path.Combine(mdDir, "api")) ? Directory.GetFiles(Path.Combine(mdDir, "api"), "*.md").Length : 0;
