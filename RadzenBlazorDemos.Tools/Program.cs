@@ -117,9 +117,8 @@ class Program
             Directory.CreateDirectory(mdDir);
 
             GenerateComponentPages(categories, pagesPath, xmlDocs, typeMap, mdDir);
-            var llmsTxtPath = Path.Combine(outputDir, "llms.txt");
-            GenerateIndex(categories, llmsTxtPath, xmlDocs);
-            File.Copy(llmsTxtPath, Path.Combine(mdDir, "index.md"), overwrite: true);
+            GenerateIndex(categories, Path.Combine(outputDir, "llms.txt"), xmlDocs);
+            GenerateHomePage(pagesPath, Path.Combine(mdDir, "index.md"));
             GenerateSitemap(categories, pagesPath, outputDir);
 
             var apiCount = Directory.Exists(Path.Combine(mdDir, "api")) ? Directory.GetFiles(Path.Combine(mdDir, "api"), "*.md").Length : 0;
@@ -810,6 +809,24 @@ class Program
         return d;
     }
 
+    static void GenerateHomePage(string pagesPath, string outputPath)
+    {
+        var indexPath = Path.Combine(pagesPath, "Index.razor");
+        if (!File.Exists(indexPath))
+            return;
+
+        var razorContent = File.ReadAllText(indexPath, Encoding.UTF8);
+        var body = ExtractDescriptionsAndExamples(razorContent, indexPath);
+
+        var sb = new StringBuilder();
+        sb.AppendLine("# Radzen Blazor Components");
+        sb.AppendLine();
+        if (!string.IsNullOrWhiteSpace(body))
+            sb.AppendLine(body);
+
+        File.WriteAllText(outputPath, sb.ToString(), Encoding.UTF8);
+    }
+
     // ── Per-component .md generation ────────────────────────────────────
 
     static void GenerateComponentPages(
@@ -1122,12 +1139,13 @@ class Program
             var line = lines[i];
             fullTag.AppendLine(line);
 
-            var openMatches = Regex.Matches(line, @"<RadzenText", RegexOptions.IgnoreCase);
-            var closeMatches = Regex.Matches(line, @"</RadzenText>", RegexOptions.IgnoreCase);
+            var selfClosingCount = Regex.Matches(line, @"<RadzenText\b[^>]*/>", RegexOptions.IgnoreCase).Count;
+            var openCount = Regex.Matches(line, @"<RadzenText\b", RegexOptions.IgnoreCase).Count - selfClosingCount;
+            var closeCount = Regex.Matches(line, @"</RadzenText>", RegexOptions.IgnoreCase).Count;
 
-            depth += openMatches.Count - closeMatches.Count;
+            depth += openCount - closeCount;
 
-            if (closeMatches.Count > 0 && depth == 0)
+            if (depth == 0 && (closeCount > 0 || selfClosingCount > 0))
             {
                 index = i;
                 break;
@@ -1136,26 +1154,38 @@ class Program
 
         var tagContent = fullTag.ToString();
 
-        var textStyleMatch = Regex.Match(tagContent, @"TextStyle=""TextStyle\.(H[2-6])""", RegexOptions.IgnoreCase);
-
         bool isHeading = false;
         int headingLevel = 0;
 
-        if (textStyleMatch.Success)
+        var tagNameMatch = Regex.Match(tagContent, @"TagName=""(?:Radzen\.Blazor\.)?TagName\.H([1-6])""", RegexOptions.IgnoreCase);
+        if (tagNameMatch.Success)
         {
-            var hMatch = Regex.Match(textStyleMatch.Groups[1].Value, @"H(\d)");
-            if (hMatch.Success)
+            headingLevel = int.Parse(tagNameMatch.Groups[1].Value);
+            isHeading = true;
+        }
+        else
+        {
+            var textStyleMatch = Regex.Match(tagContent, @"TextStyle=""(?:Radzen\.Blazor\.)?TextStyle\.(?:Display)?H([1-6])""", RegexOptions.IgnoreCase);
+            if (textStyleMatch.Success)
             {
-                headingLevel = int.Parse(hMatch.Groups[1].Value);
-                isHeading = headingLevel >= 2 && headingLevel <= 6;
+                headingLevel = int.Parse(textStyleMatch.Groups[1].Value);
+                isHeading = headingLevel >= 2;
             }
         }
 
+        string content;
         var contentMatch = Regex.Match(tagContent, @"<RadzenText[^>]*>([\s\S]*?)</RadzenText>", RegexOptions.IgnoreCase);
-        if (!contentMatch.Success)
-            return (string.Empty, false);
-
-        var content = contentMatch.Groups[1].Value.Trim();
+        if (contentMatch.Success && !string.IsNullOrWhiteSpace(contentMatch.Groups[1].Value))
+        {
+            content = contentMatch.Groups[1].Value.Trim();
+        }
+        else
+        {
+            var textAttrMatch = Regex.Match(tagContent, @"\bText=""([^""]*)""", RegexOptions.IgnoreCase);
+            if (!textAttrMatch.Success || string.IsNullOrWhiteSpace(textAttrMatch.Groups[1].Value))
+                return (string.Empty, false);
+            content = WebUtility.HtmlDecode(textAttrMatch.Groups[1].Value).Trim();
+        }
 
         content = ConvertCodeTagsToMarkdown(content);
 
@@ -1166,8 +1196,8 @@ class Program
 
         content = Regex.Replace(content, @"<[^>]+>", "");
 
-        content = Regex.Replace(content, @"@\([^)]*\)", "");
-        content = Regex.Replace(content, @"@[A-Za-z0-9_.()]+", "");
+        content = Regex.Replace(content, @"@\((?:[^()]|\([^()]*\))*\)", "");
+        content = Regex.Replace(content, @"@[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*(?:\([^()]*(?:\([^()]*\)[^()]*)*\))?", "");
         content = Regex.Replace(content, @"\$""[^""]*""", "");
         content = Regex.Replace(content, @"\?\.\w+", "");
 
@@ -1180,6 +1210,7 @@ class Program
         {
             int markdownLevel = headingLevel switch
             {
+                1 => 2,
                 2 => 3,
                 3 => 4,
                 4 => 4,
