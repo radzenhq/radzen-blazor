@@ -1,0 +1,21 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://app.radzen.com/mcp",
+      "service-desc": [
+        {
+          "href": "https://www.radzen.com/server.json",
+          "type": "application/json",
+          "title": "Radzen Blazor MCP manifest"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://www.radzen.com/blazor-mcp/documentation",
+          "type": "text/html",
+          "title": "Radzen Blazor MCP documentation"
+        }
+      ]
+    }
+  ]
+}

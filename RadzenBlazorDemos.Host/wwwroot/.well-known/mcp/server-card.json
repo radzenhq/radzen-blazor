@@ -1,0 +1,50 @@
+{
+  "serverInfo": {
+    "name": "Radzen Blazor MCP",
+    "version": "1.0.0"
+  },
+  "transport": {
+    "type": "streamable-http",
+    "url": "https://app.radzen.com/mcp",
+    "headers": [
+      {
+        "name": "X-Radzen-Key",
+        "description": "Radzen Blazor MCP key — free trial (50 requests / 15 days) at https://www.radzen.com/blazor-mcp, or a Radzen Blazor Pro / Team license key for unlimited access.",
+        "required": true,
+        "secret": true
+      }
+    ]
+  },
+  "capabilities": {
+    "tools": [
+      {
+        "name": "search",
+        "description": "Use this tool for Radzen-related questions, especially Radzen Blazor components (DataGrid, Form, Dialog, Chart, Scheduler), themes, data binding, setup, and troubleshooting. Searches Radzen documentation and examples to return relevant guides and API references.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The search query — describe what you're looking for."
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Maximum number of results to return.",
+              "default": 2
+            },
+            "minSimilarity": {
+              "type": "number",
+              "description": "Minimum similarity threshold between 0 and 1.",
+              "default": 0.3,
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    ],
+    "resources": { "listChanged": false },
+    "prompts": { "listChanged": false }
+  }
+}

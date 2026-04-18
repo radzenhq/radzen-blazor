@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.radzen.www/blazor-mcp",
+  "title": "Radzen Blazor MCP",
+  "description": "AI coding assistant for Radzen Blazor — docs, APIs, code samples, and templates for 110+ components.",
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://app.radzen.com/mcp",
+      "headers": [
+        {
+          "name": "X-Radzen-Key",
+          "description": "Radzen Blazor MCP key — get a free trial (50 requests / 15 days) at radzen.com/blazor-mcp, or use your Radzen Blazor Pro / Team license key for unlimited access",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
