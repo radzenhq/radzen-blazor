@@ -1526,6 +1526,7 @@ class Program
     {
         var sb = new StringBuilder();
         sb.AppendLine("User-agent: *");
+        sb.AppendLine("Content-Signal: ai-train=yes, search=yes, ai-input=yes");
         sb.AppendLine($"Sitemap: {BaseUrl}/sitemap.xml");
         sb.AppendLine("Disallow: /llms.txt");
         sb.AppendLine("Disallow: /*.md$");
