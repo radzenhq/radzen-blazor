@@ -138,8 +138,10 @@ if (!app.Environment.IsDevelopment())
 var contentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
 {
     [".txt"] = "text/plain; charset=utf-8",
-    [".md"] = "text/plain; charset=utf-8"
+    [".md"] = "text/markdown; charset=utf-8"
 });
+
+app.UseMarkdownNegotiation(app.Environment);
 
 app.UseStaticFiles(new StaticFileOptions
 {
