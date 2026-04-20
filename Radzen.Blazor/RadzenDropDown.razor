@@ -39,7 +39,10 @@
         }
         else if (Chips && selectedItems.Count > 0 && selectedItems.Count < MaxSelectedLabels)
         {
-            <div class="rz-dropdown-chips-wrapper">
+            var selectedItemsTitle = !string.IsNullOrEmpty(TextProperty)
+                ? string.Join(Separator, selectedItems.Select(i => GetItemOrValueFromProperty(i, TextProperty)))
+                : null;
+            <div class="rz-dropdown-chips-wrapper" title="@selectedItemsTitle">
                 @foreach (var item in selectedItems)
                 {
                     <div class="rz-chip rz-chip-base rz-variant-filled rz-shade-default">
@@ -70,7 +73,10 @@
         }
         else if (selectedItems.Count > 0)
         {
-            <span class="rz-dropdown-label rz-inputtext" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
+            var selectedItemsTitle = !string.IsNullOrEmpty(TextProperty)
+                ? string.Join(Separator, selectedItems.Select(i => GetItemOrValueFromProperty(i, TextProperty)))
+                : null;
+            <span class="rz-dropdown-label rz-inputtext" title="@selectedItemsTitle" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
                 @if (selectedItems.Count < MaxSelectedLabels)
                 {
                     @if (Template == null && ValueTemplate == null)

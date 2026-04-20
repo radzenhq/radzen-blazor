@@ -607,6 +607,81 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(2, originalHashSet);
         }
 
+        [Fact]
+        public void DropDown_Renders_Multiple_WithChips_SelectedItemsTitle()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<IEnumerable<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, true);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Value, new List<int> { 1, 2 });
+            });
+
+            var wrapper = component.Find(".rz-dropdown-chips-wrapper");
+            Assert.Equal("Item 1,Item 2", wrapper.GetAttribute("title"));
+        }
+
+        [Fact]
+        public void DropDown_Renders_Multiple_WithLabel_SelectedItemsTitle()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<IEnumerable<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, false);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Value, new List<int> { 1, 2 });
+            });
+
+            var label = component.Find("span.rz-dropdown-label");
+            Assert.Equal("Item 1,Item 2", label.GetAttribute("title"));
+        }
+
+        [Fact]
+        public void DropDown_DoesNotRender_Multiple_SelectedItemsTitle_WithoutTextProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[] { "Item 1", "Item 2" };
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<string>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, true);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Value, new List<string> { "Item 1", "Item 2" });
+            });
+
+            var wrapper = component.Find(".rz-dropdown-chips-wrapper");
+            Assert.False(wrapper.HasAttribute("title"));
+        }
+
+        [Fact]
+        public void DropDown_Renders_Multiple_SelectedItemsTitle_CustomSeparator()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<IEnumerable<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, false);
+                parameters.Add(p => p.Separator, "; ");
+                parameters.Add(p => p.MaxSelectedLabels, 1);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Value, new List<int> { 1, 2 });
+            });
+
+            var label = component.Find("span.rz-dropdown-label");
+            Assert.Equal("Item 1; Item 2", label.GetAttribute("title"));
+        }
+
         class ReferenceCollectionDropDown<T> : Radzen.Blazor.RadzenDropDown<T>
         {
             protected override void OnInitialized()
