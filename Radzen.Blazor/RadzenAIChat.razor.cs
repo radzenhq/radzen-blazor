@@ -165,6 +165,30 @@ namespace Radzen.Blazor
         public int MaxMessages { get; set; } = 100;
 
         /// <summary>
+        /// Gets or sets the format used to render the timestamp shown next to each message. Defaults to <c>"HH:mm"</c>.
+        /// </summary>
+        [Parameter]
+        public string TimestampFormat { get; set; } = "HH:mm";
+
+        /// <summary>
+        /// Gets or sets whether a date separator is rendered between messages when the day changes.
+        /// </summary>
+        [Parameter]
+        public bool ShowDateSeparator { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the format used to render the date separator. Defaults to <c>"D"</c> (long date pattern).
+        /// </summary>
+        [Parameter]
+        public string DateSeparatorFormat { get; set; } = "D";
+
+        /// <summary>
+        /// Optional template to render the date separator shown between messages when the day changes. Receives the <see cref="DateTime"/> of the following message.
+        /// </summary>
+        [Parameter]
+        public RenderFragment<DateTime>? DateSeparatorTemplate { get; set; }
+
+        /// <summary>
         /// Event callback that is invoked when a new message is added.
         /// </summary>
         [Parameter]
@@ -224,6 +248,27 @@ namespace Radzen.Blazor
 
             InvokeAsync(StateHasChanged);
             return message;
+        }
+
+        /// <summary>
+        /// Loads messages into the chat, replacing any existing ones. Preserves the timestamp of each message — use this to restore conversation history.
+        /// </summary>
+        /// <param name="messages">The messages to load.</param>
+        public async Task LoadMessages(IEnumerable<ChatMessage> messages)
+        {
+            Messages.Clear();
+
+            if (messages != null)
+            {
+                Messages.AddRange(messages);
+
+                while (Messages.Count > MaxMessages)
+                {
+                    Messages.RemoveAt(0);
+                }
+            }
+
+            await InvokeAsync(StateHasChanged);
         }
 
         /// <summary>

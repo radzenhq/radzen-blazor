@@ -69,11 +69,26 @@
             }
             else
             {
+                DateTime? previousDate = null;
                 @foreach (var message in Messages)
                 {
+                    if (ShowDateSeparator && (previousDate == null || previousDate.Value.Date != message.Timestamp.Date))
+                    {
+                        if (DateSeparatorTemplate != null)
+                        {
+                            @DateSeparatorTemplate(message.Timestamp)
+                        }
+                        else
+                        {
+                            <div class="rz-chat-date-separator">
+                                <span>@message.Timestamp.ToString(DateSeparatorFormat, Culture ?? System.Globalization.CultureInfo.CurrentCulture)</span>
+                            </div>
+                        }
+                    }
+                    previousDate = message.Timestamp;
                     if (MessageTemplate != null)
                     {
-                        @MessageTemplate(message)    
+                        @MessageTemplate(message)
                     }
                     else
                     {
@@ -97,7 +112,7 @@
                                 <div class="rz-chat-message-participant-name">@participant?.Name</div>
                             }
                                 <div class="rz-chat-message-time">
-                                    @message.Timestamp.ToString("HH:mm")
+                                    @message.Timestamp.ToString(TimestampFormat, Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                                 </div>
                             </RadzenStack>
                             <div class="rz-chat-message-text">

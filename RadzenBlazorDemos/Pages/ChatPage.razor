@@ -47,6 +47,17 @@
     <ChatEvents />
 </RadzenExample>
 
+<RadzenText Anchor="chat#date-separator" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Date separator and timestamp format
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>TimestampFormat</code> to control how the time is rendered next to each message, and <code>ShowDateSeparator</code> (with <code>DateSeparatorFormat</code>)
+    to insert a divider between messages whenever the day changes — useful for chats that span multiple days.
+</RadzenText>
+<RadzenExample ComponentName="Chat" Example="ChatDateSeparator">
+    <ChatDateSeparator />
+</RadzenExample>
+
 <RadzenText Anchor="chat#compact" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Compact chat
 </RadzenText>

@@ -2,6 +2,7 @@ using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -167,5 +168,87 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Message 3", messages[1].Content);
             Assert.Equal("Message 4", messages[2].Content);
         }
+
+        [Fact]
+        public void RadzenAIChat_ShouldRenderTimestampUsingTimestampFormat()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            RegisterChatService(ctx);
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+                .Add(p => p.TimestampFormat, "yyyy-MM-dd HH:mm")
+                .Add(p => p.Culture, System.Globalization.CultureInfo.InvariantCulture));
+
+            component.InvokeAsync(() => component.Instance.LoadMessages(new[]
+            {
+                new ChatMessage { Content = "Hello", IsUser = true, Timestamp = new DateTime(2026, 4, 20, 13, 45, 0) }
+            }));
+
+            Assert.Contains("2026-04-20 13:45", component.Markup);
+        }
+
+        [Fact]
+        public void RadzenAIChat_ShouldRenderDateSeparatorWhenDayChanges()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            RegisterChatService(ctx);
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+                .Add(p => p.DateSeparatorFormat, "yyyy-MM-dd")
+                .Add(p => p.Culture, System.Globalization.CultureInfo.InvariantCulture));
+
+            component.InvokeAsync(() => component.Instance.LoadMessages(new[]
+            {
+                new ChatMessage { Content = "First", IsUser = true, Timestamp = new DateTime(2026, 4, 19, 10, 0, 0) },
+                new ChatMessage { Content = "Second", IsUser = false, Timestamp = new DateTime(2026, 4, 19, 23, 30, 0) },
+                new ChatMessage { Content = "Third", IsUser = true, Timestamp = new DateTime(2026, 4, 20, 8, 15, 0) }
+            }));
+
+            var separators = component.FindAll(".rz-chat-date-separator");
+            Assert.Equal(2, separators.Count);
+            Assert.Contains("2026-04-19", component.Markup);
+            Assert.Contains("2026-04-20", component.Markup);
+        }
+
+        [Fact]
+        public void RadzenAIChat_ShouldNotRenderDateSeparatorWhenDisabled()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            RegisterChatService(ctx);
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters
+                .Add(p => p.ShowDateSeparator, false));
+
+            component.InvokeAsync(() => component.Instance.LoadMessages(new[]
+            {
+                new ChatMessage { Content = "First", IsUser = true, Timestamp = new DateTime(2026, 4, 19, 10, 0, 0) },
+                new ChatMessage { Content = "Second", IsUser = false, Timestamp = new DateTime(2026, 4, 20, 8, 15, 0) }
+            }));
+
+            Assert.Empty(component.FindAll(".rz-chat-date-separator"));
+        }
+
+        [Fact]
+        public void RadzenAIChat_LoadMessages_ShouldReplaceExistingMessagesAndHonorMaxMessages()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            RegisterChatService(ctx);
+            var component = ctx.RenderComponent<RadzenAIChat>(parameters => parameters.Add(p => p.MaxMessages, 2));
+
+            component.Instance.AddMessage("Initial", true);
+
+            component.InvokeAsync(() => component.Instance.LoadMessages(new[]
+            {
+                new ChatMessage { Content = "A", IsUser = true, Timestamp = new DateTime(2026, 4, 18, 9, 0, 0) },
+                new ChatMessage { Content = "B", IsUser = false, Timestamp = new DateTime(2026, 4, 19, 9, 0, 0) },
+                new ChatMessage { Content = "C", IsUser = true, Timestamp = new DateTime(2026, 4, 20, 9, 0, 0) }
+            }));
+
+            var messages = component.Instance.GetMessages();
+            Assert.Equal(2, messages.Count);
+            Assert.Equal("B", messages[0].Content);
+            Assert.Equal("C", messages[1].Content);
+        }
     }
-} 
+}

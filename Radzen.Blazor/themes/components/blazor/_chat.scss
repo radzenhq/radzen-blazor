@@ -118,6 +118,20 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     line-height: 1;
 }
 
+.rz-chat-date-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--rz-text-secondary-color);
+
+    span {
+        padding: 0.125rem 0.5rem;
+        border-radius: 1rem;
+        background-color: var(--rz-base);
+    }
+}
+
 .rz-chat-message-participant-name {
     font-size: 0.875rem;
     font-weight: 600;

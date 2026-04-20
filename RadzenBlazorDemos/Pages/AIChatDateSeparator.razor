@@ -1,0 +1,94 @@
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="8">
+        <RadzenAIChat @ref="aiChat"
+                      Title="AI Assistant"
+                      Placeholder="Type your message..."
+                      TimestampFormat="@timestampFormat"
+                      ShowDateSeparator="@showDateSeparator"
+                      DateSeparatorFormat="@dateSeparatorFormat"
+                      Style="height: 500px;" />
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                <RadzenText TextStyle="TextStyle.Subtitle1">Date &amp; Time Options</RadzenText>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                    <RadzenCheckBox @bind-Value="@showDateSeparator" TValue="bool" Name="showDateSeparator" />
+                    <RadzenLabel Text="Show date separator between days" Component="showDateSeparator" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                    <RadzenLabel Text="Timestamp Format" />
+                    <RadzenDropDown @bind-Value="@timestampFormat" Data="@timestampFormats" TextProperty="Text" ValueProperty="Value" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                    <RadzenLabel Text="Date Separator Format" />
+                    <RadzenDropDown @bind-Value="@dateSeparatorFormat" Disabled="@(!showDateSeparator)" Data="@dateSeparatorFormats" TextProperty="Text" ValueProperty="Value" />
+                </RadzenStack>
+
+                <RadzenButton Text="Load sample history"
+                              Icon="history"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Click="@LoadSampleHistory" />
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    RadzenAIChat aiChat;
+
+    private bool showDateSeparator = true;
+    private string timestampFormat = "HH:mm";
+    private string dateSeparatorFormat = "D";
+
+    private readonly IEnumerable<dynamic> timestampFormats = new[]
+    {
+        new { Text = "Time only (HH:mm)", Value = "HH:mm" },
+        new { Text = "Short date + time (g)", Value = "g" },
+        new { Text = "Day + time (ddd HH:mm)", Value = "ddd HH:mm" },
+        new { Text = "Full date + time (f)", Value = "f" }
+    };
+
+    private readonly IEnumerable<dynamic> dateSeparatorFormats = new[]
+    {
+        new { Text = "Long date (D)", Value = "D" },
+        new { Text = "Short date (d)", Value = "d" },
+        new { Text = "Month + day (MMMM d)", Value = "MMMM d" },
+        new { Text = "ISO (yyyy-MM-dd)", Value = "yyyy-MM-dd" }
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadSampleHistory();
+        }
+    }
+
+    private async Task LoadSampleHistory()
+    {
+        if (aiChat == null)
+        {
+            return;
+        }
+
+        var today = DateTime.Today;
+
+        await aiChat.LoadMessages(new[]
+        {
+            new ChatMessage { Content = "What's a good way to structure a Blazor component library?", IsUser = true, Timestamp = today.AddDays(-2).AddHours(10).AddMinutes(5) },
+            new ChatMessage { Content = "Separate markup (`.razor`) from logic (`.razor.cs`), expose parameters via `[Parameter]`, and keep styling in SCSS partials.", IsUser = false, Timestamp = today.AddDays(-2).AddHours(10).AddMinutes(6) },
+            new ChatMessage { Content = "How do I handle long-running operations?", IsUser = true, Timestamp = today.AddDays(-1).AddHours(14).AddMinutes(22) },
+            new ChatMessage { Content = "Use `async/await` and call `StateHasChanged` through `InvokeAsync` when updating state from background threads.", IsUser = false, Timestamp = today.AddDays(-1).AddHours(14).AddMinutes(23) },
+            new ChatMessage { Content = "Thanks — can you summarize the points so far?", IsUser = true, Timestamp = today.AddHours(9).AddMinutes(10) },
+            new ChatMessage { Content = "Sure: split markup and code, use `[Parameter]` for inputs, keep styles modular, and marshal UI updates through `InvokeAsync`.", IsUser = false, Timestamp = today.AddHours(9).AddMinutes(11) }
+        });
+    }
+}

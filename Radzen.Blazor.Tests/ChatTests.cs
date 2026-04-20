@@ -382,5 +382,77 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(timestamp.ToString("HH:mm"), component.Markup);
         }
+
+        [Fact]
+        public void RadzenChat_ShouldRenderTimestampUsingTimestampFormat()
+        {
+            var timestamp = new DateTime(2026, 4, 20, 13, 45, 0);
+            var messages = new List<ChatMessage>
+            {
+                new ChatMessage { Content = "Hello", UserId = "user1", Timestamp = timestamp }
+            };
+            var users = new List<ChatUser> { new ChatUser { Id = "user1", Name = "John" } };
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, users)
+                .Add(p => p.Messages, messages)
+                .Add(p => p.TimestampFormat, "yyyy-MM-dd HH:mm")
+                .Add(p => p.Culture, System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            Assert.Contains("2026-04-20 13:45", component.Markup);
+        }
+
+        [Fact]
+        public void RadzenChat_ShouldRenderDateSeparatorWhenDayChanges()
+        {
+            var messages = new List<ChatMessage>
+            {
+                new ChatMessage { Content = "First", UserId = "user1", Timestamp = new DateTime(2026, 4, 19, 10, 0, 0) },
+                new ChatMessage { Content = "Second", UserId = "user1", Timestamp = new DateTime(2026, 4, 19, 23, 30, 0) },
+                new ChatMessage { Content = "Third", UserId = "user1", Timestamp = new DateTime(2026, 4, 20, 8, 15, 0) }
+            };
+            var users = new List<ChatUser> { new ChatUser { Id = "user1", Name = "John" } };
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, users)
+                .Add(p => p.Messages, messages)
+                .Add(p => p.DateSeparatorFormat, "yyyy-MM-dd")
+                .Add(p => p.Culture, System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            var separators = component.FindAll(".rz-chat-date-separator");
+            Assert.Equal(2, separators.Count);
+            Assert.Contains("2026-04-19", component.Markup);
+            Assert.Contains("2026-04-20", component.Markup);
+        }
+
+        [Fact]
+        public void RadzenChat_ShouldNotRenderDateSeparatorWhenDisabled()
+        {
+            var messages = new List<ChatMessage>
+            {
+                new ChatMessage { Content = "First", UserId = "user1", Timestamp = new DateTime(2026, 4, 19, 10, 0, 0) },
+                new ChatMessage { Content = "Second", UserId = "user1", Timestamp = new DateTime(2026, 4, 20, 8, 15, 0) }
+            };
+            var users = new List<ChatUser> { new ChatUser { Id = "user1", Name = "John" } };
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, users)
+                .Add(p => p.Messages, messages)
+                .Add(p => p.ShowDateSeparator, false)
+            );
+
+            Assert.Empty(component.FindAll(".rz-chat-date-separator"));
+        }
     }
 }

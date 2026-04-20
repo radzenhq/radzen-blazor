@@ -1,0 +1,93 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="8">
+        <RadzenChat CurrentUserId="user1"
+                    Title="Project Chat"
+                    Users="@users"
+                    Messages="@messages"
+                    MessagesChanged="@OnMessagesChanged"
+                    TimestampFormat="@timestampFormat"
+                    ShowDateSeparator="@showDateSeparator"
+                    DateSeparatorFormat="@dateSeparatorFormat"
+                    Style="height: 500px;" />
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="4">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                <RadzenText TextStyle="TextStyle.Subtitle1">Date &amp; Time Options</RadzenText>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                    <RadzenCheckBox @bind-Value="@showDateSeparator" TValue="bool" Name="showDateSeparator" />
+                    <RadzenLabel Text="Show date separator between days" Component="showDateSeparator" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                    <RadzenLabel Text="Timestamp Format" />
+                    <RadzenDropDown @bind-Value="@timestampFormat" Data="@timestampFormats" TextProperty="Text" ValueProperty="Value" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                    <RadzenLabel Text="Date Separator Format" />
+                    <RadzenDropDown @bind-Value="@dateSeparatorFormat" Disabled="@(!showDateSeparator)" Data="@dateSeparatorFormats" TextProperty="Text" ValueProperty="Value" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private List<ChatUser> users = new();
+    private List<ChatMessage> messages = new();
+
+    private bool showDateSeparator = true;
+    private string timestampFormat = "HH:mm";
+    private string dateSeparatorFormat = "D";
+
+    private readonly IEnumerable<dynamic> timestampFormats = new[]
+    {
+        new { Text = "Time only (HH:mm)", Value = "HH:mm" },
+        new { Text = "Short date + time (g)", Value = "g" },
+        new { Text = "Day + time (ddd HH:mm)", Value = "ddd HH:mm" },
+        new { Text = "Full date + time (f)", Value = "f" }
+    };
+
+    private readonly IEnumerable<dynamic> dateSeparatorFormats = new[]
+    {
+        new { Text = "Long date (D)", Value = "D" },
+        new { Text = "Short date (d)", Value = "d" },
+        new { Text = "Month + day (MMMM d)", Value = "MMMM d" },
+        new { Text = "ISO (yyyy-MM-dd)", Value = "yyyy-MM-dd" }
+    };
+
+    protected override void OnInitialized()
+    {
+        users.AddRange(new[]
+        {
+            new ChatUser { Id = "user1", Name = "John Doe", Color = "#1976d2" },
+            new ChatUser { Id = "user2", Name = "Jane Smith", Color = "#388e3c" },
+            new ChatUser { Id = "user3", Name = "Bob Johnson", Color = "#f57c00" }
+        });
+
+        var today = DateTime.Today;
+
+        messages.AddRange(new[]
+        {
+            new ChatMessage { Content = "Kicking off the sprint — who's handling the API changes?", UserId = "user1", Timestamp = today.AddDays(-2).AddHours(9).AddMinutes(15) },
+            new ChatMessage { Content = "I've got the endpoints. Should have a PR up by end of day.", UserId = "user2", Timestamp = today.AddDays(-2).AddHours(9).AddMinutes(22) },
+            new ChatMessage { Content = "PR is up: #482. Ready for review.", UserId = "user2", Timestamp = today.AddDays(-2).AddHours(17).AddMinutes(40) },
+            new ChatMessage { Content = "Reviewed — left a couple of comments on the validation logic.", UserId = "user3", Timestamp = today.AddDays(-1).AddHours(8).AddMinutes(30) },
+            new ChatMessage { Content = "Addressed them. Merged.", UserId = "user2", Timestamp = today.AddDays(-1).AddHours(10).AddMinutes(5) },
+            new ChatMessage { Content = "Deploying to staging now.", UserId = "user1", Timestamp = today.AddHours(9).AddMinutes(0) },
+            new ChatMessage { Content = "Looks good on my end. 🚀", UserId = "user3", Timestamp = today.AddHours(9).AddMinutes(48) }
+        });
+    }
+
+    private void OnMessagesChanged(IEnumerable<ChatMessage> newMessages)
+    {
+        messages = newMessages.ToList();
+        StateHasChanged();
+    }
+}
