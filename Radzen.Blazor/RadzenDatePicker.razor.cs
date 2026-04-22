@@ -144,6 +144,24 @@ namespace Radzen.Blazor
         public string ToggleAmPmAriaLabel { get; set; } = "Toggle Am/Pm";
 
         /// <summary>
+        /// Gets or sets the suffix appended to a day cell's aria label when the date is today.
+        /// </summary>
+        [Parameter]
+        public string TodayAriaLabel { get; set; } = "today";
+
+        /// <summary>
+        /// Gets or sets the suffix appended to a day cell's aria label when the date is selected.
+        /// </summary>
+        [Parameter]
+        public string SelectedAriaLabel { get; set; } = "selected";
+
+        /// <summary>
+        /// Gets or sets the suffix appended to a day cell's aria label when the date is disabled.
+        /// </summary>
+        [Parameter]
+        public string DisabledAriaLabel { get; set; } = "disabled";
+
+        /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
         /// <value>The attributes.</value>
@@ -152,6 +170,65 @@ namespace Radzen.Blazor
 
         RadzenDropDown<int>? monthDropDown;
         RadzenDropDown<int>? yearDropDown;
+        RadzenNumeric<int>? hourNumeric;
+
+        bool shouldFocusDay;
+
+        internal string GetDayCellId(DateTime date)
+        {
+            return $"{GetId()}-day-{date:yyyy-MM-dd}";
+        }
+
+        internal bool IsDateSelected(DateTime date)
+        {
+            if (Multiple)
+            {
+                return selectedDates.Any(d => d.Date == date.Date);
+            }
+
+            return DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0;
+        }
+
+        internal string GetCalendarAriaLabel()
+        {
+            try
+            {
+                return CurrentDate.ToString("Y", Culture);
+            }
+            catch
+            {
+                return CurrentDate.ToString("Y", CultureInfo.InvariantCulture);
+            }
+        }
+
+        internal string GetDayAriaLabel(DateTime date, DateRenderEventArgs dateArgs)
+        {
+            string label;
+            try
+            {
+                label = date.ToString("D", Culture);
+            }
+            catch
+            {
+                label = date.ToString("D", CultureInfo.InvariantCulture);
+            }
+
+            var states = new List<string>();
+            if (DateTime.Now.Date == date.Date)
+            {
+                states.Add(TodayAriaLabel);
+            }
+            if (IsDateSelected(date))
+            {
+                states.Add(SelectedAriaLabel);
+            }
+            if (dateArgs.Disabled)
+            {
+                states.Add(DisabledAriaLabel);
+            }
+
+            return states.Count > 0 ? $"{label}, {string.Join(", ", states)}" : label;
+        }
 
         async Task ToggleAmPm()
         {
@@ -614,10 +691,107 @@ namespace Radzen.Blazor
         async Task OnDayKeyDown(KeyboardEventArgs args, DateTime date, DateRenderEventArgs dateArgs)
         {
             var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                var delta = key switch
+                {
+                    "ArrowLeft" => -1,
+                    "ArrowRight" => 1,
+                    "ArrowUp" => -7,
+                    "ArrowDown" => 7,
+                    _ => 0
+                };
+
+                var newDate = FocusedDate.AddDays(delta);
+                FocusedDate = newDate;
+                CurrentDate = newDate;
+                shouldFocusDay = true;
+                return;
+            }
+
+            if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                var weekDelta = key == "Home"
+                    ? -((7 + (int)FocusedDate.DayOfWeek - (int)Culture.DateTimeFormat.FirstDayOfWeek) % 7)
+                    : 6 - ((7 + (int)FocusedDate.DayOfWeek - (int)Culture.DateTimeFormat.FirstDayOfWeek) % 7);
+
+                var newDate = FocusedDate.AddDays(weekDelta);
+                FocusedDate = newDate;
+                CurrentDate = newDate;
+                shouldFocusDay = true;
+                return;
+            }
+
+            if (key == "PageUp" || key == "PageDown")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                try
+                {
+                    var newDate = Culture.Calendar.AddMonths(FocusedDate, key == "PageUp" ? -1 : 1);
+                    FocusedDate = newDate;
+                    CurrentDate = newDate;
+                    shouldFocusDay = true;
+                }
+                catch (ArgumentOutOfRangeException) { }
+
+                return;
+            }
+
+            if (key == "Escape")
+            {
+                preventKeyPress = false;
+                stopKeydownPropagation = false;
+
+                await ClosePopup();
+                await FocusAsync();
+                return;
+            }
+
+            if (key == "Tab" && !ShowTime)
+            {
+                preventKeyPress = false;
+                stopKeydownPropagation = false;
+
+                await ClosePopup();
+                await FocusAsync();
+                return;
+            }
+
             if ((key == "Enter" || key == "Space") && !Disabled && !dateArgs.Disabled)
             {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                if (ShowTime && !Multiple)
+                {
+                    // Apply the date part, keep the popup open, move focus to the hour input.
+                    CurrentDate = ClampToMinMax(new DateTime(date.Year, date.Month, date.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second));
+                    FocusedDate = CurrentDate;
+                    StateHasChanged();
+
+                    if (hourNumeric != null)
+                    {
+                        await hourNumeric.FocusAsync();
+                    }
+
+                    return;
+                }
+
                 await SetDay(date);
+                return;
             }
+
+            preventKeyPress = false;
+            stopKeydownPropagation = false;
         }
 
         /// <summary>
@@ -1707,6 +1881,16 @@ namespace Radzen.Blazor
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.createDatePicker", Element, PopupID, Reference, nameof(OnPopupClose));
             }
+
+            if (shouldFocusDay && JSRuntime != null)
+            {
+                shouldFocusDay = false;
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetDayCellId(FocusedDate));
+                }
+                catch { }
+            }
         }
 
         private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
@@ -1794,65 +1978,6 @@ namespace Radzen.Blazor
 
             return list.ToString();
         }
-        async Task OnCalendarKeyPress(KeyboardEventArgs args)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
-
-            if (key == "ArrowLeft" || key == "ArrowRight")
-            {
-                preventKeyPress = true;
-                stopKeydownPropagation = true;
-
-                FocusedDate = FocusedDate.AddDays(key == "ArrowLeft" ? -1 : 1);
-                CurrentDate = FocusedDate;
-            }
-            else if (key == "ArrowUp" || key == "ArrowDown")
-            {
-                preventKeyPress = true;
-                stopKeydownPropagation = true;
-
-                FocusedDate = FocusedDate.AddDays(key == "ArrowUp" ? -7 : 7);
-                CurrentDate = FocusedDate;
-            }
-            else if (key == "Enter" || (key == "Space" && Multiple))
-            {
-                preventKeyPress = true;
-                stopKeydownPropagation = true;
-
-                if (!DateAttributes(FocusedDate).Disabled && !ReadOnly)
-                {
-                    await SetDay(FocusedDate);
-
-                    if (!Multiple)
-                    {
-                        await ClosePopup();
-                        await FocusAsync();
-                    }
-                }
-            }
-            else if (key == "Escape")
-            {
-                preventKeyPress = false;
-                stopKeydownPropagation = false;
-
-                await ClosePopup();
-                await FocusAsync();
-            }
-            else if (key == "Tab" && !ShowTime)
-            {
-                preventKeyPress = false;
-                stopKeydownPropagation = false;
-
-                await ClosePopup();
-                await FocusAsync();
-            }
-            else
-            {
-                preventKeyPress = false;
-                stopKeydownPropagation = false;
-            }
-        }
-
         async Task OnPopupKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;

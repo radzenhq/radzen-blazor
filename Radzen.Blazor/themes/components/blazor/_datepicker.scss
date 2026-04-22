@@ -293,6 +293,15 @@ $timepicker-border: none !default;
     border-top: var(--rz-datepicker-calendar-border);
     padding: 0;
 
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible > .rz-state-default {
+      outline: var(--rz-datepicker-focus-outline);
+      outline-offset: calc(-1 * var(--rz-outline-width));
+    }
+
     .rz-state-default {
       display: block;
       padding: var(--rz-datepicker-calendar-item-padding);
