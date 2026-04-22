@@ -3203,7 +3203,7 @@ window.Radzen = {
     document.removeEventListener('touchmove', ref.touchMoveHandler)
     document.removeEventListener('touchend', ref.mouseUpHandler);
   },
-  startColumnReorder: function(id, gridId) {
+  startColumnReorder: function(id, gridId, gridRef) {
       var grid = document.getElementById(gridId);
       var el = document.getElementById(id + '-drag');
       Radzen[id + 'cell'] = el.parentNode.parentNode;
@@ -3215,6 +3215,7 @@ window.Radzen = {
       visual.style.height = Radzen[id + 'cell'].offsetHeight + 'px';
       visual.style.width = Radzen[id + 'cell'].offsetWidth + 'px';
       visual.style.zIndex = 2000;
+      visual.style.pointerEvents = 'none';
       visual.innerHTML = Radzen[id + 'cell'].firstChild.outerHTML;
       visual.id = id + 'visual';
       document.body.appendChild(visual);
@@ -3224,7 +3225,18 @@ window.Radzen = {
           resizers[i].style.display = 'none';
       }
 
+      Radzen[id + 'lastTouchX'] = null;
+      Radzen[id + 'lastTouchY'] = null;
+
       Radzen[id + 'end'] = function (e) {
+          var triggeredByTouch = e && (e.type === 'touchend' || e.type === 'touchcancel');
+          var touchX = Radzen[id + 'lastTouchX'];
+          var touchY = Radzen[id + 'lastTouchY'];
+          if (triggeredByTouch && e.changedTouches && e.changedTouches[0]) {
+              touchX = e.changedTouches[0].clientX;
+              touchY = e.changedTouches[0].clientY;
+          }
+
           var el = document.getElementById(id + 'visual');
           if (el) {
               document.body.removeChild(el);
@@ -3239,10 +3251,31 @@ window.Radzen = {
           grid.removeEventListener('click', Radzen[id + 'end']);
           document.removeEventListener('mouseup', Radzen[id + 'end']);
           document.removeEventListener('touchend', Radzen[id + 'end']);
+          document.removeEventListener('touchcancel', Radzen[id + 'end']);
 
           Radzen[id + 'end'] = null;
           Radzen[id + 'move'] = null;
           Radzen[id + 'touchmove'] = null;
+          Radzen[id + 'lastTouchX'] = null;
+          Radzen[id + 'lastTouchY'] = null;
+
+          if (triggeredByTouch && gridRef && touchX != null && touchY != null) {
+              var target = document.elementFromPoint(touchX, touchY);
+              if (target && grid.contains(target)) {
+                  var groupHeader = target.closest('.rz-group-header');
+                  if (groupHeader && grid.contains(groupHeader)) {
+                      try { gridRef.invokeMethodAsync('RadzenGrid.OnColumnDropToGroup'); } catch { }
+                      return;
+                  }
+                  var th = target.closest('th[data-column-index]');
+                  if (th && grid.contains(th)) {
+                      var columnIndex = parseInt(th.getAttribute('data-column-index'), 10);
+                      if (!isNaN(columnIndex)) {
+                          try { gridRef.invokeMethodAsync('RadzenGrid.OnColumnReorderEnded', columnIndex); } catch { }
+                      }
+                  }
+              }
+          }
       }
       grid.removeEventListener('click', Radzen[id + 'end']);
       grid.addEventListener('click', Radzen[id + 'end']);
@@ -3250,6 +3283,8 @@ window.Radzen = {
       document.addEventListener('mouseup', Radzen[id + 'end']);
       document.removeEventListener('touchend', Radzen[id + 'end']);
       document.addEventListener('touchend', Radzen[id + 'end'], { passive: true });
+      document.removeEventListener('touchcancel', Radzen[id + 'end']);
+      document.addEventListener('touchcancel', Radzen[id + 'end'], { passive: true });
 
       Radzen[id + 'move'] = function (e) {
           var el = document.getElementById(id + 'visual');
@@ -3273,11 +3308,16 @@ window.Radzen = {
 
       Radzen[id + 'touchmove'] = function (e) {
           if (e.touches && e.touches[0]) {
+              Radzen[id + 'lastTouchX'] = e.touches[0].clientX;
+              Radzen[id + 'lastTouchY'] = e.touches[0].clientY;
               Radzen[id + 'move']({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+              if (e.cancelable) {
+                  e.preventDefault();
+              }
           }
       }
       grid.removeEventListener('touchmove', Radzen[id + 'touchmove']);
-      grid.addEventListener('touchmove', Radzen[id + 'touchmove'], { passive: true });
+      grid.addEventListener('touchmove', Radzen[id + 'touchmove'], { passive: false });
   },
   stopColumnResize: function (id, grid, columnIndex) {
     var el = document.getElementById(id + '-resizer');
