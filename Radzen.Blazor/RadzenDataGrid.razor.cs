@@ -586,6 +586,11 @@ namespace Radzen.Blazor
         int focusedIndex = -1;
         int focusedCellIndex;
 
+        internal string? GetActiveDescendantId()
+        {
+            return $"{GetId()}-active-item";
+        }
+
         internal string? GridId()
         {
             return GetId();

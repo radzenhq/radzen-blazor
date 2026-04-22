@@ -618,22 +618,33 @@ window.Radzen = {
   selectTab: function (id, index) {
     var el = document.getElementById(id);
     if (el && el.parentNode && el.parentNode.previousElementSibling) {
+        var tablist = el.parentNode.previousElementSibling;
         var count = el.parentNode.children.length;
         for (var i = 0; i < count; i++) {
             var content = el.parentNode.children[i];
             if (content) {
                 content.style.display = i == index ? '' : 'none';
+                content.setAttribute('aria-hidden', i == index ? 'false' : 'true');
             }
-            var header = el.parentNode.previousElementSibling.children[i];
+            var header = tablist.children[i];
             if (header) {
+                var btn = header.querySelector('[role="tab"]') || header;
                 if (i == index) {
                     header.classList.add('rz-tabview-selected');
                     header.classList.add('rz-state-focused');
+                    btn.setAttribute('aria-selected', 'true');
                 }
                 else {
                     header.classList.remove('rz-tabview-selected');
                     header.classList.remove('rz-state-focused');
+                    btn.setAttribute('aria-selected', 'false');
                 }
+            }
+        }
+        if (tablist.getAttribute && tablist.getAttribute('role') === 'tablist') {
+            var activeBtn = tablist.children[index] && (tablist.children[index].querySelector('[role="tab"]') || tablist.children[index]);
+            if (activeBtn && activeBtn.id) {
+                tablist.setAttribute('aria-activedescendant', activeBtn.id);
             }
         }
     }
@@ -1417,6 +1428,14 @@ window.Radzen = {
         }
     }
 
+    var activeId = gridId + '-active-item';
+    var setActiveDescendant = function (el) {
+        var prev = document.getElementById(activeId);
+        if (prev && prev !== el) { prev.removeAttribute('id'); }
+        if (el && el.id !== activeId) { el.id = activeId; }
+        if (el) { grid.setAttribute('aria-activedescendant', activeId); }
+    };
+
     if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && cellIndex != null && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
         var highlightedCells = rows[table.nextSelectedIndex].querySelectorAll('.rz-state-focused');
         if (highlightedCells.length) {
@@ -1437,6 +1456,7 @@ window.Radzen = {
                     Radzen.scrollIntoViewIfNeeded(cell);
                 }
             }
+            setActiveDescendant(cell);
         }
     } else if (key == 'ArrowDown' || key == 'ArrowUp') {
         var highlighted = table.querySelectorAll('.rz-state-focused');
@@ -1457,6 +1477,7 @@ window.Radzen = {
                     Radzen.scrollIntoViewIfNeeded(row);
                 }
             }
+            setActiveDescendant(row);
         }
     }
 

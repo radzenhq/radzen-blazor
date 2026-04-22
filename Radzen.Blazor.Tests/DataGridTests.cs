@@ -3249,5 +3249,29 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(loadDataCallCount <= 2, $"LoadData was called {loadDataCallCount} times, expected at most 2 (indicating possible infinite loop)");
         }
+
+        [Fact]
+        public void DataGrid_Wrapper_Has_RoleGrid_AsFocusTarget()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.CloseComponent();
+                });
+            });
+
+            var wrapper = component.Find("div.rz-data-grid");
+            Assert.Equal("grid", wrapper.GetAttribute("role"));
+            Assert.Equal("0", wrapper.GetAttribute("tabindex"));
+            Assert.False(string.IsNullOrEmpty(wrapper.GetAttribute("aria-activedescendant")));
+        }
     }
 }

@@ -5,9 +5,11 @@
 @if (Visible)
 {
     <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
+         role="tablist"
+         aria-orientation="@(TabPosition == TabPosition.Left || TabPosition == TabPosition.Right ? "vertical" : "horizontal")"
+         aria-activedescendant="@GetActiveDescendantId()"
          tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
-        <ul role="tablist" class="rz-tabview-nav"
-            aria-orientation="@(TabPosition == TabPosition.Left || TabPosition == TabPosition.Right ? "vertical" : "horizontal")">
+        <ul role="presentation" class="rz-tabview-nav">
             @Tabs
         </ul>
         <div class="rz-tabview-panels">

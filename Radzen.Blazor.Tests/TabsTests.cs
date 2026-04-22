@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -102,6 +103,68 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenTabs>();
 
             Assert.Contains("rz-tabview-panels", component.Markup);
+        }
+
+        [Fact]
+        public void Tabs_Wrapper_IsFocusTarget_WithRoleTablist()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>();
+
+            var wrapper = component.Find("div.rz-tabview");
+            Assert.Equal("tablist", wrapper.GetAttribute("role"));
+            Assert.Equal("0", wrapper.GetAttribute("tabindex"));
+        }
+
+        [Fact]
+        public void Tabs_InnerNav_HasRolePresentation_ToAvoidDuplicateTablist()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>();
+
+            var nav = component.Find("ul.rz-tabview-nav");
+            Assert.NotEqual("tablist", nav.GetAttribute("role"));
+        }
+
+        static RenderFragment TabsFragment(params string[] titles) => builder =>
+        {
+            for (var i = 0; i < titles.Length; i++)
+            {
+                builder.OpenComponent(i, typeof(RadzenTabsItem));
+                builder.AddAttribute(i + 1, "Text", titles[i]);
+                builder.CloseComponent();
+            }
+        };
+
+        [Fact]
+        public void Tabs_Wrapper_HasAriaActiveDescendant_PointingAt_SelectedTab()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 1)
+                .Add(p => p.Tabs, TabsFragment("One", "Two"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            var active = wrapper.GetAttribute("aria-activedescendant");
+            Assert.False(string.IsNullOrEmpty(active));
+
+            var activeTab = component.Find($"#{active}");
+            Assert.Equal("tab", activeTab.GetAttribute("role"));
+            Assert.Equal("true", activeTab.GetAttribute("aria-selected"));
+        }
+
+        [Fact]
+        public void Tabs_OnlyOneTab_HasAriaSelectedTrue()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 2)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var selectedTabs = component.FindAll("[role='tab'][aria-selected='true']");
+            Assert.Single(selectedTabs);
         }
     }
 }

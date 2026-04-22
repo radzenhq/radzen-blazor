@@ -115,6 +115,15 @@ namespace Radzen.Blazor
 
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
+        internal string? GetActiveDescendantId()
+        {
+            if (focusedIndex < 0) return null;
+            var visibleTabs = tabs.Where(t => t.Visible).ToList();
+            var focused = visibleTabs.ElementAtOrDefault(focusedIndex);
+            if (focused == null) return null;
+            return $"{GetId()}-tabpanel-{IndexOf(focused)}-label";
+        }
+
         /// <summary>
         /// Adds the tab.
         /// </summary>
