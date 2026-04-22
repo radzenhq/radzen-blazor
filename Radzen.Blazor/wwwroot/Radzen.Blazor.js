@@ -2106,11 +2106,15 @@ window.Radzen = {
 
     if (!position) {
         var popupRect = popup.getBoundingClientRect();
-        if (popupRect.right > window.innerWidth && popupRect.width < window.innerWidth) {
-            popup.style.left = (window.innerWidth - popupRect.width + scrollLeft) + 'px';
+        // Clamp into the viewport. If the popup is smaller than the viewport, shift it
+        // so its right/bottom edge fits. If it is larger than the viewport, pin the
+        // top/left corner to the viewport origin so content is at least reachable
+        // (instead of leaving it positioned off-screen at the anchor).
+        if (popupRect.right > window.innerWidth) {
+            popup.style.left = Math.max(scrollLeft, window.innerWidth - popupRect.width + scrollLeft) + 'px';
         }
-        if (popupRect.bottom > window.innerHeight && popupRect.height < window.innerHeight) {
-            popup.style.top = (window.innerHeight - popupRect.height + scrollTop) + 'px';
+        if (popupRect.bottom > window.innerHeight) {
+            popup.style.top = Math.max(scrollTop, window.innerHeight - popupRect.height + scrollTop) + 'px';
         }
     }
 
