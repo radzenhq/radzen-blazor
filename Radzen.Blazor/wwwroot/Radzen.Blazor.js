@@ -1193,8 +1193,14 @@ window.Radzen = {
     }
   },
   updateActiveDescendant: function (ul, li, index) {
-    var combobox = ul ? ul.closest('[role="combobox"]') : null;
-    if (li && ul) {
+    if (!ul) return;
+    // The popup is appended to document.body when opened, so ul.closest('[role="combobox"]')
+    // fails once the dropdown is open. Fall back to a reverse lookup via aria-controls.
+    var combobox = ul.closest('[role="combobox"]');
+    if (!combobox && ul.id && window.CSS && CSS.escape) {
+      combobox = document.querySelector('[aria-controls="' + CSS.escape(ul.id) + '"][role="combobox"]');
+    }
+    if (li) {
       var itemId = ul.id + '-' + index;
       li.id = itemId;
       if (combobox) {
