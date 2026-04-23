@@ -2618,6 +2618,22 @@ namespace RadzenBlazorDemos
                             Description = "Radzen Blazor Chart with bubble series for visualizing three dimensions of data.",
                             Tags = new [] { "chart", "graph", "bubble", "scatter", "size" }
                         },
+                        new Example
+                        {
+                            Name = "Heatmap Series Chart",
+                            Path = "heatmap-series-chart",
+                            Description = "Radzen Blazor Chart with heatmap series rendering a coloured grid on numeric X/Y axes.",
+                            Tags = new [] { "chart", "graph", "heatmap", "grid", "intensity", "density" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Contour Chart",
+                            Path = "contour-chart",
+                            Description = "Radzen Blazor Chart with contour series for isoilluminance, temperature and scalar-field plots.",
+                            Tags = new [] { "chart", "graph", "contour", "isoilluminance", "isoline", "isoband", "heatmap", "scalar field" },
+                            New = true
+                        },
                     }
                 },
                 new Example

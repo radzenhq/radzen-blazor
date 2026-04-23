@@ -1,0 +1,53 @@
+@using System.Collections.Generic
+
+<RadzenChart>
+    <RadzenHeatmapSeries Data="@cells" CategoryProperty="X" ValueProperty="Y" IntensityProperty="Lux"
+                         ColorRange="@ranges" IntensityLabel="Lux" Title="Illuminance" />
+    <RadzenCategoryAxis Min="-0.5" Max="5.5" Step="1">
+        <RadzenGridLines Visible="true" />
+        <RadzenAxisTitle Text="X (m)" />
+    </RadzenCategoryAxis>
+    <RadzenValueAxis Min="-0.5" Max="5.5" Step="1">
+        <RadzenGridLines Visible="true" />
+        <RadzenAxisTitle Text="Y (m)" />
+    </RadzenValueAxis>
+    <RadzenLegend Position="LegendPosition.Right" />
+</RadzenChart>
+
+@code {
+    class Cell
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Lux { get; set; }
+    }
+
+    List<Cell> cells = new();
+
+    IList<SeriesColorRange> ranges = new[]
+    {
+        new SeriesColorRange { Min = 0,  Max = 5,  Color = "#0d47a1" },
+        new SeriesColorRange { Min = 5,  Max = 10, Color = "#1976d2" },
+        new SeriesColorRange { Min = 10, Max = 20, Color = "#42a5f5" },
+        new SeriesColorRange { Min = 20, Max = 40, Color = "#66bb6a" },
+        new SeriesColorRange { Min = 40, Max = 70, Color = "#fdd835" },
+        new SeriesColorRange { Min = 70, Max = 120, Color = "#fb8c00" },
+        new SeriesColorRange { Min = 120, Max = 1000, Color = "#e53935" },
+    };
+
+    protected override void OnInitialized()
+    {
+        // Radial illuminance pattern centred at (2.5, 2.5) on a 6x6 m grid at 1m spacing.
+        for (var ix = 0; ix <= 5; ix++)
+        {
+            for (var iy = 0; iy <= 5; iy++)
+            {
+                var dx = ix - 2.5;
+                var dy = iy - 2.5;
+                var d2 = dx * dx + dy * dy;
+                var lux = 150 * System.Math.Exp(-d2 / 4);
+                cells.Add(new Cell { X = ix, Y = iy, Lux = System.Math.Round(lux, 1) });
+            }
+        }
+    }
+}
