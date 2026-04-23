@@ -4,8 +4,17 @@
     Radzen Blazor Heatmap Chart
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Visualize data intensity as a color-coded grid using RadzenHeatmap.
+    <strong>RadzenHeatmap</strong> is a standalone component (not a chart series) that visualises data intensity as a color-coded grid with <strong>categorical string</strong> axes and a two-colour gradient. Best for calendar heatmaps, activity matrices and day × hour style dashboards.
 </RadzenText>
+
+<RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-4">
+    <strong>When to use which?</strong>
+    <ul class="rz-mt-2 rz-mb-0">
+        <li>Use <strong>RadzenHeatmap</strong> (this demo) when X and Y are <strong>categorical strings</strong> and a continuous two-colour gradient is enough.</li>
+        <li>Use <RadzenLink Path="/heatmap-series-chart" Text="RadzenHeatmapSeries" /> inside a <code>RadzenChart</code> when X and Y are <strong>numeric</strong> measurements and you need shared axes, discrete colour bands or overlay with other series.</li>
+        <li>Use <RadzenLink Path="/contour-chart" Text="RadzenContourSeries" /> when samples are on a numeric grid and you want smooth interpolated iso-bands — e.g. isoilluminance, temperature or scalar-field plots.</li>
+    </ul>
+</RadzenAlert>
 
 <RadzenExample ComponentName="Heatmap" Example="HeatmapChart">
     <HeatmapChart />
