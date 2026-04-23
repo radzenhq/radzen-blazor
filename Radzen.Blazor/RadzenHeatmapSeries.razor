@@ -1,0 +1,45 @@
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var category = ComposeCategory(categoryScale);
+        var value = ComposeValue(valueScale);
+        var index = chart.Series.IndexOf(this);
+        var className = $"rz-heatmap-series rz-series-{index}";
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+        var cellWidth = EffectiveCellWidth(categoryScale);
+        var cellHeight = EffectiveCellHeight();
+
+        var halfWidthPx = Math.Abs(categoryScale.Scale(cellWidth, true) - categoryScale.Scale(0, true)) / 2;
+        var halfHeightPx = Math.Abs(valueScale.Scale(0, true) - valueScale.Scale(cellHeight, true)) / 2;
+        var widthPx = halfWidthPx * 2;
+        var heightPx = halfHeightPx * 2;
+
+        return
+        @<g class="@className" style="@style">
+            @foreach (var item in Items)
+            {
+                var cx = category(item);
+                var cy = value(item);
+                var intensity = Intensity(item);
+                var fill = PickColor(Items.IndexOf(item), null, Fill, ColorRange, intensity) ?? "transparent";
+                var x = cx - halfWidthPx;
+                var y = cy - halfHeightPx;
+                var cellItem = item;
+                <rect x="@x.ToInvariantString()" y="@y.ToInvariantString()"
+                      width="@widthPx.ToInvariantString()" height="@heightPx.ToInvariantString()"
+                      fill="@fill"
+                      stroke="@(Stroke ?? "none")"
+                      stroke-width="@StrokeWidth.ToInvariantString()"
+                      @onclick="@(async () => { if (chart.SeriesClick.HasDelegate) { await InvokeClick(chart.SeriesClick, cellItem!); } })" />
+            }
+        </g>;
+    }
+}

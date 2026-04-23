@@ -1,0 +1,21 @@
+@page "/heatmap-series-chart"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart with heatmap series
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    <strong>RadzenHeatmapSeries</strong> renders a grid of coloured cells inside a <code>RadzenChart</code>, on <strong>numeric</strong> X/Y axes. Cell colour is driven by an intensity property mapped through discrete <code>SeriesColorRange</code> bands.
+</RadzenText>
+
+<RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-4">
+    <strong>When to use which?</strong>
+    <ul class="rz-mt-2 rz-mb-0">
+        <li>Use <RadzenLink Path="/heatmap-chart" Text="RadzenHeatmap" /> when X and Y are <strong>categorical strings</strong> (days × hours, rows × columns) and a simple two-colour gradient is enough — it is a standalone component, not a chart series.</li>
+        <li>Use <strong>RadzenHeatmapSeries</strong> (this demo) when X and Y are <strong>numeric measurements</strong> (metres, seconds, temperature). It shares axes, tooltips, legend and click events with other series, so you can overlay a scatter/line on top of it.</li>
+        <li>Use <RadzenLink Path="/contour-chart" Text="RadzenContourSeries" /> when you want smooth <strong>interpolated iso-bands</strong> between sample points instead of discrete cells — ideal for isoilluminance, temperature and other scalar-field plots.</li>
+    </ul>
+</RadzenAlert>
+
+<RadzenExample ComponentName="Chart" Example="HeatmapSeriesChart" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <HeatmapSeriesChart />
+</RadzenExample>

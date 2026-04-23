@@ -1,0 +1,69 @@
+@using System.Collections.Generic
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+            <RadzenCheckBox @bind-Value="@showLines" Name="showLines" />
+            <RadzenLabel Text="Show iso-lines" Component="showLines" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenContourSeries Data="@samples" CategoryProperty="X" ValueProperty="Y" IntensityProperty="Lux"
+                             ColorRange="@ranges"
+                             ShowLines="@showLines" LineColor="rgba(0,0,0,0.5)" LineWidth="1"
+                             IntensityLabel="Lux" Title="Illuminance" />
+        <RadzenCategoryAxis Min="0" Max="5" Step="1">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="X (m)" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis Min="0" Max="5" Step="1">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Y (m)" />
+        </RadzenValueAxis>
+        <RadzenLegend Position="LegendPosition.Right" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class Sample
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Lux { get; set; }
+    }
+
+    bool showLines = true;
+    List<Sample> samples = new();
+
+    IList<SeriesColorRange> ranges = new[]
+    {
+        new SeriesColorRange { Min = 0,   Max = 5,   Color = "#0d47a1" },
+        new SeriesColorRange { Min = 5,   Max = 10,  Color = "#1976d2" },
+        new SeriesColorRange { Min = 10,  Max = 20,  Color = "#42a5f5" },
+        new SeriesColorRange { Min = 20,  Max = 40,  Color = "#66bb6a" },
+        new SeriesColorRange { Min = 40,  Max = 70,  Color = "#fdd835" },
+        new SeriesColorRange { Min = 70,  Max = 120, Color = "#fb8c00" },
+        new SeriesColorRange { Min = 120, Max = 500, Color = "#e53935" },
+    };
+
+    protected override void OnInitialized()
+    {
+        // Radial illuminance pattern centred at (2.5, 2.5). A dense 21x21 grid gives smooth iso-bands.
+        const int steps = 20;
+        const double size = 5;
+        for (var ix = 0; ix <= steps; ix++)
+        {
+            for (var iy = 0; iy <= steps; iy++)
+            {
+                var x = (double)ix * size / steps;
+                var y = (double)iy * size / steps;
+                var dx = x - 2.5;
+                var dy = y - 2.5;
+                var d2 = dx * dx + dy * dy;
+                var lux = 150 * System.Math.Exp(-d2 / 1.5);
+                samples.Add(new Sample { X = x, Y = y, Lux = lux });
+            }
+        }
+    }
+}
