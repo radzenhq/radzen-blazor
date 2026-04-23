@@ -1,0 +1,21 @@
+@page "/contour-chart"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart with contour series (isoilluminance)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    <strong>RadzenContourSeries</strong> renders a filled iso-band contour plot from a regular grid of scalar samples. Values between the grid points are interpolated linearly (marching-triangles), producing smooth bands suitable for <strong>isoilluminance plots, temperature maps</strong> and similar scientific visualisations. Enable <code>ShowLines</code> to draw iso-lines between bands.
+</RadzenText>
+
+<RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-4">
+    <strong>When to use which?</strong>
+    <ul class="rz-mt-2 rz-mb-0">
+        <li>Use <strong>RadzenContourSeries</strong> (this demo) when samples lie on a <strong>numeric grid</strong> and you want smooth interpolation between them — the result looks continuous and is resolution-independent.</li>
+        <li>Use <RadzenLink Path="/heatmap-series-chart" Text="RadzenHeatmapSeries" /> when you want to show the <strong>raw sample cells</strong> without interpolation (each data point becomes one coloured rectangle).</li>
+        <li>Use <RadzenLink Path="/heatmap-chart" Text="RadzenHeatmap" /> for <strong>categorical</strong> grids (days × hours) where the axes are strings, not numbers.</li>
+    </ul>
+</RadzenAlert>
+
+<RadzenExample ComponentName="Chart" Example="ContourChart" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <ContourChart />
+</RadzenExample>

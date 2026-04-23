@@ -1,0 +1,28 @@
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var index = chart.Series.IndexOf(this);
+        var className = $"rz-contour-series rz-series-{index}";
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+        return builder =>
+        {
+            var seq = 0;
+            builder.OpenElement(seq++, "g");
+            builder.AddAttribute(seq++, "class", className);
+            builder.AddAttribute(seq++, "style", style);
+
+            RenderBands(builder, ref seq, categoryScale, valueScale);
+            RenderIsoLines(builder, ref seq, categoryScale, valueScale);
+
+            builder.CloseElement();
+        };
+    }
+}
