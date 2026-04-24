@@ -2187,7 +2187,7 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Chart Gallery",
-                    Path = "chart-gallery",
+                    Path = "charts",
                     Title = "Blazor Chart Gallery | Free UI Components by Radzen",
                     Description = "Visual gallery of all chart types and data visualization components available in Radzen Blazor.",
                     Icon = "\ue3b6",
