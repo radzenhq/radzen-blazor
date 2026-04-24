@@ -8,11 +8,11 @@ public class ResizeChartCommand : ICommand
 {
     private readonly SheetChart chart;
     private readonly CellAnchor? newTo;
-    private readonly long newWidth;
-    private readonly long newHeight;
+    private readonly double newWidth;
+    private readonly double newHeight;
     private CellAnchor? oldTo;
-    private long oldWidth;
-    private long oldHeight;
+    private double oldWidth;
+    private double oldHeight;
 
     /// <summary>
     /// Creates a resize command for a TwoCellAnchor chart.
@@ -26,7 +26,7 @@ public class ResizeChartCommand : ICommand
     /// <summary>
     /// Creates a resize command for a OneCellAnchor chart.
     /// </summary>
-    public ResizeChartCommand(SheetChart chart, long newWidth, long newHeight)
+    public ResizeChartCommand(SheetChart chart, double newWidth, double newHeight)
     {
         this.chart = chart;
         this.newWidth = newWidth;

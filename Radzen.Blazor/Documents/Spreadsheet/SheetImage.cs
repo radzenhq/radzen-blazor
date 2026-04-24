@@ -31,9 +31,9 @@ public class CellAnchor
     public int Column { get; set; }
 
     /// <summary>
-    /// Gets or sets the column offset in EMU (English Metric Units). 1 px = 9525 EMU at 96 DPI.
+    /// Gets or sets the column offset in pixels from the anchored cell's left edge.
     /// </summary>
-    public long ColumnOffset { get; set; }
+    public double ColumnOffset { get; set; }
 
     /// <summary>
     /// Gets or sets the row index.
@@ -41,9 +41,9 @@ public class CellAnchor
     public int Row { get; set; }
 
     /// <summary>
-    /// Gets or sets the row offset in EMU (English Metric Units). 1 px = 9525 EMU at 96 DPI.
+    /// Gets or sets the row offset in pixels from the anchored cell's top edge.
     /// </summary>
-    public long RowOffset { get; set; }
+    public double RowOffset { get; set; }
 
     /// <summary>
     /// Creates a deep copy of this anchor.
@@ -78,14 +78,14 @@ public class SheetImage
     public CellAnchor? To { get; set; }
 
     /// <summary>
-    /// Gets or sets the image width in EMU (OneCellAnchor only). 1 px = 9525 EMU at 96 DPI.
+    /// Gets or sets the image width in pixels (OneCellAnchor only).
     /// </summary>
-    public long Width { get; set; }
+    public double Width { get; set; }
 
     /// <summary>
-    /// Gets or sets the image height in EMU (OneCellAnchor only). 1 px = 9525 EMU at 96 DPI.
+    /// Gets or sets the image height in pixels (OneCellAnchor only).
     /// </summary>
-    public long Height { get; set; }
+    public double Height { get; set; }
 
     private byte[] data = [];
     private string? dataUri;

@@ -8,11 +8,11 @@ public class ResizeImageCommand : ICommand
 {
     private readonly SheetImage image;
     private readonly CellAnchor? newTo;
-    private readonly long newWidth;
-    private readonly long newHeight;
+    private readonly double newWidth;
+    private readonly double newHeight;
     private CellAnchor? oldTo;
-    private long oldWidth;
-    private long oldHeight;
+    private double oldWidth;
+    private double oldHeight;
 
     /// <summary>
     /// Creates a resize command for a TwoCellAnchor image.
@@ -26,7 +26,7 @@ public class ResizeImageCommand : ICommand
     /// <summary>
     /// Creates a resize command for a OneCellAnchor image.
     /// </summary>
-    public ResizeImageCommand(SheetImage image, long newWidth, long newHeight)
+    public ResizeImageCommand(SheetImage image, double newWidth, double newHeight)
     {
         this.image = image;
         this.newWidth = newWidth;

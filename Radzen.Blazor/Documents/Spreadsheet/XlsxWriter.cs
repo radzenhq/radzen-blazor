@@ -14,6 +14,11 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 class XlsxWriter(Workbook sourceWorkbook)
 {
+    private const double EmuPerPixel = 9525.0;
+
+    private static string PixelsToEmu(double pixels) =>
+        ((long)Math.Round(pixels * EmuPerPixel)).ToString(CultureInfo.InvariantCulture);
+
     private readonly IReadOnlyList<Worksheet> sheets = sourceWorkbook.Sheets;
 
     public void Write(Stream stream)
@@ -93,9 +98,9 @@ class XlsxWriter(Workbook sourceWorkbook)
             XElement anchorElement;
             var fromElement = new XElement(xdr + "from",
                 new XElement(xdr + "col", image.From.Column.ToString(CultureInfo.InvariantCulture)),
-                new XElement(xdr + "colOff", image.From.ColumnOffset.ToString(CultureInfo.InvariantCulture)),
+                new XElement(xdr + "colOff", PixelsToEmu(image.From.ColumnOffset)),
                 new XElement(xdr + "row", image.From.Row.ToString(CultureInfo.InvariantCulture)),
-                new XElement(xdr + "rowOff", image.From.RowOffset.ToString(CultureInfo.InvariantCulture)));
+                new XElement(xdr + "rowOff", PixelsToEmu(image.From.RowOffset)));
 
             var cNvPr = new XElement(xdr + "cNvPr",
                 new XAttribute("id", relIndex.ToString(CultureInfo.InvariantCulture)),
@@ -122,9 +127,9 @@ class XlsxWriter(Workbook sourceWorkbook)
             {
                 var toElement = new XElement(xdr + "to",
                     new XElement(xdr + "col", image.To.Column.ToString(CultureInfo.InvariantCulture)),
-                    new XElement(xdr + "colOff", image.To.ColumnOffset.ToString(CultureInfo.InvariantCulture)),
+                    new XElement(xdr + "colOff", PixelsToEmu(image.To.ColumnOffset)),
                     new XElement(xdr + "row", image.To.Row.ToString(CultureInfo.InvariantCulture)),
-                    new XElement(xdr + "rowOff", image.To.RowOffset.ToString(CultureInfo.InvariantCulture)));
+                    new XElement(xdr + "rowOff", PixelsToEmu(image.To.RowOffset)));
 
                 anchorElement = new XElement(xdr + "twoCellAnchor",
                     fromElement,
@@ -135,8 +140,8 @@ class XlsxWriter(Workbook sourceWorkbook)
             else
             {
                 var extElement = new XElement(xdr + "ext",
-                    new XAttribute("cx", image.Width.ToString(CultureInfo.InvariantCulture)),
-                    new XAttribute("cy", image.Height.ToString(CultureInfo.InvariantCulture)));
+                    new XAttribute("cx", PixelsToEmu(image.Width)),
+                    new XAttribute("cy", PixelsToEmu(image.Height)));
 
                 anchorElement = new XElement(xdr + "oneCellAnchor",
                     fromElement,
@@ -161,9 +166,9 @@ class XlsxWriter(Workbook sourceWorkbook)
             // Build anchor element
             var fromElement = new XElement(xdr + "from",
                 new XElement(xdr + "col", chart.From.Column.ToString(CultureInfo.InvariantCulture)),
-                new XElement(xdr + "colOff", chart.From.ColumnOffset.ToString(CultureInfo.InvariantCulture)),
+                new XElement(xdr + "colOff", PixelsToEmu(chart.From.ColumnOffset)),
                 new XElement(xdr + "row", chart.From.Row.ToString(CultureInfo.InvariantCulture)),
-                new XElement(xdr + "rowOff", chart.From.RowOffset.ToString(CultureInfo.InvariantCulture)));
+                new XElement(xdr + "rowOff", PixelsToEmu(chart.From.RowOffset)));
 
             XNamespace c = "http://schemas.openxmlformats.org/drawingml/2006/chart";
 
@@ -188,9 +193,9 @@ class XlsxWriter(Workbook sourceWorkbook)
             {
                 var toElement = new XElement(xdr + "to",
                     new XElement(xdr + "col", chart.To.Column.ToString(CultureInfo.InvariantCulture)),
-                    new XElement(xdr + "colOff", chart.To.ColumnOffset.ToString(CultureInfo.InvariantCulture)),
+                    new XElement(xdr + "colOff", PixelsToEmu(chart.To.ColumnOffset)),
                     new XElement(xdr + "row", chart.To.Row.ToString(CultureInfo.InvariantCulture)),
-                    new XElement(xdr + "rowOff", chart.To.RowOffset.ToString(CultureInfo.InvariantCulture)));
+                    new XElement(xdr + "rowOff", PixelsToEmu(chart.To.RowOffset)));
 
                 chartAnchor = new XElement(xdr + "twoCellAnchor",
                     fromElement, toElement, graphicFrame,
@@ -199,8 +204,8 @@ class XlsxWriter(Workbook sourceWorkbook)
             else
             {
                 var extElement = new XElement(xdr + "ext",
-                    new XAttribute("cx", chart.Width.ToString(CultureInfo.InvariantCulture)),
-                    new XAttribute("cy", chart.Height.ToString(CultureInfo.InvariantCulture)));
+                    new XAttribute("cx", PixelsToEmu(chart.Width)),
+                    new XAttribute("cy", PixelsToEmu(chart.Height)));
 
                 chartAnchor = new XElement(xdr + "oneCellAnchor",
                     fromElement, extElement, graphicFrame,
