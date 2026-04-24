@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -53,6 +54,9 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
+        [Inject] private ContextMenuService? ContextMenuService { get; set; }
+        [Inject] private NotificationService? NotificationService { get; set; }
+
         /// <summary>
         /// Gets or sets whether to display the formatting toolbar above the editor.
         /// When false, hides the toolbar but editing is still possible. Useful for read-only or simplified views.
@@ -157,6 +161,258 @@ namespace Radzen.Blazor
         public EventCallback<HtmlEditorExecuteEventArgs> Execute { get; set; }
 
         /// <summary>
+        /// Specifies the title used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableDialogTitleText { get; set; } = "Insert table";
+
+        /// <summary>
+        /// Specifies the text of the rows label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableRowsText { get; set; } = "Rows";
+
+        /// <summary>
+        /// Specifies the text of the columns label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableColumnsText { get; set; } = "Columns";
+
+        /// <summary>
+        /// Specifies the text of the width label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableWidthText { get; set; } = "Width";
+
+        /// <summary>
+        /// Specifies the text of the border label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableBorderText { get; set; } = "Border";
+
+        /// <summary>
+        /// Specifies the text of the header row toggle used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableHeaderRowText { get; set; } = "Include header row";
+
+        /// <summary>
+        /// Specifies the text of the edit section label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableEditText { get; set; } = "Edit table";
+
+        /// <summary>
+        /// Specifies the text of the insert confirmation button used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableOkText { get; set; } = "OK";
+
+        /// <summary>
+        /// Specifies the text of the update confirmation button used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableUpdateText { get; set; } = "Update";
+
+        /// <summary>
+        /// Specifies the text of the cancel button used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableCancelText { get; set; } = "Cancel";
+
+        /// <summary>
+        /// Specifies the text of the column width label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableColumnWidthText { get; set; } = "Column width";
+
+        /// <summary>
+        /// Specifies the text of the cell background label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableCellBackgroundText { get; set; } = "Cell background";
+
+        /// <summary>
+        /// Specifies the text of the cell padding label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableCellPaddingText { get; set; } = "Cell padding";
+
+        /// <summary>
+        /// Specifies the text of the horizontal cell alignment label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableCellTextAlignText { get; set; } = "Horizontal align";
+
+        /// <summary>
+        /// Specifies the text of the vertical cell alignment label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableCellVerticalAlignText { get; set; } = "Vertical align";
+
+        /// <summary>
+        /// Specifies the text of the cell border label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableCellBorderText { get; set; } = "Cell border";
+
+        /// <summary>
+        /// Specifies the text of the column width in pixels label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableColumnWidthPxText { get; set; } = "Column width (px)";
+
+        /// <summary>
+        /// Specifies the text of the cell padding in pixels label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableCellPaddingPxText { get; set; } = "Cell padding (px)";
+
+        /// <summary>
+        /// Specifies the text of the border style label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableBorderStyleText { get; set; } = "Border style";
+
+        /// <summary>
+        /// Specifies the text of the border width in pixels label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableBorderWidthPxText { get; set; } = "Border width (px)";
+
+        /// <summary>
+        /// Specifies the text of the border color label used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableBorderColorText { get; set; } = "Border color";
+
+        /// <summary>
+        /// Specifies the text of the top border toggle used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableBorderTopText { get; set; } = "Top";
+
+        /// <summary>
+        /// Specifies the text of the right border toggle used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableBorderRightText { get; set; } = "Right";
+
+        /// <summary>
+        /// Specifies the text of the bottom border toggle used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableBorderBottomText { get; set; } = "Bottom";
+
+        /// <summary>
+        /// Specifies the text of the left border toggle used by the table dialog.
+        /// </summary>
+        [Parameter]
+        public string TableBorderLeftText { get; set; } = "Left";
+
+        /// <summary>
+        /// Specifies the notification summary shown when a table action is blocked.
+        /// </summary>
+        [Parameter]
+        public string TableActionBlockedText { get; set; } = "Table action blocked";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which copies the selected table cells.
+        /// </summary>
+        [Parameter]
+        public string TableCopyCellsText { get; set; } = "Copy cells";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which pastes copied table cells.
+        /// </summary>
+        [Parameter]
+        public string TablePasteCellsText { get; set; } = "Paste cells";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which inserts a row above the current row.
+        /// </summary>
+        [Parameter]
+        public string TableInsertRowAboveText { get; set; } = "Insert row above";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which inserts a row below the current row.
+        /// </summary>
+        [Parameter]
+        public string TableInsertRowBelowText { get; set; } = "Insert row below";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which inserts a column to the left.
+        /// </summary>
+        [Parameter]
+        public string TableInsertColumnLeftText { get; set; } = "Insert column left";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which inserts a column to the right.
+        /// </summary>
+        [Parameter]
+        public string TableInsertColumnRightText { get; set; } = "Insert column right";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which deletes the current row.
+        /// </summary>
+        [Parameter]
+        public string TableDeleteRowText { get; set; } = "Delete row";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which deletes the current column.
+        /// </summary>
+        [Parameter]
+        public string TableDeleteColumnText { get; set; } = "Delete column";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which merges the current cell with the cell to the right.
+        /// </summary>
+        [Parameter]
+        public string TableMergeRightText { get; set; } = "Merge right";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which merges the current cell with the cell below.
+        /// </summary>
+        [Parameter]
+        public string TableMergeDownText { get; set; } = "Merge down";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which splits the current merged cell.
+        /// </summary>
+        [Parameter]
+        public string TableSplitCellText { get; set; } = "Split cell";
+
+        /// <summary>
+        /// Specifies the text of the context menu item which deletes the current table.
+        /// </summary>
+        [Parameter]
+        public string TableDeleteText { get; set; } = "Delete table";
+
+        /// <summary>
+        /// Specifies the message shown when a table command requires the caret to be inside a table.
+        /// </summary>
+        [Parameter]
+        public string TableActionRequiresTableText { get; set; } = "Place the caret inside a table to use table actions.";
+
+        /// <summary>
+        /// Specifies the message shown when the selected cells do not form a rectangular copy range.
+        /// </summary>
+        [Parameter]
+        public string TableCopyInvalidSelectionText { get; set; } = "Select a rectangular range of table cells before copying.";
+
+        /// <summary>
+        /// Specifies the message shown when pasted cells would overlap merged cells or an irregular selection.
+        /// </summary>
+        [Parameter]
+        public string TablePasteBlockedText { get; set; } = "The copied cells cannot be pasted over merged cells or an irregular selection.";
+
+        /// <summary>
+        /// Specifies the message shown when the selected cells cannot be merged because they are not rectangular.
+        /// </summary>
+        [Parameter]
+        public string TableMergeInvalidSelectionText { get; set; } = "The selected cells must form a valid rectangular range before they can be merged.";
+
+        /// <summary>
         /// Specifies the URL to which RadzenHtmlEditor will submit files.
         /// </summary>
         [Parameter]
@@ -185,6 +441,11 @@ namespace Radzen.Blazor
         /// Updated dynamically based on user actions or programmatically invoked commands.
         /// </summary>
         public RadzenHtmlEditorCommandState State { get; set; } = new();
+
+        /// <summary>
+        /// Gets the current table selection state.
+        /// </summary>
+        public HtmlEditorTableSelection TableSelection { get; private set; } = new();
 
         async Task OnFocus()
         {
@@ -219,6 +480,55 @@ namespace Radzen.Blazor
         public async Task OnSelectionChange()
         {
             await UpdateCommandState();
+        }
+
+        /// <summary>
+        /// Invoked by interop when the user opens the context menu inside the editor.
+        /// </summary>
+        /// <param name="clientX">The horizontal mouse position.</param>
+        /// <param name="clientY">The vertical mouse position.</param>
+        [JSInvokable]
+        public async Task OnContextMenu(double clientX, double clientY)
+        {
+            if (ContextMenuService == null || mode != HtmlEditorMode.Design)
+            {
+                return;
+            }
+
+            await UpdateTableSelectionAsync(fromContextMenu: true);
+
+            if (!TableSelection.InTable)
+            {
+                return;
+            }
+
+            var items = new List<ContextMenuItem>
+            {
+                new ContextMenuItem { Text = TableCopyCellsText, Value = "copyCells", Icon = "content_copy" },
+                new ContextMenuItem { Text = TablePasteCellsText, Value = "pasteCells", Icon = "content_paste" },
+                new ContextMenuItem { Text = TableInsertRowAboveText, Value = "addRowBefore", Icon = "north" },
+                new ContextMenuItem { Text = TableInsertRowBelowText, Value = "addRowAfter", Icon = "south" },
+                new ContextMenuItem { Text = TableInsertColumnLeftText, Value = "addColumnBefore", Icon = "west" },
+                new ContextMenuItem { Text = TableInsertColumnRightText, Value = "addColumnAfter", Icon = "east" },
+                new ContextMenuItem { Text = TableDeleteRowText, Value = "deleteRow", Icon = "horizontal_rule" },
+                new ContextMenuItem { Text = TableDeleteColumnText, Value = "deleteColumn", Icon = "vertical_align_center" },
+                new ContextMenuItem { Text = TableMergeRightText, Value = "mergeCellRight", Icon = "merge_type", Disabled = !TableSelection.CanMergeRight },
+                new ContextMenuItem { Text = TableMergeDownText, Value = "mergeCellDown", Icon = "merge", Disabled = !TableSelection.CanMergeDown },
+                new ContextMenuItem { Text = TableSplitCellText, Value = "splitCell", Icon = "call_split", Disabled = !TableSelection.CanSplit },
+                new ContextMenuItem { Text = TableDeleteText, Value = "deleteTable", Icon = "delete", IconColor = "var(--rz-danger)", Disabled = !TableSelection.InTable }
+            };
+
+            var args = new MouseEventArgs { ClientX = clientX, ClientY = clientY, Button = 2, Type = "contextmenu" };
+
+            ContextMenuService.Open(args, items, async e =>
+            {
+                if (e.Value is string command)
+                {
+                    await RestoreSelectionAsync();
+                    await ExecuteTableCommandAsync(command);
+                    await UpdateCommandState();
+                }
+            });
         }
 
         /// <summary>
@@ -331,12 +641,79 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets information about the currently selected table, if any.
+        /// </summary>
+        public ValueTask<HtmlEditorTableSelection> GetTableSelectionAsync()
+        {
+            if (JSRuntime == null) return ValueTask.FromResult(new HtmlEditorTableSelection());
+            return JSRuntime.InvokeAsync<HtmlEditorTableSelection>("Radzen.getTableSelection", ContentEditable);
+        }
+
+        /// <summary>
+        /// Executes a table command for the currently selected table.
+        /// </summary>
+        /// <param name="name">The table command name.</param>
+        /// <param name="value">Optional table command arguments.</param>
+        public async Task ExecuteTableCommandAsync(string name, HtmlEditorTableCommandArgs? value = null)
+        {
+            if (JSRuntime == null) return;
+
+            State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.execTableCommand", ContentEditable, name, value);
+
+            if (State?.Success == false && !string.IsNullOrEmpty(State.Message))
+            {
+                NotificationService?.Notify(NotificationSeverity.Warning, TableActionBlockedText, GetTableCommandMessage(State.Message), 4000);
+                await UpdateTableSelectionAsync();
+                StateHasChanged();
+                return;
+            }
+
+            await OnExecuteAsync(name);
+
+            if (State != null && Html != State.Html)
+            {
+                Html = State.Html;
+
+                htmlChanged = true;
+
+                await OnChange();
+            }
+        }
+
         async Task UpdateCommandState()
         {
             if (JSRuntime == null) return;
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.queryCommands", ContentEditable);
 
+            await UpdateTableSelectionAsync();
+
             StateHasChanged();
+        }
+
+        async Task UpdateTableSelectionAsync(bool fromContextMenu = false)
+        {
+            if (JSRuntime == null)
+            {
+                TableSelection = new HtmlEditorTableSelection();
+                return;
+            }
+
+            TableSelection = fromContextMenu
+                ? await JSRuntime.InvokeAsync<HtmlEditorTableSelection>("Radzen.getContextTableSelection", ContentEditable)
+                : await GetTableSelectionAsync();
+        }
+
+        string GetTableCommandMessage(string message)
+        {
+            return message switch
+            {
+                "table.action.requiresTable" => TableActionRequiresTableText,
+                "table.copy.invalidSelection" => TableCopyInvalidSelectionText,
+                "table.paste.blocked" => TablePasteBlockedText,
+                "table.merge.invalidSelection" => TableMergeInvalidSelectionText,
+                _ => message
+            };
         }
 
         async Task OnBlur()

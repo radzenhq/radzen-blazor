@@ -49,6 +49,7 @@ The Radzen HtmlEditor supports the following tools:
         <li>RadzenHtmlEditorLink - inserts a hyperlink.</li>
         <li>RadzenHtmlEditorUnlink - removes a hyperlink.</li>
         <li>RadzenHtmlEditorImage - allows the user to insert an image by either uploading a file or selecting a URL. Requires File upload to be implemented and the UploadUrl property of the HtmlEditor to be set.</li>
+        <li>RadzenHtmlEditorTable - inserts and edits HTML tables including rows, columns, merge/split, styling, copy/paste, resizing and context menu actions.</li>
         <li>RadzenHtmlEditorFontName - set the font of the selected text.</li>
         <li>RadzenHtmlEditorFontSize - set the font size of the selected text.</li>
         <li>RadzenHtmlEditorFormatBlock - allows the user to format the selected text as heading or paragraph.</li>
@@ -88,6 +89,16 @@ The Radzen HtmlEditor supports the following tools:
     <HtmlEditorFocus />
 </RadzenExample>
 
+<RadzenText Anchor="html-editor#tables" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Table editor
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The built-in table editor supports inserting tables, adding and removing rows or columns, merge and split operations, keyboard navigation, copy and paste for cell ranges, column resizing and a property panel for cell styling.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorTables">
+    <HtmlEditorTables />
+</RadzenExample>
+
 <RadzenText Anchor="html-editor#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Keyboard Navigation
 </RadzenText>
@@ -120,12 +131,17 @@ The Radzen HtmlEditor supports the following tools:
         <RadzenTableRow>
             <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="C" /></RadzenTableCell>
             <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="C" /></RadzenTableCell>
-            <RadzenTableCell>Copy.</RadzenTableCell>
+            <RadzenTableCell>Copy. Copies selected table cells when the caret is inside a table.</RadzenTableCell>
         </RadzenTableRow>
         <RadzenTableRow>
             <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="V" /></RadzenTableCell>
             <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="V" /></RadzenTableCell>
-            <RadzenTableCell>Paste.</RadzenTableCell>
+            <RadzenTableCell>Paste. Pastes copied table cells into a rectangular range when the caret is inside a table.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Shift" /> + <RadzenBadge Text="Click" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="Shift" /> + <RadzenBadge Text="Click" /></RadzenTableCell>
+            <RadzenTableCell>Select a rectangular table cell range.</RadzenTableCell>
         </RadzenTableRow>
         <RadzenTableRow>
             <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="B" /></RadzenTableCell>
@@ -156,6 +172,11 @@ The Radzen HtmlEditor supports the following tools:
             <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="Shift" /> + <RadzenBadge Text="Z" /></RadzenTableCell>
             <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="Shift" /> + <RadzenBadge Text="Z" /></RadzenTableCell>
             <RadzenTableCell>Redo.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Tab" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="Tab" /></RadzenTableCell>
+            <RadzenTableCell>Move to the next table cell. Adds a new row at the end of a table body.</RadzenTableCell>
         </RadzenTableRow>
     </RadzenTableBody>
 </RadzenTable>
