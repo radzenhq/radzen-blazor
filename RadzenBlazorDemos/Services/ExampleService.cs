@@ -250,6 +250,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Spreadsheet",
             Icon = "\ue3ec",
+            New = true,
             Children = new []
             {
                 new Example
