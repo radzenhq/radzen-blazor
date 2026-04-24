@@ -1592,8 +1592,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         public string Direction { get; set; } = "";
         public double StartX { get; set; }
         public double StartY { get; set; }
-        public long OriginalWidth { get; set; }
-        public long OriginalHeight { get; set; }
+        public double OriginalWidth { get; set; }
+        public double OriginalHeight { get; set; }
     }
 
     class DrawingMoveCapture
@@ -1674,46 +1674,44 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         return Task.CompletedTask;
     }
 
-    private const double EmuPerPixel = 9525.0;
-
-    private static (long width, long height) CalculateResizeDimensions(string direction, double deltaX, double deltaY, long originalWidth, long originalHeight)
+    private static (double width, double height) CalculateResizeDimensions(string direction, double deltaX, double deltaY, double originalWidth, double originalHeight)
     {
-        long newWidth = originalWidth;
-        long newHeight = originalHeight;
+        double newWidth = originalWidth;
+        double newHeight = originalHeight;
 
         switch (direction)
         {
             case "se":
-                newWidth = originalWidth + (long)(deltaX * EmuPerPixel);
-                newHeight = originalHeight + (long)(deltaY * EmuPerPixel);
+                newWidth = originalWidth + deltaX;
+                newHeight = originalHeight + deltaY;
                 break;
             case "sw":
-                newWidth = originalWidth - (long)(deltaX * EmuPerPixel);
-                newHeight = originalHeight + (long)(deltaY * EmuPerPixel);
+                newWidth = originalWidth - deltaX;
+                newHeight = originalHeight + deltaY;
                 break;
             case "ne":
-                newWidth = originalWidth + (long)(deltaX * EmuPerPixel);
-                newHeight = originalHeight - (long)(deltaY * EmuPerPixel);
+                newWidth = originalWidth + deltaX;
+                newHeight = originalHeight - deltaY;
                 break;
             case "nw":
-                newWidth = originalWidth - (long)(deltaX * EmuPerPixel);
-                newHeight = originalHeight - (long)(deltaY * EmuPerPixel);
+                newWidth = originalWidth - deltaX;
+                newHeight = originalHeight - deltaY;
                 break;
             case "n":
-                newHeight = originalHeight - (long)(deltaY * EmuPerPixel);
+                newHeight = originalHeight - deltaY;
                 break;
             case "s":
-                newHeight = originalHeight + (long)(deltaY * EmuPerPixel);
+                newHeight = originalHeight + deltaY;
                 break;
             case "e":
-                newWidth = originalWidth + (long)(deltaX * EmuPerPixel);
+                newWidth = originalWidth + deltaX;
                 break;
             case "w":
-                newWidth = originalWidth - (long)(deltaX * EmuPerPixel);
+                newWidth = originalWidth - deltaX;
                 break;
         }
 
-        const long minSize = 95250; // ~10px
+        const double minSize = 10;
         return (Math.Max(minSize, newWidth), Math.Max(minSize, newHeight));
     }
 
@@ -1794,28 +1792,28 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         while (anchor.ColumnOffset < 0 && anchor.Column > 0)
         {
             anchor.Column--;
-            anchor.ColumnOffset += (long)(Worksheet.Columns[anchor.Column] * EmuPerPixel);
+            anchor.ColumnOffset += Worksheet.Columns[anchor.Column];
         }
 
         while (anchor.Column < Worksheet.ColumnCount - 1)
         {
-            var colWidthEmu = (long)(Worksheet.Columns[anchor.Column] * EmuPerPixel);
-            if (anchor.ColumnOffset < colWidthEmu) break;
-            anchor.ColumnOffset -= colWidthEmu;
+            var colWidth = Worksheet.Columns[anchor.Column];
+            if (anchor.ColumnOffset < colWidth) break;
+            anchor.ColumnOffset -= colWidth;
             anchor.Column++;
         }
 
         while (anchor.RowOffset < 0 && anchor.Row > 0)
         {
             anchor.Row--;
-            anchor.RowOffset += (long)(Worksheet.Rows[anchor.Row] * EmuPerPixel);
+            anchor.RowOffset += Worksheet.Rows[anchor.Row];
         }
 
         while (anchor.Row < Worksheet.RowCount - 1)
         {
-            var rowHeightEmu = (long)(Worksheet.Rows[anchor.Row] * EmuPerPixel);
-            if (anchor.RowOffset < rowHeightEmu) break;
-            anchor.RowOffset -= rowHeightEmu;
+            var rowHeight = Worksheet.Rows[anchor.Row];
+            if (anchor.RowOffset < rowHeight) break;
+            anchor.RowOffset -= rowHeight;
             anchor.Row++;
         }
 
@@ -1836,8 +1834,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             return Task.CompletedTask;
         }
 
-        var deltaXEmu = (long)((args.ClientX - capture.StartX) * EmuPerPixel);
-        var deltaYEmu = (long)((args.ClientY - capture.StartY) * EmuPerPixel);
+        var deltaX = args.ClientX - capture.StartX;
+        var deltaY = args.ClientY - capture.StartY;
 
         CellAnchor? from = null;
         CellAnchor? to = null;
@@ -1856,18 +1854,18 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (from is not null)
         {
             from.Column = capture.OriginalFrom.Column;
-            from.ColumnOffset = capture.OriginalFrom.ColumnOffset + deltaXEmu;
+            from.ColumnOffset = capture.OriginalFrom.ColumnOffset + deltaX;
             from.Row = capture.OriginalFrom.Row;
-            from.RowOffset = capture.OriginalFrom.RowOffset + deltaYEmu;
+            from.RowOffset = capture.OriginalFrom.RowOffset + deltaY;
             NormalizeAnchor(from);
         }
 
         if (to is not null && capture.OriginalTo is not null)
         {
             to.Column = capture.OriginalTo.Column;
-            to.ColumnOffset = capture.OriginalTo.ColumnOffset + deltaXEmu;
+            to.ColumnOffset = capture.OriginalTo.ColumnOffset + deltaX;
             to.Row = capture.OriginalTo.Row;
-            to.RowOffset = capture.OriginalTo.RowOffset + deltaYEmu;
+            to.RowOffset = capture.OriginalTo.RowOffset + deltaY;
             NormalizeAnchor(to);
         }
 
