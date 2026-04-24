@@ -13,8 +13,6 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public partial class ImageOverlay : ComponentBase, IDisposable
 {
-    private const double EmuPerPixel = 9525.0;
-
     /// <summary>
     /// Gets or sets the sheet.
     /// </summary>
@@ -69,11 +67,8 @@ public partial class ImageOverlay : ComponentBase, IDisposable
         }
 
         // For OneCellAnchor, find the end cell by walking columns/rows until the pixel extent is covered
-        var widthPx = image.Width / EmuPerPixel;
-        var heightPx = image.Height / EmuPerPixel;
-
         var endCol = image.From.Column;
-        var remaining = widthPx - (Context.GetRectangle(image.From.Row, image.From.Column).Width - image.From.ColumnOffset / EmuPerPixel);
+        var remaining = image.Width - (Context.GetRectangle(image.From.Row, image.From.Column).Width - image.From.ColumnOffset);
         while (remaining > 0 && endCol < Worksheet.ColumnCount - 1)
         {
             endCol++;
@@ -81,7 +76,7 @@ public partial class ImageOverlay : ComponentBase, IDisposable
         }
 
         var endRow = image.From.Row;
-        remaining = heightPx - (Context.GetRectangle(image.From.Row, image.From.Column).Height - image.From.RowOffset / EmuPerPixel);
+        remaining = image.Height - (Context.GetRectangle(image.From.Row, image.From.Column).Height - image.From.RowOffset);
         while (remaining > 0 && endRow < Worksheet.RowCount - 1)
         {
             endRow++;
@@ -105,17 +100,17 @@ public partial class ImageOverlay : ComponentBase, IDisposable
         {
             var fullRect = Context.GetRectangle(imageRange.Start.Row, imageRange.Start.Column, imageRange.End.Row, imageRange.End.Column);
             return (
-                fullRect.Width + image.From.ColumnOffset / EmuPerPixel + image.To.ColumnOffset / EmuPerPixel,
-                fullRect.Height + image.From.RowOffset / EmuPerPixel + image.To.RowOffset / EmuPerPixel);
+                fullRect.Width + image.From.ColumnOffset + image.To.ColumnOffset,
+                fullRect.Height + image.From.RowOffset + image.To.RowOffset);
         }
 
-        return (image.Width / EmuPerPixel, image.Height / EmuPerPixel);
+        return (image.Width, image.Height);
     }
 
     private (double x, double y) GetZoneOffset(SheetImage image, RangeInfo zone)
     {
-        double offsetX = image.From.ColumnOffset / EmuPerPixel;
-        double offsetY = image.From.RowOffset / EmuPerPixel;
+        double offsetX = image.From.ColumnOffset;
+        double offsetY = image.From.RowOffset;
 
         for (var col = image.From.Column; col < zone.Range.Start.Column; col++)
         {
@@ -186,8 +181,8 @@ public partial class ImageOverlay : ComponentBase, IDisposable
         var (imgWidth, imgHeight) = GetImageDimensions(image, imageRange);
 
         var startRect = Context.GetRectangle(image.From.Row, image.From.Column);
-        var left = startRect.Left + image.From.ColumnOffset / EmuPerPixel;
-        var top = startRect.Top + image.From.RowOffset / EmuPerPixel;
+        var left = startRect.Left + image.From.ColumnOffset;
+        var top = startRect.Top + image.From.RowOffset;
 
         return new PixelRectangle(top, left, top + imgHeight, left + imgWidth);
     }

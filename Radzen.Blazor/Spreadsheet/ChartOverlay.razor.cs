@@ -16,8 +16,6 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public partial class ChartOverlay : ComponentBase, IDisposable
 {
-    private const double EmuPerPixel = 9525.0;
-
     private readonly Dictionary<SheetChart, List<(ChartSeriesDefinition series, List<ChartDataPoint> data)>> seriesCache = [];
 
     /// <summary>
@@ -103,11 +101,8 @@ public partial class ChartOverlay : ComponentBase, IDisposable
                 new CellRef(chart.To.Row, chart.To.Column));
         }
 
-        var widthPx = chart.Width / EmuPerPixel;
-        var heightPx = chart.Height / EmuPerPixel;
-
         var endCol = chart.From.Column;
-        var remaining = widthPx - (Context.GetRectangle(chart.From.Row, chart.From.Column).Width - chart.From.ColumnOffset / EmuPerPixel);
+        var remaining = chart.Width - (Context.GetRectangle(chart.From.Row, chart.From.Column).Width - chart.From.ColumnOffset);
         while (remaining > 0 && endCol < Worksheet.ColumnCount - 1)
         {
             endCol++;
@@ -115,7 +110,7 @@ public partial class ChartOverlay : ComponentBase, IDisposable
         }
 
         var endRow = chart.From.Row;
-        remaining = heightPx - (Context.GetRectangle(chart.From.Row, chart.From.Column).Height - chart.From.RowOffset / EmuPerPixel);
+        remaining = chart.Height - (Context.GetRectangle(chart.From.Row, chart.From.Column).Height - chart.From.RowOffset);
         while (remaining > 0 && endRow < Worksheet.RowCount - 1)
         {
             endRow++;
@@ -139,17 +134,17 @@ public partial class ChartOverlay : ComponentBase, IDisposable
         {
             var fullRect = Context.GetRectangle(chartRange.Start.Row, chartRange.Start.Column, chartRange.End.Row, chartRange.End.Column);
             return (
-                fullRect.Width + chart.From.ColumnOffset / EmuPerPixel + chart.To.ColumnOffset / EmuPerPixel,
-                fullRect.Height + chart.From.RowOffset / EmuPerPixel + chart.To.RowOffset / EmuPerPixel);
+                fullRect.Width + chart.From.ColumnOffset + chart.To.ColumnOffset,
+                fullRect.Height + chart.From.RowOffset + chart.To.RowOffset);
         }
 
-        return (chart.Width / EmuPerPixel, chart.Height / EmuPerPixel);
+        return (chart.Width, chart.Height);
     }
 
     private (double x, double y) GetZoneOffset(SheetChart chart, RangeInfo zone)
     {
-        double offsetX = chart.From.ColumnOffset / EmuPerPixel;
-        double offsetY = chart.From.RowOffset / EmuPerPixel;
+        double offsetX = chart.From.ColumnOffset;
+        double offsetY = chart.From.RowOffset;
 
         for (var col = chart.From.Column; col < zone.Range.Start.Column; col++)
         {
