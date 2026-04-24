@@ -874,24 +874,23 @@ class XlsxWriter(Workbook sourceWorkbook)
                     new XAttribute("state", "frozen"))));
     }
 
-    private static XElement CreateColumns(Worksheet sheet)
+    private static XElement? CreateColumns(Worksheet sheet)
     {
-        return new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            Enumerable.Range(0, sheet.ColumnCount).Select(col =>
-            {
-                var colElement = new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("min", col + 1),
-                    new XAttribute("max", col + 1));
+        var colElements = Enumerable.Range(0, sheet.ColumnCount)
+            .Where(col => sheet.Columns[col] != sheet.Columns.Size)
+            .Select(col => new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("min", col + 1),
+                new XAttribute("max", col + 1),
+                new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)),
+                new XAttribute("customWidth", "1")))
+            .ToList();
 
-                // Only persist width if it differs from the default
-                if (sheet.Columns[col] != sheet.Columns.Size)
-                {
-                    colElement.Add(new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)));
-                    colElement.Add(new XAttribute("customWidth", "1"));
-                }
+        if (colElements.Count == 0)
+        {
+            return null;
+        }
 
-                return colElement;
-            }));
+        return new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), colElements);
     }
 
     private void ProcessSheetData(Worksheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
