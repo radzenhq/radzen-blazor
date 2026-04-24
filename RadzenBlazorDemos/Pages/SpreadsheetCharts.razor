@@ -81,12 +81,12 @@
             sheet.Cells[totalRow, col].Format = totalFormat;
         }
 
-        // Insert a column chart below the table
+        // Insert a column chart to the right of the table
         var columnChart = new SheetChart
         {
             ChartType = SpreadsheetChartType.Column,
             AnchorMode = DrawingAnchorMode.OneCellAnchor,
-            From = new CellAnchor { Row = totalRow + 2, Column = 0 },
+            From = new CellAnchor { Row = 1, Column = 7 },
             Width = 5715000, // ~600px
             Height = 2857500, // ~300px
             Title = "Quarterly Sales by Region",
@@ -155,12 +155,12 @@
             sheet.Cells[row, 2].Format = percentFormat;
         }
 
-        // Insert a pie chart below the table
+        // Insert a pie chart to the right of the table
         var pieChart = new SheetChart
         {
             ChartType = SpreadsheetChartType.Pie,
             AnchorMode = DrawingAnchorMode.OneCellAnchor,
-            From = new CellAnchor { Row = 2 + data.Length + 1, Column = 0 },
+            From = new CellAnchor { Row = 1, Column = 4 },
             Width = 4572000, // ~480px
             Height = 3429000, // ~360px
             Title = "Browser Market Share",
@@ -237,12 +237,12 @@
             }
         }
 
-        // Insert a line chart below the table
+        // Insert a line chart to the right of the table
         var lineChart = new SheetChart
         {
             ChartType = SpreadsheetChartType.Line,
             AnchorMode = DrawingAnchorMode.OneCellAnchor,
-            From = new CellAnchor { Row = 2 + months.Length + 1, Column = 0 },
+            From = new CellAnchor { Row = 1, Column = 5 },
             Width = 5715000,
             Height = 2857500,
             Title = "Revenue Trends",
