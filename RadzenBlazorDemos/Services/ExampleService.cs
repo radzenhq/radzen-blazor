@@ -2294,14 +2294,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Trends",
-                            Path = "chart-trends",
-                            Title = "Blazor Chart - Trends | Free UI Components by Radzen",
-                            Description = "Blazor Chart trend lines displaying mean, median, and mode measures of central tendency.",
-                            Tags = new [] { "chart", "trend", "median", "mean", "mode" }
-                        },
-                        new Example
-                        {
                             Name = "Annotations",
                             Path = "chart-annotations",
                             Title = "Blazor Chart - Annotations | Free UI Components by Radzen",
@@ -2682,10 +2674,10 @@ namespace RadzenBlazorDemos
                     Children = new [] {
                         new Example
                         {
-                            Name = "Trendline Chart",
-                            Path = "trendline-chart",
-                            Description = "Radzen Blazor Chart with trendline overlays: linear regression, polynomial fit, and moving average.",
-                            Tags = new [] { "chart", "graph", "trendline", "trend", "regression", "polynomial", "moving average", "forecast" },
+                            Name = "Trendlines & Statistical Overlays",
+                            Path = "chart-trends",
+                            Description = "Radzen Blazor Chart with trendline overlays (linear regression, polynomial fit, moving average) and statistical descriptors (mean, median, mode).",
+                            Tags = new [] { "chart", "graph", "trendline", "trend", "trends", "regression", "polynomial", "moving average", "forecast", "mean", "median", "mode", "statistics" },
                             New = true
                         },
                         new Example

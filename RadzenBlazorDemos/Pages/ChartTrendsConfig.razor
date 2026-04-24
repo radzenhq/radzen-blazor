@@ -2,46 +2,70 @@
 
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
     <RadzenCard Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenCheckBox @bind-Value="@trend" Name="trend"></RadzenCheckBox>
-                <RadzenLabel Text="Trend" Component="trend" class="rz-color-danger-dark" />
+        <RadzenStack Gap="0.5rem">
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-mb-0">Regression overlays</RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@trend" Name="trend" />
+                    <RadzenLabel Text="Linear trend" Component="trend" class="rz-color-danger-dark" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@polynomial" Name="polynomial" />
+                    <RadzenLabel Text="Polynomial" Component="polynomial" class="rz-color-success-dark" />
+                    <RadzenNumeric @bind-Value="@polyOrder" Min="2" Max="6" Style="width: 70px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@movingAverage" Name="movingAverage" />
+                    <RadzenLabel Text="Moving average" Component="movingAverage" class="rz-color-warning-darker" />
+                    <RadzenNumeric @bind-Value="@maPeriod" Min="2" Max="6" Style="width: 70px;" />
+                </RadzenStack>
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenCheckBox @bind-Value="@median" Name="median"></RadzenCheckBox>
-                <RadzenLabel Text="Median" Component="median" class="rz-color-success-dark" />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenCheckBox @bind-Value="@mean" Name="mean"></RadzenCheckBox>
-                <RadzenLabel Text="Mean" Component="mean" class="rz-color-info-dark" />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenCheckBox @bind-Value="@mode" Name="mode"></RadzenCheckBox>
-                <RadzenLabel Text="Mode" Component="mode" class="rz-color-warning-darker" />
+
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-mb-0 rz-mt-2">Statistical overlays</RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@mean" Name="mean" />
+                    <RadzenLabel Text="Mean" Component="mean" class="rz-color-info-dark" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@median" Name="median" />
+                    <RadzenLabel Text="Median" Component="median" class="rz-color-primary" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@mode" Name="mode" />
+                    <RadzenLabel Text="Mode" Component="mode" class="rz-color-secondary" />
+                </RadzenStack>
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
 
     <RadzenChart>
-        <RadzenLineSeries Smooth="true" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
-            <RadzenSeriesTrendLine Visible="@trend" Stroke="var(--rz-danger-dark)" LineType="LineType.Dashed" />
-            <RadzenSeriesMedianLine Visible="@median" Stroke="var(--rz-success-dark)" LineType="LineType.Dotted" />
+        <RadzenLineSeries Smooth="true" Data="@revenue" CategoryProperty="Date" Title="Monthly revenue" ValueProperty="Revenue" Stroke="rgba(97,142,247,0.9)" StrokeWidth="2">
+            <RadzenMarkers MarkerType="MarkerType.Circle" />
+            <RadzenSeriesTrendLine Visible="@trend" Stroke="var(--rz-danger-dark)" StrokeWidth="2" LineType="LineType.Dashed" />
+            <RadzenSeriesPolynomialTrendLine Visible="@polynomial" Order="@polyOrder" Stroke="var(--rz-success-dark)" StrokeWidth="2" LineType="LineType.Dashed" />
+            <RadzenSeriesMovingAverageLine Visible="@movingAverage" Period="@maPeriod" Stroke="var(--rz-warning-darker)" StrokeWidth="2" LineType="LineType.Dotted" />
             <RadzenSeriesMeanLine Visible="@mean" Stroke="var(--rz-info-dark)" LineType="LineType.Dotted" />
-            <RadzenSeriesModeLine Visible="@mode" Stroke="var(--rz-warning-darker)" LineType="LineType.Dotted" />
+            <RadzenSeriesMedianLine Visible="@median" Stroke="var(--rz-primary)" LineType="LineType.Dotted" />
+            <RadzenSeriesModeLine Visible="@mode" Stroke="var(--rz-secondary)" LineType="LineType.Dotted" />
         </RadzenLineSeries>
         <RadzenCategoryAxis Padding="20" />
         <RadzenValueAxis Formatter="@FormatAsUSD">
             <RadzenGridLines Visible="true" />
-            <RadzenAxisTitle Text="Revenue in USD" />
+            <RadzenAxisTitle Text="Revenue (USD)" />
         </RadzenValueAxis>
     </RadzenChart>
 </RadzenStack>
 
 @code {
     bool trend = true;
-    bool median = false;
+    bool polynomial = false;
+    bool movingAverage = false;
     bool mean = false;
+    bool median = false;
     bool mode = false;
+    int polyOrder = 3;
+    int maPeriod = 3;
 
     class DataItem
     {
@@ -54,66 +78,19 @@
         return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
     }
 
-    DataItem[] revenue2023 = new DataItem[] {
-        new DataItem
-        {
-            Date = "Jan",
-            Revenue = 234000
-        },
-        new DataItem
-        {
-            Date = "Feb",
-            Revenue = 269000
-        },
-        new DataItem
-        {
-            Date = "Mar",
-            Revenue = 233000
-        },
-        new DataItem
-        {
-            Date = "Apr",
-            Revenue = 244000
-        },
-        new DataItem
-        {
-            Date = "May",
-            Revenue = 214000
-        },
-        new DataItem
-        {
-            Date = "Jun",
-            Revenue = 253000
-        },
-        new DataItem
-        {
-            Date = "Jul",
-            Revenue = 274000
-        },
-        new DataItem
-        {
-            Date = "Aug",
-            Revenue = 284000
-        },
-        new DataItem
-        {
-            Date = "Sept",
-            Revenue = 273000
-        },
-        new DataItem
-        {
-            Date = "Oct",
-            Revenue = 282000
-        },
-        new DataItem
-        {
-            Date = "Nov",
-            Revenue = 289000
-        },
-        new DataItem
-        {
-            Date = "Dec",
-            Revenue = 294000
-        }
+    DataItem[] revenue = new[]
+    {
+        new DataItem { Date = "Jan",  Revenue = 234000 },
+        new DataItem { Date = "Feb",  Revenue = 269000 },
+        new DataItem { Date = "Mar",  Revenue = 233000 },
+        new DataItem { Date = "Apr",  Revenue = 244000 },
+        new DataItem { Date = "May",  Revenue = 214000 },
+        new DataItem { Date = "Jun",  Revenue = 253000 },
+        new DataItem { Date = "Jul",  Revenue = 274000 },
+        new DataItem { Date = "Aug",  Revenue = 284000 },
+        new DataItem { Date = "Sept", Revenue = 273000 },
+        new DataItem { Date = "Oct",  Revenue = 282000 },
+        new DataItem { Date = "Nov",  Revenue = 289000 },
+        new DataItem { Date = "Dec",  Revenue = 294000 },
     };
 }
