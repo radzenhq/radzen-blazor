@@ -314,7 +314,10 @@ namespace Radzen.Blazor
 
         internal void RemoveSeries(IChartSeries series)
         {
-            Series.Remove(series);
+            if (Series.Remove(series))
+            {
+                _ = Refresh(false);
+            }
         }
         /// <summary>
         /// Returns the Series used by the Chart.
