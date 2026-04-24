@@ -1594,6 +1594,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         public double StartY { get; set; }
         public double OriginalWidth { get; set; }
         public double OriginalHeight { get; set; }
+        public CellAnchor OriginalFrom { get; set; } = default!;
     }
 
     class DrawingMoveCapture
@@ -1624,11 +1625,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (Worksheet.SelectedImage is SheetImage image)
         {
-            capture = new DrawingResizeCapture { Image = image, OriginalWidth = image.Width, OriginalHeight = image.Height };
+            capture = new DrawingResizeCapture { Image = image, OriginalWidth = image.Width, OriginalHeight = image.Height, OriginalFrom = image.From.Clone() };
         }
         else if (Worksheet.SelectedChart is SheetChart chart)
         {
-            capture = new DrawingResizeCapture { Chart = chart, OriginalWidth = chart.Width, OriginalHeight = chart.Height };
+            capture = new DrawingResizeCapture { Chart = chart, OriginalWidth = chart.Width, OriginalHeight = chart.Height, OriginalFrom = chart.From.Clone() };
         }
 
         if (capture is not null)
@@ -1655,64 +1656,62 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             return Task.CompletedTask;
         }
 
-        var (newWidth, newHeight) = CalculateResizeDimensions(
+        var (newWidth, newHeight, newFrom) = CalculateResize(
             capture.Direction, args.ClientX - capture.StartX, args.ClientY - capture.StartY,
-            capture.OriginalWidth, capture.OriginalHeight);
+            capture.OriginalWidth, capture.OriginalHeight, capture.OriginalFrom);
 
         if (capture.Image is not null)
         {
             capture.Image.Width = newWidth;
             capture.Image.Height = newHeight;
+            capture.Image.From = newFrom;
+            NormalizeAnchor(capture.Image.From);
         }
         else if (capture.Chart is not null)
         {
             capture.Chart.Width = newWidth;
             capture.Chart.Height = newHeight;
+            capture.Chart.From = newFrom;
+            NormalizeAnchor(capture.Chart.From);
         }
 
         StateHasChanged();
         return Task.CompletedTask;
     }
 
-    private static (double width, double height) CalculateResizeDimensions(string direction, double deltaX, double deltaY, double originalWidth, double originalHeight)
-    {
-        double newWidth = originalWidth;
-        double newHeight = originalHeight;
+    private const double MinDrawingSize = 10;
 
-        switch (direction)
+    private static (double width, double height, CellAnchor from) CalculateResize(
+        string direction, double deltaX, double deltaY,
+        double originalWidth, double originalHeight, CellAnchor originalFrom)
+    {
+        var from = originalFrom.Clone();
+        var newWidth = originalWidth;
+        var newHeight = originalHeight;
+
+        if (direction.Contains('e', StringComparison.Ordinal))
         {
-            case "se":
-                newWidth = originalWidth + deltaX;
-                newHeight = originalHeight + deltaY;
-                break;
-            case "sw":
-                newWidth = originalWidth - deltaX;
-                newHeight = originalHeight + deltaY;
-                break;
-            case "ne":
-                newWidth = originalWidth + deltaX;
-                newHeight = originalHeight - deltaY;
-                break;
-            case "nw":
-                newWidth = originalWidth - deltaX;
-                newHeight = originalHeight - deltaY;
-                break;
-            case "n":
-                newHeight = originalHeight - deltaY;
-                break;
-            case "s":
-                newHeight = originalHeight + deltaY;
-                break;
-            case "e":
-                newWidth = originalWidth + deltaX;
-                break;
-            case "w":
-                newWidth = originalWidth - deltaX;
-                break;
+            newWidth = Math.Max(MinDrawingSize, originalWidth + deltaX);
+        }
+        else if (direction.Contains('w', StringComparison.Ordinal))
+        {
+            var clampedDeltaX = Math.Min(deltaX, originalWidth - MinDrawingSize);
+            newWidth = originalWidth - clampedDeltaX;
+            from.ColumnOffset = originalFrom.ColumnOffset + clampedDeltaX;
         }
 
-        const double minSize = 10;
-        return (Math.Max(minSize, newWidth), Math.Max(minSize, newHeight));
+        if (direction.Contains('s', StringComparison.Ordinal))
+        {
+            newHeight = Math.Max(MinDrawingSize, originalHeight + deltaY);
+        }
+        else if (direction.Contains('n', StringComparison.Ordinal))
+        {
+            var clampedDeltaY = Math.Min(deltaY, originalHeight - MinDrawingSize);
+            newHeight = originalHeight - clampedDeltaY;
+            from.RowOffset = originalFrom.RowOffset + clampedDeltaY;
+        }
+
+        return (newWidth, newHeight, from);
     }
 
     /// <summary>
@@ -1730,21 +1729,25 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             var finalWidth = image.Width;
             var finalHeight = image.Height;
+            var finalFrom = image.From.Clone();
 
             image.Width = capture.OriginalWidth;
             image.Height = capture.OriginalHeight;
+            image.From = capture.OriginalFrom.Clone();
 
-            Execute(new ResizeImageCommand(image, finalWidth, finalHeight));
+            Execute(new ResizeImageCommand(image, finalWidth, finalHeight, finalFrom));
         }
         else if (capture.Chart is SheetChart chart)
         {
             var finalWidth = chart.Width;
             var finalHeight = chart.Height;
+            var finalFrom = chart.From.Clone();
 
             chart.Width = capture.OriginalWidth;
             chart.Height = capture.OriginalHeight;
+            chart.From = capture.OriginalFrom.Clone();
 
-            Execute(new ResizeChartCommand(chart, finalWidth, finalHeight));
+            Execute(new ResizeChartCommand(chart, finalWidth, finalHeight, finalFrom));
         }
 
         activeCapture = null;
