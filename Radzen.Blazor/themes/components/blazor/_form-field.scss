@@ -31,6 +31,7 @@ $form-field-label-floating-background-color: var(--rz-input-background-color) !d
 $form-field-helper-padding: 0 0.5rem !default;
 
 .rz-form-field-helper {
+    position: relative;
     padding: var(--rz-form-field-helper-padding);
 }
 
