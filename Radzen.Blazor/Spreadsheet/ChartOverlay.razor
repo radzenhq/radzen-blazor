@@ -7,7 +7,7 @@
     var selected = Worksheet.SelectedChart == chart;
     @foreach (var zone in Context.GetRanges(chartRange))
     {
-        <div class=@GetClass(zone.FrozenRow, zone.FrozenColumn) style=@GetZoneStyle(chart, chartRange, zone) @onpointerdown=@(e => OnChartPointerDown(e, chart)) @onpointerdown:stopPropagation @oncontextmenu=@(e => OnChartContextMenu(e, chart)) @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
+        <div @key=chart class=@GetClass(zone.FrozenRow, zone.FrozenColumn) style=@GetZoneStyle(chart, chartRange, zone) @onpointerdown=@(e => OnChartPointerDown(e, chart)) @onpointerdown:stopPropagation @oncontextmenu=@(e => OnChartContextMenu(e, chart)) @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
             <div class="rz-spreadsheet-chart-clip">
                 <div class="rz-spreadsheet-chart-container" style=@GetChartContainerStyle(chart, chartRange, zone)>
                     @if (chart.ChartType != SpreadsheetChartType.Unsupported)
