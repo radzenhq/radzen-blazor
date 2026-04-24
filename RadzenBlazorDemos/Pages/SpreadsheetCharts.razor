@@ -81,13 +81,19 @@
             sheet.Cells[totalRow, col].Format = totalFormat;
         }
 
-        // Insert a column chart to the right of the table
+        // Insert a column chart below the table, spanning columns A-F
+        var tableWidth = 0.0;
+        for (int col = 0; col < headers.Length; col++)
+        {
+            tableWidth += sheet.Columns[col];
+        }
+
         var columnChart = new SheetChart
         {
             ChartType = SpreadsheetChartType.Column,
             AnchorMode = DrawingAnchorMode.OneCellAnchor,
-            From = new CellAnchor { Row = 1, Column = 7 },
-            Width = 600,
+            From = new CellAnchor { Row = totalRow + 2, Column = 0 },
+            Width = tableWidth,
             Height = 300,
             Title = "Quarterly Sales by Region",
             ShowLegend = true,
