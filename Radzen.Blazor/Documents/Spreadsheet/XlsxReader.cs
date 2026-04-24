@@ -14,6 +14,8 @@ namespace Radzen.Documents.Spreadsheet;
 /// </summary>
 static class XlsxReader
 {
+    private const double EmuPerPixel = 9525.0;
+
     public static Workbook Read(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -812,7 +814,7 @@ static class XlsxReader
             }
 
             CellAnchor? to = null;
-            long anchorWidth = 0, anchorHeight = 0;
+            double anchorWidth = 0, anchorHeight = 0;
 
             if (mode == DrawingAnchorMode.TwoCellAnchor)
             {
@@ -829,11 +831,11 @@ static class XlsxReader
                 {
                     if (long.TryParse(ext.Attribute("cx")?.Value, out var cx))
                     {
-                        anchorWidth = cx;
+                        anchorWidth = cx / EmuPerPixel;
                     }
                     if (long.TryParse(ext.Attribute("cy")?.Value, out var cy))
                     {
-                        anchorHeight = cy;
+                        anchorHeight = cy / EmuPerPixel;
                     }
                 }
             }
@@ -919,7 +921,7 @@ static class XlsxReader
     private static void ParseChartFromGraphicFrame(
         ZipArchive archive, XElement graphicFrame, Dictionary<string, string> drawingRelMap,
         string drawingDir, XNamespace rNs, XNamespace a,
-        Worksheet sheet, DrawingAnchorMode mode, CellAnchor from, CellAnchor? to, long width, long height)
+        Worksheet sheet, DrawingAnchorMode mode, CellAnchor from, CellAnchor? to, double width, double height)
     {
         // Look for <a:graphic><a:graphicData uri="...chart..."><c:chart r:id="..."/></a:graphicData></a:graphic>
         var graphic = graphicFrame.Element(a + "graphic");
@@ -1233,9 +1235,9 @@ static class XlsxReader
         return new CellAnchor
         {
             Column = int.Parse(col, System.Globalization.CultureInfo.InvariantCulture),
-            ColumnOffset = long.TryParse(colOff, out var co) ? co : 0,
+            ColumnOffset = long.TryParse(colOff, out var co) ? co / EmuPerPixel : 0,
             Row = int.Parse(row, System.Globalization.CultureInfo.InvariantCulture),
-            RowOffset = long.TryParse(rowOff, out var ro) ? ro : 0
+            RowOffset = long.TryParse(rowOff, out var ro) ? ro / EmuPerPixel : 0
         };
     }
 

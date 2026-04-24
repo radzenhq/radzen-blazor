@@ -60,14 +60,14 @@ public class SheetChart
     public CellAnchor? To { get; set; }
 
     /// <summary>
-    /// Gets or sets the chart width in EMU (OneCellAnchor only). 1 px = 9525 EMU at 96 DPI.
+    /// Gets or sets the chart width in pixels (OneCellAnchor only).
     /// </summary>
-    public long Width { get; set; }
+    public double Width { get; set; }
 
     /// <summary>
-    /// Gets or sets the chart height in EMU (OneCellAnchor only). 1 px = 9525 EMU at 96 DPI.
+    /// Gets or sets the chart height in pixels (OneCellAnchor only).
     /// </summary>
-    public long Height { get; set; }
+    public double Height { get; set; }
 
     /// <summary>
     /// Gets or sets the chart type.
