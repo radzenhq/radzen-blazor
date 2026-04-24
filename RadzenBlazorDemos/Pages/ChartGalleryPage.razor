@@ -849,7 +849,7 @@
 <RadzenRow Gap="2rem" RowGap="2rem" class="chart-gallery">
     @* Trendline Chart *@
     <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
-        <RadzenLink Path="/trendline-chart">
+        <RadzenLink Path="/chart-trends">
             <RadzenCard Variant="Variant.Text" class="rz-p-0">
                 <div class="chart-gallery-thumb">
                     <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trendline chart thumbnail">
@@ -1646,25 +1646,6 @@
                     </svg>
                 </div>
                 <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Interpolation</RadzenText>
-            </RadzenCard>
-        </RadzenLink>
-    </RadzenColumn>
-
-    @* Trends *@
-    <RadzenColumn Size="6" SizeMD="4" SizeLG="3">
-        <RadzenLink Path="/chart-trends">
-            <RadzenCard Variant="Variant.Text" class="rz-p-0">
-                <div class="chart-gallery-thumb">
-                    <svg viewBox="0 0 200 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trends chart thumbnail">
-                        <path opacity="0.3" d="M22 96H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
-                        <path opacity="0.3" d="M22 76H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
-                        <path opacity="0.3" d="M22 56H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
-                        <path opacity="0.3" d="M22 36H178" stroke="var(--rz-chart-axis-color)" stroke-linecap="round"/>
-                        <path d="M164 47C154.711 47 145 63 132 63C119 63 113 51 100 51C87 51 81 81 68 81C55 81 49 71 36 71" stroke="var(--rz-series-1)" stroke-width="3" stroke-linecap="round"/>
-                        <path d="M36 85L164 44" stroke="var(--rz-danger)" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 8"/>
-                    </svg>
-                </div>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4 rz-text-align-center">Trends</RadzenText>
             </RadzenCard>
         </RadzenLink>
     </RadzenColumn>
