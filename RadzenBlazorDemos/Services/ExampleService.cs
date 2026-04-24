@@ -2293,12 +2293,12 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
+                            Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Split tooltip", Anchor = "#split-tooltip" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
                             Name = "ToolTip",
                             Path = "chart-tooltip",
                             Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
-                            Description = "Blazor Chart tooltip shown on hover. Customize content or disable tooltips per series.",
-                            Tags = new [] { "chart", "graph", "legend" }
+                            Description = "Blazor Chart tooltip shown on hover. Customize content, enable split tooltip, or disable tooltips per series.",
+                            Tags = new [] { "chart", "graph", "legend", "split", "tooltip" }
                         },
                         new Example
                         {
@@ -2324,6 +2324,15 @@ namespace RadzenBlazorDemos
                             Title = "Blazor Chart - Annotations | Free UI Components by Radzen",
                             Description = "This example demonstrates RadzenSeriesAnnotation.",
                             Tags = new [] { "chart", "annotation", "label" }
+                        },
+                        new Example
+                        {
+                            Name = "Crosshair",
+                            Path = "chart-crosshair",
+                            Title = "Blazor Chart - Crosshair | Free UI Components by Radzen",
+                            Description = "Per-axis opt-in crosshair that snaps to the nearest data point (or follows the cursor) and optionally shows a label with the formatted axis value.",
+                            Tags = new [] { "chart", "crosshair", "hover" },
+                            New = true
                         },
                         new Example
                         {

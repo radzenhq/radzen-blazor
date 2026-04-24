@@ -695,6 +695,53 @@ namespace Radzen.Blazor
         double mouseX;
         double mouseY;
 
+        // Plot-area-local coordinates of the nearest data point under the cursor. Used by the
+        // crosshair overlay so the vertical line snaps to the category X of the closest series point.
+        internal double SnapPlotX { get; private set; } = -1;
+        internal double SnapPlotY { get; private set; } = -1;
+
+        // True while the cursor is over the chart plot area. Drives crosshair visibility.
+        internal bool MouseInside { get; private set; }
+
+        // The series whose data point is currently nearest to the cursor (within tooltip tolerance).
+        // Used to resolve which value axis owns the horizontal crosshair line in multi-axis charts.
+        internal IChartSeries? HoveredSeries { get; private set; }
+
+        internal List<(IChartSeries Series, object Data, Point Point)>? SharedPointsAtSnap { get; private set; }
+
+        // Nearest data-point X across all visible series, in plot-local pixels. Used by the X crosshair
+        // when Snap=true. CartesianSeries.DataAt iterates all items and picks the closest by X with no
+        // tolerance, so this works even when the cursor is far from any series.
+        private double? NearestDataPointX(double plotLocalCursorX, double plotLocalCursorY)
+        {
+            double bestDistance = double.MaxValue;
+            double? bestX = null;
+            foreach (var series in Series)
+            {
+                if (!series.Visible) continue;
+                var (data, point) = series.DataAt(plotLocalCursorX, plotLocalCursorY);
+                if (data == null) continue;
+                var distance = Math.Abs(point.X - plotLocalCursorX);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestX = point.X;
+                }
+            }
+            return bestX;
+        }
+
+        private bool AnyAxisCrosshairVisible()
+        {
+            if (CategoryAxis?.Crosshair?.Visible == true) return true;
+            if (ValueAxis?.Crosshair?.Visible == true) return true;
+            foreach (var axis in AdditionalValueAxes.Values)
+            {
+                if (axis.Crosshair?.Visible == true) return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Invoked via interop when the user moves the mouse over the RadzenChart. Displays the tooltip.
         /// </summary>
@@ -705,6 +752,35 @@ namespace Radzen.Blazor
         {
             mouseX = x;
             mouseY = y;
+
+            var crosshairOrSplit = AnyAxisCrosshairVisible() || (Tooltip != null && Tooltip.Split);
+
+            // JS sends (-1, -1) on mouseleave. Clear hover state and re-render to hide the crosshair.
+            if (x < 0 && y < 0)
+            {
+                if (MouseInside || SnapPlotX >= 0 || SnapPlotY >= 0)
+                {
+                    MouseInside = false;
+                    SnapPlotX = -1;
+                    SnapPlotY = -1;
+                    HoveredSeries = null;
+                    SharedPointsAtSnap = null;
+                    if (crosshairOrSplit)
+                    {
+                        StateHasChanged();
+                    }
+                }
+            }
+            else
+            {
+                MouseInside = true;
+                // The crosshair follows the cursor even when no data point is in tooltip range,
+                // so re-render on every move when the feature is enabled.
+                if (crosshairOrSplit)
+                {
+                    StateHasChanged();
+                }
+            }
 
             await DisplayTooltip();
         }
@@ -878,18 +954,67 @@ namespace Radzen.Blazor
 
                 if (closestSeriesData != null && closestSeries != null)
                 {
+                    var snap = closestSeries.GetTooltipPosition(closestSeriesData);
+                    var snapChanged = SnapPlotX != snap.X || SnapPlotY != snap.Y || !ReferenceEquals(HoveredSeries, closestSeries);
+                    SnapPlotX = snap.X;
+                    SnapPlotY = snap.Y;
+                    HoveredSeries = closestSeries;
+
+                    if (Tooltip.Split)
+                    {
+                        // Collect all visible series' nearest points at the snapped X so the split
+                        // overlay can render a small tooltip per series anchored to its own Y.
+                        var list = new List<(IChartSeries Series, object Data, Point Point)>();
+                        foreach (var series in Series.OrderBy(s => s.RenderingOrder))
+                        {
+                            if (!series.Visible) continue;
+                            var (d, p) = series.DataAt(SnapPlotX, SnapPlotY);
+                            if (d != null)
+                            {
+                                list.Add((series, d, series.GetTooltipPosition(d)));
+                            }
+                        }
+                        SharedPointsAtSnap = list;
+                    }
+                    else
+                    {
+                        SharedPointsAtSnap = null;
+                    }
+
                     if (closestSeriesData != tooltipData)
                     {
                         tooltipData = closestSeriesData;
                         tooltip = closestSeries.RenderTooltip(closestSeriesData);
-                        var tooltipPosition = closestSeries.GetTooltipPosition(closestSeriesData);
-                        TooltipService?.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+
+                        // Split mode draws its own in-chart overlay — don't also open the popup tooltip.
+                        if (!Tooltip.Split)
                         {
-                            ColorScheme = ColorScheme
-                        });
+                            TooltipService?.OpenChartTooltip(Element, snap.X + MarginLeft, snap.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+                            {
+                                ColorScheme = ColorScheme
+                            });
+                        }
                         await Task.Yield();
                     }
+
+                    if (snapChanged && (AnyAxisCrosshairVisible() || Tooltip.Split))
+                    {
+                        StateHasChanged();
+                    }
                     return;
+                }
+            }
+
+            if (SnapPlotX >= 0 || SnapPlotY >= 0)
+            {
+                var crosshairOrSplit = AnyAxisCrosshairVisible() || Tooltip.Split;
+                SnapPlotX = -1;
+                SnapPlotY = -1;
+                HoveredSeries = null;
+                SharedPointsAtSnap = null;
+                if (crosshairOrSplit)
+                {
+                    StateHasChanged();
                 }
             }
 
@@ -1137,5 +1262,331 @@ namespace Radzen.Blazor
 
             return css;
         }
+
+        internal RenderFragment RenderCrosshair()
+        {
+            return builder =>
+            {
+                if (!MouseInside || Tooltip == null || !Tooltip.Visible)
+                {
+                    return;
+                }
+
+                if (!Width.HasValue || !Height.HasValue)
+                {
+                    return;
+                }
+
+                var plotWidth = Width.Value - MarginLeft - MarginRight;
+                var plotHeight = Height.Value - MarginTop - MarginBottom;
+                if (plotWidth <= 0 || plotHeight <= 0)
+                {
+                    return;
+                }
+
+                var categoryCrosshair = CategoryAxis?.Crosshair;
+                var hoveredValueAxis = GetValueAxis((HoveredSeries as IChartValueAxisSeries)?.ValueAxisName);
+                var hoveredValueScale = GetValueScale((HoveredSeries as IChartValueAxisSeries)?.ValueAxisName);
+                var valueCrosshair = hoveredValueAxis?.Crosshair;
+
+                var snapX = categoryCrosshair?.Snap ?? true;
+                var queryX = mouseX - MarginLeft;
+                var queryY = mouseY - MarginTop;
+                double lineX = snapX ? (NearestDataPointX(queryX, queryY) ?? queryX) : queryX;
+                var lineY = queryY;
+
+                var showX = categoryCrosshair?.Visible == true && lineX >= 0 && lineX <= plotWidth;
+                var showY = valueCrosshair?.Visible == true && lineY >= 0 && lineY <= plotHeight;
+
+                if (!showX && !showY)
+                {
+                    return;
+                }
+
+                builder.OpenElement(0, "g");
+                builder.AddAttribute(1, "class", "rz-chart-crosshair");
+                builder.AddAttribute(2, "pointer-events", "none");
+
+                if (showX && categoryCrosshair != null)
+                {
+                    RenderCrosshairLine(builder, 3, categoryCrosshair,
+                        x1: lineX, x2: lineX, y1: 0, y2: plotHeight);
+
+                    if (categoryCrosshair.Label && CategoryAxis != null)
+                    {
+                        var raw = PixelToValue(CategoryScale, lineX);
+                        var text = CategoryAxis.Format(CategoryScale, raw);
+                        RenderAxisCrosshairLabel(builder, 4, text,
+                            anchorX: lineX, anchorY: plotHeight,
+                            placement: AxisCrosshairLabelPlacement.Bottom);
+                    }
+                }
+
+                if (showY && valueCrosshair != null && hoveredValueAxis != null)
+                {
+                    RenderCrosshairLine(builder, 5, valueCrosshair,
+                        x1: 0, x2: plotWidth, y1: lineY, y2: lineY);
+
+                    if (valueCrosshair.Label)
+                    {
+                        var raw = PixelToValue(hoveredValueScale, lineY);
+                        var text = hoveredValueAxis.Format(hoveredValueScale, raw);
+                        RenderAxisCrosshairLabel(builder, 6, text,
+                            anchorX: 0, anchorY: lineY,
+                            placement: AxisCrosshairLabelPlacement.Left);
+                    }
+                }
+
+                builder.CloseElement();
+            };
+        }
+
+        // Inverse of ScaleBase.Scale(value, padding: true) for plot-local pixel -> input value.
+        // The padded variant is what the chart uses everywhere (ComposeCategory/ComposeValue, TooltipX/Y),
+        // so this matches the actual rendered position of data points and gridlines. Handles linear and
+        // logarithmic scales. Categorical-string axes use a numeric index; the label shows the index.
+        private static object PixelToValue(ScaleBase scale, double plotLocalPixel)
+        {
+            var outputDelta = scale.Output.End - scale.Output.Start;
+            var size = Math.Abs(outputDelta);
+            if (size == 0)
+            {
+                return scale.Input.Start;
+            }
+            var paddedSize = size - scale.Padding * 2;
+            if (paddedSize <= 0)
+            {
+                return scale.Input.Start;
+            }
+            var t = (plotLocalPixel - scale.Padding) / paddedSize;
+            if (t < 0) t = 0;
+            else if (t > 1) t = 1;
+            if (outputDelta < 0) t = 1 - t;
+            if (scale.IsLogarithmic && scale.Input.Start > 0 && scale.Input.End > 0)
+            {
+                var logMin = Math.Log(scale.Input.Start);
+                var logMax = Math.Log(scale.Input.End);
+                return Math.Exp(logMin + t * (logMax - logMin));
+            }
+            return scale.Input.Start + t * (scale.Input.End - scale.Input.Start);
+        }
+
+        private static void RenderCrosshairLine(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, int seqBase,
+            RadzenAxisCrosshair config, double x1, double x2, double y1, double y2)
+        {
+            var stroke = config.Stroke ?? "var(--rz-chart-crosshair-color, var(--rz-chart-axis-color, rgba(0,0,0,0.5)))";
+            var width = config.StrokeWidth;
+            string? dashArray = config.LineType switch
+            {
+                LineType.Dashed => $"{(width * 3).ToInvariantString()} {(width * 3).ToInvariantString()}",
+                LineType.Dotted => $"0 {(width * 2).ToInvariantString()}",
+                _ => null,
+            };
+            var lineCap = config.LineType == LineType.Dotted ? "round" : null;
+
+            builder.OpenRegion(seqBase);
+            builder.OpenElement(0, "line");
+            builder.AddAttribute(1, "x1", x1.ToInvariantString());
+            builder.AddAttribute(2, "x2", x2.ToInvariantString());
+            builder.AddAttribute(3, "y1", y1.ToInvariantString());
+            builder.AddAttribute(4, "y2", y2.ToInvariantString());
+            builder.AddAttribute(5, "stroke", stroke);
+            builder.AddAttribute(6, "stroke-width", width.ToInvariantString());
+            if (dashArray != null)
+            {
+                builder.AddAttribute(7, "stroke-dasharray", dashArray);
+            }
+            if (lineCap != null)
+            {
+                builder.AddAttribute(8, "stroke-linecap", lineCap);
+            }
+            builder.CloseElement();
+            builder.CloseRegion();
+        }
+
+        private enum AxisCrosshairLabelPlacement { Bottom, Left }
+
+        private static void RenderAxisCrosshairLabel(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, int seqBase,
+            string text, double anchorX, double anchorY, AxisCrosshairLabelPlacement placement)
+        {
+            var paddingX = 6.0;
+            var charWidth = 6.5;
+            var textWidth = (text?.Length ?? 0) * charWidth;
+            var boxWidth = textWidth + paddingX * 2;
+            var boxHeight = 16.0;
+
+            double rectX, rectY, textX, textY;
+            switch (placement)
+            {
+                case AxisCrosshairLabelPlacement.Bottom:
+                    rectX = anchorX - boxWidth / 2;
+                    rectY = anchorY + 4;
+                    textX = anchorX;
+                    textY = rectY + boxHeight / 2;
+                    break;
+                case AxisCrosshairLabelPlacement.Left:
+                default:
+                    rectX = -boxWidth - 4;
+                    rectY = anchorY - boxHeight / 2;
+                    textX = rectX + boxWidth - paddingX;
+                    textY = rectY + boxHeight / 2;
+                    break;
+            }
+
+            builder.OpenRegion(seqBase);
+            builder.OpenElement(0, "g");
+            builder.AddAttribute(1, "class", "rz-chart-axis-crosshair-label");
+            builder.AddAttribute(2, "pointer-events", "none");
+
+            builder.OpenElement(3, "rect");
+            builder.AddAttribute(4, "x", rectX.ToInvariantString());
+            builder.AddAttribute(5, "y", rectY.ToInvariantString());
+            builder.AddAttribute(6, "width", boxWidth.ToInvariantString());
+            builder.AddAttribute(7, "height", boxHeight.ToInvariantString());
+            builder.AddAttribute(8, "rx", "2");
+            builder.AddAttribute(9, "ry", "2");
+            builder.CloseElement();
+
+            builder.OpenElement(10, "text");
+            builder.AddAttribute(11, "x", textX.ToInvariantString());
+            builder.AddAttribute(12, "y", textY.ToInvariantString());
+            builder.AddAttribute(13, "text-anchor", placement == AxisCrosshairLabelPlacement.Bottom ? "middle" : "end");
+            builder.AddContent(14, text);
+            builder.CloseElement();
+
+            builder.CloseElement();
+            builder.CloseRegion();
+        }
+
+        internal RenderFragment RenderSplitTooltip()
+        {
+            return builder =>
+            {
+                if (!MouseInside || Tooltip == null || !Tooltip.Split || !Tooltip.Visible)
+                {
+                    return;
+                }
+
+                var points = SharedPointsAtSnap;
+                if (points == null || points.Count == 0)
+                {
+                    return;
+                }
+
+                if (!Width.HasValue || !Height.HasValue)
+                {
+                    return;
+                }
+
+                var plotWidth = Width.Value - MarginLeft - MarginRight;
+                var plotHeight = Height.Value - MarginTop - MarginBottom;
+                if (plotWidth <= 0 || plotHeight <= 0)
+                {
+                    return;
+                }
+
+                const double estTooltipHeight = 64;
+                const double gap = 10;
+                const double minVerticalGap = 6;
+                var topLimit = MarginTop;
+                var bottomLimit = MarginTop + plotHeight - estTooltipHeight;
+
+                // For each series, resolve the preferred anchor (right of the data point by default,
+                // flipped left if the expected content would spill off the plot). Content sizes itself
+                // via CSS; we only control the container's top/left.
+                var placements = new List<(IChartSeries Series, object Data, double AnchorX, double AnchorY, bool RightSide)>();
+                foreach (var entry in points)
+                {
+                    // entry.Point is in plot-local coords. Convert to chart-relative by adding margins.
+                    var anchorX = entry.Point.X + MarginLeft;
+                    var anchorY = entry.Point.Y + MarginTop;
+                    var rightSide = anchorX + gap + 180 <= MarginLeft + plotWidth;
+                    placements.Add((entry.Series, entry.Data, anchorX, anchorY, rightSide));
+                }
+
+                var adjustedAnchorY = new double[placements.Count];
+
+                // Resolve collisions per side independently, sliding the whole stack up if it overflows the bottom.
+                foreach (var side in new[] { true, false })
+                {
+                    var indices = Enumerable.Range(0, placements.Count)
+                        .Where(i => placements[i].RightSide == side)
+                        .OrderBy(i => placements[i].AnchorY)
+                        .ToList();
+                    if (indices.Count == 0) continue;
+
+                    // Initial Y positions (cursor anchored to data point).
+                    var ys = indices.Select(i => placements[i].AnchorY).ToArray();
+
+                    // Step 1: push each tooltip down so it doesn't overlap the previous one.
+                    for (var k = 1; k < ys.Length; k++)
+                    {
+                        var minY = ys[k - 1] + estTooltipHeight + minVerticalGap;
+                        if (ys[k] < minY) ys[k] = minY;
+                    }
+
+                    // Step 2: if the stack overflows the bottom, slide everything up.
+                    var bottomOverflow = ys[^1] - bottomLimit;
+                    if (bottomOverflow > 0)
+                    {
+                        for (var k = 0; k < ys.Length; k++) ys[k] -= bottomOverflow;
+                    }
+
+                    // Step 3: clamp top, then re-cascade in case the slide went above the top limit.
+                    if (ys[0] < topLimit) ys[0] = topLimit;
+                    for (var k = 1; k < ys.Length; k++)
+                    {
+                        var minY = ys[k - 1] + estTooltipHeight + minVerticalGap;
+                        if (ys[k] < minY) ys[k] = minY;
+                    }
+
+                    for (var k = 0; k < indices.Count; k++)
+                    {
+                        adjustedAnchorY[indices[k]] = ys[k];
+                    }
+                }
+
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "rz-chart-split-tooltip");
+                builder.AddAttribute(2, "style", "position: absolute; inset: 0; pointer-events: none; overflow: hidden;");
+
+                var seq = 3;
+                for (var i = 0; i < placements.Count; i++)
+                {
+                    var p = placements[i];
+                    var ty = adjustedAnchorY[i];
+
+                    // Position the container at (AnchorX ± gap, ty). For right-side, content flows left-to-right;
+                    // for left-side, we use right:<distance> instead of left so the content's right edge anchors near the data point.
+                    string positionStyle;
+                    if (p.RightSide)
+                    {
+                        var left = p.AnchorX + gap;
+                        positionStyle = $"left: {left.ToInvariantString()}px;";
+                    }
+                    else
+                    {
+                        // right = distance from chart's right edge to where the tooltip's right edge should sit.
+                        var right = Width!.Value - (p.AnchorX - gap);
+                        positionStyle = $"right: {right.ToInvariantString()}px;";
+                    }
+
+                    var borderSide = p.RightSide ? "border-left" : "border-right";
+
+                    builder.OpenElement(seq++, "div");
+                    builder.AddAttribute(seq++, "class", "rz-chart-split-tooltip-item");
+                    builder.AddAttribute(seq++, "style",
+                        $"position: absolute; top: {ty.ToInvariantString()}px; {positionStyle} " +
+                        $"{borderSide}: 3px solid {p.Series.Color}; pointer-events: none;");
+
+                    builder.AddContent(seq++, p.Series.RenderTooltip(p.Data));
+
+                    builder.CloseElement(); // tooltip item
+                }
+
+                builder.CloseElement(); // container div
+            };
+        }
+
     }
 }

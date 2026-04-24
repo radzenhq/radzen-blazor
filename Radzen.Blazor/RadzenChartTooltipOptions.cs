@@ -27,6 +27,12 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Shared { get; set; }
 
+        /// <summary>
+        /// Enable split tooltips — one small tooltip box per series, each anchored near its own data point at the snapped category X. Off by default.
+        /// </summary>
+        [Parameter]
+        public bool Split { get; set; }
+
         /// <inheritdoc />
         protected override void Initialize()
         {
@@ -39,7 +45,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override bool ShouldRefreshChart(ParameterView parameters)
         {
-            return parameters.DidParameterChange(nameof(Style), Style);
+            return parameters.DidParameterChange(nameof(Style), Style)
+                || parameters.DidParameterChange(nameof(Shared), Shared)
+                || parameters.DidParameterChange(nameof(Split), Split);
         }
     }
 }
