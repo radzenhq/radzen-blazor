@@ -1,0 +1,153 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenHtmlEditorButtonBase
+@inject DialogService DialogService
+
+<EditorButton Title=@Title Click=@OnClick Icon="table_chart" />
+
+@code {
+    protected override async Task OnClick()
+    {
+        if (Editor == null) return;
+
+        await Editor.SaveSelectionAsync();
+
+        Selection = await Editor.GetTableSelectionAsync();
+
+        var attributes = new HtmlEditorTableCommandArgs
+        {
+            Rows = Selection.InTable ? Math.Max(Selection.Rows, 1) : DefaultRows,
+            Columns = Selection.InTable ? Math.Max(Selection.Columns, 1) : DefaultColumns,
+            Width = Selection.InTable ? Selection.Width : DefaultWidth,
+            HeaderRow = Selection.InTable ? Selection.HeaderRow : DefaultHeaderRow,
+            Border = Selection.InTable ? Selection.Border : DefaultBorder,
+            ColumnWidth = Selection.ColumnWidth,
+            ColumnWidthPx = Selection.ColumnWidthPx,
+            CellBackground = Selection.CellBackground,
+            CellPadding = Selection.CellPadding,
+            CellPaddingPx = Selection.CellPaddingPx,
+            CellTextAlign = Selection.CellTextAlign,
+            CellVerticalAlign = Selection.CellVerticalAlign,
+            CellBorder = Selection.CellBorder,
+            BorderStyle = Selection.BorderStyle,
+            BorderWidthPx = Selection.BorderWidthPx,
+            BorderColor = Selection.BorderColor,
+            BorderTop = Selection.BorderTop,
+            BorderRight = Selection.BorderRight,
+            BorderBottom = Selection.BorderBottom,
+            BorderLeft = Selection.BorderLeft
+        };
+
+        var result = await DialogService.OpenAsync(Title, ds => @<div class="rz-html-editor-dialog">
+            <RadzenTemplateForm TItem="HtmlEditorTableCommandArgs" Data="@attributes" Submit="OnSubmit">
+                <div class="rz-html-editor-dialog-item">
+                    <label>@RowsText</label>
+                    <RadzenNumeric @bind-Value=@attributes.Rows TValue="int" Min="1" Style="width: 100%" />
+                </div>
+                <div class="rz-html-editor-dialog-item">
+                    <label>@ColumnsText</label>
+                    <RadzenNumeric @bind-Value=@attributes.Columns TValue="int" Min="1" Style="width: 100%" />
+                </div>
+                <div class="rz-html-editor-dialog-item">
+                    <label>@WidthText</label>
+                    <RadzenTextBox @bind-Value=@attributes.Width Style="width: 100%" />
+                </div>
+                <div class="rz-html-editor-dialog-item">
+                    <label>@BorderText</label>
+                    <RadzenNumeric @bind-Value=@attributes.Border TValue="int" Min="0" Style="width: 100%" />
+                </div>
+                <div class="rz-html-editor-dialog-item">
+                    <RadzenCheckBox @bind-Value=@attributes.HeaderRow TValue="bool" />
+                    <label>@HeaderRowText</label>
+                </div>
+                @if (Selection.InTable)
+                {
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@ColumnWidthPxText</label>
+                        <RadzenNumeric @bind-Value=@attributes.ColumnWidthPx TValue="int?" Min="24" Style="width: 100%" />
+                    </div>
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@CellBackgroundText</label>
+                        <RadzenColorPicker @bind-Value=@attributes.CellBackground Style="width: 100%" ShowButton="false" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </div>
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@CellPaddingPxText</label>
+                        <RadzenNumeric @bind-Value=@attributes.CellPaddingPx TValue="int?" Min="0" Style="width: 100%" />
+                    </div>
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@CellTextAlignText</label>
+                        <RadzenDropDown @bind-Value=@attributes.CellTextAlign Data=@TextAlignOptions Style="width: 100%" />
+                    </div>
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@CellVerticalAlignText</label>
+                        <RadzenDropDown @bind-Value=@attributes.CellVerticalAlign Data=@VerticalAlignOptions Style="width: 100%" />
+                    </div>
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@BorderStyleText</label>
+                        <RadzenDropDown @bind-Value=@attributes.BorderStyle Data=@BorderStyleOptions Style="width: 100%" />
+                    </div>
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@BorderWidthPxText</label>
+                        <RadzenNumeric @bind-Value=@attributes.BorderWidthPx TValue="int?" Min="0" Style="width: 100%" />
+                    </div>
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@BorderColorText</label>
+                        <RadzenColorPicker @bind-Value=@attributes.BorderColor Style="width: 100%" ShowButton="false" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </div>
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@CellBorderText</label>
+                        <div class="rz-html-editor-table-actions">
+                            <div><RadzenCheckBox @bind-Value=@attributes.BorderTop TValue="bool" /> <label>@BorderTopText</label></div>
+                            <div><RadzenCheckBox @bind-Value=@attributes.BorderRight TValue="bool" /> <label>@BorderRightText</label></div>
+                            <div><RadzenCheckBox @bind-Value=@attributes.BorderBottom TValue="bool" /> <label>@BorderBottomText</label></div>
+                            <div><RadzenCheckBox @bind-Value=@attributes.BorderLeft TValue="bool" /> <label>@BorderLeftText</label></div>
+                        </div>
+                    </div>
+                }
+                @if (Selection.InTable)
+                {
+                    <div class="rz-html-editor-dialog-item">
+                        <label>@EditText</label>
+                        <div class="rz-html-editor-table-actions">
+                            <RadzenButton Text=@InsertRowAboveText Click=@(() => ExecuteTableAction(ds, "addRowBefore")) ButtonStyle="ButtonStyle.Secondary" />
+                            <RadzenButton Text=@InsertRowBelowText Click=@(() => ExecuteTableAction(ds, "addRowAfter")) ButtonStyle="ButtonStyle.Secondary" />
+                            <RadzenButton Text=@InsertColumnLeftText Click=@(() => ExecuteTableAction(ds, "addColumnBefore")) ButtonStyle="ButtonStyle.Secondary" />
+                            <RadzenButton Text=@InsertColumnRightText Click=@(() => ExecuteTableAction(ds, "addColumnAfter")) ButtonStyle="ButtonStyle.Secondary" />
+                            <RadzenButton Text=@DeleteRowText Click=@(() => ExecuteTableAction(ds, "deleteRow")) ButtonStyle="ButtonStyle.Secondary" />
+                            <RadzenButton Text=@DeleteColumnText Click=@(() => ExecuteTableAction(ds, "deleteColumn")) ButtonStyle="ButtonStyle.Secondary" />
+                            <RadzenButton Text=@MergeRightText Click=@(() => ExecuteTableAction(ds, "mergeCellRight")) ButtonStyle="ButtonStyle.Secondary" Disabled=@(!Selection.CanMergeRight) />
+                            <RadzenButton Text=@MergeDownText Click=@(() => ExecuteTableAction(ds, "mergeCellDown")) ButtonStyle="ButtonStyle.Secondary" Disabled=@(!Selection.CanMergeDown) />
+                            <RadzenButton Text=@SplitCellText Click=@(() => ExecuteTableAction(ds, "splitCell")) ButtonStyle="ButtonStyle.Secondary" Disabled=@(!Selection.CanSplit) />
+                            <RadzenButton Text=@DeleteTableText Click=@(() => ExecuteTableAction(ds, "deleteTable")) ButtonStyle="ButtonStyle.Danger" />
+                        </div>
+                    </div>
+                }
+                <div class="rz-html-editor-dialog-buttons">
+                    <RadzenButton Text="@(Selection.InTable ? UpdateText : OkText)" ButtonType="ButtonType.Submit" />
+                    <RadzenButton Text=@CancelText Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                </div>
+            </RadzenTemplateForm>
+        </div>);
+
+        if (result == true)
+        {
+            if (Selection.InTable)
+            {
+                await UpdateTable(attributes);
+            }
+            else
+            {
+                await InsertHtml(attributes);
+            }
+        }
+        else
+        {
+            await Editor.RestoreSelectionAsync();
+        }
+    }
+
+    async Task ExecuteTableAction(dynamic ds, string command)
+    {
+        await ExecuteTableCommand(command);
+        ds.Close(false);
+    }
+}

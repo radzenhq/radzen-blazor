@@ -90,5 +90,15 @@ namespace Radzen.Blazor
         /// Gets or sets the current HTML content of the editor.
         /// </summary>
         public string? Html { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the last command completed successfully.
+        /// </summary>
+        public bool Success { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets an optional message for the last command result.
+        /// </summary>
+        public string? Message { get; set; }
     }
 }
