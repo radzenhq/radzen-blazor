@@ -34,8 +34,10 @@
                         @series.RenderOverlays(CategoryScale, vs);
                     }
                 }
+                @RenderCrosshair()
             </g>
         </svg>
+        @RenderSplitTooltip()
         @if ((AllowZoom || AllowPan) && (ZoomStart > 0 || ZoomEnd < 1))
         {
             <div class="rz-chart-scrollbar" style="bottom: @(scrollbarBottom.ToInvariantString())px; left: @(MarginLeft.ToInvariantString())px; right: @(MarginRight.ToInvariantString())px;">

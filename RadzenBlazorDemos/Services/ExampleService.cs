@@ -2303,6 +2303,15 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Crosshair & Split Tooltip",
+                            Path = "chart-crosshair",
+                            Title = "Blazor Chart - Crosshair & Split Tooltip | Free UI Components by Radzen",
+                            Description = "Opt-in crosshair that follows the cursor and an optional split tooltip (one small box per series at the snapped category), similar to Highcharts.",
+                            Tags = new [] { "chart", "crosshair", "split", "tooltip", "hover", "highcharts" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Styling Chart",
                             Path = "styling-chart",
                             Title = "Blazor Chart - Styling | Free UI Components by Radzen",
