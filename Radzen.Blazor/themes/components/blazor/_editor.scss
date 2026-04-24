@@ -33,6 +33,13 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   padding: 0.5rem;
   outline: none;
   background-color: var(--rz-editor-content-background-color);
+
+  td.rz-html-editor-cell-selected,
+  th.rz-html-editor-cell-selected {
+    outline: 2px solid var(--rz-primary);
+    outline-offset: -2px;
+    background-color: color-mix(in srgb, var(--rz-primary) 12%, transparent);
+  }
 }
 
 .rz-html-editor-source.rz-textarea {
@@ -203,6 +210,12 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 .rz-html-editor-dialog-buttons {
   text-align: right;
+}
+
+.rz-html-editor-table-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .rz-html-editor-separator {
