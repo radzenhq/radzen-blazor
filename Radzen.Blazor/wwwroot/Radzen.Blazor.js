@@ -2929,16 +2929,7 @@ window.Radzen = {
 
     return html;
   },
-  getTableContext: function (ref) {
-    var selection = getSelection();
-    var range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-    var node = selection && selection.focusNode ? selection.focusNode : range && range.commonAncestorContainer;
-
-    if (!node) {
-      return {};
-    }
-
-    var element = node.nodeType === 3 ? node.parentElement : node;
+  buildTableContext: function (ref, element) {
     if (!element || !ref.contains(element)) {
       return {};
     }
@@ -2969,6 +2960,17 @@ window.Radzen = {
       rowIndex: rowIndex,
       columnIndex: Array.prototype.indexOf.call(row.children, cell)
     };
+  },
+  getTableContext: function (ref) {
+    var selection = getSelection();
+    var range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+    var node = selection && selection.focusNode ? selection.focusNode : range && range.commonAncestorContainer;
+
+    if (!node) {
+      return {};
+    }
+
+    return this.buildTableContext(ref, node.nodeType === 3 ? node.parentElement : node);
   },
   getCellMatrix: function (section) {
     var matrix = [];
@@ -3003,13 +3005,79 @@ window.Radzen = {
           }
         }
 
-        cell._rzColumnIndex = columnIndex;
-        cell._rzRowIndex = rowIndex;
         columnIndex += colSpan;
       }
     }
 
     return matrix;
+  },
+  getCellPosition: function (section, cell, matrix) {
+    matrix = matrix || this.getCellMatrix(section);
+
+    for (var rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
+      for (var columnIndex = 0; columnIndex < (matrix[rowIndex] || []).length; columnIndex++) {
+        if (matrix[rowIndex][columnIndex] === cell) {
+          return { rowIndex: rowIndex, columnIndex: columnIndex };
+        }
+      }
+    }
+
+    return { rowIndex: -1, columnIndex: -1 };
+  },
+  clearSelectedTableCells: function (ref) {
+    if (!ref) {
+      return;
+    }
+
+    Array.prototype.forEach.call(ref.querySelectorAll('td.rz-html-editor-cell-selected,th.rz-html-editor-cell-selected'), function (cell) {
+      cell.classList.remove('rz-html-editor-cell-selected');
+    });
+  },
+  getSelectedTableCells: function (ref) {
+    if (!ref) {
+      return [];
+    }
+
+    return Array.prototype.filter.call(ref.querySelectorAll('td.rz-html-editor-cell-selected,th.rz-html-editor-cell-selected'), function (cell) {
+      return ref.contains(cell);
+    });
+  },
+  selectTableCellRange: function (ref, startCell, endCell) {
+    if (!ref || !startCell || !endCell) {
+      return false;
+    }
+
+    var startSection = startCell.parentElement ? startCell.parentElement.parentElement : null;
+    var endSection = endCell.parentElement ? endCell.parentElement.parentElement : null;
+
+    if (!startSection || startSection !== endSection) {
+      return false;
+    }
+
+    var matrix = this.getCellMatrix(startSection);
+    var start = this.getCellPosition(startSection, startCell, matrix);
+    var end = this.getCellPosition(startSection, endCell, matrix);
+
+    if (start.rowIndex < 0 || start.columnIndex < 0 || end.rowIndex < 0 || end.columnIndex < 0) {
+      return false;
+    }
+
+    var minRow = Math.min(start.rowIndex, end.rowIndex);
+    var maxRow = Math.max(start.rowIndex, end.rowIndex);
+    var minColumn = Math.min(start.columnIndex, end.columnIndex);
+    var maxColumn = Math.max(start.columnIndex, end.columnIndex);
+    this.clearSelectedTableCells(ref);
+
+    for (var rowIndex = minRow; rowIndex <= maxRow; rowIndex++) {
+      for (var columnIndex = minColumn; columnIndex <= maxColumn; columnIndex++) {
+        var cell = (matrix[rowIndex] || [])[columnIndex];
+        if (cell) {
+          cell.classList.add('rz-html-editor-cell-selected');
+        }
+      }
+    }
+
+    return true;
   },
   getSelectedCellBounds: function (ref, section) {
     var selectedCells = this.getSelectedTableCells(ref);
@@ -3024,8 +3092,13 @@ window.Radzen = {
     var maxColumn = -1;
 
     selectedCells.forEach(function (selectedCell) {
-      var rowIndex = typeof selectedCell._rzRowIndex === 'number' ? selectedCell._rzRowIndex : (selectedCell.parentElement ? selectedCell.parentElement.sectionRowIndex : -1);
-      var columnIndex = typeof selectedCell._rzColumnIndex === 'number' ? selectedCell._rzColumnIndex : (selectedCell.parentElement ? Array.prototype.indexOf.call(selectedCell.parentElement.children, selectedCell) : -1);
+      var position = Radzen.getCellPosition(section, selectedCell, matrix);
+      var rowIndex = position.rowIndex;
+      var columnIndex = position.columnIndex;
+      if (rowIndex < 0 || columnIndex < 0) {
+        return;
+      }
+
       var rowSpan = Math.max(parseInt(selectedCell.getAttribute('rowspan') || 1, 10) || 1, 1);
       var colSpan = Math.max(parseInt(selectedCell.getAttribute('colspan') || 1, 10) || 1, 1);
 
@@ -3034,6 +3107,10 @@ window.Radzen = {
       minColumn = Math.min(minColumn, columnIndex);
       maxColumn = Math.max(maxColumn, columnIndex + colSpan - 1);
     });
+
+    if (minRow === Number.MAX_SAFE_INTEGER || minColumn === Number.MAX_SAFE_INTEGER) {
+      return null;
+    }
 
     for (var rowIndex = minRow; rowIndex <= maxRow; rowIndex++) {
       for (var columnIndex = minColumn; columnIndex <= maxColumn; columnIndex++) {
@@ -3052,6 +3129,96 @@ window.Radzen = {
       minColumn: minColumn,
       maxColumn: maxColumn
     };
+  },
+  copySelectedTableCells: function (ref) {
+    var cells = this.getSelectedTableCells(ref);
+    if (!cells.length) {
+      return false;
+    }
+
+    var section = cells[0].parentElement ? cells[0].parentElement.parentElement : null;
+    var bounds = this.getSelectedCellBounds(ref, section);
+    if (!bounds) {
+      return false;
+    }
+
+    var copiedMatrix = [];
+    for (var rowIndex = bounds.minRow; rowIndex <= bounds.maxRow; rowIndex++) {
+      copiedMatrix.push([]);
+      for (var columnIndex = bounds.minColumn; columnIndex <= bounds.maxColumn; columnIndex++) {
+        var cell = (bounds.matrix[rowIndex] || [])[columnIndex];
+        copiedMatrix[copiedMatrix.length - 1].push(bounds.selectedCells.indexOf(cell) > -1 && cell ? cell.outerHTML : null);
+      }
+    }
+
+    ref.copiedCells = {
+      matrix: copiedMatrix,
+      rows: copiedMatrix.length,
+      columns: copiedMatrix.length ? copiedMatrix[0].length : 0
+    };
+
+    return true;
+  },
+  pasteSelectedTableCells: function (ref, targetCell) {
+    if (!ref || !ref.copiedCells || !ref.copiedCells.matrix || !targetCell || !targetCell.parentElement) {
+      return false;
+    }
+
+    var section = targetCell.parentElement.parentElement;
+    var matrix = this.getCellMatrix(section);
+    var position = this.getCellPosition(section, targetCell, matrix);
+    var startRow = position.rowIndex;
+    var startColumn = position.columnIndex;
+
+    if (startRow < 0 || startColumn < 0) {
+      return false;
+    }
+
+    for (var guardRowOffset = 0; guardRowOffset < ref.copiedCells.rows; guardRowOffset++) {
+      for (var guardColumnOffset = 0; guardColumnOffset < ref.copiedCells.columns; guardColumnOffset++) {
+        var guardCell = (matrix[startRow + guardRowOffset] || [])[startColumn + guardColumnOffset];
+        if (guardCell) {
+          var guardCellPosition = this.getCellPosition(section, guardCell, matrix);
+          var guardRowSpan = Math.max(parseInt(guardCell.getAttribute('rowspan') || 1, 10) || 1, 1);
+          var guardColSpan = Math.max(parseInt(guardCell.getAttribute('colspan') || 1, 10) || 1, 1);
+          if ((guardRowSpan > 1 || guardColSpan > 1) && (guardCellPosition.rowIndex !== startRow + guardRowOffset || guardCellPosition.columnIndex !== startColumn + guardColumnOffset)) {
+            return false;
+          }
+        }
+      }
+    }
+
+    for (var rowOffset = 0; rowOffset < ref.copiedCells.rows; rowOffset++) {
+      var targetRow = section.rows[startRow + rowOffset];
+      if (!targetRow) {
+        if (section.tagName === 'TBODY') {
+          targetRow = section.insertRow();
+        } else {
+          return false;
+        }
+      }
+
+      for (var columnOffset = 0; columnOffset < ref.copiedCells.columns; columnOffset++) {
+        var target = (this.getCellMatrix(section)[startRow + rowOffset] || [])[startColumn + columnOffset];
+        if (!target) {
+          target = document.createElement(targetCell.tagName.toLowerCase());
+          target.innerHTML = '&nbsp;';
+          targetRow.appendChild(target);
+        }
+
+        var html = ref.copiedCells.matrix[rowOffset][columnOffset];
+        if (html) {
+          var template = document.createElement('template');
+          template.innerHTML = html.trim();
+          var sourceCell = template.content.firstElementChild;
+          if (sourceCell) {
+            target.innerHTML = sourceCell.innerHTML;
+          }
+        }
+      }
+    }
+
+    return true;
   },
   createCommandResult: function (ref, success, message) {
     var result = this.queryCommands(ref);
@@ -3072,37 +3239,7 @@ window.Radzen = {
       return this.getTableContext(ref);
     }
 
-    var element = target.nodeType === 3 ? target.parentElement : target;
-    if (!element || !ref.contains(element)) {
-      return {};
-    }
-
-    var cell = element.closest('td,th');
-    var table = element.closest('table');
-
-    if (!cell || !table || !ref.contains(table)) {
-      return { table: table };
-    }
-
-    var row = cell.parentElement;
-    var tbody = table.tBodies && table.tBodies.length ? table.tBodies[0] : null;
-    var thead = table.tHead;
-    var rowIndex = -1;
-
-    if (tbody && tbody.contains(row)) {
-      rowIndex = Array.prototype.indexOf.call(tbody.rows, row);
-    }
-
-    return {
-      table: table,
-      cell: cell,
-      row: row,
-      tbody: tbody,
-      thead: thead,
-      inHeader: !!(thead && thead.contains(cell)),
-      rowIndex: rowIndex,
-      columnIndex: Array.prototype.indexOf.call(row.children, cell)
-    };
+    return this.buildTableContext(ref, target.nodeType === 3 ? target.parentElement : target);
   },
   getTableSelectionFromContext: function (ref, context) {
     var table = context.table;
@@ -3114,8 +3251,9 @@ window.Radzen = {
     var cell = context.cell;
     var section = context.inHeader && table.tHead ? table.tHead : (context.row ? context.row.parentElement : (table.tBodies[0] || table));
     var matrix = this.getCellMatrix(section);
-    var rowIndex = cell && typeof cell._rzRowIndex === 'number' ? cell._rzRowIndex : (context.row ? context.row.sectionRowIndex : -1);
-    var columnIndex = cell && typeof cell._rzColumnIndex === 'number' ? cell._rzColumnIndex : context.columnIndex;
+    var position = cell ? this.getCellPosition(section, cell, matrix) : { rowIndex: -1, columnIndex: context.columnIndex };
+    var rowIndex = position.rowIndex;
+    var columnIndex = position.columnIndex;
     var colSpan = cell ? Math.max(parseInt(cell.getAttribute('colspan') || 1, 10) || 1, 1) : 1;
     var rowSpan = cell ? Math.max(parseInt(cell.getAttribute('rowspan') || 1, 10) || 1, 1) : 1;
     var rowCells = matrix[rowIndex] || [];
@@ -3168,7 +3306,17 @@ window.Radzen = {
       cellBackground: cellBackground,
       cellPadding: cellPadding,
       cellTextAlign: cellTextAlign,
-      cellVerticalAlign: cellVerticalAlign
+      cellVerticalAlign: cellVerticalAlign,
+      cellBorder: cellBorder,
+      columnWidthPx: columnWidthPx,
+      cellPaddingPx: cellPaddingPx,
+      borderStyle: borderStyle,
+      borderWidthPx: borderWidthPx,
+      borderColor: borderColor,
+      borderTop: borderTop,
+      borderRight: borderRight,
+      borderBottom: borderBottom,
+      borderLeft: borderLeft
     };
   },
   getTableSelection: function (ref) {
@@ -3188,338 +3336,341 @@ window.Radzen = {
         rowSpan: 1,
         canMergeRight: false,
         canMergeDown: false,
-        canSplit: false
+        canSplit: false,
+        columnWidth: null,
+        columnWidthPx: null,
+        cellBackground: null,
+        cellPadding: null,
+        cellPaddingPx: null,
+        cellTextAlign: null,
+        cellVerticalAlign: null,
+        cellBorder: null,
+        borderStyle: null,
+        borderWidthPx: null,
+        borderColor: null,
+        borderTop: false,
+        borderRight: false,
+        borderBottom: false,
+        borderLeft: false
       };
     }
 
     return this.getTableSelectionFromContext(ref, context);
+  },
+  ensureTableBody: function (table) {
+    if (!table.tBodies.length) {
+      table.appendChild(document.createElement('tbody'));
+    }
+    return table.tBodies[0];
+  },
+  getTableColumnCount: function (table) {
+    var firstRow = table.rows.length ? table.rows[0] : null;
+    return firstRow ? firstRow.children.length : 0;
+  },
+  createTableRow: function (columns, header) {
+    var tr = document.createElement('tr');
+    for (var i = 0; i < columns; i++) {
+      var element = document.createElement(header ? 'th' : 'td');
+      element.innerHTML = header ? 'Column ' + (i + 1) : '&nbsp;';
+      tr.appendChild(element);
+    }
+    return tr;
+  },
+  updateTable: function (context, value) {
+    value = value || {};
+    var table = context.table;
+    var cell = context.cell;
+    var row = context.row;
+    var columns = Math.max(parseInt(value.columns || 0, 10) || 0, 1);
+    var rows = Math.max(parseInt(value.rows || 0, 10) || 0, 1);
+    var border = Math.max(parseInt(value.border || 0, 10) || 0, 0);
+    var columnWidth = value.columnWidthPx ? value.columnWidthPx + 'px' : (value.columnWidth || '');
+    var cellPadding = value.cellPaddingPx != null ? value.cellPaddingPx + 'px' : (value.cellPadding || '');
+    var borderStyle = value.borderStyle || 'solid';
+    var borderWidth = value.borderWidthPx != null ? value.borderWidthPx + 'px' : '1px';
+    var borderColor = value.borderColor || 'currentColor';
+
+    table.style.width = value.width || '100%';
+    table.style.borderCollapse = 'collapse';
+    table.setAttribute('border', border.toString());
+
+    this.updateTableHeader(table, columns, !!value.headerRow);
+    this.updateTableBody(table, rows, columns);
+
+    if (cell) {
+      this.updateTableCellStyles(row, cell, context, {
+        columnWidth: columnWidth,
+        cellBackground: value.cellBackground || '',
+        cellPadding: cellPadding,
+        cellTextAlign: value.cellTextAlign || '',
+        cellVerticalAlign: value.cellVerticalAlign || '',
+        cellBorder: value.cellBorder || '',
+        borderValue: borderWidth + ' ' + borderStyle + ' ' + borderColor,
+        borderTop: value.borderTop,
+        borderRight: value.borderRight,
+        borderBottom: value.borderBottom,
+        borderLeft: value.borderLeft
+      });
+    }
+  },
+  updateTableHeader: function (table, columns, headerRow) {
+    if (headerRow) {
+      var thead = table.tHead || table.createTHead();
+      var header = thead.rows.length ? thead.rows[0] : thead.insertRow();
+      while (header.children.length < columns) {
+        var th = document.createElement('th');
+        th.innerHTML = 'Column ' + (header.children.length + 1);
+        header.appendChild(th);
+      }
+      while (header.children.length > columns) {
+        header.removeChild(header.lastElementChild);
+      }
+      for (var h = 0; h < header.children.length; h++) {
+        if (!header.children[h].innerHTML || header.children[h].innerHTML === '&nbsp;') {
+          header.children[h].innerHTML = 'Column ' + (h + 1);
+        }
+      }
+    } else if (table.tHead) {
+      table.deleteTHead();
+    }
+  },
+  updateTableBody: function (table, rows, columns) {
+    var tbody = this.ensureTableBody(table);
+    while (tbody.rows.length < rows) {
+      tbody.appendChild(this.createTableRow(columns, false));
+    }
+    while (tbody.rows.length > rows) {
+      tbody.removeChild(tbody.lastElementChild);
+    }
+    for (var r = 0; r < tbody.rows.length; r++) {
+      var bodyRow = tbody.rows[r];
+      while (bodyRow.children.length < columns) {
+        var td = document.createElement('td');
+        td.innerHTML = '&nbsp;';
+        bodyRow.appendChild(td);
+      }
+      while (bodyRow.children.length > columns) {
+        bodyRow.removeChild(bodyRow.lastElementChild);
+      }
+    }
+  },
+  updateTableCellStyles: function (row, cell, context, options) {
+    var sectionMatrix = row && row.parentElement ? this.getCellMatrix(row.parentElement) : [];
+    var resizePosition = row && row.parentElement ? this.getCellPosition(row.parentElement, cell, sectionMatrix) : { columnIndex: context.columnIndex };
+    var resizeColumnIndex = resizePosition.columnIndex;
+
+    for (var rowIndex = 0; rowIndex < sectionMatrix.length; rowIndex++) {
+      var syncCell = sectionMatrix[rowIndex][resizeColumnIndex];
+      if (syncCell && options.columnWidth) {
+        syncCell.style.width = options.columnWidth;
+      } else if (syncCell) {
+        syncCell.style.removeProperty('width');
+      }
+    }
+
+    options.cellBackground ? cell.style.backgroundColor = options.cellBackground : cell.style.removeProperty('background-color');
+    options.cellPadding ? cell.style.padding = options.cellPadding : cell.style.removeProperty('padding');
+    options.cellTextAlign ? cell.style.textAlign = options.cellTextAlign : cell.style.removeProperty('text-align');
+    options.cellVerticalAlign ? cell.style.verticalAlign = options.cellVerticalAlign : cell.style.removeProperty('vertical-align');
+
+    if (options.cellBorder) {
+      cell.style.border = options.cellBorder;
+    } else {
+      cell.style.borderTop = options.borderTop ? options.borderValue : 'none';
+      cell.style.borderRight = options.borderRight ? options.borderValue : 'none';
+      cell.style.borderBottom = options.borderBottom ? options.borderValue : 'none';
+      cell.style.borderLeft = options.borderLeft ? options.borderValue : 'none';
+    }
+  },
+  addTableRow: function (context, command) {
+    var row = context.row;
+    var newRow = this.createTableRow(this.getTableColumnCount(context.table), context.inHeader);
+    row.parentNode.insertBefore(newRow, command === 'addRowBefore' ? row : row.nextSibling);
+  },
+  deleteTableRow: function (context) {
+    var table = context.table;
+    if (context.row) {
+      context.row.remove();
+    }
+    if (table.tHead && !table.tHead.rows.length) {
+      table.deleteTHead();
+    }
+    if (table.tBodies.length && !table.tBodies[0].rows.length) {
+      table.tBodies[0].appendChild(this.createTableRow(this.getTableColumnCount(table) || 1, false));
+    }
+  },
+  addTableColumn: function (context, command) {
+    var table = context.table;
+    var columnIndex = Math.max(context.columnIndex, 0);
+    var insertIndex = command === 'addColumnBefore' ? columnIndex : columnIndex + 1;
+    Array.prototype.forEach.call(table.rows, function (tableRow) {
+      var header = table.tHead && table.tHead.contains(tableRow);
+      var column = document.createElement(header ? 'th' : 'td');
+      column.innerHTML = header ? 'Column ' + (insertIndex + 1) : '&nbsp;';
+      tableRow.insertBefore(column, tableRow.children[insertIndex] || null);
+    });
+  },
+  deleteTableColumn: function (context) {
+    var index = context.columnIndex;
+    if (index >= 0) {
+      Array.prototype.forEach.call(context.table.rows, function (tableRow) {
+        if (tableRow.children.length > 1 && tableRow.children[index]) {
+          tableRow.removeChild(tableRow.children[index]);
+        }
+      });
+    }
+  },
+  mergeTableCellRight: function (ref, context) {
+    var row = context.row;
+    var cell = context.cell;
+    var sectionRight = row && row.parentElement ? row.parentElement : null;
+    var boundsRight = this.getSelectedCellBounds(ref, sectionRight);
+    if (boundsRight && boundsRight.selectedCells.length > 1) {
+      var anchorCellRight = (boundsRight.matrix[boundsRight.minRow] || [])[boundsRight.minColumn];
+      if (!anchorCellRight) {
+        return false;
+      }
+      anchorCellRight.setAttribute('colspan', Math.max(boundsRight.maxColumn - boundsRight.minColumn + 1, 1));
+      anchorCellRight.setAttribute('rowspan', Math.max(boundsRight.maxRow - boundsRight.minRow + 1, 1));
+      for (var mergeRow = boundsRight.minRow; mergeRow <= boundsRight.maxRow; mergeRow++) {
+        for (var mergeCol = boundsRight.minColumn; mergeCol <= boundsRight.maxColumn; mergeCol++) {
+          var mergedCell = (boundsRight.matrix[mergeRow] || [])[mergeCol];
+          if (mergedCell && mergedCell !== anchorCellRight && mergedCell.parentElement) {
+            mergedCell.remove();
+          }
+        }
+      }
+      return true;
+    }
+    if (cell && row && row.parentElement) {
+      var rightMatrix = this.getCellMatrix(row.parentElement);
+      var rightPosition = this.getCellPosition(row.parentElement, cell, rightMatrix);
+      var currentRightSpan = Math.max(parseInt(cell.getAttribute('colspan') || 1, 10) || 1, 1);
+      var nextCell = (rightMatrix[rightPosition.rowIndex] || [])[rightPosition.columnIndex + currentRightSpan];
+      if (!nextCell || nextCell === cell) {
+        return true;
+      }
+      cell.setAttribute('colspan', currentRightSpan + Math.max(parseInt(nextCell.getAttribute('colspan') || 1, 10) || 1, 1));
+      if (!cell.innerHTML || cell.innerHTML === '&nbsp;') {
+        cell.innerHTML = nextCell.innerHTML;
+      } else if (nextCell.innerHTML && nextCell.innerHTML !== '&nbsp;') {
+        cell.innerHTML += ' ' + nextCell.innerHTML;
+      }
+      nextCell.remove();
+    }
+    return true;
+  },
+  mergeTableCellDown: function (context) {
+    var cell = context.cell;
+    var row = context.row;
+    if (cell && row && row.parentElement) {
+      var downMatrix = this.getCellMatrix(row.parentElement);
+      var downPosition = this.getCellPosition(row.parentElement, cell, downMatrix);
+      var currentRowSpan = Math.max(parseInt(cell.getAttribute('rowspan') || 1, 10) || 1, 1);
+      var targetCell = (downMatrix[downPosition.rowIndex + currentRowSpan] || [])[downPosition.columnIndex];
+      if (targetCell) {
+        cell.setAttribute('rowspan', currentRowSpan + Math.max(parseInt(targetCell.getAttribute('rowspan') || 1, 10) || 1, 1));
+        if (!cell.innerHTML || cell.innerHTML === '&nbsp;') {
+          cell.innerHTML = targetCell.innerHTML;
+        } else if (targetCell.innerHTML && targetCell.innerHTML !== '&nbsp;') {
+          cell.innerHTML += '<br>' + targetCell.innerHTML;
+        }
+        targetCell.remove();
+      }
+    }
+  },
+  splitTableCell: function (context) {
+    var cell = context.cell;
+    var row = context.row;
+    if (!cell) {
+      return;
+    }
+    var splitColSpan = Math.max(parseInt(cell.getAttribute('colspan') || 1, 10) || 1, 1);
+    var splitRowSpan = Math.max(parseInt(cell.getAttribute('rowspan') || 1, 10) || 1, 1);
+    var splitPosition = row && row.parentElement ? this.getCellPosition(row.parentElement, cell) : { rowIndex: row ? row.sectionRowIndex : 0, columnIndex: context.columnIndex };
+    if (splitColSpan > 1) {
+      cell.removeAttribute('colspan');
+      for (var c = 1; c < splitColSpan; c++) {
+        var splitCell = document.createElement(cell.tagName.toLowerCase());
+        splitCell.innerHTML = '&nbsp;';
+        cell.parentElement.insertBefore(splitCell, cell.parentElement.cells[(Array.prototype.indexOf.call(cell.parentElement.cells, cell) + c)] || null);
+      }
+    }
+    if (splitRowSpan > 1 && row && row.parentElement) {
+      cell.removeAttribute('rowspan');
+      for (var sr = 1; sr < splitRowSpan; sr++) {
+        var splitRow = row.parentElement.rows[row.sectionRowIndex + sr];
+        if (splitRow) {
+          var splitMatrix = this.getCellMatrix(row.parentElement);
+          var splitDownCell = document.createElement(cell.tagName.toLowerCase());
+          splitDownCell.innerHTML = '&nbsp;';
+          var splitReference = null;
+          for (var rc = splitPosition.columnIndex; rc < (splitMatrix[splitPosition.rowIndex + sr] || []).length; rc++) {
+            if (splitMatrix[splitPosition.rowIndex + sr][rc] && splitMatrix[splitPosition.rowIndex + sr][rc] !== cell) {
+              splitReference = splitMatrix[splitPosition.rowIndex + sr][rc];
+              break;
+            }
+          }
+          splitRow.insertBefore(splitDownCell, splitReference);
+        }
+      }
+    }
   },
   execTableCommand: function (ref, name, value) {
     if (document.activeElement != ref && ref) {
       ref.focus();
     }
 
-    var context = this.getTableContext(ref);
-    var table = context.table;
-    var cell = context.cell;
-    var row = context.row;
+    var contextMenuTarget = ref && ref.contextMenuTarget ? ref.contextMenuTarget : null;
 
     if (name === 'insertTable') {
       document.execCommand('insertHTML', false, this.createTableHTML(value));
+      if (ref) {
+        ref.contextMenuTarget = null;
+      }
       return this.createCommandResult(ref, true);
     }
 
-    if (!table) {
+    var context = contextMenuTarget ? this.getTableContextFromTarget(ref, contextMenuTarget) : this.getTableContext(ref);
+    if (!context.table) {
+      if (ref) {
+        ref.contextMenuTarget = null;
+      }
       return this.createCommandResult(ref, false, 'table.action.requiresTable');
     }
 
     if (name === 'copyCells') {
-      if (!this.copySelectedTableCells(ref)) {
-        return this.createCommandResult(ref, false, 'table.copy.invalidSelection');
-      }
-
-      return this.createCommandResult(ref, true);
+      var copyResult = this.copySelectedTableCells(ref) ? this.createCommandResult(ref, true) : this.createCommandResult(ref, false, 'table.copy.invalidSelection');
+      ref.contextMenuTarget = null;
+      return copyResult;
     }
 
     if (name === 'pasteCells') {
-      if (!this.pasteSelectedTableCells(ref, cell)) {
-        return this.createCommandResult(ref, false, 'table.paste.blocked');
-      }
-
-      return this.createCommandResult(ref, true);
+      var pasteResult = this.pasteSelectedTableCells(ref, context.cell) ? this.createCommandResult(ref, true) : this.createCommandResult(ref, false, 'table.paste.blocked');
+      ref.contextMenuTarget = null;
+      return pasteResult;
     }
-
-    var ensureBody = function () {
-      if (!table.tBodies.length) {
-        table.appendChild(document.createElement('tbody'));
-      }
-      return table.tBodies[0];
-    };
-
-    var getColumnCount = function () {
-      var firstRow = table.rows.length ? table.rows[0] : null;
-      return firstRow ? firstRow.children.length : 0;
-    };
-
-    var createRow = function (columns, header) {
-      var tr = document.createElement('tr');
-      for (var i = 0; i < columns; i++) {
-        var element = document.createElement(header ? 'th' : 'td');
-        element.innerHTML = header ? 'Column ' + (i + 1) : '&nbsp;';
-        tr.appendChild(element);
-      }
-      return tr;
-    };
 
     switch (name) {
-      case 'updateTable': {
-        value = value || {};
-        var columns = Math.max(parseInt(value.columns || 0, 10) || 0, 1);
-        var rows = Math.max(parseInt(value.rows || 0, 10) || 0, 1);
-        var border = Math.max(parseInt(value.border || 0, 10) || 0, 0);
-        var width = value.width || '100%';
-        var headerRow = !!value.headerRow;
-        var columnWidth = value.columnWidthPx ? value.columnWidthPx + 'px' : (value.columnWidth || '');
-        var cellBackground = value.cellBackground || '';
-        var cellPadding = value.cellPaddingPx != null ? value.cellPaddingPx + 'px' : (value.cellPadding || '');
-        var cellTextAlign = value.cellTextAlign || '';
-        var cellVerticalAlign = value.cellVerticalAlign || '';
-        var borderStyle = value.borderStyle || 'solid';
-        var borderWidth = value.borderWidthPx != null ? value.borderWidthPx + 'px' : '1px';
-        var borderColor = value.borderColor || 'currentColor';
-        var cellBorder = value.cellBorder || '';
-        table.style.width = width;
-        table.style.borderCollapse = 'collapse';
-        table.setAttribute('border', border);
-
-        if (headerRow) {
-          var thead = table.tHead || table.createTHead();
-          var header = thead.rows.length ? thead.rows[0] : thead.insertRow();
-          while (header.children.length < columns) {
-            var th = document.createElement('th');
-            th.innerHTML = 'Column ' + (header.children.length + 1);
-            header.appendChild(th);
-          }
-          while (header.children.length > columns) {
-            header.removeChild(header.lastElementChild);
-          }
-          for (var h = 0; h < header.children.length; h++) {
-            if (!header.children[h].innerHTML || header.children[h].innerHTML === '&nbsp;') {
-              header.children[h].innerHTML = 'Column ' + (h + 1);
-            }
-          }
-        } else if (table.tHead) {
-          table.deleteTHead();
-        }
-
-        var tbody = ensureBody();
-        while (tbody.rows.length < rows) {
-          tbody.appendChild(createRow(columns, false));
-        }
-        while (tbody.rows.length > rows) {
-          tbody.removeChild(tbody.lastElementChild);
-        }
-        for (var r = 0; r < tbody.rows.length; r++) {
-          var bodyRow = tbody.rows[r];
-          while (bodyRow.children.length < columns) {
-            var td = document.createElement('td');
-            td.innerHTML = '&nbsp;';
-            bodyRow.appendChild(td);
-          }
-          while (bodyRow.children.length > columns) {
-            bodyRow.removeChild(bodyRow.lastElementChild);
-          }
-        }
-
-        if (cell) {
-          var sectionMatrix = row && row.parentElement ? this.getCellMatrix(row.parentElement) : [];
-          var resizeColumnIndex = typeof cell._rzColumnIndex === 'number' ? cell._rzColumnIndex : context.columnIndex;
-
-          if (columnWidth) {
-            for (var syncRowIndex = 0; syncRowIndex < sectionMatrix.length; syncRowIndex++) {
-              var syncCell = sectionMatrix[syncRowIndex][resizeColumnIndex];
-              if (syncCell) {
-                syncCell.style.width = columnWidth;
-              }
-            }
-          } else {
-            for (var clearRowIndex = 0; clearRowIndex < sectionMatrix.length; clearRowIndex++) {
-              var clearCell = sectionMatrix[clearRowIndex][resizeColumnIndex];
-              if (clearCell) {
-                clearCell.style.removeProperty('width');
-              }
-            }
-          }
-
-          if (cellBackground) {
-            cell.style.backgroundColor = cellBackground;
-          } else {
-            cell.style.removeProperty('background-color');
-          }
-
-          if (cellPadding) {
-            cell.style.padding = cellPadding;
-          } else {
-            cell.style.removeProperty('padding');
-          }
-
-          if (cellTextAlign) {
-            cell.style.textAlign = cellTextAlign;
-          } else {
-            cell.style.removeProperty('text-align');
-          }
-
-          if (cellVerticalAlign) {
-            cell.style.verticalAlign = cellVerticalAlign;
-          } else {
-            cell.style.removeProperty('vertical-align');
-          }
-
-          if (cellBorder) {
-            cell.style.border = cellBorder;
-          } else {
-            var borderValue = borderWidth + ' ' + borderStyle + ' ' + borderColor;
-            cell.style.borderTop = value.borderTop ? borderValue : 'none';
-            cell.style.borderRight = value.borderRight ? borderValue : 'none';
-            cell.style.borderBottom = value.borderBottom ? borderValue : 'none';
-            cell.style.borderLeft = value.borderLeft ? borderValue : 'none';
-          }
-        }
-        break;
-      }
+      case 'updateTable': this.updateTable(context, value); break;
       case 'addRowBefore':
-      case 'addRowAfter': {
-        var currentRow = row;
-        var isHeader = context.inHeader;
-        var newRow = createRow(getColumnCount(), isHeader);
-        if (name === 'addRowBefore') {
-          currentRow.parentNode.insertBefore(newRow, currentRow);
-        } else {
-          currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
-        }
-        break;
-      }
-      case 'deleteRow': {
-        if (row) {
-          row.remove();
-        }
-        if (table.tHead && !table.tHead.rows.length) {
-          table.deleteTHead();
-        }
-        if (table.tBodies.length && !table.tBodies[0].rows.length) {
-          table.tBodies[0].appendChild(createRow(getColumnCount() || 1, false));
-        }
-        break;
-      }
+      case 'addRowAfter': this.addTableRow(context, name); break;
+      case 'deleteRow': this.deleteTableRow(context); break;
       case 'addColumnBefore':
-      case 'addColumnAfter': {
-        var columnIndex = Math.max(context.columnIndex, 0);
-        var insertIndex = name === 'addColumnBefore' ? columnIndex : columnIndex + 1;
-        Array.prototype.forEach.call(table.rows, function (tableRow, index) {
-          var header = table.tHead && table.tHead.contains(tableRow);
-          var column = document.createElement(header ? 'th' : 'td');
-          column.innerHTML = header ? 'Column ' + (insertIndex + 1) : '&nbsp;';
-          var reference = tableRow.children[insertIndex] || null;
-          tableRow.insertBefore(column, reference);
-        });
-        break;
-      }
-      case 'deleteColumn': {
-        var index = context.columnIndex;
-        if (index >= 0) {
-          Array.prototype.forEach.call(table.rows, function (tableRow) {
-            if (tableRow.children.length > 1 && tableRow.children[index]) {
-              tableRow.removeChild(tableRow.children[index]);
-            }
-          });
-        }
-        break;
-      }
-      case 'mergeCellRight': {
-        var sectionRight = row && row.parentElement ? row.parentElement : null;
-        var boundsRight = this.getSelectedCellBounds(ref, sectionRight);
-        if (boundsRight && boundsRight.selectedCells.length > 1) {
-          var anchorCellRight = (boundsRight.matrix[boundsRight.minRow] || [])[boundsRight.minColumn];
-          if (anchorCellRight) {
-            anchorCellRight.setAttribute('colspan', Math.max(boundsRight.maxColumn - boundsRight.minColumn + 1, 1));
-            anchorCellRight.setAttribute('rowspan', Math.max(boundsRight.maxRow - boundsRight.minRow + 1, 1));
-            for (var mergeRow = boundsRight.minRow; mergeRow <= boundsRight.maxRow; mergeRow++) {
-              for (var mergeCol = boundsRight.minColumn; mergeCol <= boundsRight.maxColumn; mergeCol++) {
-                var mergedCell = (boundsRight.matrix[mergeRow] || [])[mergeCol];
-                if (mergedCell && mergedCell !== anchorCellRight && mergedCell.parentElement) {
-                  mergedCell.remove();
-                }
-              }
-            }
-            break;
-          }
-
+      case 'addColumnAfter': this.addTableColumn(context, name); break;
+      case 'deleteColumn': this.deleteTableColumn(context); break;
+      case 'mergeCellRight':
+        if (!this.mergeTableCellRight(ref, context)) {
+          ref.contextMenuTarget = null;
           return this.createCommandResult(ref, false, 'table.merge.invalidSelection');
         }
-        if (cell && row && row.parentElement) {
-          var rightMatrix = this.getCellMatrix(row.parentElement);
-          var rightColumnIndex = typeof cell._rzColumnIndex === 'number' ? cell._rzColumnIndex : context.columnIndex;
-          var rightRowIndex = typeof cell._rzRowIndex === 'number' ? cell._rzRowIndex : row.sectionRowIndex;
-          var currentRightSpan = Math.max(parseInt(cell.getAttribute('colspan') || 1, 10) || 1, 1);
-          var nextCell = (rightMatrix[rightRowIndex] || [])[rightColumnIndex + currentRightSpan];
-          if (!nextCell || nextCell === cell) {
-            break;
-          }
-          var currentColSpan = Math.max(parseInt(cell.getAttribute('colspan') || 1, 10) || 1, 1);
-          var nextColSpan = Math.max(parseInt(nextCell.getAttribute('colspan') || 1, 10) || 1, 1);
-          cell.setAttribute('colspan', currentColSpan + nextColSpan);
-          if (!cell.innerHTML || cell.innerHTML === '&nbsp;') {
-            cell.innerHTML = nextCell.innerHTML;
-          } else if (nextCell.innerHTML && nextCell.innerHTML !== '&nbsp;') {
-            cell.innerHTML += ' ' + nextCell.innerHTML;
-          }
-          nextCell.remove();
-        }
         break;
-      }
-      case 'mergeCellDown': {
-        if (cell && row && row.parentElement) {
-          var downMatrix = this.getCellMatrix(row.parentElement);
-          var downColumnIndex = typeof cell._rzColumnIndex === 'number' ? cell._rzColumnIndex : context.columnIndex;
-          var downRowIndex = typeof cell._rzRowIndex === 'number' ? cell._rzRowIndex : row.sectionRowIndex;
-          var currentRowSpan = Math.max(parseInt(cell.getAttribute('rowspan') || 1, 10) || 1, 1);
-          var targetCell = (downMatrix[downRowIndex + currentRowSpan] || [])[downColumnIndex];
-          if (targetCell) {
-            var targetRowSpan = Math.max(parseInt(targetCell.getAttribute('rowspan') || 1, 10) || 1, 1);
-            cell.setAttribute('rowspan', currentRowSpan + targetRowSpan);
-            if (!cell.innerHTML || cell.innerHTML === '&nbsp;') {
-              cell.innerHTML = targetCell.innerHTML;
-            } else if (targetCell.innerHTML && targetCell.innerHTML !== '&nbsp;') {
-              cell.innerHTML += '<br>' + targetCell.innerHTML;
-            }
-            targetCell.remove();
-          }
-        }
-        break;
-      }
-      case 'splitCell': {
-        if (cell) {
-          var splitColSpan = Math.max(parseInt(cell.getAttribute('colspan') || 1, 10) || 1, 1);
-          var splitRowSpan = Math.max(parseInt(cell.getAttribute('rowspan') || 1, 10) || 1, 1);
-          var splitColumnIndex = typeof cell._rzColumnIndex === 'number' ? cell._rzColumnIndex : context.columnIndex;
-          var splitRowIndex = row ? row.sectionRowIndex : 0;
-          if (splitColSpan > 1) {
-            cell.removeAttribute('colspan');
-            for (var c = 1; c < splitColSpan; c++) {
-              var splitCell = document.createElement(cell.tagName.toLowerCase());
-              splitCell.innerHTML = '&nbsp;';
-              var splitReferenceCell = cell.parentElement.cells[(Array.prototype.indexOf.call(cell.parentElement.cells, cell) + c)] || null;
-              cell.parentElement.insertBefore(splitCell, splitReferenceCell);
-            }
-          }
-          if (splitRowSpan > 1 && row && row.parentElement) {
-            cell.removeAttribute('rowspan');
-            var rows = row.parentElement.rows;
-            for (var sr = 1; sr < splitRowSpan; sr++) {
-              var splitRow = rows[row.sectionRowIndex + sr];
-              if (splitRow) {
-                var splitMatrix = this.getCellMatrix(row.parentElement);
-                var splitDownCell = document.createElement(cell.tagName.toLowerCase());
-                splitDownCell.innerHTML = '&nbsp;';
-                var splitReference = null;
-                for (var rc = splitColumnIndex; rc < (splitMatrix[splitRowIndex + sr] || []).length; rc++) {
-                  if (splitMatrix[splitRowIndex + sr][rc] && splitMatrix[splitRowIndex + sr][rc] !== cell) {
-                    splitReference = splitMatrix[splitRowIndex + sr][rc];
-                    break;
-                  }
-                }
-                splitRow.insertBefore(splitDownCell, splitReference);
-              }
-            }
-          }
-        }
-        break;
-      }
-      case 'deleteTable':
-        table.remove();
-        break;
+      case 'mergeCellDown': this.mergeTableCellDown(context); break;
+      case 'splitCell': this.splitTableCell(context); break;
+      case 'deleteTable': context.table.remove(); break;
     }
 
+    ref.contextMenuTarget = null;
     return this.createCommandResult(ref, true);
   },
   queryCommands: function (ref) {
@@ -3598,8 +3749,9 @@ window.Radzen = {
           var activeRow = activeCell.parentElement;
           var section = activeRow ? activeRow.parentElement : null;
           var matrix = Radzen.getCellMatrix(section);
-          var rowIndex = typeof activeCell._rzRowIndex === 'number' ? activeCell._rzRowIndex : (activeRow ? activeRow.sectionRowIndex : 0);
-          var columnIndex = typeof activeCell._rzColumnIndex === 'number' ? activeCell._rzColumnIndex : Array.prototype.indexOf.call(activeRow.children, activeCell);
+          var activePosition = Radzen.getCellPosition(section, activeCell, matrix);
+          var rowIndex = activePosition.rowIndex;
+          var columnIndex = activePosition.columnIndex;
           var colSpan = Math.max(parseInt(activeCell.getAttribute('colspan') || 1, 10) || 1, 1);
           var rowSpan = Math.max(parseInt(activeCell.getAttribute('rowspan') || 1, 10) || 1, 1);
           var nextColumnIndex = e.shiftKey ? columnIndex - 1 : columnIndex + colSpan;
@@ -3735,27 +3887,34 @@ window.Radzen = {
         ref.isResizingColumn = true;
         ref.resizeStartX = e.clientX;
         ref.resizeStartWidth = ref.resizeTargetCell.getBoundingClientRect().width;
+        document.addEventListener('mouseup', ref.mouseupResizeListener);
+        document.addEventListener('mousemove', ref.documentMouseMoveResizeListener);
       }
     };
 
     ref.mouseupResizeListener = function () {
-      ref.isResizingColumn = false;
-      ref.style.cursor = '';
+      if (ref.isResizingColumn) {
+        ref.isResizingColumn = false;
+        ref.style.cursor = '';
+        document.removeEventListener('mouseup', ref.mouseupResizeListener);
+        document.removeEventListener('mousemove', ref.documentMouseMoveResizeListener);
+        try { instance.invokeMethodAsync('OnChange', ref.innerHTML); } catch { }
+      }
     };
 
     ref.documentMouseMoveResizeListener = function (e) {
-      if (ref.isResizingColumn && ref.resizeTargetCell) {
+      if (ref.isResizingColumn && ref.resizeTargetCell && ref.isConnected) {
         var width = Math.max(ref.resizeStartWidth + (e.clientX - ref.resizeStartX), 24);
         var resizeSection = ref.resizeTargetCell.parentElement ? ref.resizeTargetCell.parentElement.parentElement : null;
         var resizeMatrix = Radzen.getCellMatrix(resizeSection);
-        var resizeColumnIndex = typeof ref.resizeTargetCell._rzColumnIndex === 'number' ? ref.resizeTargetCell._rzColumnIndex : Array.prototype.indexOf.call(ref.resizeTargetCell.parentElement.children, ref.resizeTargetCell);
+        var resizePosition = Radzen.getCellPosition(resizeSection, ref.resizeTargetCell, resizeMatrix);
+        var resizeColumnIndex = resizePosition.columnIndex;
         for (var resizeRowIndex = 0; resizeRowIndex < resizeMatrix.length; resizeRowIndex++) {
           var resizeCell = resizeMatrix[resizeRowIndex][resizeColumnIndex];
           if (resizeCell) {
             resizeCell.style.width = width + 'px';
           }
         }
-        try { instance.invokeMethodAsync('OnChange', ref.innerHTML); } catch { }
       }
     };
 
@@ -3866,8 +4025,6 @@ window.Radzen = {
     ref.addEventListener('contextmenu', ref.contextMenuListener);
     ref.addEventListener('mousemove', ref.mousemoveListener);
     ref.addEventListener('mousedown', ref.mousedownResizeListener);
-    document.addEventListener('mouseup', ref.mouseupResizeListener);
-    document.addEventListener('mousemove', ref.documentMouseMoveResizeListener);
     document.addEventListener('selectionchange', ref.selectionChangeListener);
     document.execCommand('styleWithCSS', false, true);
   },
@@ -3950,6 +4107,7 @@ window.Radzen = {
       ref.removeEventListener('contextmenu', ref.contextMenuListener);
       ref.removeEventListener('mousemove', ref.mousemoveListener);
       ref.removeEventListener('mousedown', ref.mousedownResizeListener);
+      ref.isResizingColumn = false;
       document.removeEventListener('mouseup', ref.mouseupResizeListener);
       document.removeEventListener('mousemove', ref.documentMouseMoveResizeListener);
       document.removeEventListener('selectionchange', ref.selectionChangeListener);
