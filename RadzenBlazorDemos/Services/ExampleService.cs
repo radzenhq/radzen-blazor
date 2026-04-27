@@ -2269,12 +2269,12 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
+                            Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Split tooltip", Anchor = "#split-tooltip" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
                             Name = "ToolTip",
                             Path = "chart-tooltip",
                             Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
-                            Description = "Blazor Chart tooltip shown on hover. Customize content or disable tooltips per series.",
-                            Tags = new [] { "chart", "graph", "legend" }
+                            Description = "Blazor Chart tooltip shown on hover. Customize content, enable split tooltip, or disable tooltips per series.",
+                            Tags = new [] { "chart", "graph", "legend", "split", "tooltip" }
                         },
                         new Example
                         {
@@ -2303,11 +2303,11 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Crosshair & Split Tooltip",
+                            Name = "Crosshair",
                             Path = "chart-crosshair",
-                            Title = "Blazor Chart - Crosshair & Split Tooltip | Free UI Components by Radzen",
-                            Description = "Opt-in crosshair that follows the cursor and an optional split tooltip (one small box per series at the snapped category), similar to Highcharts.",
-                            Tags = new [] { "chart", "crosshair", "split", "tooltip", "hover", "highcharts" },
+                            Title = "Blazor Chart - Crosshair | Free UI Components by Radzen",
+                            Description = "Per-axis opt-in crosshair that snaps to the nearest data point (or follows the cursor) and optionally shows a label with the formatted axis value, similar to Highcharts.",
+                            Tags = new [] { "chart", "crosshair", "hover", "highcharts" },
                             New = true
                         },
                         new Example

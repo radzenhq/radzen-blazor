@@ -9,5 +9,10 @@ namespace Radzen.Blazor
         /// Gets or sets the grid lines configuration of this axis.
         /// </summary>
         RadzenGridLines GridLines { get; set; }
+
+        /// <summary>
+        /// Gets or sets the crosshair configuration of this axis.
+        /// </summary>
+        RadzenAxisCrosshair Crosshair { get; set; }
     }
 }

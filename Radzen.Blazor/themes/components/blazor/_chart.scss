@@ -82,6 +82,17 @@ $chart-color-schemes: (
   fill-opacity: 0.8;
 }
 
+.rz-chart-axis-crosshair-label {
+  rect {
+    fill: var(--rz-chart-tooltip-background);
+  }
+  text {
+    fill: var(--rz-chart-tooltip-color);
+    font-size: var(--rz-chart-tooltip-font-size);
+    dominant-baseline: central;
+  }
+}
+
 // Series hover styles (scoped to AllowSeriesHover=true via .rz-chart-series-hover)
 .rz-chart-series-hover {
   .rz-line-series,
