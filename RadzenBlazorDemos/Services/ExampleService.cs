@@ -2269,12 +2269,12 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Split tooltip", Anchor = "#split-tooltip" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
+                            Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Shared tooltip", Anchor = "#shared-tooltip" }, new () { Text = "Split tooltip", Anchor = "#split-tooltip" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
                             Name = "ToolTip",
                             Path = "chart-tooltip",
                             Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
-                            Description = "Blazor Chart tooltip shown on hover. Customize content, enable split tooltip, or disable tooltips per series.",
-                            Tags = new [] { "chart", "graph", "legend", "split", "tooltip" }
+                            Description = "Blazor Chart tooltip shown on hover. Customize content, enable shared or split tooltip, or disable tooltips per series.",
+                            Tags = new [] { "chart", "graph", "legend", "shared", "split", "tooltip" }
                         },
                         new Example
                         {
