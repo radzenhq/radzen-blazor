@@ -2,37 +2,108 @@
 
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
     <RadzenCard Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenLabel Text="Crosshair" />
-                <RadzenDropDown @bind-Value="@crosshairMode" Data="@crosshairModes" Style="width: 110px;" />
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="2rem">
+            <RadzenStack Gap="0.5rem">
+                <RadzenText TextStyle="TextStyle.Subtitle2">Category axis crosshair</RadzenText>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@categoryVisible" Name="categoryVisible" />
+                    <RadzenLabel Text="Visible" Component="categoryVisible" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@categorySnap" Name="categorySnap" />
+                    <RadzenLabel Text="Snap" Component="categorySnap" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@categoryLabel" Name="categoryLabel" />
+                    <RadzenLabel Text="Label" Component="categoryLabel" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Color" />
+                    <RadzenColorPicker @bind-Value="@categoryStroke" Style="width: 110px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Width" />
+                    <RadzenNumeric @bind-Value="@categoryStrokeWidth" Min="1" Max="6" Step="1" Style="width: 80px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Style" />
+                    <RadzenDropDown @bind-Value="@categoryLineType" Data="@lineTypes" Style="width: 110px;" />
+                </RadzenStack>
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenCheckBox @bind-Value="@split" Name="split" />
-                <RadzenLabel Text="Split tooltip" Component="split" />
+
+            <RadzenStack Gap="0.5rem">
+                <RadzenText TextStyle="TextStyle.Subtitle2">Value axis crosshair</RadzenText>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@valueVisible" Name="valueVisible" />
+                    <RadzenLabel Text="Visible" Component="valueVisible" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@valueSnap" Name="valueSnap" />
+                    <RadzenLabel Text="Snap" Component="valueSnap" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@valueLabel" Name="valueLabel" />
+                    <RadzenLabel Text="Label" Component="valueLabel" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Color" />
+                    <RadzenColorPicker @bind-Value="@valueStroke" Style="width: 110px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Width" />
+                    <RadzenNumeric @bind-Value="@valueStrokeWidth" Min="1" Max="6" Step="1" Style="width: 80px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Style" />
+                    <RadzenDropDown @bind-Value="@valueLineType" Data="@lineTypes" Style="width: 110px;" />
+                </RadzenStack>
             </RadzenStack>
+
         </RadzenStack>
     </RadzenCard>
 
     <RadzenChart>
-        <RadzenChartTooltipOptions CrosshairMode="@crosshairMode" Split="@split" />
         <RadzenLineSeries Smooth="true" Data="@solar" CategoryProperty="Year" ValueProperty="Capacity" Title="Solar" />
         <RadzenLineSeries Smooth="true" Data="@wind" CategoryProperty="Year" ValueProperty="Capacity" Title="Wind" />
         <RadzenCategoryAxis Padding="20">
             <RadzenAxisTitle Text="Year" />
+            <RadzenAxisCrosshair Visible="@categoryVisible"
+                                 Snap="@categorySnap"
+                                 Label="@categoryLabel"
+                                 Stroke="@categoryStroke"
+                                 StrokeWidth="@categoryStrokeWidth"
+                                 LineType="@categoryLineType" />
         </RadzenCategoryAxis>
         <RadzenValueAxis Formatter="@FormatGW">
             <RadzenGridLines Visible="true" />
             <RadzenAxisTitle Text="Installed capacity (GW)" />
+            <RadzenAxisCrosshair Visible="@valueVisible"
+                                 Snap="@valueSnap"
+                                 Label="@valueLabel"
+                                 Stroke="@valueStroke"
+                                 StrokeWidth="@valueStrokeWidth"
+                                 LineType="@valueLineType" />
         </RadzenValueAxis>
         <RadzenLegend Position="LegendPosition.Top" />
     </RadzenChart>
 </RadzenStack>
 
 @code {
-    CrosshairMode crosshairMode = CrosshairMode.Both;
-    bool split = true;
-    CrosshairMode[] crosshairModes = new[] { CrosshairMode.None, CrosshairMode.X, CrosshairMode.Y, CrosshairMode.Both };
+    bool categoryVisible = true;
+    bool categorySnap = true;
+    bool categoryLabel = true;
+    string categoryStroke = "#1976d2";
+    double categoryStrokeWidth = 1;
+    LineType categoryLineType = LineType.Dashed;
+
+    bool valueVisible = true;
+    bool valueSnap = true;
+    bool valueLabel = true;
+    string valueStroke = "#1976d2";
+    double valueStrokeWidth = 1;
+    LineType valueLineType = LineType.Dashed;
+
+    LineType[] lineTypes = new[] { LineType.Solid, LineType.Dashed, LineType.Dotted };
 
     class DataItem
     {
