@@ -3,7 +3,7 @@
 Radzen Blazor Components
 ========================
 
-The most sophisticated free UI component library for Blazor, featuring **100+ native components**. MIT licensed, used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.
+The most sophisticated free UI component library for Blazor, featuring **145+ native components**. MIT licensed, used by thousands of developers at companies like Microsoft, NASA, Porsche, Dell, Siemens, and DHL.
 
 Supports .NET 10, Blazor Server, Blazor WebAssembly, and .NET MAUI Blazor Hybrid.
 
@@ -51,9 +51,9 @@ For the full setup guide including render modes and dialog/notification configur
 
 **AI** — AIChat, Chat, Markdown, SpeechToTextButton
 
-**Data** — DataGrid, DataList, PivotDataGrid, DataFilter, PickList, Pager, Tree, Scheduler, Gantt, Timeline, Charts (Line, Bar, Column, Area, Pie, Donut, Scatter, Bubble, Spider/Radar), SankeyDiagram, GaugeCharts (Radial, Linear, Arc)
+**Data** — DataGrid, DataList, PivotDataGrid, DataFilter, PickList, Pager, Tree, Scheduler, Gantt, Timeline, Spreadsheet, Charts (Line, Bar, Column, Area, Pie, Donut, Scatter, Bubble, Spider/Radar, BoxPlot, Bullet, Candlestick, OHLC, Pyramid, Funnel, Waterfall, HighLow, Range Area/Bar/Column, Step Line/Area, Stacked & Full-Stacked variants, Contour), Heatmap, Treemap, RangeNavigator, SankeyDiagram, GaugeCharts (Radial, Linear, Arc)
 
-**Forms** — TextBox, TextArea, Password, Numeric, Mask, DatePicker, TimePicker, ColorPicker, Dropdown, AutoComplete, ListBox, CheckBox, RadioButtonList, Switch, Slider, Rating, FileInput, SecurityCode, HtmlEditor
+**Forms** — TextBox, TextArea, Password, Numeric, Mask, DatePicker, TimePicker, ColorPicker, Dropdown, AutoComplete, ListBox, CheckBox, RadioButtonList, Switch, Slider, Rating, FileInput, SecurityCode, SignaturePad, HtmlEditor
 
 **Layout** — Card, Panel, Tabs, Accordion, Splitter, Steps, Dialog, Fieldset, Stack, Row/Column, Sidebar
 
