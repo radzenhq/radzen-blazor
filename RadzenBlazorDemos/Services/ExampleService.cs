@@ -78,7 +78,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Themes",
                     Path = "themes",
-                    Updated = true,
                     Title = "Blazor Themes | Free UI Components by Radzen",
                     Description = "Free and premium Blazor themes for Radzen components. Choose the style that best suits your project.",
                     Icon = "\ue40a",
@@ -129,7 +128,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Material Icons", Anchor = "#material-icons" }, new () { Text = "Icon color", Anchor = "#icon-color" }, new () { Text = "Filled icons", Anchor = "#filled-icons" }, new () { Text = "Styled icons", Anchor = "#styled-icons" }, new () { Text = "Using RadzenIcon with other icon fonts", Anchor = "#icons-width-other-fonts" }, new () { Text = "Video: RadzenIcon in Radzen Blazor Studio", Anchor = "#video-icons" } ],
                     Name = "Icons",
                     Path = "icon",
-                    Updated = true,
                     Title = "Blazor Icon Component | Free UI Components by Radzen",
                     Description = "Demonstration and configuration of the Radzen Blazor Icon component.",
                     Icon = "\ue148",
@@ -556,7 +554,6 @@ namespace RadzenBlazorDemos
 
             Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
             Name = "DataGrid",
-            Updated = true,
             Icon = "\uf191",
             Children = new [] {
                 new Example
@@ -658,7 +655,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Columns",
                     Icon = "\ue336",
-                    Updated = true,
                     Children = new []
                     {
                         new Example
@@ -687,7 +683,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Updated = true,
                             Name = "Reorder",
                             Path = "datagrid-column-reorder",
                             Title = "Blazor DataGrid - Column Reorder | Free UI Components by Radzen",
@@ -730,7 +725,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Updated = true,
                     Name = "Filtering",
                     Icon = "\uef4f",
                     Children = new []
@@ -828,7 +822,6 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Hierarchy",
-                    Updated = true,
                     Icon = "\ue23e",
                     Children  = new []
                     {
@@ -868,7 +861,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Updated = true,
                     Name = "Selection",
                     Icon = "\uf0c5",
                     Children = new []
@@ -883,7 +875,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Updated = true,
                             Name = "Multiple selection",
                             Path = "datagrid-multiple-selection",
                             Title = "Blazor DataGrid - Multi Selection | Free UI Components by Radzen",
@@ -935,7 +926,6 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Paging",
-                    Updated = true,
                     Icon = "\ue5dd",
                     Children = new []
                     {
@@ -967,14 +957,12 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Updated = true,
                     Name = "Grouping",
                     Icon = "\uf1be",
                     Children = new []
                     {
                         new Example
                         {
-                            Updated = true,
                             Name = "Grouping API",
                             Path = "datagrid-grouping-api",
                             Title = "Blazor DataGrid - Grouping API | Free UI Components by Radzen",
@@ -983,7 +971,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Updated = true,
                             Name = "Group Header Template",
                             Path = "datagrid-group-header-template",
                             Title = "Blazor DataGrid - Group Header | Free UI Components by Radzen",
@@ -1053,7 +1040,6 @@ namespace RadzenBlazorDemos
 
                 new Example
                 {
-                    Updated = true,
                     Name = "Save/Load settings",
                     Icon = "\uf02e",
                     Children = new []
@@ -1080,7 +1066,6 @@ namespace RadzenBlazorDemos
 
                 new Example
                 {
-                    Updated = true,
                     Name = "Drag & Drop",
                     Icon = "\ue945",
                     Children = new []
@@ -1172,7 +1157,6 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            New = true,
             Name = "PivotDataGrid",
             Icon = "\ue9ce",
             Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table" },
@@ -1215,7 +1199,6 @@ namespace RadzenBlazorDemos
         new Example
         {
             Name = "Data",
-            Updated = true,
             Icon = "\ue99c",
             Children = new [] {
                 new Example
@@ -1308,7 +1291,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Scheduler",
                     Path = "scheduler",
-                    Updated = true,
                     Description = "Blazor Scheduler component with daily, weekly and monthly views.",
                     Icon = "\ue616",
                     Tags = new[] { "scheduler", "calendar", "event", "appointment" }
@@ -1316,7 +1298,6 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Gantt",
-                    New = true,
                     Icon = "\ueb85",
                     Tags = new[] { "gantt", "timeline", "project", "task", "schedule" },
                     Children = new[]
@@ -1529,14 +1510,12 @@ namespace RadzenBlazorDemos
         new Example
         {
             Name = "Layout",
-            Updated = true,
             Icon = "\ue8f1",
             Children = new[] {
                 new Example
                 {
                     Toc = [ new () { Text = "Sidebar, Header and Footer", Anchor = "#sidebar-header-footer" }, new () { Text = "Full height Sidebar", Anchor = "#full-height-sidebar" }, new () { Text = "Overlay Sidebar", Anchor = "#overlay" }, new () { Text = "Full height overlay Sidebar", Anchor = "#overlay-full" }, new () { Text = "Right Sidebar", Anchor = "#right-sidebar" }, new () { Text = "Right full height Sidebar", Anchor = "#right-full-height-sidebar" }, new () { Text = "Right and Left Sidebar", Anchor = "#right-left-sidebar" }, new () { Text = "Start and End Sidebar", Anchor = "#start-end-sidebar" }, new () { Text = "Icon Sidebar", Anchor = "#icon-sidebar" } ],
                     Name = "Layout",
-                    Updated = true,
                     Description = "Blazor RadzenLayout allows you to define the global layout of your application.",
                     Path = "layout",
                     Icon = "\ue8f1",
@@ -1699,7 +1678,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Statically declared items", Anchor = "#panelmenu-static" }, new () { Text = "Programmatically created items with Expanded binding", Anchor = "#panelmenu-programmatic" }, new () { Text = "Set the display style of menu items", Anchor = "#panelmenu-display-style" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "PanelMenu",
                     Path = "panelmenu",
-                    Updated = true,
                     Description = "Demonstration and configuration of the Blazor RadzenPanelMenu component.",
                     Icon = "\ue875",
                     Tags = new [] { "navigation", "menu" }
@@ -1751,7 +1729,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "AIChat",
                     Path = "aichat",
-                    Updated = true,
                     Description = "A modern chat component with AI integration that provides a conversational interface similar to popular chat applications.",
                     Icon = "\ue0b7",
                     Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
@@ -1760,7 +1737,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Chat",
                     Path = "chat",
-                    New = true,
                     Description = "A modern chat component for multi-participant conversations with support for distinct user identities and real-time messaging.",
                     Icon = "\uefd1",
                     Tags = new [] { "chat", "conversation", "message", "users", "team", "group" }
@@ -1769,6 +1745,7 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Basic Label with Input", Anchor = "#basic-usage" }, new () { Text = "Labels with Different Input Types", Anchor = "#input-types" }, new () { Text = "Label with Custom Content", Anchor = "#custom-content" }, new () { Text = "Required Field Indicators", Anchor = "#required-fields" }, new () { Text = "Label Typography", Anchor = "#typography" }, new () { Text = "Label Styling", Anchor = "#styling" } ],
                     Name = "Label",
+                    Updated = true,
                     Title = "Blazor Label Component | Free UI Components by Radzen",
                     Description = "Associate descriptive text labels with form inputs for better accessibility and usability. Clicking a label focuses its associated input.",
                     Path = "label",
@@ -1815,7 +1792,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Get and Set the value of CheckBoxList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBoxList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set CheckBoxList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate CheckBoxList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated CheckBoxList items from data", Anchor = "#statically-declared" }, new () { Text = "Select all CheckBoxList items", Anchor = "#select-all-items" }, new () { Text = "Disabled CheckBoxList item", Anchor = "#disabled-item" }, new () { Text = "ReadOnly CheckBoxList item", Anchor = "#readonly-item" }, new () { Text = "Templated CheckBoxList item", Anchor = "#templated-item" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "CheckBoxList",
                     Path = "checkboxlist",
-                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor CheckBoxList component.",
                     Icon = "\ue6b1",
                     Tags = new [] { "form", "edit" }
@@ -1834,7 +1810,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "DatePicker",
                     Path = "datepicker",
-                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor Datepicker component with calendar mode. Time Picker.",
                     Icon = "\ue916",
                     Tags = new [] { "calendar", "time", "form", "edit" }
@@ -1903,7 +1878,6 @@ namespace RadzenBlazorDemos
                             Title = "Blazor DropDown Tree | Free UI Components by Radzen",
                             Description = "Combine Popup and Tree to create a DropDownTree for hierarchical selection.",
                             Tags = new [] { "select", "picker", "form", "edit", "dropdown", "tree", "hierarchical" },
-                            New = true,
                         },
                     }
                 },
@@ -1923,7 +1897,6 @@ namespace RadzenBlazorDemos
                     Path = "fab",
                     Description = "Demonstration and configuration of the Radzen Blazor Fab component.",
                     Icon = "\ue147",
-                    New = true,
                     Tags = new [] { "fab", "button", "floating", "action" }
                 },
                 new Example
@@ -1933,7 +1906,6 @@ namespace RadzenBlazorDemos
                     Path = "fab-menu",
                     Description = "Demonstration and configuration of the Radzen Blazor FabMenu component.",
                     Icon = "\ue091",
-                    New = true,
                     Tags = new [] { "fab", "menu", "button", "floating", "action" }
                 },
                 new Example
@@ -2028,7 +2000,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Get and Set the value of RadioButtonList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of RadioButtonList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set RadioButtonList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate RadioButtonList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated RadioButtonList items from data", Anchor = "#populate-items-statically" }, new () { Text = "RadioButtonList with null value", Anchor = "#null-value" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "RadioButtonList",
                     Path = "radiobuttonlist",
-                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor radio button list component.",
                     Icon = "\ue837",
                     Tags = new [] { "toggle", "form", "edit" }
@@ -2064,7 +2035,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Chip Style", Anchor = "#chip-style" }, new () { Text = "Variant", Anchor = "#variant" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Icons", Anchor = "#icons" }, new () { Text = "Selected", Anchor = "#selected" }, new () { Text = "Disabled", Anchor = "#disabled" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Add / Remove", Anchor = "#add-remove" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Chip",
                     Path = "chip",
-                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor Chip component.",
                     Icon = "\uf852",
                     Tags = new [] { "chip", "tag", "label", "status" }
@@ -2074,7 +2044,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Templates", Anchor = "#templates" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "ChipList",
                     Path = "chiplist",
-                    New = true,
                     Description = "Demonstration and configuration of the Radzen Blazor ChipList component.",
                     Icon = "\uf852",
                     Tags = new [] { "chip", "chiplist", "tag", "form", "edit", "selection" }
@@ -2084,7 +2053,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Get and Set the value of SelectBar", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of SelectBar using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Populate SelectBar items from data", Anchor = "#populate-from-data" }, new () { Text = "Statically declared and populated SelectBar items from data", Anchor = "#populate-items-statically" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "SelectBar with icons", Anchor = "#icons" }, new () { Text = "SelectBar with images", Anchor = "#images" }, new () { Text = "SelectBar with template", Anchor = "#template" }, new () { Text = "SelectBar Size", Anchor = "#size" }, new () { Text = "SelectBar Orientation", Anchor = "#orientation" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "SelectBar",
                     Path = "selectbar",
-                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor SelectBar component.",
                     Icon = "\uf8e8",
                     Tags = new [] { "form", "edit" }
@@ -2183,6 +2151,7 @@ namespace RadzenBlazorDemos
         new Example
         {
             Name = "Data Visualization",
+            Updated = true,
             Icon = "\ue4fb",
             Children = new[] {
                 new Example
@@ -2274,7 +2243,8 @@ namespace RadzenBlazorDemos
                             Path = "chart-tooltip",
                             Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
                             Description = "Blazor Chart tooltip shown on hover. Customize content, enable shared or split tooltip, or disable tooltips per series.",
-                            Tags = new [] { "chart", "graph", "legend", "shared", "split", "tooltip" }
+                            Tags = new [] { "chart", "graph", "legend", "shared", "split", "tooltip" },
+                            Updated = true
                         },
                         new Example
                         {
@@ -2566,14 +2536,16 @@ namespace RadzenBlazorDemos
                             Name = "Pie Chart",
                             Path = "pie-chart",
                             Description = "Radzen Blazor Chart with pie series.",
-                            Tags = new [] { "chart", "graph", "pie" }
+                            Tags = new [] { "chart", "graph", "pie" },
+                            Updated = true
                         },
                         new Example
                         {
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Radzen Blazor Chart with donut series.",
-                            Tags = new [] { "chart", "graph", "donut" }
+                            Tags = new [] { "chart", "graph", "donut" },
+                            Updated = true
                         },
                         new Example
                         {
@@ -2739,7 +2711,6 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "Linear Gauge",
-                            New = true,
                             Path = "linear-gauge",
                             Description = "Display values on a linear scale with configurable ticks, ranges, and pointer orientation.",
                             Tags = new [] { "gauge", "graph", "linear", "scale", "bar" },
@@ -2830,7 +2801,7 @@ namespace RadzenBlazorDemos
                     Description = "Radzen Blazor Spider Chart for displaying multivariate data in a radial format.",
                     Tags = new [] { "spider", "radar", "chart", "multivariate", "radial", "web" },
                     Icon = "\ueb39",
-                    New = true
+                    Updated = true
                 },
                 new Example
                 {
@@ -2866,8 +2837,7 @@ namespace RadzenBlazorDemos
                     Description = "Generate and display QR codes as SVG using RadzenQRCode.",
                     Path = "qrcode",
                     Icon = "\uef6b",
-                    Tags = new [] { "qr", "qrcode", "barcode", "svg" },
-                    New = true
+                    Tags = new [] { "qr", "qrcode", "barcode", "svg" }
                 },
                 new Example
                 {
@@ -2875,8 +2845,7 @@ namespace RadzenBlazorDemos
                     Description = "Generate and display 1D barcodes as SVG using RadzenBarcode.",
                     Path = "barcode",
                     Icon = "\ue70b",
-                    Tags = new [] { "barcode", "svg" },
-                    New = true
+                    Tags = new [] { "barcode", "svg" }
                 },
                 new Example
                 {
