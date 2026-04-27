@@ -1,0 +1,45 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenAutoComplete @bind-Value=@companyName Data=@customers TextProperty="@nameof(Customer.CompanyName)"
+                        LoadData=@OnLoadData IsLoading=@isLoading OpenOnFocus="true"
+                        Style="width: 16rem"
+                        InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Company Name" } })">
+        <LoadingTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-2">
+                <RadzenProgressBarCircular Size="ProgressBarCircularSize.ExtraSmall" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+                <RadzenText TextStyle="TextStyle.Body2">Loading customers...</RadzenText>
+            </RadzenStack>
+        </LoadingTemplate>
+        <EmptyTemplate>
+            <RadzenText TextStyle="TextStyle.Body2" class="rz-p-2 rz-text-align-center" Style="color: var(--rz-text-tertiary-color);">
+                No customers match your search.
+            </RadzenText>
+        </EmptyTemplate>
+    </RadzenAutoComplete>
+    <RadzenText TextStyle="TextStyle.Body2" class="rz-pt-2">
+        Focus the input to see the empty state, then type e.g. <strong>"France"</strong> to see the loading and result states.
+    </RadzenText>
+</div>
+
+@code {
+    string companyName;
+    IEnumerable<Customer> customers;
+    bool isLoading;
+
+    async Task OnLoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        // Simulate a slow data source so the LoadingTemplate is visible.
+        await Task.Delay(800);
+
+        customers = dbContext.Customers
+            .Where(c => c.CompanyName.Contains(args.Filter))
+            .OrderBy(c => c.CompanyName);
+
+        isLoading = false;
+    }
+}
