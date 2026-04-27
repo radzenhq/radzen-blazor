@@ -145,7 +145,7 @@
         }
     }
 
-    async Task ExecuteTableAction(dynamic ds, string command)
+    async Task ExecuteTableAction(DialogService ds, string command)
     {
         await ExecuteTableCommand(command);
         ds.Close(false);
