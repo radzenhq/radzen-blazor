@@ -57,6 +57,12 @@ namespace Radzen.Blazor
         public RadzenGridLines GridLines { get; set; } = new RadzenGridLines();
 
         /// <summary>
+        /// Gets or sets the crosshair configuration of the current axis.
+        /// </summary>
+        /// <value>The crosshair.</value>
+        public RadzenAxisCrosshair Crosshair { get; set; } = new RadzenAxisCrosshair();
+
+        /// <summary>
         /// Gets or sets the title configuration.
         /// </summary>
         /// <value>The title.</value>

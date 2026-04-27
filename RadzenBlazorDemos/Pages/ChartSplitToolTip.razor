@@ -1,0 +1,46 @@
+@using System.Globalization
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenChart>
+        <RadzenChartTooltipOptions Split="true" />
+        <RadzenLineSeries Smooth="true" Data="@solar" CategoryProperty="Year" ValueProperty="Capacity" Title="Solar" />
+        <RadzenLineSeries Smooth="true" Data="@wind" CategoryProperty="Year" ValueProperty="Capacity" Title="Wind" />
+        <RadzenCategoryAxis Padding="20">
+            <RadzenAxisTitle Text="Year" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis Formatter="@FormatGW">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Installed capacity (GW)" />
+        </RadzenValueAxis>
+        <RadzenLegend Position="LegendPosition.Top" />
+    </RadzenChart>
+</div>
+
+@code {
+    class DataItem
+    {
+        public int Year { get; set; }
+        public double Capacity { get; set; }
+    }
+
+    string FormatGW(object value) => $"{((double)value).ToString("N0", CultureInfo.InvariantCulture)} GW";
+
+    // Approximate global installed capacity, gigawatts (GW). Source: IRENA.
+    DataItem[] solar = new[]
+    {
+        new DataItem { Year = 2005, Capacity = 5 },     new DataItem { Year = 2007, Capacity = 9 },
+        new DataItem { Year = 2009, Capacity = 23 },    new DataItem { Year = 2011, Capacity = 73 },
+        new DataItem { Year = 2013, Capacity = 138 },   new DataItem { Year = 2015, Capacity = 228 },
+        new DataItem { Year = 2017, Capacity = 391 },   new DataItem { Year = 2019, Capacity = 587 },
+        new DataItem { Year = 2021, Capacity = 849 },   new DataItem { Year = 2023, Capacity = 1419 },
+    };
+
+    DataItem[] wind = new[]
+    {
+        new DataItem { Year = 2005, Capacity = 59 },    new DataItem { Year = 2007, Capacity = 94 },
+        new DataItem { Year = 2009, Capacity = 159 },   new DataItem { Year = 2011, Capacity = 238 },
+        new DataItem { Year = 2013, Capacity = 320 },   new DataItem { Year = 2015, Capacity = 433 },
+        new DataItem { Year = 2017, Capacity = 540 },   new DataItem { Year = 2019, Capacity = 650 },
+        new DataItem { Year = 2021, Capacity = 825 },   new DataItem { Year = 2023, Capacity = 1017 },
+    };
+}
