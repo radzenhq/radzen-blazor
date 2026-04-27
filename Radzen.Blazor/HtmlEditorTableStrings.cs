@@ -7,6 +7,10 @@ public class HtmlEditorTableStrings
 {
     /// <summary>Gets or sets the title used by the table dialog.</summary>
     public string DialogTitle { get; set; } = "Insert table";
+    /// <summary>
+    /// Gets or sets the format string used to label generated header cells. <c>{0}</c> is replaced with the 1-based column index.
+    /// </summary>
+    public string DefaultColumnHeader { get; set; } = "Column {0}";
     /// <summary>Gets or sets the rows label used by the table dialog.</summary>
     public string Rows { get; set; } = "Rows";
     /// <summary>Gets or sets the columns label used by the table dialog.</summary>

@@ -104,4 +104,9 @@ public class HtmlEditorTableCommandArgs
     /// Gets or sets a value indicating whether the left border should be applied.
     /// </summary>
     public bool BorderLeft { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the format string used to label generated header cells. <c>{0}</c> is replaced with the 1-based column index.
+    /// </summary>
+    public string? DefaultColumnHeader { get; set; }
 }

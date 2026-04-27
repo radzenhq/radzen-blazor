@@ -3435,7 +3435,11 @@ window.Radzen = {
     document.execCommand(name, false, value);
     return this.queryCommands(ref);
   },
-  createTableHTML: function (options) {
+  formatTableColumnHeader: function (ref, index) {
+    var format = (ref && ref.tableColumnHeaderFormat) || 'Column {0}';
+    return format.replace('{0}', (index + 1).toString());
+  },
+  createTableHTML: function (ref, options) {
     options = options || {};
     var rows = Math.max(parseInt(options.rows || 0, 10) || 0, 1);
     var columns = Math.max(parseInt(options.columns || 0, 10) || 0, 1);
@@ -3447,7 +3451,7 @@ window.Radzen = {
     if (headerRow) {
       html += '<thead><tr>';
       for (var headerIndex = 0; headerIndex < columns; headerIndex++) {
-        html += '<th>Column ' + (headerIndex + 1) + '</th>';
+        html += '<th>' + this.formatTableColumnHeader(ref, headerIndex) + '</th>';
       }
       html += '</tr></thead>';
     }
@@ -3466,14 +3470,14 @@ window.Radzen = {
   },
   buildTableContext: function (ref, element) {
     if (!element || !ref.contains(element)) {
-      return {};
+      return { ref: ref };
     }
 
     var cell = element.closest('td,th');
     var table = element.closest('table');
 
     if (!cell || !table || !ref.contains(table)) {
-      return { table: table };
+      return { ref: ref, table: table };
     }
 
     var row = cell.parentElement;
@@ -3486,6 +3490,7 @@ window.Radzen = {
     }
 
     return {
+      ref: ref,
       table: table,
       cell: cell,
       row: row,
@@ -3502,7 +3507,7 @@ window.Radzen = {
     var node = selection && selection.focusNode ? selection.focusNode : range && range.commonAncestorContainer;
 
     if (!node) {
-      return {};
+      return { ref: ref };
     }
 
     return this.buildTableContext(ref, node.nodeType === 3 ? node.parentElement : node);
@@ -3902,11 +3907,11 @@ window.Radzen = {
     var firstRow = table.rows.length ? table.rows[0] : null;
     return firstRow ? firstRow.children.length : 0;
   },
-  createTableRow: function (columns, header) {
+  createTableRow: function (ref, columns, header) {
     var tr = document.createElement('tr');
     for (var i = 0; i < columns; i++) {
       var element = document.createElement(header ? 'th' : 'td');
-      element.innerHTML = header ? 'Column ' + (i + 1) : '&nbsp;';
+      element.innerHTML = header ? this.formatTableColumnHeader(ref, i) : '&nbsp;';
       tr.appendChild(element);
     }
     return tr;
@@ -3926,11 +3931,13 @@ window.Radzen = {
     var borderColor = value.borderColor || 'currentColor';
 
     table.style.width = value.width || '100%';
-    table.style.borderCollapse = 'collapse';
+    if (!table.style.borderCollapse) {
+      table.style.borderCollapse = 'collapse';
+    }
     table.setAttribute('border', border.toString());
 
-    this.updateTableHeader(table, columns, !!value.headerRow);
-    this.updateTableBody(table, rows, columns);
+    this.updateTableHeader(context.ref, table, columns, !!value.headerRow);
+    this.updateTableBody(context.ref, table, rows, columns);
 
     if (cell) {
       this.updateTableCellStyles(row, cell, context, {
@@ -3948,13 +3955,13 @@ window.Radzen = {
       });
     }
   },
-  updateTableHeader: function (table, columns, headerRow) {
+  updateTableHeader: function (ref, table, columns, headerRow) {
     if (headerRow) {
       var thead = table.tHead || table.createTHead();
       var header = thead.rows.length ? thead.rows[0] : thead.insertRow();
       while (header.children.length < columns) {
         var th = document.createElement('th');
-        th.innerHTML = 'Column ' + (header.children.length + 1);
+        th.innerHTML = this.formatTableColumnHeader(ref, header.children.length);
         header.appendChild(th);
       }
       while (header.children.length > columns) {
@@ -3962,17 +3969,17 @@ window.Radzen = {
       }
       for (var h = 0; h < header.children.length; h++) {
         if (!header.children[h].innerHTML || header.children[h].innerHTML === '&nbsp;') {
-          header.children[h].innerHTML = 'Column ' + (h + 1);
+          header.children[h].innerHTML = this.formatTableColumnHeader(ref, h);
         }
       }
     } else if (table.tHead) {
       table.deleteTHead();
     }
   },
-  updateTableBody: function (table, rows, columns) {
+  updateTableBody: function (ref, table, rows, columns) {
     var tbody = this.ensureTableBody(table);
     while (tbody.rows.length < rows) {
-      tbody.appendChild(this.createTableRow(columns, false));
+      tbody.appendChild(this.createTableRow(ref, columns, false));
     }
     while (tbody.rows.length > rows) {
       tbody.removeChild(tbody.lastElementChild);
@@ -4019,7 +4026,7 @@ window.Radzen = {
   },
   addTableRow: function (context, command) {
     var row = context.row;
-    var newRow = this.createTableRow(this.getTableColumnCount(context.table), context.inHeader);
+    var newRow = this.createTableRow(context.ref, this.getTableColumnCount(context.table), context.inHeader);
     row.parentNode.insertBefore(newRow, command === 'addRowBefore' ? row : row.nextSibling);
   },
   deleteTableRow: function (context) {
@@ -4031,17 +4038,19 @@ window.Radzen = {
       table.deleteTHead();
     }
     if (table.tBodies.length && !table.tBodies[0].rows.length) {
-      table.tBodies[0].appendChild(this.createTableRow(this.getTableColumnCount(table) || 1, false));
+      table.tBodies[0].appendChild(this.createTableRow(context.ref, this.getTableColumnCount(table) || 1, false));
     }
   },
   addTableColumn: function (context, command) {
+    var self = this;
+    var ref = context.ref;
     var table = context.table;
     var columnIndex = Math.max(context.columnIndex, 0);
     var insertIndex = command === 'addColumnBefore' ? columnIndex : columnIndex + 1;
     Array.prototype.forEach.call(table.rows, function (tableRow) {
       var header = table.tHead && table.tHead.contains(tableRow);
       var column = document.createElement(header ? 'th' : 'td');
-      column.innerHTML = header ? 'Column ' + (insertIndex + 1) : '&nbsp;';
+      column.innerHTML = header ? self.formatTableColumnHeader(ref, insertIndex) : '&nbsp;';
       tableRow.insertBefore(column, tableRow.children[insertIndex] || null);
     });
   },
@@ -4156,57 +4165,70 @@ window.Radzen = {
       ref.focus();
     }
 
-    var contextMenuTarget = ref && ref.contextMenuTarget ? ref.contextMenuTarget : null;
+    this.captureTableColumnHeaderFormat(ref, value);
 
-    if (name === 'insertTable') {
-      document.execCommand('insertHTML', false, this.createTableHTML(value));
-      if (ref) {
-        ref.contextMenuTarget = null;
+    try {
+      if (name === 'insertTable') {
+        return this.insertTable(ref, value);
       }
+
+      var context = (ref && ref.contextMenuTarget)
+        ? this.getTableContextFromTarget(ref, ref.contextMenuTarget)
+        : this.getTableContext(ref);
+
+      if (!context.table) {
+        return this.createCommandResult(ref, false, 'table.action.requiresTable');
+      }
+
+      switch (name) {
+        case 'copyCells': return this.copyTableCells(ref);
+        case 'pasteCells': return this.pasteTableCells(ref, context);
+        case 'updateTable': this.updateTable(context, value); break;
+        case 'addRowBefore':
+        case 'addRowAfter': this.addTableRow(context, name); break;
+        case 'deleteRow': this.deleteTableRow(context); break;
+        case 'addColumnBefore':
+        case 'addColumnAfter': this.addTableColumn(context, name); break;
+        case 'deleteColumn': this.deleteTableColumn(context); break;
+        case 'mergeCellRight':
+          if (!this.mergeTableCellRight(ref, context)) {
+            return this.createCommandResult(ref, false, 'table.merge.invalidSelection');
+          }
+          break;
+        case 'mergeCellDown': this.mergeTableCellDown(context); break;
+        case 'splitCell': this.splitTableCell(context); break;
+        case 'deleteTable': this.deleteTable(context); break;
+      }
+
       return this.createCommandResult(ref, true);
-    }
-
-    var context = contextMenuTarget ? this.getTableContextFromTarget(ref, contextMenuTarget) : this.getTableContext(ref);
-    if (!context.table) {
+    } finally {
       if (ref) {
         ref.contextMenuTarget = null;
       }
-      return this.createCommandResult(ref, false, 'table.action.requiresTable');
     }
-
-    if (name === 'copyCells') {
-      var copyResult = this.copySelectedTableCells(ref) ? this.createCommandResult(ref, true) : this.createCommandResult(ref, false, 'table.copy.invalidSelection');
-      ref.contextMenuTarget = null;
-      return copyResult;
-    }
-
-    if (name === 'pasteCells') {
-      var pasteResult = this.pasteSelectedTableCells(ref, context.cell) ? this.createCommandResult(ref, true) : this.createCommandResult(ref, false, 'table.paste.blocked');
-      ref.contextMenuTarget = null;
-      return pasteResult;
-    }
-
-    switch (name) {
-      case 'updateTable': this.updateTable(context, value); break;
-      case 'addRowBefore':
-      case 'addRowAfter': this.addTableRow(context, name); break;
-      case 'deleteRow': this.deleteTableRow(context); break;
-      case 'addColumnBefore':
-      case 'addColumnAfter': this.addTableColumn(context, name); break;
-      case 'deleteColumn': this.deleteTableColumn(context); break;
-      case 'mergeCellRight':
-        if (!this.mergeTableCellRight(ref, context)) {
-          ref.contextMenuTarget = null;
-          return this.createCommandResult(ref, false, 'table.merge.invalidSelection');
-        }
-        break;
-      case 'mergeCellDown': this.mergeTableCellDown(context); break;
-      case 'splitCell': this.splitTableCell(context); break;
-      case 'deleteTable': context.table.remove(); break;
-    }
-
-    ref.contextMenuTarget = null;
+  },
+  insertTable: function (ref, value) {
+    this.captureTableColumnHeaderFormat(ref, value);
+    document.execCommand('insertHTML', false, this.createTableHTML(ref, value));
     return this.createCommandResult(ref, true);
+  },
+  captureTableColumnHeaderFormat: function (ref, value) {
+    if (ref && value && typeof value.defaultColumnHeader === 'string' && value.defaultColumnHeader) {
+      ref.tableColumnHeaderFormat = value.defaultColumnHeader;
+    }
+  },
+  copyTableCells: function (ref) {
+    return this.copySelectedTableCells(ref)
+      ? this.createCommandResult(ref, true)
+      : this.createCommandResult(ref, false, 'table.copy.invalidSelection');
+  },
+  pasteTableCells: function (ref, context) {
+    return this.pasteSelectedTableCells(ref, context.cell)
+      ? this.createCommandResult(ref, true)
+      : this.createCommandResult(ref, false, 'table.paste.blocked');
+  },
+  deleteTable: function (context) {
+    context.table.remove();
   },
   queryCommands: function (ref) {
     return {
