@@ -415,6 +415,9 @@ namespace Radzen.Blazor
         {
             if (JSRuntime == null) return;
 
+            value ??= new HtmlEditorTableCommandArgs();
+            value.DefaultColumnHeader ??= TableStrings.DefaultColumnHeader;
+
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.execTableCommand", ContentEditable, name, value);
 
             if (State?.Success == false && !string.IsNullOrEmpty(State.Message))
