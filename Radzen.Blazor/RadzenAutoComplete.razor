@@ -29,22 +29,42 @@
             <ul id="@ListId" @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
                 @if (OpenOnFocus || (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(customSearchText)))
                 {
-                    @foreach (var item in LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>()))
+                    if (IsLoading && LoadingTemplate != null)
                     {
-                        <li role="option" class="rz-autocomplete-list-item" tabindex="-1"
-                            aria-selected="@(object.Equals(item, SelectedItem) ? "true" : "false")"
-                            @onclick="@(() => OnSelectItem(item))" onmousedown="Radzen.activeElement = null">
-                            <span>
-                                @if (Template != null)
-                                {
-                                    @Template(item)
-                                }
-                                else
-                                {
-                                    @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
-                                }
-                            </span>
+                        <li class="rz-autocomplete-list-item" tabindex="-1" role="presentation">
+                            @LoadingTemplate
                         </li>
+                    }
+                    else
+                    {
+                        var items = (LoadData.HasDelegate ? Data : View) ?? Enumerable.Empty<object>();
+                        var hasItems = false;
+
+                        foreach (var item in items)
+                        {
+                            hasItems = true;
+                            <li role="option" class="rz-autocomplete-list-item" tabindex="-1"
+                                aria-selected="@(object.Equals(item, SelectedItem) ? "true" : "false")"
+                                @onclick="@(() => OnSelectItem(item))" onmousedown="Radzen.activeElement = null">
+                                <span>
+                                    @if (Template != null)
+                                    {
+                                        @Template(item)
+                                    }
+                                    else
+                                    {
+                                        @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                                    }
+                                </span>
+                            </li>
+                        }
+
+                        if (!hasItems && !IsLoading && EmptyTemplate != null)
+                        {
+                            <li class="rz-autocomplete-list-item" tabindex="-1" role="presentation">
+                                @EmptyTemplate
+                            </li>
+                        }
                     }
                 }
             </ul>

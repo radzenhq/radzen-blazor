@@ -140,6 +140,123 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void AutoComplete_Renders_EmptyTemplate_WhenNoData()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string>();
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true)
+                    .Add(p => p.EmptyTemplate, b => b.AddMarkupContent(0, "<span class=\"empty-marker\">No results</span>"));
+            });
+
+            Assert.Contains("empty-marker", component.Markup);
+            Assert.Contains("No results", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_DoesNotRender_EmptyTemplate_WhenItemsPresent()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple" };
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true)
+                    .Add(p => p.EmptyTemplate, b => b.AddMarkupContent(0, "<span class=\"empty-marker\">No results</span>"));
+            });
+
+            Assert.DoesNotContain("empty-marker", component.Markup);
+            Assert.Contains("Apple", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_Renders_LoadingTemplate_WhenIsLoading()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple", "Banana" };
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true)
+                    .Add(p => p.IsLoading, true)
+                    .Add(p => p.LoadingTemplate, b => b.AddMarkupContent(0, "<span class=\"loading-marker\">Loading...</span>"));
+            });
+
+            Assert.Contains("loading-marker", component.Markup);
+            Assert.DoesNotContain("Apple", component.Markup);
+            Assert.DoesNotContain("Banana", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_DoesNotRender_EmptyMarker_WhenEmptyTemplateNotSet()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string>();
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true);
+            });
+
+            Assert.DoesNotContain("rz-state-disabled", component.Markup);
+            Assert.DoesNotContain("role=\"presentation\"", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_DoesNotRender_LoadingMarker_WhenLoadingTemplateNotSet()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple" };
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true)
+                    .Add(p => p.IsLoading, true);
+            });
+
+            Assert.DoesNotContain("role=\"presentation\"", component.Markup);
+            Assert.Contains("Apple", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_LoadingTemplate_HasPrecedence_OverEmptyTemplate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string>();
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true)
+                    .Add(p => p.IsLoading, true)
+                    .Add(p => p.LoadingTemplate, b => b.AddMarkupContent(0, "<span class=\"loading-marker\">Loading...</span>"))
+                    .Add(p => p.EmptyTemplate, b => b.AddMarkupContent(0, "<span class=\"empty-marker\">No results</span>"));
+            });
+
+            Assert.Contains("loading-marker", component.Markup);
+            Assert.DoesNotContain("empty-marker", component.Markup);
+        }
+
+        [Fact]
         public void AutoComplete_Filters_StringList()
         {
             using var ctx = new TestContext();
