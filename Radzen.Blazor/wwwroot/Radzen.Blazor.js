@@ -1196,18 +1196,35 @@ window.Radzen = {
     if (!ul) return;
     // The popup is appended to document.body when opened, so ul.closest('[role="combobox"]')
     // fails once the dropdown is open. Fall back to a reverse lookup via aria-controls.
-    var combobox = ul.closest('[role="combobox"]');
-    if (!combobox && ul.id && window.CSS && CSS.escape) {
-      combobox = document.querySelector('[aria-controls="' + CSS.escape(ul.id) + '"][role="combobox"]');
+    // There can be more than one combobox referencing the same listbox (the trigger and a
+    // filter input inside the popup), so update them all so screen readers announce the
+    // active option regardless of which element currently has focus.
+    var comboboxes = [];
+    var ancestor = ul.closest('[role="combobox"]');
+    if (ancestor) {
+      comboboxes.push(ancestor);
+    }
+    if (ul.id && window.CSS && CSS.escape) {
+      var escapedId = CSS.escape(ul.id);
+      var matches = document.querySelectorAll(
+        '[aria-controls="' + escapedId + '"][role="combobox"]'
+      );
+      for (var i = 0; i < matches.length; i++) {
+        if (comboboxes.indexOf(matches[i]) === -1) {
+          comboboxes.push(matches[i]);
+        }
+      }
     }
     if (li) {
       var itemId = ul.id + '-' + index;
       li.id = itemId;
-      if (combobox) {
-        combobox.setAttribute('aria-activedescendant', itemId);
+      for (var j = 0; j < comboboxes.length; j++) {
+        comboboxes[j].setAttribute('aria-activedescendant', itemId);
       }
-    } else if (combobox) {
-      combobox.removeAttribute('aria-activedescendant');
+    } else {
+      for (var k = 0; k < comboboxes.length; k++) {
+        comboboxes[k].removeAttribute('aria-activedescendant');
+      }
     }
   },
   selectListItem: function (input, ul, index) {

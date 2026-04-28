@@ -814,5 +814,58 @@ namespace Radzen.Blazor.Tests
 
             Assert.DoesNotContain("rz-dropdown-clear-icon", component.Markup);
         }
+
+        [Fact]
+        public void DropDown_FilterInput_HasComboboxAriaAttributes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var listbox = component.Find("ul[role='listbox']");
+            var filterInput = component.Find("input.rz-dropdown-filter");
+
+            Assert.Equal("combobox", filterInput.GetAttribute("role"));
+            Assert.Equal(listbox.Id, filterInput.GetAttribute("aria-controls"));
+            Assert.Equal("listbox", filterInput.GetAttribute("aria-haspopup"));
+            Assert.NotNull(filterInput.GetAttribute("aria-expanded"));
+            Assert.Equal("list", filterInput.GetAttribute("aria-autocomplete"));
+        }
+
+        [Fact]
+        public void DropDown_Multiple_FilterInput_HasComboboxAriaAttributes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[]
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.AllowFiltering, true);
+            });
+
+            var listbox = component.Find("ul[role='listbox']");
+            var filterInput = component.Find(".rz-multiselect-filter-container input");
+
+            Assert.Equal("combobox", filterInput.GetAttribute("role"));
+            Assert.Equal(listbox.Id, filterInput.GetAttribute("aria-controls"));
+            Assert.Equal("listbox", filterInput.GetAttribute("aria-haspopup"));
+            Assert.NotNull(filterInput.GetAttribute("aria-expanded"));
+            Assert.Equal("list", filterInput.GetAttribute("aria-autocomplete"));
+        }
     }
 }
