@@ -83,7 +83,7 @@
         }
 
         <div class="rz-data-grid-data" tabindex="-1">
-            <table class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "") @(getGridLinesCSSClass())">
+            <table role="presentation" class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "") @(getGridLinesCSSClass())">
                 @if(allColumns.All(c => c.Parent == null))
                 {
                 <colgroup>
@@ -104,26 +104,26 @@
                     }
                 </colgroup>
                 }
-                <thead>
+                <thead role="rowgroup">
                     @if (ShowHeader)
                     {
                     @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                     {
-                        <tr>
+                        <tr role="row">
                             @if (i == 0) // Only add the th elements for the first row
                             {
                                 @if (ShowGroupExpandColumn)
                                 {
                                     @foreach (var g in Groups)
                                     {
-                                        <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                        <th role="columnheader" class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                             <span class="rz-column-title"><span style="visibility:hidden">GEC</span></span>
                                         </th>
                                     }
                                 }
                                 @if (Template != null && ShowExpandColumn && i == 0)
                                 {
-                                    <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                    <th role="columnheader" class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                         <span class="rz-column-title">
                                             @if(ShowExpandAll && ExpandMode == DataGridExpandMode.Multiple)
                                             {
@@ -166,26 +166,26 @@
                     }
                     @if (FilterRowActive)
                     {
-                        <tr @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                        <tr role="row" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
                              @if (ShowGroupExpandColumn)
                                 {
                                     @foreach (var g in Groups)
                                     {
-                                        <th class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                        <th role="columnheader" class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                             <span class="rz-column-title"></span>
                                         </th>
                                     }
                                 }
                             @if (Template != null && ShowExpandColumn  )
                             {
-                                <th class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                <th role="columnheader" class="rz-col-icon  rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                     <span class="rz-column-title"></span>
                                 </th>
                             }
                             @foreach (var column in visibleColumns)
                             {
                                 var filterMode = column.FilterMode ?? FilterMode;
-                                <th colspan="@column.GetColSpan()" class="@($"rz-unselectable-text {getFrozenColumnClass(column, visibleColumns)} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true, true)">
+                                <th role="columnheader" colspan="@column.GetColSpan()" class="@($"rz-unselectable-text {getFrozenColumnClass(column, visibleColumns)} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true, true)">
                                     @if (allColumns.All(c => c.Parent == null) && AllowFiltering && column.Filterable && column.Columns == null && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
                                     {
                                         if(filterMode == FilterMode.Simple || filterMode == FilterMode.SimpleWithMenu)
@@ -198,7 +198,7 @@
                         </tr>
                     }
                 </thead>
-                <tbody>
+                <tbody role="rowgroup">
                     @if (Data != null)
                     {
                         @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Count > 0 && Data.Count() > 0 : true) || LoadData.HasDelegate && Data.Count() > 0 || itemsToInsert.Count > 0)
@@ -209,8 +209,8 @@
                             }
                             else
                             {
-                                <tr class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
-                                    <td class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0))">
+                                <tr role="row" class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                                    <td role="gridcell" class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0))">
                                         @if (EmptyTemplate != null)
                                         {
                                             @EmptyTemplate
@@ -225,8 +225,8 @@
                         }
                         else
                         {
-                            <tr class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
-                                <td class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0) + Groups.Count)">
+                            <tr role="row" class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                                <td role="gridcell" class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0) + Groups.Count)">
                                     @if (EmptyTemplate != null)
                                     {
                                         @EmptyTemplate
@@ -242,24 +242,24 @@
                 </tbody>
                 @if (allColumns.Where(c => c.Visible && c.FooterTemplate != null).Any())
                 {
-                    <tfoot class="rz-datatable-tfoot" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                    <tfoot role="rowgroup" class="rz-datatable-tfoot" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
                         @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                         {
-                            <tr>
+                            <tr role="row">
                                 @if (i == 0) // Only add the th elements for the first row
                                 {
                                     @if (ShowGroupExpandColumn)
                                     {
                                         @foreach (var g in Groups)
                                         {
-                                            <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                            <td role="gridcell" class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                                 <span class="rz-column-title"></span>
                                             </td>
                                         }
                                     }
                                     @if (Template != null && ShowExpandColumn && i == 0)
                                     {
-                                        <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                        <td role="gridcell" class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                             <span class="rz-column-title"></span>
                                         </td>
                                     }
@@ -621,7 +621,7 @@
             <text>
             @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
             {
-                <td @attributes="@CellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                <td role="gridcell" @attributes="@CellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
                     @if (this.Responsive)
                     {
                         <span class="rz-column-title">

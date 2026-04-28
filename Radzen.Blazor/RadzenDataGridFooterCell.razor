@@ -1,7 +1,7 @@
 @typeparam TItem
 @if (RowIndex == Column.GetLevel())
 {
-<td rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()">
+<td role="gridcell" rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()">
     <span class="rz-column-footer">
         @if (Column.FooterTemplate != null)
         {

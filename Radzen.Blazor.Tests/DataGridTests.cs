@@ -3273,5 +3273,43 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("0", wrapper.GetAttribute("tabindex"));
             Assert.False(string.IsNullOrEmpty(wrapper.GetAttribute("aria-activedescendant")));
         }
+
+        [Fact]
+        public void DataGrid_AppliesAriaGridRolesToTableDescendants()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Equal("presentation", component.Find("table.rz-grid-table").GetAttribute("role"));
+            Assert.Equal("rowgroup", component.Find("thead").GetAttribute("role"));
+            Assert.Equal("rowgroup", component.Find("tbody").GetAttribute("role"));
+
+            var headerCell = component.Find("thead tr th");
+            Assert.Equal("row", headerCell.ParentElement!.GetAttribute("role"));
+            Assert.Equal("columnheader", headerCell.GetAttribute("role"));
+
+            var dataRows = component.FindAll("tbody tr");
+            Assert.NotEmpty(dataRows);
+            foreach (var row in dataRows)
+            {
+                Assert.Equal("row", row.GetAttribute("role"));
+                foreach (var cell in row.QuerySelectorAll("td"))
+                {
+                    Assert.Equal("gridcell", cell.GetAttribute("role"));
+                }
+            }
+        }
     }
 }

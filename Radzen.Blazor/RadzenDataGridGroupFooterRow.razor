@@ -1,19 +1,19 @@
 @typeparam TItem
 @for (var i = 0; i < Grid.deepestChildColumnLevel + 1; i++)
 {
-    <tr>
+    <tr role="row">
         @if (i == 0) // Only add the th elements for the first row
         {
             @if (Grid.Template != null && Grid.ShowExpandColumn)
             {
-                <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(Grid.deepestChildColumnLevel + 1)>
+                <td role="gridcell" class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(Grid.deepestChildColumnLevel + 1)>
                     <span class="rz-column-title"></span>
                 </td>
             }
         }
         @for (var j = 0; j < GetLevel() + (Grid.ShowGroupExpandColumn ? 0 : -1) + Grid.Groups.Count - GetLevel(); j++)
         {
-            <td class="rz-col-icon">
+            <td role="gridcell" class="rz-col-icon">
                 <span class="rz-column-title"></span>
             </td>
         }

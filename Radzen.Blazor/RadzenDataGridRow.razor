@@ -7,23 +7,23 @@
 @{var firstLevel = Grid?.AllowCompositeDataCells == true ? 0 : (Grid?.deepestChildColumnLevel ?? 0); }
 @for(var i = firstLevel; (Grid?.AllowCompositeDataCells == true ? i <= (Grid?.deepestChildColumnLevel ?? 0) + 1 : i < (Grid?.deepestChildColumnLevel ?? 0) + 1); i++)
 {
-<tr class="@(Grid?.RowStyle(Item, Index) ?? "")" @attributes="@(rowArgs?.Item2)">
+<tr role="row" class="@(Grid?.RowStyle(Item, Index) ?? "")" @attributes="@(rowArgs?.Item2)">
     @if (Grid?.ShowGroupExpandColumn == true)
     {
         @foreach(var g in Grid.Groups)
         {
             @if (i == firstLevel)
             {
-              <td class="rz-col-icon" rowspan="@((Grid?.AllowCompositeDataCells == true ? ((Grid?.deepestChildColumnLevel ?? 0) + 1) : 1))">
+              <td role="gridcell" class="rz-col-icon" rowspan="@((Grid?.AllowCompositeDataCells == true ? ((Grid?.deepestChildColumnLevel ?? 0) + 1) : 1))">
                   <span class="rz-column-title"></span>
               </td>
             }
-           
+
         }
     }
     @if (Grid?.Template != null && Grid?.ShowExpandColumn == true && i == firstLevel)
     {
-        <td class="rz-col-icon" rowspan="@((Grid?.AllowCompositeDataCells == true ? ((Grid?.deepestChildColumnLevel ?? 0) + 1) : 1))">
+        <td role="gridcell" class="rz-col-icon" rowspan="@((Grid?.AllowCompositeDataCells == true ? ((Grid?.deepestChildColumnLevel ?? 0) + 1) : 1))">
             <span class="rz-column-title"></span>
             @if (rowArgs?.Item1.Expandable == true && !(Grid?.LoadChildData.HasDelegate ?? false))
             {
@@ -90,8 +90,8 @@
 {
     @if (Grid.IsRowInEditMode(Item) && Grid.EditTemplate != null)
     {
-        <tr class="rz-expanded-row-content" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
-            <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
+        <tr role="row" class="rz-expanded-row-content" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
+            <td role="gridcell" colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
                 <div class="rz-expanded-row-template" style="position:sticky">
                     <CascadingValue Value=@EditContext>
                         <CascadingValue Value=this>
@@ -104,8 +104,8 @@
     }
     else if (Grid.Template != null)
     {
-        <tr class="rz-expanded-row-content" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
-            <td colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
+        <tr role="row" class="rz-expanded-row-content" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
+            <td role="gridcell" colspan="@(Columns.Sum(c => c.GetColSpan()) + (Grid.ShowExpandColumn ? 1 : 0) + Grid.Groups.Count)">
                 <div class="rz-expanded-row-template" style="position:sticky">
                     @Grid.Template(Item)
                 </div>

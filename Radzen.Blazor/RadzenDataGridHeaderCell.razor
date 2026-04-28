@@ -7,7 +7,7 @@
 
 @if (RowIndex == Column.GetLevel())
 {
-    <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass"
+    <th role="columnheader" rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass"
         scope="col" style="@GetStyle()" data-column-index="@ColumnIndex" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))
         aria-sort="@(Grid.AllowSorting && Column.Sortable ? (Column.GetSortOrder() == SortOrder.Ascending ? "ascending" : Column.GetSortOrder() == SortOrder.Descending ? "descending" : "none") : null)">
         <div @onclick='@((args) => Grid.OnSort(args, Column))'>
