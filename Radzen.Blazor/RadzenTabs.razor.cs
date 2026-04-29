@@ -297,11 +297,18 @@ namespace Radzen.Blazor
         }
 
         bool shouldRender = true;
+        bool suppressNextRender;
         /// <summary>
         /// Should render.
         /// </summary>
         protected override bool ShouldRender()
         {
+            if (suppressNextRender)
+            {
+                suppressNextRender = false;
+                return false;
+            }
+
             return shouldRender;
         }
 
@@ -343,8 +350,6 @@ namespace Radzen.Blazor
 
         async Task OnKeyPress(KeyboardEventArgs args)
         {
-            shouldRender = true;
-
             var key = args.Code != null ? args.Code : args.Key;
 
             var item = tabs.ElementAtOrDefault(focusedIndex) ?? tabs.FirstOrDefault();
@@ -377,7 +382,10 @@ namespace Radzen.Blazor
             }
             else
             {
-                shouldRender = preventKeyPress || stopKeydownPropagation;
+                if (!preventKeyPress && !stopKeydownPropagation)
+                {
+                    suppressNextRender = true;
+                }
                 preventKeyPress = false;
                 stopKeydownPropagation = false;
             }

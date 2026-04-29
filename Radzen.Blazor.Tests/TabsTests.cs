@@ -1,5 +1,6 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -165,6 +166,42 @@ namespace Radzen.Blazor.Tests
 
             var selectedTabs = component.FindAll("[role='tab'][aria-selected='true']");
             Assert.Single(selectedTabs);
+        }
+
+        static RenderFragment TabsFragmentWithContent(params (string Title, string Content)[] tabs) => builder =>
+        {
+            var seq = 0;
+            foreach (var (title, content) in tabs)
+            {
+                builder.OpenComponent(seq++, typeof(RadzenTabsItem));
+                builder.AddAttribute(seq++, "Text", title);
+                builder.AddAttribute(seq++, "ChildContent", (RenderFragment)(b => b.AddContent(0, content)));
+                builder.CloseComponent();
+            }
+        };
+
+        [Fact]
+        public void Tabs_NonNavigationKeyDown_DoesNotBlockSubsequentRenders()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
+            );
+
+            Assert.Contains("First-Content", component.Markup);
+
+            var wrapper = component.Find("div.rz-tabview");
+            // Simulate non-navigation keystrokes (e.g. a barcode scanner) on the focused tablist.
+            // Pre-fix: the second keypress latched shouldRender = false, blocking all later renders.
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA" });
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "b", Code = "KeyB" });
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.SelectedIndex, 1));
+
+            Assert.Contains("Second-Content", component.Markup);
+            Assert.DoesNotContain("First-Content", component.Markup);
         }
     }
 }
