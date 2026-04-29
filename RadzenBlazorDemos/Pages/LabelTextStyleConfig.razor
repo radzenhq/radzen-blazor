@@ -1,0 +1,34 @@
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                TextStyle
+                <RadzenSelectBar @bind-Value="@textStyle" TextProperty="Text" ValueProperty="Value"
+                                 Data="@textStyleOptions" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex"
+                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "text style" }})" />
+                <RadzenDropDown @bind-Value="@textStyle" TextProperty="Text" ValueProperty="Value"
+                                Data="@textStyleOptions" class="rz-display-inline-flex rz-display-xl-none"
+                                aria-label="text style" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="The quick brown fox" TextStyle="@textStyle" Component="LabelTextStyleConfigPreview" />
+        <RadzenTextBox Name="LabelTextStyleConfigPreview" @bind-Value=@previewValue Placeholder="Click the label to focus me" />
+    </RadzenStack>
+</RadzenStack>
+@code {
+    TextStyle textStyle = TextStyle.H4;
+    string previewValue = "";
+
+    static readonly TextStyle[] excluded = new[]
+    {
+        TextStyle.DisplayH1, TextStyle.DisplayH2, TextStyle.DisplayH3,
+        TextStyle.DisplayH4, TextStyle.DisplayH5, TextStyle.DisplayH6,
+    };
+
+    IEnumerable<object> textStyleOptions = Enum.GetValues(typeof(TextStyle))
+        .Cast<TextStyle>()
+        .Where(t => Array.IndexOf(excluded, t) < 0)
+        .Select(t => new { Text = t.ToString(), Value = t });
+}
