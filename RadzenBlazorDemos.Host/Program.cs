@@ -33,8 +33,14 @@ builder.Services.AddSingleton(sp =>
     // Get the address that the app is currently running at
     var server = sp.GetRequiredService<IServer>();
     var addressFeature = server.Features.Get<IServerAddressesFeature>();
-    string baseAddress = addressFeature.Addresses.First();
-    return new HttpClient { BaseAddress = new Uri(baseAddress) };
+    var baseAddress = new Uri(addressFeature.Addresses.First());
+    // Wildcard binds (0.0.0.0, ::, +) are valid listen addresses but cannot be used as
+    // connection targets, so substitute a loopback host for the HttpClient base address.
+    if (baseAddress.Host is "0.0.0.0" or "::" or "[::]" or "+" or "*")
+    {
+        baseAddress = new UriBuilder(baseAddress) { Host = "localhost" }.Uri;
+    }
+    return new HttpClient { BaseAddress = baseAddress };
 });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>

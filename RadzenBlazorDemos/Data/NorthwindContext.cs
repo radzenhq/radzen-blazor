@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RadzenBlazorDemos.Data
 {
     public partial class NorthwindContext : Microsoft.EntityFrameworkCore.DbContext
     {
+        private static readonly SemaphoreSlim seedLock = new(1, 1);
+        private static volatile bool seeded;
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -215,35 +219,61 @@ namespace RadzenBlazorDemos.Data
 
         public async Task SeedAsync()
         {
+            if (seeded)
+            {
+                return;
+            }
+
+            await seedLock.WaitAsync();
             try
             {
+                if (seeded)
+                {
+                    return;
+                }
+
                 AddData();
 
                 if (ChangeTracker.HasChanges())
                 {
                     await SaveChangesAsync();
                 }
+
+                seeded = true;
             }
-            catch
+            finally
             {
-                //
+                seedLock.Release();
             }
         }
 
         public void Seed()
         {
+            if (seeded)
+            {
+                return;
+            }
+
+            seedLock.Wait();
             try
             {
+                if (seeded)
+                {
+                    return;
+                }
+
                 AddData();
 
                 if (ChangeTracker.HasChanges())
                 {
                     SaveChanges();
                 }
+
+                seeded = true;
             }
-            catch
+            finally
             {
-                //
+                seedLock.Release();
             }
         }
 
