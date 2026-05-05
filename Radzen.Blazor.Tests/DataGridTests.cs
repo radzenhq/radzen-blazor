@@ -1955,6 +1955,43 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("Not equals", component.Markup);
         }
 
+        [Fact]
+        public void DataGrid_ClearsFilterValue_WhenSwitchingFromIsEmptyToValueOperator()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "Test" } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Name");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.SimpleWithMenu);
+            });
+
+            var column = component.FindComponent<RadzenDataGridColumn<dynamic>>().Instance;
+
+            column.SetFilterOperator(FilterOperator.IsEmpty);
+            Assert.Equal(string.Empty, column.GetFilterValue());
+            Assert.True(column.HasActiveFilter());
+
+            column.SetFilterOperator(FilterOperator.DoesNotContain);
+            Assert.Null(column.GetFilterValue());
+            Assert.False(column.HasActiveFilter());
+
+            column.SetSecondFilterOperator(FilterOperator.IsNotEmpty);
+            Assert.Equal(string.Empty, column.GetSecondFilterValue());
+
+            column.SetSecondFilterOperator(FilterOperator.Contains);
+            Assert.Null(column.GetSecondFilterValue());
+        }
+
         // Combined FilterMode and data type tests
         [Fact]
         public void DataGrid_SimpleMode_SupportsStringColumns()
