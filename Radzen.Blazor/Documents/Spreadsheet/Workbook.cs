@@ -138,4 +138,34 @@ public class Workbook
     {
         return XlsxReader.Read(stream);
     }
+
+    /// <summary>
+    /// Saves a single sheet of the workbook to the specified stream in CSV format. By default
+    /// the first sheet is exported; pass <see cref="CsvExportOptions.Sheet"/> to choose a
+    /// different one. CSV is single-sheet by design, matching Excel's "Save As CSV" behavior.
+    /// </summary>
+    /// <param name="stream">Destination stream.</param>
+    /// <param name="options">CSV options. When null, defaults are used (comma separator, UTF-8 with BOM, CRLF line endings, RFC 4180 minimal quoting).</param>
+    public void SaveAsCsv(Stream stream, CsvExportOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        options ??= new CsvExportOptions();
+
+        var sheet = options.Sheet
+            ?? (sheets.Count > 0 ? sheets[0] : throw new InvalidOperationException("Workbook contains no sheets."));
+
+        new CsvWriter(sheet, options).Write(stream);
+    }
+
+    /// <summary>
+    /// Loads a CSV stream into a new <see cref="Workbook"/> with a single sheet.
+    /// </summary>
+    /// <param name="stream">Source stream.</param>
+    /// <param name="options">CSV options. When null, defaults are used.</param>
+    public static Workbook LoadFromCsv(Stream stream, CsvImportOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        return CsvReader.Read(stream, options ?? new CsvImportOptions());
+    }
 }
