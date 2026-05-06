@@ -15,8 +15,8 @@
             <Tabs>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FileTab))>
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <Open WorkbookChanged=@OnWorkbookChangedAsync />
-                        <Save Workbook=@workbook FileName=@ExportFileName />
+                        <Open WorkbookChanged=@OnWorkbookChangedAsync CsvImportOptions=@CsvImportOptions />
+                        <Save Workbook=@workbook ActiveWorksheet=@Worksheet FileName=@ExportFileName CsvExportOptions=@CsvExportOptions />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_HomeTab))>
