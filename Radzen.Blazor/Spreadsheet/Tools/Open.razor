@@ -3,7 +3,7 @@
 @using System.IO
 
 <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button">
-    <InputFile OnChange=@OnUploadAsync accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+    <InputFile OnChange=@OnUploadAsync accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" />
     <i class="notranslate rzi">folder_open</i>
 </RadzenButton>
 @code {
@@ -12,21 +12,26 @@
     [Parameter]
     public EventCallback<Workbook> WorkbookChanged { get; set; }
 
+    [Parameter]
+    public CsvImportOptions? CsvImportOptions { get; set; }
+
     async Task OnUploadAsync(InputFileChangeEventArgs args)
     {
         var file = args.File;
 
-        if (file is not null)
-        {
-            using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10); // 10 MB max size
-            using var memoryStream = new MemoryStream();
+        if (file is null) return;
 
-            await stream.CopyToAsync(memoryStream);
-            memoryStream.Position = 0;
-    
-            var workbook = Workbook.LoadFromStream(memoryStream);
+        using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10); // 10 MB max size
+        using var memoryStream = new MemoryStream();
 
-            await WorkbookChanged.InvokeAsync(workbook);
-        }
+        await stream.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;
+
+        var ext = Path.GetExtension(file.Name);
+        var workbook = string.Equals(ext, ".csv", StringComparison.OrdinalIgnoreCase)
+            ? Workbook.LoadFromCsv(memoryStream, CsvImportOptions)
+            : Workbook.LoadFromStream(memoryStream);
+
+        await WorkbookChanged.InvokeAsync(workbook);
     }
 }

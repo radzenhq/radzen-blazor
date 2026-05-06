@@ -77,9 +77,25 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     /// <summary>
     /// The name of the file to export the workbook to when using the export functionality.
+    /// When the user picks "Save as CSV" the extension is replaced with <c>.csv</c>.
     /// </summary>
     [Parameter]
     public string ExportFileName { get; set; } = "sheet.xlsx";
+
+    /// <summary>
+    /// Options applied when the user exports the workbook as CSV. When null, defaults are
+    /// used (comma separator, UTF-8 with BOM, CRLF line endings, RFC 4180 minimal quoting,
+    /// active sheet only).
+    /// </summary>
+    [Parameter]
+    public CsvExportOptions? CsvExportOptions { get; set; }
+
+    /// <summary>
+    /// Options applied when the user opens a CSV file. When null, defaults are used
+    /// (comma separator, UTF-8, value and formula auto-detection on).
+    /// </summary>
+    [Parameter]
+    public CsvImportOptions? CsvImportOptions { get; set; }
 
     /// <summary>
     /// Event callback that is invoked when the workbook changes.
