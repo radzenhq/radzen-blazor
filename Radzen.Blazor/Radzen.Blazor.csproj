@@ -55,6 +55,7 @@
     <EmbeddedResource Include="LinkerConfig.xml">
       <LogicalName>$(MSBuildProjectName).xml</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Documents/Spreadsheet/theme1.xml" />
   </ItemGroup>
 
   <ItemGroup>
