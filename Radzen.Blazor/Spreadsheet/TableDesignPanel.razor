@@ -37,6 +37,7 @@
 
             <RadzenCheckBox Value=@CurrentTable.ShowFilterButton
                 Change=@(v => Toggle(t => t.ShowFilterButton = (bool)v)) TValue="bool"
+                Disabled=@(!CurrentTable.ShowHeaderRow)
                 Name="fltChk" />
             <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignFilter)) Component="fltChk" />
 

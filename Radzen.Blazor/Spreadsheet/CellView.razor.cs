@@ -295,15 +295,25 @@ public partial class CellView : CellBase, IDisposable
         }
         else if (isData)
         {
-            if (table.ShowBandedRows)
+            // Excel parity (verified via COM probe of $tbl.DisplayFormat.Interior.Color):
+            //   - Rows only       → odd data-row offset gets the alt color, all columns.
+            //   - Columns only    → odd data-col offset gets the alt color, all rows.
+            //   - Both on         → alt color appears only when BOTH row AND col offsets
+            //                       are odd. Other intersections keep the base color.
+            var rowOdd = ((Row - dataStart) & 1) == 1;
+            var colOdd = ((Column - table.Range.Start.Column) & 1) == 1;
+
+            if (table.ShowBandedRows && table.ShowBandedColumns)
             {
-                var dataRowOffset = Row - dataStart;
-                bg = (dataRowOffset & 1) == 0 ? preset.RowBackground : preset.AltRowBackground;
+                bg = rowOdd && colOdd ? preset.AltRowBackground : preset.RowBackground;
+            }
+            else if (table.ShowBandedRows)
+            {
+                bg = rowOdd ? preset.AltRowBackground : preset.RowBackground;
             }
             else if (table.ShowBandedColumns)
             {
-                var dataColOffset = Column - table.Range.Start.Column;
-                bg = (dataColOffset & 1) == 0 ? preset.RowBackground : preset.AltRowBackground;
+                bg = colOdd ? preset.AltRowBackground : preset.RowBackground;
             }
 
             if (table.HighlightFirstColumn && isFirstCol && preset.BoldFirstColumn) bold = true;
@@ -327,16 +337,50 @@ public partial class CellView : CellBase, IDisposable
             sb.Append("font-weight:600;");
         }
 
-        // Subtle table border on the outer edge.
+        // Outer table outline + role separators. Borders are drawn on the
+        // outermost cells so the entire table reads as a framed block.
         if (preset.BorderColor is not null)
         {
-            if (isHeader)
+            var isTopRow = Row == table.Range.Start.Row;
+            var isBottomRow = Row == table.Range.End.Row;
+            var isLeftCol = isFirstCol;
+            var isRightCol = isLastCol;
+
+            if (isTopRow)
+            {
+                sb.Append("border-top:1px solid ");
+                sb.Append(preset.BorderColor);
+                sb.Append(';');
+            }
+            if (isBottomRow)
             {
                 sb.Append("border-bottom:1px solid ");
                 sb.Append(preset.BorderColor);
                 sb.Append(';');
             }
-            if (isTotals)
+            if (isLeftCol)
+            {
+                sb.Append("border-left:1px solid ");
+                sb.Append(preset.BorderColor);
+                sb.Append(';');
+            }
+            if (isRightCol)
+            {
+                sb.Append("border-right:1px solid ");
+                sb.Append(preset.BorderColor);
+                sb.Append(';');
+            }
+
+            // Internal separator: header row gets a thicker bottom edge to demarcate
+            // the data body. (Skip when header is hidden — the role doesn't exist.)
+            if (isHeader && !isBottomRow)
+            {
+                sb.Append("border-bottom:1px solid ");
+                sb.Append(preset.BorderColor);
+                sb.Append(';');
+            }
+            // Totals row gets a thicker top edge for the same reason.
+            if (isTotals && !isTopRow)
             {
                 sb.Append("border-top:2px solid ");
                 sb.Append(preset.BorderColor);

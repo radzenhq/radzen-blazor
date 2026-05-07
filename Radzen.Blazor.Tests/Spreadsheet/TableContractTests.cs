@@ -146,25 +146,57 @@ public class TableContractTests
     }
 
     [Fact]
-    public void Table_DataRange_ShouldExcludeHeaderAndTotalsRows()
+    public void Table_DataRange_ShouldNotShrink_WhenTotalsAdded()
     {
+        // Excel parity (verified via COM probe): ShowTotals=true ADDS a new row
+        // below the existing range; data rows are unchanged.
         var (_, ws) = NewSheet();
         var t = ws.AddTable("T", Range(0, 0, 5, 4));
         Assert.Equal(Range(1, 0, 5, 4), t.DataRange);
 
         t.ShowTotalsRow = true;
-        Assert.Equal(Range(1, 0, 4, 4), t.DataRange);
+        Assert.Equal(Range(1, 0, 5, 4), t.DataRange);   // unchanged
+        Assert.Equal(Range(0, 0, 6, 4), t.Range);       // range expanded by one
     }
 
     [Fact]
-    public void Table_TotalsRowRange_ShouldBeLastRow_WhenTotalsShown()
+    public void Table_TotalsRowRange_ShouldBeNewRowBelowData_WhenTotalsShown()
     {
         var (_, ws) = NewSheet();
         var t = ws.AddTable("T", Range(0, 0, 5, 4));
         Assert.Null(t.TotalsRowRange);
 
         t.ShowTotalsRow = true;
-        Assert.Equal(Range(5, 0, 5, 4), t.TotalsRowRange);
+        // Range was 0..5, totals added at row 6.
+        Assert.Equal(Range(6, 0, 6, 4), t.TotalsRowRange);
+    }
+
+    [Fact]
+    public void ShowTotalsRow_FlipToTrue_ShouldWriteTotalLabelInFirstColumn()
+    {
+        var (_, ws) = NewSheet();
+        var t = ws.AddTable("T", Range(0, 0, 5, 4));
+        t.ShowTotalsRow = true;
+        Assert.Equal("Total", ws.Cells[6, 0].Value);
+    }
+
+    [Fact]
+    public void ShowTotalsRow_FlipToFalse_ShouldShrinkRangeAndClearRow()
+    {
+        var (_, ws) = NewSheet();
+        var t = ws.AddTable("T", Range(0, 0, 5, 4));
+        t.ShowTotalsRow = true;
+        Assert.Equal(Range(0, 0, 6, 4), t.Range);
+
+        t.ShowTotalsRow = false;
+        Assert.Equal(Range(0, 0, 5, 4), t.Range);
+        Assert.Null(t.TotalsRowRange);
+        // Row that was the totals row is now cleared (it's outside the table).
+        for (var c = 0; c < 5; c++)
+        {
+            Assert.Null(ws.Cells[6, c].Value);
+            Assert.Null(ws.Cells[6, c].Formula);
+        }
     }
 
     // ── Columns collection ──────────────────────────────────────────────────
@@ -220,11 +252,11 @@ public class TableContractTests
     {
         var (_, ws) = NewSheet();
         var t = ws.AddTable("Sales", Range(0, 0, 5, 4));
-        t.ShowTotalsRow = true;
+        t.ShowTotalsRow = true;       // adds a new row 6 below the data
         t.Columns[2].TotalsCalculation = TotalsCalculation.Sum;
 
-        // The totals cell should contain a SUBTOTAL formula referencing this column.
-        var totalsCell = ws.Cells[5, 2];
+        // The totals cell at the new bottom of the table contains a SUBTOTAL formula.
+        var totalsCell = ws.Cells[6, 2];
         Assert.NotNull(totalsCell.Formula);
         Assert.Contains("SUBTOTAL", totalsCell.Formula!, System.StringComparison.OrdinalIgnoreCase);
     }

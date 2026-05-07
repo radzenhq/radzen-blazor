@@ -52,12 +52,13 @@ public class Table
     private RangeRef range;
     private readonly List<TableColumn> columns;
 
-    internal Table(Worksheet sheet, string name, RangeRef range, bool hasHeaders)
+    internal Table(Worksheet sheet, string name, RangeRef range, bool hasHeaders, bool totalsRowShown = false)
     {
         Worksheet = sheet;
         this.name = name;
         this.range = range;
         showHeaderRow = hasHeaders;
+        showTotalsRow = totalsRowShown;
         columns = new List<TableColumn>();
         for (var i = 0; i < range.Columns; i++)
         {
@@ -178,18 +179,62 @@ public class Table
         showFilterButton = true;
     }
 
-    /// <summary>Whether the totals row is shown. Defaults to false.</summary>
+    /// <summary>
+    /// Whether the totals row is shown. Defaults to false. Toggling at runtime is a
+    /// structural operation matching Excel's behavior:
+    /// - false → true: <see cref="Range"/> expands by one row downward, "Total" is
+    ///   written into the new row's first column, and any column-level
+    ///   <see cref="TableColumn.TotalsCalculation"/> values are applied as
+    ///   <c>SUBTOTAL</c> formulas.
+    /// - true → false: the totals row's cells (values + formulas + format) are
+    ///   cleared and <see cref="Range"/> shrinks back by one row.
+    /// </summary>
     public bool ShowTotalsRow
     {
         get => showTotalsRow;
         set
         {
             if (showTotalsRow == value) return;
-            showTotalsRow = value;
-            if (value) ApplyAllTotalsCalculations();
-            else ClearTotalsRow();
+
+            if (value)
+            {
+                ExpandToIncludeTotalsRow();
+                showTotalsRow = true;
+                ApplyAllTotalsCalculations();
+            }
+            else
+            {
+                ClearAndShrinkTotalsRow();
+                showTotalsRow = false;
+            }
+
             Worksheet.OnAutoFilterChanged();
         }
+    }
+
+    private void ExpandToIncludeTotalsRow()
+    {
+        range = new RangeRef(range.Start, new CellRef(range.End.Row + 1, range.End.Column));
+        Filter = new AutoFilter(Worksheet, range);
+        // Default content: "Total" in the first column. Excel writes this only on the
+        // first column; per-column totals are applied separately via TotalsCalculation.
+        Worksheet.Cells[range.End.Row, range.Start.Column].Value = "Total";
+    }
+
+    private void ClearAndShrinkTotalsRow()
+    {
+        var totalsRow = range.End.Row;
+        for (var c = range.Start.Column; c <= range.End.Column; c++)
+        {
+            if (Worksheet.Cells.TryGet(totalsRow, c, out var cell))
+            {
+                cell.Value = null;
+                cell.Formula = null;
+                cell.Format = new Format();
+            }
+        }
+        range = new RangeRef(range.Start, new CellRef(range.End.Row - 1, range.End.Column));
+        Filter = new AutoFilter(Worksheet, range);
     }
 
     /// <summary>Whether the filter buttons render on header cells. Defaults to true.</summary>
@@ -381,19 +426,6 @@ public class Table
         cell.Formula = $"=SUBTOTAL({subtotalCode.ToString(CultureInfo.InvariantCulture)},{dataStart}:{dataEnd})";
     }
 
-    private void ClearTotalsRow()
-    {
-        var totalsRow = range.End.Row;
-        for (var i = 0; i < columns.Count; i++)
-        {
-            var sheetCol = range.Start.Column + i;
-            if (Worksheet.Cells.TryGet(totalsRow, sheetCol, out var cell))
-            {
-                cell.Formula = null;
-                cell.Value = null;
-            }
-        }
-    }
 }
 
 /// <summary>Represents a single column inside a <see cref="Table"/>.</summary>
