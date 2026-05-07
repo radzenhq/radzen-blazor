@@ -48,13 +48,20 @@ public class Cell
     /// Clones the cell, creating a new instance with the same properties.
     /// </summary>
 
-    public Cell Clone() => new(Worksheet, Address)
+    public Cell Clone()
     {
-        Data = new CellData(Value),
-        Formula = Formula,
-        QuotePrefix = QuotePrefix,
-        Hyperlink = Hyperlink?.Clone()
-    };
+        var clone = new Cell(Worksheet, Address)
+        {
+            Data = new CellData(Value),
+            Formula = Formula,
+            QuotePrefix = QuotePrefix,
+            Hyperlink = Hyperlink?.Clone(),
+        };
+        // Format is shared by reference (Format itself is mutable, but the same
+        // semantics apply as in CopyFrom, which mirrors this behavior).
+        clone.format = format;
+        return clone;
+    }
 
     /// <summary>
     /// Copies the properties from another cell to this cell.
