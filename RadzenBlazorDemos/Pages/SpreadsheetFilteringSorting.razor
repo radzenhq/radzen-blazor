@@ -71,7 +71,7 @@
         }
 
         // Enable auto-filter on the table range
-        sheet.AddTable(RangeRef.Parse("A1:F21"));
+        sheet.AddTable("Employees", RangeRef.Parse("A1:F21"));
 
         // Freeze header row
         sheet.Rows.Frozen = 1;
