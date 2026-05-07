@@ -796,7 +796,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         var row = args.Row;
         var column = args.Column;
 
-        ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
+        var menuItems = new List<ContextMenuItem>
         {
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" },
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" },
@@ -804,7 +804,29 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ClearContents)), Value = "clear", Icon = "clear" },
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ContextSortAscending)), Value = "sort-ascending", Icon = "arrow_upward" },
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ContextSortDescending)), Value = "sort-descending", Icon = "arrow_downward" },
-        }, menuArgs => OnContextMenuItemClick(menuArgs, row, column));
+        };
+
+        // If the active cell is inside a Table, add table-management actions.
+        if (FindTableAt(row, column) is not null)
+        {
+            menuItems.Add(new() { Text = Localize("Spreadsheet_ConvertTableToRange") ?? "Convert Table to Range",
+                Value = "convert-table-to-range", Icon = "grid_off" });
+            menuItems.Add(new() { Text = Localize("Spreadsheet_DeleteTable") ?? "Delete Table",
+                Value = "delete-table", Icon = "delete" });
+        }
+
+        ContextMenuService.Open(args.Pointer, menuItems,
+            menuArgs => OnContextMenuItemClick(menuArgs, row, column));
+    }
+
+    private Table? FindTableAt(int row, int column)
+    {
+        if (Worksheet is null) return null;
+        foreach (var t in Worksheet.Tables)
+        {
+            if (t.Range.Contains(row, column)) return t;
+        }
+        return null;
     }
 
     /// <summary>
@@ -912,6 +934,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     break;
                 case "sort-descending":
                     Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
+                    break;
+                case "convert-table-to-range":
+                case "delete-table":
+                    {
+                        var table = FindTableAt(row, column);
+                        if (table is not null)
+                        {
+                            Execute(new RemoveTableCommand(Worksheet, table));
+                        }
+                    }
                     break;
             }
         }
