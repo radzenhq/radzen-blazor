@@ -1,0 +1,98 @@
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text="Principal" Component="principal" />
+        <RadzenNumeric @bind-Value=@principal TValue="double" Min="0" Step="100"
+            Change=@(_ => Recompute()) Name="principal" Style="width:130px" />
+
+        <RadzenLabel Text="Annual rate (0.05 = 5%)" Component="rate" />
+        <RadzenNumeric @bind-Value=@rate TValue="double" Step="0.01" Format="0.00"
+            Change=@(_ => Recompute()) Name="rate" Style="width:90px" />
+
+        <RadzenLabel Text="Years" Component="years" />
+        <RadzenNumeric @bind-Value=@years TValue="double" Min="1" Max="50"
+            Change=@(_ => Recompute()) Name="years" Style="width:80px" />
+    </RadzenStack>
+
+    <RadzenTable>
+        <RadzenTableHeader>
+            <RadzenTableHeaderRow>
+                <RadzenTableHeaderCell>Context</RadzenTableHeaderCell>
+                <RadzenTableHeaderCell>Formula</RadzenTableHeaderCell>
+                <RadzenTableHeaderCell>Result</RadzenTableHeaderCell>
+            </RadzenTableHeaderRow>
+        </RadzenTableHeader>
+        <RadzenTableBody>
+            <RadzenTableRow>
+                <RadzenTableCell>FormulaEngine (headless)</RadzenTableCell>
+                <RadzenTableCell Style="font-family:monospace">=COMPOUND(@principal, @rate, @years)</RadzenTableCell>
+                <RadzenTableCell Style="font-family:monospace">@engineResult</RadzenTableCell>
+            </RadzenTableRow>
+            <RadzenTableRow>
+                <RadzenTableCell>Worksheet.FunctionRegistry</RadzenTableCell>
+                <RadzenTableCell Style="font-family:monospace">=COMPOUND(A1, B1, C1)</RadzenTableCell>
+                <RadzenTableCell Style="font-family:monospace">@worksheetResult</RadzenTableCell>
+            </RadzenTableRow>
+        </RadzenTableBody>
+    </RadzenTable>
+
+    <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" AllowClose="false">
+        Both contexts share the exact same <code>FormulaFunction</code> subclass. Register it on the
+        <code>FunctionStore</code> exposed by either <code>FormulaEngine.Functions</code> or
+        <code>Worksheet.FunctionRegistry</code>, and any cell formula can call it.
+    </RadzenAlert>
+</RadzenStack>
+
+@code {
+    double principal = 1000;
+    double rate = 0.05;
+    double years = 3;
+    string engineResult = "";
+    string worksheetResult = "";
+
+    protected override void OnInitialized() => Recompute();
+
+    void Recompute()
+    {
+        // 1) Stateless via FormulaEngine
+        var engine = new FormulaEngine();
+        engine.Functions.Add<CompoundFunction>();
+        engineResult = engine.Evaluate($"=COMPOUND({principal},{rate},{years})")?.ToString() ?? "(null)";
+
+        // 2) Inside a Workbook via Worksheet.FunctionRegistry
+        var wb = new Workbook();
+        var sheet = wb.AddSheet("Calc", 1, 4);
+        sheet.FunctionRegistry.Add<CompoundFunction>();
+        sheet.Cells[0, 0].Value = principal;
+        sheet.Cells[0, 1].Value = rate;
+        sheet.Cells[0, 2].Value = years;
+        sheet.Cells[0, 3].Formula = "=COMPOUND(A1, B1, C1)";
+        worksheetResult = sheet.Cells[0, 3].Value?.ToString() ?? "(null)";
+    }
+
+    /// <summary>
+    /// Compound interest: principal × (1 + rate)^years.
+    /// One class, registered on either context, callable from any cell.
+    /// </summary>
+    public sealed class CompoundFunction : FormulaFunction
+    {
+        public override string Name => "COMPOUND";
+
+        public override FunctionParameter[] Parameters =>
+        [
+            new("principal", ParameterType.Single, isRequired: true),
+            new("rate",      ParameterType.Single, isRequired: true),
+            new("years",     ParameterType.Single, isRequired: true),
+        ];
+
+        public override CellData Evaluate(FunctionArguments args)
+        {
+            System.ArgumentNullException.ThrowIfNull(args);
+            var p = args.GetSingle("principal")?.GetValueOrDefault<double>() ?? 0d;
+            var r = args.GetSingle("rate")?.GetValueOrDefault<double>() ?? 0d;
+            var y = args.GetSingle("years")?.GetValueOrDefault<double>() ?? 0d;
+            return CellData.FromNumber(p * System.Math.Pow(1d + r, y));
+        }
+    }
+}

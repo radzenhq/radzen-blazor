@@ -1,0 +1,60 @@
+@using Radzen.Documents.Spreadsheet
+
+<RadzenTable>
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell>Cell</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>Value</RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        <RadzenTableRow>
+            <RadzenTableCell Style="font-family:monospace">A1</RadzenTableCell>
+            <RadzenTableCell>
+                <RadzenNumeric @bind-Value=@a1 TValue="double" Change=@(_ => Recompute()) Style="width:120px" />
+            </RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell Style="font-family:monospace">B1</RadzenTableCell>
+            <RadzenTableCell>
+                <RadzenNumeric @bind-Value=@b1 TValue="double" Change=@(_ => Recompute()) Style="width:120px" />
+            </RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell Style="font-family:monospace">C1</RadzenTableCell>
+            <RadzenTableCell Style="font-family:monospace">
+                <span style="opacity:0.6">=A1+B1</span>
+                &nbsp;→&nbsp;
+                <strong>@c1Result</strong>
+            </RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell Style="font-family:monospace">D1</RadzenTableCell>
+            <RadzenTableCell Style="font-family:monospace">
+                <span style="opacity:0.6">=C1*2</span>
+                &nbsp;→&nbsp;
+                <strong>@d1Result</strong>
+            </RadzenTableCell>
+        </RadzenTableRow>
+    </RadzenTableBody>
+</RadzenTable>
+
+@code {
+    double a1 = 2;
+    double b1 = 3;
+    string c1Result = "";
+    string d1Result = "";
+
+    protected override void OnInitialized() => Recompute();
+
+    void Recompute()
+    {
+        var engine = new FormulaEngine();
+        engine.Set("A1", a1);
+        engine.Set("B1", b1);
+        engine.Set("C1", "=A1+B1");
+        engine.Set("D1", "=C1*2");
+        c1Result = engine.Get("C1")?.ToString() ?? "(null)";
+        d1Result = engine.Get("D1")?.ToString() ?? "(null)";
+    }
+}
