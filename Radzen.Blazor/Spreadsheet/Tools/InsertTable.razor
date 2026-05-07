@@ -7,7 +7,7 @@
     Disabled=@IsDisabled
     Click=@OnClick
     Icon="table_chart"
-    title=@(Spreadsheet?.Localize("Spreadsheet_InsertTable") ?? "Insert Table") />
+    title=@Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertTable)) />
 
 @code {
 #nullable enable
@@ -41,7 +41,7 @@
         };
 
         var result = await DialogService.OpenAsync<InsertTableDialog>(
-            Spreadsheet?.Localize("Spreadsheet_InsertTable") ?? "Insert Table",
+            Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertTable)) ?? "Insert Table",
             args,
             new DialogOptions { Width = "420px", ShowClose = true });
 
