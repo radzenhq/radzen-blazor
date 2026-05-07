@@ -1,0 +1,222 @@
+@using System.Collections.Generic
+@using System.Linq
+@using Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+@if (CurrentTable is not null)
+{
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem"
+        class="rz-spreadsheet-table-design rz-p-2"
+        Style="background:var(--rz-base-50, #f7f7f7); border-bottom:1px solid var(--rz-border)">
+
+        <RadzenLabel Text="Table" />
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+            <RadzenLabel Text="Name" Component="tableNameInput" />
+            <RadzenTextBox @bind-Value=@tableName Name="tableNameInput"
+                Change=@(_ => CommitName()) Style="width:160px" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+            <RadzenLabel Text="Style" Component="tableStyleDD" />
+            <RadzenDropDown TValue="string" Data=@styleOptions
+                Value=@(CurrentTable.TableStyle ?? "")
+                Change=@(v => CommitStyle(v as string))
+                Name="tableStyleDD" Style="width:200px" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox Value=@CurrentTable.ShowHeaderRow
+                Change=@(v => Toggle(t => t.ShowHeaderRow = (bool)v)) TValue="bool"
+                Name="hdrChk" />
+            <RadzenLabel Text="Header" Component="hdrChk" />
+
+            <RadzenCheckBox Value=@CurrentTable.ShowTotalsRow
+                Change=@(v => Toggle(t => t.ShowTotalsRow = (bool)v)) TValue="bool"
+                Name="totChk" />
+            <RadzenLabel Text="Totals" Component="totChk" />
+
+            <RadzenCheckBox Value=@CurrentTable.ShowFilterButton
+                Change=@(v => Toggle(t => t.ShowFilterButton = (bool)v)) TValue="bool"
+                Name="fltChk" />
+            <RadzenLabel Text="Filter" Component="fltChk" />
+
+            <RadzenCheckBox Value=@CurrentTable.ShowBandedRows
+                Change=@(v => Toggle(t => t.ShowBandedRows = (bool)v)) TValue="bool"
+                Name="bndRowChk" />
+            <RadzenLabel Text="Banded rows" Component="bndRowChk" />
+
+            <RadzenCheckBox Value=@CurrentTable.ShowBandedColumns
+                Change=@(v => Toggle(t => t.ShowBandedColumns = (bool)v)) TValue="bool"
+                Name="bndColChk" />
+            <RadzenLabel Text="Banded columns" Component="bndColChk" />
+
+            <RadzenCheckBox Value=@CurrentTable.HighlightFirstColumn
+                Change=@(v => Toggle(t => t.HighlightFirstColumn = (bool)v)) TValue="bool"
+                Name="firstChk" />
+            <RadzenLabel Text="First col" Component="firstChk" />
+
+            <RadzenCheckBox Value=@CurrentTable.HighlightLastColumn
+                Change=@(v => Toggle(t => t.HighlightLastColumn = (bool)v)) TValue="bool"
+                Name="lastChk" />
+            <RadzenLabel Text="Last col" Component="lastChk" />
+        </RadzenStack>
+
+        @if (TotalsColumn is { } totalsCol)
+        {
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                <RadzenLabel Text=@($"Totals: {totalsCol.Name}") />
+                <RadzenDropDown TValue="TotalsCalculation" Data=@totalsOptions
+                    TextProperty="@nameof(TotalsOption.Text)" ValueProperty="@nameof(TotalsOption.Value)"
+                    Value=@totalsCol.TotalsCalculation
+                    Change=@(v => CommitTotals(totalsCol, (TotalsCalculation)v))
+                    Style="width:180px" />
+            </RadzenStack>
+        }
+
+        <span style="flex:1"></span>
+
+        <RadzenButton Icon="grid_off" Text="Convert to range"
+            ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+            Click=@OnConvertToRange />
+    </RadzenStack>
+}
+
+@code {
+#nullable enable
+
+    [Parameter] public Worksheet? Worksheet { get; set; }
+    [CascadingParameter] public ISpreadsheet? Spreadsheet { get; set; }
+
+    private Table? CurrentTable
+    {
+        get
+        {
+            if (Worksheet is null) return null;
+            var sel = Worksheet.Selection.Cell;
+            if (sel == CellRef.Invalid) return null;
+            foreach (var t in Worksheet.Tables)
+            {
+                if (t.Range.Contains(sel.Row, sel.Column)) return t;
+            }
+            return null;
+        }
+    }
+
+    private string tableName = "";
+
+    private TableColumn? TotalsColumn
+    {
+        get
+        {
+            var t = CurrentTable;
+            if (t is null || !t.ShowTotalsRow || Worksheet is null) return null;
+            var sel = Worksheet.Selection.Cell;
+            if (sel == CellRef.Invalid) return null;
+            var totals = t.TotalsRowRange;
+            if (totals is null || !totals.Value.Contains(sel.Row, sel.Column)) return null;
+            var idx = sel.Column - t.Range.Start.Column;
+            return idx >= 0 && idx < t.Columns.Count ? t.Columns[idx] : null;
+        }
+    }
+
+    private sealed record TotalsOption(string Text, TotalsCalculation Value);
+    private static readonly TotalsOption[] totalsOptions =
+    [
+        new("None", TotalsCalculation.None),
+        new("Sum", TotalsCalculation.Sum),
+        new("Average", TotalsCalculation.Average),
+        new("Count", TotalsCalculation.Count),
+        new("Count Numbers", TotalsCalculation.CountNumbers),
+        new("Min", TotalsCalculation.Min),
+        new("Max", TotalsCalculation.Max),
+        new("StdDev", TotalsCalculation.StdDev),
+        new("Var", TotalsCalculation.Var),
+    ];
+
+    private void CommitTotals(TableColumn col, TotalsCalculation calc)
+    {
+        col.TotalsCalculation = calc;
+        StateHasChanged();
+    }
+
+    private static readonly List<string> styleOptions = BuildStyleOptions();
+
+    private static List<string> BuildStyleOptions()
+    {
+        var list = new List<string> { "" };
+        for (var i = 1; i <= 21; i++) list.Add($"TableStyleLight{i}");
+        for (var i = 1; i <= 28; i++) list.Add($"TableStyleMedium{i}");
+        for (var i = 1; i <= 11; i++) list.Add($"TableStyleDark{i}");
+        return list;
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed += OnSelectionChanged;
+        }
+
+        SyncFromTable();
+    }
+
+    private void OnSelectionChanged()
+    {
+        SyncFromTable();
+        StateHasChanged();
+    }
+
+    private void SyncFromTable()
+    {
+        tableName = CurrentTable?.Name ?? "";
+    }
+
+    private void CommitName()
+    {
+        if (CurrentTable is null) return;
+        var trimmed = tableName.Trim();
+        if (string.IsNullOrEmpty(trimmed) || trimmed == CurrentTable.Name) return;
+        try { CurrentTable.Name = trimmed; }
+        catch (System.ArgumentException) { tableName = CurrentTable.Name; }
+        StateHasChanged();
+    }
+
+    private void CommitStyle(string? value)
+    {
+        if (CurrentTable is null) return;
+        CurrentTable.TableStyle = string.IsNullOrEmpty(value) ? null : value;
+        StateHasChanged();
+    }
+
+    private void Toggle(System.Action<Table> mutator)
+    {
+        if (CurrentTable is null) return;
+        mutator(CurrentTable);
+        StateHasChanged();
+    }
+
+    private void OnConvertToRange()
+    {
+        if (Worksheet is null || CurrentTable is null) return;
+        var cmd = new RemoveTableCommand(Worksheet, CurrentTable);
+        Spreadsheet?.Execute(cmd);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Worksheet?.Selection is not null)
+        {
+            Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+}

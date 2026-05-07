@@ -85,6 +85,7 @@
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_DataTab))>
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <AutoFilter Worksheet=@Worksheet />
+                        <CustomSort Worksheet=@Worksheet />
                         <DataValidation Worksheet=@Worksheet />
                     </RadzenStack>
                 </RadzenTabsItem>
@@ -92,6 +93,7 @@
         </RadzenTabs>
 @if (Worksheet != null)
 {
+        <TableDesignPanel Worksheet=@Worksheet />
         <CascadingValue Value="@CellTypes">
         <FormulaEditor Worksheet=@Worksheet Editor=@Editor />
         <VirtualGrid @ref=@grid style="flex: 1" View=@ActiveView>
@@ -164,7 +166,9 @@
             {
                 <CellMenu Worksheet=@Worksheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync
                          SortAscending=@(() => OnCellMenuSortAsync(SortOrder.Ascending)) SortDescending=@(() => OnCellMenuSortAsync(SortOrder.Descending)) Clear=@OnCellMenuClearAsync
-                         CustomFilter=@OnCellMenuCustomFilterAsync />
+                         CustomFilter=@OnCellMenuCustomFilterAsync
+                         Top10Filter=@OnCellMenuTop10FilterAsync
+                         DynamicFilter=@OnCellMenuDynamicFilterAsync />
             }
         </Popup>
         <Popup @ref=@validationListPopup class="rz-spreadsheet-cell-popup" Lazy="true">

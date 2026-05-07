@@ -19,6 +19,12 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <param name="skipHeaderRow">If true, skips the first row (header) when sorting.</param>
 public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int keyIndex, bool skipHeaderRow = false) : ICommand, IProtectedCommand
 {
+    /// <summary>
+    /// Convenience factory for the multi-key sort variant.
+    /// </summary>
+    public static MultiKeySortCommand MultiKey(Worksheet sheet, RangeRef range, SortKey[] keys, bool skipHeaderRow = false) =>
+        new(sheet, range, keys, skipHeaderRow);
+
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.Sort;
 
