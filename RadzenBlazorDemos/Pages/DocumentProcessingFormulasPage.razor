@@ -1,0 +1,48 @@
+@page "/document-processing-formulas"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor <strong>Formulas</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Evaluate Excel formulas in Blazor and C#. Use them as cell formulas in a workbook, calculate them directly in code, or register your own custom Excel functions. Supports 65+ Excel functions including SUM, AVERAGE, IF, VLOOKUP, XLOOKUP, EDATE and SUMIF.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-formulas#in-code" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Formulas in code
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use Excel formulas inside a workbook. Edit any Qty or Price below and every dependent cell recomputes live.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingFormulas" Example="DocumentProcessingFormulas">
+    <DocumentProcessingFormulas />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-formulas#stateless-engine" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Stateless evaluation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Calculate any Excel formula directly in C# without creating a workbook. Type an expression and get the result.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingFormulas" Example="DocumentProcessingFormulaEngineStateless">
+    <DocumentProcessingFormulaEngineStateless />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-formulas#stateful-engine" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Stateful evaluation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Calculate Excel formulas with cell references. Change any input and all dependent formulas recompute automatically.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingFormulas" Example="DocumentProcessingFormulaEngineStateful">
+    <DocumentProcessingFormulaEngineStateful />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-formulas#custom-functions" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom functions
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add your own Excel functions and call them from any cell formula. Below: a custom <code>COMPOUND(principal, rate, years)</code> function for compound interest.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingFormulas" Example="DocumentProcessingCustomFunctions">
+    <DocumentProcessingCustomFunctions />
+</RadzenExample>
