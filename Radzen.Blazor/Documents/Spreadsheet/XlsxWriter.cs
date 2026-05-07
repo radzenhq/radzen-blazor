@@ -30,7 +30,8 @@ class XlsxWriter(Workbook sourceWorkbook)
         var sharedStrings = new Dictionary<string, int>();
         var sharedStringsDoc = CreateSharedStringsDocument(sharedStrings);
 
-        SaveSheets(archive, styleTracker, sharedStrings, sharedStringsDoc);
+        var totalTables = 0;
+        SaveSheets(archive, styleTracker, sharedStrings, sharedStringsDoc, ref totalTables);
         SaveStyles(archive, styleTracker);
         UpdateAndSaveSharedStrings(archive, sharedStrings, sharedStringsDoc);
         SaveWorkbook(archive);
@@ -38,9 +39,110 @@ class XlsxWriter(Workbook sourceWorkbook)
         SaveDocPropsCore(archive);
         SaveDocPropsApp(archive);
 
-        SaveContentTypes(archive, includeSharedStrings: sharedStrings.Count > 0);
+        SaveContentTypes(archive, includeSharedStrings: sharedStrings.Count > 0, tableCount: totalTables);
         SaveRelationships(archive);
     }
+
+    private static void SaveTable(ZipArchive archive, Table table, int tableId)
+    {
+        XNamespace ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+
+        var refStr = $"{table.Range.Start}:{table.Range.End}";
+
+        var tableElement = new XElement(ns + "table",
+            new XAttribute("id", tableId.ToString(CultureInfo.InvariantCulture)),
+            new XAttribute("name", table.Name),
+            new XAttribute("displayName", table.DisplayName),
+            new XAttribute("ref", refStr),
+            new XAttribute("totalsRowShown", table.ShowTotalsRow ? "1" : "0"),
+            new XAttribute("totalsRowCount", table.ShowTotalsRow ? "1" : "0"),
+            new XAttribute("headerRowCount", table.ShowHeaderRow ? "1" : "0"));
+
+        // <autoFilter> is present when the filter button is shown.
+        if (table.ShowFilterButton)
+        {
+            // AutoFilter range covers headers + data (excludes totals row).
+            var afEnd = table.ShowTotalsRow
+                ? new CellRef(table.Range.End.Row - 1, table.Range.End.Column)
+                : table.Range.End;
+            tableElement.Add(new XElement(ns + "autoFilter",
+                new XAttribute("ref", $"{table.Range.Start}:{afEnd}")));
+        }
+
+        // <tableColumns count="N">
+        var tableColumnsElement = new XElement(ns + "tableColumns",
+            new XAttribute("count", table.Columns.Count.ToString(CultureInfo.InvariantCulture)));
+
+        for (var i = 0; i < table.Columns.Count; i++)
+        {
+            var col = table.Columns[i];
+            var columnElement = new XElement(ns + "tableColumn",
+                new XAttribute("id", (i + 1).ToString(CultureInfo.InvariantCulture)),
+                new XAttribute("name", col.Name));
+
+            if (table.ShowTotalsRow && col.TotalsCalculation != TotalsCalculation.None)
+            {
+                columnElement.Add(new XAttribute("totalsRowFunction",
+                    TotalsCalculationToXml(col.TotalsCalculation)));
+            }
+
+            if (col.CalculatedFormula is not null)
+            {
+                columnElement.Add(new XElement(ns + "calculatedColumnFormula", col.CalculatedFormula));
+            }
+
+            tableColumnsElement.Add(columnElement);
+        }
+        tableElement.Add(tableColumnsElement);
+
+        // <tableStyleInfo>
+        if (table.TableStyle is not null
+            || table.ShowBandedRows || table.ShowBandedColumns
+            || table.HighlightFirstColumn || table.HighlightLastColumn)
+        {
+            var tableStyleInfoElement = new XElement(ns + "tableStyleInfo");
+            if (table.TableStyle is not null)
+                tableStyleInfoElement.Add(new XAttribute("name", table.TableStyle));
+            tableStyleInfoElement.Add(new XAttribute("showFirstColumn", table.HighlightFirstColumn ? "1" : "0"));
+            tableStyleInfoElement.Add(new XAttribute("showLastColumn", table.HighlightLastColumn ? "1" : "0"));
+            tableStyleInfoElement.Add(new XAttribute("showRowStripes", table.ShowBandedRows ? "1" : "0"));
+            tableStyleInfoElement.Add(new XAttribute("showColumnStripes", table.ShowBandedColumns ? "1" : "0"));
+            tableElement.Add(tableStyleInfoElement);
+        }
+
+        var doc = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), tableElement);
+        using var entry = archive.CreateEntry($"xl/tables/table{tableId}.xml").Open();
+        doc.Save(entry);
+    }
+
+    private static string TotalsCalculationToXml(TotalsCalculation calc) => calc switch
+    {
+        TotalsCalculation.None => "none",
+        TotalsCalculation.Sum => "sum",
+        TotalsCalculation.Average => "average",
+        TotalsCalculation.Count => "countNums",   // Excel reverses these — see ECMA-376
+        TotalsCalculation.CountNumbers => "count",
+        TotalsCalculation.Min => "min",
+        TotalsCalculation.Max => "max",
+        TotalsCalculation.StdDev => "stdDev",
+        TotalsCalculation.Var => "var",
+        TotalsCalculation.Custom => "custom",
+        _ => "none",
+    };
+
+    internal static TotalsCalculation TotalsCalculationFromXml(string? value) => value switch
+    {
+        "sum" => TotalsCalculation.Sum,
+        "average" => TotalsCalculation.Average,
+        "countNums" => TotalsCalculation.Count,
+        "count" => TotalsCalculation.CountNumbers,
+        "min" => TotalsCalculation.Min,
+        "max" => TotalsCalculation.Max,
+        "stdDev" => TotalsCalculation.StdDev,
+        "var" => TotalsCalculation.Var,
+        "custom" => TotalsCalculation.Custom,
+        _ => TotalsCalculation.None,
+    };
 
     private static void SaveTheme(ZipArchive archive)
     {
@@ -528,7 +630,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         return group;
     }
 
-    private void SaveContentTypes(ZipArchive archive, bool includeSharedStrings)
+    private void SaveContentTypes(ZipArchive archive, bool includeSharedStrings, int tableCount = 0)
     {
         var ctNs = "http://schemas.openxmlformats.org/package/2006/content-types";
         var contentTypes = new XDocument(
@@ -567,6 +669,13 @@ class XlsxWriter(Workbook sourceWorkbook)
             contentTypes.Root!.Add(new XElement(XName.Get("Override", ctNs),
                 new XAttribute("PartName", $"/xl/worksheets/sheet{i + 1}.xml"),
                 new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml")));
+        }
+
+        for (var i = 1; i <= tableCount; i++)
+        {
+            contentTypes.Root!.Add(new XElement(XName.Get("Override", ctNs),
+                new XAttribute("PartName", $"/xl/tables/table{i}.xml"),
+                new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml")));
         }
 
         // Add image extension defaults for any sheets with images
@@ -773,7 +882,7 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("builtinId", "0")));
     }
 
-    private void SaveSheets(ZipArchive archive, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    private void SaveSheets(ZipArchive archive, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc, ref int globalTableIndex)
     {
         var workbookRels = CreateWorkbookRelationships();
         var workbookRelsElement = workbookRels.Root!;
@@ -804,7 +913,7 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("Target", $"worksheets/{sheetName}")));
 
             // Save individual sheet
-            SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, sharedStringsDoc, mediaMap, ref globalMediaIndex);
+            SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, sharedStringsDoc, mediaMap, ref globalMediaIndex, ref globalTableIndex);
         }
 
         // Theme relationship (shared by every workbook)
@@ -833,7 +942,7 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships")));
     }
 
-    private void SaveSheet(ZipArchive archive, Worksheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc, Dictionary<string, string> mediaMap, ref int globalMediaIndex)
+    private void SaveSheet(ZipArchive archive, Worksheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc, Dictionary<string, string> mediaMap, ref int globalMediaIndex, ref int globalTableIndex)
     {
         var sheetDoc = CreateSheetDocument(sheet, sheetId, relId);
         var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
@@ -881,6 +990,37 @@ class XlsxWriter(Workbook sourceWorkbook)
         // pageMargins is appended last; ECMA-376 puts it before drawing,
         // but Excel and downstream readers tolerate trailing position too.
         sheetDoc.Root!.Add(CreatePageMargins());
+
+        // Tables: write each table's XML part, register a relationship per table,
+        // and emit a <tableParts> block on the sheet.
+        if (sheet.Tables.Count > 0)
+        {
+            var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+            XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+
+            var tablePartsElement = new XElement(XName.Get("tableParts", ns),
+                new XAttribute("count", sheet.Tables.Count.ToString(CultureInfo.InvariantCulture)));
+
+            var nextRelIndex = sheetRelEntries.Count + 1;
+            foreach (var table in sheet.Tables)
+            {
+                globalTableIndex++;
+                var tableId = globalTableIndex;
+                var tableRelId = $"rId{nextRelIndex++}";
+
+                tablePartsElement.Add(new XElement(XName.Get("tablePart", ns),
+                    new XAttribute(rNs + "id", tableRelId)));
+
+                sheetRelEntries.Add((tableRelId,
+                    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/table",
+                    $"../tables/table{tableId}.xml",
+                    false));
+
+                SaveTable(archive, table, tableId);
+            }
+
+            sheetDoc.Root!.Add(tablePartsElement);
+        }
 
         // Save sheet in xl/worksheets/ subdirectory
         using (var entry = archive.CreateEntry($"xl/worksheets/{sheetName}").Open())

@@ -34,7 +34,7 @@ public class AutoFilterTests
     {
         // Add a data table
         var range = RangeRef.Parse("A1:C5");
-        sheet.AddTable(range);
+        sheet.AddTable("Table1", range);
 
         var table = sheet.Tables[0];
         
@@ -59,8 +59,8 @@ public class AutoFilterTests
     public void Should_HandleMultipleDataTables()
     {
         // Add two data tables
-        sheet.AddTable(RangeRef.Parse("A1:C5"));
-        sheet.AddTable(RangeRef.Parse("E1:G5"));
+        sheet.AddTable("Table1", RangeRef.Parse("A1:C5"));
+        sheet.AddTable("Table2", RangeRef.Parse("E1:G5"));
 
         var table1 = sheet.Tables[0];
         var table2 = sheet.Tables[1];
