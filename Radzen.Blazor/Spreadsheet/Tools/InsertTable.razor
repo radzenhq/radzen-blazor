@@ -1,0 +1,54 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetToolBase
+@inject DialogService DialogService
+
+<RadzenButton ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" ButtonType="ButtonType.Button"
+    Disabled=@IsDisabled
+    Click=@OnClick
+    Icon="table_chart"
+    title=@(Spreadsheet?.Localize("Spreadsheet_InsertTable") ?? "Insert Table") />
+
+@code {
+#nullable enable
+
+    private async Task OnClick()
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var range = Worksheet.Selection.Range;
+        if (range.Rows == 0 || range.Columns == 0)
+        {
+            return;
+        }
+
+        // Auto-generate a unique table name within the workbook.
+        var nextIndex = 1;
+        var existing = new System.Collections.Generic.HashSet<string>(
+            Worksheet.Workbook.Sheets.SelectMany(s => s.Tables).Select(t => t.Name),
+            StringComparer.OrdinalIgnoreCase);
+        while (existing.Contains($"Table{nextIndex}")) nextIndex++;
+
+        var defaultName = $"Table{nextIndex}";
+
+        var args = new System.Collections.Generic.Dictionary<string, object?>
+        {
+            ["DefaultName"] = defaultName,
+            ["Range"] = range,
+        };
+
+        var result = await DialogService.OpenAsync<InsertTableDialog>(
+            Spreadsheet?.Localize("Spreadsheet_InsertTable") ?? "Insert Table",
+            args,
+            new DialogOptions { Width = "420px", ShowClose = true });
+
+        if (result is InsertTableDialog.Result r)
+        {
+            var command = new InsertTableCommand(Worksheet, r.Name, range, r.HasHeaders);
+            Spreadsheet?.Execute(command);
+        }
+    }
+}

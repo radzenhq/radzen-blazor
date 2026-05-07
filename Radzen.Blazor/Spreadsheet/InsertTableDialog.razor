@@ -1,0 +1,56 @@
+@using Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text="Range" Component="rangeLabel" />
+        <RadzenLabel id="rangeLabel" Text=@($"{Range.Start}:{Range.End}") />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+        <RadzenLabel Text="Table name" Component="nameInput" />
+        <RadzenTextBox @bind-Value=@name Name="nameInput" Style="width: 100%" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenCheckBox @bind-Value=@hasHeaders Name="hasHeadersCheck" TValue="bool" />
+        <RadzenLabel Text="My table has headers" Component="hasHeadersCheck" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End" class="rz-pt-2">
+        <RadzenButton Text="OK" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
+            Disabled=@string.IsNullOrWhiteSpace(name)
+            Click=@OnOk />
+        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+            Click=@OnCancel />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    [Parameter] public string DefaultName { get; set; } = "Table1";
+    [Parameter] public RangeRef Range { get; set; }
+
+    private string name = "";
+    private bool hasHeaders = true;
+
+    /// <summary>The result returned to the caller via DialogService.</summary>
+    public sealed record Result(string Name, bool HasHeaders);
+
+    protected override void OnInitialized()
+    {
+        name = DefaultName;
+    }
+
+    private void OnOk()
+    {
+        DialogService.Close(new Result(name.Trim(), hasHeaders));
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close(null);
+    }
+}
