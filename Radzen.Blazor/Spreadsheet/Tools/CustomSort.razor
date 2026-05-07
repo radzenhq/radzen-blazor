@@ -7,7 +7,7 @@
     Disabled=@IsDisabled
     Click=@OnClick
     Icon="sort"
-    title=@(Spreadsheet?.Localize("Spreadsheet_CustomSort") ?? "Custom Sort...") />
+    title=@Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CustomSortTooltip)) />
 
 @code {
 #nullable enable
@@ -34,7 +34,7 @@
         };
 
         var result = await DialogService.OpenAsync<CustomSortDialog>(
-            Spreadsheet?.Localize("Spreadsheet_CustomSort") ?? "Custom Sort",
+            Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CustomSort)) ?? "Custom Sort",
             args,
             new DialogOptions { Width = "640px", ShowClose = true });
 

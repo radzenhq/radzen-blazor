@@ -569,6 +569,161 @@
   <data name="Spreadsheet_InsertChart" xml:space="preserve">
     <value>Insert Chart</value>
   </data>
+  <data name="Spreadsheet_InsertTable" xml:space="preserve">
+    <value>Insert Table</value>
+  </data>
+  <data name="Spreadsheet_TableName" xml:space="preserve">
+    <value>Table name</value>
+  </data>
+  <data name="Spreadsheet_TableHasHeaders" xml:space="preserve">
+    <value>My table has headers</value>
+  </data>
+  <data name="Spreadsheet_TableRange" xml:space="preserve">
+    <value>Range</value>
+  </data>
+  <!-- Spreadsheet: Table Design tab -->
+  <data name="Spreadsheet_TableDesignTab" xml:space="preserve">
+    <value>Table Design</value>
+  </data>
+  <data name="Spreadsheet_TableDesignName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Spreadsheet_TableDesignStyle" xml:space="preserve">
+    <value>Style</value>
+  </data>
+  <data name="Spreadsheet_TableDesignHeader" xml:space="preserve">
+    <value>Header</value>
+  </data>
+  <data name="Spreadsheet_TableDesignTotals" xml:space="preserve">
+    <value>Totals</value>
+  </data>
+  <data name="Spreadsheet_TableDesignFilter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="Spreadsheet_TableDesignBandedRows" xml:space="preserve">
+    <value>Banded rows</value>
+  </data>
+  <data name="Spreadsheet_TableDesignBandedColumns" xml:space="preserve">
+    <value>Banded columns</value>
+  </data>
+  <data name="Spreadsheet_TableDesignFirstColumn" xml:space="preserve">
+    <value>First col</value>
+  </data>
+  <data name="Spreadsheet_TableDesignLastColumn" xml:space="preserve">
+    <value>Last col</value>
+  </data>
+  <data name="Spreadsheet_TableDesignTotalsForColumn" xml:space="preserve">
+    <value>Totals: {0}</value>
+  </data>
+  <data name="Spreadsheet_ConvertTableToRange" xml:space="preserve">
+    <value>Convert to range</value>
+  </data>
+  <data name="Spreadsheet_DeleteTable" xml:space="preserve">
+    <value>Delete table</value>
+  </data>
+  <!-- Spreadsheet: TotalsCalculation labels -->
+  <data name="Spreadsheet_TotalsNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Spreadsheet_TotalsSum" xml:space="preserve">
+    <value>Sum</value>
+  </data>
+  <data name="Spreadsheet_TotalsAverage" xml:space="preserve">
+    <value>Average</value>
+  </data>
+  <data name="Spreadsheet_TotalsCount" xml:space="preserve">
+    <value>Count</value>
+  </data>
+  <data name="Spreadsheet_TotalsCountNumbers" xml:space="preserve">
+    <value>Count Numbers</value>
+  </data>
+  <data name="Spreadsheet_TotalsMin" xml:space="preserve">
+    <value>Min</value>
+  </data>
+  <data name="Spreadsheet_TotalsMax" xml:space="preserve">
+    <value>Max</value>
+  </data>
+  <data name="Spreadsheet_TotalsStdDev" xml:space="preserve">
+    <value>StdDev</value>
+  </data>
+  <data name="Spreadsheet_TotalsVar" xml:space="preserve">
+    <value>Var</value>
+  </data>
+  <!-- Spreadsheet: Custom Sort dialog -->
+  <data name="Spreadsheet_CustomSort" xml:space="preserve">
+    <value>Custom Sort</value>
+  </data>
+  <data name="Spreadsheet_CustomSortTooltip" xml:space="preserve">
+    <value>Custom Sort...</value>
+  </data>
+  <data name="Spreadsheet_SortHasHeaders" xml:space="preserve">
+    <value>My data has headers</value>
+  </data>
+  <data name="Spreadsheet_SortLevelColumn" xml:space="preserve">
+    <value>Column</value>
+  </data>
+  <data name="Spreadsheet_SortLevelSortOn" xml:space="preserve">
+    <value>Sort On</value>
+  </data>
+  <data name="Spreadsheet_SortLevelOrder" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="Spreadsheet_SortLevelCustomList" xml:space="preserve">
+    <value>Custom List</value>
+  </data>
+  <data name="Spreadsheet_SortLevelCustomListPlaceholder" xml:space="preserve">
+    <value>Comma-separated</value>
+  </data>
+  <data name="Spreadsheet_SortLevelCase" xml:space="preserve">
+    <value>Case</value>
+  </data>
+  <data name="Spreadsheet_SortLevelAddLevel" xml:space="preserve">
+    <value>Add level</value>
+  </data>
+  <data name="Spreadsheet_SortOnValues" xml:space="preserve">
+    <value>Values</value>
+  </data>
+  <data name="Spreadsheet_SortOnCellColor" xml:space="preserve">
+    <value>Cell color</value>
+  </data>
+  <data name="Spreadsheet_SortOnFontColor" xml:space="preserve">
+    <value>Font color</value>
+  </data>
+  <data name="Spreadsheet_SortOrderAscending" xml:space="preserve">
+    <value>Ascending</value>
+  </data>
+  <data name="Spreadsheet_SortOrderDescending" xml:space="preserve">
+    <value>Descending</value>
+  </data>
+  <!-- Spreadsheet: Top 10 filter dialog -->
+  <data name="Spreadsheet_Top10Filter" xml:space="preserve">
+    <value>Top 10</value>
+  </data>
+  <data name="Spreadsheet_Top10FilterTooltip" xml:space="preserve">
+    <value>Top 10...</value>
+  </data>
+  <data name="Spreadsheet_Top10Show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="Spreadsheet_Top10DirectionTop" xml:space="preserve">
+    <value>Top</value>
+  </data>
+  <data name="Spreadsheet_Top10DirectionBottom" xml:space="preserve">
+    <value>Bottom</value>
+  </data>
+  <data name="Spreadsheet_Top10UnitItems" xml:space="preserve">
+    <value>Items</value>
+  </data>
+  <data name="Spreadsheet_Top10UnitPercent" xml:space="preserve">
+    <value>Percent</value>
+  </data>
+  <!-- Spreadsheet: Dynamic filter shortcuts -->
+  <data name="Spreadsheet_FilterAboveAverage" xml:space="preserve">
+    <value>Above average</value>
+  </data>
+  <data name="Spreadsheet_FilterBelowAverage" xml:space="preserve">
+    <value>Below average</value>
+  </data>
   <!-- DropDown -->
   <data name="DropDown_RemoveChipTitle" xml:space="preserve">
     <value>Remove</value>
