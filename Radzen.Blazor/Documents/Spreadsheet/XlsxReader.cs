@@ -635,26 +635,88 @@ static class XlsxReader
     private static void ParseFilterColumn(XElement filterColumn, XNamespace sNs, RangeRef range, Worksheet sheet)
     {
         var colIdAttribute = filterColumn.Attribute("colId")?.Value;
-        if (!string.IsNullOrEmpty(colIdAttribute) && int.TryParse(colIdAttribute, out var colId))
+        if (string.IsNullOrEmpty(colIdAttribute) || !int.TryParse(colIdAttribute, out var colId))
+            return;
+
+        var actualColumn = range.Start.Column + colId;
+
+        // Slice range to a single column for the per-column filter contract.
+        var sliceRange = new RangeRef(
+            new CellRef(range.Start.Row, actualColumn),
+            new CellRef(range.End.Row, actualColumn));
+
+        // <top10 val="N" top="0|1" percent="0|1"/>
+        var top10Element = filterColumn.Element(sNs + "top10");
+        if (top10Element is not null)
         {
-            var actualColumn = range.Start.Column + colId;
-
-            // Find customFilters or filters element
-            var customFiltersElement = filterColumn.Element(sNs + "customFilters");
-            var filtersElement = filterColumn.Element(sNs + "filters");
-
-            if (customFiltersElement is not null)
+            var val = top10Element.Attribute("val")?.Value;
+            var top = top10Element.Attribute("top")?.Value != "0";
+            var percent = top10Element.Attribute("percent")?.Value == "1";
+            if (int.TryParse(val, NumberStyles.Any, CultureInfo.InvariantCulture, out var count))
             {
-                var criterion = DeserializeFilterCriterion(customFiltersElement, actualColumn);
-                var sheetFilter = new SheetFilter(criterion, range);
-                sheet.AddFilter(sheetFilter);
+                sheet.AddFilter(new SheetFilter(
+                    new TopFilterCriterion
+                    {
+                        Column = actualColumn,
+                        Count = count,
+                        Percent = percent,
+                        Bottom = !top,
+                    },
+                    sliceRange));
             }
-            else if (filtersElement is not null)
+            return;
+        }
+
+        // <dynamicFilter type="aboveAverage"/>
+        var dynElement = filterColumn.Element(sNs + "dynamicFilter");
+        if (dynElement is not null)
+        {
+            var typeAttr = dynElement.Attribute("type")?.Value;
+            sheet.AddFilter(new SheetFilter(
+                new DynamicFilterCriterion
+                {
+                    Column = actualColumn,
+                    Type = XlsxWriter.DynamicFilterTypeFromXml(typeAttr),
+                },
+                sliceRange));
+            return;
+        }
+
+        // <colorFilter dxfId="0" cellColor="1" radzen:color="#FFFF00"/>
+        var colorElement = filterColumn.Element(sNs + "colorFilter");
+        if (colorElement is not null)
+        {
+            // Read the radzen-private color attribute we round-trip until dxfs land.
+            var radzenNs = XNamespace.Get("urn:schemas-radzen:spreadsheet");
+            var color = colorElement.Attribute(radzenNs + "color")?.Value
+                ?? colorElement.Attribute("color")?.Value;
+            var fontColor = colorElement.Attribute("cellColor")?.Value == "0";
+            if (!string.IsNullOrEmpty(color))
             {
-                var criterion = DeserializeFilterCriterion(filtersElement, actualColumn);
-                var sheetFilter = new SheetFilter(criterion, range);
-                sheet.AddFilter(sheetFilter);
+                sheet.AddFilter(new SheetFilter(
+                    new CellColorFilterCriterion
+                    {
+                        Column = actualColumn,
+                        Color = color,
+                        FontColor = fontColor,
+                    },
+                    sliceRange));
             }
+            return;
+        }
+
+        var customFiltersElement = filterColumn.Element(sNs + "customFilters");
+        var filtersElement = filterColumn.Element(sNs + "filters");
+
+        if (customFiltersElement is not null)
+        {
+            var criterion = DeserializeFilterCriterion(customFiltersElement, actualColumn);
+            sheet.AddFilter(new SheetFilter(criterion, sliceRange));
+        }
+        else if (filtersElement is not null)
+        {
+            var criterion = DeserializeFilterCriterion(filtersElement, actualColumn);
+            sheet.AddFilter(new SheetFilter(criterion, sliceRange));
         }
     }
 
