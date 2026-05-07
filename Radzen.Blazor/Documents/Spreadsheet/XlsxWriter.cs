@@ -1898,6 +1898,51 @@ class XlsxWriter(Workbook sourceWorkbook)
 
     private static XElement? CreateFilterColumn(SheetFilter filter, RangeRef autoFilterRange)
     {
+        XNamespace ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+
+        // New criterion types know their own column directly.
+        if (filter.Criterion is TopFilterCriterion topCriterion)
+        {
+            var colId = topCriterion.Column - autoFilterRange.Start.Column;
+            if (colId < 0 || colId > autoFilterRange.End.Column - autoFilterRange.Start.Column)
+                return null;
+            return new XElement(ns + "filterColumn",
+                new XAttribute("colId", colId),
+                new XElement(ns + "top10",
+                    new XAttribute("val", topCriterion.Count.ToString(CultureInfo.InvariantCulture)),
+                    new XAttribute("top", topCriterion.Bottom ? "0" : "1"),
+                    new XAttribute("percent", topCriterion.Percent ? "1" : "0")));
+        }
+
+        if (filter.Criterion is DynamicFilterCriterion dynCriterion)
+        {
+            var colId = dynCriterion.Column - autoFilterRange.Start.Column;
+            if (colId < 0 || colId > autoFilterRange.End.Column - autoFilterRange.Start.Column)
+                return null;
+            return new XElement(ns + "filterColumn",
+                new XAttribute("colId", colId),
+                new XElement(ns + "dynamicFilter",
+                    new XAttribute("type", DynamicFilterTypeToXml(dynCriterion.Type))));
+        }
+
+        if (filter.Criterion is CellColorFilterCriterion colorCriterion)
+        {
+            var colId = colorCriterion.Column - autoFilterRange.Start.Column;
+            if (colId < 0 || colId > autoFilterRange.End.Column - autoFilterRange.Start.Column)
+                return null;
+            // Color filters in OOXML reference a dxfId in styles.xml's <dxfs> block.
+            // We don't yet write dxfs, so encode the color + kind in a custom data attribute
+            // we recognize on read. Excel itself ignores unknown attributes and falls back to
+            // showing all rows, which is acceptable until we wire dxfs.
+            return new XElement(ns + "filterColumn",
+                new XAttribute("colId", colId),
+                new XElement(ns + "colorFilter",
+                    new XAttribute("dxfId", "0"),
+                    new XAttribute("cellColor", colorCriterion.FontColor ? "0" : "1"),
+                    new XAttribute(XNamespace.Get("urn:schemas-radzen:spreadsheet") + "color",
+                        colorCriterion.Color ?? "")));
+        }
+
         if (filter.Criterion is FilterCriterionLeaf leaf)
         {
             var colId = leaf.Column - autoFilterRange.Start.Column;
@@ -1985,6 +2030,84 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute("operator", operatorName),
             new XAttribute("val", value));
     }
+
+    private static string DynamicFilterTypeToXml(DynamicFilterType type) => type switch
+    {
+        DynamicFilterType.AboveAverage => "aboveAverage",
+        DynamicFilterType.BelowAverage => "belowAverage",
+        DynamicFilterType.Today => "today",
+        DynamicFilterType.Yesterday => "yesterday",
+        DynamicFilterType.Tomorrow => "tomorrow",
+        DynamicFilterType.ThisWeek => "thisWeek",
+        DynamicFilterType.LastWeek => "lastWeek",
+        DynamicFilterType.NextWeek => "nextWeek",
+        DynamicFilterType.ThisMonth => "thisMonth",
+        DynamicFilterType.LastMonth => "lastMonth",
+        DynamicFilterType.NextMonth => "nextMonth",
+        DynamicFilterType.ThisQuarter => "thisQuarter",
+        DynamicFilterType.LastQuarter => "lastQuarter",
+        DynamicFilterType.NextQuarter => "nextQuarter",
+        DynamicFilterType.ThisYear => "thisYear",
+        DynamicFilterType.LastYear => "lastYear",
+        DynamicFilterType.NextYear => "nextYear",
+        DynamicFilterType.YearToDate => "yearToDate",
+        DynamicFilterType.January => "M1",
+        DynamicFilterType.February => "M2",
+        DynamicFilterType.March => "M3",
+        DynamicFilterType.April => "M4",
+        DynamicFilterType.May => "M5",
+        DynamicFilterType.June => "M6",
+        DynamicFilterType.July => "M7",
+        DynamicFilterType.August => "M8",
+        DynamicFilterType.September => "M9",
+        DynamicFilterType.October => "M10",
+        DynamicFilterType.November => "M11",
+        DynamicFilterType.December => "M12",
+        DynamicFilterType.Quarter1 => "Q1",
+        DynamicFilterType.Quarter2 => "Q2",
+        DynamicFilterType.Quarter3 => "Q3",
+        DynamicFilterType.Quarter4 => "Q4",
+        _ => "today",
+    };
+
+    internal static DynamicFilterType DynamicFilterTypeFromXml(string? value) => value switch
+    {
+        "aboveAverage" => DynamicFilterType.AboveAverage,
+        "belowAverage" => DynamicFilterType.BelowAverage,
+        "today" => DynamicFilterType.Today,
+        "yesterday" => DynamicFilterType.Yesterday,
+        "tomorrow" => DynamicFilterType.Tomorrow,
+        "thisWeek" => DynamicFilterType.ThisWeek,
+        "lastWeek" => DynamicFilterType.LastWeek,
+        "nextWeek" => DynamicFilterType.NextWeek,
+        "thisMonth" => DynamicFilterType.ThisMonth,
+        "lastMonth" => DynamicFilterType.LastMonth,
+        "nextMonth" => DynamicFilterType.NextMonth,
+        "thisQuarter" => DynamicFilterType.ThisQuarter,
+        "lastQuarter" => DynamicFilterType.LastQuarter,
+        "nextQuarter" => DynamicFilterType.NextQuarter,
+        "thisYear" => DynamicFilterType.ThisYear,
+        "lastYear" => DynamicFilterType.LastYear,
+        "nextYear" => DynamicFilterType.NextYear,
+        "yearToDate" => DynamicFilterType.YearToDate,
+        "M1" => DynamicFilterType.January,
+        "M2" => DynamicFilterType.February,
+        "M3" => DynamicFilterType.March,
+        "M4" => DynamicFilterType.April,
+        "M5" => DynamicFilterType.May,
+        "M6" => DynamicFilterType.June,
+        "M7" => DynamicFilterType.July,
+        "M8" => DynamicFilterType.August,
+        "M9" => DynamicFilterType.September,
+        "M10" => DynamicFilterType.October,
+        "M11" => DynamicFilterType.November,
+        "M12" => DynamicFilterType.December,
+        "Q1" => DynamicFilterType.Quarter1,
+        "Q2" => DynamicFilterType.Quarter2,
+        "Q3" => DynamicFilterType.Quarter3,
+        "Q4" => DynamicFilterType.Quarter4,
+        _ => DynamicFilterType.Today,
+    };
 
     private static void UpdateAndSaveSharedStrings(ZipArchive archive, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
