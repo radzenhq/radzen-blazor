@@ -51,6 +51,13 @@ public abstract class FilterCriterion
     public abstract bool Matches(Worksheet sheet, int row);
 
     /// <summary>
+    /// Called once before iteration begins, with the range the filter is being applied to.
+    /// Default is no-op. Distribution-aware criteria (top/bottom, above-average) override this
+    /// to compute their threshold.
+    /// </summary>
+    public virtual void OnApply(Worksheet sheet, RangeRef range) { }
+
+    /// <summary>
     /// Accepts a visitor that can perform operations on this filter criterion.
     /// </summary>
     public abstract void Accept(IFilterCriterionVisitor visitor);
@@ -140,6 +147,21 @@ public interface IFilterCriterionVisitor
     /// Visits a DoesNotContainCriterion.
     /// </summary>
     void Visit(DoesNotContainCriterion criterion);
+
+    /// <summary>
+    /// Visits a TopFilterCriterion.
+    /// </summary>
+    void Visit(TopFilterCriterion criterion);
+
+    /// <summary>
+    /// Visits a DynamicFilterCriterion.
+    /// </summary>
+    void Visit(DynamicFilterCriterion criterion);
+
+    /// <summary>
+    /// Visits a CellColorFilterCriterion.
+    /// </summary>
+    void Visit(CellColorFilterCriterion criterion);
 }
 
 /// <summary>
@@ -238,6 +260,21 @@ public abstract class FilterCriterionVisitorBase : IFilterCriterionVisitor
 
     /// <inheritdoc/>
     public virtual void Visit(DoesNotContainCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(TopFilterCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(DynamicFilterCriterion criterion)
+    {
+    }
+
+    /// <inheritdoc/>
+    public virtual void Visit(CellColorFilterCriterion criterion)
     {
     }
 }
@@ -897,6 +934,8 @@ public partial class Worksheet
         {
             return;
         }
+
+        criterion.OnApply(this, range);
 
         // Excel treats the first row as a header and excludes it from filtering
         var startRow = range.Start.Row + 1;
