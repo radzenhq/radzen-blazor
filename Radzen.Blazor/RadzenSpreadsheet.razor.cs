@@ -520,6 +520,65 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
+    private async Task OnCellMenuTop10FilterAsync()
+    {
+        if (cellMenuPopup != null) await cellMenuPopup.CloseAsync();
+        if (Worksheet is null) return;
+
+        var range = ResolveColumnFilterRange();
+        if (range == RangeRef.Invalid) return;
+
+        var result = await DialogService.OpenAsync<Spreadsheet.Top10FilterDialog>(
+            Localize("Spreadsheet_Top10Filter") ?? "Top 10",
+            null,
+            new DialogOptions { Width = "380px", ShowClose = true });
+
+        if (result is Spreadsheet.Top10FilterDialog.Result r)
+        {
+            var sliceRange = new RangeRef(
+                new CellRef(range.Start.Row, cellMenuColumn),
+                new CellRef(range.End.Row, cellMenuColumn));
+            var criterion = new TopFilterCriterion
+            {
+                Column = cellMenuColumn,
+                Count = r.Count,
+                Percent = r.Percent,
+                Bottom = r.Bottom,
+            };
+            Execute(new FilterCommand(Worksheet, new SheetFilter(criterion, sliceRange)));
+        }
+    }
+
+    private void OnCellMenuDynamicFilterAsync(DynamicFilterType type)
+    {
+        if (Worksheet is null) return;
+        _ = cellMenuPopup?.CloseAsync();
+
+        var range = ResolveColumnFilterRange();
+        if (range == RangeRef.Invalid) return;
+
+        var sliceRange = new RangeRef(
+            new CellRef(range.Start.Row, cellMenuColumn),
+            new CellRef(range.End.Row, cellMenuColumn));
+        var criterion = new DynamicFilterCriterion { Column = cellMenuColumn, Type = type };
+        Execute(new FilterCommand(Worksheet, new SheetFilter(criterion, sliceRange)));
+    }
+
+    private RangeRef ResolveColumnFilterRange()
+    {
+        if (Worksheet is null) return RangeRef.Invalid;
+
+        foreach (var t in Worksheet.Tables)
+        {
+            if (t.Range.Contains(cellMenuRow, cellMenuColumn)) return t.Range;
+        }
+        if (Worksheet.AutoFilter.Range is { } afRange && afRange.Contains(cellMenuRow, cellMenuColumn))
+        {
+            return afRange;
+        }
+        return RangeRef.Invalid;
+    }
+
     private async Task OnFormatCellsAsync()
     {
         if (Worksheet != null && Worksheet.Selection.Cell != CellRef.Invalid &&

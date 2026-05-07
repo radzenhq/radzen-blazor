@@ -459,4 +459,26 @@ public partial class CellMenu : ComponentBase
     {
         await CustomFilter.InvokeAsync();
     }
+
+    /// <summary>
+    /// Invoked when the user clicks "Top 10..." in the filter dropdown.
+    /// </summary>
+    [Parameter]
+    public EventCallback Top10Filter { get; set; }
+
+    /// <summary>
+    /// Invoked when the user clicks one of the dynamic filter shortcut items.
+    /// </summary>
+    [Parameter]
+    public EventCallback<DynamicFilterType> DynamicFilter { get; set; }
+
+    private async Task OnTop10FilterAsync()
+    {
+        await Top10Filter.InvokeAsync();
+    }
+
+    private async Task OnDynamicFilterAsync(DynamicFilterType type)
+    {
+        await DynamicFilter.InvokeAsync(type);
+    }
 }

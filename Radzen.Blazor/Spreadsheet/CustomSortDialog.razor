@@ -1,0 +1,172 @@
+@using System.Collections.Generic
+@using System.Linq
+@using Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem" Style="min-width:560px">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text="Range" />
+        <RadzenLabel Text=@($"{Range.Start}:{Range.End}") />
+        <span style="flex:1"></span>
+        <RadzenCheckBox @bind-Value=@hasHeaders Name="hasHeadersCheck" TValue="bool" />
+        <RadzenLabel Text="My data has headers" Component="hasHeadersCheck" />
+    </RadzenStack>
+
+    <table class="rz-data-grid" style="width:100%">
+        <thead>
+            <tr>
+                <th style="width:32px"></th>
+                <th>Column</th>
+                <th>Sort On</th>
+                <th>Order</th>
+                <th>Custom List</th>
+                <th>Case</th>
+                <th style="width:80px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < levels.Count; i++)
+            {
+                var idx = i;
+                var level = levels[idx];
+                <tr>
+                    <td>@(idx + 1)</td>
+                    <td>
+                        <RadzenDropDown TValue="int" Data=@columnOptions
+                            TextProperty="@nameof(ColumnOption.Text)" ValueProperty="@nameof(ColumnOption.Value)"
+                            Value=@level.ColumnIndex
+                            Change=@(v => level.ColumnIndex = (int)v)
+                            Style="width:100%" />
+                    </td>
+                    <td>
+                        <RadzenDropDown TValue="SortOn" Data=@sortOnOptions
+                            TextProperty="@nameof(SortOnOption.Text)" ValueProperty="@nameof(SortOnOption.Value)"
+                            Value=@level.SortOn
+                            Change=@(v => level.SortOn = (SortOn)v)
+                            Style="width:120px" />
+                    </td>
+                    <td>
+                        <RadzenDropDown TValue="SortOrder" Data=@orderOptions
+                            TextProperty="@nameof(OrderOption.Text)" ValueProperty="@nameof(OrderOption.Value)"
+                            Value=@level.Order
+                            Change=@(v => level.Order = (SortOrder)v)
+                            Style="width:140px" />
+                    </td>
+                    <td>
+                        <RadzenTextBox @bind-Value=@level.CustomListText Placeholder="Comma-separated"
+                            Style="width:100%" />
+                    </td>
+                    <td>
+                        <RadzenCheckBox @bind-Value=@level.CaseSensitive TValue="bool" />
+                    </td>
+                    <td>
+                        <RadzenButton Icon="arrow_upward" ButtonStyle="ButtonStyle.Light"
+                            Size="ButtonSize.Small" Disabled=@(idx == 0)
+                            Click=@(() => Move(idx, -1)) />
+                        <RadzenButton Icon="arrow_downward" ButtonStyle="ButtonStyle.Light"
+                            Size="ButtonSize.Small" Disabled=@(idx == levels.Count - 1)
+                            Click=@(() => Move(idx, 1)) />
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Light"
+                            Size="ButtonSize.Small" Disabled=@(levels.Count == 1)
+                            Click=@(() => RemoveLevel(idx)) />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+        <RadzenButton Icon="add" Text="Add level" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+            Click=@AddLevel />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+        <RadzenButton Text="OK" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click=@OnOk />
+        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnCancel />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    [Parameter] public RangeRef Range { get; set; }
+    [Parameter] public List<string> ColumnNames { get; set; } = [];
+
+    /// <summary>The result returned via DialogService when the user clicks OK.</summary>
+    public sealed record Result(SortKey[] Keys, bool HasHeaders);
+
+    private sealed class Level
+    {
+        public int ColumnIndex { get; set; }
+        public SortOrder Order { get; set; } = SortOrder.Ascending;
+        public SortOn SortOn { get; set; } = SortOn.Values;
+        public string CustomListText { get; set; } = "";
+        public bool CaseSensitive { get; set; }
+    }
+
+    private sealed record ColumnOption(string Text, int Value);
+    private sealed record SortOnOption(string Text, SortOn Value);
+    private sealed record OrderOption(string Text, SortOrder Value);
+
+    private bool hasHeaders = true;
+    private readonly List<Level> levels = [];
+    private List<ColumnOption> columnOptions = [];
+    private static readonly SortOnOption[] sortOnOptions =
+    [
+        new("Values", SortOn.Values),
+        new("Cell color", SortOn.CellColor),
+        new("Font color", SortOn.FontColor),
+    ];
+    private static readonly OrderOption[] orderOptions =
+    [
+        new("Ascending", SortOrder.Ascending),
+        new("Descending", SortOrder.Descending),
+    ];
+
+    protected override void OnInitialized()
+    {
+        columnOptions = ColumnNames
+            .Select((n, i) => new ColumnOption(string.IsNullOrEmpty(n) ? $"Column {i + 1}" : n, i))
+            .ToList();
+        if (columnOptions.Count == 0)
+        {
+            // Fall back to plain numbers
+            for (var i = 0; i < Math.Max(1, Range.Columns); i++)
+                columnOptions.Add(new ColumnOption($"Column {i + 1}", i));
+        }
+        levels.Add(new Level { ColumnIndex = 0 });
+    }
+
+    private void AddLevel() => levels.Add(new Level { ColumnIndex = 0 });
+
+    private void RemoveLevel(int idx)
+    {
+        if (levels.Count > 1) levels.RemoveAt(idx);
+    }
+
+    private void Move(int idx, int delta)
+    {
+        var newIdx = idx + delta;
+        if (newIdx < 0 || newIdx >= levels.Count) return;
+        (levels[idx], levels[newIdx]) = (levels[newIdx], levels[idx]);
+    }
+
+    private void OnOk()
+    {
+        var keys = levels.Select(l => new SortKey
+        {
+            ColumnIndex = l.ColumnIndex,
+            Order = l.Order,
+            SortOn = l.SortOn,
+            CaseSensitive = l.CaseSensitive,
+            CustomList = string.IsNullOrWhiteSpace(l.CustomListText)
+                ? null
+                : l.CustomListText.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0).ToArray(),
+        }).ToArray();
+
+        DialogService.Close(new Result(keys, hasHeaders));
+    }
+
+    private void OnCancel() => DialogService.Close(null);
+}
