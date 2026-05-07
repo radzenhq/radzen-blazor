@@ -240,7 +240,12 @@ public partial class CellView : CellBase, IDisposable
     /// <inheritdoc/>
     protected override void AppendStyle(StringBuilder sb)
     {
+        ArgumentNullException.ThrowIfNull(sb);
         base.AppendStyle(sb);
+
+        // Table style first (defaults), then user format (which can override),
+        // then number-format color directives. Last write wins in inline style.
+        AppendTableStyle(sb);
         cell.ApplyFormat(sb);
 
         if (numberFormatColor is not null)
@@ -248,6 +253,95 @@ public partial class CellView : CellBase, IDisposable
             sb.Append("color: ");
             sb.Append(numberFormatColor);
             sb.Append(';');
+        }
+    }
+
+    private void AppendTableStyle(StringBuilder sb)
+    {
+        if (Worksheet?.Tables is null || Worksheet.Tables.Count == 0) return;
+
+        Documents.Spreadsheet.Table? table = null;
+        foreach (var t in Worksheet.Tables)
+        {
+            if (t.Range.Contains(Row, Column)) { table = t; break; }
+        }
+        if (table is null) return;
+
+        var preset = TableStylePresets.Get(table.TableStyle);
+
+        var isHeader = table.ShowHeaderRow && Row == table.Range.Start.Row;
+        var isTotals = table.ShowTotalsRow && Row == table.Range.End.Row;
+        var dataStart = table.ShowHeaderRow ? table.Range.Start.Row + 1 : table.Range.Start.Row;
+        var dataEnd = table.ShowTotalsRow ? table.Range.End.Row - 1 : table.Range.End.Row;
+        var isData = !isHeader && !isTotals && Row >= dataStart && Row <= dataEnd;
+        var isFirstCol = Column == table.Range.Start.Column;
+        var isLastCol = Column == table.Range.End.Column;
+
+        string? bg = null;
+        string? color = null;
+        var bold = false;
+
+        if (isHeader)
+        {
+            bg = preset.HeaderBackground;
+            color = preset.HeaderColor;
+            bold = preset.BoldHeader;
+        }
+        else if (isTotals)
+        {
+            bg = preset.TotalsBackground;
+            color = preset.TotalsColor;
+            bold = preset.BoldTotals;
+        }
+        else if (isData)
+        {
+            if (table.ShowBandedRows)
+            {
+                var dataRowOffset = Row - dataStart;
+                bg = (dataRowOffset & 1) == 0 ? preset.RowBackground : preset.AltRowBackground;
+            }
+            else if (table.ShowBandedColumns)
+            {
+                var dataColOffset = Column - table.Range.Start.Column;
+                bg = (dataColOffset & 1) == 0 ? preset.RowBackground : preset.AltRowBackground;
+            }
+
+            if (table.HighlightFirstColumn && isFirstCol && preset.BoldFirstColumn) bold = true;
+            if (table.HighlightLastColumn && isLastCol && preset.BoldLastColumn) bold = true;
+        }
+
+        if (bg is not null)
+        {
+            sb.Append("background:");
+            sb.Append(bg);
+            sb.Append(';');
+        }
+        if (color is not null)
+        {
+            sb.Append("color:");
+            sb.Append(color);
+            sb.Append(';');
+        }
+        if (bold)
+        {
+            sb.Append("font-weight:600;");
+        }
+
+        // Subtle table border on the outer edge.
+        if (preset.BorderColor is not null)
+        {
+            if (isHeader)
+            {
+                sb.Append("border-bottom:1px solid ");
+                sb.Append(preset.BorderColor);
+                sb.Append(';');
+            }
+            if (isTotals)
+            {
+                sb.Append("border-top:2px solid ");
+                sb.Append(preset.BorderColor);
+                sb.Append(';');
+            }
         }
     }
 
@@ -314,7 +408,26 @@ public partial class CellView : CellBase, IDisposable
         {
             showCellMenu = show;
             StateHasChanged();
+            return;
         }
+
+        // Table style toggles (ShowBandedRows, TableStyle, ShowHeaderRow, etc.) all
+        // fire AutoFilterChanged. Re-render when the cell is inside a table so the
+        // table-style overrides in AppendStyle pick up the new values.
+        if (IsInsideAnyTable())
+        {
+            StateHasChanged();
+        }
+    }
+
+    private bool IsInsideAnyTable()
+    {
+        if (Worksheet?.Tables is null) return false;
+        foreach (var t in Worksheet.Tables)
+        {
+            if (t.Range.Contains(Row, Column)) return true;
+        }
+        return false;
     }
 
     void IDisposable.Dispose()

@@ -226,6 +226,56 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_InsertHyperlink { get { return ResourceManager.GetString("Spreadsheet_InsertHyperlink", resourceCulture); } }
         public static string Spreadsheet_InsertImage { get { return ResourceManager.GetString("Spreadsheet_InsertImage", resourceCulture); } }
         public static string Spreadsheet_InsertChart { get { return ResourceManager.GetString("Spreadsheet_InsertChart", resourceCulture); } }
+        public static string Spreadsheet_InsertTable { get { return ResourceManager.GetString("Spreadsheet_InsertTable", resourceCulture); } }
+        public static string Spreadsheet_TableName { get { return ResourceManager.GetString("Spreadsheet_TableName", resourceCulture); } }
+        public static string Spreadsheet_TableHasHeaders { get { return ResourceManager.GetString("Spreadsheet_TableHasHeaders", resourceCulture); } }
+        public static string Spreadsheet_TableRange { get { return ResourceManager.GetString("Spreadsheet_TableRange", resourceCulture); } }
+        public static string Spreadsheet_TableDesignTab { get { return ResourceManager.GetString("Spreadsheet_TableDesignTab", resourceCulture); } }
+        public static string Spreadsheet_TableDesignName { get { return ResourceManager.GetString("Spreadsheet_TableDesignName", resourceCulture); } }
+        public static string Spreadsheet_TableDesignStyle { get { return ResourceManager.GetString("Spreadsheet_TableDesignStyle", resourceCulture); } }
+        public static string Spreadsheet_TableDesignHeader { get { return ResourceManager.GetString("Spreadsheet_TableDesignHeader", resourceCulture); } }
+        public static string Spreadsheet_TableDesignTotals { get { return ResourceManager.GetString("Spreadsheet_TableDesignTotals", resourceCulture); } }
+        public static string Spreadsheet_TableDesignFilter { get { return ResourceManager.GetString("Spreadsheet_TableDesignFilter", resourceCulture); } }
+        public static string Spreadsheet_TableDesignBandedRows { get { return ResourceManager.GetString("Spreadsheet_TableDesignBandedRows", resourceCulture); } }
+        public static string Spreadsheet_TableDesignBandedColumns { get { return ResourceManager.GetString("Spreadsheet_TableDesignBandedColumns", resourceCulture); } }
+        public static string Spreadsheet_TableDesignFirstColumn { get { return ResourceManager.GetString("Spreadsheet_TableDesignFirstColumn", resourceCulture); } }
+        public static string Spreadsheet_TableDesignLastColumn { get { return ResourceManager.GetString("Spreadsheet_TableDesignLastColumn", resourceCulture); } }
+        public static string Spreadsheet_TableDesignTotalsForColumn { get { return ResourceManager.GetString("Spreadsheet_TableDesignTotalsForColumn", resourceCulture); } }
+        public static string Spreadsheet_ConvertTableToRange { get { return ResourceManager.GetString("Spreadsheet_ConvertTableToRange", resourceCulture); } }
+        public static string Spreadsheet_DeleteTable { get { return ResourceManager.GetString("Spreadsheet_DeleteTable", resourceCulture); } }
+        public static string Spreadsheet_TotalsNone { get { return ResourceManager.GetString("Spreadsheet_TotalsNone", resourceCulture); } }
+        public static string Spreadsheet_TotalsSum { get { return ResourceManager.GetString("Spreadsheet_TotalsSum", resourceCulture); } }
+        public static string Spreadsheet_TotalsAverage { get { return ResourceManager.GetString("Spreadsheet_TotalsAverage", resourceCulture); } }
+        public static string Spreadsheet_TotalsCount { get { return ResourceManager.GetString("Spreadsheet_TotalsCount", resourceCulture); } }
+        public static string Spreadsheet_TotalsCountNumbers { get { return ResourceManager.GetString("Spreadsheet_TotalsCountNumbers", resourceCulture); } }
+        public static string Spreadsheet_TotalsMin { get { return ResourceManager.GetString("Spreadsheet_TotalsMin", resourceCulture); } }
+        public static string Spreadsheet_TotalsMax { get { return ResourceManager.GetString("Spreadsheet_TotalsMax", resourceCulture); } }
+        public static string Spreadsheet_TotalsStdDev { get { return ResourceManager.GetString("Spreadsheet_TotalsStdDev", resourceCulture); } }
+        public static string Spreadsheet_TotalsVar { get { return ResourceManager.GetString("Spreadsheet_TotalsVar", resourceCulture); } }
+        public static string Spreadsheet_CustomSort { get { return ResourceManager.GetString("Spreadsheet_CustomSort", resourceCulture); } }
+        public static string Spreadsheet_CustomSortTooltip { get { return ResourceManager.GetString("Spreadsheet_CustomSortTooltip", resourceCulture); } }
+        public static string Spreadsheet_SortHasHeaders { get { return ResourceManager.GetString("Spreadsheet_SortHasHeaders", resourceCulture); } }
+        public static string Spreadsheet_SortLevelColumn { get { return ResourceManager.GetString("Spreadsheet_SortLevelColumn", resourceCulture); } }
+        public static string Spreadsheet_SortLevelSortOn { get { return ResourceManager.GetString("Spreadsheet_SortLevelSortOn", resourceCulture); } }
+        public static string Spreadsheet_SortLevelOrder { get { return ResourceManager.GetString("Spreadsheet_SortLevelOrder", resourceCulture); } }
+        public static string Spreadsheet_SortLevelCustomList { get { return ResourceManager.GetString("Spreadsheet_SortLevelCustomList", resourceCulture); } }
+        public static string Spreadsheet_SortLevelCustomListPlaceholder { get { return ResourceManager.GetString("Spreadsheet_SortLevelCustomListPlaceholder", resourceCulture); } }
+        public static string Spreadsheet_SortLevelCase { get { return ResourceManager.GetString("Spreadsheet_SortLevelCase", resourceCulture); } }
+        public static string Spreadsheet_SortLevelAddLevel { get { return ResourceManager.GetString("Spreadsheet_SortLevelAddLevel", resourceCulture); } }
+        public static string Spreadsheet_SortOnValues { get { return ResourceManager.GetString("Spreadsheet_SortOnValues", resourceCulture); } }
+        public static string Spreadsheet_SortOnCellColor { get { return ResourceManager.GetString("Spreadsheet_SortOnCellColor", resourceCulture); } }
+        public static string Spreadsheet_SortOnFontColor { get { return ResourceManager.GetString("Spreadsheet_SortOnFontColor", resourceCulture); } }
+        public static string Spreadsheet_SortOrderAscending { get { return ResourceManager.GetString("Spreadsheet_SortOrderAscending", resourceCulture); } }
+        public static string Spreadsheet_SortOrderDescending { get { return ResourceManager.GetString("Spreadsheet_SortOrderDescending", resourceCulture); } }
+        public static string Spreadsheet_Top10Filter { get { return ResourceManager.GetString("Spreadsheet_Top10Filter", resourceCulture); } }
+        public static string Spreadsheet_Top10FilterTooltip { get { return ResourceManager.GetString("Spreadsheet_Top10FilterTooltip", resourceCulture); } }
+        public static string Spreadsheet_Top10Show { get { return ResourceManager.GetString("Spreadsheet_Top10Show", resourceCulture); } }
+        public static string Spreadsheet_Top10DirectionTop { get { return ResourceManager.GetString("Spreadsheet_Top10DirectionTop", resourceCulture); } }
+        public static string Spreadsheet_Top10DirectionBottom { get { return ResourceManager.GetString("Spreadsheet_Top10DirectionBottom", resourceCulture); } }
+        public static string Spreadsheet_Top10UnitItems { get { return ResourceManager.GetString("Spreadsheet_Top10UnitItems", resourceCulture); } }
+        public static string Spreadsheet_Top10UnitPercent { get { return ResourceManager.GetString("Spreadsheet_Top10UnitPercent", resourceCulture); } }
+        public static string Spreadsheet_FilterAboveAverage { get { return ResourceManager.GetString("Spreadsheet_FilterAboveAverage", resourceCulture); } }
+        public static string Spreadsheet_FilterBelowAverage { get { return ResourceManager.GetString("Spreadsheet_FilterBelowAverage", resourceCulture); } }
         public static string DropDown_RemoveChipTitle { get { return ResourceManager.GetString("DropDown_RemoveChipTitle", resourceCulture); } }
         public static string DropDown_ClearAriaLabel { get { return ResourceManager.GetString("DropDown_ClearAriaLabel", resourceCulture); } }
         public static string DropDown_SearchAriaLabel { get { return ResourceManager.GetString("DropDown_SearchAriaLabel", resourceCulture); } }

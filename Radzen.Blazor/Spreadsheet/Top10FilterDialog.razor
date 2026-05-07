@@ -1,22 +1,25 @@
 @using Radzen.Blazor
 @using Radzen.Documents.Spreadsheet
 @inject DialogService DialogService
+@inject Localizer Localizer
 
 <RadzenStack Gap="1rem" Style="min-width:320px">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenLabel Text="Show" />
-        <RadzenDropDown TValue="bool" Data=@directionOptions
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Top10Show)) />
+        <RadzenDropDown TValue="bool" Data=@DirectionOptions
             TextProperty="Text" ValueProperty="Value"
             @bind-Value=@bottom Style="width:90px" />
         <RadzenNumeric TValue="int" @bind-Value=@count Min="1" Max="100" Style="width:80px" />
-        <RadzenDropDown TValue="bool" Data=@unitOptions
+        <RadzenDropDown TValue="bool" Data=@UnitOptions
             TextProperty="Text" ValueProperty="Value"
             @bind-Value=@percent Style="width:110px" />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
-        <RadzenButton Text="OK" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click=@OnOk />
-        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnCancel />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary"
+            Size="ButtonSize.Small" Click=@OnOk />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base"
+            Size="ButtonSize.Small" Click=@OnCancel />
     </RadzenStack>
 </RadzenStack>
 
@@ -26,19 +29,22 @@
     /// <summary>Result returned by the dialog.</summary>
     public sealed record Result(int Count, bool Percent, bool Bottom);
 
+    private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
     private bool bottom;          // false = top, true = bottom
     private bool percent;         // false = items, true = percent
     private int count = 10;
 
-    private static readonly object[] directionOptions =
+    private object[] DirectionOptions =>
     [
-        new { Text = "Top", Value = false },
-        new { Text = "Bottom", Value = true },
+        new { Text = L(nameof(RadzenStrings.Spreadsheet_Top10DirectionTop)), Value = false },
+        new { Text = L(nameof(RadzenStrings.Spreadsheet_Top10DirectionBottom)), Value = true },
     ];
-    private static readonly object[] unitOptions =
+
+    private object[] UnitOptions =>
     [
-        new { Text = "Items", Value = false },
-        new { Text = "Percent", Value = true },
+        new { Text = L(nameof(RadzenStrings.Spreadsheet_Top10UnitItems)), Value = false },
+        new { Text = L(nameof(RadzenStrings.Spreadsheet_Top10UnitPercent)), Value = true },
     ];
 
     private void OnOk() => DialogService.Close(new Result(count, percent, bottom));

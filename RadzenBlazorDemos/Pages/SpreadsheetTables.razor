@@ -1,0 +1,82 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Sales", 12, 6);
+
+        sheet.BeginUpdate();
+
+        // Reasonable column widths so the table reads well at default zoom.
+        sheet.Columns[0] = 130;
+        sheet.Columns[1] = 130;
+        sheet.Columns[2] = 100;
+        sheet.Columns[3] = 100;
+        sheet.Columns[4] = 110;
+
+        // Header row — values only. Once the cells are wrapped in a Table, the
+        // table style colors them automatically; no manual header formatting needed.
+        sheet.Cells[0, 0].Value = "Region";
+        sheet.Cells[0, 1].Value = "Product";
+        sheet.Cells[0, 2].Value = "Q1";
+        sheet.Cells[0, 3].Value = "Q2";
+        sheet.Cells[0, 4].Value = "Total";
+
+        // Sample data
+        var rows = new (string Region, string Product, double Q1, double Q2)[]
+        {
+            ("EMEA",  "Laptop Pro",        45200, 52100),
+            ("EMEA",  "Ultra Monitor",     18500, 21300),
+            ("EMEA",  "Ergo Keyboard",      8200,  7600),
+            ("AMER",  "Wireless Mouse",     5400,  6100),
+            ("AMER",  "Noise Headset",     12300, 14500),
+            ("AMER",  "USB Dock",          22100, 25400),
+            ("APAC",  "Office Chair",      15800, 17200),
+            ("APAC",  "Standing Desk",     28500, 31200),
+            ("APAC",  "Webcam Pro",         9800, 10750),
+            ("APAC",  "Cable Organizer",    3200,  3450),
+        };
+
+        var currency = new Format { NumberFormat = "$#,##0.00" };
+
+        for (var i = 0; i < rows.Length; i++)
+        {
+            var r = i + 1;
+            sheet.Cells[r, 0].Value = rows[i].Region;
+            sheet.Cells[r, 1].Value = rows[i].Product;
+            sheet.Cells[r, 2].Value = rows[i].Q1; sheet.Cells[r, 2].Format = currency;
+            sheet.Cells[r, 3].Value = rows[i].Q2; sheet.Cells[r, 3].Format = currency;
+            sheet.Cells[r, 4].Format = currency;
+            // The Total column is left empty here; the Table's calculated column
+            // formula below populates it for every data row.
+        }
+
+        // Wrap the range in a Table. The full table feature surface lives on the
+        // returned object: name, style, banded rows, totals, column metadata.
+        var table = sheet.AddTable("Sales", RangeRef.Parse("A1:E11"));
+        table.DisplayName = "Sales Q1-Q2";
+        table.TableStyle = "TableStyleMedium9";
+        table.ShowBandedRows = true;
+        table.HighlightFirstColumn = true;
+
+        // Calculated column — the formula is filled into every data row using
+        // structured references. Editing the Q1 or Q2 column will recompute Total.
+        table.Columns[4].CalculatedFormula = "=[@[Q1]]+[@[Q2]]";
+
+        // Show a totals row with per-column SUBTOTAL functions.
+        table.ShowTotalsRow = true;
+        table.Columns[0].Name = "Region";              // also serves as totals label
+        table.Columns[2].TotalsCalculation = TotalsCalculation.Sum;
+        table.Columns[3].TotalsCalculation = TotalsCalculation.Sum;
+        table.Columns[4].TotalsCalculation = TotalsCalculation.Sum;
+
+        sheet.Rows.Frozen = 1;
+
+        sheet.EndUpdate();
+    }
+}

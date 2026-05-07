@@ -3,25 +3,26 @@
 @using Radzen.Blazor
 @using Radzen.Documents.Spreadsheet
 @inject DialogService DialogService
+@inject Localizer Localizer
 
 <RadzenStack Gap="1rem" Style="min-width:560px">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenLabel Text="Range" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableRange)) />
         <RadzenLabel Text=@($"{Range.Start}:{Range.End}") />
         <span style="flex:1"></span>
         <RadzenCheckBox @bind-Value=@hasHeaders Name="hasHeadersCheck" TValue="bool" />
-        <RadzenLabel Text="My data has headers" Component="hasHeadersCheck" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_SortHasHeaders)) Component="hasHeadersCheck" />
     </RadzenStack>
 
     <table class="rz-data-grid" style="width:100%">
         <thead>
             <tr>
                 <th style="width:32px"></th>
-                <th>Column</th>
-                <th>Sort On</th>
-                <th>Order</th>
-                <th>Custom List</th>
-                <th>Case</th>
+                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelColumn))</th>
+                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelSortOn))</th>
+                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelOrder))</th>
+                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelCustomList))</th>
+                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelCase))</th>
                 <th style="width:80px"></th>
             </tr>
         </thead>
@@ -40,21 +41,22 @@
                             Style="width:100%" />
                     </td>
                     <td>
-                        <RadzenDropDown TValue="SortOn" Data=@sortOnOptions
+                        <RadzenDropDown TValue="SortOn" Data=@SortOnOptions
                             TextProperty="@nameof(SortOnOption.Text)" ValueProperty="@nameof(SortOnOption.Value)"
                             Value=@level.SortOn
                             Change=@(v => level.SortOn = (SortOn)v)
                             Style="width:120px" />
                     </td>
                     <td>
-                        <RadzenDropDown TValue="SortOrder" Data=@orderOptions
+                        <RadzenDropDown TValue="SortOrder" Data=@OrderOptions
                             TextProperty="@nameof(OrderOption.Text)" ValueProperty="@nameof(OrderOption.Value)"
                             Value=@level.Order
                             Change=@(v => level.Order = (SortOrder)v)
                             Style="width:140px" />
                     </td>
                     <td>
-                        <RadzenTextBox @bind-Value=@level.CustomListText Placeholder="Comma-separated"
+                        <RadzenTextBox @bind-Value=@level.CustomListText
+                            Placeholder=@L(nameof(RadzenStrings.Spreadsheet_SortLevelCustomListPlaceholder))
                             Style="width:100%" />
                     </td>
                     <td>
@@ -77,13 +79,15 @@
     </table>
 
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-        <RadzenButton Icon="add" Text="Add level" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
-            Click=@AddLevel />
+        <RadzenButton Icon="add" Text=@L(nameof(RadzenStrings.Spreadsheet_SortLevelAddLevel))
+            ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click=@AddLevel />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
-        <RadzenButton Text="OK" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click=@OnOk />
-        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnCancel />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary"
+            Size="ButtonSize.Small" Click=@OnOk />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base"
+            Size="ButtonSize.Small" Click=@OnCancel />
     </RadzenStack>
 </RadzenStack>
 
@@ -95,6 +99,8 @@
 
     /// <summary>The result returned via DialogService when the user clicks OK.</summary>
     public sealed record Result(SortKey[] Keys, bool HasHeaders);
+
+    private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     private sealed class Level
     {
@@ -112,16 +118,18 @@
     private bool hasHeaders = true;
     private readonly List<Level> levels = [];
     private List<ColumnOption> columnOptions = [];
-    private static readonly SortOnOption[] sortOnOptions =
+
+    private SortOnOption[] SortOnOptions =>
     [
-        new("Values", SortOn.Values),
-        new("Cell color", SortOn.CellColor),
-        new("Font color", SortOn.FontColor),
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOnValues)), SortOn.Values),
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOnCellColor)), SortOn.CellColor),
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOnFontColor)), SortOn.FontColor),
     ];
-    private static readonly OrderOption[] orderOptions =
+
+    private OrderOption[] OrderOptions =>
     [
-        new("Ascending", SortOrder.Ascending),
-        new("Descending", SortOrder.Descending),
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOrderAscending)), SortOrder.Ascending),
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOrderDescending)), SortOrder.Descending),
     ];
 
     protected override void OnInitialized()
@@ -131,7 +139,6 @@
             .ToList();
         if (columnOptions.Count == 0)
         {
-            // Fall back to plain numbers
             for (var i = 0; i < Math.Max(1, Range.Columns); i++)
                 columnOptions.Add(new ColumnOption($"Column {i + 1}", i));
         }

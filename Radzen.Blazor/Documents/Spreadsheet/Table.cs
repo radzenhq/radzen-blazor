@@ -100,11 +100,82 @@ public class Table
         set => displayName = value;
     }
 
-    /// <summary>Whether the header row is shown. Defaults to true.</summary>
+    /// <summary>
+    /// Whether the header row is shown. Defaults to true. Toggling at runtime is a
+    /// structural operation matching Excel's behavior:
+    /// - true → false: clears the current top row's cells (values + formula + format),
+    ///   shrinks <see cref="Range"/> upward by one row, and disables
+    ///   <see cref="ShowFilterButton"/>.
+    /// - false → true: expands <see cref="Range"/> upward by one row, writes default
+    ///   header values (each <see cref="TableColumn.Name"/>) into the new top row,
+    ///   and enables <see cref="ShowFilterButton"/>.
+    /// </summary>
     public bool ShowHeaderRow
     {
         get => showHeaderRow;
-        set { showHeaderRow = value; Worksheet.OnAutoFilterChanged(); }
+        set
+        {
+            if (showHeaderRow == value) return;
+
+            if (value)
+            {
+                ExpandToIncludeHeaderRow();
+            }
+            else
+            {
+                ShrinkToExcludeHeaderRow();
+            }
+            showHeaderRow = value;
+            Worksheet.OnAutoFilterChanged();
+        }
+    }
+
+    private void ShrinkToExcludeHeaderRow()
+    {
+        var topRow = range.Start.Row;
+        for (var c = range.Start.Column; c <= range.End.Column; c++)
+        {
+            if (Worksheet.Cells.TryGet(topRow, c, out var cell))
+            {
+                cell.Value = null;
+                cell.Formula = null;
+                cell.Format = new Format();
+            }
+        }
+
+        // Range shrinks upward. Range.End may equal Range.Start (single-row table)
+        // — guard against producing an inverted range.
+        var newStart = new CellRef(range.Start.Row + 1, range.Start.Column);
+        if (newStart.Row > range.End.Row) return; // degenerate; leave untouched
+
+        range = new RangeRef(newStart, range.End);
+        Filter = new AutoFilter(Worksheet, range);
+        showFilterButton = false;
+    }
+
+    private void ExpandToIncludeHeaderRow()
+    {
+        if (range.Start.Row == 0)
+        {
+            // Cannot expand above row 0; leave range as-is and rely on the flag flip
+            // (the existing top row becomes the header). Excel handles this by shifting
+            // data down, which is structural enough that we skip it for v1.
+            return;
+        }
+
+        var newStart = new CellRef(range.Start.Row - 1, range.Start.Column);
+        range = new RangeRef(newStart, range.End);
+        Filter = new AutoFilter(Worksheet, range);
+
+        // Write default header values into the new top row.
+        var headerRow = range.Start.Row;
+        for (var i = 0; i < columns.Count; i++)
+        {
+            var sheetCol = range.Start.Column + i;
+            Worksheet.Cells[headerRow, sheetCol].Value = columns[i].Name;
+        }
+
+        showFilterButton = true;
     }
 
     /// <summary>Whether the totals row is shown. Defaults to false.</summary>

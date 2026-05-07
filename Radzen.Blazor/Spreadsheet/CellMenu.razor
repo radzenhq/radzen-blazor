@@ -7,9 +7,9 @@
     <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_SortDescending)) ?? "Sort descending") Icon="sort" Click=@OnSortDescendingAsync />
     <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ClearFilter)) ?? "Clear Filter") Icon="filter_alt_off" Click=@OnClearFilterAsync Disabled=@(!HasFilterApplied()) />
     <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CustomFilter)) ?? "Custom filter...") Icon="filter_alt" Click=@OnCustomFilterAsync />
-    <CellMenuItem Text="Top 10..." Icon="leaderboard" Click=@OnTop10FilterAsync />
-    <CellMenuItem Text="Above average" Icon="north_east" Click=@(() => OnDynamicFilterAsync(DynamicFilterType.AboveAverage)) />
-    <CellMenuItem Text="Below average" Icon="south_east" Click=@(() => OnDynamicFilterAsync(DynamicFilterType.BelowAverage)) />
+    <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Top10FilterTooltip)) ?? "") Icon="leaderboard" Click=@OnTop10FilterAsync />
+    <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FilterAboveAverage)) ?? "") Icon="north_east" Click=@(() => OnDynamicFilterAsync(DynamicFilterType.AboveAverage)) />
+    <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FilterBelowAverage)) ?? "") Icon="south_east" Click=@(() => OnDynamicFilterAsync(DynamicFilterType.BelowAverage)) />
     <div class="rz-spreadsheet-cell-menu-filter">
         <CellMenuItem>
             <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" />
