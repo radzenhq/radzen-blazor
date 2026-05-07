@@ -1384,9 +1384,12 @@ static class XlsxReader
             if (refStr is null || !TryParseRange(refStr, out var range)) continue;
 
             var hasHeaders = headerRowCount != "0";
-            var table = sheet.AddTable(name, range, hasHeaders);
+            var totalsShown = totalsRowCount == "1";
+            // totalsRowShown is supplied to the constructor so the structural setter
+            // doesn't try to expand the range — the saved range already contains
+            // the totals row when totalsRowCount=1.
+            var table = sheet.AddTable(name, range, hasHeaders, totalsShown);
             if (displayName is not null && displayName != name) table.DisplayName = displayName;
-            table.ShowTotalsRow = totalsRowCount == "1";
 
             // Filter button: presence of <autoFilter> child indicates ShowFilterButton=true
             var hasAutoFilter = root.Element(tNs + "autoFilter") is not null;
