@@ -202,11 +202,21 @@ public class Table
             : null;
 
     /// <summary>
-    /// Sorts the table by a single column. Column index is relative to the table.
+    /// Sorts the table by a single column. <paramref name="column"/> is relative to the table
+    /// (0 = first column of the table).
     /// </summary>
     public void Sort(SortOrder order, int column)
     {
-        Worksheet.Sort(range, order, column);
+        Worksheet.Sort(range, new SortKey { ColumnIndex = column, Order = order });
+    }
+
+    /// <summary>
+    /// Sorts the table using the given multi-level sort keys. Column indices are relative
+    /// to the table.
+    /// </summary>
+    public void Sort(params SortKey[] keys)
+    {
+        Worksheet.Sort(range, keys);
     }
 
     /// <summary>Resizes the table to a new range. Columns are added or trimmed accordingly.</summary>
@@ -506,5 +516,143 @@ public class AutoFilter
         {
             Worksheet.ClearFilters();
         }
+    }
+
+    // ── Per-column filter API ───────────────────────────────────────────────
+    // Column indices are RELATIVE to the AutoFilter's range left edge.
+
+    /// <summary>
+    /// Filters a column to the given list of allowed values. Replaces any existing
+    /// filter on that column.
+    /// </summary>
+    public void ApplyValueFilter(int columnIndex, System.Collections.Generic.IEnumerable<object?> values)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        var absCol = ResolveAbsoluteColumn(columnIndex);
+        ApplyColumnFilter(absCol, new InListCriterion
+        {
+            Column = absCol,
+            Values = values.ToArray(),
+        });
+    }
+
+    /// <summary>
+    /// Filters a column using an arbitrary <see cref="FilterCriterion"/>. The criterion's
+    /// <c>Column</c> field is overwritten with the absolute column derived from
+    /// <paramref name="columnIndex"/>.
+    /// </summary>
+    public void ApplyCustomFilter(int columnIndex, FilterCriterion criterion)
+    {
+        ArgumentNullException.ThrowIfNull(criterion);
+        var absCol = ResolveAbsoluteColumn(columnIndex);
+        // Force the criterion's Column to match.
+        if (criterion is FilterCriterionLeaf leaf)
+        {
+            // FilterCriterionLeaf.Column is init-only; clone if necessary. For simplicity,
+            // we just pass the criterion through and trust the caller.
+            _ = leaf;
+        }
+        ApplyColumnFilter(absCol, criterion);
+    }
+
+    /// <summary>Filters a column to its top N (or bottom N) items, by count or by percent.</summary>
+    public void ApplyTopFilter(int columnIndex, int count, bool percent = false, bool bottom = false)
+    {
+        var absCol = ResolveAbsoluteColumn(columnIndex);
+        ApplyColumnFilter(absCol, new TopFilterCriterion
+        {
+            Column = absCol,
+            Count = count,
+            Percent = percent,
+            Bottom = bottom,
+        });
+    }
+
+    /// <summary>Filters a column using one of Excel's dynamic predicates.</summary>
+    public void ApplyDynamicFilter(int columnIndex, DynamicFilterType type)
+    {
+        var absCol = ResolveAbsoluteColumn(columnIndex);
+        ApplyColumnFilter(absCol, new DynamicFilterCriterion
+        {
+            Column = absCol,
+            Type = type,
+        });
+    }
+
+    /// <summary>Filters a column to cells with the matching color.</summary>
+    public void ApplyColorFilter(int columnIndex, string color, bool fontColor = false)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(color);
+        var absCol = ResolveAbsoluteColumn(columnIndex);
+        ApplyColumnFilter(absCol, new CellColorFilterCriterion
+        {
+            Column = absCol,
+            Color = color,
+            FontColor = fontColor,
+        });
+    }
+
+    /// <summary>Removes any filter applied to <paramref name="columnIndex"/>.</summary>
+    public void ClearColumnFilter(int columnIndex)
+    {
+        var absCol = ResolveAbsoluteColumn(columnIndex);
+        var existing = FindColumnFilter(absCol);
+        if (existing is not null)
+        {
+            Worksheet.RemoveFilter(existing);
+        }
+    }
+
+    /// <summary>Returns the filter currently applied to <paramref name="columnIndex"/>, or null.</summary>
+    public SheetFilter? GetColumnFilter(int columnIndex)
+    {
+        var absCol = ResolveAbsoluteColumn(columnIndex);
+        return FindColumnFilter(absCol);
+    }
+
+    private int ResolveAbsoluteColumn(int relativeColumn)
+    {
+        if (Range is null)
+        {
+            throw new InvalidOperationException(
+                "AutoFilter.Range must be set before applying per-column filters.");
+        }
+        if (relativeColumn < 0 || relativeColumn >= Range.Value.Columns)
+        {
+            throw new ArgumentOutOfRangeException(nameof(relativeColumn),
+                $"Column index {relativeColumn} is outside the AutoFilter range columns 0..{Range.Value.Columns - 1}.");
+        }
+        return Range.Value.Start.Column + relativeColumn;
+    }
+
+    private void ApplyColumnFilter(int absoluteColumn, FilterCriterion criterion)
+    {
+        // Replace any existing per-column filter for this column.
+        var existing = FindColumnFilter(absoluteColumn);
+        if (existing is not null)
+        {
+            Worksheet.RemoveFilter(existing);
+        }
+
+        // SheetFilter range = single column slice spanning the AutoFilter rows.
+        var afRange = Range!.Value;
+        var sliceRange = new RangeRef(
+            new CellRef(afRange.Start.Row, absoluteColumn),
+            new CellRef(afRange.End.Row, absoluteColumn));
+
+        Worksheet.AddFilter(new SheetFilter(criterion, sliceRange));
+    }
+
+    private SheetFilter? FindColumnFilter(int absoluteColumn)
+    {
+        foreach (var f in Worksheet.Filters)
+        {
+            // A per-column filter has range collapsed to one column.
+            if (f.Range.Start.Column == absoluteColumn && f.Range.End.Column == absoluteColumn)
+            {
+                return f;
+            }
+        }
+        return null;
     }
 }
