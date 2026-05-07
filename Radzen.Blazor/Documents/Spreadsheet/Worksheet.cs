@@ -223,15 +223,36 @@ public partial class Worksheet
     /// <summary>
     /// Adds a table to the sheet.
     /// </summary>
-    /// <param name="range"></param>
-    /// <exception cref="ArgumentException"></exception>
-    public void AddTable(RangeRef range)
+    /// <param name="name">Unique table name (used in structured references like <c>=SUM(Sales[Amount])</c>).</param>
+    /// <param name="range">The cell range covered by the table.</param>
+    /// <param name="hasHeaders">When true, the first row of <paramref name="range"/> is treated as the header row.</param>
+    /// <returns>The created <see cref="Table"/>.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="range"/> is invalid or the name is already in use.</exception>
+    public Table AddTable(string name, RangeRef range, bool hasHeaders = true)
     {
         if (range == RangeRef.Invalid || range.Rows == 0 || range.Columns == 0)
         {
             throw new ArgumentException("Invalid range for Table.");
         }
-        tables.Add(new Table(this, range));
+        ArgumentException.ThrowIfNullOrEmpty(name);
+
+        if (tables.Any(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new ArgumentException($"A table named '{name}' already exists on this sheet.", nameof(name));
+        }
+
+        var table = new Table(this, name, range, hasHeaders);
+        tables.Add(table);
+        return table;
+    }
+
+    /// <summary>
+    /// Removes a table abstraction. Cell content is left in place.
+    /// </summary>
+    public bool RemoveTable(Table table)
+    {
+        ArgumentNullException.ThrowIfNull(table);
+        return tables.Remove(table);
     }
 
     /// <summary>

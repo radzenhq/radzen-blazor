@@ -361,6 +361,9 @@ static class XlsxReader
         // Parse drawings (images)
         ParseDrawings(archive, sheetInfo, sheetDoc, sNs, sheet);
 
+        // Parse tables (must run after rows/cells so column-name fallback can read header values)
+        ParseTables(archive, sheetInfo, sheetDoc, sNs, sheet);
+
         // Parse sheet protection
         ParseSheetProtection(sheetDoc, sNs, sheet);
 
@@ -1266,6 +1269,127 @@ static class XlsxReader
             result[i] = stack.Pop();
         }
         return string.Join("/", result);
+    }
+
+    private static void ParseTables(ZipArchive archive, WorksheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
+    {
+        XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+        var tableParts = sheetDoc.Descendants(sNs + "tablePart").ToList();
+        if (tableParts.Count == 0) return;
+
+        // Resolve sheet rels into a map
+        var sheetFileName = sheetInfo.FullPath.Split('/').Last();
+        var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
+        var relsEntry = archive.GetEntry(relsPath);
+        if (relsEntry is null) return;
+
+        var sheetRelMap = new Dictionary<string, string>();
+        using (var relsStream = relsEntry.Open())
+        {
+            var relsDoc = XDocument.Load(relsStream);
+            var relsNs = XNamespace.Get("http://schemas.openxmlformats.org/package/2006/relationships");
+            foreach (var rel in relsDoc.Descendants(relsNs + "Relationship"))
+            {
+                var id = rel.Attribute("Id")?.Value;
+                var target = rel.Attribute("Target")?.Value;
+                if (id is not null && target is not null)
+                {
+                    sheetRelMap[id] = target;
+                }
+            }
+        }
+
+        foreach (var tablePart in tableParts)
+        {
+            var relId = tablePart.Attribute(rNs + "id")?.Value;
+            if (relId is null || !sheetRelMap.TryGetValue(relId, out var target)) continue;
+
+            var tablePath = ResolvePath("xl/worksheets/", target);
+            var tableEntry = archive.GetEntry(tablePath);
+            if (tableEntry is null) continue;
+
+            using var tableStream = tableEntry.Open();
+            var tableDoc = XDocument.Load(tableStream);
+            var tNs = tableDoc.Root!.Name.Namespace;
+            var root = tableDoc.Root!;
+
+            var name = root.Attribute("name")?.Value ?? "Table";
+            var displayName = root.Attribute("displayName")?.Value;
+            var refStr = root.Attribute("ref")?.Value;
+            var headerRowCount = root.Attribute("headerRowCount")?.Value;
+            var totalsRowCount = root.Attribute("totalsRowCount")?.Value;
+
+            if (refStr is null || !TryParseRange(refStr, out var range)) continue;
+
+            var hasHeaders = headerRowCount != "0";
+            var table = sheet.AddTable(name, range, hasHeaders);
+            if (displayName is not null && displayName != name) table.DisplayName = displayName;
+            table.ShowTotalsRow = totalsRowCount == "1";
+
+            // Filter button: presence of <autoFilter> child indicates ShowFilterButton=true
+            var hasAutoFilter = root.Element(tNs + "autoFilter") is not null;
+            table.ShowFilterButton = hasAutoFilter;
+
+            // Style + striping
+            var styleInfo = root.Element(tNs + "tableStyleInfo");
+            if (styleInfo is not null)
+            {
+                table.TableStyle = styleInfo.Attribute("name")?.Value;
+                table.HighlightFirstColumn = styleInfo.Attribute("showFirstColumn")?.Value == "1";
+                table.HighlightLastColumn = styleInfo.Attribute("showLastColumn")?.Value == "1";
+                table.ShowBandedRows = styleInfo.Attribute("showRowStripes")?.Value != "0";
+                table.ShowBandedColumns = styleInfo.Attribute("showColumnStripes")?.Value == "1";
+            }
+
+            // Columns: rename + totals function + calculated formula
+            var tableColumns = root.Element(tNs + "tableColumns");
+            if (tableColumns is not null)
+            {
+                var i = 0;
+                foreach (var colElem in tableColumns.Elements(tNs + "tableColumn"))
+                {
+                    if (i >= table.Columns.Count) break;
+                    var colName = colElem.Attribute("name")?.Value;
+                    if (colName is not null) table.Columns[i].Name = colName;
+
+                    var totalsFunction = colElem.Attribute("totalsRowFunction")?.Value;
+                    if (totalsFunction is not null)
+                    {
+                        table.Columns[i].TotalsCalculation = XlsxWriter.TotalsCalculationFromXml(totalsFunction);
+                    }
+
+                    var calcFormula = colElem.Element(tNs + "calculatedColumnFormula")?.Value;
+                    if (!string.IsNullOrEmpty(calcFormula))
+                    {
+                        table.Columns[i].CalculatedFormula = calcFormula;
+                    }
+                    i++;
+                }
+            }
+        }
+    }
+
+    private static bool TryParseRange(string s, out RangeRef range)
+    {
+        range = default;
+        var parts = s.Split(':');
+        if (parts.Length == 1)
+        {
+            if (CellRef.TryParse(parts[0], out var only))
+            {
+                range = new RangeRef(only, only);
+                return true;
+            }
+            return false;
+        }
+        if (parts.Length == 2
+            && CellRef.TryParse(parts[0], out var start)
+            && CellRef.TryParse(parts[1], out var end))
+        {
+            range = new RangeRef(start, end);
+            return true;
+        }
+        return false;
     }
 
     private static void ParseSheetProtection(XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
