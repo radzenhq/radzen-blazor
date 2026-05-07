@@ -16,7 +16,9 @@ public class TableXlsxRoundTripTests
                                                      int rows = 6, int cols = 5)
     {
         var wb = new Workbook();
-        var ws = wb.AddSheet("Sheet1", rows, cols);
+        // Allocate a few extra rows so toggling ShowTotalsRow on later (which expands
+        // the table range) doesn't run off the bottom of the worksheet.
+        var ws = wb.AddSheet("Sheet1", rows + 5, cols);
         if (hasHeaders)
         {
             ws.Cells[0, 0].SetValue("Region");
