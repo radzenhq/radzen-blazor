@@ -1,0 +1,46 @@
+@using Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@inject DialogService DialogService
+
+<RadzenStack Gap="1rem" Style="min-width:320px">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text="Show" />
+        <RadzenDropDown TValue="bool" Data=@directionOptions
+            TextProperty="Text" ValueProperty="Value"
+            @bind-Value=@bottom Style="width:90px" />
+        <RadzenNumeric TValue="int" @bind-Value=@count Min="1" Max="100" Style="width:80px" />
+        <RadzenDropDown TValue="bool" Data=@unitOptions
+            TextProperty="Text" ValueProperty="Value"
+            @bind-Value=@percent Style="width:110px" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+        <RadzenButton Text="OK" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Click=@OnOk />
+        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnCancel />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    /// <summary>Result returned by the dialog.</summary>
+    public sealed record Result(int Count, bool Percent, bool Bottom);
+
+    private bool bottom;          // false = top, true = bottom
+    private bool percent;         // false = items, true = percent
+    private int count = 10;
+
+    private static readonly object[] directionOptions =
+    [
+        new { Text = "Top", Value = false },
+        new { Text = "Bottom", Value = true },
+    ];
+    private static readonly object[] unitOptions =
+    [
+        new { Text = "Items", Value = false },
+        new { Text = "Percent", Value = true },
+    ];
+
+    private void OnOk() => DialogService.Close(new Result(count, percent, bottom));
+    private void OnCancel() => DialogService.Close(null);
+}
