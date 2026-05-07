@@ -262,14 +262,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Import & Export",
-                    Path = "spreadsheet-import-export",
-                    Title = "Blazor Spreadsheet Import & Export | Free UI Components by Radzen",
-                    Description = "Load and save XLSX files with the Radzen Blazor Spreadsheet component.",
-                    Tags = new [] { "spreadsheet", "import", "export", "xlsx", "save", "load", "file" }
-                },
-                new Example
-                {
                     Name = "Formulas",
                     Path = "spreadsheet-formulas",
                     Title = "Blazor Spreadsheet Formulas | Free UI Components by Radzen",
@@ -395,6 +387,43 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Spreadsheet Charts - Embed Column, Bar, Line, Pie Charts in Spreadsheet | Radzen",
                     Description = "Embed interactive charts in Blazor spreadsheet cells. Supports column, bar, line, area, pie, donut, and scatter charts with live data binding and XLSX import/export.",
                     Tags = new [] { "spreadsheet", "chart", "charts", "graph", "visualization", "column chart", "bar chart", "line chart", "pie chart", "donut chart", "scatter chart", "area chart", "excel chart", "embedded chart", "data visualization", "xlsx", "dashboard" }
+                },
+            }
+        },
+        new Example
+        {
+            Name = "Document Processing",
+            Icon = "",
+            New = true,
+            Title = "Blazor Document Processing | Free UI Components by Radzen",
+            Description = "Read and write Excel (XLSX) and CSV files in Blazor and C#. Generate downloads, parse uploads, and evaluate Excel formulas in code.",
+            Children = new []
+            {
+                new Example
+                {
+                    Name = "Spreadsheet API",
+                    Path = "document-processing-spreadsheet",
+                    Title = "Generate Excel (XLSX) and CSV Files in Blazor | Radzen",
+                    Description = "Create Excel (XLSX) and CSV files from a list of objects and let users download them in Blazor.",
+                    Tags = new [] { "document", "processing", "spreadsheet", "api", "xlsx", "csv", "excel", "generate", "create", "download", "list", "objects", "workbook" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "XLSX", Anchor = "#xlsx" }, new () { Text = "CSV", Anchor = "#csv" } ],
+                    Name = "Import & Export",
+                    Path = "document-processing-import-export",
+                    Title = "Import and Export Excel (XLSX) and CSV in Blazor | Radzen",
+                    Description = "Import and export Excel (XLSX) and CSV files in Blazor. Upload a file, parse the data, and display the rows, or generate a file users can download.",
+                    Tags = new [] { "document", "processing", "import", "export", "xlsx", "csv", "excel", "upload", "download", "read", "write", "parse", "separator", "encoding", "quoting" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Formulas in code", Anchor = "#in-code" }, new () { Text = "Stateless evaluation", Anchor = "#stateless-engine" }, new () { Text = "Stateful evaluation", Anchor = "#stateful-engine" }, new () { Text = "Custom functions", Anchor = "#custom-functions" } ],
+                    Name = "Formulas",
+                    Path = "document-processing-formulas",
+                    Title = "Excel Formula Evaluator for Blazor and C# | Radzen",
+                    Description = "Evaluate Excel formulas in Blazor and C#. Use them as cell formulas in a workbook, calculate them in code, or add your own custom Excel functions.",
+                    Tags = new [] { "document", "processing", "formula", "formulas", "excel", "evaluate", "calculate", "engine", "evaluator", "custom", "function", "compound", "vlookup", "sum", "average", "if", "iferror", "edate", "sumif" }
                 },
             }
         },

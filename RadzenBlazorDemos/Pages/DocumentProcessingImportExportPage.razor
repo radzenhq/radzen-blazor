@@ -1,0 +1,28 @@
+@page "/document-processing-import-export"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    <strong>Import & Export</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Read and write Excel (XLSX) and CSV files in Blazor. Upload a file from the user, parse the data, and display the rows; or generate a file in code and offer it as a download.
+</RadzenText>
+
+<RadzenText Anchor="document-processing-import-export#xlsx" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    XLSX
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Import an Excel file uploaded by the user, or download an Excel file generated in code.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingImportExport" Example="DocumentProcessingXlsx">
+    <DocumentProcessingXlsx />
+</RadzenExample>
+
+<RadzenText Anchor="document-processing-import-export#csv" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    CSV
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Import or export CSV files with configurable separator, quoting, and encoding (including UTF-8 BOM). The preview updates as you change options.
+</RadzenText>
+<RadzenExample ComponentName="DocumentProcessingImportExport" Example="DocumentProcessingCsv">
+    <DocumentProcessingCsv />
+</RadzenExample>

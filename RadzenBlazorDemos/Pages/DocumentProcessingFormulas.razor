@@ -1,0 +1,124 @@
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="1rem">
+    <RadzenTable>
+        <RadzenTableHeader>
+            <RadzenTableHeaderRow>
+                <RadzenTableHeaderCell>Product</RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="text-align:right">Qty</RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="text-align:right">Price</RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="text-align:right">Subtotal</RadzenTableHeaderCell>
+            </RadzenTableHeaderRow>
+        </RadzenTableHeader>
+        <RadzenTableBody>
+            @for (var i = 0; i < productCount; i++)
+            {
+                var r = i + 1;
+                <RadzenTableRow>
+                    <RadzenTableCell>@sheet.Cells[r, 0].GetValueAsString()</RadzenTableCell>
+                    <RadzenTableCell Style="text-align:right">
+                        <RadzenNumeric TValue="double" Value=@GetDouble(r, 1)
+                            ValueChanged=@(v => SetCellValue(r, 1, v)) Min="0" Style="width:90px" />
+                    </RadzenTableCell>
+                    <RadzenTableCell Style="text-align:right">
+                        <RadzenNumeric TValue="double" Value=@GetDouble(r, 2)
+                            ValueChanged=@(v => SetCellValue(r, 2, v)) Min="0" Format="0.00" Style="width:110px" />
+                    </RadzenTableCell>
+                    <RadzenTableCell Style="text-align:right; font-family:monospace">
+                        <span style="opacity:0.6">@sheet.Cells[r, 3].Formula</span>
+                        &nbsp;→&nbsp;
+                        <strong>@sheet.Cells[r, 3].GetValueAsString()</strong>
+                    </RadzenTableCell>
+                </RadzenTableRow>
+            }
+            <RadzenTableRow>
+                <RadzenTableCell Style="font-weight:600">Subtotal</RadzenTableCell>
+                <RadzenTableCell></RadzenTableCell>
+                <RadzenTableCell></RadzenTableCell>
+                <RadzenTableCell Style="text-align:right; font-family:monospace">
+                    <span style="opacity:0.6">@sheet.Cells[5, 3].Formula</span>
+                    &nbsp;→&nbsp;
+                    <strong>@sheet.Cells[5, 3].GetValueAsString()</strong>
+                </RadzenTableCell>
+            </RadzenTableRow>
+            <RadzenTableRow>
+                <RadzenTableCell>Tax (8%)</RadzenTableCell>
+                <RadzenTableCell></RadzenTableCell>
+                <RadzenTableCell></RadzenTableCell>
+                <RadzenTableCell Style="text-align:right; font-family:monospace">
+                    <span style="opacity:0.6">@sheet.Cells[6, 3].Formula</span>
+                    &nbsp;→&nbsp;
+                    <strong>@sheet.Cells[6, 3].GetValueAsString()</strong>
+                </RadzenTableCell>
+            </RadzenTableRow>
+            <RadzenTableRow>
+                <RadzenTableCell>Discount (subtotal &gt; $1000)</RadzenTableCell>
+                <RadzenTableCell></RadzenTableCell>
+                <RadzenTableCell></RadzenTableCell>
+                <RadzenTableCell Style="text-align:right; font-family:monospace">
+                    <span style="opacity:0.6">@sheet.Cells[7, 3].Formula</span>
+                    &nbsp;→&nbsp;
+                    <strong>@sheet.Cells[7, 3].GetValueAsString()</strong>
+                </RadzenTableCell>
+            </RadzenTableRow>
+            <RadzenTableRow>
+                <RadzenTableCell Style="font-weight:700">Total</RadzenTableCell>
+                <RadzenTableCell></RadzenTableCell>
+                <RadzenTableCell></RadzenTableCell>
+                <RadzenTableCell Style="text-align:right; font-family:monospace; font-weight:700">
+                    <span style="opacity:0.6; font-weight:400">@sheet.Cells[8, 3].Formula</span>
+                    &nbsp;→&nbsp;
+                    @sheet.Cells[8, 3].GetValueAsString()
+                </RadzenTableCell>
+            </RadzenTableRow>
+        </RadzenTableBody>
+    </RadzenTable>
+</RadzenStack>
+
+@code {
+    Workbook wb = default!;
+    Worksheet sheet = default!;
+    const int productCount = 3;
+
+    protected override void OnInitialized()
+    {
+        wb = new Workbook();
+        sheet = wb.AddSheet("Order", 12, 4);
+
+        sheet.Cells[0, 0].Value = "Product";
+        sheet.Cells[0, 1].Value = "Qty";
+        sheet.Cells[0, 2].Value = "Price";
+        sheet.Cells[0, 3].Value = "Subtotal";
+
+        var seed = new (string Name, double Qty, double Price)[]
+        {
+            ("Laptop Pro", 2, 1200),
+            ("USB Dock", 4, 80),
+            ("Wireless Mouse", 5, 25),
+        };
+        for (var i = 0; i < seed.Length; i++)
+        {
+            var r = i + 1;
+            sheet.Cells[r, 0].Value = seed[i].Name;
+            sheet.Cells[r, 1].Value = seed[i].Qty;
+            sheet.Cells[r, 2].Value = seed[i].Price;
+            sheet.Cells[r, 3].Formula = $"=B{r + 1}*C{r + 1}";
+        }
+
+        sheet.Cells[5, 3].Formula = "=SUM(D2:D4)";
+        sheet.Cells[6, 3].Formula = "=D6*0.08";
+        sheet.Cells[7, 3].Formula = "=IF(D6>1000,-100,0)";
+        sheet.Cells[8, 3].Formula = "=D6+D7+D8";
+    }
+
+    double GetDouble(int row, int col)
+    {
+        var v = sheet.Cells[row, col].Value;
+        return v is null ? 0d : System.Convert.ToDouble(v);
+    }
+
+    void SetCellValue(int row, int col, double value)
+    {
+        sheet.Cells[row, col].Value = value;
+    }
+}
