@@ -3,23 +3,21 @@
 @using Radzen.Blazor
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
+@inject Localizer Localizer
 
 @if (CurrentTable is not null)
 {
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem"
-        class="rz-spreadsheet-table-design rz-p-2"
-        Style="background:var(--rz-base-50, #f7f7f7); border-bottom:1px solid var(--rz-border)">
-
-        <RadzenLabel Text="Table" />
+        class="rz-spreadsheet-table-design rz-p-2">
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
-            <RadzenLabel Text="Name" Component="tableNameInput" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignName)) Component="tableNameInput" />
             <RadzenTextBox @bind-Value=@tableName Name="tableNameInput"
                 Change=@(_ => CommitName()) Style="width:160px" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
-            <RadzenLabel Text="Style" Component="tableStyleDD" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignStyle)) Component="tableStyleDD" />
             <RadzenDropDown TValue="string" Data=@styleOptions
                 Value=@(CurrentTable.TableStyle ?? "")
                 Change=@(v => CommitStyle(v as string))
@@ -30,44 +28,44 @@
             <RadzenCheckBox Value=@CurrentTable.ShowHeaderRow
                 Change=@(v => Toggle(t => t.ShowHeaderRow = (bool)v)) TValue="bool"
                 Name="hdrChk" />
-            <RadzenLabel Text="Header" Component="hdrChk" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignHeader)) Component="hdrChk" />
 
             <RadzenCheckBox Value=@CurrentTable.ShowTotalsRow
                 Change=@(v => Toggle(t => t.ShowTotalsRow = (bool)v)) TValue="bool"
                 Name="totChk" />
-            <RadzenLabel Text="Totals" Component="totChk" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignTotals)) Component="totChk" />
 
             <RadzenCheckBox Value=@CurrentTable.ShowFilterButton
                 Change=@(v => Toggle(t => t.ShowFilterButton = (bool)v)) TValue="bool"
                 Name="fltChk" />
-            <RadzenLabel Text="Filter" Component="fltChk" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignFilter)) Component="fltChk" />
 
             <RadzenCheckBox Value=@CurrentTable.ShowBandedRows
                 Change=@(v => Toggle(t => t.ShowBandedRows = (bool)v)) TValue="bool"
                 Name="bndRowChk" />
-            <RadzenLabel Text="Banded rows" Component="bndRowChk" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignBandedRows)) Component="bndRowChk" />
 
             <RadzenCheckBox Value=@CurrentTable.ShowBandedColumns
                 Change=@(v => Toggle(t => t.ShowBandedColumns = (bool)v)) TValue="bool"
                 Name="bndColChk" />
-            <RadzenLabel Text="Banded columns" Component="bndColChk" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignBandedColumns)) Component="bndColChk" />
 
             <RadzenCheckBox Value=@CurrentTable.HighlightFirstColumn
                 Change=@(v => Toggle(t => t.HighlightFirstColumn = (bool)v)) TValue="bool"
                 Name="firstChk" />
-            <RadzenLabel Text="First col" Component="firstChk" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignFirstColumn)) Component="firstChk" />
 
             <RadzenCheckBox Value=@CurrentTable.HighlightLastColumn
                 Change=@(v => Toggle(t => t.HighlightLastColumn = (bool)v)) TValue="bool"
                 Name="lastChk" />
-            <RadzenLabel Text="Last col" Component="lastChk" />
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignLastColumn)) Component="lastChk" />
         </RadzenStack>
 
         @if (TotalsColumn is { } totalsCol)
         {
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
-                <RadzenLabel Text=@($"Totals: {totalsCol.Name}") />
-                <RadzenDropDown TValue="TotalsCalculation" Data=@totalsOptions
+                <RadzenLabel Text=@string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_TableDesignTotalsForColumn)), totalsCol.Name) />
+                <RadzenDropDown TValue="TotalsCalculation" Data=@TotalsOptions
                     TextProperty="@nameof(TotalsOption.Text)" ValueProperty="@nameof(TotalsOption.Value)"
                     Value=@totalsCol.TotalsCalculation
                     Change=@(v => CommitTotals(totalsCol, (TotalsCalculation)v))
@@ -77,7 +75,7 @@
 
         <span style="flex:1"></span>
 
-        <RadzenButton Icon="grid_off" Text="Convert to range"
+        <RadzenButton Icon="grid_off" Text=@L(nameof(RadzenStrings.Spreadsheet_ConvertTableToRange))
             ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
             Click=@OnConvertToRange />
     </RadzenStack>
@@ -88,6 +86,8 @@
 
     [Parameter] public Worksheet? Worksheet { get; set; }
     [CascadingParameter] public ISpreadsheet? Spreadsheet { get; set; }
+
+    private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     private Table? CurrentTable
     {
@@ -122,17 +122,17 @@
     }
 
     private sealed record TotalsOption(string Text, TotalsCalculation Value);
-    private static readonly TotalsOption[] totalsOptions =
+    private TotalsOption[] TotalsOptions =>
     [
-        new("None", TotalsCalculation.None),
-        new("Sum", TotalsCalculation.Sum),
-        new("Average", TotalsCalculation.Average),
-        new("Count", TotalsCalculation.Count),
-        new("Count Numbers", TotalsCalculation.CountNumbers),
-        new("Min", TotalsCalculation.Min),
-        new("Max", TotalsCalculation.Max),
-        new("StdDev", TotalsCalculation.StdDev),
-        new("Var", TotalsCalculation.Var),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsNone)), TotalsCalculation.None),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsSum)), TotalsCalculation.Sum),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsAverage)), TotalsCalculation.Average),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsCount)), TotalsCalculation.Count),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsCountNumbers)), TotalsCalculation.CountNumbers),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsMin)), TotalsCalculation.Min),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsMax)), TotalsCalculation.Max),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsStdDev)), TotalsCalculation.StdDev),
+        new(L(nameof(RadzenStrings.Spreadsheet_TotalsVar)), TotalsCalculation.Var),
     ];
 
     private void CommitTotals(TableColumn col, TotalsCalculation calc)

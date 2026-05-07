@@ -89,11 +89,13 @@
                         <DataValidation Worksheet=@Worksheet />
                     </RadzenStack>
                 </RadzenTabsItem>
+                <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_TableDesignTab)) Visible=@hasTableSelection>
+                    <TableDesignPanel Worksheet=@Worksheet />
+                </RadzenTabsItem>
             </Tabs>
         </RadzenTabs>
 @if (Worksheet != null)
 {
-        <TableDesignPanel Worksheet=@Worksheet />
         <CascadingValue Value="@CellTypes">
         <FormulaEditor Worksheet=@Worksheet Editor=@Editor />
         <VirtualGrid @ref=@grid style="flex: 1" View=@ActiveView>

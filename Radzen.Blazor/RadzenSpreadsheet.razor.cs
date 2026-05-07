@@ -138,11 +138,70 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             workbookView = null;
             sheetIndex = 0;
         }
+
+        // Always reconcile our worksheet event subscriptions so the contextual
+        // "Table Design" tab can flip its Visible flag whenever the active cell
+        // moves into or out of a table.
+        SubscribeToWorksheetEvents(Worksheet);
     }
 
     private int sheetIndex;
 
     private Worksheet? Worksheet => workbook != null && sheetIndex < workbook.Sheets.Count ? workbook.Sheets[sheetIndex] : null;
+
+    /// <summary>
+    /// True when the active cell sits inside a Table — drives visibility of the contextual
+    /// "Table Design" tab. Maintained as a flag rather than a computed property because
+    /// RadzenTabsItem.Visible is captured at parameter-set time; we need an explicit
+    /// StateHasChanged() each time the value flips.
+    /// </summary>
+    private bool hasTableSelection;
+    private Worksheet? subscribedWorksheet;
+
+    private void SubscribeToWorksheetEvents(Worksheet? next)
+    {
+        if (ReferenceEquals(subscribedWorksheet, next)) return;
+
+        if (subscribedWorksheet is not null)
+        {
+            subscribedWorksheet.Selection.Changed -= OnTableSelectionMaybeChanged;
+            subscribedWorksheet.AutoFilterChanged -= OnTableSelectionMaybeChanged;
+        }
+
+        subscribedWorksheet = next;
+
+        if (subscribedWorksheet is not null)
+        {
+            subscribedWorksheet.Selection.Changed += OnTableSelectionMaybeChanged;
+            subscribedWorksheet.AutoFilterChanged += OnTableSelectionMaybeChanged;
+        }
+
+        UpdateHasTableSelection();
+    }
+
+    private void OnTableSelectionMaybeChanged() => UpdateHasTableSelection();
+
+    private void UpdateHasTableSelection()
+    {
+        var next = ComputeHasTableSelection();
+        if (next != hasTableSelection)
+        {
+            hasTableSelection = next;
+            StateHasChanged();
+        }
+    }
+
+    private bool ComputeHasTableSelection()
+    {
+        if (Worksheet is null) return false;
+        var sel = Worksheet.Selection.Cell;
+        if (sel == CellRef.Invalid) return false;
+        foreach (var t in Worksheet.Tables)
+        {
+            if (t.Range.Contains(sel.Row, sel.Column)) return true;
+        }
+        return false;
+    }
 
     private WorkbookView? workbookView;
 
@@ -529,7 +588,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (range == RangeRef.Invalid) return;
 
         var result = await DialogService.OpenAsync<Spreadsheet.Top10FilterDialog>(
-            Localize("Spreadsheet_Top10Filter") ?? "Top 10",
+            Localize(nameof(RadzenStrings.Spreadsheet_Top10Filter)),
             null,
             new DialogOptions { Width = "380px", ShowClose = true });
 
@@ -868,9 +927,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         // If the active cell is inside a Table, add table-management actions.
         if (FindTableAt(row, column) is not null)
         {
-            menuItems.Add(new() { Text = Localize("Spreadsheet_ConvertTableToRange") ?? "Convert Table to Range",
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ConvertTableToRange)),
                 Value = "convert-table-to-range", Icon = "grid_off" });
-            menuItems.Add(new() { Text = Localize("Spreadsheet_DeleteTable") ?? "Delete Table",
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteTable)),
                 Value = "delete-table", Icon = "delete" });
         }
 
@@ -2023,6 +2082,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         activeCapture = null;
+
+        SubscribeToWorksheetEvents(null);
 
         if (jsRef is not null)
         {

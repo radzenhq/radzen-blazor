@@ -275,4 +275,82 @@ public class TableContractTests
         // Default Delete preserves cell content (Excel parity).
         Assert.Equal("Region", ws.Cells[0, 0].Value);
     }
+
+    // ── ShowHeaderRow runtime toggle (Excel parity) ─────────────────────────
+    // Pinned via COM probe: when Excel flips ShowHeaders to false, the table
+    // range shrinks, the header row's cells (values + formatting) are cleared,
+    // the AutoFilter is removed, and ShowAutoFilter becomes false.
+
+    [Fact]
+    public void ShowHeaderRow_FlipToFalse_ShouldShrinkRange()
+    {
+        var (_, ws) = NewSheet();
+        var t = ws.AddTable("Sales", Range(0, 0, 5, 4));
+        Assert.Equal(Range(0, 0, 5, 4), t.Range);
+
+        t.ShowHeaderRow = false;
+
+        Assert.Equal(Range(1, 0, 5, 4), t.Range);
+        Assert.Null(t.HeaderRowRange);
+        Assert.Equal(Range(1, 0, 5, 4), t.DataRange);
+    }
+
+    [Fact]
+    public void ShowHeaderRow_FlipToFalse_ShouldClearHeaderRowCells()
+    {
+        var (_, ws) = NewSheet();
+        var t = ws.AddTable("Sales", Range(0, 0, 5, 4));
+        Assert.Equal("Region", ws.Cells[0, 0].Value);
+
+        t.ShowHeaderRow = false;
+
+        // Each cell that was in the now-removed header row is cleared.
+        for (var c = 0; c < 5; c++)
+        {
+            Assert.Null(ws.Cells[0, c].Value);
+            Assert.Null(ws.Cells[0, c].Formula);
+        }
+    }
+
+    [Fact]
+    public void ShowHeaderRow_FlipToFalse_ShouldDisableFilterButton()
+    {
+        var (_, ws) = NewSheet();
+        var t = ws.AddTable("Sales", Range(0, 0, 5, 4));
+        Assert.True(t.ShowFilterButton);
+
+        t.ShowHeaderRow = false;
+
+        Assert.False(t.ShowFilterButton);
+    }
+
+    [Fact]
+    public void ShowHeaderRow_FlipToTrue_ShouldExpandRangeAndWriteDefaultHeaders()
+    {
+        var (_, ws) = NewSheet();
+        // Build a header-less table starting at row 1 so there is room above to expand.
+        var t = ws.AddTable("Sales", Range(1, 0, 5, 4), hasHeaders: false);
+        Assert.Equal(Range(1, 0, 5, 4), t.Range);
+
+        t.ShowHeaderRow = true;
+
+        Assert.Equal(Range(0, 0, 5, 4), t.Range);
+        Assert.Equal(Range(0, 0, 0, 4), t.HeaderRowRange);
+        Assert.Equal("Column1", ws.Cells[0, 0].Value);
+        Assert.Equal("Column2", ws.Cells[0, 1].Value);
+        Assert.Equal("Column5", ws.Cells[0, 4].Value);
+    }
+
+    [Fact]
+    public void ShowHeaderRow_FlipToTrue_ShouldEnableFilterButton()
+    {
+        var (_, ws) = NewSheet();
+        var t = ws.AddTable("Sales", Range(1, 0, 5, 4), hasHeaders: false);
+        // hasHeaders=false implies no filter button needed; verify state then flip.
+        t.ShowFilterButton = false;
+
+        t.ShowHeaderRow = true;
+
+        Assert.True(t.ShowFilterButton);
+    }
 }

@@ -294,6 +294,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Tables",
+                    Path = "spreadsheet-tables",
+                    Title = "Blazor Spreadsheet Tables | Free UI Components by Radzen",
+                    Description = "Wrap a range in an Excel-style table with style, banded rows, calculated columns, and a totals row.",
+                    Tags = new [] { "spreadsheet", "table", "tables", "listobject", "totals", "subtotal", "calculated column", "banded rows", "table style" }
+                },
+                new Example
+                {
                     Name = "Data Validation",
                     Path = "spreadsheet-data-validation",
                     Title = "Blazor Spreadsheet Data Validation | Free UI Components by Radzen",
