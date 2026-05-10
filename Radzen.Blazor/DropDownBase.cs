@@ -470,16 +470,19 @@ namespace Radzen
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
                     valuePropertyGetter = GetGetter(ValueProperty, type);
+                    valuePropertyGetterType = type;
                 }
 
                 if (!string.IsNullOrEmpty(TextProperty))
                 {
                     textPropertyGetter = GetGetter(TextProperty, type);
+                    textPropertyGetterType = type;
                 }
 
                 if (!string.IsNullOrEmpty(DisabledProperty))
                 {
                     disabledPropertyGetter = GetGetter(DisabledProperty, type);
+                    disabledPropertyGetterType = type;
                 }
 
                 if (selectedItems.Count == 0)
@@ -507,8 +510,18 @@ namespace Radzen
         }
 
         internal Func<object, object?>? valuePropertyGetter;
+        internal Type? valuePropertyGetterType;
+
         internal Func<object, object?>? textPropertyGetter;
+        internal Type? textPropertyGetterType;
+
         internal Func<object, object?>? disabledPropertyGetter;
+        internal Type? disabledPropertyGetterType;
+
+        private object? GetItemOrValueFromPropertyUsingGetter(object item, string property, Func<object, object?>? getter, Type? getterType)
+        {
+            return getter != null && getterType?.IsInstanceOfType(item) == true ? getter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
+        }
 
         /// <summary>
         /// Gets the item or value from property.
@@ -528,15 +541,15 @@ namespace Radzen
 
                 if (property == TextProperty)
                 {
-                    return textPropertyGetter != null ? textPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
+                    return GetItemOrValueFromPropertyUsingGetter(item, property, textPropertyGetter, textPropertyGetterType);
                 }
                 else if (property == ValueProperty)
                 {
-                    return valuePropertyGetter != null ? valuePropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
+                    return GetItemOrValueFromPropertyUsingGetter(item, property, valuePropertyGetter, valuePropertyGetterType);
                 }
                 else if (property == DisabledProperty)
                 {
-                    return disabledPropertyGetter != null ? disabledPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
+                    return GetItemOrValueFromPropertyUsingGetter(item, property, disabledPropertyGetter, disabledPropertyGetterType);
                 }
             }
 
