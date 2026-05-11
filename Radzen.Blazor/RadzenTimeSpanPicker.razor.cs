@@ -964,9 +964,16 @@ namespace Radzen.Blazor
         #endregion
 
         #region Internal: styles
+        /// <summary>
+        /// Gets or sets the size of the component.
+        /// </summary>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
              => ClassList.Create("rz-timespanpicker")
+                .AddInputSize(InputSize)
                 .Add("rz-timespanpicker-inline", Inline)
                 .AddDisabled(Disabled)
                 .Add("rz-state-empty", !HasValue)

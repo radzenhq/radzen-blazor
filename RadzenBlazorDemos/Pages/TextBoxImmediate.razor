@@ -1,0 +1,15 @@
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
+    <RadzenLabel Text="Type something" Component="TextBoxImmediate" />
+    <RadzenTextBox Immediate="true" Change=@(value => OnChange(value)) Style="width: 100%; max-width: 400px;" Name="TextBoxImmediate" />
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    void OnChange(string value)
+    {
+        console.Log($"Value changed to {value}");
+    }
+}

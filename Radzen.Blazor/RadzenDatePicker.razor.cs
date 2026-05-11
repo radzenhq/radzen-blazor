@@ -1681,10 +1681,17 @@ namespace Radzen.Blazor
 
         }
 
+        /// <summary>
+        /// Gets or sets the size of the component.
+        /// </summary>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return ClassList.Create("rz-datepicker")
+                            .AddInputSize(InputSize)
                             .Add("rz-datepicker-inline", Inline)
                             .AddDisabled(Disabled)
                             .Add("rz-state-empty", !HasValue)

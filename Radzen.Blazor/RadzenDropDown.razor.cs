@@ -444,10 +444,17 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets the size of the component.
+        /// </summary>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-dropdown")
+                        .AddInputSize(InputSize)
                         .Add("rz-clear", AllowClear)
                         .Add("rz-dropdown-chips", Chips && selectedItems.Count > 0)
                         .ToString();

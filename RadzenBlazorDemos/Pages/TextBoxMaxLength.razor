@@ -1,0 +1,8 @@
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
+    <RadzenLabel Text="Max 5 characters" Component="TextBoxMaxLength" />
+    <RadzenTextBox @bind-Value=@value MaxLength="5" Style="width: 100%; max-width: 400px;" Name="TextBoxMaxLength" />
+</RadzenStack>
+
+@code {
+    string value;
+}

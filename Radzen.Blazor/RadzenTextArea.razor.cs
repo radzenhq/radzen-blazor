@@ -96,10 +96,16 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(Value);
         }
 
+        /// <summary>
+        /// Gets or sets the size of the component.
+        /// </summary>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-textarea").ToString();
+            return GetClassList("rz-textarea").AddInputSize(InputSize).ToString();
         }
 
         /// <inheritdoc />

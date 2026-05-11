@@ -475,10 +475,23 @@ namespace Radzen.Blazor
                 await Popup.ToggleAsync(Element);
             }
         }
+        /// <summary>
+        /// Gets or sets a value indicating whether the dropdown arrow is shown.
+        /// </summary>
+        /// <value><c>true</c> if the arrow is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowArrow { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the size of the component.
+        /// </summary>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-colorpicker").ToString();
+            return GetClassList("rz-colorpicker").AddInputSize(InputSize).ToString();
         }
 
         /// <inheritdoc />

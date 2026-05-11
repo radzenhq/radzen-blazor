@@ -13,7 +13,10 @@
             <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
         }
         <div class="rz-colorpicker-value" style="background-color: @Value" ></div>
-        <button aria-label="@ToggleAriaLabel" type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="notranslate rzi" /></button>
+        @if (ShowArrow)
+        {
+            <button aria-label="@ToggleAriaLabel" type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="notranslate rzi" /></button>
+        }
         <Popup id="@($"{GetId()}-popup")" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup
                role="dialog" aria-label="@PopupAriaLabel"
                class="rz-colorpicker-popup" Close=@OnClosePopup Open=@OnPopupOpen>

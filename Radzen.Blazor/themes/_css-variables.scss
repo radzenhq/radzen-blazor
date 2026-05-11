@@ -146,6 +146,10 @@
   --rz-button-active-background-size: #{$button-active-background-size};
   --rz-button-disabled-opacity: #{$button-disabled-opacity};
   --rz-button-empty-opacity: #{$button-empty-opacity};
+  --rz-button-size-xs: #{$button-size-xs};
+  --rz-button-size-sm: #{$button-size-sm};
+  --rz-button-size-md: #{$button-size-md};
+  --rz-button-size-lg: #{$button-size-lg};
 
   /* Card */
   --rz-card-padding: #{$card-padding};
@@ -705,9 +709,27 @@
   --rz-icon-grade: #{$rz-icon-grade};
   --rz-icon-optical-size: #{$rz-icon-optical-size};
 
+  /* Input sizing per size */
+  --rz-input-size-xs: #{$input-size-xs};
+  --rz-input-size-sm: #{$input-size-sm};
+  --rz-input-size-md: #{$input-size-md};
+  --rz-input-size-lg: #{$input-size-lg};
+  --rz-input-padding-block-xs: #{$input-padding-block-xs};
+  --rz-input-padding-block-sm: #{$input-padding-block-sm};
+  --rz-input-padding-block-md: #{$input-padding-block-md};
+  --rz-input-padding-block-lg: #{$input-padding-block-lg};
+  --rz-input-padding-inline-xs: #{$input-padding-inline-xs};
+  --rz-input-padding-inline-sm: #{$input-padding-inline-sm};
+  --rz-input-padding-inline-md: #{$input-padding-inline-md};
+  --rz-input-padding-inline-lg: #{$input-padding-inline-lg};
+  --rz-input-font-size-xs: #{$input-font-size-xs};
+  --rz-input-font-size-sm: #{$input-font-size-sm};
+  --rz-input-font-size-md: #{$input-font-size-md};
+  --rz-input-font-size-lg: #{$input-font-size-lg};
+
   /* Input */
   --rz-input-font-size: #{$input-font-size};
-  --rz-input-height: #{$input-height};
+  --rz-input-height: var(--rz-input-size-md);
   --rz-input-line-height: #{$input-line-height};
   --rz-input-padding-block: #{$input-padding-block};
   --rz-input-padding-inline: #{$input-padding-inline};
@@ -1365,4 +1387,11 @@
   --rz-upload-cancel-background-color: #{$upload-cancel-background-color};
   --rz-upload-cancel-color: #{$upload-cancel-color};
   --rz-upload-button-background-color: #{$upload-button-background-color};
+
+  /* Spreadsheet */
+  --rz-spreadsheet-tab-font-size: #{$spreadsheet-tab-font-size};
+  --rz-spreadsheet-cell-border: #{$spreadsheet-cell-border};
+  --rz-spreadsheet-header-background-color: #{$spreadsheet-header-background-color};
+  --rz-spreadsheet-header-active-background-color: #{$spreadsheet-header-active-background-color};
+  --rz-spreadsheet-splitter-background-color: #{$spreadsheet-splitter-background-color};
 }

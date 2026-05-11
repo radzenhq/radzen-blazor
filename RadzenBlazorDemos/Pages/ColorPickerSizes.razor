@@ -1,0 +1,22 @@
+<RadzenStack Gap="1rem" class="rz-p-sm-12" AlignItems="AlignItems.Center">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="width: 200px;">
+        <RadzenLabel Text="Large" Style="width: 80px;" />
+        <RadzenColorPicker @bind-Value=@value InputSize="InputSize.Large" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="width: 200px;">
+        <RadzenLabel Text="Medium" Style="width: 80px;" />
+        <RadzenColorPicker @bind-Value=@value InputSize="InputSize.Medium" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="width: 200px;">
+        <RadzenLabel Text="Small" Style="width: 80px;" />
+        <RadzenColorPicker @bind-Value=@value InputSize="InputSize.Small" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Style="width: 200px;">
+        <RadzenLabel Text="Extra Small" Style="width: 80px;" />
+        <RadzenColorPicker @bind-Value=@value InputSize="InputSize.ExtraSmall" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    string value = "#ff0000";
+}
