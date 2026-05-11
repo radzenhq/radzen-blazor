@@ -2,7 +2,7 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
-<RadzenSplitButton Click=@OnClick Icon="merge_type" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+<RadzenSplitButton Click=@OnClick Icon="merge_type" Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_MergeAndCenter)) ?? "Merge && Center") Value="merge-center" />
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_MergeCells)) ?? "Merge Cells") Value="merge" />

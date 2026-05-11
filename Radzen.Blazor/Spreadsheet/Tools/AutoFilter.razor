@@ -2,7 +2,8 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenToggleButton @bind-Value=@IsAutoFilterEnabled Icon="filter_list" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" />
+<RadzenToggleButton @bind-Value=@IsAutoFilterEnabled Icon="filter_list" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+    ToggleVariant="Variant.Flat" ToggleButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Lighter" />
 
 @code {
 #nullable enable

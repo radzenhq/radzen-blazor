@@ -2,7 +2,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnRedoAsync Icon="redo" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnRedoAsync Icon="redo" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
 
 @code {
 #nullable enable

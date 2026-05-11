@@ -2,7 +2,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenSelectBar @bind-Value=@CurrentVerticalAlign Disabled=@IsDisabled>
+<RadzenSelectBar @bind-Value=@CurrentVerticalAlign Disabled=@IsDisabled Size="ButtonSize.Small">
     <Items>
         <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Top Icon="align_vertical_top" />
         <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Middle Icon="align_vertical_center" />

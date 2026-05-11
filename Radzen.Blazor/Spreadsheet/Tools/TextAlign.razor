@@ -2,7 +2,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenSelectBar @bind-Value=@CurrentTextAlign Disabled=@IsDisabled>
+<RadzenSelectBar @bind-Value=@CurrentTextAlign Disabled=@IsDisabled Size="ButtonSize.Small">
     <Items>
         <RadzenSelectBarItem Value=@Radzen.TextAlign.Left Icon="format_align_left" />
         <RadzenSelectBarItem Value=@Radzen.TextAlign.Center Icon="format_align_center" />

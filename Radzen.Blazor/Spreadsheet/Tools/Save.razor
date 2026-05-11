@@ -2,13 +2,15 @@
 @using Microsoft.JSInterop
 @using System.IO
 @inject IJSRuntime JSRuntime
-<RadzenSplitButton ButtonStyle="ButtonStyle.Base" Icon="download" ButtonType="ButtonType.Button"
+
+<RadzenSplitButton ButtonStyle="ButtonStyle.Base" Icon="download" ButtonType="ButtonType.Button" Size="ButtonSize.Small"
     Disabled=@(Workbook is null) Click=@OnClickAsync>
     <ChildContent>
         <RadzenSplitButtonItem Text="Excel (.xlsx)" Icon="table_view" Value="xlsx" />
         <RadzenSplitButtonItem Text="CSV (.csv)" Icon="description" Value="csv" />
     </ChildContent>
 </RadzenSplitButton>
+
 @code {
 #nullable enable
 

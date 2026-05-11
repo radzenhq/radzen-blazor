@@ -444,5 +444,9 @@ $rz-toc-horizontal-link-selected-color: var(--rz-text-title-color) !default;
 $skeleton-background-color: var(--rz-base-600) !default;
 $skeleton-animation-color: var(--rz-base-700) !default;
 
+// Spreadsheet
+$spreadsheet-header-background-color: var(--rz-base-900) !default;
+$spreadsheet-splitter-background-color: var(--rz-base-700) !default;
+
 @import 'fonts';
 @import 'components';

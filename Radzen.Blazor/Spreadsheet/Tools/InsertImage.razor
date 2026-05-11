@@ -3,7 +3,7 @@
 @using Radzen.Documents.Spreadsheet
 @inherits SpreadsheetToolBase
 
-<RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button"
+<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button"
     Disabled=@IsDisabled Size="ButtonSize.Small"
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertImage)) ?? "Insert Image")>
     <InputFile OnChange=@OnFileSelectedAsync accept="image/*" disabled=@IsDisabled />

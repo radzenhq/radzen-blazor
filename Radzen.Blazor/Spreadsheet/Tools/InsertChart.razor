@@ -2,7 +2,7 @@
 @using Radzen.Documents.Spreadsheet
 @inherits SpreadsheetToolBase
 
-<RadzenSplitButton ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+<RadzenSplitButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
     Disabled=@IsDisabled Click=@OnClick
     Icon="bar_chart" Text="Chart"
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertChart)) ?? "Insert Chart")>
