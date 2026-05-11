@@ -121,4 +121,17 @@
     {
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), Reference, nameof(OnClose));
     }
+
+    /// <inheritdoc />
+    public override void Dispose()
+    {
+        base.Dispose();
+
+        if (IsJSRuntimeAvailable && JSRuntime != null)
+        {
+            JSRuntime.InvokeVoid("Radzen.destroyPopup", GetId());
+        }
+
+        GC.SuppressFinalize(this);
+    }
 }
