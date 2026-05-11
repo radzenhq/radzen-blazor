@@ -298,7 +298,7 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass() => ClassList.Create("rz-button rz-toggle-button")
                 .Add("rz-button-icon-only", string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon))
                 .AddButtonSize(Size)
-                .AddVariant(Variant)
+                .AddVariant(CurrentVariant)
                 .AddButtonStyle(CurrentButtonStyle)
                 .AddShade(CurrentShade)
                 .AddDisabled(IsDisabled)
@@ -308,6 +308,7 @@ namespace Radzen.Blazor
 
         private Shade CurrentShade => HasValue ? ToggleShade : Shade;
         private ButtonStyle CurrentButtonStyle => HasValue ? ToggleButtonStyle : ButtonStyle;
+        private Variant CurrentVariant => HasValue && ToggleVariant.HasValue ? ToggleVariant.Value : Variant;
 
         /// <summary>
         /// Gets or sets the ToggleButton style.
@@ -322,6 +323,13 @@ namespace Radzen.Blazor
         /// <value>The ToggleButton shade.</value>
         [Parameter]
         public Shade ToggleShade { get; set; } = Shade.Darker;
+
+        /// <summary>
+        /// Gets or sets the variant used when the button is toggled.
+        /// </summary>
+        /// <value>The toggled variant. When null, the Variant property is used.</value>
+        [Parameter]
+        public Variant? ToggleVariant { get; set; }
 
         /// <summary>
         /// Gets or sets the aria-label attribute.
