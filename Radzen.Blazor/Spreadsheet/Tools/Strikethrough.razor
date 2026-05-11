@@ -1,7 +1,8 @@
 @using Radzen.Documents.Spreadsheet
 @inherits FormatToggleToolBase
 
-<RadzenToggleButton @bind-Value=@IsToggled Icon="strikethrough_s" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" />
+<RadzenToggleButton @bind-Value=@IsToggled Icon="strikethrough_s" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+    ToggleVariant="Variant.Flat" ToggleButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Lighter" />
 
 @code {
     protected override bool GetValue(Format format) => format.Strikethrough;

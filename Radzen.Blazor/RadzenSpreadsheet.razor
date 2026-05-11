@@ -14,22 +14,24 @@
         <RadzenTabs SelectedIndex="1">
             <Tabs>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FileTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <Open WorkbookChanged=@OnWorkbookChangedAsync CsvImportOptions=@CsvImportOptions />
                         <Save Workbook=@workbook ActiveWorksheet=@Worksheet FileName=@ExportFileName CsvExportOptions=@CsvExportOptions />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_HomeTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal">
-                        <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <Undo Commands=@ActiveView?.Commands />
                             <Redo Commands=@ActiveView?.Commands />
                         </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal">
+                        <div class="rz-html-editor-separator"></div>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <FontFamily Worksheet=@Worksheet />
                             <FontSize Worksheet=@Worksheet />
                         </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal">
+                        <div class="rz-html-editor-separator"></div>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <Bold Worksheet=@Worksheet />
                             <Italic Worksheet=@Worksheet />
                             <Underline Worksheet=@Worksheet />
@@ -38,38 +40,43 @@
                             <BackgroundColor Worksheet=@Worksheet />
                             <CellBorders Worksheet=@Worksheet />
                         </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal">
+                        <div class="rz-html-editor-separator"></div>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <TextAlign Worksheet=@Worksheet />
                             <VerticalAlign Worksheet=@Worksheet />
                             <TextWrap Worksheet=@Worksheet />
                             <MergeCells Worksheet=@Worksheet />
                         </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal">
+                        <div class="rz-html-editor-separator"></div>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <ConditionalFormat Worksheet=@Worksheet />
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <DataFormat Worksheet=@Worksheet />
                         <IncreaseDecimals Worksheet=@Worksheet />
                         <DecreaseDecimals Worksheet=@Worksheet />
+                        <div class="rz-html-editor-separator"></div>
                         <RadzenButton Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatCells)) Click=@OnFormatCellsAsync
-                            ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+                            Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
                             Disabled=@(Worksheet?.Selection.Cell == CellRef.Invalid) />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_InsertTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal">
-                        <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <InsertRowAfter Worksheet=@Worksheet />
                             <InsertRowBefore Worksheet=@Worksheet />
                         </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal">
+                        <div class="rz-html-editor-separator"></div>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <InsertColumnAfter Worksheet=@Worksheet />
                             <InsertColumnBefore Worksheet=@Worksheet />
                         </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Horizontal">
+                        <div class="rz-html-editor-separator"></div>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <InsertHyperlink Worksheet=@Worksheet />
                             <InsertImage Worksheet=@Worksheet />
                             <InsertChart Worksheet=@Worksheet />
@@ -78,14 +85,15 @@
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_ViewTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <Freeze Worksheet=@Worksheet />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_DataTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <AutoFilter Worksheet=@Worksheet />
                         <CustomSort Worksheet=@Worksheet />
+                        <div class="rz-html-editor-separator"></div>
                         <DataValidation Worksheet=@Worksheet />
                     </RadzenStack>
                 </RadzenTabsItem>

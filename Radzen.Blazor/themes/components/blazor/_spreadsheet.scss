@@ -1,8 +1,80 @@
+$spreadsheet-tab-font-size: 0.875rem !default;
+$spreadsheet-cell-border: var(--rz-border-normal) !default;
+$spreadsheet-header-background-color: var(--rz-base-200) !default;
+$spreadsheet-header-active-background-color: var(--rz-secondary-lighter) !default;
+$spreadsheet-splitter-background-color: var(--rz-base-200) !default;
+
 .rz-spreadsheet {
     display: flex;
     flex-direction: column;
-    border: 1px solid #e0e0e0;
+    border: var(--rz-spreadsheet-cell-border);
     outline: none;
+
+    .rz-tabview-nav {
+        background-color: var(--rz-tabs-tab-background-color);
+    }
+
+    .rz-tabview {
+        --rz-tabs-tab-padding-block: 0.25rem;
+        --rz-tabs-tab-padding-inline: 0.5rem;
+        --rz-tabs-tab-font-size: var(--rz-spreadsheet-tab-font-size);
+    }
+
+    .rz-tabview-panels {
+        border: none;
+    }
+
+    .rz-tabview-panel {
+        padding: 0.25rem;
+
+        --rz-selectbar-border-radius: var(--rz-border-radius);
+        --rz-button-border-radius: var(--rz-border-radius);
+    }
+
+    .rz-tabview-panel .rz-button {
+        
+        .rzi {
+            font-size: 1rem;
+        }
+
+        .rz-button-text {
+            font-size: 0.75rem;
+        }
+    }
+
+    .rz-selectbar.rz-selectbar-horizontal .rz-button {
+        outline: none;
+        border-radius: var(--rz-border-radius) !important;
+    }
+
+    .rz-selectbar.rz-selectbar-horizontal .rz-button:not(:first-child) {
+        margin-inline-start: 0.25rem;
+    }
+
+    .rz-colorpicker {
+        flex-direction: column;
+        gap: 0;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-block-end: 1px solid transparent;
+        --rz-colorpicker-panel-border: none;
+
+        .rzi {
+            font-size: 0.875rem;
+        }
+
+        .rz-colorpicker-value {
+            height: 0.25rem;
+            min-height: 0.25rem;
+            max-height: 0.25rem;
+            min-width: 1rem;
+        }
+    }
+
+    .rz-html-editor-separator {
+        margin-inline: 0.125rem;
+        height: 1.25rem;
+    }
 }
 
 .rz-virtual-grid {
@@ -23,40 +95,22 @@
     height: 100%;
 }
 
-.rz-virtual-grid-scroller::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.rz-virtual-grid-scroller::-webkit-scrollbar-track {
-  background: #f0f0f0;
-}
-
-.rz-virtual-grid-scroller::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 5px;
-}
-
-.rz-virtual-grid-scroller::-webkit-scrollbar-thumb:hover {
-  background-color: #555;
-}
-
 .rz-spreadsheet-formula-editor {
     padding: 0.2rem 0.2rem;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: var(--rz-spreadsheet-cell-border);
 }
 
 .rz-spreadsheet-cell {
     position: absolute;
-    border-right: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
+    border-right: var(--rz-spreadsheet-cell-border);
+    border-bottom: var(--rz-spreadsheet-cell-border);
     cursor: cell;
     font-size: 0.8rem;
     padding: 0.2rem 0.2rem;
     box-sizing: border-box;
     white-space: nowrap;
     overflow: hidden;
-    background: #fff;
+    background: var(--rz-base-background-color);
     user-select: none;
     -webkit-user-select: none;
 }
@@ -69,43 +123,43 @@
 }
 
 .rz-spreadsheet-selection-cell-top {
-    border-top: 2px solid #258cfb;
+    border-top: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-cell-right {
-    border-right: 2px solid #258cfb;
+    border-right: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-cell-bottom {
-    border-bottom: 2px solid #258cfb;
+    border-bottom: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-cell-left {
-    border-left: 2px solid #258cfb;
+    border-left: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-range {
     position: absolute;
     pointer-events: none;
     box-sizing: border-box;
-    background: rgba(37, 140, 251, 0.2);
+    background: var(--rz-primary-lighter);
     z-index: 2;
 }
 
 .rz-spreadsheet-selection-range-top {
-    border-top: 2px solid #258cfb;
+    border-top: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-range-right {
-    border-right: 2px solid #258cfb;
+    border-right: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-range-bottom {
-    border-bottom: 2px solid #258cfb;
+    border-bottom: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-range-left {
-    border-left: 2px solid #258cfb;
+    border-left: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-range-mask {
@@ -120,8 +174,8 @@
     position: absolute;
     width: 8px;
     height: 8px;
-    background: #258cfb;
-    border: 1px solid #fff;
+    background: var(--rz-primary);
+    border: 1px solid var(--rz-base-background-color);
     box-sizing: border-box;
     cursor: crosshair;
     z-index: 1;
@@ -132,24 +186,24 @@
     position: absolute;
     pointer-events: none;
     box-sizing: border-box;
-    background: rgba(37, 140, 251, 0.08);
+    background: var(--rz-primary-lighter);
     z-index: 1;
 }
 
 .rz-spreadsheet-autofill-range-top {
-    border-top: 2px dashed #258cfb;
+    border-top: 2px dashed var(--rz-primary);
 }
 
 .rz-spreadsheet-autofill-range-right {
-    border-right: 2px dashed #258cfb;
+    border-right: 2px dashed var(--rz-primary);
 }
 
 .rz-spreadsheet-autofill-range-bottom {
-    border-bottom: 2px dashed #258cfb;
+    border-bottom: 2px dashed var(--rz-primary);
 }
 
 .rz-spreadsheet-autofill-range-left {
-    border-left: 2px dashed #258cfb;
+    border-left: 2px dashed var(--rz-primary);
 }
 
 .rz-spreadsheet-autofill-handle.rz-spreadsheet-frozen-row,
@@ -174,9 +228,9 @@
     text-align: center;
     position: absolute;
     box-sizing: border-box;
-    background: #f5f5f5;
-    border-right: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
+    background: var(--rz-spreadsheet-header-background-color);
+    border-right: var(--rz-spreadsheet-cell-border);
+    border-bottom: var(--rz-spreadsheet-cell-border);
     font-weight: bold;
     font-size: 0.8rem;
     padding: 0.2rem 0.2rem;
@@ -194,12 +248,12 @@
 }
 
 .rz-spreadsheet-header-active {
-    background: #e0e0e0;
+    background: var(--rz-spreadsheet-header-active-background-color);
 }
 
 .rz-spreadsheet-header-selected {
-    background: #258cfb;
-    color: white;
+    background: var(--rz-primary);
+    color: var(--rz-on-primary);
 }
 
 .rz-spreadsheet-cell-editor {
@@ -209,7 +263,7 @@
 }
 
 .rz-spreadsheet-cell-editor .rz-spreadsheet-editor {
-    border: 2px solid #258cfb;
+    border: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-cell-editor .rz-spreadsheet-editor-input {
@@ -223,7 +277,7 @@
     min-width: fit-content;
     min-height: 100%;
     box-sizing: border-box;
-    background-color: #fff;
+    background-color: var(--rz-base-background-color);
 }
 
 .rz-spreadsheet-editor-input {
@@ -258,12 +312,12 @@
 }
 
 .rz-operator-highlight {
-    color: var(--rz-cell-color, #000000);
+    color: var(--rz-cell-color, var(--rz-text-color));
     font-weight: 500;
 }
 
 .rz-default-highlight {
-    color: var(--rz-cell-color, #000000);
+    color: var(--rz-cell-color, var(--rz-text-color));
 }
 
 .rz-spreadsheet-highlight-popup {
@@ -346,14 +400,14 @@
 .rz-spreadsheet-input-prompt {
     position: absolute;
     z-index: 1;
-    background: #ffffd0;
-    border: 1px solid var(--rz-border-color, #e0e0e0);
+    background: var(--rz-warning-lighter);
+    border: var(--rz-spreadsheet-cell-border);
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     padding: 0.5rem;
     max-width: 250px;
     font-size: 0.85rem;
     pointer-events: none;
-    border-radius: var(--rz-border-radius, 4px);
+    border-radius: var(--rz-border-radius);
 }
 
 .rz-spreadsheet-input-prompt-title {
@@ -373,18 +427,18 @@
 .rz-spreadsheet-validation-error {
     position: absolute;
     z-index: 1;
-    background: #fff0f0;
-    border: 1px solid var(--rz-form-error-color, #f44336);
+    background: var(--rz-danger-lighter);
+    border: 1px solid var(--rz-danger);
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     padding: 0.5rem;
     max-width: 300px;
     font-size: 0.85rem;
     pointer-events: none;
-    border-radius: var(--rz-border-radius, 4px);
+    border-radius: var(--rz-border-radius);
 }
 
 .rz-spreadsheet-validation-error-message {
-    color: var(--rz-form-error-color, #f44336);
+    color: var(--rz-danger);
 }
 
 .rz-spreadsheet-validation-error.rz-spreadsheet-frozen-row,
@@ -399,7 +453,7 @@
 .rz-spreadsheet-horizontal-splitter,
 .rz-spreadsheet-vertical-splitter {
     position: absolute;
-    background-color: #e0e0e0;
+    background-color: var(--rz-spreadsheet-splitter-background-color);
     z-index: 6;
 }
 
@@ -410,19 +464,19 @@
 }
 
 .rz-spreadsheet-table-frame-top {
-    border-top: 1px solid black;
+    border-top: 1px solid var(--rz-text-color);
 }
 
 .rz-spreadsheet-table-frame-left {
-    border-left: 1px solid black;
+    border-left: 1px solid var(--rz-text-color);
 }
 
 .rz-spreadsheet-table-frame-right {
-    border-right: 1px solid black;
+    border-right: 1px solid var(--rz-text-color);
 }
 
 .rz-spreadsheet-table-frame-bottom {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--rz-text-color);
 }
 
 .rz-spreadsheet-table-frame.rz-spreadsheet-frozen-row,
@@ -443,7 +497,7 @@
     z-index: 5;
     transform: translateX(-50%);
     &:hover {
-        background-color: #258cfb;
+        background-color: var(--rz-primary);
     }
 }
 
@@ -454,7 +508,7 @@
     z-index: 5;
     transform: translateY(-50%);
     &:hover {
-        background-color: #258cfb;
+        background-color: var(--rz-primary);
     }
 }
 
@@ -464,15 +518,15 @@
     top: 2px;
     right: 2px;
     font-size: 12px;
-    color: #666;
+    color: var(--rz-text-disabled-color);
     cursor: pointer;
     z-index: 5;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 2px;
     padding: 1px;
-    
+
     &:hover {
-        color: #258cfb;
+        color: var(--rz-primary);
         background: rgba(255, 255, 255, 1);
     }
 }
@@ -503,13 +557,13 @@
 }
 
 .rz-spreadsheet-cell-hyperlink {
-    color: #0563C1;
-    text-decoration: underline;
+    color: var(--rz-link-color);
+    text-decoration: var(--rz-link-text-decoration);
     cursor: pointer;
 
     &:hover {
-        color: #0563C1;
-        text-decoration: underline;
+        color: var(--rz-link-hover-color);
+        text-decoration: var(--rz-link-hover-text-decoration);
     }
 
     &:visited {
@@ -527,7 +581,7 @@
         height: 0;
         border-style: solid;
         border-width: 0 6px 6px 0;
-        border-color: transparent var(--rz-form-error-color, #f44336) transparent transparent;
+        border-color: transparent var(--rz-danger) transparent transparent;
     }
 }
 
@@ -536,7 +590,7 @@
 }
 
 .rz-spreadsheet-cell-error {
-    color: var(--rz-form-error-color);
+    color: var(--rz-danger);
 }
 
 .rz-spreadsheet-cell-editor-number {
@@ -596,8 +650,8 @@
     position: absolute;
     width: 8px;
     height: 8px;
-    background: #258cfb;
-    border: 1px solid white;
+    background: var(--rz-primary);
+    border: 1px solid var(--rz-base-background-color);
     pointer-events: auto;
     z-index: 5;
 }
@@ -635,7 +689,7 @@
 .rz-spreadsheet-chart-container {
     position: absolute;
     overflow: hidden;
-    background: var(--rz-base-background-color, #fff);
+    background: var(--rz-base-background-color);
     pointer-events: auto;
     cursor: grab;
 
@@ -651,8 +705,8 @@
     justify-content: center;
     width: 100%;
     height: 100%;
-    background: var(--rz-base-200, #f0f0f0);
-    color: var(--rz-text-disabled-color, #999);
+    background: var(--rz-base-200);
+    color: var(--rz-text-disabled-color);
     font-size: 0.875rem;
 }
 
@@ -660,7 +714,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    border-top: 1px solid #e0e0e0;
+    border-top: var(--rz-spreadsheet-cell-border);
 }
 
 .rz-spreadsheet-sheet-tabs .rz-tabview {
