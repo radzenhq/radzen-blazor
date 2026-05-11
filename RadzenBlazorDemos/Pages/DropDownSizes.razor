@@ -1,0 +1,23 @@
+<RadzenStack Gap="1rem" class="rz-p-sm-12">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+        <RadzenLabel Text="Large" Style="width: 80px;" />
+        <RadzenDropDown @bind-Value=@value Data=@items InputSize="InputSize.Large" Style="width: 100%; max-width: 400px;" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+        <RadzenLabel Text="Medium" Style="width: 80px;" />
+        <RadzenDropDown @bind-Value=@value Data=@items InputSize="InputSize.Medium" Style="width: 100%; max-width: 400px;" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+        <RadzenLabel Text="Small" Style="width: 80px;" />
+        <RadzenDropDown @bind-Value=@value Data=@items InputSize="InputSize.Small" Style="width: 100%; max-width: 400px;" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+        <RadzenLabel Text="Extra Small" Style="width: 80px;" />
+        <RadzenDropDown @bind-Value=@value Data=@items InputSize="InputSize.ExtraSmall" Style="width: 100%; max-width: 400px;" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    string value = "Item 1";
+    IEnumerable<string> items = new[] { "Item 1", "Item 2", "Item 3" };
+}
