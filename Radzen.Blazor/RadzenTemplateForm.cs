@@ -181,7 +181,7 @@ namespace Radzen.Blazor
 
                 if (valid)
                 {
-                    await Submit.InvokeAsync(Data);
+                    await Submit.InvokeAsync(Data ?? (EditContext.Model is TItem model ? model : default));
 
                     if (Action != null && JSRuntime != null)
                     {
