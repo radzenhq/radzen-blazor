@@ -3412,5 +3412,111 @@ namespace Radzen.Blazor.Tests
                 }
             }
         }
+
+        [Fact]
+        public void DataGrid_Virtualization_DoesNotFullyEnumerateData_OnReRender()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            // 1000 items wrapped so the wrapper is NOT ICollection — Enumerable.Count()
+            // would have to walk every element, while Enumerable.Any() stops after 1.
+            // This simulates an IQueryable (e.g. EF Core DbSet) where the difference
+            // is SELECT COUNT(*) / SELECT * vs SELECT EXISTS / SELECT TOP 1.
+            var items = Enumerable.Range(1, 1000).Select(i => new { Id = i }).ToArray();
+            var tracking = new TrackingEnumerable<object>(items);
+
+            var component = ctx.RenderComponent<RadzenDataGrid<object>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<object>>(p => p.Data, tracking);
+                parameterBuilder.Add(p => p.AllowVirtualization, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<object>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.CloseComponent();
+                });
+            });
+
+            // Snapshot after the initial render. LoadItems (called by Virtualize) does
+            // its own view.Count() per invocation, so each render already iterates the
+            // source ~once. The fix prevents a SECOND full iteration from the razor
+            // empty-message guard.
+            var baseline = tracking.MoveNextCalls;
+
+            const int extraRenders = 5;
+            for (int i = 0; i < extraRenders; i++)
+            {
+                component.Render();
+            }
+
+            var growth = tracking.MoveNextCalls - baseline;
+            var iterationsPerRender = (double)growth / extraRenders / items.Length;
+
+            // With Data.Any() the empty-message guard adds 1 MoveNext per render on top
+            // of LoadItems' single full iteration — so iterationsPerRender ≈ 1.0.
+            // With Data.Count() the guard adds a SECOND full iteration — so it's ≈ 2.0.
+            // 1.5 cleanly separates the two regimes.
+            Assert.True(iterationsPerRender < 1.5,
+                $"Data was iterated {iterationsPerRender:F2}× per render ({growth} MoveNext calls across {extraRenders} renders for {items.Length} items). " +
+                "Expected ≤1× (LoadItems only). The virtualization empty-message guard must use Data.Any() rather than Data.Count() to avoid an extra full enumeration of the IQueryable on every render.");
+        }
+
+        [Fact]
+        public void DataGrid_Virtualization_ShowsEmptyMessage_WhenDataIsEmpty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<object>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<object>>(p => p.Data, Enumerable.Empty<object>());
+                parameterBuilder.Add(p => p.AllowVirtualization, true);
+                parameterBuilder.Add(p => p.EmptyText, "Nothing to display");
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<object>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.CloseComponent();
+                });
+            });
+
+            // Guards the original fix from fb0d588cb: empty data with virtualization
+            // must still render the empty-message row.
+            Assert.Contains("rz-datatable-emptymessage", component.Markup);
+            Assert.Contains("Nothing to display", component.Markup);
+        }
+
+        private sealed class TrackingEnumerable<T> : IEnumerable<T>
+        {
+            private readonly IEnumerable<T> _source;
+            public int MoveNextCalls { get; private set; }
+
+            public TrackingEnumerable(IEnumerable<T> source) => _source = source;
+
+            public IEnumerator<T> GetEnumerator() => new TrackingEnumerator(this, _source.GetEnumerator());
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+
+            private sealed class TrackingEnumerator : IEnumerator<T>
+            {
+                private readonly TrackingEnumerable<T> _owner;
+                private readonly IEnumerator<T> _inner;
+
+                public TrackingEnumerator(TrackingEnumerable<T> owner, IEnumerator<T> inner)
+                {
+                    _owner = owner;
+                    _inner = inner;
+                }
+
+                public T Current => _inner.Current;
+                object System.Collections.IEnumerator.Current => Current!;
+                public void Dispose() => _inner.Dispose();
+                public bool MoveNext() { _owner.MoveNextCalls++; return _inner.MoveNext(); }
+                public void Reset() => _inner.Reset();
+            }
+        }
     }
 }
