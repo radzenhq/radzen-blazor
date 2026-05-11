@@ -71,7 +71,7 @@
     Editable DropDown
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Use the <code>AllowFiltering</code> property to enable editable mode, allowing users to type and filter dropdown items.
+    Use the <code>ValueTemplate</code> with an embedded input bound to the same value to let users edit the selected item in place. Set <code>ShowValueTemplateOnEmpty</code> to <code>true</code> to render the template (and its editor) even when no item is selected, so the user can type an initial value without first picking from the list. The pattern requires the DropDown <code>Value</code> to be the displayed text itself (e.g. a primitive type) and is not designed for use with <code>TextProperty</code>/<code>ValueProperty</code>.
 </RadzenText>
 <RadzenExample ComponentName="DropDown" Example="DropDownEdit">
     <DropDownEdit/>

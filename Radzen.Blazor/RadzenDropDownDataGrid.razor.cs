@@ -258,6 +258,15 @@ namespace Radzen.Blazor
         public RenderFragment<dynamic>? ValueTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets whether <see cref="ValueTemplate"/> is rendered even when there is no selected item.
+        /// When <c>true</c>, the template is invoked with a <c>null</c> context so it can render an editor
+        /// (e.g. a text box) for an empty value. Templates must handle a null context.
+        /// </summary>
+        /// <value><c>true</c> to render <see cref="ValueTemplate"/> on empty value; otherwise <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool ShowValueTemplateOnEmpty { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating DataGrid density.
         /// </summary>
         [Parameter]

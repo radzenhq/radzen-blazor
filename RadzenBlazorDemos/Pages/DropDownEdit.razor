@@ -1,8 +1,8 @@
 ﻿@inherits DbContextPage
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
-    <RadzenLabel id="DropDownEditLabel" Text="Select Value" Component="DropDownEdit" />
-    <RadzenDropDown @bind-Value=@value Data=@companyNames Style="width: 100%; max-width: 400px;" Name="DropDownEdit">
+    <RadzenLabel id="DropDownEditLabel" Text="Select or type a value" Component="DropDownEdit" />
+    <RadzenDropDown @bind-Value=@value Data=@companyNames ShowValueTemplateOnEmpty="true" Style="width: 100%; max-width: 400px;" Name="DropDownEdit">
         <ValueTemplate>
             <RadzenTextBox @bind-Value=@value Style="width:120%; height:120%; margin:-15px" aria-labelledby="DropDownEditLabel" />
         </ValueTemplate>
@@ -10,7 +10,7 @@
 </RadzenStack>
 
 @code {
-    string value = "Around the Horn";
+    string value = "";
     IEnumerable<string> companyNames;
 
     protected override async Task OnInitializedAsync()

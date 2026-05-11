@@ -19,10 +19,10 @@
                    aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes="InputAttributes"/>
         </div>
 
-        @if (ValueTemplate != null && selectedItem != null)
+        @if (ValueTemplate != null && (selectedItem != null || (ShowValueTemplateOnEmpty && !Multiple)))
         {
             <span class="rz-dropdown-label rz-inputtext" style="width:100%;" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
-                @ValueTemplate(selectedItem)
+                @ValueTemplate(selectedItem!)
             </span>
         }
         else if (Template != null && selectedItem != null)
