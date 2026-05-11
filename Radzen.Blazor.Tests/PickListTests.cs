@@ -296,6 +296,164 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void PickList_Move_Fires_OnMoveAllSourceToTarget()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var source = new List<Item>
+            {
+                new Item { Id = 1, Name = "A" },
+                new Item { Id = 2, Name = "B" }
+            };
+
+            PickListMoveEventArgs<Item> captured = null;
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.Source, source);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.Move, args => captured = args);
+            });
+
+            component.Find("button[title='Move all items from source to target collection']").Click();
+
+            Assert.NotNull(captured);
+            Assert.True(captured.MoveDirectionToTarget);
+            Assert.Equal(new[] { 1, 2 }, captured.Items.Select(i => i.Id).OrderBy(i => i).ToArray());
+        }
+
+        [Fact]
+        public void PickList_Move_Fires_OnSelectedSourceToTarget()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var source = new List<Item>
+            {
+                new Item { Id = 1, Name = "A" },
+                new Item { Id = 2, Name = "B" },
+                new Item { Id = 3, Name = "C" }
+            };
+
+            PickListMoveEventArgs<Item> captured = null;
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.Source, source);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Move, args => captured = args);
+            });
+
+            var field = typeof(RadzenPickList<Item>).GetField("selectedSourceItems", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            field.SetValue(component.Instance, new[] { 1, 3 });
+
+            component.Render();
+            component.Find("button[title='Move all selected source items to target collection']").Click();
+
+            Assert.NotNull(captured);
+            Assert.True(captured.MoveDirectionToTarget);
+            Assert.Equal(new[] { 1, 3 }, captured.Items.Select(i => i.Id).OrderBy(i => i).ToArray());
+        }
+
+        [Fact]
+        public void PickList_Move_Fires_OnMoveAllTargetToSource()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var target = new List<Item>
+            {
+                new Item { Id = 1, Name = "A" },
+                new Item { Id = 2, Name = "B" }
+            };
+
+            PickListMoveEventArgs<Item> captured = null;
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.Target, target);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.Move, args => captured = args);
+            });
+
+            component.Find("button[title='Move all items from target to source collection']").Click();
+
+            Assert.NotNull(captured);
+            Assert.False(captured.MoveDirectionToTarget);
+            Assert.Equal(new[] { 1, 2 }, captured.Items.Select(i => i.Id).OrderBy(i => i).ToArray());
+        }
+
+        [Fact]
+        public void PickList_Move_Fires_OnSelectedTargetToSource()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var target = new List<Item>
+            {
+                new Item { Id = 1, Name = "A" },
+                new Item { Id = 2, Name = "B" },
+                new Item { Id = 3, Name = "C" }
+            };
+
+            PickListMoveEventArgs<Item> captured = null;
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.Target, target);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Move, args => captured = args);
+            });
+
+            var field = typeof(RadzenPickList<Item>).GetField("selectedTargetItems", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            field.SetValue(component.Instance, new[] { 2 });
+
+            component.Render();
+            component.Find("button[title='Move selected target items to source collection']").Click();
+
+            Assert.NotNull(captured);
+            Assert.False(captured.MoveDirectionToTarget);
+            Assert.Equal(new[] { 2 }, captured.Items.Select(i => i.Id).ToArray());
+        }
+
+        [Fact]
+        public void PickList_Move_Fires_AfterSourceAndTargetChanged()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var source = new List<Item>
+            {
+                new Item { Id = 1, Name = "A" }
+            };
+
+            var order = new List<string>();
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.Source, source);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.SourceChanged, _ => order.Add(nameof(RadzenPickList<Item>.SourceChanged)));
+                parameters.Add(p => p.TargetChanged, _ => order.Add(nameof(RadzenPickList<Item>.TargetChanged)));
+                parameters.Add(p => p.Move, _ => order.Add(nameof(RadzenPickList<Item>.Move)));
+            });
+
+            component.Find("button[title='Move all items from source to target collection']").Click();
+
+            Assert.Equal(new[]
+            {
+                nameof(RadzenPickList<Item>.SourceChanged),
+                nameof(RadzenPickList<Item>.TargetChanged),
+                nameof(RadzenPickList<Item>.Move)
+            }, order.ToArray());
+        }
+
+        [Fact]
         public void PickList_DoesNotRender_EmptyText_WhenDataExists()
         {
             using var ctx = new TestContext();

@@ -424,6 +424,14 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<IEnumerable<TItem>> SelectedTargetChanged { get; set; }
 
+        /// <summary>
+        /// Gets or sets the callback that is invoked when items are moved between the source and target collections.
+        /// Fires after <see cref="SourceChanged"/> and <see cref="TargetChanged"/>, so the bound collections already reflect the move.
+        /// </summary>
+        /// <value>The move callback.</value>
+        [Parameter]
+        public EventCallback<PickListMoveEventArgs<TItem>> Move { get; set; }
+
         object? selectedSourceItems;
         object? selectedTargetItems;
 
@@ -524,30 +532,36 @@ namespace Radzen.Blazor
         RadzenListBox<object>? targetListBox;
         private async Task Update(bool sourceToTarget, IEnumerable<TItem>? items)
         {
+            IEnumerable<TItem> movedItems;
+
             if (sourceToTarget)
             {
                 if (items != null)
                 {
-                    target = (target ?? Enumerable.Empty<TItem>()).Concat(items);
-                    source = (source ?? Enumerable.Empty<TItem>()).Except(items);
+                    movedItems = items as IList<TItem> ?? items.ToList();
+                    target = (target ?? Enumerable.Empty<TItem>()).Concat(movedItems);
+                    source = (source ?? Enumerable.Empty<TItem>()).Except(movedItems);
                 }
                 else
                 {
-                    target = (target ?? Enumerable.Empty<TItem>()).Concat(MoveFilteredItemsOnlyOnMoveAll ? sourceListBox?.GetView()?.Cast<TItem>() ?? Enumerable.Empty<TItem>() : source ?? Enumerable.Empty<TItem>());
-                    source = MoveFilteredItemsOnlyOnMoveAll && source != null ? source.Except(sourceListBox?.GetView()?.Cast<TItem>() ?? Enumerable.Empty<TItem>()) : null;
+                    movedItems = (MoveFilteredItemsOnlyOnMoveAll ? sourceListBox?.GetView()?.Cast<TItem>() ?? Enumerable.Empty<TItem>() : source ?? Enumerable.Empty<TItem>()).ToList();
+                    target = (target ?? Enumerable.Empty<TItem>()).Concat(movedItems);
+                    source = MoveFilteredItemsOnlyOnMoveAll && source != null ? source.Except(movedItems) : null;
                 }
             }
             else
             {
                 if (items != null)
                 {
-                    source = (source ?? Enumerable.Empty<TItem>()).Concat(items);
-                    target = (target ?? Enumerable.Empty<TItem>()).Except(items);
+                    movedItems = items as IList<TItem> ?? items.ToList();
+                    source = (source ?? Enumerable.Empty<TItem>()).Concat(movedItems);
+                    target = (target ?? Enumerable.Empty<TItem>()).Except(movedItems);
                 }
                 else
                 {
-                    source = (source ?? Enumerable.Empty<TItem>()).Concat(MoveFilteredItemsOnlyOnMoveAll ? targetListBox?.GetView()?.Cast<TItem>() ?? Enumerable.Empty<TItem>() : target ?? Enumerable.Empty<TItem>());
-                    target = MoveFilteredItemsOnlyOnMoveAll && target != null ? target.Except(targetListBox?.GetView()?.Cast<TItem>() ?? Enumerable.Empty<TItem>()) : null;
+                    movedItems = (MoveFilteredItemsOnlyOnMoveAll ? targetListBox?.GetView()?.Cast<TItem>() ?? Enumerable.Empty<TItem>() : target ?? Enumerable.Empty<TItem>()).ToList();
+                    source = (source ?? Enumerable.Empty<TItem>()).Concat(movedItems);
+                    target = MoveFilteredItemsOnlyOnMoveAll && target != null ? target.Except(movedItems) : null;
                 }
             }
 
@@ -556,6 +570,15 @@ namespace Radzen.Blazor
 
             await SourceChanged.InvokeAsync(source);
             await TargetChanged.InvokeAsync(target);
+
+            if (Move.HasDelegate)
+            {
+                await Move.InvokeAsync(new PickListMoveEventArgs<TItem>
+                {
+                    MoveDirectionToTarget = sourceToTarget,
+                    Items = movedItems,
+                });
+            }
 
             if (EditContext != null)
             {
