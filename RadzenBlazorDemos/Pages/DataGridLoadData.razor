@@ -106,7 +106,7 @@ void LoadData(LoadDataArgs args)
 
         if (!string.IsNullOrEmpty(args.Filter))
         {
-            // Query cannot be transalated to SQL and filtering will be performed in-memory.
+            // Query cannot be translated to SQL and filtering will be performed in-memory.
             if (selectedTitles?.Any() == true)
             {
                 query = query.ToList().AsQueryable();
