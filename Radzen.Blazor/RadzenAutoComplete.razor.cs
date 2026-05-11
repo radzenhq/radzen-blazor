@@ -339,8 +339,14 @@ namespace Radzen.Blazor
             return $"Radzen.openPopup(this.parentNode, '{PopupID}', true)";
         }
 
+        /// <summary>
+        /// Gets or sets the size of the component.
+        /// </summary>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
-        protected override string GetComponentCssClass() => GetClassList("rz-autocomplete").ToString();
+        protected override string GetComponentCssClass() => GetClassList("rz-autocomplete").AddInputSize(InputSize).ToString();
 
         IJSObjectReference? _jsRef;
         bool _jsParamsChanged;

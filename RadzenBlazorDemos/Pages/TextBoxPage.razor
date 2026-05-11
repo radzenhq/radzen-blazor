@@ -7,6 +7,72 @@
     Single-line text input component.
 </RadzenText>
 
-<RadzenExample ComponentName="TextBox" Example="TextBoxConfig">
-    <TextBoxConfig />
+<RadzenText Anchor="textbox#bind-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of TextBox
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="TextBox" Example="TextBoxBindValue">
+    <TextBoxBindValue />
+</RadzenExample>
+
+<RadzenText Anchor="textbox#placeholder" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Placeholder
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Placeholder</code> property to display hint text when the TextBox is empty.
+</RadzenText>
+<RadzenExample ComponentName="TextBox" Example="TextBoxPlaceholder">
+    <TextBoxPlaceholder />
+</RadzenExample>
+
+<RadzenText Anchor="textbox#max-length" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Maximum length
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>MaxLength</code> property to limit the number of characters the user can enter.
+</RadzenText>
+<RadzenExample ComponentName="TextBox" Example="TextBoxMaxLength">
+    <TextBoxMaxLength />
+</RadzenExample>
+
+<RadzenText Anchor="textbox#immediate" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Change on every input
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set the <code>Immediate</code> property to raise the <code>Change</code> event on every keystroke.
+</RadzenText>
+<RadzenExample ComponentName="TextBox" Example="TextBoxImmediate">
+    <TextBoxImmediate />
+</RadzenExample>
+
+<RadzenText Anchor="textbox#disabled" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Disabled TextBox
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Disabled</code> property to prevent user interaction.
+</RadzenText>
+<RadzenExample ComponentName="TextBox" Example="TextBoxDisabled">
+    <TextBoxDisabled />
+</RadzenExample>
+
+<RadzenText Anchor="textbox#autocomplete" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    AutoComplete
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>AutoComplete</code>, <code>autocomplete</code>, or <code>AutoCompleteType</code> properties to control browser autocomplete behavior.
+</RadzenText>
+<RadzenExample ComponentName="TextBox" Example="TextBoxAutoComplete">
+    <TextBoxAutoComplete />
+</RadzenExample>
+
+<RadzenText Anchor="textbox#sizes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    TextBox Sizes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>InputSize</code> property to set the TextBox size. Available sizes are ExtraSmall, Small, Medium (default), and Large.
+</RadzenText>
+<RadzenExample ComponentName="TextBox" Example="TextBoxSizes">
+    <TextBoxSizes />
 </RadzenExample>

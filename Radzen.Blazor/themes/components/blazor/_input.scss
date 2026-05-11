@@ -1,8 +1,32 @@
+// Input sizes
+$input-size-xs: 1.25rem !default;
+$input-size-sm: 1.75rem !default;
+$input-size-md: 2.25rem !default;
+$input-size-lg: 3.25rem !default;
+
 $input-font-size: var(--rz-body-font-size) !default;
-$input-height: 2.25rem !default;
-$input-line-height: var(--rz-body-line-height) !default;
+$input-height: $input-size-md !default;
+$input-line-height: calc(var(--rz-input-height) - 2 * var(--rz-input-padding-block) - 2 * var(--rz-border-width)) !default;
 $input-padding-block: 0.4375rem !default;
 $input-padding-inline: 0.4375rem !default;
+// Input padding per size - block
+$input-padding-block-xs: 0rem !default;
+$input-padding-block-sm: 0.125rem !default;
+$input-padding-block-md: $input-padding-block !default;
+$input-padding-block-lg: 0.625rem !default;
+
+// Input padding per size - inline
+$input-padding-inline-xs: 0.25rem !default;
+$input-padding-inline-sm: 0.25rem !default;
+$input-padding-inline-md: $input-padding-inline !default;
+$input-padding-inline-lg: 0.625rem !default;
+
+// Input font-size per size
+$input-font-size-xs: 0.75rem !default;
+$input-font-size-sm: $input-font-size !default;
+$input-font-size-md: $input-font-size !default;
+$input-font-size-lg: 1rem !default;
+
 $input-value-color: var(--rz-text-color) !default;
 $input-placeholder-color: var(--rz-text-tertiary-color) !default;
 $input-background-color: var(--rz-base-background-color) !default;
@@ -116,6 +140,42 @@ input {
   &:disabled {
     @extend %input-disabled;
   }
+}
+
+.rz-input-xs {
+  --rz-input-height: var(--rz-input-size-xs);
+  --rz-input-padding-block: var(--rz-input-padding-block-xs);
+  --rz-input-padding-inline: var(--rz-input-padding-inline-xs);
+  --rz-input-font-size: var(--rz-input-font-size-xs);
+  --rz-input-line-height: calc(var(--rz-input-size-xs) - 2 * var(--rz-input-padding-block-xs) - 2 * var(--rz-border-width));
+  --rz-dropdown-trigger-icon-margin-inline: 0 var(--rz-input-padding-block-xs);
+}
+
+.rz-input-sm {
+  --rz-input-height: var(--rz-input-size-sm);
+  --rz-input-padding-block: var(--rz-input-padding-block-sm);
+  --rz-input-padding-inline: var(--rz-input-padding-inline-sm);
+  --rz-input-font-size: var(--rz-input-font-size-sm);
+  --rz-input-line-height: calc(var(--rz-input-size-sm) - 2 * var(--rz-input-padding-block-sm) - 2 * var(--rz-border-width));
+  --rz-dropdown-trigger-icon-margin-inline: 0 var(--rz-input-padding-block-sm);
+}
+
+.rz-input-md {
+  --rz-input-height: var(--rz-input-size-md);
+  --rz-input-padding-block: var(--rz-input-padding-block-md);
+  --rz-input-padding-inline: var(--rz-input-padding-inline-md);
+  --rz-input-font-size: var(--rz-input-font-size-md);
+  --rz-input-line-height: calc(var(--rz-input-size-md) - 2 * var(--rz-input-padding-block-md) - 2 * var(--rz-border-width));
+  --rz-dropdown-trigger-icon-margin-inline: 0 var(--rz-input-padding-block-md);
+}
+
+.rz-input-lg {
+  --rz-input-height: var(--rz-input-size-lg);
+  --rz-input-padding-block: var(--rz-input-padding-block-lg);
+  --rz-input-padding-inline: var(--rz-input-padding-inline-lg);
+  --rz-input-font-size: var(--rz-input-font-size-lg);
+  --rz-input-line-height: calc(var(--rz-input-size-lg) - 2 * var(--rz-input-padding-block-lg) - 2 * var(--rz-border-width));
+  --rz-dropdown-trigger-icon-margin-inline: 0 var(--rz-input-padding-block-lg);
 }
 
 %input-blank {

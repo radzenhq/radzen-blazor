@@ -105,6 +105,18 @@ public readonly struct ClassList
     };
 
     /// <summary>
+    /// Adds the specified size as input size class.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public ClassList AddInputSize(InputSize size) => size switch {
+        InputSize.Small => Add("rz-input-sm"),
+        InputSize.Large => Add("rz-input-lg"),
+        InputSize.Medium => Add("rz-input-md"),
+        InputSize.ExtraSmall => Add("rz-input-xs"),
+        _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
+    };
+
+    /// <summary>
     /// Adds the specified variant as variant CSS class.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException"></exception>

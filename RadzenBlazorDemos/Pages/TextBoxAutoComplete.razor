@@ -1,0 +1,14 @@
+<RadzenStack Gap="1rem" class="rz-p-sm-12">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+        <RadzenLabel Text="Disabled AutoComplete" Style="width: 200px;" Component="TextBoxAutoCompleteDisabled" />
+        <RadzenTextBox AutoComplete="false" Style="width: 100%; max-width: 400px;" Name="TextBoxAutoCompleteDisabled" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+        <RadzenLabel Text="Custom AutoComplete" Style="width: 200px;" Component="TextBoxAutoCompleteCustom" />
+        <RadzenTextBox autocomplete="custom" Style="width: 100%; max-width: 400px;" Name="TextBoxAutoCompleteCustom" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+        <RadzenLabel Text="Predefined AutoCompleteType" Style="width: 200px;" Component="TextBoxAutoCompleteType" />
+        <RadzenTextBox AutoCompleteType="AutoCompleteType.Sex" Style="width: 100%; max-width: 400px;" Name="TextBoxAutoCompleteType" />
+    </RadzenStack>
+</RadzenStack>

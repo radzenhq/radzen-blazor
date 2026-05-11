@@ -1791,7 +1791,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of AutoComplete", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of AutoComplete using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Get the selected item of AutoComplete", Anchor = "#get-selected" }, new () { Text = "Define AutoComplete placeholder", Anchor = "#placeholder" }, new () { Text = "Define AutoComplete template", Anchor = "#template" }, new () { Text = "Change AutoComplete filter operator, case sensitivity and delay", Anchor = "#filter-operator" }, new () { Text = "Load data on-demand in AutoComplete and apply custom filter and sort", Anchor = "#load-on-demand" }, new () { Text = "Empty and Loading templates", Anchor = "#empty-and-loading-templates" }, new () { Text = "AutoComplete with a List of Strings", Anchor = "#list-of-strings" }, new () { Text = "Multiline AutoComplete", Anchor = "#multiline" }, new () { Text = "Open on Focus", Anchor = "#open-on-focus" }, new () { Text = "Disabled AutoComplete", Anchor = "#disabled-autocomplete" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Get and Set the value of AutoComplete", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of AutoComplete using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Get the selected item of AutoComplete", Anchor = "#get-selected" }, new () { Text = "Define AutoComplete placeholder", Anchor = "#placeholder" }, new () { Text = "Define AutoComplete template", Anchor = "#template" }, new () { Text = "Change AutoComplete filter operator, case sensitivity and delay", Anchor = "#filter-operator" }, new () { Text = "Load data on-demand in AutoComplete and apply custom filter and sort", Anchor = "#load-on-demand" }, new () { Text = "Empty and Loading templates", Anchor = "#empty-and-loading-templates" }, new () { Text = "AutoComplete with a List of Strings", Anchor = "#list-of-strings" }, new () { Text = "Multiline AutoComplete", Anchor = "#multiline" }, new () { Text = "Open on Focus", Anchor = "#open-on-focus" }, new () { Text = "Disabled AutoComplete", Anchor = "#disabled-autocomplete" }, new () { Text = "AutoComplete Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "AutoComplete",
                     Path = "autocomplete",
                     Description = "Demonstration and configuration of the Radzen Blazor AutoComplete textbox component.",
@@ -1835,7 +1835,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "ColorPicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "ColorPicker",
                     Description = "Demonstration and configuration of the Radzen Blazor ColorPicker component. HSV Picker. RGBA Picker.",
                     Path = "colorpicker",
@@ -1844,7 +1844,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "DatePicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "DatePicker",
                     Path = "datepicker",
                     Description = "Demonstration and configuration of the Radzen Blazor Datepicker component with calendar mode. Time Picker.",
@@ -1858,7 +1858,7 @@ namespace RadzenBlazorDemos
                     Children = new [] {
                         new Example
                         {
-                            Toc = [ new () { Text = "Get and Set the value of DropDown", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDown using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-and-value-properties" }, new () { Text = "DropDown with template", Anchor = "#template" }, new () { Text = "Disable specific item", Anchor = "#disable-item" }, new () { Text = "Clear selected item", Anchor = "#clear-selected-item" }, new () { Text = "Editable DropDown", Anchor = "#editable-dropdown" }, new () { Text = "Open and close events", Anchor = "#open-and-close-event" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                            Toc = [ new () { Text = "Get and Set the value of DropDown", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDown using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-and-value-properties" }, new () { Text = "DropDown with template", Anchor = "#template" }, new () { Text = "Disable specific item", Anchor = "#disable-item" }, new () { Text = "Clear selected item", Anchor = "#clear-selected-item" }, new () { Text = "Editable DropDown", Anchor = "#editable-dropdown" }, new () { Text = "Open and close events", Anchor = "#open-and-close-event" }, new () { Text = "DropDown Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                             Name = "Single selection",
                             Path = "dropdown",
                             Title = "Blazor DropDown Component | Free UI Components by Radzen",
@@ -1920,7 +1920,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of DropDownDataGrid", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDownDataGrid using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-value-properties" }, new () { Text = "DropDownDataGrid with custom header, footer, value and item templates", Anchor = "#template" }, new () { Text = "Define multiple columns", Anchor = "#multiple-columns" }, new () { Text = "Filtering case sensitivity and filter operator", Anchor = "#filtering-case-sensitivity-and-filter-operator" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "DropDownDataGrid binding to dynamic data", Anchor = "#dynamic" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Get and Set the value of DropDownDataGrid", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDownDataGrid using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-value-properties" }, new () { Text = "DropDownDataGrid with custom header, footer, value and item templates", Anchor = "#template" }, new () { Text = "Define multiple columns", Anchor = "#multiple-columns" }, new () { Text = "Filtering case sensitivity and filter operator", Anchor = "#filtering-case-sensitivity-and-filter-operator" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "DropDownDataGrid binding to dynamic data", Anchor = "#dynamic" }, new () { Text = "DropDownDataGrid Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "DropDownDataGrid",
                     Path = "dropdown-datagrid",
                     Description = "Blazor DropDown component with columns and multiple selection support.",
@@ -2008,6 +2008,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Mask Sizes", Anchor = "#sizes" } ],
                     Name = "Mask",
                     Path = "mask",
                     Description = "Demonstration and configuration of the Radzen Blazor masked textbox component.",
@@ -2025,7 +2026,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of Password", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Password using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define placeholder", Anchor = "#placeholder" }, new () { Text = "Without auto-complete", Anchor = "#without-auto-complete" } ],
+                    Toc = [ new () { Text = "Get and Set the value of Password", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Password using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define placeholder", Anchor = "#placeholder" }, new () { Text = "Without auto-complete", Anchor = "#without-auto-complete" }, new () { Text = "Password Sizes", Anchor = "#sizes" } ],
                     Name = "Password",
                     Path = "password",
                     Description = "Demonstration and configuration of the Radzen Blazor password textbox component.",
@@ -2147,6 +2148,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Get and Set the value of TextBox", Anchor = "#bind-value" }, new () { Text = "Placeholder", Anchor = "#placeholder" }, new () { Text = "Maximum length", Anchor = "#max-length" }, new () { Text = "Change on every input", Anchor = "#immediate" }, new () { Text = "Disabled TextBox", Anchor = "#disabled" }, new () { Text = "AutoComplete", Anchor = "#autocomplete" }, new () { Text = "TextBox Sizes", Anchor = "#sizes" } ],
                     Name = "TextBox",
                     Path = "textbox",
                     Description = "Demonstration and configuration of the Radzen Blazor TextBox input component.",
