@@ -3,7 +3,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenSplitButton Icon="view_column" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezePanes)) ?? "Freeze panes") Click=@OnFreezeClick ButtonStyle="ButtonStyle.Base" Disabled=@IsDisabled>
+<RadzenSplitButton Icon="view_column" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezePanes)) ?? "Freeze panes") Click=@OnFreezeClick Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Disabled=@IsDisabled>
     <ChildContent>
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeTopRow)) ?? "Freeze Top Row") Value="row" Icon="view_column" />
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedRows)) ?? "Freeze Selected Rows") Value="rows" Icon="view_column" />

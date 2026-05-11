@@ -1,7 +1,7 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @inherits SpreadsheetToolBase
-<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnInsertColumnAfterClick Icon="add_column_right" ButtonType="ButtonType.Button" Disabled=@IsDisabled
+<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnInsertColumnAfterClick Icon="add_column_right" ButtonType="ButtonType.Button" Disabled=@IsDisabled
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnAfter)) ?? "Insert Column After") />
 @code {
     private void OnInsertColumnAfterClick()

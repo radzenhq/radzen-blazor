@@ -3,7 +3,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenButton Text=".0+" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Click=@OnClick title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_IncreaseDecimalPlaces)) ?? "Increase decimal places") />
+<RadzenButton Text=".0+" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnClick title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_IncreaseDecimalPlaces)) ?? "Increase decimal places") />
 
 @code {
 #nullable enable

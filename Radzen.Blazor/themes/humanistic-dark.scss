@@ -445,5 +445,9 @@ $skeleton-animation-color: var(--rz-base-500) !default;
 $fab-border-radius: 0 !default;
 $fab-active-border-radius: 0 !default;
 
+// Spreadsheet
+$spreadsheet-header-background-color: var(--rz-base-900) !default;
+$spreadsheet-splitter-background-color: var(--rz-base-700) !default;
+
 @import 'fonts';
 @import 'components';

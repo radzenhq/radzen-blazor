@@ -3,7 +3,7 @@
 @using Radzen.Documents.Spreadsheet
 @inject DialogService DialogService
 
-<RadzenSplitButton Click=@OnClickAsync Icon="format_color_fill" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Conditional)) ?? "Conditional") Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+<RadzenSplitButton Click=@OnClickAsync Icon="format_color_fill" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Conditional)) ?? "Conditional") Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_GreaterThanMenu)) ?? "Greater Than...") Value="greater" />
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_LessThanMenu)) ?? "Less Than...") Value="less" />

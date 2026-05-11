@@ -135,7 +135,7 @@
   @else if $style == 'base' {
     &.rz-shade-lighter { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-lighter), $use-bc); color: var(--rz-#{$style}-light); }
     &.rz-shade-light { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-light), $use-bc); color: var(--rz-#{$style}-light); }
-    &.rz-shade-default { #{$border-prop}: rz-outlined-border-val(var(--rz-text-color), $use-bc); color: var(--rz-text-color); }
+    &.rz-shade-default { #{$border-prop}: rz-outlined-border-val($button-base-outlined-border-color, $use-bc); color: var(--rz-text-color); }
     &.rz-shade-dark { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-dark), $use-bc); color: var(--rz-#{$style}-dark); }
     &.rz-shade-darker { #{$border-prop}: rz-outlined-border-val(var(--rz-#{$style}-darker), $use-bc); color: var(--rz-#{$style}-darker); }
   }
@@ -190,8 +190,8 @@
   @if $style == 'light' { background-color: rgba(255, 255, 255, .12); }
   @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); }
   @else if $style == 'base' {
-    @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); }
-    @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+    @if $theme-dark == true { background-color: var(--rz-base-600); color: var(--rz-on-#{$style}-darker); }
+    @else { background-color: var(--rz-base-200); color: var(--rz-on-#{$style}-lighter); }
   }
   @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
 }

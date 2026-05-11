@@ -147,6 +147,7 @@ $button-active-gradient: $button-hover-gradient !default;
 $button-border-radius: $rz-border-radius !default;
 $button-shadow: none !default;
 $button-disabled-opacity: 0.5 !default;
+$button-base-outlined-border-color: var(--rz-base-200) !default;
 $button-line-height: 1.25rem !default;
 $button-vertical-align: top !default;
 $button-background-size: 100% 0%, 100% 0% !default;
@@ -606,6 +607,10 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
 // Skeleton
 $skeleton-background-color: var(--rz-base-300) !default;
 $skeleton-animation-color: var(--rz-base-100) !default;
+
+// Spreadsheet
+$spreadsheet-header-background-color: var(--rz-base-100) !default;
+$spreadsheet-header-active-background-color: var(--rz-primary-lighter) !default;
 
 @import 'fonts';
 @import 'components';

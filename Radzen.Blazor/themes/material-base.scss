@@ -296,14 +296,15 @@ $button-focus-gradient: linear-gradient(rgba(#fff, 0.2), rgba(#fff, 0.2)) !defau
 $button-focus-outline: var(--rz-outline-normal) !default;
 $button-active-shadow: var(--rz-shadow-6) !default;
 $button-active-gradient: none !default;
+$button-base-outlined-border-color: var(--rz-base-400) !default;
 $button-sizes: (
   lg: (
     font-size: 1rem,
     padding: 0.75rem 1.5rem,
     line-height: 1.5rem,
     height: auto,
-    min-height: 3rem,
-    min-width: 3rem,
+    min-height: var(--rz-button-size-lg),
+    min-width: var(--rz-button-size-lg),
     font-weight: 500,
     letter-spacing: 1.25px,
     text-transform: uppercase,
@@ -322,8 +323,8 @@ $button-sizes: (
     padding: 0.5rem 1rem,
     line-height: 1.25rem,
     height: auto,
-    min-height: 2.25rem,
-    min-width: 2.25rem,
+    min-height: var(--rz-button-size-md),
+    min-width: var(--rz-button-size-md),
     font-weight: 500,
     letter-spacing: 1.25px,
     text-transform: uppercase,
@@ -342,8 +343,8 @@ $button-sizes: (
     padding: 0.375rem 0.75rem,
     line-height: 1rem,
     height: auto,
-    min-height: 1.75rem,
-    min-width: 1.75rem,
+    min-height: var(--rz-button-size-sm),
+    min-width: var(--rz-button-size-sm),
     font-weight: 500,
     letter-spacing: 0.75px,
     text-transform: uppercase,
@@ -362,8 +363,8 @@ $button-sizes: (
     padding: 0.25rem 0.5rem,
     line-height: 1rem,
     height: auto,
-    min-height: 1.25rem,
-    min-width: 1.25rem,
+    min-height: var(--rz-button-size-xs),
+    min-width: var(--rz-button-size-xs),
     font-weight: 500,
     letter-spacing: 0,
     text-transform: uppercase,
@@ -389,8 +390,17 @@ $badge-font-weight: 500 !default;
 // Chip
 $chip-border-radius: calc(4 * var(--rz-border-radius)) !default;
 
+// Component sizes
+$button-size-md: 2.25rem !default;
+$button-size-lg: 3rem !default;
+$input-size-xs: 1.5rem !default;
+$input-size-md: 2.5rem !default;
+$input-size-lg: 3rem !default;
+$input-padding-inline-sm: 0.5rem !default;
+$input-padding-inline-lg: 1.125rem !default;
+$input-font-size-sm: 0.75rem !default;
+
 // Input
-$input-height: 2.5rem !default;
 $input-line-height: var(--rz-body-line-height) !default;
 $input-padding-block: 0.4375rem !default;
 $input-padding-inline: 0.9375rem !default;
@@ -1551,6 +1561,12 @@ $rz-toc-horizontal-link-selected-indicator-inset-inline: 0 !default;
 // FAB
 $fab-border-radius: var(--rz-border-radius-10) !default;
 $fab-active-border-radius: var(--rz-border-radius-10) !default;
+
+// Spreadsheet
+$spreadsheet-tab-font-size: 0.75rem !default;
+$spreadsheet-cell-border: var(--rz-border-base-300) !default;
+$spreadsheet-header-background-color: var(--rz-base-background-color) !default;
+$spreadsheet-header-active-background-color: var(--rz-base-100) !default;
 
 @import 'fonts';
 @import 'components';
