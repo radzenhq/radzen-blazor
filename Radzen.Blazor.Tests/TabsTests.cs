@@ -150,7 +150,7 @@ namespace Radzen.Blazor.Tests
             var active = wrapper.GetAttribute("aria-activedescendant");
             Assert.False(string.IsNullOrEmpty(active));
 
-            var activeTab = component.Find($"#{active}");
+            var activeTab = component.Find($"[id='{active}']");
             Assert.Equal("tab", activeTab.GetAttribute("role"));
             Assert.Equal("true", activeTab.GetAttribute("aria-selected"));
         }
