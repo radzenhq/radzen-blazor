@@ -19,8 +19,15 @@ $button-active-gradient: linear-gradient(rgba(#000, 0.1), rgba(#000, 0.1)) !defa
 $button-active-background-size: $button-background-size !default;
 $button-disabled-opacity: 0.2 !default;
 $button-empty-opacity: 0.4 !default;
+$button-base-outlined-border-color: var(--rz-base-300) !default;
 
 $button-sizes: () !default;
+
+// Button sizes
+$button-size-xs: 1.25rem !default;
+$button-size-sm: 1.75rem !default;
+$button-size-md: 2.25rem !default;
+$button-size-lg: 3.25rem !default;
 
 $button-sizes: map-merge(
   (
@@ -29,8 +36,8 @@ $button-sizes: map-merge(
       padding: 0.875rem 1.5rem,
       line-height: 1.5rem,
       height: auto,
-      min-height: 3.25rem,
-      min-width: 3.25rem,
+      min-height: var(--rz-button-size-lg),
+      min-width: var(--rz-button-size-lg),
       font-weight: 600,
       border-radius: calc(2 * var(--rz-border-radius)),
       gap: 0.25rem,
@@ -48,8 +55,8 @@ $button-sizes: map-merge(
       padding: 0.5rem 1rem,
       line-height: 1.25rem,
       height: auto,
-      min-height: 2.25rem,
-      min-width: 2.25rem,
+      min-height: var(--rz-button-size-md),
+      min-width: var(--rz-button-size-md),
       font-weight: 600,
       gap: 0.25rem,
       icon: (
@@ -66,8 +73,8 @@ $button-sizes: map-merge(
       padding: 0.25rem 0.75rem,
       line-height: 1.25rem,
       height: auto,
-      min-height: 1.75rem,
-      min-width: 1.75rem,
+      min-height: var(--rz-button-size-sm),
+      min-width: var(--rz-button-size-sm),
       gap: 0.25rem,
       icon: (
         font-size: var(--rz-icon-size),
@@ -83,8 +90,8 @@ $button-sizes: map-merge(
       padding: 0.125rem 0.25rem,
       line-height: 1rem,
       height: auto,
-      min-height: 1.25rem,
-      min-width: 1.25rem,
+      min-height: var(--rz-button-size-xs),
+      min-width: var(--rz-button-size-xs),
       font-weight: 600,
       gap: 0.125rem,
       icon: (
