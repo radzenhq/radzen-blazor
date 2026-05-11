@@ -4,7 +4,7 @@
 @implements IDisposable
 
 <RadzenDropDown @bind-Value=@CurrentFormat Data=@FormatOptions TextProperty="Name" ValueProperty="FormatCode"
-    Disabled=@IsDisabled Style="width: 130px" />
+    Disabled=@IsDisabled InputSize="InputSize.Small" Style="width: 130px" />
 
 @code {
 #nullable enable

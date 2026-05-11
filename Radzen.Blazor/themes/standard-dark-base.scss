@@ -307,6 +307,7 @@ $button-active-gradient: $button-hover-gradient !default;
 $button-border-radius: $rz-border-radius !default;
 $button-shadow: none !default;
 $button-disabled-opacity: 0.5 !default;
+$button-base-outlined-border-color: var(--rz-base-600) !default;
 $button-line-height: 1.25rem !default;
 $button-vertical-align: top !default;
 $button-background-size: 100% 0%, 100% 0% !default;
@@ -321,7 +322,7 @@ $chip-disabled-opacity: 0.5 !default;
 // SelectButton
 $selectbar-background-color: transparent !default;
 $selectbar-selected-background-color: var(--rz-primary-lighter) !default;
-$selectbar-selected-color: var(--rz-primary-light) !default;
+$selectbar-selected-color: var(--rz-on-primary-lighter) !default;
 $selectbar-selected-border: var(--rz-border-normal) !default;
 
 
@@ -815,6 +816,12 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
 // Skeleton
 $skeleton-background-color: var(--rz-base-600) !default;
 $skeleton-animation-color: var(--rz-base-500) !default;
+
+// Spreadsheet
+$spreadsheet-cell-border: var(--rz-border-base-700) !default;
+$spreadsheet-header-background-color: var(--rz-base-800) !default;
+$spreadsheet-header-active-background-color: var(--rz-primary-lighter) !default;
+$spreadsheet-splitter-background-color: var(--rz-base-700) !default;
 
 @import 'fonts';
 @import 'components';
