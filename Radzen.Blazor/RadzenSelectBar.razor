@@ -33,13 +33,16 @@
                 {
                     @if (!string.IsNullOrEmpty(item.Icon))
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon" style="margin-right:2px;@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : "")">@item.Icon</i>
+                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@item.Icon</i>
                     }
                     @if (!string.IsNullOrEmpty(item.Image))
                     {
-                        <img class="rz-navigation-item-icon" src="@item.Image" style="@item.ImageStyle" alt=@item.ImageAlternateText/>
+                        <img class="notranslate rz-button-icon-left rzi" src="@item.Image" alt=@item.ImageAlternateText/>
                     }
-                    <span class="rz-button-text">@item.Text</span>
+                    @if (!string.IsNullOrEmpty(item.Text))
+                    {
+                        <span class="rz-button-text">@item.Text</span>
+                    }
                 }
             </button>
         }

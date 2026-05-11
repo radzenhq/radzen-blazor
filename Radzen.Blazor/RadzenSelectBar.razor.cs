@@ -61,7 +61,9 @@ namespace Radzen.Blazor
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
 
-        string ButtonClass(RadzenSelectBarItem item) => ClassList.Create($"rz-button rz-button-text-only")
+        string ButtonClass(RadzenSelectBarItem item) => ClassList.Create("rz-button")
+                                                                 .Add("rz-button-icon-only", string.IsNullOrEmpty(item.Text) && !string.IsNullOrEmpty(item.Icon))
+                                                                 .Add("rz-button-text-only", !string.IsNullOrEmpty(item.Text) || string.IsNullOrEmpty(item.Icon))
                                                                  .AddButtonSize(Size)
                                                                  .Add("rz-state-active", IsSelected(item))
                                                                  .Add("rz-state-focused", IsFocused(item) && focused)
