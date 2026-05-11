@@ -3548,6 +3548,12 @@ namespace Radzen.Blazor
                 {
                     column.ResetSortOrder();
                 }
+
+                var existing = sorts.FirstOrDefault(d => d.Property == oldDescriptor.Property);
+                if (existing != null)
+                {
+                    sorts.Remove(existing);
+                }
             }
             else if (args.Action == NotifyCollectionChangedAction.Reset)
             {
@@ -3555,6 +3561,8 @@ namespace Radzen.Blazor
                 {
                     c.ResetSortOrder();
                 });
+
+                sorts.Clear();
             }
 
             SaveSettings();

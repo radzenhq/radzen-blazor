@@ -3288,6 +3288,70 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DataGrid_Sorts_KeepsInternalSortsInSync_OnClearAndRemove()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new { City = "Sofia", FirstName = "Ivan", Country = "BG" },
+                new { City = "Berlin", FirstName = "Anna", Country = "DE" },
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<object>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<object>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowSorting, true);
+                parameterBuilder.Add<bool>(p => p.AllowMultiColumnSorting, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<object>));
+                    builder.AddAttribute(1, "Property", "City");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(2, typeof(RadzenDataGridColumn<object>));
+                    builder.AddAttribute(3, "Property", "FirstName");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(4, typeof(RadzenDataGridColumn<object>));
+                    builder.AddAttribute(5, "Property", "Country");
+                    builder.CloseComponent();
+                });
+            });
+
+            var grid = component.Instance;
+
+            component.InvokeAsync(() =>
+            {
+                grid.Sorts.Add(new SortDescriptor { Property = "City", SortOrder = SortOrder.Ascending });
+                grid.Sorts.Add(new SortDescriptor { Property = "FirstName", SortOrder = SortOrder.Ascending });
+            });
+
+            Assert.Equal(new[] { "City", "FirstName" }, grid.sorts.Select(s => s.Property).ToArray());
+
+            component.InvokeAsync(() => grid.Sorts.Clear());
+
+            Assert.Empty(grid.sorts);
+            Assert.All(grid.ColumnsCollection, c => Assert.Null(c.GetSortOrder()));
+
+            component.InvokeAsync(() =>
+            {
+                grid.Sorts.Add(new SortDescriptor { Property = "Country", SortOrder = SortOrder.Ascending });
+                grid.Sorts.Add(new SortDescriptor { Property = "FirstName", SortOrder = SortOrder.Ascending });
+            });
+
+            Assert.Equal(new[] { "Country", "FirstName" }, grid.sorts.Select(s => s.Property).ToArray());
+            Assert.Equal(new[] { "Country", "FirstName" }, grid.Sorts.Select(s => s.Property).ToArray());
+
+            var firstNameDescriptor = grid.Sorts.First(s => s.Property == "FirstName");
+            component.InvokeAsync(() => grid.Sorts.Remove(firstNameDescriptor));
+
+            Assert.Equal(new[] { "Country" }, grid.sorts.Select(s => s.Property).ToArray());
+        }
+
+        [Fact]
         public void DataGrid_Wrapper_Has_RoleGrid_AsFocusTarget()
         {
             using var ctx = new TestContext();
