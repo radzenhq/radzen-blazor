@@ -796,6 +796,37 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("rz-dropdown-clear-icon", component.Markup);
         }
 
+        class BaseDataItem
+        {
+            public string Text { get; set; }
+        }
+
+        class DerivedDataItem : BaseDataItem
+        {
+            public int Id { get; set; }
+        }
+
+        [Fact]
+        public void DropDown_Renders_SelectedBaseValue_WhenDataItemsAreDerived()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[] { new DerivedDataItem { Text = "Item 1", Id = 1 } };
+            var value = new BaseDataItem { Text = "Item 1" };
+
+            var component = ctx.RenderComponent<RadzenDropDown<BaseDataItem>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(BaseDataItem.Text));
+                parameters.Add(p => p.Value, value);
+            });
+
+            var dropdown = component.Find("div.rz-dropdown");
+
+            Assert.Equal("Item 1", dropdown.GetAttribute("aria-label"));
+        }
+
         [Fact]
         public void DropDown_DoesNotRender_AllowClear_WhenNotAllowed()
         {
