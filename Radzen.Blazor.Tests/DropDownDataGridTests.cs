@@ -387,6 +387,41 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("rz-data-grid", component.Markup);
         }
+
+        // Regression test for https://github.com/radzenhq/radzen-blazor/issues/2546
+        [Fact]
+        public void DropDownDataGrid_LoadData_ReceivesSorts_OnColumnHeaderClick()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp", ContactName = "John Doe" }
+            };
+
+            LoadDataArgs capturedArgs = null;
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Count, 1);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.AllowSorting, true);
+                parameters.Add(p => p.LoadData, args => { capturedArgs = args; });
+            });
+
+            component.Find(".rz-sortable-column").FirstElementChild.Click();
+
+            Assert.NotNull(capturedArgs);
+            Assert.NotNull(capturedArgs.Sorts);
+            Assert.Single(capturedArgs.Sorts);
+            Assert.Equal("CompanyName", capturedArgs.Sorts.First().Property);
+            Assert.Equal(SortOrder.Ascending, capturedArgs.Sorts.First().SortOrder);
+            Assert.Equal("CompanyName asc", capturedArgs.OrderBy);
+        }
     }
 }
 

@@ -696,7 +696,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = args.Top, OrderBy = args.OrderBy, Filter = searchText });
+                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = args.Top, OrderBy = args.OrderBy, Filter = searchText, Sorts = args.Sorts, Filters = args.Filters, GetFilter = args.GetFilter });
             }
             
             if(PreserveRowSelectionOnPaging && selectedIndex != -1)
