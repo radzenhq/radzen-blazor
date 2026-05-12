@@ -3,7 +3,7 @@
 @using System.IO
 @inject IJSRuntime JSRuntime
 
-<RadzenSplitButton ButtonStyle="ButtonStyle.Base" Icon="download" ButtonType="ButtonType.Button" Size="ButtonSize.Small"
+<RadzenSplitButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Icon="download" ButtonType="ButtonType.Button" Size="ButtonSize.Small"
     Disabled=@(Workbook is null) Click=@OnClickAsync>
     <ChildContent>
         <RadzenSplitButtonItem Text="Excel (.xlsx)" Icon="table_view" Value="xlsx" />
