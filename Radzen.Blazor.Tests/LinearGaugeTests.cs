@@ -439,6 +439,31 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void LinearGauge_Range_UpdatesOnResize()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenLinearGauge>(parameters =>
+                parameters.Add(p => p.Style, "width:300px;height:150px")
+                    .AddChildContent<RadzenLinearGaugeScale>(scale =>
+                        scale.AddChildContent<RadzenLinearGaugeScaleRange>(range =>
+                            range.Add(p => p.From, 0)
+                                .Add(p => p.To, 100)
+                                .Add(p => p.Fill, "blue"))));
+
+            component.InvokeAsync(() => component.Instance.Resize(300, 150));
+            var markupBefore = component.Markup;
+
+            component.InvokeAsync(() => component.Instance.Resize(600, 150));
+            var markupAfter = component.Markup;
+
+            // The range rect x/width attributes must change when the gauge is wider
+            Assert.NotEqual(markupBefore, markupAfter);
+            Assert.Contains("rz-linear-gauge-range", markupAfter);
+        }
+
+        [Fact]
         public void LinearGauge_Renders_RangeBorderRadius()
         {
             using var ctx = new TestContext();
