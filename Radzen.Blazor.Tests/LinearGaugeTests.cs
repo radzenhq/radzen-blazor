@@ -453,14 +453,14 @@ namespace Radzen.Blazor.Tests
                                 .Add(p => p.Fill, "blue"))));
 
             component.InvokeAsync(() => component.Instance.Resize(300, 150));
-            var markupBefore = component.Markup;
+            var widthBefore = component.Find("rect.rz-linear-gauge-range").GetAttribute("width");
 
             component.InvokeAsync(() => component.Instance.Resize(600, 150));
-            var markupAfter = component.Markup;
+            var widthAfter = component.Find("rect.rz-linear-gauge-range").GetAttribute("width");
 
-            // The range rect x/width attributes must change when the gauge is wider
-            Assert.NotEqual(markupBefore, markupAfter);
-            Assert.Contains("rz-linear-gauge-range", markupAfter);
+            // The range rect width must grow when the gauge is wider; this fails if the
+            // child range is not re-rendered on resize (the cascading Scale must not be IsFixed).
+            Assert.NotEqual(widthBefore, widthAfter);
         }
 
         [Fact]
