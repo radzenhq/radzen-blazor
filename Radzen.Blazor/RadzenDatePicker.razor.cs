@@ -1971,7 +1971,7 @@ namespace Radzen.Blazor
             }
         }
 
-        Popup? popup;
+        RadzenPopup? popup;
 
         /// <summary>
         /// Gets or sets the render mode.

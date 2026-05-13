@@ -14,6 +14,7 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> .NET 7 support has been removed. The library now targets .NET 8, .NET 9, and .NET 10.</li>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> The Markdown parser namespace has changed from <code>Radzen.Blazor.Markdown</code> to <code>Radzen.Documents.Markdown</code>. Update <code>using</code> directives accordingly.</li>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Empty <code>CategoryProperty</code> in chart series will no longer fall back to the row index.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> The internal <code>Radzen.Blazor.Rendering.Popup</code> component has been promoted to the public <RadzenLink Text="RadzenPopup" Path="/popup" /> component in the <code>Radzen.Blazor</code> namespace. Replace <code>&lt;Popup&gt;</code> with <code>&lt;RadzenPopup&gt;</code> and remove the <code>@@using Radzen.Blazor.Rendering</code> directive.</li>
 </ul>
 
 <RadzenText Anchor="changelog#v11-new-components" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">

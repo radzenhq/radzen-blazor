@@ -135,7 +135,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string ButtonText { get => buttonText ?? Localize(nameof(RadzenStrings.ColorPicker_ButtonText)); set => buttonText = value; }
 
-        Popup Popup { get; set; } = default!;
+        RadzenPopup Popup { get; set; } = default!;
         bool isPopupOpen;
 
         internal event EventHandler<string>? SelectedColorChanged;

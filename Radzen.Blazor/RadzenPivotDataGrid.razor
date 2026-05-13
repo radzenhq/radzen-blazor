@@ -438,7 +438,7 @@
     {
         var prefix = currentFilterField is RadzenPivotColumn<TItem> ? "col" : currentFilterField is RadzenPivotRow<TItem> ? "row" : "agg";
         var filterIconRefKey = $"{prefix}{currentFilterField.GetFilterProperty()}";
-        <Popup @ref="filterPopup" id="@($"pivot-filter-{currentFilterField.Property}")" class="rz-overlaypanel"
+        <RadzenPopup @ref="filterPopup" id="@($"pivot-filter-{currentFilterField.Property}")" class="rz-overlaypanel"
                role="dialog" aria-label="@FilterText"
                style="display:none;min-width:250px;" @onkeydown=@(args => OnFilterPopupKeyPressed(args, filterIconRefKey))>
             <div class="rz-overlaypanel-content">
@@ -521,6 +521,6 @@
                     </div>
                 }
             </div>
-        </Popup>
+        </RadzenPopup>
     }
 }

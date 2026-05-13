@@ -6,7 +6,7 @@
     <div class="rz-spreadsheet-editor-input" spellcheck="false" @ref=@element contenteditable></div>
     <SheetEditorHighlight Value=@value />
 </div>
-<Popup @ref=@popup class="rz-spreadsheet-highlight-popup" Close="OnPopupClose">
+<RadzenPopup @ref=@popup class="rz-spreadsheet-highlight-popup" Close="OnPopupClose">
 @if (functionHint is not null)
 {
     <FunctionHint ArgumentIndex=@functionHint.ArgumentIndex Function=@functionHint.Function />
@@ -28,4 +28,4 @@
             }
         </ul>
     }
-</Popup>
+</RadzenPopup>
