@@ -129,9 +129,16 @@
 
         if (IsJSRuntimeAvailable && JSRuntime != null)
         {
-            JSRuntime.InvokeVoid("Radzen.destroyPopup", GetId());
+            try
+            {
+                JSRuntime.InvokeVoid("Radzen.destroyPopup", GetId());
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
-
-        GC.SuppressFinalize(this);
     }
 }

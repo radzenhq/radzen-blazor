@@ -2314,7 +2314,9 @@ window.Radzen = {
           popup.removeEventListener('keydown', popup.__escapeHandler, true);
           delete popup.__escapeHandler;
       }
-      popup.parentNode.removeChild(popup);
+      if (popup.parentNode === document.body) {
+          document.body.removeChild(popup);
+      }
     }
     document.removeEventListener('mousedown', Radzen[id]);
   },
