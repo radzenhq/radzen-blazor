@@ -54,15 +54,15 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute("name", table.Name),
             new XAttribute("displayName", table.DisplayName),
             new XAttribute("ref", refStr),
-            new XAttribute("totalsRowShown", table.ShowTotalsRow ? "1" : "0"),
-            new XAttribute("totalsRowCount", table.ShowTotalsRow ? "1" : "0"),
+            new XAttribute("totalsRowShown", table.ShowTotals ? "1" : "0"),
+            new XAttribute("totalsRowCount", table.ShowTotals ? "1" : "0"),
             new XAttribute("headerRowCount", table.ShowHeaderRow ? "1" : "0"));
 
         // <autoFilter> is present when the filter button is shown.
         if (table.ShowFilterButton)
         {
             // AutoFilter range covers headers + data (excludes totals row).
-            var afEnd = table.ShowTotalsRow
+            var afEnd = table.ShowTotals
                 ? new CellRef(table.Range.End.Row - 1, table.Range.End.Column)
                 : table.Range.End;
             tableElement.Add(new XElement(ns + "autoFilter",
@@ -80,15 +80,15 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("id", (i + 1).ToString(CultureInfo.InvariantCulture)),
                 new XAttribute("name", col.Name));
 
-            if (table.ShowTotalsRow && col.TotalsCalculation != TotalsCalculation.None)
+            if (table.ShowTotals && col.TotalsCalculation != TotalsCalculation.None)
             {
                 columnElement.Add(new XAttribute("totalsRowFunction",
                     TotalsCalculationToXml(col.TotalsCalculation)));
             }
 
-            if (col.CalculatedFormula is not null)
+            if (col.Formula is not null)
             {
-                columnElement.Add(new XElement(ns + "calculatedColumnFormula", col.CalculatedFormula));
+                columnElement.Add(new XElement(ns + "calculatedColumnFormula", col.Formula));
             }
 
             tableColumnsElement.Add(columnElement);
@@ -558,20 +558,20 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XElement(c + "idx", new XAttribute("val", series.Index.ToString(CultureInfo.InvariantCulture))),
                 new XElement(c + "order", new XAttribute("val", series.Index.ToString(CultureInfo.InvariantCulture))));
 
-            if (!string.IsNullOrEmpty(series.Title))
+            if (!string.IsNullOrEmpty(series.Name))
             {
                 ser.Add(new XElement(c + "tx",
                     new XElement(c + "strRef",
                         new XElement(c + "strCache",
                             new XElement(c + "ptCount", new XAttribute("val", "1")),
                             new XElement(c + "pt", new XAttribute("idx", "0"),
-                                new XElement(c + "v", series.Title))))));
+                                new XElement(c + "v", series.Name))))));
             }
 
-            if (!string.IsNullOrEmpty(series.CategoryFormula))
+            if (!string.IsNullOrEmpty(series.Categories))
             {
                 var catRef = new XElement(c + "strRef",
-                    new XElement(c + "f", series.CategoryFormula));
+                    new XElement(c + "f", series.Categories));
 
                 if (series.CategoryCache.Count > 0)
                 {
@@ -590,10 +590,10 @@ class XlsxWriter(Workbook sourceWorkbook)
                 ser.Add(new XElement(c + "cat", catRef));
             }
 
-            if (!string.IsNullOrEmpty(series.ValueFormula))
+            if (!string.IsNullOrEmpty(series.Values))
             {
                 var numRef = new XElement(c + "numRef",
-                    new XElement(c + "f", series.ValueFormula));
+                    new XElement(c + "f", series.Values));
 
                 if (series.ValueCache.Count > 0)
                 {

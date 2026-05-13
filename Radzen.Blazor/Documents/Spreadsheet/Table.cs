@@ -42,7 +42,7 @@ public class Table
     private string name = "Table";
     private string? displayName;
     private bool showHeaderRow = true;
-    private bool showTotalsRow;
+    private bool showTotals;
     private bool showFilterButton = true;
     private bool showBandedRows = true;
     private bool showBandedColumns;
@@ -58,7 +58,7 @@ public class Table
         this.name = name;
         this.range = range;
         showHeaderRow = hasHeaders;
-        showTotalsRow = totalsRowShown;
+        showTotals = totalsRowShown;
         columns = new List<TableColumn>();
         for (var i = 0; i < range.Columns; i++)
         {
@@ -189,23 +189,23 @@ public class Table
     /// - true → false: the totals row's cells (values + formulas + format) are
     ///   cleared and <see cref="Range"/> shrinks back by one row.
     /// </summary>
-    public bool ShowTotalsRow
+    public bool ShowTotals
     {
-        get => showTotalsRow;
+        get => showTotals;
         set
         {
-            if (showTotalsRow == value) return;
+            if (showTotals == value) return;
 
             if (value)
             {
                 ExpandToIncludeTotalsRow();
-                showTotalsRow = true;
+                showTotals = true;
                 ApplyAllTotalsCalculations();
             }
             else
             {
                 ClearAndShrinkTotalsRow();
-                showTotalsRow = false;
+                showTotals = false;
             }
 
             Worksheet.OnAutoFilterChanged();
@@ -299,21 +299,21 @@ public class Table
     /// <summary>
     /// The data body range — the table range minus the header row (if shown) and totals row (if shown).
     /// </summary>
-    public RangeRef DataRange
+    public RangeRef DataBodyRange
     {
         get
         {
             var startRow = showHeaderRow ? range.Start.Row + 1 : range.Start.Row;
-            var endRow = showTotalsRow ? range.End.Row - 1 : range.End.Row;
+            var endRow = showTotals ? range.End.Row - 1 : range.End.Row;
             return new RangeRef(
                 new CellRef(startRow, range.Start.Column),
                 new CellRef(endRow, range.End.Column));
         }
     }
 
-    /// <summary>The range of the totals row, or null if <see cref="ShowTotalsRow"/> is false.</summary>
+    /// <summary>The range of the totals row, or null if <see cref="ShowTotals"/> is false.</summary>
     public RangeRef? TotalsRowRange =>
-        showTotalsRow
+        showTotals
             ? new RangeRef(new CellRef(range.End.Row, range.Start.Column), range.End)
             : null;
 
@@ -389,7 +389,7 @@ public class Table
 
     internal void ApplyTotalsCalculation(int columnIndex)
     {
-        if (!showTotalsRow) return;
+        if (!showTotals) return;
         var col = columns[columnIndex];
         var totalsRow = range.End.Row;
         var sheetCol = range.Start.Column + columnIndex;
@@ -435,7 +435,7 @@ public class TableColumn
     private readonly int index;
     private string? customName;
     private TotalsCalculation totalsCalculation;
-    private string? calculatedFormula;
+    private string? formula;
 
     internal TableColumn(Table table, int index)
     {
@@ -487,18 +487,18 @@ public class TableColumn
     /// Calculated-column formula. Setting this populates every data row in this column.
     /// Use Excel structured-reference syntax (<c>[@[Q1]]</c>) or plain cell references.
     /// </summary>
-    public string? CalculatedFormula
+    public string? Formula
     {
-        get => calculatedFormula;
+        get => formula;
         set
         {
-            calculatedFormula = value;
+            formula = value;
             if (value is null) return;
 
             // Translate structured references to absolute cell references for the
             // formula stored on each data row — naive replacement is enough for v1.
             var sheetCol = table.Range.Start.Column + index;
-            var data = table.DataRange;
+            var data = table.DataBodyRange;
             for (var r = data.Start.Row; r <= data.End.Row; r++)
             {
                 table.Worksheet.Cells[r, sheetCol].Formula = ResolveStructuredRefs(value, r);
@@ -513,7 +513,7 @@ public class TableColumn
     {
         get
         {
-            var data = table.DataRange;
+            var data = table.DataBodyRange;
             var col = table.Range.Start.Column + index;
             return new RangeRef(
                 new CellRef(data.Start.Row, col),

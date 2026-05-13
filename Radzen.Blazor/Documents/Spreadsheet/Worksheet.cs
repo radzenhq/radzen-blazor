@@ -226,7 +226,7 @@ public partial class Worksheet
     /// <param name="name">Unique table name (used in structured references like <c>=SUM(Sales[Amount])</c>).</param>
     /// <param name="range">The cell range covered by the table.</param>
     /// <param name="hasHeaders">When true, the first row of <paramref name="range"/> is treated as the header row.</param>
-    /// <param name="totalsRowShown">When true, the last row of <paramref name="range"/> is treated as the totals row. Used by the XLSX reader; new tables typically toggle this via <see cref="Table.ShowTotalsRow"/>.</param>
+    /// <param name="totalsRowShown">When true, the last row of <paramref name="range"/> is treated as the totals row. Used by the XLSX reader; new tables typically toggle this via <see cref="Table.ShowTotals"/>.</param>
     /// <returns>The created <see cref="Table"/>.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="range"/> is invalid or the name is already in use.</exception>
     public Table AddTable(string name, RangeRef range, bool hasHeaders = true, bool totalsRowShown = false)

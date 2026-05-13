@@ -17,7 +17,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public partial class ChartOverlay : ComponentBase, IDisposable
 {
-    private readonly Dictionary<SheetChart, List<(ChartSeriesDefinition series, List<ChartDataPoint> data)>> seriesCache = [];
+    private readonly Dictionary<SheetChart, List<(ChartSeries series, List<ChartDataPoint> data)>> seriesCache = [];
 
     /// <summary>
     /// Gets or sets the sheet.
@@ -267,10 +267,10 @@ public partial class ChartOverlay : ComponentBase, IDisposable
             Series = chart.Series.Select((s, i) => new EditChartSeriesDraft
             {
                 Index = i,
-                Title = s.Title,
+                Name = s.Name,
                 Color = s.Color,
-                CategoryFormula = s.CategoryFormula,
-                ValueFormula = s.ValueFormula,
+                Categories = s.Categories,
+                Values = s.Values,
             }).ToList(),
         };
 
@@ -313,7 +313,7 @@ public partial class ChartOverlay : ComponentBase, IDisposable
                 finalDraft.ShowLegend,
                 finalDraft.LegendPosition,
                 finalDraft.Series
-                    .Select(s => new EditChartSeriesState(s.Title, s.Color, s.CategoryFormula, s.ValueFormula))
+                    .Select(s => new EditChartSeriesState(s.Name, s.Color, s.Categories, s.Values))
                     .ToList());
 
             Spreadsheet?.Execute(new EditChartCommand(chart, newState));
@@ -331,13 +331,13 @@ public partial class ChartOverlay : ComponentBase, IDisposable
             && int.TryParse(fieldId[categoryPrefix.Length..], out var catIndex)
             && catIndex >= 0 && catIndex < draft.Series.Count)
         {
-            draft.Series[catIndex].CategoryFormula = picked;
+            draft.Series[catIndex].Categories = picked;
         }
         else if (fieldId.StartsWith(valuePrefix, System.StringComparison.Ordinal)
             && int.TryParse(fieldId[valuePrefix.Length..], out var valIndex)
             && valIndex >= 0 && valIndex < draft.Series.Count)
         {
-            draft.Series[valIndex].ValueFormula = picked;
+            draft.Series[valIndex].Values = picked;
         }
     }
 
@@ -369,7 +369,7 @@ public partial class ChartOverlay : ComponentBase, IDisposable
                 chartBuilder.AddAttribute(seriesBase + 1, "Data", data);
                 chartBuilder.AddAttribute(seriesBase + 2, "CategoryProperty", "Category");
                 chartBuilder.AddAttribute(seriesBase + 3, "ValueProperty", "Value");
-                chartBuilder.AddAttribute(seriesBase + 4, "Title", series.Title ?? "");
+                chartBuilder.AddAttribute(seriesBase + 4, "Title", series.Name ?? "");
 
                 if (series.Color is not null)
                 {
@@ -435,14 +435,14 @@ public partial class ChartOverlay : ComponentBase, IDisposable
         };
     }
 
-    private List<(ChartSeriesDefinition series, List<ChartDataPoint> data)> GetOrResolveSeriesData(SheetChart chart)
+    private List<(ChartSeries series, List<ChartDataPoint> data)> GetOrResolveSeriesData(SheetChart chart)
     {
         if (seriesCache.TryGetValue(chart, out var cached))
         {
             return cached;
         }
 
-        var result = new List<(ChartSeriesDefinition, List<ChartDataPoint>)>();
+        var result = new List<(ChartSeries, List<ChartDataPoint>)>();
 
         foreach (var series in chart.Series)
         {

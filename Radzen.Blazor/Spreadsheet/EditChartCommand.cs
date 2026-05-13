@@ -8,7 +8,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents the editable state of a single chart series.
 /// </summary>
-public record EditChartSeriesState(string? Title, string? Color, string? CategoryFormula, string? ValueFormula);
+public record EditChartSeriesState(string? Name, string? Color, string? Categories, string? Values);
 
 /// <summary>
 /// Represents the editable state of a chart.
@@ -33,17 +33,17 @@ public class EditChartCommand(SheetChart chart, EditChartState newState) : IComm
     private readonly List<EditChartSeriesState> oldSeriesStates = [];
     private string? oldRawChartXml;
 
-    private static List<ChartSeriesDefinition> ToSeriesList(List<EditChartSeriesState> states)
+    private static List<ChartSeries> ToSeriesList(List<EditChartSeriesState> states)
     {
-        var list = new List<ChartSeriesDefinition>();
+        var list = new List<ChartSeries>();
         for (int i = 0; i < states.Count; i++)
         {
-            list.Add(new ChartSeriesDefinition
+            list.Add(new ChartSeries
             {
-                Title = states[i].Title,
+                Name = states[i].Name,
                 Color = states[i].Color,
-                CategoryFormula = states[i].CategoryFormula,
-                ValueFormula = states[i].ValueFormula,
+                Categories = states[i].Categories,
+                Values = states[i].Values,
                 Index = i
             });
         }
@@ -62,7 +62,7 @@ public class EditChartCommand(SheetChart chart, EditChartState newState) : IComm
         oldSeriesStates.Clear();
         foreach (var s in chart.Series)
         {
-            oldSeriesStates.Add(new EditChartSeriesState(s.Title, s.Color, s.CategoryFormula, s.ValueFormula));
+            oldSeriesStates.Add(new EditChartSeriesState(s.Name, s.Color, s.Categories, s.Values));
         }
 
         chart.ChartType = newState.ChartType;

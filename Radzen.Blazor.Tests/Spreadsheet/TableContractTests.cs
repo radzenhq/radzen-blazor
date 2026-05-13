@@ -98,20 +98,20 @@ public class TableContractTests
         var t = ws.AddTable("T", Range(0, 0, 5, 4));
 
         Assert.True(t.ShowHeaderRow);
-        Assert.False(t.ShowTotalsRow);
+        Assert.False(t.ShowTotals);
         Assert.True(t.ShowFilterButton);
         Assert.True(t.ShowBandedRows);
         Assert.False(t.ShowBandedColumns);
         Assert.False(t.HighlightFirstColumn);
         Assert.False(t.HighlightLastColumn);
 
-        t.ShowTotalsRow = true;
+        t.ShowTotals = true;
         t.ShowBandedColumns = true;
         t.HighlightFirstColumn = true;
         t.HighlightLastColumn = true;
         t.ShowBandedRows = false;
 
-        Assert.True(t.ShowTotalsRow);
+        Assert.True(t.ShowTotals);
         Assert.True(t.ShowBandedColumns);
         Assert.True(t.HighlightFirstColumn);
         Assert.True(t.HighlightLastColumn);
@@ -146,16 +146,16 @@ public class TableContractTests
     }
 
     [Fact]
-    public void Table_DataRange_ShouldNotShrink_WhenTotalsAdded()
+    public void Table_DataBodyRange_ShouldNotShrink_WhenTotalsAdded()
     {
         // Excel parity (verified via COM probe): ShowTotals=true ADDS a new row
         // below the existing range; data rows are unchanged.
         var (_, ws) = NewSheet();
         var t = ws.AddTable("T", Range(0, 0, 5, 4));
-        Assert.Equal(Range(1, 0, 5, 4), t.DataRange);
+        Assert.Equal(Range(1, 0, 5, 4), t.DataBodyRange);
 
-        t.ShowTotalsRow = true;
-        Assert.Equal(Range(1, 0, 5, 4), t.DataRange);   // unchanged
+        t.ShowTotals = true;
+        Assert.Equal(Range(1, 0, 5, 4), t.DataBodyRange);   // unchanged
         Assert.Equal(Range(0, 0, 6, 4), t.Range);       // range expanded by one
     }
 
@@ -166,29 +166,29 @@ public class TableContractTests
         var t = ws.AddTable("T", Range(0, 0, 5, 4));
         Assert.Null(t.TotalsRowRange);
 
-        t.ShowTotalsRow = true;
+        t.ShowTotals = true;
         // Range was 0..5, totals added at row 6.
         Assert.Equal(Range(6, 0, 6, 4), t.TotalsRowRange);
     }
 
     [Fact]
-    public void ShowTotalsRow_FlipToTrue_ShouldWriteTotalLabelInFirstColumn()
+    public void ShowTotals_FlipToTrue_ShouldWriteTotalLabelInFirstColumn()
     {
         var (_, ws) = NewSheet();
         var t = ws.AddTable("T", Range(0, 0, 5, 4));
-        t.ShowTotalsRow = true;
+        t.ShowTotals = true;
         Assert.Equal("Total", ws.Cells[6, 0].Value);
     }
 
     [Fact]
-    public void ShowTotalsRow_FlipToFalse_ShouldShrinkRangeAndClearRow()
+    public void ShowTotals_FlipToFalse_ShouldShrinkRangeAndClearRow()
     {
         var (_, ws) = NewSheet();
         var t = ws.AddTable("T", Range(0, 0, 5, 4));
-        t.ShowTotalsRow = true;
+        t.ShowTotals = true;
         Assert.Equal(Range(0, 0, 6, 4), t.Range);
 
-        t.ShowTotalsRow = false;
+        t.ShowTotals = false;
         Assert.Equal(Range(0, 0, 5, 4), t.Range);
         Assert.Null(t.TotalsRowRange);
         // Row that was the totals row is now cleared (it's outside the table).
@@ -242,7 +242,7 @@ public class TableContractTests
         var t = ws.AddTable("T", Range(0, 0, 5, 4));
         Assert.Equal(TotalsCalculation.None, t.Columns[2].TotalsCalculation);
 
-        t.ShowTotalsRow = true;
+        t.ShowTotals = true;
         t.Columns[2].TotalsCalculation = TotalsCalculation.Sum;
         Assert.Equal(TotalsCalculation.Sum, t.Columns[2].TotalsCalculation);
     }
@@ -252,7 +252,7 @@ public class TableContractTests
     {
         var (_, ws) = NewSheet();
         var t = ws.AddTable("Sales", Range(0, 0, 5, 4));
-        t.ShowTotalsRow = true;       // adds a new row 6 below the data
+        t.ShowTotals = true;       // adds a new row 6 below the data
         t.Columns[2].TotalsCalculation = TotalsCalculation.Sum;
 
         // The totals cell at the new bottom of the table contains a SUBTOTAL formula.
@@ -262,11 +262,11 @@ public class TableContractTests
     }
 
     [Fact]
-    public void TableColumn_CalculatedFormula_ShouldFillEntireColumn()
+    public void TableColumn_Formula_ShouldFillEntireColumn()
     {
         var (_, ws) = NewSheet();
         var t = ws.AddTable("Sales", Range(0, 0, 5, 4));
-        t.Columns[4].CalculatedFormula = "=[@[Q1]]+[@[Q2]]";
+        t.Columns[4].Formula = "=[@[Q1]]+[@[Q2]]";
         // Setting the calculated formula populates every data row of column 4.
         for (var r = 1; r <= 5; r++)
         {
@@ -324,7 +324,7 @@ public class TableContractTests
 
         Assert.Equal(Range(1, 0, 5, 4), t.Range);
         Assert.Null(t.HeaderRowRange);
-        Assert.Equal(Range(1, 0, 5, 4), t.DataRange);
+        Assert.Equal(Range(1, 0, 5, 4), t.DataBodyRange);
     }
 
     [Fact]

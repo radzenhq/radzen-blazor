@@ -1189,9 +1189,9 @@ static class XlsxReader
         return pt?.Element(c + "v")?.Value;
     }
 
-    private static ChartSeriesDefinition? ParseChartSeries(XElement ser, XNamespace c, XNamespace a)
+    private static ChartSeries? ParseChartSeries(XElement ser, XNamespace c, XNamespace a)
     {
-        var series = new ChartSeriesDefinition();
+        var series = new ChartSeries();
 
         // Parse index
         var idx = ser.Element(c + "idx")?.Attribute("val")?.Value;
@@ -1207,11 +1207,11 @@ static class XlsxReader
             var strRef = tx.Element(c + "strRef");
             if (strRef is not null)
             {
-                series.Title = strRef.Element(c + "strCache")?.Element(c + "pt")?.Element(c + "v")?.Value;
+                series.Name = strRef.Element(c + "strCache")?.Element(c + "pt")?.Element(c + "v")?.Value;
             }
             else
             {
-                series.Title = tx.Element(c + "v")?.Value;
+                series.Name = tx.Element(c + "v")?.Value;
             }
         }
 
@@ -1225,7 +1225,7 @@ static class XlsxReader
 
             if (refElement is not null)
             {
-                series.CategoryFormula = refElement.Element(c + "f")?.Value;
+                series.Categories = refElement.Element(c + "f")?.Value;
 
                 var cache = refElement.Element(c + "strCache") ?? refElement.Element(c + "numCache");
                 if (cache is not null)
@@ -1245,7 +1245,7 @@ static class XlsxReader
             var numRef = val.Element(c + "numRef");
             if (numRef is not null)
             {
-                series.ValueFormula = numRef.Element(c + "f")?.Value;
+                series.Values = numRef.Element(c + "f")?.Value;
 
                 var numCache = numRef.Element(c + "numCache");
                 if (numCache is not null)
@@ -1426,7 +1426,7 @@ static class XlsxReader
                     var calcFormula = colElem.Element(tNs + "calculatedColumnFormula")?.Value;
                     if (!string.IsNullOrEmpty(calcFormula))
                     {
-                        table.Columns[i].CalculatedFormula = calcFormula;
+                        table.Columns[i].Formula = calcFormula;
                     }
                     i++;
                 }
