@@ -42,8 +42,8 @@ public static class ChartFactory
         var hasHeader = IsTextCell(sheet, selection.Start.Row, selection.Start.Column);
         var dataStartRow = hasHeader ? selection.Start.Row + 1 : selection.Start.Row;
 
-        var sheetName = QuoteSheetName(sheet.Name);
-        var catFormula = $"{sheetName}!${ColumnRef.ToString(catStart.Column)}${dataStartRow + 1}:${ColumnRef.ToString(catEnd.Column)}${catEnd.Row + 1}";
+        var catFormula = FormulaFormat.ToAbsoluteFormula(sheet,
+            new RangeRef(new CellRef(dataStartRow, catStart.Column), new CellRef(catEnd.Row, catEnd.Column)));
 
         for (var col = selection.Start.Column + 1; col <= selection.End.Column; col++)
         {
@@ -51,7 +51,8 @@ public static class ChartFactory
             {
                 Index = col - selection.Start.Column - 1,
                 CategoryFormula = catFormula,
-                ValueFormula = $"{sheetName}!${ColumnRef.ToString(col)}${dataStartRow + 1}:${ColumnRef.ToString(col)}${selection.End.Row + 1}"
+                ValueFormula = FormulaFormat.ToAbsoluteFormula(sheet,
+                    new RangeRef(new CellRef(dataStartRow, col), new CellRef(selection.End.Row, col))),
             };
 
             if (hasHeader)
@@ -69,7 +70,8 @@ public static class ChartFactory
             var series = new ChartSeriesDefinition
             {
                 Index = 0,
-                ValueFormula = $"{sheetName}!${ColumnRef.ToString(selection.Start.Column)}${dataStartRow + 1}:${ColumnRef.ToString(selection.Start.Column)}${selection.End.Row + 1}"
+                ValueFormula = FormulaFormat.ToAbsoluteFormula(sheet,
+                    new RangeRef(new CellRef(dataStartRow, selection.Start.Column), new CellRef(selection.End.Row, selection.Start.Column))),
             };
 
             if (hasHeader)
@@ -88,15 +90,5 @@ public static class ChartFactory
     {
         var cell = sheet.Cells[row, col];
         return cell?.Data.Type == CellDataType.String;
-    }
-
-    private static string QuoteSheetName(string name)
-    {
-        if (name.Contains(' ', StringComparison.Ordinal) || name.Contains('\'', StringComparison.Ordinal))
-        {
-            return $"'{name.Replace("'", "''", StringComparison.Ordinal)}'";
-        }
-
-        return name;
     }
 }

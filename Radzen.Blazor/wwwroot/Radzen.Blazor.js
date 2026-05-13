@@ -5788,6 +5788,7 @@ class Spreadsheet {
   onColumnPointerUp = (e) => {
     removeEventListener('pointermove', this.onColumnPointerMove);
     removeEventListener('pointerup', this.onColumnPointerUp);
+    this.dotNetRef.invokeMethodAsync('OnSelectionPointerUpAsync');
   }
 
   onColumnPointerMove = (e) => {
@@ -5801,6 +5802,7 @@ class Spreadsheet {
   onRowPointerUp = (e) => {
     removeEventListener('pointermove', this.onRowPointerMove);
     removeEventListener('pointerup', this.onRowPointerUp);
+    this.dotNetRef.invokeMethodAsync('OnSelectionPointerUpAsync');
   }
 
   onCellPointerMove = (e) => {
@@ -5810,6 +5812,7 @@ class Spreadsheet {
   onCellPointerUp = (e) => {
     removeEventListener('pointermove', this.onCellPointerMove);
     removeEventListener('pointerup', this.onCellPointerUp);
+    this.dotNetRef.invokeMethodAsync('OnSelectionPointerUpAsync');
   }
 
   onKeyDown = (e) => {
@@ -5930,6 +5933,25 @@ class Spreadsheet {
     removeEventListener('pointerup', this.onAutofillPointerUp);
   }
 }
+
+Radzen.beginRangePickKeyHandler = function (dotNetRef) {
+  Radzen.endRangePickKeyHandler();
+  Radzen.rangePickKeyHandler = function (e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      dotNetRef.invokeMethodAsync('OnEscapeKeyAsync');
+    }
+  };
+  document.addEventListener('keydown', Radzen.rangePickKeyHandler, true);
+};
+
+Radzen.endRangePickKeyHandler = function () {
+  if (Radzen.rangePickKeyHandler) {
+    document.removeEventListener('keydown', Radzen.rangePickKeyHandler, true);
+    Radzen.rangePickKeyHandler = null;
+  }
+};
 
 class SheetEditor {
   constructor(options) {
