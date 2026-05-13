@@ -30,8 +30,8 @@
                 Name="hdrChk" />
             <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignHeader)) Component="hdrChk" />
 
-            <RadzenCheckBox Value=@CurrentTable.ShowTotalsRow
-                Change=@(v => Toggle(t => t.ShowTotalsRow = (bool)v)) TValue="bool"
+            <RadzenCheckBox Value=@CurrentTable.ShowTotals
+                Change=@(v => Toggle(t => t.ShowTotals = (bool)v)) TValue="bool"
                 Name="totChk" />
             <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignTotals)) Component="totChk" />
 
@@ -112,7 +112,7 @@
         get
         {
             var t = CurrentTable;
-            if (t is null || !t.ShowTotalsRow || Worksheet is null) return null;
+            if (t is null || !t.ShowTotals || Worksheet is null) return null;
             var sel = Worksheet.Selection.Cell;
             if (sel == CellRef.Invalid) return null;
             var totals = t.TotalsRowRange;
