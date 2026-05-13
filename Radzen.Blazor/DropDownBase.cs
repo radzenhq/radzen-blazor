@@ -546,6 +546,7 @@ namespace Radzen
         internal Func<object, object?>? disabledPropertyGetter;
         internal Type? disabledPropertyGetterType;
 
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private object? GetItemOrValueFromPropertyUsingGetter(object item, string property, Func<object, object?>? getter, Type? getterType)
         {
             return getter != null && getterType?.IsInstanceOfType(item) == true ? getter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
