@@ -64,7 +64,7 @@ public class RemoveTableCommand(Worksheet sheet, Table table) : ICommand
             // identity; downstream callers can re-apply style/totals if needed.
             var restored = sheet.AddTable(table.Name, table.Range, table.ShowHeaderRow);
             restored.DisplayName = table.DisplayName;
-            restored.ShowTotalsRow = table.ShowTotalsRow;
+            restored.ShowTotals = table.ShowTotals;
             restored.ShowFilterButton = table.ShowFilterButton;
             restored.ShowBandedRows = table.ShowBandedRows;
             restored.ShowBandedColumns = table.ShowBandedColumns;

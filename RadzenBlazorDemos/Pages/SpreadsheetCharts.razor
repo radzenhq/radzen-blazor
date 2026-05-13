@@ -102,12 +102,12 @@
 
         for (int q = 0; q < 4; q++)
         {
-            columnChart.Series.Add(new ChartSeriesDefinition
+            columnChart.Series.Add(new ChartSeries
             {
                 Index = q,
-                Title = headers[q + 1],
-                CategoryFormula = $"'Sales Dashboard'!$A$3:$A${2 + regions.Length}",
-                ValueFormula = $"'Sales Dashboard'!${(char)('B' + q)}$3:${(char)('B' + q)}${2 + regions.Length}"
+                Name = headers[q + 1],
+                Categories = $"'Sales Dashboard'!$A$3:$A${2 + regions.Length}",
+                Values = $"'Sales Dashboard'!${(char)('B' + q)}$3:${(char)('B' + q)}${2 + regions.Length}"
             });
         }
 
@@ -174,12 +174,12 @@
             LegendPosition = ChartLegendPosition.Right
         };
 
-        pieChart.Series.Add(new ChartSeriesDefinition
+        pieChart.Series.Add(new ChartSeries
         {
             Index = 0,
-            Title = "Market Share",
-            CategoryFormula = $"'Market Share'!$A$3:$A${2 + data.Length}",
-            ValueFormula = $"'Market Share'!$B$3:$B${2 + data.Length}"
+            Name = "Market Share",
+            Categories = $"'Market Share'!$A$3:$A${2 + data.Length}",
+            Values = $"'Market Share'!$B$3:$B${2 + data.Length}"
         });
 
         sheet.AddChart(pieChart);
@@ -258,12 +258,12 @@
 
         for (int p = 0; p < 3; p++)
         {
-            lineChart.Series.Add(new ChartSeriesDefinition
+            lineChart.Series.Add(new ChartSeries
             {
                 Index = p,
-                Title = headers[p + 1],
-                CategoryFormula = $"Trends!$A$3:$A${2 + months.Length}",
-                ValueFormula = $"Trends!${(char)('B' + p)}$3:${(char)('B' + p)}${2 + months.Length}"
+                Name = headers[p + 1],
+                Categories = $"Trends!$A$3:$A${2 + months.Length}",
+                Values = $"Trends!${(char)('B' + p)}$3:${(char)('B' + p)}${2 + months.Length}"
             });
         }
 

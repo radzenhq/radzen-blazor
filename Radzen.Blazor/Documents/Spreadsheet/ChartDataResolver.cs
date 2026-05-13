@@ -53,7 +53,7 @@ public static class ChartDataResolver
     /// Resolves chart data points for a series definition from the workbook.
     /// Falls back to cached values when live resolution fails.
     /// </summary>
-    public static List<ChartDataPoint> ResolveSeriesData(ChartSeriesDefinition series, Workbook workbook, Worksheet currentSheet)
+    public static List<ChartDataPoint> ResolveSeriesData(ChartSeries series, Workbook workbook, Worksheet currentSheet)
     {
         ArgumentNullException.ThrowIfNull(series);
 
@@ -75,13 +75,13 @@ public static class ChartDataResolver
         return result;
     }
 
-    private static List<string> ResolveCategories(ChartSeriesDefinition series, Workbook workbook, Worksheet currentSheet)
+    private static List<string> ResolveCategories(ChartSeries series, Workbook workbook, Worksheet currentSheet)
     {
-        if (!string.IsNullOrEmpty(series.CategoryFormula))
+        if (!string.IsNullOrEmpty(series.Categories))
         {
             try
             {
-                var (sheetName, range) = ParseRangeFormula(series.CategoryFormula);
+                var (sheetName, range) = ParseRangeFormula(series.Categories);
                 var sheet = ResolveSheet(sheetName, workbook, currentSheet);
 
                 if (sheet != null)
@@ -115,13 +115,13 @@ public static class ChartDataResolver
             : [];
     }
 
-    private static List<double> ResolveValues(ChartSeriesDefinition series, Workbook workbook, Worksheet currentSheet)
+    private static List<double> ResolveValues(ChartSeries series, Workbook workbook, Worksheet currentSheet)
     {
-        if (!string.IsNullOrEmpty(series.ValueFormula))
+        if (!string.IsNullOrEmpty(series.Values))
         {
             try
             {
-                var (sheetName, range) = ParseRangeFormula(series.ValueFormula);
+                var (sheetName, range) = ParseRangeFormula(series.Values);
                 var sheet = ResolveSheet(sheetName, workbook, currentSheet);
 
                 if (sheet != null)

@@ -66,10 +66,10 @@
 
         // Calculated column — the formula is filled into every data row using
         // structured references. Editing the Q1 or Q2 column will recompute Total.
-        table.Columns[4].CalculatedFormula = "=[@[Q1]]+[@[Q2]]";
+        table.Columns[4].Formula = "=[@[Q1]]+[@[Q2]]";
 
         // Show a totals row with per-column SUBTOTAL functions.
-        table.ShowTotalsRow = true;
+        table.ShowTotals = true;
         table.Columns[0].Name = "Region";              // also serves as totals label
         table.Columns[2].TotalsCalculation = TotalsCalculation.Sum;
         table.Columns[3].TotalsCalculation = TotalsCalculation.Sum;
