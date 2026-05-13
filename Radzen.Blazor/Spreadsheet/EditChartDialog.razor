@@ -28,11 +28,11 @@
         var index = entry.Index;
         var categoryFieldId = CategoryFieldId(index);
         var valueFieldId = ValueFieldId(index);
-        <RadzenFieldset Text=@(entry.Title ?? $"Series {index + 1}")>
+        <RadzenFieldset Text=@(entry.Name ?? $"Series {index + 1}")>
             <RadzenStack Gap="0.5rem">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                     <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_SeriesTitle)) Style="flex: 1">
-                        <RadzenTextBox Value=@entry.Title Change=@(v => entry.Title = v) Style="width: 100%" />
+                        <RadzenTextBox Value=@entry.Name Change=@(v => entry.Name = v) Style="width: 100%" />
                     </RadzenFormField>
                     <RadzenColorPicker Value=@entry.Color Change=@(v => entry.Color = v) ShowHSV=false ShowRGBA=false ShowButton=false />
                     <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Size="ButtonSize.Small"
@@ -40,14 +40,14 @@
                 </RadzenStack>
                 <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
                     <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange)) />
-                    <RangePicker Value=@entry.CategoryFormula ValueChanged=@(v => entry.CategoryFormula = v)
-                        OnPickRequested=@(() => RequestPick(categoryFieldId, entry.CategoryFormula ?? string.Empty))
+                    <RangePicker Value=@entry.Categories ValueChanged=@(v => entry.Categories = v)
+                        OnPickRequested=@(() => RequestPick(categoryFieldId, entry.Categories ?? string.Empty))
                         ShouldFocusOnLoad=@(FocusFieldId == categoryFieldId) />
                 </RadzenStack>
                 <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
                     <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange)) />
-                    <RangePicker Value=@entry.ValueFormula ValueChanged=@(v => entry.ValueFormula = v)
-                        OnPickRequested=@(() => RequestPick(valueFieldId, entry.ValueFormula ?? string.Empty))
+                    <RangePicker Value=@entry.Values ValueChanged=@(v => entry.Values = v)
+                        OnPickRequested=@(() => RequestPick(valueFieldId, entry.Values ?? string.Empty))
                         ShouldFocusOnLoad=@(FocusFieldId == valueFieldId) />
                 </RadzenStack>
             </RadzenStack>
@@ -109,7 +109,7 @@
         Draft.Series.Add(new EditChartSeriesDraft
         {
             Index = Draft.Series.Count,
-            Title = $"Series {Draft.Series.Count + 1}"
+            Name = $"Series {Draft.Series.Count + 1}"
         });
     }
 

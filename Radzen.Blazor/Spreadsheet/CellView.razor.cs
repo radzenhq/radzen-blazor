@@ -270,9 +270,9 @@ public partial class CellView : CellBase, IDisposable
         var preset = TableStylePresets.Get(table.TableStyle);
 
         var isHeader = table.ShowHeaderRow && Row == table.Range.Start.Row;
-        var isTotals = table.ShowTotalsRow && Row == table.Range.End.Row;
+        var isTotals = table.ShowTotals && Row == table.Range.End.Row;
         var dataStart = table.ShowHeaderRow ? table.Range.Start.Row + 1 : table.Range.Start.Row;
-        var dataEnd = table.ShowTotalsRow ? table.Range.End.Row - 1 : table.Range.End.Row;
+        var dataEnd = table.ShowTotals ? table.Range.End.Row - 1 : table.Range.End.Row;
         var isData = !isHeader && !isTotals && Row >= dataStart && Row <= dataEnd;
         var isFirstCol = Column == table.Range.Start.Column;
         var isLastCol = Column == table.Range.End.Column;

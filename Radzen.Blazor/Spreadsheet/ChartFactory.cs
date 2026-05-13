@@ -47,18 +47,18 @@ public static class ChartFactory
 
         for (var col = selection.Start.Column + 1; col <= selection.End.Column; col++)
         {
-            var series = new ChartSeriesDefinition
+            var series = new ChartSeries
             {
                 Index = col - selection.Start.Column - 1,
-                CategoryFormula = catFormula,
-                ValueFormula = FormulaFormat.ToAbsoluteFormula(sheet,
+                Categories = catFormula,
+                Values = FormulaFormat.ToAbsoluteFormula(sheet,
                     new RangeRef(new CellRef(dataStartRow, col), new CellRef(selection.End.Row, col))),
             };
 
             if (hasHeader)
             {
                 var headerCell = sheet.Cells[selection.Start.Row, col];
-                series.Title = headerCell?.GetValueAsString();
+                series.Name = headerCell?.GetValueAsString();
             }
 
             chart.Series.Add(series);
@@ -67,17 +67,17 @@ public static class ChartFactory
         // If only one column selected, use it as values with row indices as categories
         if (selection.Columns == 1)
         {
-            var series = new ChartSeriesDefinition
+            var series = new ChartSeries
             {
                 Index = 0,
-                ValueFormula = FormulaFormat.ToAbsoluteFormula(sheet,
+                Values = FormulaFormat.ToAbsoluteFormula(sheet,
                     new RangeRef(new CellRef(dataStartRow, selection.Start.Column), new CellRef(selection.End.Row, selection.Start.Column))),
             };
 
             if (hasHeader)
             {
                 var headerCell = sheet.Cells[selection.Start.Row, selection.Start.Column];
-                series.Title = headerCell?.GetValueAsString();
+                series.Name = headerCell?.GetValueAsString();
             }
 
             chart.Series.Add(series);

@@ -16,7 +16,7 @@ public class TableXlsxRoundTripTests
                                                      int rows = 6, int cols = 5)
     {
         var wb = new Workbook();
-        // Allocate a few extra rows so toggling ShowTotalsRow on later (which expands
+        // Allocate a few extra rows so toggling ShowTotals on later (which expands
         // the table range) doesn't run off the bottom of the worksheet.
         var ws = wb.AddSheet("Sheet1", rows + 5, cols);
         if (hasHeaders)
@@ -79,12 +79,12 @@ public class TableXlsxRoundTripTests
     {
         var (wb, ws) = Build("Sales");
         var t = ws.Tables[0];
-        t.ShowTotalsRow = true;
+        t.ShowTotals = true;
         t.Columns[2].TotalsCalculation = TotalsCalculation.Sum;
         t.Columns[3].TotalsCalculation = TotalsCalculation.Average;
 
         var loaded = Roundtrip(wb).Sheets[0].Tables[0];
-        Assert.True(loaded.ShowTotalsRow);
+        Assert.True(loaded.ShowTotals);
         Assert.Equal(TotalsCalculation.Sum, loaded.Columns[2].TotalsCalculation);
         Assert.Equal(TotalsCalculation.Average, loaded.Columns[3].TotalsCalculation);
     }

@@ -97,7 +97,7 @@ public class SheetChart
     /// <summary>
     /// Gets or sets the series definitions.
     /// </summary>
-    public List<ChartSeriesDefinition> Series { get; set; } = [];
+    public List<ChartSeries> Series { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the raw chart XML for lossless XLSX round-tripping.
@@ -123,22 +123,22 @@ public enum ChartLegendPosition
 /// <summary>
 /// Defines a data series within a spreadsheet chart.
 /// </summary>
-public class ChartSeriesDefinition
+public class ChartSeries
 {
     /// <summary>
-    /// Gets or sets the series title.
+    /// Gets or sets the series name.
     /// </summary>
-    public string? Title { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// Gets or sets the category range formula (e.g. "Sheet1!$A$2:$A$10").
     /// </summary>
-    public string? CategoryFormula { get; set; }
+    public string? Categories { get; set; }
 
     /// <summary>
     /// Gets or sets the value range formula (e.g. "Sheet1!$B$2:$B$10").
     /// </summary>
-    public string? ValueFormula { get; set; }
+    public string? Values { get; set; }
 
     /// <summary>
     /// Gets or sets the cached category values from the XLSX file.

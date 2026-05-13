@@ -33,15 +33,15 @@ public sealed class EditChartSeriesDraft
     /// <summary>Zero-based ordinal of the series within the chart.</summary>
     public int Index { get; set; }
 
-    /// <summary>Display title.</summary>
-    public string? Title { get; set; }
+    /// <summary>Series name.</summary>
+    public string? Name { get; set; }
 
     /// <summary>Series color.</summary>
     public string? Color { get; set; }
 
     /// <summary>Sheet-qualified absolute formula for categories.</summary>
-    public string? CategoryFormula { get; set; }
+    public string? Categories { get; set; }
 
     /// <summary>Sheet-qualified absolute formula for values.</summary>
-    public string? ValueFormula { get; set; }
+    public string? Values { get; set; }
 }
