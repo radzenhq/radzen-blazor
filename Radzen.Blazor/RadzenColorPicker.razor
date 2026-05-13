@@ -17,7 +17,7 @@
         {
             <button aria-label="@ToggleAriaLabel" type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="notranslate rzi" /></button>
         }
-        <Popup id="@($"{GetId()}-popup")" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup
+        <RadzenPopup id="@($"{GetId()}-popup")" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup
                role="dialog" aria-label="@PopupAriaLabel"
                class="rz-colorpicker-popup" Close=@OnClosePopup Open=@OnPopupOpen>
             @if (ShowHSV)
@@ -123,6 +123,6 @@
                     <RadzenButton ButtonStyle="ButtonStyle.Primary" Click=@OnClick Text=@ButtonText @onclick:preventDefault />
                 </div>
             }
-        </Popup>
+        </RadzenPopup>
     </div>
 }

@@ -114,8 +114,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     protected override string GetComponentCssClass() => "rz-spreadsheet";
 
     private VirtualGrid? grid;
-    private Popup? cellMenuPopup;
-    private Popup? validationListPopup;
+    private RadzenPopup? cellMenuPopup;
+    private RadzenPopup? validationListPopup;
     private RangePickerBar? rangePickerBar;
     private int cellMenuRow = -1;
     private int cellMenuColumn = -1;

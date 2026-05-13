@@ -496,7 +496,7 @@ namespace Radzen.Blazor
 
         // Filter functionality
         private RadzenPivotField<TItem>? currentFilterField;
-        private Popup? filterPopup;
+        private RadzenPopup? filterPopup;
 
         /// <summary>
         /// Gets the columns collection.

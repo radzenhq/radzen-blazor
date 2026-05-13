@@ -37,7 +37,7 @@
             }
         }
 
-        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle
+        <RadzenPopup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle
                Close="@OnPopupCloseFromEvent"
                role="dialog" aria-label="@PopupAriaLabel"
                class="@($"{(Inline ? "rz-datepicker-inline-container " : "rz-datepicker-popup-container ")}")">
@@ -177,7 +177,7 @@
                         }
                     </div>
                 }
-        </Popup>
+        </RadzenPopup>
 
     </div>
 }

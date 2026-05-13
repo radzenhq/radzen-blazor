@@ -1,0 +1,8 @@
+@inherits RadzenComponent
+
+<div @ref=Element @onmousedown:preventDefault=@PreventDefault @attributes=@Attributes style=@Style id=@GetId()>
+    @if (open || !Lazy)
+    {
+        @ChildContent
+    }
+</div>
