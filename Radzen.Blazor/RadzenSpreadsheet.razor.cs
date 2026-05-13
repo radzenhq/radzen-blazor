@@ -116,6 +116,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private VirtualGrid? grid;
     private Popup? cellMenuPopup;
     private Popup? validationListPopup;
+    private RangePickerBar? rangePickerBar;
     private int cellMenuRow = -1;
     private int cellMenuColumn = -1;
     private int validationListRow = -1;
@@ -1260,6 +1261,35 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             await ScrollToAsync(address);
         }
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the user releases the pointer after a cell, row, or
+    /// column selection gesture. Fires <see cref="Selection.RangeFinalized"/> so subscribers
+    /// (such as the range picker) can commit the user's pick.
+    /// </summary>
+    [JSInvokable]
+    public Task OnSelectionPointerUpAsync()
+    {
+        activeCapture = null;
+        Worksheet?.Selection.FinalizeRange();
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Opens the visual range picker bar. The dialog calling this should already be closed.
+    /// The returned task resolves with the picked range as a sheet-qualified absolute formula
+    /// (e.g. <c>Sheet1!$A$1:$C$5</c>) when the user finishes a selection on the sheet, or
+    /// <c>null</c> if the pick is cancelled.
+    /// </summary>
+    internal Task<string?> BeginRangePickAsync(string initialValue)
+    {
+        if (rangePickerBar is null || Worksheet is null)
+        {
+            return Task.FromResult<string?>(null);
+        }
+
+        return rangePickerBar.ShowAsync(initialValue, Worksheet);
     }
 
     private CellRef GetDeltaCell(PointerCapture capture, PointerEventArgs args)

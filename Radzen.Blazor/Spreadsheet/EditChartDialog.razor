@@ -5,42 +5,51 @@
 <RadzenStack Gap="0" Style="max-height: 70vh; display: flex; flex-direction: column">
 <RadzenStack Gap="1rem" Style="padding: 1rem; overflow-y: auto; flex: 1">
     <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ChartType))>
-        <RadzenDropDown @bind-Value=@chartType Data=@chartTypes TextProperty="Text" ValueProperty="Value" Style="width: 100%" />
+        <RadzenDropDown Value=@Draft.ChartType Change=@(v => Draft.ChartType = (SpreadsheetChartType)v) Data=@chartTypes TextProperty="Text" ValueProperty="Value" Style="width: 100%" />
     </RadzenFormField>
     <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ChartTitle))>
-        <RadzenTextBox @bind-Value=@title Style="width: 100%" />
+        <RadzenTextBox Value=@Draft.Title Change=@(v => Draft.Title = v) Style="width: 100%" />
     </RadzenFormField>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenCheckBox @bind-Value=@showLegend TValue="bool" />
+        <RadzenCheckBox Value=@Draft.ShowLegend Change=@((bool v) => Draft.ShowLegend = v) TValue="bool" />
         <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowLegend)) />
     </RadzenStack>
     <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_LegendPosition))>
-        <RadzenDropDown @bind-Value=@legendPosition Data=@legendPositions TextProperty="Text" ValueProperty="Value"
-            Disabled=@(!showLegend) Style="width: 100%" />
+        <RadzenDropDown Value=@Draft.LegendPosition Change=@(v => Draft.LegendPosition = (ChartLegendPosition)v) Data=@legendPositions TextProperty="Text" ValueProperty="Value"
+            Disabled=@(!Draft.ShowLegend) Style="width: 100%" />
     </RadzenFormField>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
         <RadzenText TextStyle="TextStyle.Subtitle1" Text=@L(nameof(RadzenStrings.Spreadsheet_Series)) />
         <RadzenButton Icon="add" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click=@OnAddSeries
             title=@L(nameof(RadzenStrings.Spreadsheet_AddSeries)) />
     </RadzenStack>
-    @foreach (var entry in seriesEntries)
+    @foreach (var entry in Draft.Series)
     {
-        <RadzenFieldset Text=@(entry.Title ?? $"Series {entry.Index + 1}")>
+        var index = entry.Index;
+        var categoryFieldId = CategoryFieldId(index);
+        var valueFieldId = ValueFieldId(index);
+        <RadzenFieldset Text=@(entry.Title ?? $"Series {index + 1}")>
             <RadzenStack Gap="0.5rem">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                     <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_SeriesTitle)) Style="flex: 1">
-                        <RadzenTextBox @bind-Value=@entry.Title Style="width: 100%" />
+                        <RadzenTextBox Value=@entry.Title Change=@(v => entry.Title = v) Style="width: 100%" />
                     </RadzenFormField>
-                    <RadzenColorPicker @bind-Value=@entry.Color ShowHSV=false ShowRGBA=false ShowButton=false />
+                    <RadzenColorPicker Value=@entry.Color Change=@(v => entry.Color = v) ShowHSV=false ShowRGBA=false ShowButton=false />
                     <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Size="ButtonSize.Small"
-                        Click=@(() => OnRemoveSeries(entry)) Disabled=@(seriesEntries.Count <= 1) />
+                        Click=@(() => OnRemoveSeries(entry)) Disabled=@(Draft.Series.Count <= 1) />
                 </RadzenStack>
-                <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange))>
-                    <RadzenTextBox @bind-Value=@entry.CategoryFormula Style="width: 100%" />
-                </RadzenFormField>
-                <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange))>
-                    <RadzenTextBox @bind-Value=@entry.ValueFormula Style="width: 100%" />
-                </RadzenFormField>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange)) />
+                    <RangePicker Value=@entry.CategoryFormula ValueChanged=@(v => entry.CategoryFormula = v)
+                        OnPickRequested=@(() => RequestPick(categoryFieldId, entry.CategoryFormula ?? string.Empty))
+                        ShouldFocusOnLoad=@(FocusFieldId == categoryFieldId) />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange)) />
+                    <RangePicker Value=@entry.ValueFormula ValueChanged=@(v => entry.ValueFormula = v)
+                        OnPickRequested=@(() => RequestPick(valueFieldId, entry.ValueFormula ?? string.Empty))
+                        ShouldFocusOnLoad=@(FocusFieldId == valueFieldId) />
+                </RadzenStack>
             </RadzenStack>
         </RadzenFieldset>
     }
@@ -54,20 +63,8 @@
 @code {
 #nullable enable
 
-    [Parameter]
-    public SpreadsheetChartType ChartType { get; set; }
-
-    [Parameter]
-    public string? Title { get; set; }
-
-    [Parameter]
-    public bool ShowLegend { get; set; }
-
-    [Parameter]
-    public ChartLegendPosition LegendPosition { get; set; }
-
-    [Parameter]
-    public List<ChartSeriesDefinition> Series { get; set; } = [];
+    [Parameter] public EditChartDraft Draft { get; set; } = default!;
+    [Parameter] public string? FocusFieldId { get; set; }
 
     [Inject]
     DialogService DialogService { get; set; } = default!;
@@ -77,11 +74,13 @@
 
     string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
-    private SpreadsheetChartType chartType;
-    private string? title;
-    private bool showLegend;
-    private ChartLegendPosition legendPosition;
-    private List<SeriesEntry> seriesEntries = [];
+    internal static string CategoryFieldId(int seriesIndex) => $"category_{seriesIndex}";
+    internal static string ValueFieldId(int seriesIndex) => $"value_{seriesIndex}";
+
+    private void RequestPick(string fieldId, string value)
+    {
+        DialogService.Close(new RangePickRequest(fieldId, value));
+    }
 
     private static readonly List<object> chartTypes =
     [
@@ -105,67 +104,31 @@
         new { Text = "Bottom", Value = ChartLegendPosition.Bottom },
     ];
 
-    protected override void OnInitialized()
-    {
-        chartType = ChartType;
-        title = Title;
-        showLegend = ShowLegend;
-        legendPosition = LegendPosition;
-
-        seriesEntries = [];
-        for (int i = 0; i < Series.Count; i++)
-        {
-            seriesEntries.Add(new SeriesEntry
-            {
-                Index = i,
-                Title = Series[i].Title,
-                Color = Series[i].Color,
-                CategoryFormula = Series[i].CategoryFormula,
-                ValueFormula = Series[i].ValueFormula
-            });
-        }
-    }
-
     private void OnAddSeries()
     {
-        seriesEntries.Add(new SeriesEntry
+        Draft.Series.Add(new EditChartSeriesDraft
         {
-            Index = seriesEntries.Count,
-            Title = $"Series {seriesEntries.Count + 1}"
+            Index = Draft.Series.Count,
+            Title = $"Series {Draft.Series.Count + 1}"
         });
     }
 
-    private void OnRemoveSeries(SeriesEntry entry)
+    private void OnRemoveSeries(EditChartSeriesDraft entry)
     {
-        seriesEntries.Remove(entry);
-        for (int i = 0; i < seriesEntries.Count; i++)
+        Draft.Series.Remove(entry);
+        for (int i = 0; i < Draft.Series.Count; i++)
         {
-            seriesEntries[i].Index = i;
+            Draft.Series[i].Index = i;
         }
     }
 
     private void OnOk()
     {
-        var states = new List<EditChartSeriesState>();
-        foreach (var entry in seriesEntries)
-        {
-            states.Add(new EditChartSeriesState(entry.Title, entry.Color, entry.CategoryFormula, entry.ValueFormula));
-        }
-
-        DialogService.Close(new EditChartState(chartType, title, showLegend, legendPosition, states));
+        DialogService.Close(Draft);
     }
 
     private void OnCancel()
     {
         DialogService.Close(null);
-    }
-
-    private class SeriesEntry
-    {
-        public int Index { get; set; }
-        public string? Title { get; set; }
-        public string? Color { get; set; }
-        public string? CategoryFormula { get; set; }
-        public string? ValueFormula { get; set; }
     }
 }
