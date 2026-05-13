@@ -40,12 +40,12 @@
         {
             <button type="button" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel" @onclick="@Clear" @onclick:stopPropagation="true"></button>
         }
-        <Popup id="@($"{GetId()}-popup")" @ref="@popup" Lazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
+        <RadzenPopup id="@($"{GetId()}-popup")" @ref="@popup" Lazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
                    Open="@OnPopupOpen" Close="@OnPopupClose"
                    role="dialog" aria-label="@PopupAriaLabel"
                    class="rz-timespanpicker-popup-container">
             @RenderPanel()
-        </Popup>
+        </RadzenPopup>
     }
 </div>
 

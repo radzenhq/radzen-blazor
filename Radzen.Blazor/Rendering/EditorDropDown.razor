@@ -4,9 +4,9 @@
     <span class="rz-html-editor-dropdown-value">@(SelectedItem?.Text ?? Placeholder)</span>
     <i class="notranslate rzi" aria-hidden="true" />
 </button>
-<Popup id=@PopupId role="listbox" Open=@OnPopupOpen Close=@OnPopupClose @ref=Popup class="rz-html-editor-dropdown-items" Style=@PopupStyle PreventDefault=true>
+<RadzenPopup id=@PopupId role="listbox" Open=@OnPopupOpen Close=@OnPopupClose @ref=Popup class="rz-html-editor-dropdown-items" Style=@PopupStyle PreventDefault=true>
     <CascadingValue Value=@this ChildContent=@ChildContent />
-</Popup>
+</RadzenPopup>
 @code {
     [CascadingParameter]
     public RadzenHtmlEditor? Editor { get; set; }
@@ -31,7 +31,7 @@
 
     private string PopupId => $"{GetId()}-popup";
 
-    Popup? Popup { get; set; }
+    RadzenPopup? Popup { get; set; }
 
     [Parameter]
     public string? Title { get; set; }
