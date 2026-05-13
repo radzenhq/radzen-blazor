@@ -1,4 +1,3 @@
-@using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime
 
 <style>
@@ -26,7 +25,7 @@
     </div>
 </div>
 
-<Popup @ref=popup id="locationPopup" Style="padding: 0;" class="rz-dropdown-tree-filter-popup"
+<RadzenPopup @ref=popup id="locationPopup" Style="padding: 0;" class="rz-dropdown-tree-filter-popup"
     Close=@OnPopupClose>
     <RadzenStack Gap="0">
         <RadzenTextBox Placeholder="Search..." @oninput=@OnSearch Style="width: 100%; border: none; border-bottom: var(--rz-panel-border);" />
@@ -36,11 +35,11 @@
                 HasChildren=@(e => (e as Location).FilteredChildren?.Any() == true) Expanded=@(e => true) />
         </RadzenTree>
     </RadzenStack>
-</Popup>
+</RadzenPopup>
 
 @code {
     ElementReference trigger;
-    Popup popup;
+    RadzenPopup popup;
     object selection;
     string selectedText;
     string searchText = "";

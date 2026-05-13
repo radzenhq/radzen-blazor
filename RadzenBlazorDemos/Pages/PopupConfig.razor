@@ -1,7 +1,6 @@
 ﻿@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
-@using Radzen.Blazor.Rendering
 
 @inherits DbContextPage
 
@@ -23,7 +22,7 @@
     <RadzenButton @ref=button Text="@(orderId != null ? "Selected order: " + orderId.ToString() : "Select order")" Click="@(args => popup.ToggleAsync(button.Element))" />
 </div>
 
-<Popup @ref=popup Lazy=true class="my-popup">
+<RadzenPopup @ref=popup Lazy=true class="my-popup">
     <RadzenStack Orientation="Orientation.Vertical" Gap="1rem" class="rz-h-100 rz-p-4">
     <RadzenTextBox id="search" Placeholder="Type to search..." @oninput=@(args => searchString = $"{args.Value}") Value="@searchString" />
     <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" Style="flex: 1; --rz-datalist-padding: 0.5rem 0; --rz-datalist-item-margin-inline: 0; overflow:auto;">
@@ -52,11 +51,11 @@
         </Template>
     </RadzenDataList>
     </RadzenStack>
-</Popup>
+</RadzenPopup>
 
 @code {
     RadzenButton button;
-    Popup popup;
+    RadzenPopup popup;
     RadzenDataList<Order> dataList;
     IEnumerable<Order> orders;
     int? orderId;

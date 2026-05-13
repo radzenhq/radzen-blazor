@@ -72,7 +72,7 @@
                     @Grid.FilterIcon
                 </button>
 
-                <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{Column.GetColumnPopupID()}")" class="rz-overlaypanel"
+                <RadzenPopup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{Column.GetColumnPopupID()}")" class="rz-overlaypanel"
                 role="dialog" aria-label="@Grid.FilterText"
                 style="display:none;min-width:250px;" @onkeydown="OnFilterPopupKeyPressed">
                     <div class="rz-overlaypanel-content">
@@ -191,7 +191,7 @@
                             <RadzenButton ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{Column.GetColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
                         </div>
                     }
-                </Popup>
+                </RadzenPopup>
             }
         </div>
         @if (Grid.allColumns.Any(c => c.Parent != null) && Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Simple || filterMode == FilterMode.SimpleWithMenu))
@@ -211,7 +211,7 @@ else
     }
 }
 @code {
-    Radzen.Blazor.Rendering.Popup? popup;
+    RadzenPopup? popup;
     ElementReference filterButton;
 
     int filterValuesCount;

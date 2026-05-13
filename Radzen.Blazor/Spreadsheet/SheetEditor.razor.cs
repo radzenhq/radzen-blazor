@@ -26,7 +26,7 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
 
     private int caretPosition = -1;
 
-    private Popup? popup;
+    private RadzenPopup? popup;
 
     private List<string> functions = [];
 

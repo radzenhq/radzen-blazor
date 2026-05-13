@@ -171,7 +171,7 @@
                 </Tabs>
             </RadzenTabs>
         </div>
-        <Popup @ref=@cellMenuPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
+        <RadzenPopup @ref=@cellMenuPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
             @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
             {
                 <CellMenu Worksheet=@Worksheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync
@@ -180,13 +180,13 @@
                          Top10Filter=@OnCellMenuTop10FilterAsync
                          DynamicFilter=@OnCellMenuDynamicFilterAsync />
             }
-        </Popup>
-        <Popup @ref=@validationListPopup class="rz-spreadsheet-cell-popup" Lazy="true">
+        </RadzenPopup>
+        <RadzenPopup @ref=@validationListPopup class="rz-spreadsheet-cell-popup" Lazy="true">
             @if (validationListItems.Count > 0)
             {
                 <ValidationListPopup Items=@validationListItems Value=@GetValidationListValue() ValueSelected=@OnValidationListValueSelectedAsync />
             }
-        </Popup>
+        </RadzenPopup>
         </CascadingValue>
 }
     </CascadingValue>

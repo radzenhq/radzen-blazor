@@ -750,7 +750,7 @@ namespace Radzen.Blazor
         #endregion
 
         #region Internal: popup general actions
-        private Popup? popup;
+        private RadzenPopup? popup;
 
         private Task TogglePopup()
             => Inline ? Task.CompletedTask : popup?.ToggleAsync(Element) ?? Task.CompletedTask;
