@@ -1,0 +1,122 @@
+@using Microsoft.JSInterop
+@using Radzen.Documents.Spreadsheet
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@if (visible)
+{
+    <div class="rz-range-picker-bar">
+        <span class="rz-range-picker-bar-value">@displayedValue</span>
+        <button type="button" class="rz-range-picker-bar-cancel" @onclick=@CancelClick title=@CancelTitle>
+            <i class="notranslate rzi">close</i>
+        </button>
+    </div>
+}
+
+@code {
+#nullable enable
+
+    [Parameter] public string CancelTitle { get; set; } = "Cancel";
+
+    private bool visible;
+    private string displayedValue = string.Empty;
+    private Worksheet? subscribedWorksheet;
+    private TaskCompletionSource<string?>? tcs;
+    private DotNetObjectReference<RangePickerBar>? selfRef;
+
+    public async Task<string?> ShowAsync(string initialValue, Worksheet worksheet)
+    {
+        ArgumentNullException.ThrowIfNull(worksheet);
+
+        if (tcs is not null && !tcs.Task.IsCompleted)
+        {
+            tcs.TrySetResult(null);
+            await TeardownAsync();
+        }
+
+        displayedValue = initialValue;
+        subscribedWorksheet = worksheet;
+        worksheet.Selection.Changed += OnSelectionChanged;
+        worksheet.Selection.RangeFinalized += OnRangeFinalized;
+
+        selfRef ??= DotNetObjectReference.Create(this);
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.beginRangePickKeyHandler", selfRef);
+        }
+        catch
+        {
+            // Tolerate missing JS during prerender; the bar is purely interactive.
+        }
+
+        tcs = new TaskCompletionSource<string?>();
+        visible = true;
+        StateHasChanged();
+
+        try
+        {
+            return await tcs.Task;
+        }
+        finally
+        {
+            await TeardownAsync();
+        }
+    }
+
+    [JSInvokable]
+    public Task OnEscapeKeyAsync()
+    {
+        tcs?.TrySetResult(null);
+        return Task.CompletedTask;
+    }
+
+    private void CancelClick()
+    {
+        tcs?.TrySetResult(null);
+    }
+
+    private void OnSelectionChanged()
+    {
+        if (subscribedWorksheet is null) return;
+        var range = subscribedWorksheet.Selection.Range;
+        if (range == RangeRef.Invalid) return;
+        displayedValue = FormulaFormat.ToAbsoluteFormula(subscribedWorksheet, range);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnRangeFinalized()
+    {
+        tcs?.TrySetResult(displayedValue);
+    }
+
+    private async Task TeardownAsync()
+    {
+        if (subscribedWorksheet is not null)
+        {
+            subscribedWorksheet.Selection.Changed -= OnSelectionChanged;
+            subscribedWorksheet.Selection.RangeFinalized -= OnRangeFinalized;
+            subscribedWorksheet = null;
+        }
+
+        if (selfRef is not null)
+        {
+            try { await JSRuntime.InvokeVoidAsync("Radzen.endRangePickKeyHandler"); }
+            catch { }
+        }
+
+        visible = false;
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (tcs is not null && !tcs.Task.IsCompleted)
+        {
+            tcs.TrySetResult(null);
+        }
+
+        await TeardownAsync();
+        selfRef?.Dispose();
+        selfRef = null;
+    }
+}

@@ -23,6 +23,19 @@ public class Selection(Worksheet sheet)
     /// </summary>
     public event Action? Changed;
 
+    /// <summary>
+    /// Event that is triggered when the user finalizes a selection — i.e. releases the
+    /// pointer after a click or drag on the sheet. Subscribers (such as the range picker)
+    /// use this to commit a picked range.
+    /// </summary>
+    public event Action? RangeFinalized;
+
+    /// <summary>
+    /// Notifies subscribers that the user has finished a selection gesture
+    /// (pointer-up after a click or drag).
+    /// </summary>
+    internal void FinalizeRange() => RangeFinalized?.Invoke();
+
     private bool pendingChange;
 
     /// <summary>

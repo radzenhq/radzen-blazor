@@ -1,0 +1,50 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor
+
+<div class="rz-range-picker">
+    <RadzenTextBox @ref=textBox Value=@Value Change=@OnTextChanged Style="width: 100%; padding-right: 2rem;" />
+    <button type="button" class="rz-range-picker-collapse" @onclick=@OnPickClick title=@Title>
+        <i class="notranslate rzi">grid_on</i>
+    </button>
+</div>
+
+@code {
+#nullable enable
+
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public EventCallback OnPickRequested { get; set; }
+    [Parameter] public bool ShouldFocusOnLoad { get; set; }
+    [Parameter] public string? Title { get; set; }
+
+    private RadzenTextBox? textBox;
+    private bool pendingFocus;
+
+    protected override void OnParametersSet()
+    {
+        if (ShouldFocusOnLoad)
+        {
+            pendingFocus = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (pendingFocus && textBox != null)
+        {
+            pendingFocus = false;
+            try
+            {
+                await textBox.Element.FocusAsync();
+            }
+            catch
+            {
+                // Element may not be ready; harmless to drop.
+            }
+        }
+    }
+
+    private Task OnTextChanged(string value) => ValueChanged.InvokeAsync(value);
+
+    private Task OnPickClick() => OnPickRequested.InvokeAsync();
+}
