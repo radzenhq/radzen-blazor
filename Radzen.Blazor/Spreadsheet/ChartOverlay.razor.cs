@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
@@ -252,25 +253,91 @@ public partial class ChartOverlay : ComponentBase, IDisposable
 
     private async Task OpenEditChartDialogAsync(SheetChart chart)
     {
-        var parameters = new Dictionary<string, object?>
+        if (Spreadsheet is not RadzenSpreadsheet spreadsheet)
         {
-            { nameof(EditChartDialog.ChartType), chart.ChartType },
-            { nameof(EditChartDialog.Title), chart.Title },
-            { nameof(EditChartDialog.ShowLegend), chart.ShowLegend },
-            { nameof(EditChartDialog.LegendPosition), chart.LegendPosition },
-            { nameof(EditChartDialog.Series), chart.Series },
+            return;
+        }
+
+        var draft = new EditChartDraft
+        {
+            ChartType = chart.ChartType,
+            Title = chart.Title,
+            ShowLegend = chart.ShowLegend,
+            LegendPosition = chart.LegendPosition,
+            Series = chart.Series.Select((s, i) => new EditChartSeriesDraft
+            {
+                Index = i,
+                Title = s.Title,
+                Color = s.Color,
+                CategoryFormula = s.CategoryFormula,
+                ValueFormula = s.ValueFormula,
+            }).ToList(),
         };
 
-        var result = await DialogService.OpenAsync<EditChartDialog>(
-            L(nameof(RadzenStrings.Spreadsheet_EditChartTitle)),
-            parameters,
-            new DialogOptions { Width = "480px" });
+        string? focusFieldId = null;
+        var title = L(nameof(RadzenStrings.Spreadsheet_EditChartTitle));
+        object? result;
 
-        if (result is EditChartState newState)
+        // Loop only while the dialog closes for a range-pick request. On OK
+        // (EditChartDraft) or Cancel (null) the dialog returns and we exit.
+        do
         {
+            var parameters = new Dictionary<string, object?>
+            {
+                [nameof(EditChartDialog.Draft)]        = draft,
+                [nameof(EditChartDialog.FocusFieldId)] = focusFieldId,
+            };
+
+            result = await DialogService.OpenAsync<EditChartDialog>(
+                title,
+                parameters,
+                new DialogOptions { Width = "480px" });
+
+            if (result is RangePickRequest pick)
+            {
+                var picked = await spreadsheet.BeginRangePickAsync(pick.Value);
+                if (picked != null)
+                {
+                    ApplyPickedFormula(draft, pick.FieldId, picked);
+                }
+                focusFieldId = pick.FieldId;
+            }
+        }
+        while (result is RangePickRequest);
+
+        if (result is EditChartDraft finalDraft)
+        {
+            var newState = new EditChartState(
+                finalDraft.ChartType,
+                finalDraft.Title,
+                finalDraft.ShowLegend,
+                finalDraft.LegendPosition,
+                finalDraft.Series
+                    .Select(s => new EditChartSeriesState(s.Title, s.Color, s.CategoryFormula, s.ValueFormula))
+                    .ToList());
+
             Spreadsheet?.Execute(new EditChartCommand(chart, newState));
             seriesCache.Remove(chart);
             StateHasChanged();
+        }
+    }
+
+    private static void ApplyPickedFormula(EditChartDraft draft, string fieldId, string picked)
+    {
+        const string categoryPrefix = "category_";
+        const string valuePrefix = "value_";
+
+        if (fieldId.StartsWith(categoryPrefix, System.StringComparison.Ordinal)
+            && int.TryParse(fieldId[categoryPrefix.Length..], out var catIndex)
+            && catIndex >= 0 && catIndex < draft.Series.Count)
+        {
+            draft.Series[catIndex].CategoryFormula = picked;
+        }
+        else if (fieldId.StartsWith(valuePrefix, System.StringComparison.Ordinal)
+            && int.TryParse(fieldId[valuePrefix.Length..], out var valIndex)
+            && valIndex >= 0 && valIndex < draft.Series.Count)
+        {
+            draft.Series[valIndex].ValueFormula = picked;
         }
     }
 

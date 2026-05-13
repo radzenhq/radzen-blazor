@@ -4,24 +4,26 @@
 @inject Localizer Localizer
 
 <RadzenStack Gap="1rem">
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableRange)) Component="rangeLabel" />
-        <RadzenLabel id="rangeLabel" Text=@($"{Range.Start}:{Range.End}") />
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableRange)) />
+        <RangePicker Value=@Draft.RangeFormula ValueChanged=@OnRangeFormulaChanged
+            OnPickRequested=@OnRangePickRequested
+            ShouldFocusOnLoad=@(FocusFieldId == RangeFieldId) />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
         <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableName)) Component="nameInput" />
-        <RadzenTextBox @bind-Value=@name Name="nameInput" Style="width: 100%" />
+        <RadzenTextBox Value=@Draft.Name Change=@OnNameChanged Name="nameInput" Style="width: 100%" />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenCheckBox @bind-Value=@hasHeaders Name="hasHeadersCheck" TValue="bool" />
+        <RadzenCheckBox Value=@Draft.HasHeaders Change=@OnHasHeadersChanged Name="hasHeadersCheck" TValue="bool" />
         <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableHasHeaders)) Component="hasHeadersCheck" />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End" class="rz-pt-2">
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
-            Disabled=@string.IsNullOrWhiteSpace(name)
+            Disabled=@string.IsNullOrWhiteSpace(Draft.Name)
             Click=@OnOk />
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
             Click=@OnCancel />
@@ -31,25 +33,26 @@
 @code {
 #nullable enable
 
-    [Parameter] public string DefaultName { get; set; } = "Table1";
-    [Parameter] public RangeRef Range { get; set; }
+    internal const string RangeFieldId = "Range";
 
-    private string name = "";
-    private bool hasHeaders = true;
-
-    /// <summary>The result returned to the caller via DialogService.</summary>
-    public sealed record Result(string Name, bool HasHeaders);
-
-    protected override void OnInitialized()
-    {
-        name = DefaultName;
-    }
+    [Parameter] public InsertTableDraft Draft { get; set; } = default!;
+    [Parameter] public string? FocusFieldId { get; set; }
 
     private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
+    private void OnNameChanged(string value) => Draft.Name = value ?? string.Empty;
+    private void OnHasHeadersChanged(bool value) => Draft.HasHeaders = value;
+    private void OnRangeFormulaChanged(string? value) => Draft.RangeFormula = value ?? string.Empty;
+
+    private void OnRangePickRequested()
+    {
+        DialogService.Close(new RangePickRequest(RangeFieldId, Draft.RangeFormula));
+    }
+
     private void OnOk()
     {
-        DialogService.Close(new Result(name.Trim(), hasHeaders));
+        Draft.Name = Draft.Name.Trim();
+        DialogService.Close(Draft);
     }
 
     private void OnCancel()
