@@ -16,6 +16,7 @@
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FileTab))>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <Open WorkbookChanged=@OnWorkbookChangedAsync CsvImportOptions=@CsvImportOptions />
+                        <div class="rz-html-editor-separator"></div>
                         <Save Workbook=@workbook ActiveWorksheet=@Worksheet FileName=@ExportFileName CsvExportOptions=@CsvExportOptions />
                     </RadzenStack>
                 </RadzenTabsItem>
@@ -79,8 +80,8 @@
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <InsertHyperlink Worksheet=@Worksheet />
                             <InsertImage Worksheet=@Worksheet />
-                            <InsertChart Worksheet=@Worksheet />
                             <InsertTable Worksheet=@Worksheet />
+                            <InsertChart Worksheet=@Worksheet />
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>

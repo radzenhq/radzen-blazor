@@ -271,7 +271,7 @@ public partial class Worksheet
     /// <param name="columns"></param>
     public Worksheet(int rows, int columns)
     {
-        Rows = new(24, rows);
+        Rows = new(22, rows);
         Columns = new(100, columns);
         Selection = new(this);
         MergedCells = new();

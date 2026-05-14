@@ -81,7 +81,7 @@ public partial class SheetEditorHighlight : ComponentBase
         if (tokenType == FormulaTokenType.CellIdentifier)
         {
             var colorIndex = (refCount % 5) + 1;
-            return $"color:var(--rz-highlight-color-{colorIndex})";
+            return $"color:var(--rz-series-{colorIndex})";
         }
 
         return null;
