@@ -107,8 +107,9 @@ namespace Radzen.Blazor
         /// Renders the appointment.
         /// </summary>
         /// <param name="item">The item.</param>
+        /// <param name="isAgenda">Indicates if the appointment is in agenda view.</param>
         /// <returns>RenderFragment.</returns>
-        RenderFragment RenderAppointment(AppointmentData item);
+        RenderFragment RenderAppointment(AppointmentData item, bool isAgenda = false);
 
         /// <summary>
         /// Notifies the scheduler that the user has moved the mouse over the specified appointment.

@@ -38,7 +38,11 @@ $scheduler-view-selected-border-color: $scheduler-view-selected-background-color
 $scheduler-header-background-color: var(--rz-base-200) !default;
 $scheduler-header-font-size: 0.75rem !default;
 $scheduler-header-font-size-small: 0.5rem !default;
+$scheduler-header-agenda-font-size: 1.5rem !default;
+$scheduler-header-agenda-font-weight: 600 !default;
+$scheduler-header-agenda-font-size-small: 1rem !default;
 $scheduler-header-text-transform: uppercase !default;
+$scheduler-header-agenda-text-transform: none !default;
 $scheduler-header-color: inherit !default;
 $scheduler-header-border: var(--rz-border-normal) !default;
 $scheduler-header-padding: 0.5rem 0 !default;
@@ -236,6 +240,41 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       }
     }
   }
+}
+
+.rz-event-agenda {
+  position: unset;
+}
+
+.rz-view-content-agenda {
+  display: flex;
+  flex-direction: column;
+}
+
+.rz-slot-header-agenda {
+  width: 10%;
+  min-width: 10%;
+  margin-top: 1.5rem;
+
+  .rz-slot-header-agenda-day-title {
+    font-size: var(--rz-scheduler-header-agenda-font-size-small);
+    text-transform: var(--rz-scheduler-header-agenda-text-transform);
+    color: var(--rz-scheduler-header-color);
+    text-align: center;
+  }
+
+  .rz-slot-header-agenda-day-number {
+    font-size: var(--rz-scheduler-header-agenda-font-size);
+    font-weight: var(--rz-scheduler-header-agenda-font-weight);
+    text-transform: var(--rz-scheduler-header-text-transform);
+    color: var(--rz-scheduler-header-color);
+    text-align: center;
+  }
+}
+
+.rz-slot-agenda {
+  width: 85%;
+  min-width: 85%;
 }
 
 .rz-slots {

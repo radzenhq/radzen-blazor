@@ -1,0 +1,76 @@
+@using Radzen.Blazor
+
+<div class="rz-events">
+    <RadzenStack Orientation="Orientation.Vertical">
+    @{
+        foreach (var appointment in Appointments ?? Enumerable.Empty<AppointmentData>())
+        {
+            <div>
+                <Appointment Data=@(appointment) Click=@OnAppointmentSelect
+                        CssClass="@(CurrentDate.Date >= appointment.Start.Date && CurrentDate.Date <= appointment.End.Date && object.Equals(Appointments?.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),appointment) ? " rz-state-focused" : "" )"
+                        DragStart=@OnAppointmentDragStart IsAgenda="true" />
+            </div>
+        }
+    }
+    </RadzenStack>
+</div>
+@code {
+    [Parameter]
+    public int CurrentAppointment { get; set; } = -1;
+
+    [Parameter]
+    public DateTime CurrentDate { get; set; }
+
+    [CascadingParameter]
+    public IScheduler? Scheduler { get; set; }
+
+    [Parameter]
+    public DateTime StartDate { get; set; }
+
+    [Parameter]
+    public DateTime EndDate { get; set; }
+
+    [Parameter]
+    public int MinutesPerSlot { get; set; }
+
+    [Parameter]
+    public EventCallback<AppointmentData> AppointmentDragStart { get; set; }
+
+    [Parameter]
+    public IList<AppointmentData>? Appointments { get; set; }
+
+    async Task OnAppointmentSelect(AppointmentData data)
+    {
+        if (Scheduler != null)
+        {
+            await Scheduler.SelectAppointment(data);
+        }
+    }
+
+    public async Task OnAppointmentDragStart(AppointmentData Data)
+    {
+        await AppointmentDragStart.InvokeAsync(Data);
+    }
+
+    internal class RenderedAppointment
+    {
+        public RenderedAppointment(AppointmentData appointment)
+        {
+            this.Appointment = appointment;
+        }
+
+        public AppointmentData Appointment { get; set; }
+        // This will be the same as the appointment Start. Otherwise, if the appointment started before today, it will be equal to the parameter StartDate
+        public DateTime Start { get; set; }
+        // This will be the same as the appointment End. Otherwise, if the appointment finishes after today, it will be equal to the parameter EndDate
+        public DateTime End { get; set; }
+        public double Top { get; set; }
+        public double Height { get; set; }        
+        public double Left { get; set; }
+        public double Width { get; set; }
+        // This is used for both querying a collection of AppointmentExtended and for rendering the display
+        // A value of zero (the initial value) indicates that this appointment has not been assigned a column
+        // A value greater than zero is the actual column that this appointment has been assigned
+        public int Column { get; set; }
+    }
+}
