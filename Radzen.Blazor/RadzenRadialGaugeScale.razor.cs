@@ -181,7 +181,10 @@ namespace Radzen.Blazor
             get
             {
                 if (Gauge == null || Gauge.Width == null || Gauge.Height == null)
+                {
                     return 0;
+                }
+
                 var radius = Math.Min(Gauge.Width.Value, Gauge.Height.Value) / 2 - Margin * 2;
 
                 radius *= Radius;
@@ -204,7 +207,10 @@ namespace Radzen.Blazor
             get
             {
                 if (Gauge == null || Gauge.Width == null || Gauge.Height == null)
+                {
                     return new Point { X = 0, Y = 0 };
+                }
+
                 var x = X * Gauge.Width;
                 var y = Y * Gauge.Height;
 

@@ -320,13 +320,20 @@ namespace Radzen.Blazor
         /// </summary>
         public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
-            if (FilterOperators != null) return FilterOperators;
+            if (FilterOperators != null)
+            {
+                return FilterOperators;
+            }
 
             if (PropertyAccess.IsEnum(FilterPropertyType))
+            {
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
+            }
 
             if (PropertyAccess.IsNullableEnum(FilterPropertyType))
+            {
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull };
+            }
 
             if ((typeof(IEnumerable).IsAssignableFrom(FilterPropertyType) || typeof(IEnumerable<>).IsAssignableFrom(FilterPropertyType))
                 && FilterPropertyType != typeof(string))

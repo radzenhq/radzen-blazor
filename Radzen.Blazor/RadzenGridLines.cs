@@ -40,7 +40,9 @@ namespace Radzen.Blazor
             set
             {
                 if (value != null)
+                {
                     value.GridLines = this;
+                }
             }
         }
 

@@ -134,7 +134,10 @@ namespace Radzen.Blazor
                 .OrderByDescending(i => i.Value)
                 .ToList();
 
-            if (items.Count == 0) return;
+            if (items.Count == 0)
+            {
+                return;
+            }
 
             Squarify(items, new TreemapRect { X = 0, Y = 0, Width = Width.Value, Height = Height.Value });
 
@@ -143,7 +146,10 @@ namespace Radzen.Blazor
 
         private void Squarify(List<TreemapLayoutItem> items, TreemapRect rect)
         {
-            if (items.Count == 0) return;
+            if (items.Count == 0)
+            {
+                return;
+            }
 
             if (items.Count == 1)
             {
@@ -185,7 +191,10 @@ namespace Radzen.Blazor
 
         private double WorstAspectRatio(List<TreemapLayoutItem> row, TreemapRect rect, double totalValue)
         {
-            if (row.Count == 0 || totalValue == 0) return double.MaxValue;
+            if (row.Count == 0 || totalValue == 0)
+            {
+                return double.MaxValue;
+            }
 
             var rowSum = row.Sum(i => i.Value);
             var areaFraction = rowSum / totalValue;
@@ -196,7 +205,10 @@ namespace Radzen.Blazor
                 ? rect.Width * areaFraction
                 : rect.Height * areaFraction;
 
-            if (stripThickness == 0 || stripLength == 0) return double.MaxValue;
+            if (stripThickness == 0 || stripLength == 0)
+            {
+                return double.MaxValue;
+            }
 
             double worst = 0;
             foreach (var item in row)

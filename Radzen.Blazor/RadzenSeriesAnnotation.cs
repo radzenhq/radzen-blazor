@@ -83,7 +83,11 @@ namespace Radzen.Blazor
         /// <inheritdoc/>
         public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
         {
-            if (series == null) return _ => { };
+            if (series == null)
+            {
+                return _ => { };
+            }
+
             double x = Data != null ? series.TooltipX(Data) : 0;
             double y = Data != null ? series.TooltipY(Data) : 0;
 

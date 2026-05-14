@@ -172,7 +172,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            if (!Items.Any()) return false;
+            if (!Items.Any())
+            {
+                return false;
+            }
 
             var minY = Math.Min(TopY, TopY + AvailableHeight);
             var maxY = Math.Max(TopY, TopY + AvailableHeight);
@@ -184,11 +187,17 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override (object, Point) DataAt(double x, double y)
         {
-            if (!Contains(x, y, 0)) return (default!, new Point());
+            if (!Contains(x, y, 0))
+            {
+                return (default!, new Point());
+            }
 
             var sorted = GetSortedItems();
             var count = sorted.Count;
-            if (count == 0) return (default!, new Point());
+            if (count == 0)
+            {
+                return (default!, new Point());
+            }
 
             var fractions = GetCumulativeYFractions(sorted);
             // AvailableHeight is negative (SVG Y-axis), so yFraction still maps 0→1 correctly
@@ -251,7 +260,10 @@ namespace Radzen.Blazor
         {
             var list = new List<ChartDataLabel>();
 
-            if (Data == null || !Items.Any()) return list;
+            if (Data == null || !Items.Any())
+            {
+                return list;
+            }
 
             var sorted = GetSortedItems();
             var count = sorted.Count;

@@ -121,9 +121,20 @@ public partial class Worksheet
             {
                 var aEmpty = ca?.Value is null;
                 var bEmpty = cb?.Value is null;
-                if (aEmpty && bEmpty) return 0;
-                if (aEmpty) return 1;
-                if (bEmpty) return -1;
+                if (aEmpty && bEmpty)
+                {
+                    return 0;
+                }
+
+                if (aEmpty)
+                {
+                    return 1;
+                }
+
+                if (bEmpty)
+                {
+                    return -1;
+                }
             }
 
             int cmp = key.SortOn switch
@@ -147,9 +158,20 @@ public partial class Worksheet
             int yi = IndexInList(list, ys, key.CaseSensitive);
 
             // List members come first, in list order; non-members fall through to natural compare.
-            if (xi >= 0 && yi >= 0) return xi.CompareTo(yi);
-            if (xi >= 0) return -1;
-            if (yi >= 0) return 1;
+            if (xi >= 0 && yi >= 0)
+            {
+                return xi.CompareTo(yi);
+            }
+
+            if (xi >= 0)
+            {
+                return -1;
+            }
+
+            if (yi >= 0)
+            {
+                return 1;
+            }
             // Both outside the list — natural string compare
             return string.Compare(xs, ys, key.CaseSensitive
                 ? StringComparison.Ordinal
@@ -168,23 +190,45 @@ public partial class Worksheet
         var bMatch = string.Equals(bc, targetColor, StringComparison.OrdinalIgnoreCase);
 
         // Matching colors come first.
-        if (aMatch == bMatch) return 0;
+        if (aMatch == bMatch)
+        {
+            return 0;
+        }
+
         return aMatch ? -1 : 1;
     }
 
     private static string? ColorOf(Cell? c, bool fontColor)
     {
-        if (c is null) return null;
+        if (c is null)
+        {
+            return null;
+        }
+
         return fontColor ? c.Format.Color : c.Format.BackgroundColor;
     }
 
     private static int Compare(object? x, object? y, bool caseSensitive = false)
     {
-        if (x is null && y is null) return 0;
-        if (x is null) return 1;
-        if (y is null) return -1;
+        if (x is null && y is null)
+        {
+            return 0;
+        }
 
-        if (x is double dx && y is double dy) return dx.CompareTo(dy);
+        if (x is null)
+        {
+            return 1;
+        }
+
+        if (y is null)
+        {
+            return -1;
+        }
+
+        if (x is double dx && y is double dy)
+        {
+            return dx.CompareTo(dy);
+        }
 
         var sx = x.ToString();
         var sy = y.ToString();
@@ -197,11 +241,18 @@ public partial class Worksheet
 
     private static int IndexInList(string[] list, string? value, bool caseSensitive)
     {
-        if (value is null) return -1;
+        if (value is null)
+        {
+            return -1;
+        }
+
         var cmp = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
         for (var i = 0; i < list.Length; i++)
         {
-            if (string.Equals(list[i], value, cmp)) return i;
+            if (string.Equals(list[i], value, cmp))
+            {
+                return i;
+            }
         }
         return -1;
     }
@@ -215,7 +266,10 @@ public partial class Worksheet
     /// <param name="keyIndex">Absolute column index of the key (must be inside <paramref name="range"/>).</param>
     public void Sort(RangeRef range, SortOrder order, int keyIndex = 0)
     {
-        if (range == RangeRef.Invalid) return;
+        if (range == RangeRef.Invalid)
+        {
+            return;
+        }
 
         if (keyIndex < range.Start.Column || keyIndex > range.End.Column)
         {

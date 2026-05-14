@@ -126,7 +126,15 @@ public partial class Worksheet
 
     internal void AddImage(SheetImage image) { images.Add(image); ImagesChanged?.Invoke(); }
 
-    internal bool RemoveImage(SheetImage image) { var removed = images.Remove(image); if (removed) ImagesChanged?.Invoke(); return removed; }
+    internal bool RemoveImage(SheetImage image)
+    {
+        var removed = images.Remove(image);
+        if (removed)
+        {
+            ImagesChanged?.Invoke();
+        }
+        return removed;
+    }
 
     private readonly List<SheetChart> charts = [];
 
@@ -651,7 +659,10 @@ public partial class Worksheet
         foreach (var cell in Cells.GetPopulatedCells().ToList())
         {
             var tree = cell.FormulaSyntaxTree;
-            if (tree is null) continue;
+            if (tree is null)
+            {
+                continue;
+            }
 
             bool hasRef;
 
@@ -686,7 +697,11 @@ public partial class Worksheet
                 var rebuilt = new StringBuilder();
                 foreach (var t in tokens)
                 {
-                    if (t.Type == FormulaTokenType.None) break;
+                    if (t.Type == FormulaTokenType.None)
+                    {
+                        break;
+                    }
+
                     rebuilt.Append(t.Value);
                 }
                 cell.Formula = rebuilt.ToString();

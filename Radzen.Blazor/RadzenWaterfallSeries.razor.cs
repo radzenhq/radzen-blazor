@@ -190,7 +190,10 @@ namespace Radzen.Blazor
         {
             var style = base.TooltipStyle(item);
             var index = Items.IndexOf(item);
-            if (index < 0) return style;
+            if (index < 0)
+            {
+                return style;
+            }
 
             var wfItems = ComputeWaterfallItems();
             var wf = wfItems[index];
@@ -224,7 +227,10 @@ namespace Radzen.Blazor
         {
             var chart = RequireChart();
             var index = Items.IndexOf(item);
-            if (index < 0) return 0;
+            if (index < 0)
+            {
+                return 0;
+            }
 
             var wfItems = ComputeWaterfallItems();
             var wf = wfItems[index];
@@ -241,7 +247,10 @@ namespace Radzen.Blazor
         public override (object, Point) DataAt(double x, double y)
         {
             var chart = Chart;
-            if (chart == null) return (default!, new Point());
+            if (chart == null)
+            {
+                return (default!, new Point());
+            }
 
             var category = ComposeCategory(chart.CategoryScale);
             var columnSeries = VisibleColumnSeries;

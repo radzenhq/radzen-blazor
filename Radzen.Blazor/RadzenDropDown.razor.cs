@@ -198,7 +198,9 @@ namespace Radzen.Blazor
         protected override async Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
+            {
                 return;
+            }
 
             if (!isOpen)
             {

@@ -230,7 +230,11 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Upload()
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple, false, ParameterName);
         }
 
@@ -413,7 +417,10 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromUpload", Reference, file.Name, Name ?? GetId());
             }
 
-            if (fireChangeEvent) await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
+            if (fireChangeEvent)
+            {
+                await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
+            }
         }
 
         /// <summary>

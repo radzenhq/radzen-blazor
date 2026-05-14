@@ -489,7 +489,9 @@ namespace Radzen
             var filterList = filters as ICollection<FilterDescriptor> ?? filters.ToList();
 
             if (filterList.Count == 0)
+            {
                 return source;
+            }
 
             var parameter = Expression.Parameter(typeof(T), "x");
             Expression? combinedExpression = null;
@@ -497,7 +499,10 @@ namespace Radzen
             foreach (var filter in filterList)
             {
                 var expression = GetExpression<T>(parameter, filter, filterCaseSensitivity, filter.Type ?? typeof(object));
-                if (expression == null) continue;
+                if (expression == null)
+                {
+                    continue;
+                }
 
                 combinedExpression = combinedExpression == null
                     ? expression
@@ -507,7 +512,9 @@ namespace Radzen
             }
 
             if (combinedExpression == null)
+            {
                 return source;
+            }
 
             var lambda = Expression.Lambda<Func<T, bool>>(combinedExpression!, parameter);
 
@@ -518,7 +525,10 @@ namespace Radzen
         internal static Expression GetNestedPropertyExpression(Expression expression, string property, Type? type = null)
         {
             ArgumentNullException.ThrowIfNull(expression);
-            if (string.IsNullOrWhiteSpace(property)) return Expression.Constant(null, typeof(object));
+            if (string.IsNullOrWhiteSpace(property))
+            {
+                return Expression.Constant(null, typeof(object));
+            }
 
             var parts = property.Split(separator, 2);
             var currentPart = parts[0];
@@ -557,7 +567,9 @@ namespace Radzen
                             .FirstOrDefault(i => i.GetProperty(memberName) != null);
 
                     if (declaring == null)
+                    {
                         throw new InvalidOperationException($"Member '{memberName}' not found on interface '{t}'.");
+                    }
 
                     return Expression.Property(instance, declaring, memberName);
                 }
@@ -569,10 +581,16 @@ namespace Radzen
                 catch (AmbiguousMatchException)
                 {
                     var prop = t.GetProperty(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                    if (prop != null) return Expression.Property(instance, prop);
+                    if (prop != null)
+                    {
+                        return Expression.Property(instance, prop);
+                    }
 
                     var field = t.GetField(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                    if (field != null) return Expression.Field(instance, field);
+                    if (field != null)
+                    {
+                        return Expression.Field(instance, field);
+                    }
 
                     throw;
                 }
@@ -635,7 +653,9 @@ namespace Radzen
                 collection = shouldNullPropagate ? NullPropagate(expression, collection) : collection;
 
                 if (!int.TryParse(indexString, out var index))
+                {
                     throw new ArgumentException($"Invalid index format: {indexString}");
+                }
 
                 var underlyingCollection = Nullable.GetUnderlyingType(collection.Type) != null
                     ? Expression.Property(collection, "Value")
@@ -650,7 +670,9 @@ namespace Radzen
                 {
                     var itemProp = underlyingCollection.Type.GetProperty("Item");
                     if (itemProp == null)
+                    {
                         throw new InvalidOperationException($"Type '{underlyingCollection.Type}' has no indexer 'Item'.");
+                    }
 
                     indexed = Expression.Property(underlyingCollection, itemProp, Expression.Constant(index));
                 }
@@ -664,7 +686,9 @@ namespace Radzen
             }
 
             if (parts.Length > 1)
+            {
                 return GetNestedPropertyExpression(member, parts[1], type);
+            }
 
             return member;
         }
@@ -977,7 +1001,10 @@ namespace Radzen
                     foreach (var filter in filters)
                     {
                         var expression = GetExpression<T>(parameter, filter, gridFilterCaseSensitivity, filter.Type ?? typeof(object));
-                        if (expression == null) continue;
+                        if (expression == null)
+                        {
+                            continue;
+                        }
 
                         combinedExpression = combinedExpression == null
                             ? expression
@@ -1212,9 +1239,21 @@ namespace Radzen
 
                 Func<object, string> formatElement = item =>
                 {
-                    if (item is DateTimeOffset dto) return dto.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
-                    if (item is DateTime dt) return dt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
-                    if (item is DateOnly d) return d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    if (item is DateTimeOffset dto)
+                    {
+                        return dto.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
+                    }
+
+                    if (item is DateTime dt)
+                    {
+                        return dt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
+                    }
+
+                    if (item is DateOnly d)
+                    {
+                        return d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    }
+
                     return item?.ToString() ?? "";
                 };
 
@@ -1790,7 +1829,10 @@ namespace Radzen
 
                 var propertyExpression = GetNestedPropertyExpression(parameter, filter.Property);
 
-                if (propertyExpression == null) return;
+                if (propertyExpression == null)
+                {
+                    return;
+                }
 
                 var filterPropertyType = filter.Type ?? propertyExpression.Type;
 
@@ -1837,7 +1879,9 @@ namespace Radzen
                 else
                 {
                     if (IsEnumerable(filterPropertyType) && filterPropertyType != typeof(string))
+                    {
                         return;
+                    }
 
                     var value = $"{filter.FilterValue}";
 

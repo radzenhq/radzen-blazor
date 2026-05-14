@@ -69,11 +69,15 @@ namespace Radzen.Blazor
         public string GetInitials()
         {
             if (string.IsNullOrWhiteSpace(Name))
+            {
                 return "?";
+            }
 
             var parts = Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 1)
+            {
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper(CultureInfo.InvariantCulture);
+            }
 
             return (parts[0].Substring(0, 1) + parts[1].Substring(0, 1)).ToUpper(CultureInfo.InvariantCulture);
         }
@@ -441,11 +445,15 @@ namespace Radzen.Blazor
         public async Task SendMessage(string content, string? userId = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
+            {
                 return;
+            }
 
             var senderId = userId ?? CurrentUserId;
             if (string.IsNullOrEmpty(senderId))
+            {
                 return;
+            }
 
             // Add message
             var message = await AddMessage(content, senderId);

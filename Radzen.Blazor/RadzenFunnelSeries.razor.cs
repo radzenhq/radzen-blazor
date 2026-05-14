@@ -144,7 +144,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            if (!Items.Any()) return false;
+            if (!Items.Any())
+            {
+                return false;
+            }
 
             return x >= CenterX - AvailableWidth / 2 && x <= CenterX + AvailableWidth / 2
                 && y >= TopY && y <= TopY + AvailableHeight;
@@ -153,11 +156,17 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override (object, Point) DataAt(double x, double y)
         {
-            if (!Contains(x, y, 0)) return (default!, new Point());
+            if (!Contains(x, y, 0))
+            {
+                return (default!, new Point());
+            }
 
             var orderedItems = GetOrderedItems();
             var count = orderedItems.Count;
-            if (count == 0) return (default!, new Point());
+            if (count == 0)
+            {
+                return (default!, new Point());
+            }
 
             var segHeight = AvailableHeight / count;
             var index = (int)((y - TopY) / segHeight);
@@ -210,7 +219,10 @@ namespace Radzen.Blazor
         {
             var list = new List<ChartDataLabel>();
 
-            if (Data == null || !Items.Any()) return list;
+            if (Data == null || !Items.Any())
+            {
+                return list;
+            }
 
             var orderedItems = GetOrderedItems();
             var count = orderedItems.Count;

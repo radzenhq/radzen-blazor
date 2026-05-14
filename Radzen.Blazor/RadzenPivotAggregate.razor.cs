@@ -65,7 +65,9 @@ namespace Radzen.Blazor
         public string? FormatValue(object value)
         {
             if (value == null)
+            {
                 return "";
+            }
 
             if (!string.IsNullOrEmpty(FormatString))
             {

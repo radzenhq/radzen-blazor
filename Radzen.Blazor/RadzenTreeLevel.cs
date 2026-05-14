@@ -113,7 +113,10 @@ namespace Radzen.Blazor
             set
             {
                 if (value != null)
+                {
                     value.AddLevel(this);
+                }
+
                 _tree = value;
             }
         }

@@ -80,7 +80,9 @@ public class MD5
             // copy the input to M
             uint[] M = new uint[16];
             for (int j = 0; j < 16; ++j)
+            {
                 M[j] = BitConverter.ToUInt32(processedInput, (i * 64) + (j * 4));
+            }
 
             // initialize round variables
             uint A = a0, B = b0, C = c0, D = d0, F = 0, g = 0;

@@ -492,7 +492,11 @@ static class NumberFormatParser
     {
         var i = start;
         var lower = char.ToLowerInvariant(c);
-        while (i < s.Length && char.ToLowerInvariant(s[i]) == lower) i++;
+        while (i < s.Length && char.ToLowerInvariant(s[i]) == lower)
+        {
+            i++;
+        }
+
         return i - start;
     }
 

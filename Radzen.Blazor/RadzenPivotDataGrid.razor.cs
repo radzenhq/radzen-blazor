@@ -584,7 +584,9 @@ namespace Radzen.Blazor
         {
             var root = new ColumnHeaderNode { Level = 0, Title = null };
             if (pivotColumns.Count == 0 || Data == null)
+            {
                 return root;
+            }
 
             BuildColumnHeaderTreeRecursive(root, PagedView, 0, new List<object>());
 
@@ -594,7 +596,9 @@ namespace Radzen.Blazor
         void BuildColumnHeaderTreeRecursive(ColumnHeaderNode node, IQueryable<TItem> items, int level, List<object> path)
         {
             if (level >= pivotColumns.Count)
+            {
                 return;
+            }
 
             var col = pivotColumns[level];
 
@@ -635,7 +639,10 @@ namespace Radzen.Blazor
             var rows = new List<List<ColumnHeaderCell>>();
             int maxLevel = pivotColumns.Count;
             for (int i = 0; i < maxLevel; i++)
+            {
                 rows.Add(new List<ColumnHeaderCell>());
+            }
+
             FlattenColumnHeaderTreeRecursive(root, rows, 0, maxLevel);
             return rows;
         }
@@ -679,7 +686,11 @@ namespace Radzen.Blazor
 
         int GetLeafCount(ColumnHeaderNode node)
         {
-            if (node.Children.Count == 0) return 1;
+            if (node.Children.Count == 0)
+            {
+                return 1;
+            }
+
             return node.Children.Sum(GetLeafCount);
         }
 
@@ -1174,7 +1185,9 @@ namespace Radzen.Blazor
         private IQueryable<TItem> GetRowItems(PivotBodyRow pivotRow)
         {
             if (Data == null || pivotRows.Count == 0)
+            {
                 return Enumerable.Empty<TItem>().AsQueryable();
+            }
 
             var items = PagedView;
 
@@ -1206,7 +1219,10 @@ namespace Radzen.Blazor
         /// <param name="pathKey">The path key identifying the column group.</param>
         public async Task ToggleColumnDrillDown(string pathKey)
         {
-            if (!AllowDrillDown) return;
+            if (!AllowDrillDown)
+            {
+                return;
+            }
 
             if (_collapsedColumnGroups.TryGetValue(pathKey, out var isCollapsed))
             {
@@ -1231,7 +1247,10 @@ namespace Radzen.Blazor
         /// <param name="pathKey">The path key identifying the row group.</param>
         public async Task ToggleRowDrillDown(string pathKey)
         {
-            if (!AllowDrillDown) return;
+            if (!AllowDrillDown)
+            {
+                return;
+            }
 
             if (_collapsedRowGroups.TryGetValue(pathKey, out var isRowCollapsed))
             {
@@ -1262,7 +1281,9 @@ namespace Radzen.Blazor
             ArgumentNullException.ThrowIfNull(aggregate);
 
             if (items == null || !items.Any())
+            {
                 return null;
+            }
 
             if (isCollapsed)
             {
@@ -1285,7 +1306,9 @@ namespace Radzen.Blazor
             ArgumentNullException.ThrowIfNull(aggregate);
 
             if (items == null || !items.Any())
+            {
                 return null;
+            }
 
             try
             {
@@ -1359,7 +1382,9 @@ namespace Radzen.Blazor
         {
             var root = new RowHeaderNode { Level = 0, Title = null };
             if (pivotRows.Count == 0 || Data == null)
+            {
                 return root;
+            }
 
             BuildRowHeaderTreeRecursive(root, PagedView, 0, new List<object>());
 
@@ -1384,7 +1409,11 @@ namespace Radzen.Blazor
             {
                 static double? ToSortKey(object? value)
                 {
-                    if (value == null) return null;
+                    if (value == null)
+                    {
+                        return null;
+                    }
+
                     try { return Convert.ToDouble(value, System.Globalization.CultureInfo.InvariantCulture); } catch { return null; }
                 }
 
@@ -1564,15 +1593,21 @@ namespace Radzen.Blazor
         // Helper for row header cell rowspan
         private int GetLeafCount(RowHeaderNode node)
         {
-            if (node.Children.Count == 0) return 1;
+            if (node.Children.Count == 0)
+            {
+                return 1;
+            }
+
             return node.Children.Sum(GetLeafCount);
         }
 
         private string? GetWidthForColumnPath(List<object> colPath)
         {
             if (colPath.Count == 0 || pivotColumns.Count == 0)
+            {
                 return null;
-            
+            }
+
             // For now, return the width of the first column
             // In a more complex implementation, you might want to calculate based on the path
             return pivotColumns[0].Width;
@@ -1804,7 +1839,9 @@ namespace Radzen.Blazor
         private async Task ToggleFilter(RadzenPivotField<TItem> field, string filterIconRefKey)
         {
             if (field == null || !AllowFiltering || !field.Filterable)
+            {
                 return;
+            }
 
             currentFilterField = field;
             StateHasChanged();
@@ -1823,7 +1860,9 @@ namespace Radzen.Blazor
         private static Type GetFilterPropertyType(RadzenPivotField<TItem> field)
         {
             if (field == null || string.IsNullOrEmpty(field.Property))
+            {
                 return typeof(string);
+            }
 
             return PropertyAccess.GetPropertyType(typeof(TItem), field.Property) ?? typeof(string);
         }
@@ -1908,7 +1947,9 @@ namespace Radzen.Blazor
         private static bool CanSetFilterValue(RadzenPivotField<TItem> field, bool isFirst = true)
         {
             if (field == null)
+            {
                 return false;
+            }
 
             var filterOperator = isFirst ? field.GetFilterOperator() : field.GetSecondFilterOperator();
             return filterOperator != FilterOperator.IsNull && filterOperator != FilterOperator.IsNotNull;
@@ -2121,11 +2162,17 @@ namespace Radzen.Blazor
         {
             var propertyType = GetFilterPropertyType(field);
             if (PropertyAccess.IsDateOnly(propertyType))
+            {
                 return "yyyy-MM-dd";
+            }
             else if (PropertyAccess.IsDate(propertyType))
+            {
                 return "yyyy-MM-dd HH:mm";
+            }
             else
+            {
                 return "yyyy-MM-dd";
+            }
         }
 
         /// <summary>

@@ -50,7 +50,10 @@ namespace Radzen.Blazor
             foreach (var link in computedLinks)
             {
                 if (link.SourceNode == null || link.TargetNode == null)
+                {
                     continue;
+                }
+
                 link.SourceNode.SourceLinks.Add(link);
                 link.TargetNode.TargetLinks.Add(link);
             }
@@ -123,7 +126,9 @@ namespace Radzen.Blazor
                     else
                     {
                         if (target != null)
+                        {
                             target.Layer = Math.Max(target.Layer, node.Layer + 1);
+                        }
                     }
                 }
             }
@@ -229,8 +234,11 @@ namespace Radzen.Blazor
 
         private void InitializeNodeDepths(List<ComputedSankeyNode> nodes)
         {
-            if (nodes.Count == 0) return;
-            
+            if (nodes.Count == 0)
+            {
+                return;
+            }
+
             var totalValue = nodes.Sum(n => n.ComputedValue);
             var totalPadding = Math.Max(0, (nodes.Count - 1) * NodePadding);
             var availableHeight = Math.Max(1, Height - totalPadding);
@@ -456,7 +464,10 @@ namespace Radzen.Blazor
             foreach (var link in links)
             {
                 if (link.SourceNode == null || link.TargetNode == null)
+                {
                     continue;
+                }
+
                 var x0 = link.SourceNode.X + link.SourceNode.Width;
                 var x1 = link.TargetNode.X;
                 var y0 = link.SourceNode.Y + link.Y0;

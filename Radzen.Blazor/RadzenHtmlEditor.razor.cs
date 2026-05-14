@@ -303,7 +303,11 @@ namespace Radzen.Blazor
         /// <param name="value">The value.</param>
         public async Task ExecuteCommandAsync(string name, string? value = null)
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.execCommand", ContentEditable, name, value);
 
             await OnExecuteAsync(name);
@@ -402,7 +406,11 @@ namespace Radzen.Blazor
         /// </summary>
         public ValueTask<HtmlEditorTableSelection> GetTableSelectionAsync()
         {
-            if (JSRuntime == null) return ValueTask.FromResult(new HtmlEditorTableSelection());
+            if (JSRuntime == null)
+            {
+                return ValueTask.FromResult(new HtmlEditorTableSelection());
+            }
+
             return JSRuntime.InvokeAsync<HtmlEditorTableSelection>("Radzen.getTableSelection", ContentEditable);
         }
 
@@ -413,7 +421,10 @@ namespace Radzen.Blazor
         /// <param name="value">Optional table command arguments.</param>
         public async Task ExecuteTableCommandAsync(string name, HtmlEditorTableCommandArgs? value = null)
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
 
             value ??= new HtmlEditorTableCommandArgs();
             value.DefaultColumnHeader ??= TableStrings.DefaultColumnHeader;
@@ -442,7 +453,11 @@ namespace Radzen.Blazor
 
         async Task UpdateCommandState()
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.queryCommands", ContentEditable);
 
             await UpdateTableSelectionAsync();
@@ -495,7 +510,11 @@ namespace Radzen.Blazor
         /// <returns>A task that represents the asynchronous operation, returning the attributes as an object of type T.</returns>
         public ValueTask<T> GetSelectionAttributes<T>(string selector, string[] attributes)
         {
-            if (JSRuntime == null) return ValueTask.FromResult<T>(default!);
+            if (JSRuntime == null)
+            {
+                return ValueTask.FromResult<T>(default!);
+            }
+
             return JSRuntime.InvokeAsync<T>("Radzen.selectionAttributes", selector, attributes, ContentEditable);
         }
 

@@ -374,7 +374,10 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenCarousel.OnScroll")]
         public async Task OnScroll(int index)
         {
-            if (!AllowScroll) return;
+            if (!AllowScroll)
+            {
+                return;
+            }
 
             if (index >= 0 && index <= items.Count - 1 && selectedIndex != index)
             {
@@ -436,7 +439,10 @@ namespace Radzen.Blazor
 
         void OnTouchStart(TouchEventArgs args)
         {
-            if (!AllowScroll) return;
+            if (!AllowScroll)
+            {
+                return;
+            }
 
             x = args.Touches[0].ClientX;
             y = args.Touches[0].ClientY;

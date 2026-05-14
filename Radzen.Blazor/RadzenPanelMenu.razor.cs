@@ -167,7 +167,11 @@ namespace Radzen.Blazor
                     focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
                 }
 
-                if (JSRuntime == null) return;
+                if (JSRuntime == null)
+                {
+                    return;
+                }
+
                 try
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);

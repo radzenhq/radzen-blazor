@@ -48,7 +48,9 @@ namespace Radzen.Blazor
             enumVal ??= enumValueAsString;
 
             if (translationFunction != null)
+            {
                 return translationFunction(enumVal);
+            }
 
             return enumVal;
         }

@@ -189,7 +189,11 @@ namespace Radzen.Blazor
 
         internal double? GetCrossesAtValue()
         {
-            if (CrossesAt == null) return null;
+            if (CrossesAt == null)
+            {
+                return null;
+            }
+
             return Convert.ToDouble(CrossesAt, CultureInfo.InvariantCulture);
         }
 

@@ -156,7 +156,10 @@ namespace Radzen.Blazor
             get
             {
                 var barSeries = VisibleBarSeries;
-                if (barSeries.Count == 0) return 0;
+                if (barSeries.Count == 0)
+                {
+                    return 0;
+                }
 
                 var chart = RequireChart();
                 var barOptions = chart.BarOptions;
@@ -221,7 +224,10 @@ namespace Radzen.Blazor
             var category = ComposeCategory(chart.ValueScale);
             var barSeries = VisibleBarSeries;
             var index = barSeries.IndexOf(this);
-            if (barSeries.Count == 0 || index < 0) return 0;
+            if (barSeries.Count == 0 || index < 0)
+            {
+                return 0;
+            }
 
             var padding = chart.BarOptions?.Margin ?? 0;
             var bandHeight = BandHeight;
@@ -241,12 +247,18 @@ namespace Radzen.Blazor
         public override (object, Point) DataAt(double x, double y)
         {
             var chart = Chart;
-            if (chart == null) return (default!, new Point());
+            if (chart == null)
+            {
+                return (default!, new Point());
+            }
 
             var category = ComposeCategory(chart.ValueScale);
             var barSeries = VisibleBarSeries;
             var index = barSeries.IndexOf(this);
-            if (barSeries.Count == 0 || index < 0) return (default!, new Point());
+            if (barSeries.Count == 0 || index < 0)
+            {
+                return (default!, new Point());
+            }
 
             var padding = chart.BarOptions?.Margin ?? 0;
             var bandHeight = BandHeight;

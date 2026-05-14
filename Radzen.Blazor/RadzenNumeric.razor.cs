@@ -278,7 +278,9 @@ namespace Radzen.Blazor
             }
 
             if(object.Equals(newValue, Value))
+            {
                 return;
+            }
 
             Value = newValue!;
 
@@ -457,7 +459,10 @@ namespace Radzen.Blazor
 
         private static string NormalizeDigits(string input)
         {
-            if (string.IsNullOrEmpty(input)) return input;
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
 
             var sb = new System.Text.StringBuilder(input.Length);
             foreach (var ch in input)
@@ -544,9 +549,15 @@ namespace Radzen.Blazor
             if (newValue is IComparable<decimal> c)
             {
                 if (Max != null && c.CompareTo(Max.Value) > 0)
+                {
                     return ConvertFromDecimal(Max.Value);
+                }
+
                 if (Min != null && c.CompareTo(Min.Value) < 0)
+                {
                     return ConvertFromDecimal(Min.Value);
+                }
+
                 return newValue;
             }
 
@@ -575,7 +586,9 @@ namespace Radzen.Blazor
         private decimal ConvertToDecimal(TValue? input)
         {
             if (input == null)
+            {
                 return default;
+            }
 
             var converter = TypeDescriptor.GetConverter(typeof(TValue));
             if (converter.CanConvertTo(typeof(decimal)))
@@ -597,7 +610,9 @@ namespace Radzen.Blazor
         private TValue? ConvertFromDecimal(decimal? input)
         {
             if (input == null)
+            {
                 return default(TValue?);
+            }
 
             var converter = TypeDescriptor.GetConverter(typeof(TValue));
             if (converter.CanConvertFrom(typeof(decimal)))

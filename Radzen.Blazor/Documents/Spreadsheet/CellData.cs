@@ -435,7 +435,9 @@ public class CellData : IComparable, IComparable<CellData>
     {
         ArgumentNullException.ThrowIfNull(other);
         if (Value is null || other.Value is null)
+        {
             return false;
+        }
 
         var compareResult = ((IComparable)Value).CompareTo(other.Value);
         return compareResult < 0;
@@ -449,7 +451,9 @@ public class CellData : IComparable, IComparable<CellData>
     {
         ArgumentNullException.ThrowIfNull(other);
         if (Value is null || other.Value is null)
+        {
             return false;
+        }
 
         var compareResult = ((IComparable)Value).CompareTo(other.Value);
         return compareResult > 0;
@@ -463,7 +467,9 @@ public class CellData : IComparable, IComparable<CellData>
     {
         ArgumentNullException.ThrowIfNull(other);
         if (Value is null || other.Value is null)
+        {
             return false;
+        }
 
         var compareResult = ((IComparable)Value).CompareTo(other.Value);
         return compareResult <= 0;
@@ -477,7 +483,9 @@ public class CellData : IComparable, IComparable<CellData>
     {
         ArgumentNullException.ThrowIfNull(other);
         if (Value is null || other.Value is null)
+        {
             return false;
+        }
 
         var compareResult = ((IComparable)Value).CompareTo(other.Value);
         return compareResult >= 0;

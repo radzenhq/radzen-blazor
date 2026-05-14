@@ -34,7 +34,9 @@ public class RadzenFlexComponent : RadzenComponentWithChildren
         var sb = new StringBuilder();
 
         if (value == null)
+        {
             return string.Empty;
+        }
 
         foreach (var ch in value)
         {

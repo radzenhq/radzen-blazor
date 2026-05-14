@@ -102,7 +102,10 @@ class XlsxWriter(Workbook sourceWorkbook)
         {
             var tableStyleInfoElement = new XElement(ns + "tableStyleInfo");
             if (table.TableStyle is not null)
+            {
                 tableStyleInfoElement.Add(new XAttribute("name", table.TableStyle));
+            }
+
             tableStyleInfoElement.Add(new XAttribute("showFirstColumn", table.HighlightFirstColumn ? "1" : "0"));
             tableStyleInfoElement.Add(new XAttribute("showLastColumn", table.HighlightLastColumn ? "1" : "0"));
             tableStyleInfoElement.Add(new XAttribute("showRowStripes", table.ShowBandedRows ? "1" : "0"));
@@ -1111,12 +1114,20 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid));
 
         var sheetPr = CreateSheetProperties(sheet);
-        if (sheetPr is not null) worksheet.Add(sheetPr);
+        if (sheetPr is not null)
+        {
+            worksheet.Add(sheetPr);
+        }
+
         worksheet.Add(CreateDimension(sheet));
         worksheet.Add(CreateSheetViews(sheet));
         worksheet.Add(CreateSheetFormatPr());
         var cols = CreateColumns(sheet);
-        if (cols is not null) worksheet.Add(cols);
+        if (cols is not null)
+        {
+            worksheet.Add(cols);
+        }
+
         worksheet.Add(new XElement(ns + "sheetData"));
 
         return new XDocument(worksheet);
@@ -1246,10 +1257,16 @@ class XlsxWriter(Workbook sourceWorkbook)
             {
                 for (var c = range.Start.Column; c <= range.End.Column; c++)
                 {
-                    if (r == range.Start.Row && c == range.Start.Column) continue;
+                    if (r == range.Start.Row && c == range.Start.Column)
+                    {
+                        continue;
+                    }
 
                     var rowDict = EnsureRow(r);
-                    if (rowDict.ContainsKey(c)) continue;
+                    if (rowDict.ContainsKey(c))
+                    {
+                        continue;
+                    }
 
                     var placeholder = new XElement(XName.Get("c", ns),
                         new XAttribute("r", new CellRef(r, c).ToString()));
@@ -1263,8 +1280,15 @@ class XlsxWriter(Workbook sourceWorkbook)
         }
 
         // 3. Rows with custom height or hidden state but no cells.
-        foreach (var rowIndex in sheet.Rows.GetCustomSizedIndices()) EnsureRow(rowIndex);
-        foreach (var rowIndex in sheet.Rows.GetHiddenIndices()) EnsureRow(rowIndex);
+        foreach (var rowIndex in sheet.Rows.GetCustomSizedIndices())
+        {
+            EnsureRow(rowIndex);
+        }
+
+        foreach (var rowIndex in sheet.Rows.GetHiddenIndices())
+        {
+            EnsureRow(rowIndex);
+        }
 
         // 4. Emit.
         foreach (var (row, rowDict) in rowMap)
@@ -1905,7 +1929,10 @@ class XlsxWriter(Workbook sourceWorkbook)
         {
             var colId = topCriterion.Column - autoFilterRange.Start.Column;
             if (colId < 0 || colId > autoFilterRange.End.Column - autoFilterRange.Start.Column)
+            {
                 return null;
+            }
+
             return new XElement(ns + "filterColumn",
                 new XAttribute("colId", colId),
                 new XElement(ns + "top10",
@@ -1918,7 +1945,10 @@ class XlsxWriter(Workbook sourceWorkbook)
         {
             var colId = dynCriterion.Column - autoFilterRange.Start.Column;
             if (colId < 0 || colId > autoFilterRange.End.Column - autoFilterRange.Start.Column)
+            {
                 return null;
+            }
+
             return new XElement(ns + "filterColumn",
                 new XAttribute("colId", colId),
                 new XElement(ns + "dynamicFilter",
@@ -1929,7 +1959,9 @@ class XlsxWriter(Workbook sourceWorkbook)
         {
             var colId = colorCriterion.Column - autoFilterRange.Start.Column;
             if (colId < 0 || colId > autoFilterRange.End.Column - autoFilterRange.Start.Column)
+            {
                 return null;
+            }
             // Color filters in OOXML reference a dxfId in styles.xml's <dxfs> block.
             // We don't yet write dxfs, so encode the color + kind in a custom data attribute
             // we recognize on read. Excel itself ignores unknown attributes and falls back to
@@ -2172,12 +2204,36 @@ class XlsxWriter(Workbook sourceWorkbook)
         {
             var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
             var wpElement = new XElement(XName.Get("workbookProtection", ns));
-            if (wp.LockStructure) wpElement.Add(new XAttribute("lockStructure", "1"));
-            if (wp.PasswordHash is not null) wpElement.Add(new XAttribute("workbookPassword", wp.PasswordHash));
-            if (wp.AlgorithmName is not null) wpElement.Add(new XAttribute("workbookAlgorithmName", wp.AlgorithmName));
-            if (wp.HashValue is not null) wpElement.Add(new XAttribute("workbookHashValue", wp.HashValue));
-            if (wp.SaltValue is not null) wpElement.Add(new XAttribute("workbookSaltValue", wp.SaltValue));
-            if (wp.SpinCount is not null) wpElement.Add(new XAttribute("workbookSpinCount", wp.SpinCount.Value.ToString(CultureInfo.InvariantCulture)));
+            if (wp.LockStructure)
+            {
+                wpElement.Add(new XAttribute("lockStructure", "1"));
+            }
+
+            if (wp.PasswordHash is not null)
+            {
+                wpElement.Add(new XAttribute("workbookPassword", wp.PasswordHash));
+            }
+
+            if (wp.AlgorithmName is not null)
+            {
+                wpElement.Add(new XAttribute("workbookAlgorithmName", wp.AlgorithmName));
+            }
+
+            if (wp.HashValue is not null)
+            {
+                wpElement.Add(new XAttribute("workbookHashValue", wp.HashValue));
+            }
+
+            if (wp.SaltValue is not null)
+            {
+                wpElement.Add(new XAttribute("workbookSaltValue", wp.SaltValue));
+            }
+
+            if (wp.SpinCount is not null)
+            {
+                wpElement.Add(new XAttribute("workbookSpinCount", wp.SpinCount.Value.ToString(CultureInfo.InvariantCulture)));
+            }
+
             sheetsElement.AddBeforeSelf(wpElement);
         }
 
@@ -2196,30 +2252,98 @@ class XlsxWriter(Workbook sourceWorkbook)
         var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         var element = new XElement(XName.Get("sheetProtection", ns));
 
-        if (p.IsProtected) element.Add(new XAttribute("sheet", "1"));
+        if (p.IsProtected)
+        {
+            element.Add(new XAttribute("sheet", "1"));
+        }
 
         // XLSX: attribute absent or "1" = forbidden; write "0" to allow
-        if (p.AllowFormatCells) element.Add(new XAttribute("formatCells", "0"));
-        if (p.AllowFormatRows) element.Add(new XAttribute("formatRows", "0"));
-        if (p.AllowFormatColumns) element.Add(new XAttribute("formatColumns", "0"));
-        if (p.AllowInsertColumns) element.Add(new XAttribute("insertColumns", "0"));
-        if (p.AllowInsertRows) element.Add(new XAttribute("insertRows", "0"));
-        if (p.AllowInsertHyperlinks) element.Add(new XAttribute("insertHyperlinks", "0"));
-        if (p.AllowDeleteColumns) element.Add(new XAttribute("deleteColumns", "0"));
-        if (p.AllowDeleteRows) element.Add(new XAttribute("deleteRows", "0"));
-        if (p.AllowSort) element.Add(new XAttribute("sort", "0"));
-        if (p.AllowAutoFilter) element.Add(new XAttribute("autoFilter", "0"));
+        if (p.AllowFormatCells)
+        {
+            element.Add(new XAttribute("formatCells", "0"));
+        }
+
+        if (p.AllowFormatRows)
+        {
+            element.Add(new XAttribute("formatRows", "0"));
+        }
+
+        if (p.AllowFormatColumns)
+        {
+            element.Add(new XAttribute("formatColumns", "0"));
+        }
+
+        if (p.AllowInsertColumns)
+        {
+            element.Add(new XAttribute("insertColumns", "0"));
+        }
+
+        if (p.AllowInsertRows)
+        {
+            element.Add(new XAttribute("insertRows", "0"));
+        }
+
+        if (p.AllowInsertHyperlinks)
+        {
+            element.Add(new XAttribute("insertHyperlinks", "0"));
+        }
+
+        if (p.AllowDeleteColumns)
+        {
+            element.Add(new XAttribute("deleteColumns", "0"));
+        }
+
+        if (p.AllowDeleteRows)
+        {
+            element.Add(new XAttribute("deleteRows", "0"));
+        }
+
+        if (p.AllowSort)
+        {
+            element.Add(new XAttribute("sort", "0"));
+        }
+
+        if (p.AllowAutoFilter)
+        {
+            element.Add(new XAttribute("autoFilter", "0"));
+        }
 
         // selectLockedCells/selectUnlockedCells: write "1" if forbidden
-        if (!p.AllowSelectLockedCells) element.Add(new XAttribute("selectLockedCells", "1"));
-        if (!p.AllowSelectUnlockedCells) element.Add(new XAttribute("selectUnlockedCells", "1"));
+        if (!p.AllowSelectLockedCells)
+        {
+            element.Add(new XAttribute("selectLockedCells", "1"));
+        }
+
+        if (!p.AllowSelectUnlockedCells)
+        {
+            element.Add(new XAttribute("selectUnlockedCells", "1"));
+        }
 
         // Password hashes
-        if (p.PasswordHash is not null) element.Add(new XAttribute("password", p.PasswordHash));
-        if (p.AlgorithmName is not null) element.Add(new XAttribute("algorithmName", p.AlgorithmName));
-        if (p.HashValue is not null) element.Add(new XAttribute("hashValue", p.HashValue));
-        if (p.SaltValue is not null) element.Add(new XAttribute("saltValue", p.SaltValue));
-        if (p.SpinCount is not null) element.Add(new XAttribute("spinCount", p.SpinCount.Value.ToString(CultureInfo.InvariantCulture)));
+        if (p.PasswordHash is not null)
+        {
+            element.Add(new XAttribute("password", p.PasswordHash));
+        }
+
+        if (p.AlgorithmName is not null)
+        {
+            element.Add(new XAttribute("algorithmName", p.AlgorithmName));
+        }
+
+        if (p.HashValue is not null)
+        {
+            element.Add(new XAttribute("hashValue", p.HashValue));
+        }
+
+        if (p.SaltValue is not null)
+        {
+            element.Add(new XAttribute("saltValue", p.SaltValue));
+        }
+
+        if (p.SpinCount is not null)
+        {
+            element.Add(new XAttribute("spinCount", p.SpinCount.Value.ToString(CultureInfo.InvariantCulture)));
+        }
 
         // Insert after sheetData per ECMA-376 element order
         var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", ns));

@@ -416,11 +416,19 @@ namespace Radzen.Blazor
                     if (axis.Logarithmic)
                     {
                         var s = new LogarithmicScale { Base = axis.LogarithmicBase };
-                        if (output != null) s.Output = output;
+                        if (output != null)
+                        {
+                            s.Output = output;
+                        }
+
                         return s;
                     }
                     var ls = new LinearScale();
-                    if (output != null) ls.Output = output;
+                    if (output != null)
+                    {
+                        ls.Output = output;
+                    }
+
                     return ls;
                 }
 
@@ -718,9 +726,17 @@ namespace Radzen.Blazor
             double? bestX = null;
             foreach (var series in Series)
             {
-                if (!series.Visible) continue;
+                if (!series.Visible)
+                {
+                    continue;
+                }
+
                 var (data, point) = series.DataAt(plotLocalCursorX, plotLocalCursorY);
-                if (data == null) continue;
+                if (data == null)
+                {
+                    continue;
+                }
+
                 var distance = Math.Abs(point.X - plotLocalCursorX);
                 if (distance < bestDistance)
                 {
@@ -733,11 +749,22 @@ namespace Radzen.Blazor
 
         private bool AnyAxisCrosshairVisible()
         {
-            if (CategoryAxis?.Crosshair?.Visible == true) return true;
-            if (ValueAxis?.Crosshair?.Visible == true) return true;
+            if (CategoryAxis?.Crosshair?.Visible == true)
+            {
+                return true;
+            }
+
+            if (ValueAxis?.Crosshair?.Visible == true)
+            {
+                return true;
+            }
+
             foreach (var axis in AdditionalValueAxes.Values)
             {
-                if (axis.Crosshair?.Visible == true) return true;
+                if (axis.Crosshair?.Visible == true)
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -846,10 +873,16 @@ namespace Radzen.Blazor
         [JSInvokable]
         public async Task OnWheel(double x, int delta)
         {
-            if (!AllowZoom) return;
+            if (!AllowZoom)
+            {
+                return;
+            }
 
             var plotWidth = (Width ?? 0) - MarginLeft - MarginRight;
-            if (plotWidth <= 0) return;
+            if (plotWidth <= 0)
+            {
+                return;
+            }
 
             var fraction = Math.Clamp((x - MarginLeft) / plotWidth, 0, 1);
             var zoomFactor = delta < 0 ? 0.8 : 1.25;
@@ -885,7 +918,10 @@ namespace Radzen.Blazor
         [JSInvokable]
         public async Task OnPan(double position)
         {
-            if (!AllowPan && !AllowZoom) return;
+            if (!AllowPan && !AllowZoom)
+            {
+                return;
+            }
 
             var range = ZoomEnd - ZoomStart;
             ZoomStart = Math.Clamp(position, 0, 1 - range);
@@ -967,7 +1003,11 @@ namespace Radzen.Blazor
                         var list = new List<(IChartSeries Series, object Data, Point Point)>();
                         foreach (var series in Series.OrderBy(s => s.RenderingOrder))
                         {
-                            if (!series.Visible) continue;
+                            if (!series.Visible)
+                            {
+                                continue;
+                            }
+
                             var (d, p) = series.DataAt(SnapPlotX, SnapPlotY);
                             if (d != null)
                             {
@@ -1362,9 +1402,20 @@ namespace Radzen.Blazor
                 return scale.Input.Start;
             }
             var t = (plotLocalPixel - scale.Padding) / paddedSize;
-            if (t < 0) t = 0;
-            else if (t > 1) t = 1;
-            if (outputDelta < 0) t = 1 - t;
+            if (t < 0)
+            {
+                t = 0;
+            }
+            else if (t > 1)
+            {
+                t = 1;
+            }
+
+            if (outputDelta < 0)
+            {
+                t = 1 - t;
+            }
+
             if (scale.IsLogarithmic && scale.Input.Start > 0 && scale.Input.End > 0)
             {
                 var logMin = Math.Log(scale.Input.Start);
@@ -1518,7 +1569,10 @@ namespace Radzen.Blazor
                         .Where(i => placements[i].RightSide == side)
                         .OrderBy(i => placements[i].AnchorY)
                         .ToList();
-                    if (indices.Count == 0) continue;
+                    if (indices.Count == 0)
+                    {
+                        continue;
+                    }
 
                     // Initial Y positions (cursor anchored to data point).
                     var ys = indices.Select(i => placements[i].AnchorY).ToArray();
@@ -1527,22 +1581,35 @@ namespace Radzen.Blazor
                     for (var k = 1; k < ys.Length; k++)
                     {
                         var minY = ys[k - 1] + estTooltipHeight + minVerticalGap;
-                        if (ys[k] < minY) ys[k] = minY;
+                        if (ys[k] < minY)
+                        {
+                            ys[k] = minY;
+                        }
                     }
 
                     // Step 2: if the stack overflows the bottom, slide everything up.
                     var bottomOverflow = ys[^1] - bottomLimit;
                     if (bottomOverflow > 0)
                     {
-                        for (var k = 0; k < ys.Length; k++) ys[k] -= bottomOverflow;
+                        for (var k = 0; k < ys.Length; k++)
+                        {
+                            ys[k] -= bottomOverflow;
+                        }
                     }
 
                     // Step 3: clamp top, then re-cascade in case the slide went above the top limit.
-                    if (ys[0] < topLimit) ys[0] = topLimit;
+                    if (ys[0] < topLimit)
+                    {
+                        ys[0] = topLimit;
+                    }
+
                     for (var k = 1; k < ys.Length; k++)
                     {
                         var minY = ys[k - 1] + estTooltipHeight + minVerticalGap;
-                        if (ys[k] < minY) ys[k] = minY;
+                        if (ys[k] < minY)
+                        {
+                            ys[k] = minY;
+                        }
                     }
 
                     for (var k = 0; k < indices.Count; k++)

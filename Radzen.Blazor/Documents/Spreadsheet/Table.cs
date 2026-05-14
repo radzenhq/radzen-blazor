@@ -89,7 +89,10 @@ public class Table
         set
         {
             if (string.IsNullOrEmpty(value))
+            {
                 throw new ArgumentException("Table name cannot be empty.", nameof(value));
+            }
+
             name = value;
         }
     }
@@ -116,7 +119,10 @@ public class Table
         get => showHeaderRow;
         set
         {
-            if (showHeaderRow == value) return;
+            if (showHeaderRow == value)
+            {
+                return;
+            }
 
             if (value)
             {
@@ -147,7 +153,10 @@ public class Table
         // Range shrinks upward. Range.End may equal Range.Start (single-row table)
         // — guard against producing an inverted range.
         var newStart = new CellRef(range.Start.Row + 1, range.Start.Column);
-        if (newStart.Row > range.End.Row) return; // degenerate; leave untouched
+        if (newStart.Row > range.End.Row)
+        {
+            return; // degenerate; leave untouched
+        }
 
         range = new RangeRef(newStart, range.End);
         Filter = new AutoFilter(Worksheet, range);
@@ -194,7 +203,10 @@ public class Table
         get => showTotals;
         set
         {
-            if (showTotals == value) return;
+            if (showTotals == value)
+            {
+                return;
+            }
 
             if (value)
             {
@@ -243,7 +255,11 @@ public class Table
         get => showFilterButton;
         set
         {
-            if (showFilterButton == value) return;
+            if (showFilterButton == value)
+            {
+                return;
+            }
+
             showFilterButton = value;
             Worksheet.OnAutoFilterChanged();
         }
@@ -339,13 +355,21 @@ public class Table
     public void Resize(RangeRef newRange)
     {
         if (newRange.Start != range.Start)
+        {
             throw new ArgumentException(
                 "Resize must keep the same top-left corner.", nameof(newRange));
+        }
 
         var newColCount = newRange.Columns;
-        while (columns.Count < newColCount) columns.Add(new TableColumn(this, columns.Count));
+        while (columns.Count < newColCount)
+        {
+            columns.Add(new TableColumn(this, columns.Count));
+        }
+
         if (columns.Count > newColCount)
+        {
             columns.RemoveRange(newColCount, columns.Count - newColCount);
+        }
 
         range = newRange;
         Filter = new AutoFilter(Worksheet, range);
@@ -389,7 +413,11 @@ public class Table
 
     internal void ApplyTotalsCalculation(int columnIndex)
     {
-        if (!showTotals) return;
+        if (!showTotals)
+        {
+            return;
+        }
+
         var col = columns[columnIndex];
         var totalsRow = range.End.Row;
         var sheetCol = range.Start.Column + columnIndex;
@@ -457,14 +485,21 @@ public class TableColumn
     {
         get
         {
-            if (customName is not null) return customName;
+            if (customName is not null)
+            {
+                return customName;
+            }
+
             if (table.ShowHeaderRow)
             {
                 var headerCell = table.Worksheet.Cells[
                     table.Range.Start.Row,
                     table.Range.Start.Column + index];
                 var v = headerCell.Value as string;
-                if (!string.IsNullOrEmpty(v)) return v!;
+                if (!string.IsNullOrEmpty(v))
+                {
+                    return v!;
+                }
             }
             return $"Column{index + 1}";
         }
@@ -477,7 +512,11 @@ public class TableColumn
         get => totalsCalculation;
         set
         {
-            if (totalsCalculation == value) return;
+            if (totalsCalculation == value)
+            {
+                return;
+            }
+
             totalsCalculation = value;
             table.ApplyTotalsCalculation(index);
         }
@@ -493,7 +532,10 @@ public class TableColumn
         set
         {
             formula = value;
-            if (value is null) return;
+            if (value is null)
+            {
+                return;
+            }
 
             // Translate structured references to absolute cell references for the
             // formula stored on each data row — naive replacement is enough for v1.
@@ -527,7 +569,11 @@ public class TableColumn
         get
         {
             var totals = table.TotalsRowRange;
-            if (totals is null) return null;
+            if (totals is null)
+            {
+                return null;
+            }
+
             return new CellRef(totals.Value.Start.Row, table.Range.Start.Column + index);
         }
     }

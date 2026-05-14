@@ -38,7 +38,9 @@ namespace System.Linq.Dynamic.Core
                     {
                         int index = int.Parse(match.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
                         if (index >= parameters.Length)
+                        {
                             throw new InvalidOperationException($"No parameter provided for {match.Value}");
+                        }
 
                         return ExpressionSerializer.FormatValue(parameters[index]) ?? string.Empty;
                     });

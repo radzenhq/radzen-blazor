@@ -158,7 +158,10 @@ namespace Radzen.Blazor
             get
             {
                 var gauge = Gauge;
-                if (gauge?.Width == null || gauge.Height == null) return new Point();
+                if (gauge?.Width == null || gauge.Height == null)
+                {
+                    return new Point();
+                }
 
                 if (Orientation == global::Radzen.Orientation.Vertical)
                 {
@@ -173,7 +176,10 @@ namespace Radzen.Blazor
             get
             {
                 var gauge = Gauge;
-                if (gauge?.Width == null || gauge.Height == null) return new Point();
+                if (gauge?.Width == null || gauge.Height == null)
+                {
+                    return new Point();
+                }
 
                 if (Orientation == global::Radzen.Orientation.Vertical)
                 {
@@ -265,7 +271,10 @@ namespace Radzen.Blazor
 
         internal void HandleScaleClick(MouseEventArgs args)
         {
-            if (!Click.HasDelegate) return;
+            if (!Click.HasDelegate)
+            {
+                return;
+            }
 
             double svgX, svgY;
             if (Orientation == global::Radzen.Orientation.Vertical)

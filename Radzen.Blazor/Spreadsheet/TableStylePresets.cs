@@ -65,7 +65,11 @@ internal static class TableStylePresets
     /// <summary>Looks up a preset by name; falls back to a sensible default.</summary>
     internal static Preset Get(string? name)
     {
-        if (string.IsNullOrEmpty(name)) return Default;
+        if (string.IsNullOrEmpty(name))
+        {
+            return Default;
+        }
+
         return presets.TryGetValue(name, out var p) ? p : Default;
     }
 
