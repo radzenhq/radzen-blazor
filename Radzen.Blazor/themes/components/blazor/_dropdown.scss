@@ -310,3 +310,18 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
     padding-inline-end: calc(2 * var(--rz-dropdown-trigger-icon-width));
   }
 }
+
+.rz-input-xs {
+  --rz-dropdown-item-padding: var(--rz-input-padding-block-sm) var(--rz-input-padding-inline-xs);
+  --rz-dropdown-item-font-size: var(--rz-input-font-size-xs);
+}
+
+.rz-input-sm {
+  --rz-dropdown-item-padding: var(--rz-input-padding-block-sm) var(--rz-input-padding-inline-sm);
+  --rz-dropdown-item-font-size: var(--rz-input-font-size-sm);
+}
+
+.rz-input-lg {
+  --rz-dropdown-item-padding: var(--rz-input-padding-block-lg) var(--rz-input-padding-inline-lg);
+  --rz-dropdown-item-font-size: var(--rz-input-font-size-lg);
+}

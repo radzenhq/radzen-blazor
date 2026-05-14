@@ -352,6 +352,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass() => GetClassList("rz-autocomplete").AddInputSize(InputSize).ToString();
 
+        string PopupCssClass => ClassList.Create("rz-autocomplete-panel")
+                                         .AddInputSize(InputSize)
+                                         .ToString();
+
         IJSObjectReference? _jsRef;
         bool _jsParamsChanged;
 
