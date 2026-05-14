@@ -605,6 +605,24 @@ namespace Radzen.Blazor
 
         bool preventKeyPress;
         bool stopKeydownPropagation;
+        int? pendingSelectionStart;
+        int? pendingSelectionEnd;
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (pendingSelectionStart.HasValue && JSRuntime != null)
+            {
+                var start = pendingSelectionStart.Value;
+                var end = pendingSelectionEnd ?? start;
+                pendingSelectionStart = null;
+                pendingSelectionEnd = null;
+                await JSRuntime.InvokeVoidAsync("Radzen.setSelectionRange", input, start, end);
+            }
+        }
+
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
@@ -639,6 +657,13 @@ namespace Radzen.Blazor
 
                 if (JSRuntime != null)
                 {
+                    var selection = await JSRuntime.InvokeAsync<int[]>("Radzen.getSelectionRange", input);
+                    if (selection != null && selection.Length >= 2)
+                    {
+                        pendingSelectionStart = selection[0];
+                        pendingSelectionEnd = selection[1];
+                    }
+
                     var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
                     await SetValue(value);
                 }

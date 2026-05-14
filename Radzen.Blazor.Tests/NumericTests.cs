@@ -335,6 +335,28 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Numeric_Restores_Cursor_After_Immediate_KeyDown()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            ctx.JSInterop.Setup<int[]>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 3, 3 });
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("21345.00");
+
+            var component = ctx.RenderComponent<RadzenNumeric<decimal?>>(parameters =>
+                parameters.Add(p => p.Immediate, true).Add(p => p.Format, "#.00").Add(p => p.Value, 2345m));
+
+            component.Find("input").KeyDown(new KeyboardEventArgs { Key = "1", Code = "Digit1" });
+
+            var invocations = ctx.JSInterop.Invocations["Radzen.setSelectionRange"];
+            Assert.NotEmpty(invocations);
+            var invocation = invocations[invocations.Count - 1];
+            Assert.Equal(3, invocation.Arguments[1]);
+            Assert.Equal(3, invocation.Arguments[2]);
+        }
+
+        [Fact]
         public void Numeric_Raises_ValueChangedEvent()
         {
             using var ctx = new TestContext();
