@@ -121,7 +121,7 @@
             <span class="notranslate rz-dropdown-trigger-icon rzi rzi-chevron-down"></span>
         </div>
 
-        <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
+        <div id="@PopupID" class="@PopupCssClass"
              style="@PopupStyle">
             <div class="rz-lookup-panel" @onkeydown="@CloseOnEscape">
                 @if (AllowFiltering || HeaderTemplate != null)

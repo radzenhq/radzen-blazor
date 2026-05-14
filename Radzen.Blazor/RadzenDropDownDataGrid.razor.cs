@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1258,6 +1259,10 @@ namespace Radzen.Blazor
         {
             return GetClassList("rz-dropdown").AddInputSize(InputSize).Add("rz-dropdown-chips", Chips && selectedItems.Count > 0).Add("rz-clear", AllowClear).ToString();
         }
+
+        string PopupCssClass => ClassList.Create(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")
+                                         .AddInputSize(InputSize)
+                                         .ToString();
 
         /// <inheritdoc />
         public override void Dispose()

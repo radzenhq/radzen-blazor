@@ -25,7 +25,7 @@
                 class=@InputClass
                 type="@InputType" id="@Name" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
         }
-        <div id="@PopupID" class="rz-autocomplete-panel" style="@PopupStyle">
+        <div id="@PopupID" class="@PopupCssClass" style="@PopupStyle">
             <ul id="@ListId" @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
                 @if (OpenOnFocus || (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(customSearchText)))
                 {
