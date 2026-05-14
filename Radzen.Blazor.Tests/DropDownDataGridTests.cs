@@ -422,6 +422,36 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(SortOrder.Ascending, capturedArgs.Sorts.First().SortOrder);
             Assert.Equal("CompanyName asc", capturedArgs.OrderBy);
         }
+
+        [Fact]
+        public void DropDownDataGrid_LoadData_ReceivesFilter_OnSearchInputChange()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("foo");
+
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp", ContactName = "John Doe" }
+            };
+
+            var loadDataCalls = new List<LoadDataArgs>();
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Count, 1);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.LoadData, args => loadDataCalls.Add(args));
+            });
+
+            component.Find(".rz-lookup-search-input").Change("foo");
+
+            Assert.Contains(loadDataCalls, c => c.Filter == "foo");
+        }
     }
 }
 
