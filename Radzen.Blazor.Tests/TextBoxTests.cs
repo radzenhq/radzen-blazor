@@ -254,5 +254,88 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
         }
+
+        [Fact]
+        public void TextBox_Trim_TrimsOnChange()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters => parameters.Add(p => p.Trim, true));
+
+            string newValue = null;
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => newValue = args));
+
+            component.Find("input").Change("  hello  ");
+
+            Assert.Equal("hello", newValue);
+            Assert.Equal("hello", component.Instance.Value);
+        }
+
+        [Fact]
+        public void TextBox_Immediate_Trim_DoesNotTrimOnInput()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            {
+                parameters.Add(p => p.Immediate, true);
+                parameters.Add(p => p.Trim, true);
+            });
+
+            string newValue = null;
+            int changeCount = 0;
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.ValueChanged, args => newValue = args);
+                parameters.Add(p => p.Change, args => changeCount++);
+            });
+
+            component.Find("input").Input("hello ");
+
+            Assert.Equal("hello ", newValue);
+            Assert.Equal("hello ", component.Instance.Value);
+            Assert.Equal(1, changeCount);
+        }
+
+        [Fact]
+        public void TextBox_Immediate_Trim_TrimsOnChangeAfterInput()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            {
+                parameters.Add(p => p.Immediate, true);
+                parameters.Add(p => p.Trim, true);
+            });
+
+            string newValue = null;
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => newValue = args));
+
+            component.Find("input").Input("hello world ");
+            component.Find("input").Change("hello world ");
+
+            Assert.Equal("hello world", newValue);
+            Assert.Equal("hello world", component.Instance.Value);
+        }
+
+        [Fact]
+        public void TextBox_Trim_SkipsChangeNotificationWhenTrimDoesNotAlterExistingValue()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            {
+                parameters.Add(p => p.Trim, true);
+                parameters.Add(p => p.Value, "hello");
+            });
+
+            int changeCount = 0;
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, _ => changeCount++));
+
+            component.Find("input").Change("hello   ");
+
+            Assert.Equal("hello", component.Instance.Value);
+            Assert.Equal(0, changeCount);
+        }
     }
 }
