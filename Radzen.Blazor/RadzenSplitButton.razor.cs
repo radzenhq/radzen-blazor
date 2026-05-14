@@ -250,6 +250,16 @@ namespace Radzen.Blazor
                                             .AddDisabled(IsDisabled)
                                             .ToString();
 
+        string PopupMenuClass => ClassList.Create("rz-splitbutton-menu")
+                                          .Add(Size switch
+                                          {
+                                              ButtonSize.ExtraSmall => "rz-input-xs",
+                                              ButtonSize.Small => "rz-input-sm",
+                                              ButtonSize.Large => "rz-input-lg",
+                                              _ => "rz-input-md",
+                                          })
+                                          .ToString();
+
         private string OpenPopupScript()
         {
             if (Disabled)

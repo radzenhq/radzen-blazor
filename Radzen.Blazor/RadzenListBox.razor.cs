@@ -203,10 +203,17 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ReadOnly { get; set; }
 
+        /// <summary>
+        /// Gets or sets the input size.
+        /// </summary>
+        /// <value>The input size.</value>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-listbox rz-inputtext").ToString();
+            return GetClassList("rz-listbox rz-inputtext").AddInputSize(InputSize).ToString();
         }
 
         /// <inheritdoc />
