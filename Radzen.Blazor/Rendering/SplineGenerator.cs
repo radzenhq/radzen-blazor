@@ -195,7 +195,10 @@ namespace Radzen.Blazor.Rendering
 
         private void AppendSegment(StringBuilder path, IList<SplinePoint> points)
         {
-            if (points.Count == 0) return;
+            if (points.Count == 0)
+            {
+                return;
+            }
 
             if (path.Length > 0)
             {
@@ -204,7 +207,10 @@ namespace Radzen.Blazor.Rendering
 
             path.Append(CultureInfo.InvariantCulture, $"{points[0].X.ToInvariantString()} {points[0].Y.ToInvariantString()} ");
 
-            if (points.Count == 1) return;
+            if (points.Count == 1)
+            {
+                return;
+            }
 
             var pointsWithTangents = CurveMonotone(points);
             var count = pointsWithTangents.Count;

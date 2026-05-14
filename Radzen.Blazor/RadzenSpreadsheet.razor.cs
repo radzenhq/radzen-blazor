@@ -161,7 +161,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void SubscribeToWorksheetEvents(Worksheet? next)
     {
-        if (ReferenceEquals(subscribedWorksheet, next)) return;
+        if (ReferenceEquals(subscribedWorksheet, next))
+        {
+            return;
+        }
 
         if (subscribedWorksheet is not null)
         {
@@ -194,12 +197,23 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private bool ComputeHasTableSelection()
     {
-        if (Worksheet is null) return false;
+        if (Worksheet is null)
+        {
+            return false;
+        }
+
         var sel = Worksheet.Selection.Cell;
-        if (sel == CellRef.Invalid) return false;
+        if (sel == CellRef.Invalid)
+        {
+            return false;
+        }
+
         foreach (var t in Worksheet.Tables)
         {
-            if (t.Range.Contains(sel.Row, sel.Column)) return true;
+            if (t.Range.Contains(sel.Row, sel.Column))
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -582,11 +596,21 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnCellMenuTop10FilterAsync()
     {
-        if (cellMenuPopup != null) await cellMenuPopup.CloseAsync();
-        if (Worksheet is null) return;
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
+
+        if (Worksheet is null)
+        {
+            return;
+        }
 
         var range = ResolveColumnFilterRange();
-        if (range == RangeRef.Invalid) return;
+        if (range == RangeRef.Invalid)
+        {
+            return;
+        }
 
         var result = await DialogService.OpenAsync<Spreadsheet.Top10FilterDialog>(
             Localize(nameof(RadzenStrings.Spreadsheet_Top10Filter)),
@@ -611,11 +635,18 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void OnCellMenuDynamicFilterAsync(DynamicFilterType type)
     {
-        if (Worksheet is null) return;
+        if (Worksheet is null)
+        {
+            return;
+        }
+
         _ = cellMenuPopup?.CloseAsync();
 
         var range = ResolveColumnFilterRange();
-        if (range == RangeRef.Invalid) return;
+        if (range == RangeRef.Invalid)
+        {
+            return;
+        }
 
         var sliceRange = new RangeRef(
             new CellRef(range.Start.Row, cellMenuColumn),
@@ -626,11 +657,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private RangeRef ResolveColumnFilterRange()
     {
-        if (Worksheet is null) return RangeRef.Invalid;
+        if (Worksheet is null)
+        {
+            return RangeRef.Invalid;
+        }
 
         foreach (var t in Worksheet.Tables)
         {
-            if (t.Range.Contains(cellMenuRow, cellMenuColumn)) return t.Range;
+            if (t.Range.Contains(cellMenuRow, cellMenuColumn))
+            {
+                return t.Range;
+            }
         }
         if (Worksheet.AutoFilter.Range is { } afRange && afRange.Contains(cellMenuRow, cellMenuColumn))
         {
@@ -940,10 +977,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Table? FindTableAt(int row, int column)
     {
-        if (Worksheet is null) return null;
+        if (Worksheet is null)
+        {
+            return null;
+        }
+
         foreach (var t in Worksheet.Tables)
         {
-            if (t.Range.Contains(row, column)) return t;
+            if (t.Range.Contains(row, column))
+            {
+                return t;
+            }
         }
         return null;
     }
@@ -1986,7 +2030,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void NormalizeAnchor(CellAnchor anchor)
     {
-        if (Worksheet is null) return;
+        if (Worksheet is null)
+        {
+            return;
+        }
 
         while (anchor.ColumnOffset < 0 && anchor.Column > 0)
         {
@@ -1997,7 +2044,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         while (anchor.Column < Worksheet.ColumnCount - 1)
         {
             var colWidth = Worksheet.Columns[anchor.Column];
-            if (anchor.ColumnOffset < colWidth) break;
+            if (anchor.ColumnOffset < colWidth)
+            {
+                break;
+            }
+
             anchor.ColumnOffset -= colWidth;
             anchor.Column++;
         }
@@ -2011,13 +2062,24 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         while (anchor.Row < Worksheet.RowCount - 1)
         {
             var rowHeight = Worksheet.Rows[anchor.Row];
-            if (anchor.RowOffset < rowHeight) break;
+            if (anchor.RowOffset < rowHeight)
+            {
+                break;
+            }
+
             anchor.RowOffset -= rowHeight;
             anchor.Row++;
         }
 
-        if (anchor.ColumnOffset < 0) anchor.ColumnOffset = 0;
-        if (anchor.RowOffset < 0) anchor.RowOffset = 0;
+        if (anchor.ColumnOffset < 0)
+        {
+            anchor.ColumnOffset = 0;
+        }
+
+        if (anchor.RowOffset < 0)
+        {
+            anchor.RowOffset = 0;
+        }
     }
 
     /// <summary>
@@ -2089,7 +2151,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             var finalTo = image.To?.Clone();
 
             image.From = capture.OriginalFrom.Clone();
-            if (capture.OriginalTo is not null) image.To = capture.OriginalTo.Clone();
+            if (capture.OriginalTo is not null)
+            {
+                image.To = capture.OriginalTo.Clone();
+            }
 
             Execute(new MoveImageCommand(image, finalFrom, finalTo));
         }
@@ -2099,7 +2164,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             var finalTo = chart.To?.Clone();
 
             chart.From = capture.OriginalFrom.Clone();
-            if (capture.OriginalTo is not null) chart.To = capture.OriginalTo.Clone();
+            if (capture.OriginalTo is not null)
+            {
+                chart.To = capture.OriginalTo.Clone();
+            }
 
             Execute(new MoveChartCommand(chart, finalFrom, finalTo));
         }

@@ -39,7 +39,9 @@ public static class PropertyAccess
         Expression body = arg;
 
         if (type != null)
+        {
             body = Expression.Convert(body, type);
+        }
 
         Expression AccessNoInterface(Expression instance, string memberName)
         {
@@ -51,7 +53,9 @@ public static class PropertyAccess
                         .FirstOrDefault(t => t.GetProperty(memberName) != null);
 
                 if (declaringType == null)
+                {
                     throw new InvalidOperationException($"Member '{memberName}' not found on interface '{instance.Type}'.");
+                }
 
                 return Expression.Property(instance, declaringType, memberName);
             }
@@ -64,11 +68,17 @@ public static class PropertyAccess
             {
                 var prop = instance.Type.GetProperty(memberName,
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                if (prop != null) return Expression.Property(instance, prop);
+                if (prop != null)
+                {
+                    return Expression.Property(instance, prop);
+                }
 
                 var field = instance.Type.GetField(memberName,
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                if (field != null) return Expression.Field(instance, field);
+                if (field != null)
+                {
+                    return Expression.Field(instance, field);
+                }
 
                 throw;
             }
@@ -97,7 +107,9 @@ public static class PropertyAccess
         }
 
         foreach (var member in propertyName.Split('.'))
+        {
             body = AccessWithNullPropagation(body, member);
+        }
 
         body = Expression.Convert(body, typeof(TValue));
         return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
@@ -110,7 +122,11 @@ public static class PropertyAccess
     /// <returns><c>true</c> if the specified type is a DateTime instance or nullable DateTime; otherwise, <c>false</c>.</returns>
     public static bool IsDate(Type? source)
     {
-        if (source == null) return false;
+        if (source == null)
+        {
+            return false;
+        }
+
         var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
         if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
@@ -131,7 +147,11 @@ public static class PropertyAccess
     /// <returns><c>true</c> if the specified type is a DateOnly instance or nullable DateOnly; otherwise, <c>false</c>.</returns>
     public static bool IsDateOnly(Type? source)
     {
-        if (source == null) return false;
+        if (source == null)
+        {
+            return false;
+        }
+
         var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
         if (type == typeof(DateOnly))
@@ -300,7 +320,9 @@ public static class PropertyAccess
     public static bool IsNumeric(Type source)
     {
         if (source == null)
+        {
             return false;
+        }
 
         var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
@@ -331,7 +353,9 @@ public static class PropertyAccess
     public static bool IsEnum(Type? source)
     {
         if (source == null)
+        {
             return false;
+        }
 
         return source.IsEnum;
     }
@@ -343,7 +367,11 @@ public static class PropertyAccess
     /// <returns><c>true</c> if the specified source is an enum; otherwise, <c>false</c>.</returns>
     public static bool IsNullableEnum(Type? source)
     {
-        if (source == null) return false;
+        if (source == null)
+        {
+            return false;
+        }
+
         Type? u = Nullable.GetUnderlyingType(source);
         return (u != null) && u.IsEnum;
     }
@@ -410,7 +438,10 @@ public static class PropertyAccess
             var part = property.Split('.').FirstOrDefault();
             var propertyType = GetPropertyTypeIncludeInterface(type, part);
             if (propertyType == null)
+            {
                 return null;
+            }
+
             return GetPropertyType(propertyType, property.ReplaceFirst($"{part}.", ""));
         }
 

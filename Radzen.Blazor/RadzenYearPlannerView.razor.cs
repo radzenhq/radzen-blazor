@@ -26,7 +26,11 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (Scheduler == null) return "";
+                if (Scheduler == null)
+                {
+                    return "";
+                }
+
                 var culture = Scheduler.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
                 if (StartMonth == Month.January)
                 {

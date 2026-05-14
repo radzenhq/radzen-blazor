@@ -1,8 +1,7 @@
 #nullable enable
 
-using System.Collections.Generic;
-
 using Radzen.Documents.Spreadsheet;
+using System.Collections.Generic;
 namespace Radzen.Blazor.Spreadsheet;
 
 class ClearContentsCommand(Worksheet sheet, RangeRef range) : ICommand, IProtectedCommand

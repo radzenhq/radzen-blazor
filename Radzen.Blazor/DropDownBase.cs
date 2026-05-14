@@ -411,7 +411,9 @@ namespace Radzen
         protected async Task ClearAll()
         {
             if (Disabled)
+            {
                 return;
+            }
 
             searchText = null;
             _view = null;
@@ -690,7 +692,9 @@ namespace Radzen
         protected virtual async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
+            {
                 return;
+            }
 
             if (JSRuntime != null)
             {
@@ -732,7 +736,9 @@ namespace Radzen
             var key = args.Code != null ? args.Code : args.Key;
 
             if (Disabled || Data == null || args == null || key == null)
+            {
                 return;
+            }
 
             List<object> items = Enumerable.Empty<object>().ToList();
 
@@ -772,11 +778,17 @@ namespace Radzen
 
                             if (isDown)
                             {
-                                if (selectedIndex < virtualTotalCount - 1) selectedIndex++;
+                                if (selectedIndex < virtualTotalCount - 1)
+                                {
+                                    selectedIndex++;
+                                }
                             }
                             else
                             {
-                                if (selectedIndex > 0) selectedIndex--;
+                                if (selectedIndex > 0)
+                                {
+                                    selectedIndex--;
+                                }
                             }
 
                             await JSRuntime.InvokeVoidAsync("Radzen.focusVirtualListItem", list, selectedIndex, virtualTotalCount);
@@ -1036,7 +1048,10 @@ namespace Radzen
             }
 
             if (Multiple)
+            {
                 selectedIndex = -1;
+            }
+
             if (JSRuntime != null)
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
@@ -1357,7 +1372,9 @@ namespace Radzen
             if (!Multiple)
             {
                 if (object.Equals(item, selectedItem))
+                {
                     return;
+                }
 
                 selectedItem = item;
                 if (!string.IsNullOrEmpty(ValueProperty) && item != null)
@@ -1721,12 +1738,16 @@ namespace Radzen
                 foreach (var i in currentItems)
                 {
                     if (!existingItems.Contains(i))
+                    {
                         addMethod!.Invoke(originalCollection, [i]);
+                    }
                 }
                 foreach (var i in existingItems)
                 {
                     if (!currentItems.Contains(i))
+                    {
                         removeMethod!.Invoke(originalCollection, [i]);
+                    }
                 }
 
                 await valueChanged.InvokeAsync(originalCollection);

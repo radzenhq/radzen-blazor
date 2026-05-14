@@ -168,9 +168,15 @@ namespace Radzen
         /// <returns></returns>
         public bool Equals(NotificationMessage? other)
         {
-            if(other == null) return false;
+            if(other == null)
+            {
+                return false;
+            }
 
-            if(object.ReferenceEquals(this, other)) return true;
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
 
             return this.Severity == other.Severity
                 && this.Summary == other.Summary

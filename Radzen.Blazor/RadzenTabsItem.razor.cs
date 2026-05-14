@@ -148,7 +148,11 @@ namespace Radzen.Blazor
 
         async Task SelectTab(RadzenTabsItem item)
         {
-            if (Tabs == null) return;
+            if (Tabs == null)
+            {
+                return;
+            }
+
             if (Tabs.RenderMode == TabRenderMode.Server)
             {
                 await Tabs.SelectTab(this, true);

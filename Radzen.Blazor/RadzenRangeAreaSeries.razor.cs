@@ -171,7 +171,10 @@ namespace Radzen.Blazor
         public override bool Contains(double x, double y, double tolerance)
         {
             var chart = Chart;
-            if (chart == null) return false;
+            if (chart == null)
+            {
+                return false;
+            }
 
             var category = ComposeCategory(chart.CategoryScale);
 

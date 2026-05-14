@@ -87,7 +87,11 @@ namespace Radzen.Blazor
                 var sweep = EndAngle - StartAngle;
                 // Normalize to (0, 360]
                 sweep = sweep % 360;
-                if (sweep <= 0) sweep += 360;
+                if (sweep <= 0)
+                {
+                    sweep += 360;
+                }
+
                 return sweep;
             }
         }
@@ -207,7 +211,10 @@ namespace Radzen.Blazor
         private double GetAngle(int index)
         {
             var categories = GetAllCategories();
-            if (categories.Count == 0) return -Math.PI / 2;
+            if (categories.Count == 0)
+            {
+                return -Math.PI / 2;
+            }
 
             var startRad = StartAngle * Math.PI / 180 - Math.PI / 2;
             var sweepRad = SweepDegrees * Math.PI / 180;
@@ -242,7 +249,10 @@ namespace Radzen.Blazor
         /// </summary>
         private string GetArcPath(double scale)
         {
-            if (!Width.HasValue || !Height.HasValue) return "";
+            if (!Width.HasValue || !Height.HasValue)
+            {
+                return "";
+            }
 
             var centerX = Width.Value / 2;
             var centerY = Height.Value / 2;
@@ -277,7 +287,10 @@ namespace Radzen.Blazor
                 points.Add($"{x.ToString("F2", CultureInfo.InvariantCulture)},{y.ToString("F2", CultureInfo.InvariantCulture)}");
             }
 
-            if (points.Count == 0) return "";
+            if (points.Count == 0)
+            {
+                return "";
+            }
 
             return IsPartial
                 ? $"M{string.Join(" L", points)}"
@@ -290,7 +303,10 @@ namespace Radzen.Blazor
         /// </summary>
         internal string GetColumnPath(int categoryIndex, double value, double halfAngle)
         {
-            if (!Width.HasValue || !Height.HasValue) return "";
+            if (!Width.HasValue || !Height.HasValue)
+            {
+                return "";
+            }
 
             var centerX = Width.Value / 2;
             var centerY = Height.Value / 2;
@@ -324,7 +340,10 @@ namespace Radzen.Blazor
         internal double GetColumnHalfAngle()
         {
             var categories = GetAllCategories();
-            if (categories.Count == 0) return 0;
+            if (categories.Count == 0)
+            {
+                return 0;
+            }
 
             var sweepRad = SweepDegrees * Math.PI / 180;
             var divisor = IsPartial ? Math.Max(categories.Count - 1, 1) : categories.Count;
@@ -391,7 +410,10 @@ namespace Radzen.Blazor
         private string GetLabelAnchor(int index)
         {
             var categories = GetAllCategories();
-            if (categories.Count == 0) return "middle";
+            if (categories.Count == 0)
+            {
+                return "middle";
+            }
 
             var angle = GetAngle(index);
             var x = Math.Cos(angle);
@@ -416,7 +438,10 @@ namespace Radzen.Blazor
         private string GetLabelBaseline(int index)
         {
             var categories = GetAllCategories();
-            if (categories.Count == 0) return "middle";
+            if (categories.Count == 0)
+            {
+                return "middle";
+            }
 
             var angle = GetAngle(index);
             var y = Math.Sin(angle);
@@ -443,7 +468,11 @@ namespace Radzen.Blazor
             get
             {
                 var categories = GetAllCategories();
-                if (categories.Count <= 1) return SweepDegrees;
+                if (categories.Count <= 1)
+                {
+                    return SweepDegrees;
+                }
+
                 var divisor = IsPartial ? Math.Max(categories.Count - 1, 1) : categories.Count;
                 return SweepDegrees / divisor;
             }
@@ -461,15 +490,27 @@ namespace Radzen.Blazor
             // Calculate how many labels to skip to avoid overlap
             var spacing = AngularSpacingDegrees;
             var step = 1;
-            if (spacing < 10) step = 4;
-            else if (spacing < 15) step = 3;
-            else if (spacing < 20) step = 2;
+            if (spacing < 10)
+            {
+                step = 4;
+            }
+            else if (spacing < 15)
+            {
+                step = 3;
+            }
+            else if (spacing < 20)
+            {
+                step = 2;
+            }
 
             for (int i = 0; i < categories.Count; i++)
             {
                 // Always show first and last labels for partial charts; skip intermediate ones based on step
                 var isEndpoint = IsPartial && (i == 0 || i == categories.Count - 1);
-                if (!isEndpoint && step > 1 && i % step != 0) continue;
+                if (!isEndpoint && step > 1 && i % step != 0)
+                {
+                    continue;
+                }
 
                 var (x, y) = GetLabelPoint(i);
                 var category = categories[i];
@@ -519,10 +560,16 @@ namespace Radzen.Blazor
         /// </summary>
         private RenderFragment RenderAxisValues() => builder =>
         {
-            if (!Width.HasValue || !Height.HasValue) return;
+            if (!Width.HasValue || !Height.HasValue)
+            {
+                return;
+            }
 
             var categories = GetAllCategories();
-            if (categories.Count == 0) return;
+            if (categories.Count == 0)
+            {
+                return;
+            }
 
             // For partial charts, render along the last axis; for full charts, along the first
             var axisIndex = IsPartial ? categories.Count - 1 : 0;
@@ -542,9 +589,18 @@ namespace Radzen.Blazor
             // Determine text-anchor based on offset direction
             var cosPerp = Math.Cos(perpAngle);
             string anchor;
-            if (Math.Abs(cosPerp) < 0.3) anchor = "middle";
-            else if (cosPerp > 0) anchor = "start";
-            else anchor = "end";
+            if (Math.Abs(cosPerp) < 0.3)
+            {
+                anchor = "middle";
+            }
+            else if (cosPerp > 0)
+            {
+                anchor = "start";
+            }
+            else
+            {
+                anchor = "end";
+            }
 
             for (int i = 1; i <= 5; i++)
             {
@@ -572,8 +628,16 @@ namespace Radzen.Blazor
         private static double AngleDiff(double a, double b)
         {
             var d = a - b;
-            while (d > Math.PI) d -= 2 * Math.PI;
-            while (d < -Math.PI) d += 2 * Math.PI;
+            while (d > Math.PI)
+            {
+                d -= 2 * Math.PI;
+            }
+
+            while (d < -Math.PI)
+            {
+                d += 2 * Math.PI;
+            }
+
             return d;
         }
 
@@ -646,12 +710,16 @@ namespace Radzen.Blazor
         private async Task ShowMarkerTooltip(MouseEventArgs args, IRadzenSpiderSeries series, string category, double value)
         {
             if (!this.ShowTooltip || TooltipService == null)
+            {
                 return;
-            
+            }
+
             // Prevent duplicate tooltips
-            if (currentTooltipSeries == series && currentTooltipCategory == category) 
+            if (currentTooltipSeries == series && currentTooltipCategory == category)
+            {
                 return;
-            
+            }
+
             currentTooltipSeries = series;
             currentTooltipCategory = category;
             
