@@ -49,7 +49,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     }
 
     .rz-selectbar.rz-selectbar-horizontal .rz-button:not(:first-child) {
-        margin-inline-start: 0.25rem;
+        margin-inline-start: 0.125rem;
     }
 
     .rz-colorpicker {
@@ -58,7 +58,14 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
         justify-content: center;
         border: 1px solid transparent;
         border-block-end: 1px solid transparent;
+        box-shadow: none;
+        background-color: transparent;
         --rz-colorpicker-panel-border: none;
+
+        &.rz-state-disabled {
+            border: 1px solid transparent;
+            border-block-end: 1px solid transparent;
+        }
 
         .rzi {
             font-size: 0.875rem;
@@ -97,8 +104,32 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-formula-editor {
-    padding: 0.2rem 0.2rem;
+    padding: 0 0.25rem 0.25rem;
     border-bottom: var(--rz-spreadsheet-cell-border);
+
+    .rz-spreadsheet-editor {
+        border-radius: var(--rz-input-border-radius);
+
+        &::before {
+            content: 'function';
+            font-family: var(--rz-icon-font-family);
+            font-size: 1rem;
+            font-weight: 300;
+            position: absolute;
+            inset-inline-start: 0.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--rz-text-tertiary-color);
+            pointer-events: none;
+            z-index: 1;
+        }
+    }
+
+    .rz-spreadsheet-editor-input,
+    .rz-spreadsheet-editor-highlight {
+        padding: 0.125rem;
+        padding-inline-start: 1.5rem;
+    }
 }
 
 .rz-spreadsheet-cell {
@@ -106,8 +137,8 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     border-right: var(--rz-spreadsheet-cell-border);
     border-bottom: var(--rz-spreadsheet-cell-border);
     cursor: cell;
-    font-size: 0.8rem;
-    padding: 0.2rem 0.2rem;
+    font-size: 0.75rem;
+    padding: 0.125rem;
     box-sizing: border-box;
     white-space: nowrap;
     overflow: hidden;
@@ -232,9 +263,9 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     background: var(--rz-spreadsheet-header-background-color);
     border-right: var(--rz-spreadsheet-cell-border);
     border-bottom: var(--rz-spreadsheet-cell-border);
-    font-weight: bold;
-    font-size: 0.8rem;
-    padding: 0.2rem 0.2rem;
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.125rem;
     z-index: 1;
     user-select: none;
     -webkit-user-select: none;
@@ -273,17 +304,31 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 
 .rz-spreadsheet-editor {
     position: relative;
-    border: none;
+    border: var(--rz-input-border);
     font-size: 0.8rem;
     min-width: fit-content;
     min-height: 100%;
     box-sizing: border-box;
     background-color: var(--rz-base-background-color);
+    transition: var(--rz-input-transition);
+
+    &:hover {
+        border: var(--rz-input-hover-border);
+        background-color: var(--rz-input-hover-background-color);
+    }
+
+    &:focus-within {
+        border: var(--rz-input-focus-border);
+        background-color: var(--rz-input-focus-background-color);
+        outline: var(--rz-input-focus-outline);
+        outline-offset: var(--rz-input-focus-outline-offset);
+    }
 }
 
 .rz-spreadsheet-editor-input {
     color: transparent;
-    caret-color: var(--rz-text-selection-background-color);
+    caret-color: var(--rz-text-color);
+    outline: none;
 }
 
 .rz-spreadsheet-editor-highlight {
@@ -328,20 +373,6 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     width: 300px;
     overflow: auto;
     box-sizing: content-box;
-}
-
-/* Cell reference colors */
-:root {
-    --rz-highlight-color-1: #FF6B6B;
-    --rz-highlight-color-2: #4ECDC4;
-    --rz-highlight-color-3: #45B7D1;
-    --rz-highlight-color-4: #96CEB4;
-    --rz-highlight-color-5: #FFEAA7;
-}
-
-.rz-spreadsheet-formula-editor .rz-spreadsheet-editor-input,
-.rz-spreadsheet-formula-editor .rz-spreadsheet-editor-highlight {
-    padding: 0.2rem 0.2rem;
 }
 
 .rz-spreadsheet-frozen-row {
@@ -491,45 +522,33 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     z-index: 4;
 }
 
-.rz-spreadsheet-column-resize-handle {
+.rz-spreadsheet-column-resize-handle,
+.rz-spreadsheet-row-resize-handle {
     position: absolute;
-    width: 5px;
-    cursor: ew-resize;
     z-index: 5;
-    transform: translateX(-50%);
     &:hover {
         background-color: var(--rz-primary);
     }
+}
+
+.rz-spreadsheet-column-resize-handle {
+    width: 5px;
+    cursor: ew-resize;
+    transform: translateX(-50%);
 }
 
 .rz-spreadsheet-row-resize-handle {
-    position: absolute;
     height: 5px;
     cursor: ns-resize;
-    z-index: 5;
     transform: translateY(-50%);
-    &:hover {
-        background-color: var(--rz-primary);
-    }
 }
 
-// Cell chevron icon styles
 .rz-spreadsheet-cell-chevron {
     position: absolute;
     top: 2px;
     right: 2px;
-    font-size: 12px;
-    color: var(--rz-text-disabled-color);
-    cursor: pointer;
-    z-index: 5;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 2px;
-    padding: 1px;
-
-    &:hover {
-        color: var(--rz-primary);
-        background: rgba(255, 255, 255, 1);
-    }
+    border-radius: 0;
+    padding: 0 !important;
 }
 
 .rz-spreadsheet-cell-popup {
@@ -541,12 +560,6 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     border: 1px solid var(--rz-border-color);
     border-radius: var(--rz-border-radius);
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-}
-
-.rz-spreadsheet-cell-chevron {
-    position: absolute;
-    right: 0;
-    bottom: 0;
 }
 
 .rz-spreadsheet-cell-menu-filter {

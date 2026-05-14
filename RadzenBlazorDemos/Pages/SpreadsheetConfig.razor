@@ -13,10 +13,10 @@
         sheet.BeginUpdate();
 
         var headerFormat = new Format { Bold = true, FontSize = 14, TextAlign = TextAlign.Center, BackgroundColor = "#1e88e5", Color = "#ffffff" };
-        var columnHeaderFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center, BorderBottom = new BorderStyle { LineStyle = BorderLineStyle.Medium } };
+        var columnHeaderFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center, Color = "#005da1" };
         var currencyFormat = new Format { NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right };
-        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9", BorderTop = new BorderStyle { LineStyle = BorderLineStyle.Double } };
-        var grandTotalFormat = new Format { Bold = true, FontSize = 12, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9", BorderTop = new BorderStyle { LineStyle = BorderLineStyle.Double } };
+        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9" };
+        var grandTotalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
 
         // Title row
         sheet.MergedCells.Add(RangeRef.Parse("A1:G1"));
@@ -70,7 +70,7 @@
 
         // Grand total row (row 13, 1-indexed row 14)
         sheet.Cells["A13"].Value = "Grand Total";
-        sheet.Cells["A13"].Format = new Format { Bold = true, FontSize = 12, BackgroundColor = "#c8e6c9" };
+        sheet.Cells["A13"].Format = new Format { Bold = true, BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
         for (int col = 1; col <= 5; col++)
         {
             var colLetter = (char)('A' + col);
@@ -78,7 +78,7 @@
             sheet.Cells[12, col].Format = grandTotalFormat;
         }
         sheet.Cells["G13"].Value = 1.0;
-        sheet.Cells["G13"].Format = new Format { Bold = true, FontSize = 12, NumberFormat = "0.0%", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9" };
+        sheet.Cells["G13"].Format = new Format { Bold = true, NumberFormat = "0.0%", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
 
         // Freeze header rows
         sheet.Rows.Frozen = 2;
