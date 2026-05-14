@@ -3,13 +3,13 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenSplitButton Icon="view_column" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezePanes)) ?? "Freeze panes") Click=@OnFreezeClick Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Disabled=@IsDisabled>
+<RadzenSplitButton Icon="mode_cool" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezePanes)) ?? "Freeze panes") Click=@OnFreezeClick Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Disabled=@IsDisabled>
     <ChildContent>
-        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeTopRow)) ?? "Freeze Top Row") Value="row" Icon="view_column" />
-        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedRows)) ?? "Freeze Selected Rows") Value="rows" Icon="view_column" />
-        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeFirstColumn)) ?? "Freeze First Column") Value="column" Icon="view_column" />
-        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedColumns)) ?? "Freeze Selected Columns") Value="columns" Icon="view_column" />
-        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Unfreeze)) ?? "Unfreeze") Value="unfreeze" Icon="view_column" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeTopRow)) ?? "Freeze Top Row") Value="row" Icon="splitscreen_top" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedRows)) ?? "Freeze Selected Rows") Value="rows" Icon="split_scene_up" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeFirstColumn)) ?? "Freeze First Column") Value="column" Icon="splitscreen_left" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FreezeSelectedColumns)) ?? "Freeze Selected Columns") Value="columns" Icon="split_scene_left" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Unfreeze)) ?? "Unfreeze") Value="unfreeze" Icon="mode_cool_off" />
     </ChildContent>
 </RadzenSplitButton>
 
