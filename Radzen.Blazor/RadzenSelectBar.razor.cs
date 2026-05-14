@@ -218,7 +218,9 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled)
+            {
                 return;
+            }
 
             focusedIndex = allItems.IndexOf(item);
 
@@ -272,7 +274,10 @@ namespace Radzen.Blazor
 
             var item = allItems.ElementAtOrDefault(focusedIndex) ?? allItems.FirstOrDefault();
 
-            if (item == null) return;
+            if (item == null)
+            {
+                return;
+            }
 
             if (key == "ArrowLeft" || key == "ArrowRight")
             {

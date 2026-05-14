@@ -374,7 +374,9 @@ namespace Radzen
 
             // register the cancellation token
             if (cancellationToken.HasValue)
+            {
                 cancellationToken.Value.Register(() => task.TrySetCanceled());
+            }
 
             tasks.Add(task);
 
@@ -400,7 +402,9 @@ namespace Radzen
 
             // register the cancellation token
             if (cancellationToken.HasValue)
+            {
                 cancellationToken.Value.Register(() => task.TrySetCanceled());
+            }
 
             tasks.Add(task);
 
@@ -1098,7 +1102,11 @@ namespace Radzen
             get => minWidth;
             set
             {
-                if (Equals(value, minWidth)) return;
+                if (Equals(value, minWidth))
+                {
+                    return;
+                }
+
                 minWidth = value;
                 OnPropertyChanged(nameof(MinWidth));
             }
@@ -1114,7 +1122,11 @@ namespace Radzen
             get => minHeight;
             set
             {
-                if (Equals(value, minHeight)) return;
+                if (Equals(value, minHeight))
+                {
+                    return;
+                }
+
                 minHeight = value;
                 OnPropertyChanged(nameof(MinHeight));
             }
@@ -1130,7 +1142,11 @@ namespace Radzen
             get => resizeBarTitle;
             set
             {
-                if (value == resizeBarTitle) return;
+                if (value == resizeBarTitle)
+                {
+                    return;
+                }
+
                 resizeBarTitle = value;
                 OnPropertyChanged(nameof(ResizeBarTitle));
             }
@@ -1146,7 +1162,11 @@ namespace Radzen
             get => resizeBarAriaLabel;
             set
             {
-                if (value == resizeBarAriaLabel) return;
+                if (value == resizeBarAriaLabel)
+                {
+                    return;
+                }
+
                 resizeBarAriaLabel = value;
                 OnPropertyChanged(nameof(ResizeBarAriaLabel));
             }

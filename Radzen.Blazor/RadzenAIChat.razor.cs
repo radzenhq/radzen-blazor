@@ -303,7 +303,9 @@ namespace Radzen.Blazor
         public async Task SendMessage(string content)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
+            {
                 return;
+            }
 
             // Add user message
             var userMessage = AddMessage(content, true);
@@ -333,7 +335,9 @@ namespace Radzen.Blazor
         public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
+            {
                 return;
+            }
 
             // Add user message
             var userMessage = AddMessage(content, true);
@@ -354,7 +358,9 @@ namespace Radzen.Blazor
         public async Task LoadConversationHistory()
         {
             if (string.IsNullOrEmpty(currentSessionId))
+            {
                 return;
+            }
 
             var session = ChatService.GetOrCreateSession(currentSessionId);
             
@@ -373,7 +379,9 @@ namespace Radzen.Blazor
         private async Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(userInput))
+            {
                 return;
+            }
 
             IsLoading = true;
             var previousCts = cts;

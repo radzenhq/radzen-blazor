@@ -376,7 +376,9 @@ namespace Radzen.Blazor
             set
             {
                 if (form == value || value is null)
+                {
                     return;
+                }
 
                 form = value;
                 form.AddComponent(this);

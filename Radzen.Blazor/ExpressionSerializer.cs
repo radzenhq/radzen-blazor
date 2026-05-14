@@ -39,7 +39,11 @@ public class ExpressionSerializer : ExpressionVisitor
             _sb.Append("(");
             for (int i = 0; i < node.Parameters.Count; i++)
             {
-                if (i > 0) _sb.Append(", ");
+                if (i > 0)
+                {
+                    _sb.Append(", ");
+                }
+
                 _sb.Append(node.Parameters[i].Name);
             }
             _sb.Append(") => ");
@@ -90,7 +94,10 @@ public class ExpressionSerializer : ExpressionVisitor
 
             for (int i = 1; i < node.Arguments.Count; i++)
             {
-                if (i > 1) _sb.Append(", ");
+                if (i > 1)
+                {
+                    _sb.Append(", ");
+                }
 
                 if (node.Arguments[i] is NewArrayExpression arrayExpr)
                 {
@@ -110,7 +117,11 @@ public class ExpressionSerializer : ExpressionVisitor
 
             for (int i = 0; i < node.Arguments.Count; i++)
             {
-                if (i > 0) _sb.Append(", ");
+                if (i > 0)
+                {
+                    _sb.Append(", ");
+                }
+
                 Visit(node.Arguments[i]);
             }
 
@@ -130,7 +141,11 @@ public class ExpressionSerializer : ExpressionVisitor
 
             for (int i = 0; i < node.Arguments.Count; i++)
             {
-                if (i > 0) _sb.Append(", ");
+                if (i > 0)
+                {
+                    _sb.Append(", ");
+                }
+
                 Visit(node.Arguments[i]);
             }
 
@@ -232,19 +247,29 @@ public class ExpressionSerializer : ExpressionVisitor
         bool needsParentheses = node.NodeType == ExpressionType.NewArrayInit &&
                                 (node.Expressions.Count > 1 || node.Expressions[0].NodeType != ExpressionType.Constant);
 
-        if (needsParentheses) _sb.Append("(");
+        if (needsParentheses)
+        {
+            _sb.Append("(");
+        }
 
         _sb.Append("new [] { ");
         bool first = true;
         foreach (var expr in node.Expressions)
         {
-            if (!first) _sb.Append(", ");
+            if (!first)
+            {
+                _sb.Append(", ");
+            }
+
             first = false;
             Visit(expr);
         }
         _sb.Append(" }");
 
-        if (needsParentheses) _sb.Append(")");
+        if (needsParentheses)
+        {
+            _sb.Append(")");
+        }
 
         return node;
     }

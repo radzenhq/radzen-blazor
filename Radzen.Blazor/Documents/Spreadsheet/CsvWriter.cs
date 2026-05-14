@@ -32,7 +32,10 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
             .Where(c => c.Value is not null || !string.IsNullOrEmpty(c.Formula))
             .ToList();
 
-        if (populated.Count == 0) return string.Empty;
+        if (populated.Count == 0)
+        {
+            return string.Empty;
+        }
 
         var maxRow = populated.Max(c => c.Address.Row);
         var maxCol = populated.Max(c => c.Address.Column);
@@ -48,7 +51,10 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
             rowMap.TryGetValue(r, out var cols);
             for (var c = 0; c <= maxCol; c++)
             {
-                if (c > 0) sb.Append(options.Separator);
+                if (c > 0)
+                {
+                    sb.Append(options.Separator);
+                }
 
                 var field = cols is not null && cols.TryGetValue(c, out var cell)
                     ? FormatCell(cell)
@@ -95,10 +101,14 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
     private string QuoteIfNeeded(string field)
     {
         if (options.Quoting == CsvQuoting.Always)
+        {
             return Wrap(field);
+        }
 
         if (options.Quoting == CsvQuoting.Never)
+        {
             return field;
+        }
 
         // Minimal: quote only when necessary (RFC 4180).
         var needsQuote = false;

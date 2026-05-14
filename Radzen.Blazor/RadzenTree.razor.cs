@@ -289,7 +289,10 @@ namespace Radzen.Blazor
             }
 
             var level = depth < Levels.Count ? Levels.ElementAt(depth) : (Levels.Count > 0 ? Levels.LastOrDefault() : null);
-            if (level == null) return _ => { };
+            if (level == null)
+            {
+                return _ => { };
+            }
 
             return builder =>
             {

@@ -33,7 +33,10 @@ namespace Radzen.Blazor
         internal RadzenSplitterPane? Next()
         {
             if (Splitter == null)
+            {
                 return null;
+            }
+
             return Index <= Splitter.Panes.Count - 2
                 ? Splitter.Panes[Index + 1]
                 : null;
@@ -49,8 +52,9 @@ namespace Radzen.Blazor
                     || (Splitter != null && Index == Splitter.Panes.Count - 2 && paneNext?.IsResizable == false)
                     || (IsLastResizable && paneNext != null && paneNext.GetCollapsed())
                     )
+                {
                     return false;
-
+                }
 
                 return Resizable;
             }
@@ -61,11 +65,15 @@ namespace Radzen.Blazor
             get
             {
                 if (Collapsible && !GetCollapsed())
+                {
                     return true;
+                }
 
                 var paneNext = Next();
                 if (paneNext == null)
+                {
                     return false;
+                }
 
                 return paneNext.IsLast && paneNext.Collapsible && paneNext.GetCollapsed();
             }
@@ -76,11 +84,15 @@ namespace Radzen.Blazor
             get
             {
                 if (GetCollapsed())
+                {
                     return true;
+                }
 
                 var paneNext = Next();
                 if (paneNext == null)
+                {
                     return false;
+                }
 
                 return paneNext.IsLast && paneNext.Collapsible && !paneNext.GetCollapsed();
             }
@@ -91,13 +103,19 @@ namespace Radzen.Blazor
             get
             {
                 if (GetCollapsed())
+                {
                     return "collapsed";
+                }
 
                 if (IsLastResizable)
+                {
                     return "lastresizable";
+                }
 
                 if (IsResizable)
+                {
                     return "resizable";
+                }
 
                 return "locked";
             }
@@ -271,7 +289,11 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                if (JSRuntime == null || Splitter == null) return;
+                if (JSRuntime == null || Splitter == null)
+                {
+                    return;
+                }
+
                 var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", GetId() + "-resize");
 
                 await Splitter.StartResize(new PointerEventArgs()
@@ -298,9 +320,14 @@ namespace Radzen.Blazor
         {
             // Only handle double-click if the pane or its next pane is collapsible
             if (!IsCollapsible && !IsExpandable)
+            {
                 return;
+            }
 
-            if (Splitter == null) return;
+            if (Splitter == null)
+            {
+                return;
+            }
             // If the current pane is collapsed, expand it
             if (GetCollapsed())
             {

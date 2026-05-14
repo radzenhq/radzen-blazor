@@ -38,7 +38,9 @@ namespace Radzen.Blazor
                     text = value;
 
                     if (List != null)
+                    {
                         List.Refresh();
+                    }
                 }
             }
         }

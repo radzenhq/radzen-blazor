@@ -254,7 +254,10 @@ namespace Radzen.Blazor
 
         async Task ToggleAmPm()
         {
-            if (Disabled) return;
+            if (Disabled)
+            {
+                return;
+            }
 
             var newHour = (CurrentDate.Hour + 12) % 24;
 
@@ -358,7 +361,10 @@ namespace Radzen.Blazor
 
         void RevertUncommittedTimeChange()
         {
-            if (!ShowTimeOkButton || !_hasUncommittedTimeChange) return;
+            if (!ShowTimeOkButton || !_hasUncommittedTimeChange)
+            {
+                return;
+            }
 
             _hasUncommittedTimeChange = false;
 
@@ -1160,7 +1166,11 @@ namespace Radzen.Blazor
         /// </summary>
         protected async Task ParseDate()
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             DateTime? newValue;
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
             bool valid = TryParseInput(inputValue, out DateTime value);
@@ -1231,7 +1241,11 @@ namespace Radzen.Blazor
         /// </summary>
         protected async Task ParseDateImmediate()
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
             bool valid = TryParseInput(inputValue, out DateTime value);
 
@@ -1313,7 +1327,9 @@ namespace Radzen.Blazor
         async Task Clear()
         {
             if (Disabled || ReadOnly)
+            {
                 return;
+            }
 
             if (Multiple)
             {
@@ -1608,7 +1624,9 @@ namespace Radzen.Blazor
         public void Close()
         {
             if (Disabled || ReadOnly || Inline)
+            {
                 return;
+            }
 
             RevertUncommittedTimeChange();
 
@@ -2065,7 +2083,10 @@ namespace Radzen.Blazor
 
         internal async Task TogglePopup()
         {
-            if (Inline) return;
+            if (Inline)
+            {
+                return;
+            }
 
             if (PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
             {
@@ -2079,7 +2100,10 @@ namespace Radzen.Blazor
 
         async Task ClosePopup()
         {
-            if (Inline) return;
+            if (Inline)
+            {
+                return;
+            }
 
             RevertUncommittedTimeChange();
 

@@ -223,7 +223,11 @@ namespace Radzen.Blazor
             }
 
             var vbWidth = x + Math.Max(0, QuietZoneModules);
-            if (vbWidth <= 0) vbWidth = 1;
+            if (vbWidth <= 0)
+            {
+                vbWidth = 1;
+            }
+
             return (rects, vbWidth, checksumText, null);
         }
 
@@ -245,20 +249,32 @@ namespace Radzen.Blazor
                 }
 
                 int j = i + 1;
-                while (j < bits.Length && bits[j] == '1') j++;
+                while (j < bits.Length && bits[j] == '1')
+                {
+                    j++;
+                }
+
                 rects.Add(new BarcodeRect(quiet + i, 0, j - i, BarHeight));
                 i = j;
             }
 
             var vbWidth = quiet + bits.Length + quiet;
-            if (vbWidth <= 0) vbWidth = 1;
+            if (vbWidth <= 0)
+            {
+                vbWidth = 1;
+            }
+
             return (rects, vbWidth, checksumText, null);
         }
 
         (IReadOnlyList<BarcodeRect> bars, double vbWidth, string? checksumText, string? error) CreateFromRects((IReadOnlyList<BarcodeRect> bars, double vbWidth) geometry, string? checksumText)
         {
             var vbWidth = geometry.vbWidth;
-            if (vbWidth <= 0) vbWidth = 1;
+            if (vbWidth <= 0)
+            {
+                vbWidth = 1;
+            }
+
             return (geometry.bars, vbWidth, checksumText, null);
         }
 

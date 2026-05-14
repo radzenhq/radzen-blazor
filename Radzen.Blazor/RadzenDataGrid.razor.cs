@@ -873,7 +873,9 @@ namespace Radzen.Blazor
         internal void UpdatePickableColumn(RadzenDataGridColumn<TItem> column, bool visible)
         {
             if (selectedColumns == null)
+            {
                 return;
+            }
 
             var columnsList = ((IEnumerable<object>)selectedColumns).ToList();
             if (visible)
@@ -2031,7 +2033,10 @@ namespace Radzen.Blazor
         {
             var property = d.Property;
             if (string.IsNullOrEmpty(property))
+            {
                 return "";
+            }
+
             var p = isOData ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
             return $"{p} {(d.SortOrder == Radzen.SortOrder.Ascending ? "asc" : "desc")}";
         }
@@ -2248,8 +2253,16 @@ namespace Radzen.Blazor
         // cheap EXISTS query.
         internal bool HasAnyData()
         {
-            if (Data == null) return false;
-            if (Data is IQueryable<TItem> queryable) return queryable.Any();
+            if (Data == null)
+            {
+                return false;
+            }
+
+            if (Data is IQueryable<TItem> queryable)
+            {
+                return queryable.Any();
+            }
+
             return Data.Any();
         }
 
@@ -2663,8 +2676,16 @@ namespace Radzen.Blazor
         /// <returns>Are items equal</returns>
         protected bool ItemEquals(TItem item, TItem otherItem)
         {
-            if (item == null && otherItem == null) return true;
-            if (item == null || otherItem == null) return false;
+            if (item == null && otherItem == null)
+            {
+                return true;
+            }
+
+            if (item == null || otherItem == null)
+            {
+                return false;
+            }
+
             return keyPropertyGetter != null ? Equals(keyPropertyGetter(item), keyPropertyGetter(otherItem)) : item.Equals(otherItem);
         }
 
@@ -2677,7 +2698,9 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(item);
             if (expandedOnLoad == true)
+            {
                 return;
+            }
 
             allGroupsExpanded = null;
             await AllGroupsExpandedChanged.InvokeAsync(allGroupsExpanded);
@@ -2915,7 +2938,10 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(items);
             // Only allow the functionality when multiple row expand is allowed
-            if (this.ExpandMode != DataGridExpandMode.Multiple) return;
+            if (this.ExpandMode != DataGridExpandMode.Multiple)
+            {
+                return;
+            }
 
             foreach (TItem item in items)
             {
@@ -2957,7 +2983,10 @@ namespace Radzen.Blazor
         public async System.Threading.Tasks.Task CollapseRows(IEnumerable<TItem> items)
         {
             // Only allow the functionality when multiple row expand is allowed
-            if (this.ExpandMode != DataGridExpandMode.Multiple) return;
+            if (this.ExpandMode != DataGridExpandMode.Multiple)
+            {
+                return;
+            }
 
             foreach (TItem item in items.Where(x=> expandedItems.Keys.Any(i => ItemEquals(i, x))))
             {
@@ -3311,7 +3340,10 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(items);
             // Only allow the functionality when multiple row edits is allowed
-            if (this.EditMode != DataGridEditMode.Multiple) return;
+            if (this.EditMode != DataGridEditMode.Multiple)
+            {
+                return;
+            }
 
             foreach (TItem item in items)
             {
@@ -4065,7 +4097,9 @@ namespace Radzen.Blazor
 
                             // Filtering
                             if( SetColumnFilterValueFromSettings(gridColumn, column, true))
+                            {
                                 shouldUpdateState = true;
+                            }
 
                             if (gridColumn.GetFilterOperator() != column.FilterOperator)
                             {
@@ -4075,7 +4109,9 @@ namespace Radzen.Blazor
 
                             // 2nd filter value
                             if( SetColumnFilterValueFromSettings(gridColumn, column, false))
+                            {
                                 shouldUpdateState = true;
+                            }
 
                             if (gridColumn.GetSecondFilterOperator() != column.SecondFilterOperator)
                             {
