@@ -1,78 +1,64 @@
 :root {
-
   /* Theme Colors */
   @each $color, $value in $rz-theme-colors-map {
     --rz-#{$color}: #{$value};
   }
-
   /* Theme Constants */
   @each $token, $value in $rz-theme-constants-map {
     --rz-#{$token}: #{$value};
   }
-
   /* Semantic Text */
   @each $token, $value in $rz-text-map {
     --rz-#{$token}: #{$value};
   }
-
   /* Text */
   @each $element, $property in $text {
     @each $key, $value in $property {
       --rz-text-#{$element}-#{$key}: #{$value};
     }
   }
+
   --rz-text-selection-background-color: #{$rz-text-selection-background-color};
   --rz-text-selection-color: #{$rz-text-selection-color};
-
   /* Link */
   @each $token, $value in $rz-link-map {
     --rz-#{$token}: #{$value};
   }
-
   /* Base Background */
   --rz-base-background-color: #{$rz-base-background-color};
-
   /* Border */
   @each $color, $value in $rz-theme-colors-map {
     --rz-border-#{$color}: var(--rz-border-width) solid var(--rz-#{$color});
   }
-
   /* Interaction State Border */
   @each $token, $value in $rz-state-border-map {
     --rz-#{$token}: #{$value};
   }
-
   /* Border Radius */
   @each $token, $value in $rz-border-radius-map {
     --rz-#{$token}: #{$value};
   }
-
   /* Outline */
   @each $color, $value in $rz-theme-colors-map {
     --rz-outline-#{$color}: var(--rz-outline-width) solid var(--rz-#{$color});
   }
-
   /* Interaction State Outline */
   @each $token, $value in $rz-state-outline-map {
     --rz-#{$token}: #{$value};
   }
-
   /* Shadow */
   @each $token, $value in $rz-shadow-map {
     --rz-#{$token}: #{$value};
   }
-
   /* Transition */
   --rz-transition: #{$rz-transition};
   --rz-transition-all: #{$rz-transition-all};
   --rz-expander-transition: #{$rz-expander-transition};
-
   /* Layout Body */
   --rz-layout-body-margin: #{$layout-body-margin};
   --rz-layout-body-padding: #{$layout-body-padding};
   --rz-layout-body-border-radius: #{$layout-body-border-radius};
   --rz-layout-body-background-color: #{$layout-body-background-color};
-
   /* Accordion */
   --rz-accordion-item-padding-block: #{$accordion-item-padding-block};
   --rz-accordion-item-padding-inline: #{$accordion-item-padding-inline};
@@ -98,8 +84,7 @@
   --rz-accordion-content-font-size: #{$accordion-content-font-size};
   --rz-accordion-border-radius: #{$accordion-border-radius};
   --rz-accordion-shadow: #{$accordion-shadow};
-
- /* Alert */
+  /* Alert */
   --rz-alert-margin: #{$alert-margin};
   --rz-alert-padding: #{$alert-padding};
   --rz-alert-gap: #{$alert-gap};
@@ -112,7 +97,6 @@
   --rz-alert-icon-color: #{$alert-icon-color};
   --rz-alert-icon-margin: #{$alert-icon-margin};
   --rz-alert-icon-size: #{$alert-icon-size};
-
   /* Badge */
   --rz-badge-border-radius: #{$badge-border-radius};
   --rz-badge-pill-border-radius: #{$badge-pill-border-radius};
@@ -123,7 +107,6 @@
   --rz-badge-line-height: #{$badge-line-height};
   --rz-badge-text-transform: #{$badge-text-transform};
   --rz-badge-letter-spacing: #{$badge-letter-spacing};
-
   /* Button */
   --rz-button-base-background-color: #{$button-base-background-color};
   --rz-button-base-color: #{$button-base-color};
@@ -146,7 +129,6 @@
   --rz-button-active-background-size: #{$button-active-background-size};
   --rz-button-disabled-opacity: #{$button-disabled-opacity};
   --rz-button-empty-opacity: #{$button-empty-opacity};
-
   /* Card */
   --rz-card-padding: #{$card-padding};
   --rz-card-background-color: #{$card-background-color};
@@ -155,7 +137,6 @@
   --rz-card-border: #{$card-border};
   --rz-card-border-radius: #{$card-border-radius};
   --rz-card-heading-margin-bottom: #{$card-heading-margin-bottom};
-
   /* Carousel */
   --rz-carousel-pager-button-width: #{$rz-carousel-pager-button-width};
   --rz-carousel-pager-button-height: #{$rz-carousel-pager-button-height};
@@ -177,7 +158,6 @@
   --rz-carousel-prev-next-button-border-radius: #{$rz-carousel-prev-next-button-border-radius};
   --rz-carousel-prev-next-button-inset: #{$rz-carousel-prev-next-button-inset};
   --rz-carousel-border-radius: #{$rz-carousel-border-radius};
-
   /* Chart */
   --rz-chart-axis-color: #{$chart-axis-color};
   --rz-chart-axis-label-color: #{$chart-axis-label-color};
@@ -192,7 +172,6 @@
   --rz-chart-tooltip-item-border-radius: #{$chart-tooltip-item-border-radius};
   --rz-chart-tooltip-item-hover-background-color: #{$chart-tooltip-item-hover-background-color};
   --rz-chart-marker-stroke: #{$chart-marker-stroke};
-
   /* Chat */
   --rz-chat-background-color: #{$rz-chat-background-color};
   --rz-chat-border: #{$rz-chat-border};
@@ -216,7 +195,6 @@
   --rz-chat-avatar-font-weight: #{$rz-chat-avatar-font-weight};
   --rz-chat-message-info-padding: #{$rz-chat-message-info-padding};
   --rz-chat-message-callout-radius: #{$rz-chat-message-callout-radius};
-
   /* Checkbox */
   --rz-checkbox-width: #{$checkbox-width};
   --rz-checkbox-height: #{$checkbox-height};
@@ -244,7 +222,6 @@
   --rz-checkbox-tri-icon-width: #{$checkbox-tri-icon-width};
   --rz-checkbox-tri-icon-height: #{$checkbox-tri-icon-height};
   --rz-checkbox-tri-icon-font-size: #{$checkbox-tri-icon-font-size};
-
   /* Chip */
   --rz-chip-background-color: #{$chip-background-color};
   --rz-chip-color: #{$chip-color};
@@ -270,7 +247,6 @@
   --rz-chip-xs-padding-inline: #{$chip-xs-padding-inline};
   --rz-chip-list-gap: #{$chip-list-gap};
   --rz-chip-disabled-opacity: #{$chip-disabled-opacity};
-
   /* ColorPicker */
   --rz-colorpicker-panel-border: #{$colorpicker-panel-border};
   --rz-colorpicker-panel-background-color: #{$colorpicker-panel-background-color};
@@ -294,7 +270,6 @@
   --rz-colorpicker-rgba-input-padding: #{$colorpicker-rgba-input-padding};
   --rz-colorpicker-rgba-input-height: #{$colorpicker-rgba-input-height};
   --rz-colorpicker-input-labels-color: #{$colorpicker-input-labels-color};
-
   /* DataFilter */
   --rz-datafilter-item-padding-block: #{$datafilter-item-padding-block};
   --rz-datafilter-item-padding-inline-start: #{$datafilter-item-padding-inline-start};
@@ -303,7 +278,6 @@
   --rz-datafilter-item-path-height: #{$datafilter-item-path-height};
   --rz-datafilter-item-path-border: #{$datafilter-item-path-border};
   --rz-datafilter-item-path-border-radius: #{$datafilter-item-path-border-radius};
-
   /* DataList */
   --rz-datalist-background-color: #{$datalist-background-color};
   --rz-datalist-shadow: #{$datalist-shadow};
@@ -316,7 +290,6 @@
   --rz-datalist-item-margin-inline: #{$datalist-item-margin-inline};
   --rz-datalist-item-padding: #{$datalist-item-padding};
   --rz-datalist-item-background-color: #{$datalist-item-background-color};
-
   /* DatePicker */
   --rz-datepicker-trigger-icon-width: #{$datepicker-trigger-icon-width};
   --rz-datepicker-trigger-icon-height: #{$datepicker-trigger-icon-height};
@@ -377,7 +350,6 @@
   --rz-timepicker-gap: #{$timepicker-gap};
   --rz-timepicker-separator-margin: #{$timepicker-separator-margin};
   --rz-timepicker-border: #{$timepicker-border};
-
   /* Dialog */
   --rz-dialog-background-color: #{$dialog-background-color};
   --rz-dialog-shadow: #{$dialog-shadow};
@@ -406,7 +378,6 @@
   --rz-dialog-resize-bar-thickness: #{$dialog-resize-bar-thickness};
   --rz-dialog-resize-bar-length: #{$dialog-resize-bar-length};
   --rz-dialog-resize-bar-handle-size: #{$dialog-resize-bar-handle-size};
-
   /* DropDown */
   --rz-dropdown-trigger-icon-width: #{$dropdown-trigger-icon-width};
   --rz-dropdown-trigger-icon-height: #{$dropdown-trigger-icon-height};
@@ -439,7 +410,6 @@
   --rz-dropdown-chips-padding-inline: #{$dropdown-chips-padding-inline};
   --rz-multiselect-checkbox-margin-block: #{$multiselect-checkbox-margin-block};
   --rz-multiselect-checkbox-margin-inline: #{$multiselect-checkbox-margin-inline};
-
   /* Editor */
   --rz-editor-border: #{$editor-border};
   --rz-editor-border-radius: #{$editor-border-radius};
@@ -455,7 +425,6 @@
   --rz-editor-content-background-color: #{$editor-content-background-color};
   --rz-editor-focus-outline: #{$editor-focus-outline};
   --rz-editor-focus-outline-offset: #{$editor-focus-outline-offset};
-
   /* Fieldset */
   --rz-fieldset-border: #{$fieldset-border};
   --rz-fieldset-border-radius: #{$fieldset-border-radius};
@@ -476,7 +445,6 @@
   --rz-fieldset-toggle-border: #{$fieldset-toggle-border};
   --rz-fieldset-toggle-focus-outline: #{$fieldset-toggle-focus-outline};
   --rz-fieldset-toggle-focus-outline-offset: #{$fieldset-toggle-focus-outline-offset};
-
   /* Fab */
   --rz-fab-inset-block-start: #{$fab-inset-block-start};
   --rz-fab-inset-block-end: #{$fab-inset-block-end};
@@ -489,14 +457,12 @@
   --rz-fab-hover-shadow: #{$fab-hover-shadow};
   --rz-fab-active-shadow: #{$fab-active-shadow};
   --rz-fabmenu-offset: #{$fabmenu-offset};
-  
   /* Footer */
   --rz-footer-padding: #{$footer-padding};
   --rz-footer-background-color: #{$footer-background-color};
   --rz-footer-border: #{$footer-border};
   --rz-footer-color: #{$footer-color};
   --rz-footer-z: #{$footer-z};
-
   /* FormField */
   --rz-form-field-margin-block: #{$form-field-margin-block};
   --rz-form-field-margin-inline: #{$form-field-margin-inline};
@@ -529,7 +495,6 @@
   --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
   --rz-form-field-label-floating-background-color: #{$form-field-label-floating-background-color};
   --rz-form-field-helper-padding: #{$form-field-helper-padding};
-
   /* Forms */
   --rz-form-error-color: #{$form-error-color};
   --rz-form-error-font-size: #{$form-error-font-size};
@@ -540,7 +505,6 @@
   --rz-validator-padding: #{$validator-padding};
   --rz-validator-pointer-size: #{$validator-pointer-size};
   --rz-validator-transform: #{$validator-transform};
-
   /* Gauge */
   --rz-gauge-scale-color: #{$gauge-scale-color};
   --rz-gauge-scale-label-color: #{$gauge-scale-label-color};
@@ -549,19 +513,16 @@
   --rz-gauge-arc-scale-color: #{$gauge-arc-scale-color};
   --rz-gauge-arc-scale-label-color: #{$gauge-arc-scale-label-color};
   --rz-gauge-arc-value-color: #{$gauge-arc-value-color};
-
   /* Map */
   --rz-map-height: #{$map-height};
   --rz-map-padding: #{$map-padding};
   --rz-map-background-color: #{$map-background-color};
   --rz-map-shadow: #{$map-shadow};
-
   /* Gravatar */
   --rz-gravatar-width: #{$gravatar-width};
   --rz-gravatar-height: #{$gravatar-height};
   --rz-gravatar-border-radius: #{$gravatar-border-radius};
   --rz-gravatar-box-shadow: #{$gravatar-box-shadow};
-
   /* Grid */
   --rz-grid-data-border-shadow: #{$grid-data-border-shadow};
   --rz-grid-cell-border: #{$grid-cell-border};
@@ -663,14 +624,12 @@
   --rz-column-drag-handle-hover-color: #{$column-drag-handle-hover-color};
   --rz-column-drag-handle-margin-inline: #{$column-drag-handle-margin-inline};
   --rz-column-draggable-shadow: #{$column-draggable-shadow};
-
   /* Gantt */
   --rz-gantt-row-height: #{$gantt-row-height};
   --rz-gantt-border: #{$gantt-border};
   --rz-gantt-border-radius: #{$gantt-border-radius};
   --rz-gantt-background-color: #{$gantt-background-color};
   --rz-gantt-event-border-radius: #{$gantt-event-border-radius};
-
   /* Header */
   --rz-header-background-color: #{$header-background-color};
   --rz-header-min-height: #{$header-min-height};
@@ -678,7 +637,6 @@
   --rz-header-border: #{$header-border};
   --rz-header-color: #{$header-color};
   --rz-header-shadow: #{$header-shadow};
-
   /* Icon */
   --rz-icon-font-family: #{$rz-icon-font-family};
   --rz-icon-size: #{$rz-icon-size};
@@ -686,7 +644,6 @@
   --rz-icon-weight: #{$rz-icon-weight};
   --rz-icon-grade: #{$rz-icon-grade};
   --rz-icon-optical-size: #{$rz-icon-optical-size};
-
   /* Input */
   --rz-input-font-size: #{$input-font-size};
   --rz-input-height: #{$input-height};
@@ -718,10 +675,8 @@
   --rz-input-disabled-placeholder-color: #{$input-disabled-placeholder-color};
   --rz-input-disabled-opacity: #{$input-disabled-opacity};
   --rz-input-transition: #{$input-transition};
-
   /* Layout */
   --rz-layout-background-color: #{$layout-background-color};
-
   /* Listbox */
   --rz-listbox-background-color: #{$listbox-background-color};
   --rz-listbox-border-radius: #{$listbox-border-radius};
@@ -739,7 +694,6 @@
   --rz-listbox-header-icon-width: #{$listbox-header-icon-width};
   --rz-listbox-header-icon-height: #{$listbox-header-icon-height};
   --rz-listbox-header-icon-margin: #{$listbox-header-icon-margin};
-
   /* Login */
   --rz-login-register-background-color: #{$login-register-background-color};
   --rz-login-register-padding-block: #{$login-register-padding-block};
@@ -748,13 +702,11 @@
   --rz-login-register-margin-inline: #{$login-register-margin-inline};
   --rz-login-register-button-margin-block: #{$login-register-button-margin-block};
   --rz-login-register-button-margin-inline: #{$login-register-button-margin-inline};
-
   /* Lookup */
   --rz-lookup-panel-background-color: #{$lookup-panel-background-color};
   --rz-lookup-panel-padding: #{$lookup-panel-padding};
   --rz-lookup-search-gap: #{$lookup-search-gap};
   --rz-lookup-search-margin-bottom: #{$lookup-search-margin-bottom};
-
   /* Menu */
   --rz-menu-background-color: #{$menu-background-color};
   --rz-menu-border: #{$menu-border};
@@ -789,7 +741,6 @@
   --rz-context-menu-padding-block: #{$context-menu-padding-block};
   --rz-context-menu-padding-inline: #{$context-menu-padding-inline};
   --rz-context-menu-box-shadow: #{$context-menu-box-shadow};
-
   /* Notification */
   --rz-notification-padding: #{$notification-padding};
   --rz-notification-gap: #{$notification-gap};
@@ -809,7 +760,6 @@
   --rz-notification-info-color: #{$notification-info-color};
   --rz-notification-info-background-color: #{$notification-info-background-color};
   --rz-notification-info-icon-color: #{$notification-info-icon-color};
-
   /* Numeric */
   --rz-numeric-line-height: #{$numeric-line-height};
   --rz-numeric-input-padding-block: #{$numeric-input-padding-block};
@@ -822,12 +772,10 @@
   --rz-numeric-button-disabled-background-color: #{$numeric-button-disabled-background-color};
   --rz-numeric-button-disabled-color: #{$numeric-button-disabled-color};
   --rz-numeric-button-color: #{$numeric-button-color};
-
   /* Overlay */
   --rz-overlay-shadow: #{$overlay-shadow};
   --rz-overlay-border: #{$overlay-border};
   --rz-overlay-background-color: #{$overlay-background-color};
-
   /* Pager */
   --rz-pager-background-color: #{$pager-background-color};
   --rz-pager-padding: #{$pager-padding};
@@ -853,7 +801,6 @@
   --rz-pager-summary-padding: #{$pager-summary-padding};
   --rz-pager-summary-font-size: #{$pager-summary-font-size};
   --rz-pager-summary-color: #{$pager-summary-color};
-
   /* PanelMenu */
   --rz-panel-menu-padding-block: #{$panel-menu-padding-block};
   --rz-panel-menu-padding-inline: #{$panel-menu-padding-inline};
@@ -908,7 +855,6 @@
   --rz-panel-menu-icon-2nd-level-icon-size: #{$panel-menu-icon-2nd-level-icon-size};
   --rz-panel-menu-toggle-icon-font-size: #{$panel-menu-toggle-icon-font-size};
   --rz-panel-menu-toggle-icon-opacity: #{$panel-menu-toggle-icon-opacity};
-
   /* Panel */
   --rz-panel-background-color: #{$panel-background-color};
   --rz-panel-padding: #{$panel-padding};
@@ -925,7 +871,6 @@
   --rz-panel-hover-color: #{$panel-hover-color};
   --rz-panel-border-radius: #{$panel-border-radius};
   --rz-panel-shadow: #{$panel-shadow};
-
   /* ProfileMenu */
   --rz-profile-menu-background-color: #{$profile-menu-background-color};
   --rz-profile-menu-top-item-background-color: #{$profile-menu-top-item-background-color};
@@ -941,7 +886,6 @@
   --rz-profile-menu-item-icon-height: #{$profile-menu-item-icon-height};
   --rz-profile-menu-item-icon-font-size: #{$profile-menu-item-icon-font-size};
   --rz-profile-menu-item-icon-margin-inline: #{$profile-menu-item-icon-margin-inline};
-
   /* ProgressBar */
   --rz-progressbar-value: #{$progressbar-value};
   --rz-progressbar-background-color: #{$progressbar-background-color};
@@ -951,10 +895,9 @@
   --rz-progressbar-border-radius: #{$progressbar-border-radius};
   --rz-progressbar-value-background-color: #{$progressbar-value-background-color};
   --rz-progressbar-value-transition: #{$progressbar-value-transition};
-  --rz-progressbar-circular-stroke-width:  #{$progressbar-circular-stroke-width};
-  --rz-progressbar-circular-value-stroke-width:  #{$progressbar-circular-value-stroke-width};
-  --rz-progressbar-circular-value-endpoint:  #{$progressbar-circular-value-endpoint};
-
+  --rz-progressbar-circular-stroke-width: #{$progressbar-circular-stroke-width};
+  --rz-progressbar-circular-value-stroke-width: #{$progressbar-circular-value-stroke-width};
+  --rz-progressbar-circular-value-endpoint: #{$progressbar-circular-value-endpoint};
   /* Radio */
   --rz-radio-width: #{$radio-width};
   --rz-radio-height: #{$radio-height};
@@ -978,7 +921,6 @@
   --rz-radio-icon-width: #{$radio-icon-width};
   --rz-radio-icon-height: #{$radio-icon-height};
   --rz-radio-checked-border: #{$radio-checked-border};
-
   /* Rating */
   --rz-rating-color: #{$rating-color};
   --rz-rating-opacity: #{$rating-opacity};
@@ -989,7 +931,6 @@
   --rz-rating-disabled-opacity: #{$rating-disabled-opacity};
   --rz-rating-ban-icon: #{$rating-ban-icon};
   --rz-rating-ban-icon-color: #{$rating-ban-icon-color};
-
   /* Sankey Diagram */
   --rz-sankey-node-stroke-width: #{$rz-sankey-node-stroke-width};
   --rz-sankey-link-stroke-width: #{$rz-sankey-link-stroke-width};
@@ -999,7 +940,6 @@
   --rz-sankey-label-color: #{$rz-sankey-label-color};
   --rz-sankey-label-stroke: #{$rz-sankey-label-stroke};
   --rz-sankey-label-stroke-width: #{$rz-sankey-label-stroke-width};
-
   /* Scheduler */
   --rz-scheduler-border: #{$scheduler-border};
   --rz-scheduler-border-color: #{$scheduler-border-color};
@@ -1039,6 +979,9 @@
   --rz-scheduler-header-background-color: #{$scheduler-header-background-color};
   --rz-scheduler-header-font-size: #{$scheduler-header-font-size};
   --rz-scheduler-header-font-size-small: #{$scheduler-header-font-size-small};
+  --rz-scheduler-header-agenda-font-size: #{$scheduler-header-agenda-font-size};
+  --rz-scheduler-header-agenda-font-weight: #{$scheduler-header-agenda-font-weight};
+  --rz-scheduler-header-agenda-font-size-small: #{$scheduler-header-agenda-font-size-small};
   --rz-scheduler-header-text-transform: #{$scheduler-header-text-transform};
   --rz-scheduler-header-color: #{$scheduler-header-color};
   --rz-scheduler-header-border: #{$scheduler-header-border};
@@ -1070,13 +1013,11 @@
   --rz-scheduler-focus-outline: #{$scheduler-focus-outline};
   --rz-scheduler-focus-outline-offset: #{$scheduler-focus-outline-offset};
   --rz-scheduler-highlight-background-color: #{$scheduler-highlight-background-color};
-
   /* Scrollbar */
   --rz-scrollbar-background-color: #{$scrollbar-background-color};
   --rz-scrollbar-color: #{$scrollbar-color};
   --rz-scrollbar-border-radius: #{$scrollbar-border-radius};
   --rz-scrollbar-size: #{$scrollbar-size};
-
   /* SecurityCode */
   --rz-security-code-input-min-width: #{$rz-security-code-input-min-width};
   --rz-security-code-input-min-height: #{$rz-security-code-input-min-height};
@@ -1084,7 +1025,6 @@
   --rz-security-code-input-font-size: #{$rz-security-code-input-font-size};
   --rz-security-code-input-font-weight: #{$rz-security-code-input-font-weight};
   --rz-security-code-input-line-height: #{$rz-security-code-input-line-height};
-
   /* SelectBar */
   --rz-selectbar-background-color: #{$selectbar-background-color};
   --rz-selectbar-color: #{$selectbar-color};
@@ -1097,7 +1037,6 @@
   --rz-selectbar-focus-outline-offset: #{$selectbar-focus-outline-offset};
   --rz-selectbar-button-focus-outline: #{$selectbar-button-focus-outline};
   --rz-selectbar-button-focus-outline-offset: #{$selectbar-button-focus-outline-offset};
-
   /* SidebarToggle */
   --rz-sidebar-toggle-icon-width: #{$sidebar-toggle-icon-width};
   --rz-sidebar-toggle-icon-height: #{$sidebar-toggle-icon-height};
@@ -1111,20 +1050,17 @@
   --rz-sidebar-toggle-hover-border-radius: #{$sidebar-toggle-hover-border-radius};
   --rz-sidebar-toggle-focus-outline: #{$sidebar-toggle-focus-outline};
   --rz-sidebar-toggle-focus-outline-offset: #{$sidebar-toggle-focus-outline-offset};
-
   /* Sidebar */
   --rz-sidebar-z: #{$sidebar-z};
   --rz-sidebar-width: #{$sidebar-width};
   --rz-sidebar-border-inline-end: #{$sidebar-border-inline-end};
   --rz-sidebar-background-color: #{$sidebar-background-color};
   --rz-sidebar-color: #{$sidebar-color};
-
   /* Skeleton */
   --rz-skeleton-background-color: #{$skeleton-background-color};
   --rz-skeleton-animation-color: #{$skeleton-animation-color};
   --rz-skeleton-border-radius: #{$skeleton-border-radius};
   --rz-skeleton-animation-duration: #{$skeleton-animation-duration};
-
   /* Slider */
   --rz-slider-background-color: #{$slider-background-color};
   --rz-slider-border: #{$slider-border};
@@ -1152,24 +1088,20 @@
   --rz-slider-disabled-range-border: #{$slider-disabled-range-border};
   --rz-slider-disabled-handle-border: #{$slider-disabled-handle-border};
   --rz-slider-disabled-handle-background-color: #{$slider-disabled-handle-background-color};
-
   /* SplitButton */
   --rz-splitbutton-menu-shadow: #{$splitbutton-menu-shadow};
   --rz-splitbutton-menu-min-width: #{$splitbutton-menu-min-width};
   --rz-splitbutton-background-color: #{$splitbutton-background-color};
   --rz-splitbutton-border-radius: #{$splitbutton-border-radius};
-
   /* Splitter */
   --rz-splitter-bar-color: #{$splitter-bar-color};
   --rz-splitter-bar-color-active: #{$splitter-bar-color-active};
   --rz-splitter-bar-background-color: #{$splitter-bar-background-color};
   --rz-splitter-bar-background-color-active: #{$splitter-bar-background-color-active};
   --rz-splitter-bar-hover-opacity: #{$splitter-bar-hover-opacity};
-
   /* Stack/Grid Layout */
   --rz-gap: #{$rz-gap};
   --rz-row-gap: #{$rz-row-gap};
-
   /* Steps */
   --rz-steps-color: #{$steps-color};
   --rz-steps-number-border-radius: #{$steps-number-border-radius};
@@ -1190,7 +1122,6 @@
   --rz-steps-buttons-padding-block: #{$steps-buttons-padding-block};
   --rz-steps-buttons-padding-inline: #{$steps-buttons-padding-inline};
   --rz-steps-button-color: #{$steps-button-color};
-
   /* Switch */
   --rz-switch-background-color: #{$switch-background-color};
   --rz-switch-checked-background-color: #{$switch-checked-background-color};
@@ -1199,7 +1130,6 @@
   --rz-switch-checked-circle-background-color: #{$switch-checked-circle-background-color};
   --rz-switch-focus-outline: #{$switch-focus-outline};
   --rz-switch-focus-outline-offset: #{$switch-focus-outline-offset};
-
   /* Tabs */
   --rz-tabs-padding: #{$tabs-padding};
   --rz-tabs-shadow: #{$tabs-shadow};
@@ -1227,11 +1157,9 @@
   --rz-tabs-icon-font-size: #{$tabs-icon-font-size};
   --rz-tabs-icon-margin-inline: #{$tabs-icon-margin-inline};
   --rz-tabs-transition: #{$tabs-transition};
-
   /* Textarea */
   --rz-text-area-padding-block: #{$text-area-padding-block};
   --rz-text-area-padding-inline: #{$text-area-padding-inline};
-
   /* Timeline */
   --rz-timeline-item-padding: #{$rz-timeline-item-padding};
   --rz-timeline-axis-size: #{$rz-timeline-axis-size};
@@ -1243,7 +1171,6 @@
   --rz-timeline-line-color: #{$rz-timeline-line-color};
   --rz-timeline-line-width: #{$rz-timeline-line-width};
   --rz-timeline-line-border-radius: #{$rz-timeline-line-border-radius};
-
   /* TimestampPicker */
   --rz-timespanpicker-line-height: #{$timespanpicker-line-height};
   --rz-timespanpicker-trigger-icon-width: #{$timespanpicker-trigger-icon-width};
@@ -1262,7 +1189,6 @@
   --rz-timespanpicker-panel-unit-gap: #{$timespanpicker-panel-unit-gap};
   --rz-timespanpicker-panel-field-min-width: #{$timespanpicker-panel-field-min-width};
   --rz-timespanpicker-unit-label-color: #{$timespanpicker-unit-label-color};
-
   /* Toc */
   --rz-toc-link-padding-block: #{$rz-toc-link-padding-block};
   --rz-toc-link-padding-inline: #{$rz-toc-link-padding-inline};
@@ -1293,7 +1219,6 @@
   --rz-toc-horizontal-link-selected-color: #{$rz-toc-horizontal-link-selected-color};
   --rz-toc-horizontal-link-selected-background-color: #{$rz-toc-horizontal-link-selected-background-color};
   --rz-toc-link-selected-indicator-border-radius: #{$rz-toc-link-selected-indicator-border-radius};
-
   /* Tooltip */
   --rz-tooltip-background-color: #{$tooltip-background-color};
   --rz-tooltip-color: #{$tooltip-color};
@@ -1301,7 +1226,6 @@
   --rz-tooltip-padding: #{$tooltip-padding};
   --rz-tooltip-border-radius: #{$tooltip-border-radius};
   --rz-tooltip-font-size: #{$tooltip-font-size};
-
   /* Tree */
   --rz-tree-background-color: #{$tree-background-color};
   --rz-tree-node-padding-block: #{$tree-node-padding-block};
@@ -1319,7 +1243,6 @@
   --rz-tree-node-toggle-color: #{$tree-node-toggle-color};
   --rz-tree-node-toggle-hover-color: #{$tree-node-toggle-hover-color};
   --rz-tree-transition: #{$tree-transition};
-
   /* Upload */
   --rz-upload-button-bar-background-color: #{$upload-button-bar-background-color};
   --rz-upload-button-bar-padding: #{$upload-button-bar-padding};
