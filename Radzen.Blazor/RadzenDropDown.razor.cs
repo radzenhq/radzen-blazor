@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
 using System;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -461,6 +462,10 @@ namespace Radzen.Blazor
                         .Add("rz-dropdown-chips", Chips && selectedItems.Count > 0)
                         .ToString();
         }
+
+        string PopupCssClass => ClassList.Create(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")
+                                         .AddInputSize(InputSize)
+                                         .ToString();
 
         /// <inheritdoc />
         public override void Dispose()
