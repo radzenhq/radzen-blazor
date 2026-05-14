@@ -117,10 +117,18 @@ namespace Radzen.Blazor
 
         internal string? GetActiveDescendantId()
         {
-            if (focusedIndex < 0) return null;
+            if (focusedIndex < 0)
+            {
+                return null;
+            }
+
             var visibleTabs = tabs.Where(t => t.Visible).ToList();
             var focused = visibleTabs.ElementAtOrDefault(focusedIndex);
-            if (focused == null) return null;
+            if (focused == null)
+            {
+                return null;
+            }
+
             return $"{GetId()}-tabpanel-{IndexOf(focused)}-label";
         }
 
@@ -354,7 +362,10 @@ namespace Radzen.Blazor
 
             var item = tabs.ElementAtOrDefault(focusedIndex) ?? tabs.FirstOrDefault();
 
-            if (item == null) return;
+            if (item == null)
+            {
+                return;
+            }
 
             if (key == "ArrowLeft" || key == "ArrowRight")
             {

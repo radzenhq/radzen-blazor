@@ -120,7 +120,10 @@ public class TopFilterCriterion : FilterCriterion
             ? (int)Math.Ceiling(rowCount * (Count / 100.0))
             : Count;
         keep = Math.Clamp(keep, 0, rowCount);
-        if (keep == 0) return;
+        if (keep == 0)
+        {
+            return;
+        }
 
         var values = new List<(int row, double value)>(rowCount);
         for (var r = startRow; r <= endRow; r++)
@@ -220,11 +223,19 @@ public class DynamicFilterCriterion : FilterCriterion
         switch (Type)
         {
             case DynamicFilterType.AboveAverage:
-                if (!averageComputed) return false;
+                if (!averageComputed)
+                {
+                    return false;
+                }
+
                 return TopFilterCriterion.TryCoerceToDouble(cell.Value, out var av) && av > average;
 
             case DynamicFilterType.BelowAverage:
-                if (!averageComputed) return false;
+                if (!averageComputed)
+                {
+                    return false;
+                }
+
                 return TopFilterCriterion.TryCoerceToDouble(cell.Value, out var bv) && bv < average;
 
             default:
@@ -288,7 +299,11 @@ public class DynamicFilterCriterion : FilterCriterion
 
     private static bool InQuarter(DateTime d, DateTime reference)
     {
-        if (d.Year != reference.Year) return false;
+        if (d.Year != reference.Year)
+        {
+            return false;
+        }
+
         var quarterOf = (int month) => (month - 1) / 3 + 1;
         return quarterOf(d.Month) == quarterOf(reference.Month);
     }
@@ -340,7 +355,11 @@ public class CellColorFilterCriterion : FilterCriterion
     public override bool Matches(Worksheet sheet, int row)
     {
         ArgumentNullException.ThrowIfNull(sheet);
-        if (!sheet.Cells.TryGet(row, Column, out var cell)) return false;
+        if (!sheet.Cells.TryGet(row, Column, out var cell))
+        {
+            return false;
+        }
+
         var actual = FontColor ? cell.Format.Color : cell.Format.BackgroundColor;
         return string.Equals(actual, Color, StringComparison.OrdinalIgnoreCase);
     }

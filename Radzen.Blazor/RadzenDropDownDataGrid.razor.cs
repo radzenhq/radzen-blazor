@@ -205,7 +205,9 @@ namespace Radzen.Blazor
         protected override async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
+            {
                 return;
+            }
 
             if (IsVirtualizationAllowed() && grid != null)
             {
@@ -633,7 +635,10 @@ namespace Radzen.Blazor
 
         private bool IsColumnFilterPropertyTypeString(RadzenDataGridColumn<object> column)
         {
-            if (column.Type == typeof(string)) return true;
+            if (column.Type == typeof(string))
+            {
+                return true;
+            }
 
             var property = column.GetFilterProperty();
             if(property is not null)
@@ -667,7 +672,9 @@ namespace Radzen.Blazor
                 var query = Query;
 
                 if (query == null)
+                {
                     return;
+                }
 
                 var filterOperator = FilterOperator == StringFilterOperator.Contains ?
                                         Radzen.FilterOperator.Contains :
@@ -873,7 +880,9 @@ namespace Radzen.Blazor
         async System.Threading.Tasks.Task Clear()
         {
             if (Disabled)
+            {
                 return;
+            }
 
             var canRequest = searchText != null;
 
@@ -961,7 +970,11 @@ namespace Radzen.Blazor
             {
                 preventKeydown = false;
 
-                if (JSRuntime == null) return;
+                if (JSRuntime == null)
+                {
+                    return;
+                }
+
                 var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
 
                 if (!popupOpened)

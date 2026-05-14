@@ -30,8 +30,8 @@
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
     
-    <!-- Don't enforce code style in build (yet) - just show warnings -->
-    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <!-- Enforce code style rules at build (e.g. csharp_prefer_braces). -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     
     <!-- Don't treat warnings as errors (yet) - too many to fix immediately -->
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>

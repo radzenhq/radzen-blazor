@@ -129,7 +129,9 @@ namespace Radzen
                 }
 
                 if (!value.Equals(_value))
+                {
                     _value = value;
+                }
             }
         }
 

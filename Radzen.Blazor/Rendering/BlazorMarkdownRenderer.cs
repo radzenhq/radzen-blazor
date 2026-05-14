@@ -351,7 +351,11 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     /// <inheritdoc />
     public override void VisitHtmlInline(HtmlInline htmlInline)
     {
-        if (htmlInline.Value == null) return;
+        if (htmlInline.Value == null)
+        {
+            return;
+        }
+
         var match = OutletRegex.Match(htmlInline.Value);
 
         if (match.Success)

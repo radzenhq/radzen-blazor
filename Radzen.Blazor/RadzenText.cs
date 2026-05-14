@@ -126,7 +126,11 @@ namespace Radzen.Blazor
 
             private string GetAnchor()
             {
-                if (string.IsNullOrEmpty(Path)) return "";
+                if (string.IsNullOrEmpty(Path))
+                {
+                    return "";
+                }
+
                 var fragments = Path.Split('#');
 
                 return fragments.Length > 1 ? fragments[1] : fragments[0];
@@ -152,7 +156,11 @@ namespace Radzen.Blazor
 
             private string GetPath()
             {
-                if (NavigationManager == null) return "";
+                if (NavigationManager == null)
+                {
+                    return "";
+                }
+
                 var uri = new Uri(NavigationManager.Uri);
 
                 var anchor = GetAnchor();

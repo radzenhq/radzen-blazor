@@ -18,7 +18,13 @@ static class CsvReader
 
         var rowCount = rows.Count == 0 ? 1 : rows.Count;
         var maxCols = 1;
-        foreach (var r in rows) if (r.Count > maxCols) maxCols = r.Count;
+        foreach (var r in rows)
+        {
+            if (r.Count > maxCols)
+            {
+                maxCols = r.Count;
+            }
+        }
 
         var wb = new Workbook();
         var sheet = wb.AddSheet(options.SheetName, rowCount, maxCols);
@@ -87,8 +93,14 @@ static class CsvReader
             else if (ch == '\r')
             {
                 EndRow();
-                if (i + 1 < text.Length && text[i + 1] == '\n') i += 2;
-                else i++;
+                if (i + 1 < text.Length && text[i + 1] == '\n')
+                {
+                    i += 2;
+                }
+                else
+                {
+                    i++;
+                }
             }
             else if (ch == '\n')
             {

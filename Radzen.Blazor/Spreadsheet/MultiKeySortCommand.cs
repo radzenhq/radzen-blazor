@@ -24,7 +24,10 @@ public class MultiKeySortCommand(Worksheet sheet, RangeRef range, SortKey[] keys
     /// <inheritdoc/>
     public bool Execute()
     {
-        if (range == RangeRef.Invalid || keys.Length == 0) return false;
+        if (range == RangeRef.Invalid || keys.Length == 0)
+        {
+            return false;
+        }
 
         Snapshot();
 
@@ -38,14 +41,20 @@ public class MultiKeySortCommand(Worksheet sheet, RangeRef range, SortKey[] keys
     /// <inheritdoc/>
     public void Unexecute()
     {
-        if (range == RangeRef.Invalid) return;
+        if (range == RangeRef.Invalid)
+        {
+            return;
+        }
 
         foreach (var (cellRef, (value, formula, format)) in cells)
         {
             var target = sheet.Cells[cellRef];
             target.Value = value;
             target.Formula = formula;
-            if (format is not null) target.Format = format;
+            if (format is not null)
+            {
+                target.Format = format;
+            }
         }
     }
 

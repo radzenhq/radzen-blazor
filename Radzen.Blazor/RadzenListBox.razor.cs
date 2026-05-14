@@ -105,7 +105,9 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(args);
             if (Disabled)
+            {
                 return;
+            }
 
             var key = $"{args.Key}".Trim();
 

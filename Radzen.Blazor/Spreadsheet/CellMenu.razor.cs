@@ -269,7 +269,10 @@ public partial class CellMenu : ComponentBase
     {
         var rangeToUse = GetActiveFilterRange();
 
-        if (rangeToUse == RangeRef.Invalid) return false;
+        if (rangeToUse == RangeRef.Invalid)
+        {
+            return false;
+        }
 
         // Excel treats the first row as a header and excludes it from blank checking
         // Check if any cell in the column (excluding header) has null or empty value

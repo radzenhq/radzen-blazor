@@ -214,7 +214,11 @@ namespace Radzen.Blazor
 
         async Task DebounceFilter()
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
 
             value = $"{value}";

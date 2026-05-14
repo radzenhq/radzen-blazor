@@ -111,17 +111,41 @@ namespace Radzen.Blazor
 
             if (round)
             {
-                if (fraction < 1.5) niceFraction = 1;
-                else if (fraction < 3) niceFraction = 2;
-                else if (fraction < 7) niceFraction = 5;
-                else niceFraction = 10;
+                if (fraction < 1.5)
+                {
+                    niceFraction = 1;
+                }
+                else if (fraction < 3)
+                {
+                    niceFraction = 2;
+                }
+                else if (fraction < 7)
+                {
+                    niceFraction = 5;
+                }
+                else
+                {
+                    niceFraction = 10;
+                }
             }
             else
             {
-                if (fraction <= 1) niceFraction = 1;
-                else if (fraction <= 2) niceFraction = 2;
-                else if (fraction <= 5) niceFraction = 5;
-                else niceFraction = 10;
+                if (fraction <= 1)
+                {
+                    niceFraction = 1;
+                }
+                else if (fraction <= 2)
+                {
+                    niceFraction = 2;
+                }
+                else if (fraction <= 5)
+                {
+                    niceFraction = 5;
+                }
+                else
+                {
+                    niceFraction = 10;
+                }
             }
 
             return sign * niceFraction * Math.Pow(10, exponent);

@@ -104,7 +104,11 @@ namespace Radzen.Blazor
 
         private void ValidateField(object? sender, FieldChangedEventArgs args)
         {
-            if (Form == null) return;
+            if (Form == null)
+            {
+                return;
+            }
+
             var component = Form.FindComponent(Component);
             if (component != null && args != null)
             {
@@ -117,7 +121,11 @@ namespace Radzen.Blazor
 
         private void ValidateModel(object? sender, ValidationRequestedEventArgs args)
         {
-            if (Form == null) return;
+            if (Form == null)
+            {
+                return;
+            }
+
             var component = Form.FindComponent(Component);
 
             if (component == null)

@@ -118,7 +118,11 @@ public partial class CellView : CellBase, IDisposable
 
     private string? GetDisplayValue()
     {
-        if (cell is null) return null;
+        if (cell is null)
+        {
+            return null;
+        }
+
         var (formatted, color) = NumberFormat.ApplyWithColor(cell.Format?.NumberFormat, cell.Value, cell.ValueType);
         numberFormatColor = color;
         return formatted ?? cell.Value?.ToString();
@@ -164,7 +168,10 @@ public partial class CellView : CellBase, IDisposable
 
     private bool HasListValidation()
     {
-        if (Worksheet is null) return false;
+        if (Worksheet is null)
+        {
+            return false;
+        }
 
         var validators = Worksheet.Validation.GetValidatorsForCell(new CellRef(Row, Column));
         foreach (var v in validators)
@@ -258,14 +265,20 @@ public partial class CellView : CellBase, IDisposable
 
     private void AppendTableStyle(StringBuilder sb)
     {
-        if (Worksheet?.Tables is null || Worksheet.Tables.Count == 0) return;
+        if (Worksheet?.Tables is null || Worksheet.Tables.Count == 0)
+        {
+            return;
+        }
 
         Documents.Spreadsheet.Table? table = null;
         foreach (var t in Worksheet.Tables)
         {
             if (t.Range.Contains(Row, Column)) { table = t; break; }
         }
-        if (table is null) return;
+        if (table is null)
+        {
+            return;
+        }
 
         var preset = TableStylePresets.Get(table.TableStyle);
 
@@ -316,8 +329,15 @@ public partial class CellView : CellBase, IDisposable
                 bg = colOdd ? preset.AltRowBackground : preset.RowBackground;
             }
 
-            if (table.HighlightFirstColumn && isFirstCol && preset.BoldFirstColumn) bold = true;
-            if (table.HighlightLastColumn && isLastCol && preset.BoldLastColumn) bold = true;
+            if (table.HighlightFirstColumn && isFirstCol && preset.BoldFirstColumn)
+            {
+                bold = true;
+            }
+
+            if (table.HighlightLastColumn && isLastCol && preset.BoldLastColumn)
+            {
+                bold = true;
+            }
         }
 
         if (bg is not null)
@@ -466,10 +486,17 @@ public partial class CellView : CellBase, IDisposable
 
     private bool IsInsideAnyTable()
     {
-        if (Worksheet?.Tables is null) return false;
+        if (Worksheet?.Tables is null)
+        {
+            return false;
+        }
+
         foreach (var t in Worksheet.Tables)
         {
-            if (t.Range.Contains(Row, Column)) return true;
+            if (t.Range.Contains(Row, Column))
+            {
+                return true;
+            }
         }
         return false;
     }

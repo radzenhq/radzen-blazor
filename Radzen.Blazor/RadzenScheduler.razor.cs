@@ -510,10 +510,14 @@ namespace Radzen.Blazor
         {
             var viewIndex = Views.IndexOf(view);
             if (viewIndex == -1)
+            {
                 return;
+            }
 
             if (SelectedView == view)
+            {
                 return;
+            }
 
             selectedIndex = viewIndex;
 

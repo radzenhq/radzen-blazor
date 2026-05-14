@@ -297,7 +297,11 @@ public static class RadzenBarcodeEncoder
 
         bool HasStartStop(string s)
         {
-            if (s.Length < 2) return false;
+            if (s.Length < 2)
+            {
+                return false;
+            }
+
             bool isStart = s[0] == 'A' || s[0] == 'B' || s[0] == 'C' || s[0] == 'D';
             bool isStop = s[s.Length - 1] == 'A' || s[s.Length - 1] == 'B' || s[s.Length - 1] == 'C' || s[s.Length - 1] == 'D';
             return isStart && isStop;
@@ -553,12 +557,20 @@ public static class RadzenBarcodeEncoder
         {
             // ISBN-10 -> EAN-13: 978 + first 9 digits + EAN check
             var core = raw[..9];
-            if (!core.All(char.IsDigit)) throw new ArgumentException("Invalid ISBN-10.");
+            if (!core.All(char.IsDigit))
+            {
+                throw new ArgumentException("Invalid ISBN-10.");
+            }
+
             return EncodeEan13("978" + core, out checksumText);
         }
         if (raw.Length == 13)
         {
-            if (!raw.All(char.IsDigit)) throw new ArgumentException("Invalid ISBN-13.");
+            if (!raw.All(char.IsDigit))
+            {
+                throw new ArgumentException("Invalid ISBN-13.");
+            }
+
             return EncodeEan13(raw, out checksumText);
         }
 
@@ -575,9 +587,17 @@ public static class RadzenBarcodeEncoder
     {
         // ISSN EAN-13: 977 + first 7 digits + 00 + EAN check
         var raw = new string(value.Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
-        if (raw.Length != 8) throw new ArgumentException("ISSN requires 8 characters.");
+        if (raw.Length != 8)
+        {
+            throw new ArgumentException("ISSN requires 8 characters.");
+        }
+
         var core = raw[..7];
-        if (!core.All(char.IsDigit)) throw new ArgumentException("Invalid ISSN.");
+        if (!core.All(char.IsDigit))
+        {
+            throw new ArgumentException("Invalid ISSN.");
+        }
+
         return EncodeEan13("977" + core + "00", out checksumText);
     }
 
@@ -628,7 +648,11 @@ public static class RadzenBarcodeEncoder
         }
 
         var vbWidth = x + Math.Max(0, quietZone);
-        if (vbWidth <= 0) vbWidth = 1;
+        if (vbWidth <= 0)
+        {
+            vbWidth = 1;
+        }
+
         return (rects, vbWidth);
     }
 
@@ -700,7 +724,11 @@ public static class RadzenBarcodeEncoder
         x += 1;
 
         var vbWidth = x + Math.Max(0, quietZone);
-        if (vbWidth <= 0) vbWidth = 1;
+        if (vbWidth <= 0)
+        {
+            vbWidth = 1;
+        }
+
         return (rects, vbWidth);
     }
 
@@ -823,7 +851,11 @@ public static class RadzenBarcodeEncoder
             }
         }
 
-        foreach (var ch in text) AddSymbol(ch);
+        foreach (var ch in text)
+        {
+            AddSymbol(ch);
+        }
+
         AddSymbol(checkChar);
 
         // Stop bar (descender)
@@ -831,7 +863,11 @@ public static class RadzenBarcodeEncoder
         xPos += 1;
 
         var vbWidth = xPos + Math.Max(0, quietZone);
-        if (vbWidth <= 0) vbWidth = 1;
+        if (vbWidth <= 0)
+        {
+            vbWidth = 1;
+        }
+
         return (rects, vbWidth);
     }
 
@@ -844,7 +880,10 @@ public static class RadzenBarcodeEncoder
     public static string EncodeMsiPlessey(string value, out string checksumText)
     {
         var digits = new string(value.Where(char.IsDigit).ToArray());
-        if (digits.Length == 0) throw new ArgumentException("Plessey (MSI) requires numeric input.");
+        if (digits.Length == 0)
+        {
+            throw new ArgumentException("Plessey (MSI) requires numeric input.");
+        }
 
         // Mod 10 (Luhn) check digit (common)
         int check = ComputeLuhnCheckDigit(digits);
@@ -869,7 +908,11 @@ public static class RadzenBarcodeEncoder
 
         var sb = new StringBuilder();
         sb.Append("110"); // start
-        foreach (var ch in digits) sb.Append(DigitMap(ch));
+        foreach (var ch in digits)
+        {
+            sb.Append(DigitMap(ch));
+        }
+
         sb.Append("1001"); // stop
         return sb.ToString();
     }
@@ -884,7 +927,10 @@ public static class RadzenBarcodeEncoder
             if (dbl)
             {
                 d *= 2;
-                if (d > 9) d -= 9;
+                if (d > 9)
+                {
+                    d -= 9;
+                }
             }
             sum += d;
             dbl = !dbl;
@@ -906,7 +952,11 @@ public static class RadzenBarcodeEncoder
         int sum = 0;
         for (int i = 0; i < bytes.Length; i++)
         {
-            if (bytes[i] > 0x7F) throw new ArgumentException("Telepen supports ASCII only.");
+            if (bytes[i] > 0x7F)
+            {
+                throw new ArgumentException("Telepen supports ASCII only.");
+            }
+
             sum = (sum + bytes[i]) % 127;
         }
 
@@ -978,14 +1028,21 @@ public static class RadzenBarcodeEncoder
             }
 
             int j = idx + 1;
-            while (j < bitStream.Count && bitStream[j] == 1) j++;
+            while (j < bitStream.Count && bitStream[j] == 1)
+            {
+                j++;
+            }
+
             if (j >= bitStream.Count || bitStream[j] != 0)
             {
                 throw new ArgumentException("Invalid Telepen bit stream.");
             }
 
             int k = j - (idx + 1); // number of 1s
-            if (k < 2) throw new ArgumentException("Invalid Telepen bit stream.");
+            if (k < 2)
+            {
+                throw new ArgumentException("Invalid Telepen bit stream.");
+            }
 
             // leading "01" => narrow bar, wide space
             widths.Add(narrow);
@@ -1026,8 +1083,15 @@ public static class RadzenBarcodeEncoder
 
         var (bars, viewBoxWidth, viewBoxHeight) = EncodeToBars(type, value, barHeight, quietZoneModules);
 
-        if (viewBoxWidth <= 0) viewBoxWidth = 1;
-        if (viewBoxHeight <= 0) viewBoxHeight = 1;
+        if (viewBoxWidth <= 0)
+        {
+            viewBoxWidth = 1;
+        }
+
+        if (viewBoxHeight <= 0)
+        {
+            viewBoxHeight = 1;
+        }
 
         var sb = new StringBuilder(bars.Count * 64 + 256);
         sb.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{F(viewBoxWidth)}\" height=\"{F(viewBoxHeight)}\" viewBox=\"0 0 {F(viewBoxWidth)} {F(viewBoxHeight)}\" shape-rendering=\"crispEdges\">");
@@ -1155,7 +1219,11 @@ public static class RadzenBarcodeEncoder
         }
 
         var vbWidth = x + Math.Max(0, quietZoneModules);
-        if (vbWidth <= 0) vbWidth = 1;
+        if (vbWidth <= 0)
+        {
+            vbWidth = 1;
+        }
+
         return (rects, vbWidth);
     }
 
@@ -1179,20 +1247,32 @@ public static class RadzenBarcodeEncoder
             }
 
             int j = i + 1;
-            while (j < bits.Length && bits[j] == '1') j++;
+            while (j < bits.Length && bits[j] == '1')
+            {
+                j++;
+            }
+
             rects.Add(new BarcodeRect(quiet + i, 0, j - i, barHeight));
             i = j;
         }
 
         var vbWidth = quiet + bits.Length + quiet;
-        if (vbWidth <= 0) vbWidth = 1;
+        if (vbWidth <= 0)
+        {
+            vbWidth = 1;
+        }
+
         return (rects, vbWidth);
     }
 
     static (IReadOnlyList<BarcodeRect> bars, double vbWidth) CreateFromRects((IReadOnlyList<BarcodeRect> bars, double vbWidth) geometry)
     {
         var vbWidth = geometry.vbWidth;
-        if (vbWidth <= 0) vbWidth = 1;
+        if (vbWidth <= 0)
+        {
+            vbWidth = 1;
+        }
+
         return (geometry.bars, vbWidth);
     }
 

@@ -636,7 +636,9 @@ static class XlsxReader
     {
         var colIdAttribute = filterColumn.Attribute("colId")?.Value;
         if (string.IsNullOrEmpty(colIdAttribute) || !int.TryParse(colIdAttribute, out var colId))
+        {
             return;
+        }
 
         var actualColumn = range.Start.Column + colId;
 
@@ -1337,13 +1339,19 @@ static class XlsxReader
     {
         XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
         var tableParts = sheetDoc.Descendants(sNs + "tablePart").ToList();
-        if (tableParts.Count == 0) return;
+        if (tableParts.Count == 0)
+        {
+            return;
+        }
 
         // Resolve sheet rels into a map
         var sheetFileName = sheetInfo.FullPath.Split('/').Last();
         var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
         var relsEntry = archive.GetEntry(relsPath);
-        if (relsEntry is null) return;
+        if (relsEntry is null)
+        {
+            return;
+        }
 
         var sheetRelMap = new Dictionary<string, string>();
         using (var relsStream = relsEntry.Open())
@@ -1364,11 +1372,17 @@ static class XlsxReader
         foreach (var tablePart in tableParts)
         {
             var relId = tablePart.Attribute(rNs + "id")?.Value;
-            if (relId is null || !sheetRelMap.TryGetValue(relId, out var target)) continue;
+            if (relId is null || !sheetRelMap.TryGetValue(relId, out var target))
+            {
+                continue;
+            }
 
             var tablePath = ResolvePath("xl/worksheets/", target);
             var tableEntry = archive.GetEntry(tablePath);
-            if (tableEntry is null) continue;
+            if (tableEntry is null)
+            {
+                continue;
+            }
 
             using var tableStream = tableEntry.Open();
             var tableDoc = XDocument.Load(tableStream);
@@ -1381,7 +1395,10 @@ static class XlsxReader
             var headerRowCount = root.Attribute("headerRowCount")?.Value;
             var totalsRowCount = root.Attribute("totalsRowCount")?.Value;
 
-            if (refStr is null || !TryParseRange(refStr, out var range)) continue;
+            if (refStr is null || !TryParseRange(refStr, out var range))
+            {
+                continue;
+            }
 
             var hasHeaders = headerRowCount != "0";
             var totalsShown = totalsRowCount == "1";
@@ -1389,7 +1406,10 @@ static class XlsxReader
             // doesn't try to expand the range — the saved range already contains
             // the totals row when totalsRowCount=1.
             var table = sheet.AddTable(name, range, hasHeaders, totalsShown);
-            if (displayName is not null && displayName != name) table.DisplayName = displayName;
+            if (displayName is not null && displayName != name)
+            {
+                table.DisplayName = displayName;
+            }
 
             // Filter button: presence of <autoFilter> child indicates ShowFilterButton=true
             var hasAutoFilter = root.Element(tNs + "autoFilter") is not null;
@@ -1413,9 +1433,16 @@ static class XlsxReader
                 var i = 0;
                 foreach (var colElem in tableColumns.Elements(tNs + "tableColumn"))
                 {
-                    if (i >= table.Columns.Count) break;
+                    if (i >= table.Columns.Count)
+                    {
+                        break;
+                    }
+
                     var colName = colElem.Attribute("name")?.Value;
-                    if (colName is not null) table.Columns[i].Name = colName;
+                    if (colName is not null)
+                    {
+                        table.Columns[i].Name = colName;
+                    }
 
                     var totalsFunction = colElem.Attribute("totalsRowFunction")?.Value;
                     if (totalsFunction is not null)

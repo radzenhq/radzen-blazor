@@ -1128,7 +1128,10 @@ namespace Radzen.Blazor
 
             var start = min.Value.Date;
             var end = max.Value.Date;
-            if (end < start) (start, end) = (end, start);
+            if (end < start)
+            {
+                (start, end) = (end, start);
+            }
 
             var pad = ZoomLevel switch
             {
@@ -1203,9 +1206,21 @@ namespace Radzen.Blazor
 
         private static DateTime? ToDateTime(object? value)
         {
-            if (value == null) return null;
-            if (value is DateTime dt) return dt;
-            if (value is DateTimeOffset dto) return dto.DateTime;
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is DateTime dt)
+            {
+                return dt;
+            }
+
+            if (value is DateTimeOffset dto)
+            {
+                return dto.DateTime;
+            }
+
             if (value is string s && DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var parsed))
             {
                 return parsed;
@@ -1251,7 +1266,10 @@ namespace Radzen.Blazor
             var links = new List<GanttDependency<TItem>>();
             foreach (var dep in DependencyData)
             {
-                if (dep == null) continue;
+                if (dep == null)
+                {
+                    continue;
+                }
 
                 fromGetter ??= PropertyAccess.Getter<object>(dep, DependencyFromProperty!);
                 toGetter ??= PropertyAccess.Getter<object>(dep, DependencyToProperty!);
@@ -1262,7 +1280,10 @@ namespace Radzen.Blazor
 
                 var fromId = fromGetter(dep);
                 var toId = toGetter(dep);
-                if (fromId == null || toId == null) continue;
+                if (fromId == null || toId == null)
+                {
+                    continue;
+                }
 
                 if (!taskById.TryGetValue(fromId, out var fromTask) || !taskById.TryGetValue(toId, out var toTask))
                 {
@@ -1354,7 +1375,10 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (items.Count == 0) return;
+            if (items.Count == 0)
+            {
+                return;
+            }
 
             var deps = resolvedDeps
                 .Where(d => d != null && itemSet.Contains(d.From) && itemSet.Contains(d.To))
@@ -1383,7 +1407,10 @@ namespace Radzen.Blazor
             foreach (var t in items)
             {
                 var s = ToDateTime(startGet(t));
-                if (s.HasValue && s.Value < refDate) refDate = s.Value;
+                if (s.HasValue && s.Value < refDate)
+                {
+                    refDate = s.Value;
+                }
             }
 
             foreach (var t in items)
@@ -1507,7 +1534,10 @@ namespace Radzen.Blazor
 
             var s = start.Value.Date;
             var e = end.Value.Date;
-            if (e < s) (s, e) = (e, s);
+            if (e < s)
+            {
+                (s, e) = (e, s);
+            }
 
             if (e < rangeStart || s > rangeEnd)
             {
@@ -1555,10 +1585,25 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (dayView != null) yield return dayView;
-                if (weekView != null) yield return weekView;
-                if (monthView != null) yield return monthView;
-                if (yearView != null) yield return yearView;
+                if (dayView != null)
+                {
+                    yield return dayView;
+                }
+
+                if (weekView != null)
+                {
+                    yield return weekView;
+                }
+
+                if (monthView != null)
+                {
+                    yield return monthView;
+                }
+
+                if (yearView != null)
+                {
+                    yield return yearView;
+                }
             }
         }
 
@@ -1632,14 +1677,20 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task ZoomToFit()
         {
-            if (scheduler == null) return;
+            if (scheduler == null)
+            {
+                return;
+            }
 
             var data = (IEnumerable<TItem>?)grid?.View ?? Data ?? Enumerable.Empty<TItem>();
             DateTime? min = null, max = null;
 
             var sg = GetStartGetter();
             var eg = GetEndGetter();
-            if (sg == null || eg == null) return;
+            if (sg == null || eg == null)
+            {
+                return;
+            }
 
             foreach (var item in data)
             {
@@ -1655,18 +1706,29 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (!min.HasValue || !max.HasValue) return;
+            if (!min.HasValue || !max.HasValue)
+            {
+                return;
+            }
 
             var span = max.Value - min.Value;
             GanttZoomLevel bestZoom;
             if (span.TotalDays <= 2)
+            {
                 bestZoom = GanttZoomLevel.Day;
+            }
             else if (span.TotalDays <= 60)
+            {
                 bestZoom = GanttZoomLevel.Week;
+            }
             else if (span.TotalDays <= 180)
+            {
                 bestZoom = GanttZoomLevel.Month;
+            }
             else
+            {
                 bestZoom = GanttZoomLevel.Year;
+            }
 
             var pad = bestZoom switch
             {

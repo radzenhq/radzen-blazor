@@ -150,7 +150,11 @@ namespace Radzen.Blazor
         {
             string uploadValue;
 
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             try
             {
                 uploadValue = await JSRuntime.InvokeAsync<string>("Radzen.readFileAsBase64", fileUpload, MaxFileSize, MaxWidth, MaxHeight);
@@ -189,7 +193,10 @@ namespace Radzen.Blazor
             }
 
             var file = files.FirstOrDefault();
-            if (file == null) return;
+            if (file == null)
+            {
+                return;
+            }
 
             FileSize = file.Size;
             await FileSizeChanged.InvokeAsync(FileSize);

@@ -51,18 +51,25 @@ public static class RadzenQREncoder
             var bb = new BitBuffer();
             bb.AppendBits(0b0100, 4);                     // mode: BYTE
             bb.AppendBits(data.Length, charCountBits);    // char count
-            foreach (var b in data) bb.AppendBits(b, 8);  // payload
+            foreach (var b in data)
+            {
+                bb.AppendBits(b, 8);  // payload
+            }
 
             // --- Fit math (this is the authoritative acceptance test)
             int baseBits = bb.Length;                     // header+data bits
             if (baseBits > capacityBits)                  // early reject
+            {
                 continue;
+            }
 
             int needed = baseBits + Math.Min(4, capacityBits - baseBits); // add up to 4-bit terminator
             needed += (8 - (needed % 8)) % 8;            // pad to byte boundary
 
             if (needed > capacityBits)
+            {
                 continue; // try next version
+            }
 
             // --- Build data codewords (pads 0xEC/0x11 as needed)
             var dataCwBytes = BuildDataCodewords(bb, dataCwCount);
@@ -78,7 +85,10 @@ public static class RadzenQREncoder
             int bestMask = ChooseBestMask(m, reserved);  // or force 0 while testing
             ApplyMask(m, reserved, bestMask);            // mask only NON-reserved
             WriteFormatInfo(m, reserved, ecc, bestMask); // write both copies
-            if (ver >= 7) WriteVersionInfo(m, reserved, ver);
+            if (ver >= 7)
+            {
+                WriteVersionInfo(m, reserved, ver);
+            }
 
             //var sb = new StringBuilder();
             //sb.AppendLine("DATA: " + BitConverter.ToString(dataCwBytes));
@@ -100,7 +110,9 @@ public static class RadzenQREncoder
         ArgumentNullException.ThrowIfNull(data);
 
         if (minVersion < 1 || maxVersion > 40 || minVersion > maxVersion)
+        {
             throw new ArgumentOutOfRangeException(nameof(minVersion), "Version range must be within 1..40");
+        }
 
         // Try versions until payload (with headers) fits into available data bits
         for (int ver = minVersion; ver <= maxVersion; ver++)
@@ -110,7 +122,10 @@ public static class RadzenQREncoder
             // Mode = Byte (0100)
             bb.AppendBits(0b0100, 4);
             bb.AppendBits(data.Length, charCountBits);
-            foreach (byte b in data) bb.AppendBits(b, 8);
+            foreach (byte b in data)
+            {
+                bb.AppendBits(b, 8);
+            }
 
             var (dataCw, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw) = EcParams(ver, ecc);
             int capacityBits = dataCw * 8;
@@ -148,7 +163,10 @@ public static class RadzenQREncoder
                 WriteFormatInfo(m, reserved, ecc, bestMask);
 
                 // Write version info for v7+
-                if (ver >= 7) WriteVersionInfo(m, reserved, ver);
+                if (ver >= 7)
+                {
+                    WriteVersionInfo(m, reserved, ver);
+                }
 
                 return m;
             }
@@ -198,8 +216,15 @@ public static class RadzenQREncoder
         {
             for (int c = 0; c < n; c++)
             {
-                if (!modules[r, c]) continue;
-                if (IsFinderCell(r, c, n)) continue;
+                if (!modules[r, c])
+                {
+                    continue;
+                }
+
+                if (IsFinderCell(r, c, n))
+                {
+                    continue;
+                }
 
                 var x = c + 4;
                 var y = r + 4;
@@ -272,12 +297,17 @@ public static class RadzenQREncoder
         // Alignment patterns
         var ap = AlignmentPatternPositions(ver);
         foreach (int y in ap)
+        {
             foreach (int x in ap)
             {
                 // Skip the corners with finders
                 bool corner = (x < 9 && y < 9) || (x > n - 9 && y < 9) || (x < 9 && y > n - 9);
-                if (!corner) DrawAlignment(m, reserved, x, y);
+                if (!corner)
+                {
+                    DrawAlignment(m, reserved, x, y);
+                }
             }
+        }
 
         // Dark module (always)
         m[4 * ver + 9, 8] = true; reserved[4 * ver + 9, 8] = true;
@@ -286,7 +316,10 @@ public static class RadzenQREncoder
         ReserveFormat(reserved);
 
         // Reserve version info (v7+)
-        if (ver >= 7) ReserveVersion(reserved);
+        if (ver >= 7)
+        {
+            ReserveVersion(reserved);
+        }
 
         return (m, reserved);
     }
@@ -295,10 +328,15 @@ public static class RadzenQREncoder
     private static void DrawFinder(bool[,] m, bool[,] res, int x, int y)
     {
         for (int r = -1; r <= 7; r++)
+        {
             for (int c = -1; c <= 7; c++)
             {
                 int rr = y + r, cc = x + c;
-                if (rr < 0 || cc < 0 || rr >= m.GetLength(0) || cc >= m.GetLength(1)) continue;
+                if (rr < 0 || cc < 0 || rr >= m.GetLength(0) || cc >= m.GetLength(1))
+                {
+                    continue;
+                }
+
                 bool in7 = r >= 0 && r < 7 && c >= 0 && c < 7;
                 if (in7)
                 {
@@ -312,17 +350,20 @@ public static class RadzenQREncoder
                     res[rr, cc] = true;
                 }
             }
+        }
     }
 
     private static void DrawAlignment(bool[,] m, bool[,] res, int cx, int cy)
     {
         for (int r = -2; r <= 2; r++)
+        {
             for (int c = -2; c <= 2; c++)
             {
                 int rr = cy + r, cc = cx + c;
                 m[rr, cc] = Math.Max(Math.Abs(r), Math.Abs(c)) != 1; // dark outer, white ring, dark center
                 res[rr, cc] = true;
             }
+        }
     }
 
     private static void ReserveFormat(bool[,] res)
@@ -330,24 +371,36 @@ public static class RadzenQREncoder
         int n = res.GetLength(0);
 
         // Row 8, left of the timing cross (cols 0..5)
-        for (int c = 0; c <= 5; c++) res[8, c] = true;
+        for (int c = 0; c <= 5; c++)
+        {
+            res[8, c] = true;
+        }
 
         // Row 8, skip col 6 (timing), then 7 and 8 are format
         res[8, 7] = true;
         res[8, 8] = true;
 
         // Column 8, above the timing cross (rows 0..5)
-        for (int r = 0; r <= 5; r++) res[r, 8] = true;
+        for (int r = 0; r <= 5; r++)
+        {
+            res[r, 8] = true;
+        }
 
         // Column 8, row 7 is format (row 6 is timing, skip it)
         res[7, 8] = true;
 
         // Second copy:
         // Column 8, bottom 7 cells (rows n-1 down to n-7)  ← exactly 7 cells
-        for (int i = 0; i < 7; i++) res[n - 1 - i, 8] = true;
+        for (int i = 0; i < 7; i++)
+        {
+            res[n - 1 - i, 8] = true;
+        }
 
         // Row 8, right side 8 cells (cols n-8 .. n-1)      ← exactly 8 cells
-        for (int i = 0; i < 8; i++) res[8, n - 8 + i] = true;
+        for (int i = 0; i < 8; i++)
+        {
+            res[8, n - 8 + i] = true;
+        }
     }
 
     private static void ReserveVersion(bool[,] res)
@@ -358,15 +411,23 @@ public static class RadzenQREncoder
         // Rows: n-11, n-10, n-9
         // Cols: 0..5
         for (int r = n - 11; r <= n - 9; r++)
+        {
             for (int c = 0; c <= 5; c++)
+            {
                 res[r, c] = true;
+            }
+        }
 
         // Top-right version info block: 6 rows x 3 columns
         // Rows: 0..5
         // Cols: n-11, n-10, n-9
         for (int r = 0; r <= 5; r++)
+        {
             for (int c = n - 11; c <= n - 9; c++)
+            {
                 res[r, c] = true;
+            }
+        }
     }
 
     private static void WriteVersionInfo(bool[,] m, bool[,] res, int ver)
@@ -429,19 +490,34 @@ public static class RadzenQREncoder
         int remaining = totalBits - bb.Length;
         bb.AppendBits(0, Math.Min(4, remaining));
         // Pad to byte
-        while (bb.Length % 8 != 0) bb.AppendBits(0, 1);
+        while (bb.Length % 8 != 0)
+        {
+            bb.AppendBits(0, 1);
+        }
         // Build bytes
         var bytes = new List<byte>(dataCw);
         for (int i = 0; i < bb.Length; i += 8)
         {
-            if (bytes.Count == dataCw) break;
+            if (bytes.Count == dataCw)
+            {
+                break;
+            }
+
             int b = 0;
-            for (int j = 0; j < 8; j++) b = (b << 1) | bb[i + j];
+            for (int j = 0; j < 8; j++)
+            {
+                b = (b << 1) | bb[i + j];
+            }
+
             bytes.Add((byte)b);
         }
         // Pad bytes
         byte[] pads = { 0xEC, 0x11 }; int p = 0;
-        while (bytes.Count < dataCw) bytes.Add(pads[(p++) & 1]);
+        while (bytes.Count < dataCw)
+        {
+            bytes.Add(pads[(p++) & 1]);
+        }
+
         return bytes.ToArray();
     }
 
@@ -484,17 +560,40 @@ public static class RadzenQREncoder
         foreach (var b in blocks)
         {
             totalLen += b.Data.Length + b.Ec.Length;
-            if (b.Data.Length > maxData) maxData = b.Data.Length;
-            if (b.Ec.Length > maxEc) maxEc = b.Ec.Length;
+            if (b.Data.Length > maxData)
+            {
+                maxData = b.Data.Length;
+            }
+
+            if (b.Ec.Length > maxEc)
+            {
+                maxEc = b.Ec.Length;
+            }
         }
         var r = new byte[totalLen];
         int k = 0;
         for (int i = 0; i < maxData; i++)
+        {
             foreach (var b in blocks)
-                if (i < b.Data.Length) r[k++] = b.Data[i];
+            {
+                if (i < b.Data.Length)
+                {
+                    r[k++] = b.Data[i];
+                }
+            }
+        }
+
         for (int i = 0; i < maxEc; i++)
+        {
             foreach (var b in blocks)
-                if (i < b.Ec.Length) r[k++] = b.Ec[i];
+            {
+                if (i < b.Ec.Length)
+                {
+                    r[k++] = b.Ec[i];
+                }
+            }
+        }
+
         return r;
     }
 
@@ -502,7 +601,10 @@ public static class RadzenQREncoder
     {
         var gen = new List<byte> { 1 };
         for (int i = 0; i < ecCount; i++)
+        {
             gen = PolyMul(gen, new List<byte> { 1, GfPow(2, i) }); // (x - α^i), α=2
+        }
+
         return gen.ToArray(); // length = ecCount + 1 (leading 1 included)
     }
 
@@ -515,9 +617,15 @@ public static class RadzenQREncoder
         for (int i = 0; i < data.Length; i++)
         {
             int factor = msg[i];
-            if (factor == 0) continue;
+            if (factor == 0)
+            {
+                continue;
+            }
+
             for (int j = 0; j < gen.Length; j++)           // use full generator
+            {
                 msg[i + j] ^= GfMul((byte)factor, gen[j]); // start at i, not i+1
+            }
         }
 
         var ec = new byte[ecCount];
@@ -529,8 +637,13 @@ public static class RadzenQREncoder
     {
         var r = new byte[a.Count + b.Count - 1];
         for (int i = 0; i < a.Count; i++)
+        {
             for (int j = 0; j < b.Count; j++)
+            {
                 r[i + j] ^= GfMul(a[i], b[j]);
+            }
+        }
+
         return new List<byte>(r);
     }
 
@@ -541,7 +654,10 @@ public static class RadzenQREncoder
         while (y > 0)
         {
             if ((y & 1) != 0)
+            {
                 r ^= x;
+            }
+
             y >>= 1;
             x = (byte)((x << 1) ^ ((x & 0x80) != 0 ? GF_POLY : 0));
         }
@@ -551,7 +667,11 @@ public static class RadzenQREncoder
     private static byte GfPow(byte a, int e)
     {
         byte r = 1;
-        for (int i = 0; i < e; i++) r = GfMul(r, a);
+        for (int i = 0; i < e; i++)
+        {
+            r = GfMul(r, a);
+        }
+
         return r;
     }
 
@@ -566,7 +686,11 @@ public static class RadzenQREncoder
 
         for (int col = n - 1; col > 0; col -= 2)
         {
-            if (col == 6) col--; // skip timing column
+            if (col == 6)
+            {
+                col--; // skip timing column
+            }
+
             int rowStart = (dir < 0) ? n - 1 : 0;
             for (int i = 0; i < n; i++)
             {
@@ -574,7 +698,11 @@ public static class RadzenQREncoder
                 for (int c = 0; c < 2; c++)
                 {
                     int cc = col - c;
-                    if (res[r, cc]) continue;
+                    if (res[r, cc])
+                    {
+                        continue;
+                    }
+
                     if (bitIndex < totalBits)
                     {
                         m[r, cc] = ((codewords[bitIndex >> 3] >> (7 - (bitIndex & 7))) & 1) != 0;
@@ -603,12 +731,19 @@ public static class RadzenQREncoder
         int n = src.GetLength(0);
         var dst = new bool[n, n];
         for (int r = 0; r < n; r++)
+        {
             for (int c = 0; c < n; c++)
             {
                 bool v = src[r, c];
-                if (!res[r, c] && Mask(mask, r, c)) v = !v;
+                if (!res[r, c] && Mask(mask, r, c))
+                {
+                    v = !v;
+                }
+
                 dst[r, c] = v;
             }
+        }
+
         return dst;
     }
 
@@ -616,8 +751,15 @@ public static class RadzenQREncoder
     {
         int n = m.GetLength(0);
         for (int r = 0; r < n; r++)
+        {
             for (int c = 0; c < n; c++)
-                if (!res[r, c] && Mask(mask, r, c)) m[r, c] = !m[r, c];
+            {
+                if (!res[r, c] && Mask(mask, r, c))
+                {
+                    m[r, c] = !m[r, c];
+                }
+            }
+        }
     }
 
     private static bool Mask(int mask, int r, int c) => mask switch
@@ -644,43 +786,84 @@ public static class RadzenQREncoder
             int run = 1;
             for (int c = 1; c < n; c++)
             {
-                if (m[r, c] == m[r, c - 1]) run++;
-                else { if (run >= 5) total += 3 + (run - 5); run = 1; }
+                if (m[r, c] == m[r, c - 1])
+                {
+                    run++;
+                }
+                else { if (run >= 5) { total += 3 + (run - 5); } run = 1; }
             }
-            if (run >= 5) total += 3 + (run - 5);
+            if (run >= 5)
+            {
+                total += 3 + (run - 5);
+            }
         }
         for (int c = 0; c < n; c++)
         {
             int run = 1;
             for (int r = 1; r < n; r++)
             {
-                if (m[r, c] == m[r - 1, c]) run++;
-                else { if (run >= 5) total += 3 + (run - 5); run = 1; }
+                if (m[r, c] == m[r - 1, c])
+                {
+                    run++;
+                }
+                else { if (run >= 5) { total += 3 + (run - 5); } run = 1; }
             }
-            if (run >= 5) total += 3 + (run - 5);
+            if (run >= 5)
+            {
+                total += 3 + (run - 5);
+            }
         }
 
         // N2: 2x2 blocks
         for (int r = 0; r < n - 1; r++)
+        {
             for (int c = 0; c < n - 1; c++)
+            {
                 if (m[r, c] == m[r, c + 1] && m[r, c] == m[r + 1, c] && m[r, c] == m[r + 1, c + 1])
+                {
                     total += 3;
+                }
+            }
+        }
 
         // N3: Finder-like patterns
         int[] p1 = { 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0 };
         int[] p2 = { 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1 };
         for (int r = 0; r < n; r++)
+        {
             for (int c = 0; c <= n - 11; c++)
-                if (MatchRow(m, r, c, p1) || MatchRow(m, r, c, p2)) total += 40;
+            {
+                if (MatchRow(m, r, c, p1) || MatchRow(m, r, c, p2))
+                {
+                    total += 40;
+                }
+            }
+        }
+
         for (int c = 0; c < n; c++)
+        {
             for (int r = 0; r <= n - 11; r++)
-                if (MatchCol(m, r, c, p1) || MatchCol(m, r, c, p2)) total += 40;
+            {
+                if (MatchCol(m, r, c, p1) || MatchCol(m, r, c, p2))
+                {
+                    total += 40;
+                }
+            }
+        }
 
         // N4: Balance
         int dark = 0;
         for (int r = 0; r < n; r++)
+        {
             for (int c = 0; c < n; c++)
-                if (m[r, c]) dark++;
+            {
+                if (m[r, c])
+                {
+                    dark++;
+                }
+            }
+        }
+
         int percent = (dark * 100 + (n * n / 2)) / (n * n);
         total += (Math.Abs(percent - 50) / 5) * 10;
 
@@ -689,12 +872,26 @@ public static class RadzenQREncoder
 
     private static bool MatchRow(bool[,] m, int r, int c, int[] pat)
     {
-        for (int k = 0; k < pat.Length; k++) if ((m[r, c + k] ? 1 : 0) != pat[k]) return false;
+        for (int k = 0; k < pat.Length; k++)
+        {
+            if ((m[r, c + k] ? 1 : 0) != pat[k])
+            {
+                return false;
+            }
+        }
+
         return true;
     }
     private static bool MatchCol(bool[,] m, int r, int c, int[] pat)
     {
-        for (int k = 0; k < pat.Length; k++) if ((m[r + k, c] ? 1 : 0) != pat[k]) return false;
+        for (int k = 0; k < pat.Length; k++)
+        {
+            if ((m[r + k, c] ? 1 : 0) != pat[k])
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -715,7 +912,10 @@ public static class RadzenQREncoder
 
         // ---- First copy (around TL finder/timing), bits 0..14 ----
         // row 8, cols 0..5 (bits 0..5)
-        for (int i = 0; i <= 5; i++) Set(m, res, 8, i, GetBit(i));
+        for (int i = 0; i <= 5; i++)
+        {
+            Set(m, res, 8, i, GetBit(i));
+        }
         // row 8, col 7 (bit 6)
         Set(m, res, 8, 7, GetBit(6));
         // row 8, col 8 (bit 7)
@@ -723,20 +923,35 @@ public static class RadzenQREncoder
         // row 7, col 8 (bit 8)
         Set(m, res, 7, 8, GetBit(8));
         // rows 5..0, col 8 (bits 9..14)
-        for (int i = 9; i <= 14; i++) Set(m, res, 14 - i, 8, GetBit(i));
+        for (int i = 9; i <= 14; i++)
+        {
+            Set(m, res, 14 - i, 8, GetBit(i));
+        }
 
         // ---- Second copy (right/bottom), bits 0..14 again ----
         // col 8, rows n-1..n-7 (bits 0..6)
-        for (int i = 0; i <= 6; i++) Set(m, res, n - 1 - i, 8, GetBit(i));
+        for (int i = 0; i <= 6; i++)
+        {
+            Set(m, res, n - 1 - i, 8, GetBit(i));
+        }
         // row 8, cols n-8..n-1 (bits 7..14)
-        for (int i = 7; i <= 14; i++) Set(m, res, 8, n - 15 + i, GetBit(i));
+        for (int i = 7; i <= 14; i++)
+        {
+            Set(m, res, 8, n - 15 + i, GetBit(i));
+        }
     }
 
     private static int BchEncode(int data, int gen, int totalBits, int dataBits)
     {
         int d = data << (totalBits - dataBits);
         for (int i = totalBits - 1; i >= (totalBits - dataBits); i--)
-            if (((d >> i) & 1) != 0) d ^= gen << (i - (totalBits - dataBits));
+        {
+            if (((d >> i) & 1) != 0)
+            {
+                d ^= gen << (i - (totalBits - dataBits));
+            }
+        }
+
         return (data << (totalBits - dataBits)) | (d & ((1 << (totalBits - dataBits)) - 1));
     }
 
@@ -805,7 +1020,9 @@ public static class RadzenQREncoder
         EcParams(int ver, RadzenQREcc ecc)
     {
         if (ver < 1 || ver > 40)
+        {
             throw new ArgumentOutOfRangeException(nameof(ver), "Version must be 1..40");
+        }
 
         int eccIndex = ecc switch
         {
@@ -1137,7 +1354,10 @@ public static class RadzenQREncoder
         public int Length => Count;
         public void AppendBits(int val, int len)
         {
-            for (int i = len - 1; i >= 0; i--) this.Add((val >> i) & 1);
+            for (int i = len - 1; i >= 0; i--)
+            {
+                this.Add((val >> i) & 1);
+            }
         }
     }
 

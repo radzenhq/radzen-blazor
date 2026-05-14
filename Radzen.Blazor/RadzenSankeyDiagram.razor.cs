@@ -534,10 +534,17 @@ namespace Radzen.Blazor
 
         private void ShowNodeTooltip(MouseEventArgs args, ComputedSankeyNode node)
         {
-            if (TooltipService == null) return;
-            
+            if (TooltipService == null)
+            {
+                return;
+            }
+
             // Store current tooltip node to prevent re-opening
-            if (currentTooltipNode == node) return;
+            if (currentTooltipNode == node)
+            {
+                return;
+            }
+
             currentTooltipNode = node;
             
             var tooltip = new RenderFragment(builder =>
@@ -607,10 +614,17 @@ namespace Radzen.Blazor
 
         private void ShowLinkTooltip(MouseEventArgs args, ComputedSankeyLink link)
         {
-            if (TooltipService == null) return;
-            
+            if (TooltipService == null)
+            {
+                return;
+            }
+
             // Store current tooltip link to prevent re-opening
-            if (currentTooltipLink == link) return;
+            if (currentTooltipLink == link)
+            {
+                return;
+            }
+
             currentTooltipLink = link;
             
             var sourceLabel = link.SourceNode?.Label ?? link.Source;
