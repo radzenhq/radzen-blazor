@@ -85,6 +85,14 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     }
 }
 
+.rz-spreadsheet-table-design {
+    overflow-y: hidden;
+
+    .rz-label {
+        font-size: var(--rz-input-font-size-sm);
+    }
+}
+
 .rz-virtual-grid {
     position: relative;
     overflow: hidden;
