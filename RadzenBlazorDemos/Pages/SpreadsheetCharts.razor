@@ -20,9 +20,9 @@
         sheet.BeginUpdate();
 
         var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
-        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", Color = "#005da1", TextAlign = TextAlign.Center };
         var numberFormat = new Format { NumberFormat = "#,##0" };
-        var totalFormat = new Format { Bold = true, NumberFormat = "#,##0", BackgroundColor = "#e8f5e9" };
+        var totalFormat = new Format { Bold = true, NumberFormat = "#,##0", BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
 
         sheet.Columns[0] = 120;
         sheet.Columns[1] = 100;
@@ -35,6 +35,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A1:F1"));
         sheet.Cells["A1"].Value = "Quarterly Sales Report";
         sheet.Cells["A1"].Format = titleFormat;
+        sheet.Rows[0] = 32;
 
         // Headers
         string[] headers = { "Region", "Q1", "Q2", "Q3", "Q4", "Total" };
@@ -73,7 +74,7 @@
         // Totals row
         int totalRow = 2 + regions.Length;
         sheet.Cells[totalRow, 0].Value = "Total";
-        sheet.Cells[totalRow, 0].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9" };
+        sheet.Cells[totalRow, 0].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
         for (int col = 1; col <= 5; col++)
         {
             var colLetter = (char)('A' + col);
@@ -124,7 +125,7 @@
         sheet.BeginUpdate();
 
         var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#2e7d32", Color = "#ffffff", TextAlign = TextAlign.Center };
-        var headerFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9" };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
         var percentFormat = new Format { NumberFormat = "0.0%" };
 
         sheet.Columns[0] = 140;
@@ -135,6 +136,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A1:C1"));
         sheet.Cells["A1"].Value = "Browser Market Share 2025";
         sheet.Cells["A1"].Format = titleFormat;
+        sheet.Rows[0] = 32;
 
         // Headers
         sheet.Cells["A2"].Value = "Browser"; sheet.Cells["A2"].Format = headerFormat;
@@ -194,7 +196,7 @@
         sheet.BeginUpdate();
 
         var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#6a1b9a", Color = "#ffffff", TextAlign = TextAlign.Center };
-        var headerFormat = new Format { Bold = true, BackgroundColor = "#f3e5f5" };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#f3e5f5", Color = "#4a148c" };
         var numberFormat = new Format { NumberFormat = "#,##0" };
 
         sheet.Columns[0] = 100;
@@ -206,6 +208,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A1:D1"));
         sheet.Cells["A1"].Value = "Monthly Revenue Trends";
         sheet.Cells["A1"].Format = titleFormat;
+        sheet.Rows[0] = 32;
 
         // Headers
         string[] headers = { "Month", "Product A", "Product B", "Product C" };

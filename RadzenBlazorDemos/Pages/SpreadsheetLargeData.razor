@@ -68,12 +68,12 @@
 
         // Summary row
         int totalRow = rowCount + 1;
-        var totalFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9", NumberFormat = "$#,##0.00" };
-        var totalLabelFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9" };
+        var totalFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9", Color = "#0f2e10", NumberFormat = "$#,##0.00" };
+        var totalLabelFormat = new Format { Bold = true, BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
         sheet.Cells[totalRow, 0].Value = "Total";
         sheet.Cells[totalRow, 0].Format = totalLabelFormat;
         sheet.Cells[totalRow, 5].Formula = $"=SUM(F2:F{rowCount + 1})";
-        sheet.Cells[totalRow, 5].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9", NumberFormat = "#,##0" };
+        sheet.Cells[totalRow, 5].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9", Color = "#0f2e10", NumberFormat = "#,##0" };
         sheet.Cells[totalRow, 7].Formula = $"=SUM(H2:H{rowCount + 1})";
         sheet.Cells[totalRow, 7].Format = totalFormat;
 

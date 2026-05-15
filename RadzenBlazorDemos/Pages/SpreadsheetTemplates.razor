@@ -19,10 +19,10 @@
         sheet.BeginUpdate();
 
         var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
-        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center };
-        var categoryFormat = new Format { Bold = true, BackgroundColor = "#f5f5f5" };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", Color = "#005da1", TextAlign = TextAlign.Center };
+        var categoryFormat = new Format { Bold = true, BackgroundColor = "#f5f5f5", Color = "#212121" };
         var currencyFormat = new Format { NumberFormat = "$#,##0.00" };
-        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", BackgroundColor = "#e8f5e9" };
+        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
         var overBudgetFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", Color = "#c62828", BackgroundColor = "#ffebee" };
 
         sheet.Columns[0] = 140;
@@ -34,6 +34,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A1:O1"));
         sheet.Cells["A1"].Value = "2025 Annual Budget Tracker";
         sheet.Cells["A1"].Format = titleFormat;
+        sheet.Rows[0] = 32;
 
         // Headers
         string[] months = { "Category", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Total", "Budget" };
@@ -71,11 +72,11 @@
         }
 
         // Income total
-        sheet.Cells["A8"].Value = "Total Income"; sheet.Cells["A8"].Format = new Format { Bold = true, BackgroundColor = "#c8e6c9" };
+        sheet.Cells["A8"].Value = "Total Income"; sheet.Cells["A8"].Format = new Format { Bold = true, BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
         for (int m = 1; m <= 14; m++)
         {
             sheet.Cells[7, m].Formula = $"=SUM({CellRef(3, m)}:{CellRef(6, m)})";
-            sheet.Cells[7, m].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", BackgroundColor = "#c8e6c9" };
+            sheet.Cells[7, m].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
         }
 
         // Expense section
@@ -121,19 +122,20 @@
         }
 
         // Expense total
-        sheet.Cells["A21"].Value = "Total Expenses"; sheet.Cells["A21"].Format = new Format { Bold = true, BackgroundColor = "#ffcdd2" };
+        sheet.Cells["A21"].Value = "Total Expenses"; sheet.Cells["A21"].Format = new Format { Bold = true, BackgroundColor = "#ffcdd2", Color = "#c62828" };
         for (int m = 1; m <= 14; m++)
         {
             sheet.Cells[20, m].Formula = $"=SUM({CellRef(10, m)}:{CellRef(19, m)})";
-            sheet.Cells[20, m].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", BackgroundColor = "#ffcdd2" };
+            sheet.Cells[20, m].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", BackgroundColor = "#ffcdd2", Color = "#c62828" };
         }
 
         // Net savings
-        sheet.Cells["A23"].Value = "NET SAVINGS"; sheet.Cells["A23"].Format = new Format { Bold = true, FontSize = 12, BackgroundColor = "#fff9c4" };
+        sheet.Cells["A23"].Value = "NET SAVINGS"; sheet.Cells["A23"].Format = new Format { Bold = true, FontSize = 12, BackgroundColor = "#fff9c4", Color = "#f57f17" };
+        sheet.Rows[22] = 28;
         for (int m = 1; m <= 14; m++)
         {
             sheet.Cells[22, m].Formula = $"={CellRef(7, m)}-{CellRef(20, m)}";
-            sheet.Cells[22, m].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", FontSize = 12, BackgroundColor = "#fff9c4" };
+            sheet.Cells[22, m].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", FontSize = 12, BackgroundColor = "#fff9c4", Color = "#f57f17" };
         }
 
         sheet.EndUpdate();
@@ -146,9 +148,9 @@
         sheet.BeginUpdate();
 
         var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
-        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", Color = "#005da1", TextAlign = TextAlign.Center };
         var hoursFormat = new Format { NumberFormat = "0.0", TextAlign = TextAlign.Center };
-        var totalFormat = new Format { Bold = true, NumberFormat = "0.0", BackgroundColor = "#e8f5e9", TextAlign = TextAlign.Center };
+        var totalFormat = new Format { Bold = true, NumberFormat = "0.0", BackgroundColor = "#e8f5e9", Color = "#0f2e10", TextAlign = TextAlign.Center };
         var nameFormat = new Format { Bold = true };
 
         sheet.Columns[0] = 130;
@@ -160,6 +162,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A1:J1"));
         sheet.Cells["A1"].Value = "Weekly Timesheet - March 24-28, 2025";
         sheet.Cells["A1"].Format = titleFormat;
+        sheet.Rows[0] = 32;
 
         // Headers
         string[] headers = { "Employee", "Project", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Total" };
@@ -208,8 +211,8 @@
         // Daily totals
         int totalRow = 2 + employees.Length;
         sheet.Cells[totalRow, 0].Value = "Daily Total";
-        sheet.Cells[totalRow, 0].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9" };
-        sheet.Cells[totalRow, 1].Format = new Format { BackgroundColor = "#e8f5e9" };
+        sheet.Cells[totalRow, 0].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
+        sheet.Cells[totalRow, 1].Format = new Format { BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
         for (int d = 2; d <= 9; d++)
         {
             sheet.Cells[totalRow, d].Formula = $"=SUM({CellRef(2, d)}:{CellRef(totalRow - 1, d)})";
@@ -221,6 +224,7 @@
         sheet.MergedCells.Add(new RangeRef(new CellRef(summaryStart, 0), new CellRef(summaryStart, 2)));
         sheet.Cells[summaryStart, 0].Value = "Employee Summary";
         sheet.Cells[summaryStart, 0].Format = new Format { Bold = true, FontSize = 12, BackgroundColor = "#1565c0", Color = "#ffffff" };
+        sheet.Rows[summaryStart] = 28;
 
         sheet.Cells[summaryStart + 1, 0].Value = "Employee"; sheet.Cells[summaryStart + 1, 0].Format = headerFormat;
         sheet.Cells[summaryStart + 1, 1].Value = "Total Hours"; sheet.Cells[summaryStart + 1, 1].Format = headerFormat;
