@@ -17,7 +17,7 @@
         sheet.Columns[2] = 120;
 
         var sectionFormat = new Format { Bold = true, FontSize = 12, BackgroundColor = "#1565c0", Color = "#ffffff" };
-        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd" };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", Color = "#005da1" };
         var formulaFormat = new Format { Color = "#1565c0", FontFamily = "Courier New" };
 
         // Source data in columns E-F
@@ -38,6 +38,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A1:C1"));
         sheet.Cells[row, 0].Value = "Math Functions";
         sheet.Cells[row, 0].Format = sectionFormat;
+        sheet.Rows[row] = 28;
 
         row = 1;
         sheet.Cells[row, 0].Value = "Function"; sheet.Cells[row, 0].Format = headerFormat;
@@ -72,6 +73,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A12:C12"));
         sheet.Cells[row, 0].Value = "Logical Functions";
         sheet.Cells[row, 0].Format = sectionFormat;
+        sheet.Rows[row] = 28;
 
         row = 12;
         sheet.Cells[row, 0].Value = "Function"; sheet.Cells[row, 0].Format = headerFormat;
@@ -104,6 +106,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A21:C21"));
         sheet.Cells[row, 0].Value = "Text Functions";
         sheet.Cells[row, 0].Format = sectionFormat;
+        sheet.Rows[row] = 28;
 
         // Source text
         sheet.Cells["E21"].Value = "Source";
@@ -143,6 +146,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A32:C32"));
         sheet.Cells[row, 0].Value = "Date Functions";
         sheet.Cells[row, 0].Format = sectionFormat;
+        sheet.Rows[row] = 28;
 
         row = 32;
         sheet.Cells[row, 0].Value = "Function"; sheet.Cells[row, 0].Format = headerFormat;
@@ -179,6 +183,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A41:C41"));
         sheet.Cells[row, 0].Value = "Lookup Functions";
         sheet.Cells[row, 0].Format = sectionFormat;
+        sheet.Rows[row] = 28;
 
         // Lookup table in H-J
         sheet.Columns[7] = 80;
