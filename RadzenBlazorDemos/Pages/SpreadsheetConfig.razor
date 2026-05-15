@@ -15,14 +15,14 @@
         var headerFormat = new Format { Bold = true, FontSize = 14, TextAlign = TextAlign.Center, BackgroundColor = "#1e88e5", Color = "#ffffff" };
         var columnHeaderFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center, Color = "#005da1" };
         var currencyFormat = new Format { NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right };
-        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9" };
+        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
         var grandTotalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
 
         // Title row
         sheet.MergedCells.Add(RangeRef.Parse("A1:G1"));
         sheet.Cells["A1"].Value = "Quarterly Sales Report 2025";
         sheet.Cells["A1"].Format = headerFormat;
-        sheet.Rows[0] = 36;
+        sheet.Rows[0] = 32;
 
         // Column headers
         string[] headers = { "Product", "Q1", "Q2", "Q3", "Q4", "Total", "% of Total" };

@@ -18,29 +18,31 @@
         // --- Section 1: Merge Examples ---
         sheet.Cells["A1"].Value = "Merge Examples";
         sheet.Cells["A1"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[0] = 28;
 
         // Horizontal merge
         sheet.MergedCells.Add(RangeRef.Parse("A3:D3"));
         sheet.Cells["A3"].Value = "Horizontal Merge (A3:D3)";
-        sheet.Cells["A3"].Format = new Format { TextAlign = TextAlign.Center, BackgroundColor = "#e3f2fd", Bold = true,
+        sheet.Cells["A3"].Format = new Format { TextAlign = TextAlign.Center, BackgroundColor = "#e3f2fd", Color = "#005da1", Bold = true,
             BorderTop = new BorderStyle(), BorderRight = new BorderStyle(), BorderBottom = new BorderStyle(), BorderLeft = new BorderStyle() };
 
         // Vertical merge
         sheet.MergedCells.Add(RangeRef.Parse("A5:A8"));
         sheet.Cells["A5"].Value = "Vertical Merge";
-        sheet.Cells["A5"].Format = new Format { TextAlign = TextAlign.Center, VerticalAlign = VerticalAlign.Middle, BackgroundColor = "#f3e5f5", Bold = true, WrapText = true,
+        sheet.Cells["A5"].Format = new Format { TextAlign = TextAlign.Center, VerticalAlign = VerticalAlign.Middle, BackgroundColor = "#f3e5f5", Color = "#4a148c", Bold = true, WrapText = true,
             BorderTop = new BorderStyle(), BorderRight = new BorderStyle(), BorderBottom = new BorderStyle(), BorderLeft = new BorderStyle() };
         for (int r = 4; r <= 7; r++) sheet.Rows[r] = 28;
 
         // Block merge
         sheet.MergedCells.Add(RangeRef.Parse("C5:E8"));
         sheet.Cells["C5"].Value = "Block Merge (C5:E8)";
-        sheet.Cells["C5"].Format = new Format { TextAlign = TextAlign.Center, VerticalAlign = VerticalAlign.Middle, BackgroundColor = "#fff3e0", Bold = true,
+        sheet.Cells["C5"].Format = new Format { TextAlign = TextAlign.Center, VerticalAlign = VerticalAlign.Middle, BackgroundColor = "#fff3e0", Color = "#e65100", Bold = true,
             BorderTop = new BorderStyle(), BorderRight = new BorderStyle(), BorderBottom = new BorderStyle(), BorderLeft = new BorderStyle() };
 
         // --- Section 2: Invoice Layout ---
         sheet.Cells["A10"].Value = "Invoice Layout (Merge Cells)";
         sheet.Cells["A10"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[9] = 28;
 
         var thinBorder = new BorderStyle { LineStyle = BorderLineStyle.Thin };
 
@@ -57,7 +59,7 @@
 
         sheet.MergedCells.Add(RangeRef.Parse("A13:A14"));
         sheet.Cells["A13"].Value = "Bill To";
-        sheet.Cells["A13"].Format = new Format { Bold = true, BackgroundColor = "#e0e0e0", VerticalAlign = VerticalAlign.Middle,
+        sheet.Cells["A13"].Format = new Format { Bold = true, BackgroundColor = "#e0e0e0", Color = "#212121", VerticalAlign = VerticalAlign.Middle,
             BorderTop = thinBorder.Clone(), BorderRight = thinBorder.Clone(), BorderBottom = thinBorder.Clone(), BorderLeft = thinBorder.Clone() };
 
         sheet.MergedCells.Add(RangeRef.Parse("B13:D13"));
@@ -73,7 +75,7 @@
         for (int i = 0; i < invoiceHeaders.Length; i++)
         {
             sheet.Cells[15, i].Value = invoiceHeaders[i];
-            sheet.Cells[15, i].Format = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center,
+            sheet.Cells[15, i].Format = new Format { Bold = true, BackgroundColor = "#e3f2fd", Color = "#005da1", TextAlign = TextAlign.Center,
                 BorderTop = new BorderStyle { LineStyle = BorderLineStyle.Medium }, BorderRight = thinBorder.Clone(), BorderBottom = new BorderStyle { LineStyle = BorderLineStyle.Medium }, BorderLeft = thinBorder.Clone() };
         }
 
@@ -105,10 +107,10 @@
         // Total row
         sheet.MergedCells.Add(RangeRef.Parse("A19:C19"));
         sheet.Cells["A19"].Value = "Total";
-        sheet.Cells["A19"].Format = new Format { Bold = true, TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9",
+        sheet.Cells["A19"].Format = new Format { Bold = true, TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9", Color = "#0f2e10",
             BorderTop = new BorderStyle { LineStyle = BorderLineStyle.Double }, BorderRight = thinBorder.Clone(), BorderBottom = thinBorder.Clone(), BorderLeft = thinBorder.Clone() };
         sheet.Cells["D19"].Formula = "=SUM(D17:D19)";
-        sheet.Cells["D19"].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9",
+        sheet.Cells["D19"].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9", Color = "#0f2e10",
             BorderTop = new BorderStyle { LineStyle = BorderLineStyle.Double }, BorderRight = thinBorder.Clone(), BorderBottom = thinBorder.Clone(), BorderLeft = thinBorder.Clone() };
 
         sheet.EndUpdate();

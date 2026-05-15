@@ -19,12 +19,12 @@
         sheet.BeginUpdate();
 
         var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
-        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd" };
-        var lockedFormat = new Format { BackgroundColor = "#f5f5f5" };
-        var unlockedFormat = new Format { BackgroundColor = "#ffffff", Locked = false };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", Color = "#005da1" };
+        var lockedFormat = new Format { BackgroundColor = "#f5f5f5", Color = "#212121" };
+        var unlockedFormat = new Format { BackgroundColor = "#ffffff", Color = "#000000", Locked = false };
         var noteFormat = new Format { Color = "#757575", Italic = true };
-        var currencyFormat = new Format { NumberFormat = "$#,##0.00", BackgroundColor = "#ffffff", Locked = false };
-        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", BackgroundColor = "#e8f5e9" };
+        var currencyFormat = new Format { NumberFormat = "$#,##0.00", BackgroundColor = "#ffffff", Color = "#000000", Locked = false };
+        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
 
         sheet.Columns[0] = 140;
         sheet.Columns[1] = 120;
@@ -37,6 +37,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A1:F1"));
         sheet.Cells["A1"].Value = "Quarterly Budget - Edit the Budget column";
         sheet.Cells["A1"].Format = titleFormat;
+        sheet.Rows[0] = 32;
 
         // Headers (locked)
         string[] headers = { "Department", "Q1 Actual", "Q2 Actual", "Q3 Actual", "Budget", "Variance" };
@@ -67,7 +68,7 @@
             for (int q = 0; q < 3; q++)
             {
                 sheet.Cells[row, q + 1].Value = actuals[i][q];
-                sheet.Cells[row, q + 1].Format = new Format { NumberFormat = "$#,##0.00", BackgroundColor = "#f5f5f5" };
+                sheet.Cells[row, q + 1].Format = new Format { NumberFormat = "$#,##0.00", BackgroundColor = "#f5f5f5", Color = "#212121" };
             }
 
             // Budget column - UNLOCKED (editable)
@@ -76,13 +77,13 @@
 
             // Variance formula (locked)
             sheet.Cells[row, 5].Formula = $"=E{row + 1}-AVERAGE(B{row + 1}:D{row + 1})";
-            sheet.Cells[row, 5].Format = new Format { NumberFormat = "$#,##0.00", BackgroundColor = "#f5f5f5" };
+            sheet.Cells[row, 5].Format = new Format { NumberFormat = "$#,##0.00", BackgroundColor = "#f5f5f5", Color = "#212121" };
         }
 
         // Totals
         int totalRow = 2 + departments.Length;
         sheet.Cells[totalRow, 0].Value = "Total";
-        sheet.Cells[totalRow, 0].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9" };
+        sheet.Cells[totalRow, 0].Format = new Format { Bold = true, BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
         for (int col = 1; col <= 5; col++)
         {
             var colLetter = (char)('A' + col);
@@ -112,11 +113,11 @@
         sheet.BeginUpdate();
 
         var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = TextAlign.Center };
-        var labelFormat = new Format { Bold = true, BackgroundColor = "#f5f5f5", TextAlign = TextAlign.Right };
-        var inputFormat = new Format { BackgroundColor = "#fff8e1", Locked = false };
-        var dateInputFormat = new Format { BackgroundColor = "#fff8e1", Locked = false, NumberFormat = "yyyy-mm-dd" };
+        var labelFormat = new Format { Bold = true, BackgroundColor = "#f5f5f5", Color = "#212121", TextAlign = TextAlign.Right };
+        var inputFormat = new Format { BackgroundColor = "#fff8e1", Color = "#ff6f00", Locked = false };
+        var dateInputFormat = new Format { BackgroundColor = "#fff8e1", Color = "#ff6f00", Locked = false, NumberFormat = "yyyy-mm-dd" };
         var noteFormat = new Format { Color = "#757575", Italic = true };
-        var sectionFormat = new Format { Bold = true, FontSize = 11, BackgroundColor = "#e3f2fd" };
+        var sectionFormat = new Format { Bold = true, FontSize = 11, BackgroundColor = "#e3f2fd", Color = "#005da1" };
 
         sheet.Columns[0] = 140;
         sheet.Columns[1] = 200;
@@ -127,6 +128,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A1:D1"));
         sheet.Cells["A1"].Value = "Employee Information Form";
         sheet.Cells["A1"].Format = titleFormat;
+        sheet.Rows[0] = 32;
 
         // Personal section
         sheet.MergedCells.Add(RangeRef.Parse("A3:D3"));
@@ -170,7 +172,7 @@
 
         sheet.Cells["A13"].Value = "Comments:"; sheet.Cells["A13"].Format = labelFormat;
         sheet.MergedCells.Add(RangeRef.Parse("B13:D15"));
-        sheet.Cells["B13"].Format = new Format { BackgroundColor = "#fff8e1", Locked = false, WrapText = true };
+        sheet.Cells["B13"].Format = new Format { BackgroundColor = "#fff8e1", Color = "#ff6f00", Locked = false, WrapText = true };
 
         // Note
         sheet.MergedCells.Add(RangeRef.Parse("A17:D17"));

@@ -18,6 +18,7 @@
         // --- Text Styles ---
         sheet.Cells["A1"].Value = "Text Styles";
         sheet.Cells["A1"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[0] = 28;
 
         sheet.Cells["A2"].Value = "Bold";
         sheet.Cells["A2"].Format = new Format { Bold = true };
@@ -33,6 +34,7 @@
         // --- Font Families ---
         sheet.Cells["A4"].Value = "Font Families";
         sheet.Cells["A4"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[3] = 28;
 
         sheet.Cells["A5"].Value = "Arial";
         sheet.Cells["A5"].Format = new Format { FontFamily = "Arial" };
@@ -46,6 +48,7 @@
         // --- Font Sizes ---
         sheet.Cells["A7"].Value = "Font Sizes";
         sheet.Cells["A7"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[6] = 28;
 
         sheet.Cells["A8"].Value = "8pt";
         sheet.Cells["A8"].Format = new Format { FontSize = 8 };
@@ -55,11 +58,12 @@
         sheet.Cells["C8"].Format = new Format { FontSize = 14 };
         sheet.Cells["D8"].Value = "18pt";
         sheet.Cells["D8"].Format = new Format { FontSize = 18 };
-        sheet.Rows[7] = 30;
+        sheet.Rows[7] = 32;
 
         // --- Colors ---
         sheet.Cells["A10"].Value = "Colors";
         sheet.Cells["A10"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[9] = 28;
 
         sheet.Cells["A11"].Value = "Red Text";
         sheet.Cells["A11"].Format = new Format { Color = "#e53935" };
@@ -69,17 +73,18 @@
         sheet.Cells["C11"].Format = new Format { Color = "#43a047" };
 
         sheet.Cells["A12"].Value = "Red Background";
-        sheet.Cells["A12"].Format = new Format { BackgroundColor = "#ffcdd2" };
+        sheet.Cells["A12"].Format = new Format { BackgroundColor = "#ffcdd2", Color = "#c62828" };
         sheet.Cells["B12"].Value = "Blue Background";
-        sheet.Cells["B12"].Format = new Format { BackgroundColor = "#bbdefb" };
+        sheet.Cells["B12"].Format = new Format { BackgroundColor = "#bbdefb", Color = "#005da1" };
         sheet.Cells["C12"].Value = "Green Background";
-        sheet.Cells["C12"].Format = new Format { BackgroundColor = "#c8e6c9" };
+        sheet.Cells["C12"].Format = new Format { BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
         sheet.Cells["D12"].Value = "Yellow Background";
-        sheet.Cells["D12"].Format = new Format { BackgroundColor = "#fff9c4" };
+        sheet.Cells["D12"].Format = new Format { BackgroundColor = "#fff9c4", Color = "#f57f17" };
 
         // --- Alignment ---
         sheet.Cells["A14"].Value = "Alignment";
         sheet.Cells["A14"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[13] = 28;
 
         sheet.Cells["A15"].Value = "Left";
         sheet.Cells["A15"].Format = new Format { TextAlign = TextAlign.Left };
@@ -99,6 +104,7 @@
         // --- Text Wrapping ---
         sheet.Cells["A19"].Value = "Text Wrap";
         sheet.Cells["A19"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[18] = 28;
 
         sheet.Rows[19] = 50;
         sheet.Cells["A20"].Value = "This is a long text that will wrap within the cell when wrap text is enabled.";
@@ -108,6 +114,7 @@
         // --- Number Formats ---
         sheet.Cells["A22"].Value = "Number Formats";
         sheet.Cells["A22"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[21] = 28;
 
         sheet.Cells["A23"].Value = "Currency";
         sheet.Cells["B23"].Value = 1234.56;
@@ -136,6 +143,7 @@
         // --- Border Styles ---
         sheet.Cells["A30"].Value = "Border Styles";
         sheet.Cells["A30"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[29] = 28;
 
         var borderStyles = new BorderSample[]
         {
@@ -166,6 +174,7 @@
         // --- Colored Borders ---
         sheet.Cells["A34"].Value = "Colored Borders";
         sheet.Cells["A34"].Format = new Format { Bold = true, FontSize = 12 };
+        sheet.Rows[33] = 28;
 
         var colors = new ColorSample[]
         {

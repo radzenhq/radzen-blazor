@@ -17,13 +17,14 @@
         sheet.Columns[2] = 200;
 
         var sectionFormat = new Format { Bold = true, FontSize = 12, BackgroundColor = "#1565c0", Color = "#ffffff" };
-        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd" };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", Color = "#005da1" };
         var noteFormat = new Format { Color = "#757575", Italic = true };
 
         // --- Hyperlinks Section ---
         sheet.MergedCells.Add(RangeRef.Parse("A1:C1"));
         sheet.Cells["A1"].Value = "Hyperlinks";
         sheet.Cells["A1"].Format = sectionFormat;
+        sheet.Rows[0] = 28;
 
         sheet.Cells["A2"].Value = "Description"; sheet.Cells["A2"].Format = headerFormat;
         sheet.Cells["B2"].Value = "Link"; sheet.Cells["B2"].Format = headerFormat;
@@ -62,6 +63,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A9:C9"));
         sheet.Cells["A9"].Value = "Images";
         sheet.Cells["A9"].Format = sectionFormat;
+        sheet.Rows[8] = 28;
 
         sheet.MergedCells.Add(RangeRef.Parse("A10:C10"));
         sheet.Cells["A10"].Value = "Use the Insert > Image toolbar button to add images to the spreadsheet.";
@@ -75,6 +77,7 @@
         sheet.MergedCells.Add(RangeRef.Parse("A13:C13"));
         sheet.Cells["A13"].Value = "Tips";
         sheet.Cells["A13"].Format = sectionFormat;
+        sheet.Rows[12] = 28;
 
         sheet.MergedCells.Add(RangeRef.Parse("A14:C14"));
         sheet.Cells["A14"].Value = "Use Insert > Hyperlink from the toolbar to add links interactively.";
