@@ -7,13 +7,13 @@
 
 @if (CurrentTable is not null)
 {
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem"
-        class="rz-spreadsheet-table-design rz-p-2">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center"
+        class="rz-spreadsheet-table-design">
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
             <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableDesignName)) Component="tableNameInput" />
             <RadzenTextBox @bind-Value=@tableName Name="tableNameInput"
-                Change=@(_ => CommitName()) Style="width:160px" />
+                Change=@(_ => CommitName()) InputSize="InputSize.Small" Style="width:160px" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
@@ -21,7 +21,7 @@
             <RadzenDropDown TValue="string" Data=@styleOptions
                 Value=@(CurrentTable.TableStyle ?? "")
                 Change=@(v => CommitStyle(v as string))
-                Name="tableStyleDD" Style="width:200px" />
+                Name="tableStyleDD" InputSize="InputSize.Small" Style="width:200px" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
@@ -70,14 +70,14 @@
                     TextProperty="@nameof(TotalsOption.Text)" ValueProperty="@nameof(TotalsOption.Value)"
                     Value=@totalsCol.TotalsCalculation
                     Change=@(v => CommitTotals(totalsCol, (TotalsCalculation)v))
-                    Style="width:180px" />
+                    InputSize="InputSize.Small" Style="width:180px" />
             </RadzenStack>
         }
 
         <span style="flex:1"></span>
 
         <RadzenButton Icon="grid_off" Text=@L(nameof(RadzenStrings.Spreadsheet_ConvertTableToRange))
-            ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small"
+            ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small"
             Click=@OnConvertToRange />
     </RadzenStack>
 }
