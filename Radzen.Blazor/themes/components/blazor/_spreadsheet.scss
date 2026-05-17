@@ -570,12 +570,30 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
+.rz-spreadsheet-cell-menu {
+    --rz-menu-item-padding-block: var(--rz-input-padding-block-sm);
+    --rz-menu-item-padding-inline: var(--rz-input-padding-inline-sm);
+    font-size: var(--rz-input-font-size-sm);
+
+    .rz-navigation-item-icon {
+        font-size: 1rem;
+    }
+}
+
 .rz-spreadsheet-cell-menu-filter {
     flex: 1;
     height: 200px;
     overflow-y: auto;
     padding-block: var(--rz-menu-item-padding-block);
     padding-inline: var(--rz-menu-item-padding-inline);
+}
+
+.rz-spreadsheet-cell-menu-filter .rz-navigation-item {
+    padding-block: 0.25rem;
+}
+
+.rz-spreadsheet-cell-menu-filter .rz-chkbox {
+    margin-inline-end: calc(1.5rem - var(--rz-checkbox-width));
 }
 
 .rz-spreadsheet-cell-hyperlink {
