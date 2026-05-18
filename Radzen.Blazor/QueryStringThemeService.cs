@@ -115,7 +115,13 @@ namespace Radzen
             return (query?.Get(options?.ThemeParameter), wcag, rtl);
         }
 
-        private string GetUriWithStateQueryParameters(string uri)
+        /// <summary>
+        /// Returns the specified URI with the current theme, WCAG, and right-to-left state
+        /// appended as query parameters. Use this when building hrefs that must preserve the
+        /// active theme across navigation - it produces a cleanly URL-encoded query rather
+        /// than reusing whatever query happens to be on the current URI.
+        /// </summary>
+        public string GetUriWithStateQueryParameters(string uri)
         {
             var parameters = new Dictionary<string, object?>
             {
