@@ -12,26 +12,30 @@
     <CellMenuItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FilterBelowAverage)) ?? "") Icon="south_east" Click=@(() => OnDynamicFilterAsync(DynamicFilterType.BelowAverage)) />
     <div class="rz-spreadsheet-cell-menu-filter">
         <CellMenuItem>
-            <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" />
-            <RadzenLabel Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_SelectAll)) ?? "(Select All)") />
+            <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" Name="cellMenuSelectAll" />
+            <RadzenLabel Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_SelectAll)) ?? "(Select All)") Component="cellMenuSelectAll" />
         </CellMenuItem>
+        @{
+            var valueIndex = 0;
+        }
         @foreach (var item in LoadAvailableValues())
         {
+            var name = $"cellMenuValue{valueIndex++}";
             <CellMenuItem>
-                <RadzenCheckBox TValue="bool" Value=@IsValueSelected(item.Value) Change=@(isChecked => OnValueSelectionChanged(item.Value, isChecked)) />
-                <RadzenLabel Text=@item.Text />
+                <RadzenCheckBox TValue="bool" Value=@IsValueSelected(item.Value) Change=@(isChecked => OnValueSelectionChanged(item.Value, isChecked)) Name=@name />
+                <RadzenLabel Text=@item.Text Component=@name />
             </CellMenuItem>
         }
         @if (ShouldShowBlankOption())
         {
             <CellMenuItem>
-                <RadzenCheckBox TValue="bool" Value=@IsBlankSelected() Change=@OnBlankSelectionChanged />
-                <RadzenLabel Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Blank)) ?? "(Blank)") />
+                <RadzenCheckBox TValue="bool" Value=@IsBlankSelected() Change=@OnBlankSelectionChanged Name="cellMenuBlank" />
+                <RadzenLabel Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Blank)) ?? "(Blank)") Component="cellMenuBlank" />
             </CellMenuItem>
         }
     </div>
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End">
-        <RadzenButton Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_OK)) ?? "OK") Click=@OnApplyFilterAsync ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Disabled=@(!CanApplyFilter()) />
-        <RadzenButton Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Cancel)) ?? "Cancel") Click=@OnCancelFilterAsync ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
+    <RadzenStack class="rz-spreadsheet-cell-menu-buttons" Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+        <RadzenButton Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Cancel)) ?? "Cancel") Click=@OnCancelFilterAsync ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+        <RadzenButton Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_OK)) ?? "OK") Click=@OnApplyFilterAsync ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Disabled=@(!CanApplyFilter()) />
     </RadzenStack>
 </ul>

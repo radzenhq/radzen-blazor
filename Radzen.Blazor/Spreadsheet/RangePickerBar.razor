@@ -5,12 +5,12 @@
 
 @if (visible)
 {
-    <div class="rz-range-picker-bar">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem"
+        class="rz-range-picker-bar">
         <span class="rz-range-picker-bar-value">@displayedValue</span>
-        <button type="button" class="rz-range-picker-bar-cancel" @onclick=@CancelClick title=@CancelTitle>
-            <i class="notranslate rzi">close</i>
-        </button>
-    </div>
+        <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text"
+            Click=@CancelClick title=@CancelTitle />
+    </RadzenStack>
 }
 
 @code {

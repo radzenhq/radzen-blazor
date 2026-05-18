@@ -55,8 +55,8 @@
     }
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Style="padding: 1rem; border-top: 1px solid var(--rz-border-color)">
-        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
-        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
     </RadzenStack>
 </RadzenStack>
 
