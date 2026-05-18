@@ -379,6 +379,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     position: absolute;
     @extend %dropdown-panel;
     width: 300px;
+    padding: var(--rz-tooltip-padding);
     overflow: auto;
     box-sizing: content-box;
 }
@@ -564,16 +565,21 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     position: absolute;
     overflow: hidden;
     width: 300px;
+    padding: 0 var(--rz-dropdown-horizontal-padding);
     background: var(--rz-base-background-color);
-    border: 1px solid var(--rz-border-color);
+    border: var(--rz-border-normal);
     border-radius: var(--rz-border-radius);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    box-shadow: var(--rz-dropdown-panel-shadow);
 }
 
-.rz-spreadsheet-cell-menu {
+.rz-menu.rz-spreadsheet-cell-menu {
     --rz-menu-item-padding-block: var(--rz-input-padding-block-sm);
     --rz-menu-item-padding-inline: var(--rz-input-padding-inline-sm);
     font-size: var(--rz-input-font-size-sm);
+    margin-inline: calc(-1 * var(--rz-dropdown-horizontal-padding));
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
 
     .rz-navigation-item-icon {
         font-size: 1rem;
@@ -584,8 +590,9 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     flex: 1;
     height: 200px;
     overflow-y: auto;
-    padding-block: var(--rz-menu-item-padding-block);
-    padding-inline: var(--rz-menu-item-padding-inline);
+    padding: calc(var(--rz-dialog-content-padding) - max(var(--rz-context-menu-padding-block), var(--rz-context-menu-padding-inline)));
+    border-top: var(--rz-border-normal);
+    margin-top: 0.5rem;
 }
 
 .rz-spreadsheet-cell-menu-filter .rz-navigation-item {
@@ -594,6 +601,16 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 
 .rz-spreadsheet-cell-menu-filter .rz-chkbox {
     margin-inline-end: calc(1.5rem - var(--rz-checkbox-width));
+}
+
+.rz-spreadsheet-cell-menu-buttons {
+    padding: calc(var(--rz-dialog-content-padding) - max(var(--rz-context-menu-padding-block), var(--rz-context-menu-padding-inline)));
+    margin-bottom: calc(-1 * var(--rz-context-menu-padding-block));
+    border-top: var(--rz-border-normal);
+
+    .rz-button {
+        flex: 1;
+    }
 }
 
 .rz-spreadsheet-cell-hyperlink {
@@ -818,38 +835,18 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     background: var(--rz-base-background-color);
     border: 1px solid var(--rz-primary);
     border-radius: var(--rz-border-radius);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--rz-shadow-4);
     padding: 0.375rem 0.5rem;
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
     min-width: 280px;
     max-width: 480px;
+    font-family: var(--rz-font-family);
     font-size: 0.875rem;
 
     .rz-range-picker-bar-value {
         flex: 1;
-        font-family: var(--rz-font-mono, ui-monospace, SFMono-Regular, monospace);
         color: var(--rz-text-color);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-
-    .rz-range-picker-bar-cancel {
-        background: transparent;
-        border: 0;
-        cursor: pointer;
-        padding: 0.25rem;
-        color: var(--rz-text-secondary-color);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: var(--rz-border-radius);
-
-        &:hover {
-            color: var(--rz-danger);
-            background: var(--rz-base-200);
-        }
     }
 }

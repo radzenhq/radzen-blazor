@@ -22,11 +22,11 @@
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End" class="rz-pt-2">
-        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small"
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined"
+            Click=@OnCancel />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat"
             Disabled=@string.IsNullOrWhiteSpace(Draft.Name)
             Click=@OnOk />
-        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
-            Click=@OnCancel />
     </RadzenStack>
 </RadzenStack>
 
