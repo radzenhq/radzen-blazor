@@ -55,6 +55,13 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
     public EventCallback Focus { get; set; }
 
     /// <summary>
+    /// When <c>true</c>, the input is rendered as non-editable. Used by the formula bar
+    /// when the host spreadsheet is read-only or has editing disabled.
+    /// </summary>
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    /// <summary>
     /// Gets or sets additional HTML attributes for the content editable element.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]

@@ -1,0 +1,124 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="1rem" class="rz-mb-4">
+    <RadzenFieldset Text="Permissions">
+        <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="1.5rem">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@allowEditing />
+                <RadzenLabel Text="AllowEditing" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@allowFiltering />
+                <RadzenLabel Text="AllowFiltering" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@allowSorting />
+                <RadzenLabel Text="AllowSorting" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@allowCellFormatting />
+                <RadzenLabel Text="AllowCellFormatting" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@allowClipboard />
+                <RadzenLabel Text="AllowClipboard" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@allowUndoRedo />
+                <RadzenLabel Text="AllowUndoRedo" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenFieldset>
+
+    <RadzenFieldset Text="Visibility">
+        <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="1.5rem">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@showToolbar />
+                <RadzenLabel Text="ShowToolbar" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@showFormulaBar />
+                <RadzenLabel Text="ShowFormulaBar" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenSwitch @bind-Value=@showSheetTabs />
+                <RadzenLabel Text="ShowSheetTabs" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenFieldset>
+</RadzenStack>
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 500px"
+                   AllowEditing=@allowEditing
+                   AllowFiltering=@allowFiltering
+                   AllowSorting=@allowSorting
+                   AllowCellFormatting=@allowCellFormatting
+                   AllowClipboard=@allowClipboard
+                   AllowUndoRedo=@allowUndoRedo
+                   ShowToolbar=@showToolbar
+                   ShowFormulaBar=@showFormulaBar
+                   ShowSheetTabs=@showSheetTabs />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    bool allowEditing = true;
+    bool allowFiltering = true;
+    bool allowSorting = true;
+    bool allowCellFormatting = true;
+    bool allowClipboard = true;
+    bool allowUndoRedo = true;
+    bool showToolbar = true;
+    bool showFormulaBar = true;
+    bool showSheetTabs = true;
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Reviews", 12, 5);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 160;
+        sheet.Columns[1] = 120;
+        sheet.Columns[2] = 110;
+        sheet.Columns[3] = 240;
+
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = Radzen.TextAlign.Center };
+        var doneFormat = new Format { BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
+        var reviewFormat = new Format { BackgroundColor = "#fff8e1", Color = "#ff6f00" };
+
+        string[] headers = { "Product", "Reviewer", "Status", "Notes" };
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[0, i].Value = headers[i];
+            sheet.Cells[0, i].Format = headerFormat;
+        }
+
+        var rows = new (string Product, string Reviewer, string Status, string Notes)[]
+        {
+            ("Laptop Pro 14",  "Alice", "Done",      "Looks great"),
+            ("Ultra Monitor",  "Bob",   "In Review", "Verify color accuracy"),
+            ("Ergo Keyboard",  "Alice", "Done",      "Approved"),
+            ("Wireless Mouse", "Carol", "In Review", "Battery life?"),
+            ("Noise Headset",  "Bob",   "Done",      "Solid mic"),
+            ("USB Dock",       "Alice", "In Review", "Heat under load"),
+            ("Office Chair",   "Carol", "Done",      "Comfortable"),
+            ("Standing Desk",  "Bob",   "In Review", "Stability check pending"),
+        };
+
+        for (int i = 0; i < rows.Length; i++)
+        {
+            int r = i + 1;
+            sheet.Cells[r, 0].Value = rows[i].Product;
+            sheet.Cells[r, 1].Value = rows[i].Reviewer;
+            sheet.Cells[r, 2].Value = rows[i].Status;
+            sheet.Cells[r, 2].Format = rows[i].Status == "Done" ? doneFormat : reviewFormat;
+            sheet.Cells[r, 3].Value = rows[i].Notes;
+        }
+
+        sheet.Rows.Frozen = 1;
+
+        sheet.EndUpdate();
+    }
+}

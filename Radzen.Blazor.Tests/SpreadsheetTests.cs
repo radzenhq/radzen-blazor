@@ -517,8 +517,10 @@ public class SpreadsheetTests
     }
 
     [Fact]
-    public void IsFeatureAllowed_ReadOnly_TurnsOff_AllFeatures()
+    public void IsFeatureAllowed_ReadOnly_TurnsOff_AllFeaturesExceptClipboard()
     {
+        // Clipboard is intentionally decoupled from ReadOnly so view-only users can
+        // still copy data unless the host explicitly sets AllowClipboard to false.
         using var ctx = CreateContext();
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
         {
@@ -528,8 +530,28 @@ public class SpreadsheetTests
 
         foreach (SpreadsheetFeature f in System.Enum.GetValues(typeof(SpreadsheetFeature)))
         {
-            Assert.False(c.Instance.IsFeatureAllowed(f), $"Feature {f} should be off in ReadOnly mode");
+            if (f == SpreadsheetFeature.Clipboard)
+            {
+                Assert.True(c.Instance.IsFeatureAllowed(f), "Clipboard should stay on under ReadOnly");
+            }
+            else
+            {
+                Assert.False(c.Instance.IsFeatureAllowed(f), $"Feature {f} should be off in ReadOnly mode");
+            }
         }
+    }
+
+    [Fact]
+    public void IsFeatureAllowed_AllowClipboard_False_TurnsOff_Clipboard_EvenWhenNotReadOnly()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, NewWorkbook());
+            p.Add(x => x.AllowClipboard, false);
+        });
+
+        Assert.False(c.Instance.IsFeatureAllowed(SpreadsheetFeature.Clipboard));
     }
 
     [Fact]

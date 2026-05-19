@@ -208,7 +208,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// <summary>Allows adding and clearing conditional formatting rules.</summary>
     [Parameter] public bool AllowConditionalFormatting { get; set; } = true;
 
-    /// <summary>Allows cut and paste through the system clipboard. Copy is always allowed.</summary>
+    /// <summary>
+    /// Allows cut, copy, and paste through the system clipboard. Independent of
+    /// <see cref="ReadOnly"/>, so view-only users can still copy unless this is set
+    /// to <c>false</c>. Cut and paste also require <see cref="AllowEditing"/>.
+    /// </summary>
     [Parameter] public bool AllowClipboard { get; set; } = true;
 
     /// <summary>Allows undo and redo of previously executed commands.</summary>
@@ -241,11 +245,20 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     /// <summary>
     /// Returns <c>true</c> when the given feature is enabled. <see cref="ReadOnly"/>
-    /// forces every feature off; otherwise the matching <c>Allow*</c> parameter applies.
+    /// forces every feature off except <see cref="SpreadsheetFeature.Clipboard"/>, which
+    /// stays governed solely by <see cref="AllowClipboard"/> so view-only users can still
+    /// copy data unless the host explicitly opts out.
     /// </summary>
     /// <param name="feature">The feature to check.</param>
     public bool IsFeatureAllowed(SpreadsheetFeature feature)
     {
+        // Clipboard is decoupled from ReadOnly. Cut and Paste require both Clipboard
+        // and Editing, so ReadOnly still blocks them through the Editing gate.
+        if (feature == SpreadsheetFeature.Clipboard)
+        {
+            return AllowClipboard;
+        }
+
         if (ReadOnly)
         {
             return false;
@@ -1013,6 +1026,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task CopySelectionAsync()
     {
+        if (!IsFeatureAllowed(SpreadsheetFeature.Clipboard))
+        {
+            return;
+        }
+
         if (Worksheet is not null)
         {
             var text = Worksheet.GetDelimitedString(Worksheet.Selection.Range);
@@ -1027,7 +1045,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task CutSelectionAsync()
     {
-        if (ReadOnly || !AllowClipboard)
+        if (!IsFeatureAllowed(SpreadsheetFeature.Clipboard) || !IsFeatureAllowed(SpreadsheetFeature.Editing))
         {
             return;
         }
@@ -1057,7 +1075,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnPasteAsync(string text)
     {
-        if (ReadOnly || !AllowClipboard || !AllowEditing)
+        if (!IsFeatureAllowed(SpreadsheetFeature.Clipboard) || !IsFeatureAllowed(SpreadsheetFeature.Editing))
         {
             return Task.CompletedTask;
         }
@@ -1090,18 +1108,35 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         var row = args.Row;
         var column = args.Column;
 
-        var menuItems = new List<ContextMenuItem>
-        {
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ClearContents)), Value = "clear", Icon = "clear" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ContextSortAscending)), Value = "sort-ascending", Icon = "arrow_upward" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ContextSortDescending)), Value = "sort-descending", Icon = "arrow_downward" },
-        };
+        var menuItems = new List<ContextMenuItem>();
 
-        // If the active cell is inside a Table, add table-management actions.
-        if (FindTableAt(row, column) is not null)
+        var canCutPaste = IsFeatureAllowed(SpreadsheetFeature.Clipboard) && IsFeatureAllowed(SpreadsheetFeature.Editing);
+        if (canCutPaste)
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Clipboard))
+        {
+            if (IsFeatureAllowed(SpreadsheetFeature.Clipboard))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" });
+        }
+        }
+        if (canCutPaste)
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Editing))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ClearContents)), Value = "clear", Icon = "clear" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Sorting))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ContextSortAscending)), Value = "sort-ascending", Icon = "arrow_upward" });
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ContextSortDescending)), Value = "sort-descending", Icon = "arrow_downward" });
+        }
+
+        if (FindTableAt(row, column) is not null && IsFeatureAllowed(SpreadsheetFeature.Tables))
         {
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_ConvertTableToRange)),
                 Value = "convert-table-to-range", Icon = "grid_off" });
@@ -1148,18 +1183,34 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         Worksheet.Selection.Select(new RowRef(args.Row));
 
         var row = args.Row;
+        var menuItems = new List<ContextMenuItem>();
 
-        ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
+        var canCutPaste = IsFeatureAllowed(SpreadsheetFeature.Clipboard) && IsFeatureAllowed(SpreadsheetFeature.Editing);
+        if (canCutPaste)
         {
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertRowAbove)), Value = "insert-row-before", Icon = "north" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertRowBelow)), Value = "insert-row-after", Icon = "south" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteRow)), Value = "delete-row", Icon = "delete" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideRow)), Value = "hide-row", Icon = "visibility_off" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideRow)), Value = "unhide-row", Icon = "visibility" },
-        }, menuArgs => _ = OnRowContextMenuItemClick(menuArgs, row));
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Clipboard))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" });
+        }
+        if (canCutPaste)
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Editing))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertRowAbove)), Value = "insert-row-before", Icon = "north" });
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertRowBelow)), Value = "insert-row-after", Icon = "south" });
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteRow)), Value = "delete-row", Icon = "delete" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideRow)), Value = "hide-row", Icon = "visibility_off" });
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideRow)), Value = "unhide-row", Icon = "visibility" });
+        }
+
+        ContextMenuService.Open(args.Pointer, menuItems, menuArgs => _ = OnRowContextMenuItemClick(menuArgs, row));
     }
 
     /// <summary>
@@ -1180,18 +1231,34 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         Worksheet.Selection.Select(new ColumnRef(args.Column));
 
         var column = args.Column;
+        var menuItems = new List<ContextMenuItem>();
 
-        ContextMenuService.Open(args.Pointer, new List<ContextMenuItem>
+        var canCutPaste = IsFeatureAllowed(SpreadsheetFeature.Clipboard) && IsFeatureAllowed(SpreadsheetFeature.Editing);
+        if (canCutPaste)
         {
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnBefore)), Value = "insert-column-before", Icon = "west" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnAfter)), Value = "insert-column-after", Icon = "east" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteColumn)), Value = "delete-column", Icon = "delete" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideColumn)), Value = "hide-column", Icon = "visibility_off" },
-            new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideColumn)), Value = "unhide-column", Icon = "visibility" },
-        }, menuArgs => _ = OnColumnContextMenuItemClick(menuArgs, column));
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Cut)), Value = "cut", Icon = "content_cut" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Clipboard))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" });
+        }
+        if (canCutPaste)
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Paste)), Value = "paste", Icon = "content_paste" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Editing))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnBefore)), Value = "insert-column-before", Icon = "west" });
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnAfter)), Value = "insert-column-after", Icon = "east" });
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteColumn)), Value = "delete-column", Icon = "delete" });
+        }
+        if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
+        {
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideColumn)), Value = "hide-column", Icon = "visibility_off" });
+            menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideColumn)), Value = "unhide-column", Icon = "visibility" });
+        }
+
+        ContextMenuService.Open(args.Pointer, menuItems, menuArgs => _ = OnColumnContextMenuItemClick(menuArgs, column));
     }
 
     private bool HandleCommonContextMenuAction(string? action)
@@ -1338,7 +1405,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task PasteFromClipboardAsync()
     {
-        if (ReadOnly || !AllowClipboard || !AllowEditing)
+        if (!IsFeatureAllowed(SpreadsheetFeature.Clipboard) || !IsFeatureAllowed(SpreadsheetFeature.Editing))
         {
             return;
         }
