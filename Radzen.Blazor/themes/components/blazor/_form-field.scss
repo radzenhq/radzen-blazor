@@ -14,6 +14,32 @@ $form-field-filled-hover-border: var(--rz-input-hover-border) !default;
 $form-field-filled-focus-border: var(--rz-input-focus-border) !default;
 $form-field-filled-border-radius: var(--rz-border-radius) !default;
 $form-field-filled-label-floating-top: 0.25rem !default;
+
+$form-field-filled-height-xs: 2.375rem !default;
+$form-field-filled-height-sm: 2.875rem !default;
+$form-field-filled-height-md: $form-field-filled-height !default;
+$form-field-filled-height-lg: 4.375rem !default;
+
+$form-field-filled-padding-block-xs: 0.875rem 0.125rem !default;
+$form-field-filled-padding-block-sm: 1.125rem 0.125rem !default;
+$form-field-filled-padding-block-md: $form-field-filled-padding-block !default;
+$form-field-filled-padding-block-lg: 1.625rem 0.625rem !default;
+
+$form-field-filled-padding-inline-xs: var(--rz-input-padding-inline-xs) !default;
+$form-field-filled-padding-inline-sm: var(--rz-input-padding-inline-sm) !default;
+$form-field-filled-padding-inline-md: $form-field-filled-padding-inline !default;
+$form-field-filled-padding-inline-lg: var(--rz-input-padding-inline-lg) !default;
+
+$form-field-filled-label-floating-top-xs: 0.0625rem !default;
+$form-field-filled-label-floating-top-sm: 0.125rem !default;
+$form-field-filled-label-floating-top-md: $form-field-filled-label-floating-top !default;
+$form-field-filled-label-floating-top-lg: 0.4375rem !default;
+
+$form-field-filled-label-floating-font-size-xs: 0.625rem !default;
+$form-field-filled-label-floating-font-size-sm: 0.6875rem !default;
+$form-field-filled-label-floating-font-size-md: 0.75rem !default;
+$form-field-filled-label-floating-font-size-lg: 0.875rem !default;
+
 $form-field-filled-hover-shadow: var(--rz-input-hover-shadow) !default;
 $form-field-filled-focus-shadow: var(--rz-input-focus-shadow) !default;
 $form-field-filled-underline-display: none !default;
@@ -167,6 +193,26 @@ $form-field-helper-padding: 0 0.5rem !default;
             .rz-datepicker .rz-dropdown-clear-icon,
             .rz-timespanpicker .rz-dropdown-clear-icon {
                 top: 0.4375rem;
+            }
+        }
+
+        @each $size in (xs, sm, md, lg) {
+            &:has(.rz-input-#{$size}) {
+                .rz-form-field-content {
+                    --rz-input-height: var(--rz-form-field-filled-height-#{$size});
+                    --rz-input-padding-block: var(--rz-form-field-filled-padding-block-#{$size});
+                    --rz-input-padding-inline: var(--rz-form-field-filled-padding-inline-#{$size});
+                    --rz-dropdown-chips-padding-block: var(--rz-form-field-filled-padding-block-#{$size});
+                    --rz-dropdown-chips-padding-inline: var(--rz-form-field-filled-padding-inline-#{$size});
+                    --rz-form-field-label-floating-top: var(--rz-form-field-filled-label-floating-top-#{$size});
+                    --rz-form-field-label-floating-font-size: var(--rz-form-field-filled-label-floating-font-size-#{$size});
+
+                    > .rz-input-#{$size} {
+                        --rz-input-height: var(--rz-form-field-filled-height-#{$size});
+                        --rz-input-padding-block: var(--rz-form-field-filled-padding-block-#{$size});
+                        --rz-input-padding-inline: var(--rz-form-field-filled-padding-inline-#{$size});
+                    }
+                }
             }
         }
     }
@@ -386,7 +432,7 @@ $form-field-helper-padding: 0 0.5rem !default;
         transform: translate(0, 0);
         color: var(--rz-input-placeholder-color);
         background-color: var(--rz-form-field-label-floating-background-color);
-        font-size: 0.75rem;
+        font-size: var(--rz-form-field-label-floating-font-size, 0.75rem);
         line-height: 1rem;
         max-width: calc(100% - 1.5rem);
     }
