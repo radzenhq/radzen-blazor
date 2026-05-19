@@ -63,7 +63,7 @@ public interface ISpreadsheet
     /// <summary>
     /// Returns <c>true</c> when the given feature is enabled on the host
     /// <see cref="RadzenSpreadsheet"/>. Tools should use this to decide whether
-    /// they should appear disabled in the ribbon.
+    /// they should appear disabled.
     /// </summary>
     /// <param name="feature">The feature to check.</param>
     bool IsFeatureAllowed(SpreadsheetFeature feature);
@@ -128,17 +128,18 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public Dictionary<string, Spreadsheet.SpreadsheetCellType>? CellTypes { get; set; }
 
     /// <summary>
-    /// The index of the active ribbon tab. Defaults to <c>1</c> so the Home tab is
-    /// shown first. Supports two-way binding via <c>@bind-SelectedTabIndex</c>.
+    /// The index of the active toolset in the toolbar. Defaults to <c>1</c> so the
+    /// Home toolset is shown first. Supports two-way binding via
+    /// <c>@bind-SelectedToolsetIndex</c>.
     /// </summary>
     [Parameter]
-    public int SelectedTabIndex { get; set; } = 1;
+    public int SelectedToolsetIndex { get; set; } = 1;
 
     /// <summary>
-    /// Fired when the active ribbon tab changes. Used by <c>@bind-SelectedTabIndex</c>.
+    /// Fired when the active toolset changes. Used by <c>@bind-SelectedToolsetIndex</c>.
     /// </summary>
     [Parameter]
-    public EventCallback<int> SelectedTabIndexChanged { get; set; }
+    public EventCallback<int> SelectedToolsetIndexChanged { get; set; }
 
     /// <summary>
     /// When <c>true</c>, the spreadsheet rejects every command that mutates the
@@ -149,14 +150,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public bool ReadOnly { get; set; }
 
     /// <summary>
-    /// When <c>true</c> (the default) the ribbon toolbar is rendered above the grid.
+    /// When <c>true</c> (the default) the toolbar is rendered above the grid.
     /// Set to <c>false</c> for kiosk or view-only embeds.
     /// </summary>
     [Parameter]
     public bool ShowToolbar { get; set; } = true;
 
     /// <summary>
-    /// When <c>true</c> (the default) the formula bar is rendered between the ribbon
+    /// When <c>true</c> (the default) the formula bar is rendered between the toolbar
     /// and the grid.
     /// </summary>
     [Parameter]
@@ -223,11 +224,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public EventCallback<SpreadsheetCommandEventArgs> CommandExecuting { get; set; }
 
     /// <summary>
-    /// Replaces the built-in ribbon tabs. When set, the supplied content sits inside the
-    /// ribbon's <see cref="RadzenTabs.Tabs"/> slot — each child should be a
+    /// Replaces the built-in toolsets. When set, the supplied content sits inside the
+    /// toolbar's <see cref="RadzenTabs.Tabs"/> slot — each child should be a
     /// <see cref="RadzenTabsItem"/>. Add
-    /// <see cref="Radzen.Blazor.Spreadsheet.Tools.TableDesignTab"/> to keep the contextual
-    /// "Table Design" tab.
+    /// <see cref="Radzen.Blazor.Spreadsheet.Tools.TableDesignToolset"/> to keep the
+    /// contextual "Table Design" toolset.
     /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }

@@ -50,12 +50,12 @@ public class SpreadsheetTests
     }
 
     [Fact]
-    public void Spreadsheet_Defaults_RenderRibbonFormulaBarAndSheetTabs()
+    public void Spreadsheet_Defaults_RenderToolbarFormulaBarAndSheetTabs()
     {
         using var ctx = CreateContext();
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, NewWorkbook()));
 
-        Assert.Contains("rz-tabview", c.Markup);                       // ribbon
+        Assert.Contains("rz-tabview", c.Markup);                       // toolbar
         Assert.Contains("rz-spreadsheet-formula-editor", c.Markup); // formula bar
         Assert.Contains("rz-spreadsheet-sheet-tabs", c.Markup);     // sheet strip
     }
@@ -63,7 +63,7 @@ public class SpreadsheetTests
     // ── ShowToolbar / ShowFormulaBar / ShowSheetTabs ────────────────────
 
     [Fact]
-    public void ShowToolbar_False_HidesRibbonTabLabels()
+    public void ShowToolbar_False_HidesToolbarToolsetLabels()
     {
         using var ctx = CreateContext();
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
@@ -72,7 +72,7 @@ public class SpreadsheetTests
             p.Add(x => x.ShowToolbar, false);
         });
 
-        // Every ribbon tab label is gone; the bottom sheet-tabs strip stays.
+        // Every toolset label is gone; the bottom sheet-tabs strip stays.
         var home = RadzenStrings.ResourceManager.GetString(nameof(RadzenStrings.Spreadsheet_HomeTab))!;
         var insert = RadzenStrings.ResourceManager.GetString(nameof(RadzenStrings.Spreadsheet_InsertTab))!;
         Assert.DoesNotContain(home, c.Markup);
@@ -105,10 +105,10 @@ public class SpreadsheetTests
         Assert.DoesNotContain("rz-spreadsheet-sheet-tabs", c.Markup);
     }
 
-    // ── ChildContent (custom ribbon) ────────────────────────────────────
+    // ── ChildContent (custom toolbar) ──
 
     [Fact]
-    public void ChildContent_Replaces_DefaultRibbonTabs()
+    public void ChildContent_Replaces_DefaultToolsets()
     {
         using var ctx = CreateContext();
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
@@ -117,7 +117,7 @@ public class SpreadsheetTests
             p.AddChildContent("<RadzenTabsItem Text=\"My Tab\"><div>my tools</div></RadzenTabsItem>");
         });
 
-        // Default labels are gone, the supplied tab is rendered, the ribbon shell stays.
+        // Default labels are gone, the supplied toolset is rendered, the toolbar shell stays.
         var home = RadzenStrings.ResourceManager.GetString(nameof(RadzenStrings.Spreadsheet_HomeTab))!;
         Assert.DoesNotContain(home, c.Markup);
         Assert.Contains("My Tab", c.Markup);
@@ -125,10 +125,10 @@ public class SpreadsheetTests
     }
 
     [Fact]
-    public void ChildContent_DoesNotInclude_TableDesignTab_AutomaticallyInsideTable()
+    public void ChildContent_DoesNotInclude_TableDesignToolset_AutomaticallyInsideTable()
     {
         // ChildContent fully replaces the toolbar — the host does NOT inject the
-        // Table Design tab. Users add the TableDesignTab component themselves to opt in.
+        // Table Design tab. Users add the TableDesignToolset component themselves to opt in.
         using var ctx = CreateContext();
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
@@ -147,7 +147,7 @@ public class SpreadsheetTests
     }
 
     [Fact]
-    public void TableDesignTab_InChildContent_ShowsWhenCellInsideTable()
+    public void TableDesignToolset_InChildContent_ShowsWhenCellInsideTable()
     {
         using var ctx = CreateContext();
         var wb = NewWorkbook();
@@ -158,7 +158,7 @@ public class SpreadsheetTests
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
-            p.AddChildContent<Radzen.Blazor.Spreadsheet.Tools.TableDesignTab>(tab =>
+            p.AddChildContent<Radzen.Blazor.Spreadsheet.Tools.TableDesignToolset>(tab =>
                 tab.Add(t => t.Worksheet, sheet));
         });
 
@@ -167,7 +167,7 @@ public class SpreadsheetTests
     }
 
     [Fact]
-    public void TableDesignTab_InChildContent_HiddenWhenCellOutsideTable()
+    public void TableDesignToolset_InChildContent_HiddenWhenCellOutsideTable()
     {
         using var ctx = CreateContext();
         var wb = NewWorkbook();
@@ -178,7 +178,7 @@ public class SpreadsheetTests
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
-            p.AddChildContent<Radzen.Blazor.Spreadsheet.Tools.TableDesignTab>(tab =>
+            p.AddChildContent<Radzen.Blazor.Spreadsheet.Tools.TableDesignToolset>(tab =>
                 tab.Add(t => t.Worksheet, sheet));
         });
 
