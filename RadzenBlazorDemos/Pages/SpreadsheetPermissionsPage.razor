@@ -1,0 +1,38 @@
+@page "/spreadsheet-permissions"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Spreadsheet <strong>Permissions</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Lock the spreadsheet for view-only embedding, disable individual features, or veto commands dynamically with a <code>CommandExecuting</code> handler. These are component-level rules — for workbook-level rules that round-trip through XLSX, see the <RadzenLink Path="spreadsheet-protection" Text="Protection demo" />.
+</RadzenText>
+
+<RadzenText Anchor="spreadsheet-permissions#read-only" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Read-only mode
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>ReadOnly="true"</code> to reject every mutating command. The user can still scroll, select, and copy — formatting, autofill, paste, undo, sheet add/remove and every toolbar action are all silently dropped.
+</RadzenText>
+<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetPermissionsReadOnly">
+    <SpreadsheetPermissionsReadOnly />
+</RadzenExample>
+
+<RadzenText Anchor="spreadsheet-permissions#toggles" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Configuration toggles
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Each <code>Allow*</code> parameter independently gates a single feature area. The <code>Show*</code> parameters control which parts of the chrome are rendered. All flags are independent — flip them in any combination.
+</RadzenText>
+<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetPermissionsToggles">
+    <SpreadsheetPermissionsToggles />
+</RadzenExample>
+
+<RadzenText Anchor="spreadsheet-permissions#dynamic-veto" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Dynamic veto with CommandExecuting
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Subscribe to <code>CommandExecuting</code> to veto specific commands at runtime — for role checks, audit gates, or any logic that depends on backend state. The handler is <code>async</code>, so you can <code>await</code> a backend check before calling <code>PreventDefault()</code>.
+</RadzenText>
+<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetPermissionsVeto">
+    <SpreadsheetPermissionsVeto />
+</RadzenExample>

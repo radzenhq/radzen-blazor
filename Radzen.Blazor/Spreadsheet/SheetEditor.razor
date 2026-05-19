@@ -3,7 +3,7 @@
 @using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime;
 <div class="rz-spreadsheet-editor" @attributes=@Attributes>
-    <div class="rz-spreadsheet-editor-input" spellcheck="false" @ref=@element contenteditable></div>
+    <div class="rz-spreadsheet-editor-input" spellcheck="false" @ref=@element contenteditable=@(ReadOnly ? "false" : "true")></div>
     <SheetEditorHighlight Value=@value />
 </div>
 <RadzenPopup @ref=@popup class="rz-spreadsheet-highlight-popup" Close="OnPopupClose">

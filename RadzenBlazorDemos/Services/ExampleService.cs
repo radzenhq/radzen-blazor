@@ -397,6 +397,15 @@ namespace RadzenBlazorDemos
                     Tags = new [] { "spreadsheet", "toolbar", "custom", "custom tools", "childcontent", "command", "icommand", "undo", "extend" },
                     Toc = [ new () { Text = "Predefined tools in a custom layout", Anchor = "#predefined-tools" }, new () { Text = "Custom tool with an undoable command", Anchor = "#custom-tool" } ]
                 },
+                new Example
+                {
+                    Name = "Permissions",
+                    Path = "spreadsheet-permissions",
+                    Title = "Blazor Spreadsheet Permissions | Free UI Components by Radzen",
+                    Description = "Lock the spreadsheet for view-only embedding with ReadOnly, disable individual features with Allow* flags, or veto commands dynamically with a CommandExecuting handler.",
+                    Tags = new [] { "spreadsheet", "permissions", "readonly", "read-only", "view-only", "allow", "allowediting", "allowfiltering", "allowsorting", "commandexecuting", "preventdefault", "audit", "role", "restrict" },
+                    Toc = [ new () { Text = "Read-only mode", Anchor = "#read-only" }, new () { Text = "Configuration toggles", Anchor = "#toggles" }, new () { Text = "Dynamic veto with CommandExecuting", Anchor = "#dynamic-veto" } ]
+                },
             }
         },
         new Example

@@ -1,0 +1,86 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inject NotificationService NotificationService
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-mb-4">
+    <RadzenLabel Text="Role:" />
+    <RadzenSelectBar @bind-Value=@isApprover TValue="bool" Size="ButtonSize.Small">
+        <Items>
+            <RadzenSelectBarItem Value="false" Text="Reviewer" />
+            <RadzenSelectBarItem Value="true" Text="Approver" />
+        </Items>
+    </RadzenSelectBar>
+    <RadzenText TextStyle="TextStyle.Body2" class="rz-color-secondary">
+        Reviewers can edit values. Only approvers can change cell formatting.
+    </RadzenText>
+</RadzenStack>
+
+<RadzenSpreadsheet Workbook=@workbook CommandExecuting=@OnCommandExecutingAsync style="height: 500px" />
+
+@code {
+    Workbook workbook = new Workbook();
+    bool isApprover;
+
+    async Task OnCommandExecutingAsync(SpreadsheetCommandEventArgs args)
+    {
+        // Formatting is the gated action in this scenario. The handler is async so a
+        // real app can await a backend role check before deciding — here we simulate
+        // network latency with a short delay.
+        if (args.Command is FormatCommand)
+        {
+            await Task.Delay(150);
+
+            if (!isApprover)
+            {
+                args.PreventDefault();
+                NotificationService.Notify(NotificationSeverity.Warning,
+                    "Formatting denied",
+                    "Switch to Approver to change cell formatting.");
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Reviews", 12, 5);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 160;
+        sheet.Columns[1] = 120;
+        sheet.Columns[2] = 110;
+        sheet.Columns[3] = 240;
+
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = Radzen.TextAlign.Center };
+
+        string[] headers = { "Product", "Reviewer", "Status", "Notes" };
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[0, i].Value = headers[i];
+            sheet.Cells[0, i].Format = headerFormat;
+        }
+
+        var rows = new (string Product, string Reviewer, string Status, string Notes)[]
+        {
+            ("Laptop Pro 14",  "Alice", "Done",      "Looks great"),
+            ("Ultra Monitor",  "Bob",   "In Review", "Verify color accuracy"),
+            ("Ergo Keyboard",  "Alice", "Done",      "Approved"),
+            ("Wireless Mouse", "Carol", "In Review", "Battery life?"),
+            ("Noise Headset",  "Bob",   "Done",      "Solid mic"),
+            ("USB Dock",       "Alice", "In Review", "Heat under load"),
+        };
+
+        for (int i = 0; i < rows.Length; i++)
+        {
+            int r = i + 1;
+            sheet.Cells[r, 0].Value = rows[i].Product;
+            sheet.Cells[r, 1].Value = rows[i].Reviewer;
+            sheet.Cells[r, 2].Value = rows[i].Status;
+            sheet.Cells[r, 3].Value = rows[i].Notes;
+        }
+
+        sheet.Rows.Frozen = 1;
+
+        sheet.EndUpdate();
+    }
+}

@@ -1,0 +1,62 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook ReadOnly="true" style="height: 500px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Q4 Report", 12, 6);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 160;
+        sheet.Columns[1] = 110;
+        sheet.Columns[2] = 110;
+        sheet.Columns[3] = 110;
+        sheet.Columns[4] = 110;
+
+        var titleFormat = new Format { Bold = true, FontSize = 14, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = Radzen.TextAlign.Center };
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", Color = "#005da1", TextAlign = Radzen.TextAlign.Center };
+        var currency = new Format { NumberFormat = "$#,##0" };
+        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0", BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
+
+        sheet.MergedCells.Add(RangeRef.Parse("A1:E1"));
+        sheet.Cells["A1"].Value = "Q4 2025 — Final Sales (locked)";
+        sheet.Cells["A1"].Format = titleFormat;
+        sheet.Rows[0] = 32;
+
+        string[] headers = { "Region", "Oct", "Nov", "Dec", "Total" };
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[1, i].Value = headers[i];
+            sheet.Cells[1, i].Format = headerFormat;
+        }
+
+        var rows = new (string Region, double Oct, double Nov, double Dec)[]
+        {
+            ("North America", 45200, 52100, 61300),
+            ("Europe",        38400, 41200, 44500),
+            ("Asia Pacific",  29100, 35600, 48900),
+            ("Latin America", 15800, 18200, 24600),
+            ("Middle East",   12300, 14500, 19200),
+        };
+
+        for (int i = 0; i < rows.Length; i++)
+        {
+            int r = i + 2;
+            sheet.Cells[r, 0].Value = rows[i].Region;
+            sheet.Cells[r, 1].Value = rows[i].Oct; sheet.Cells[r, 1].Format = currency;
+            sheet.Cells[r, 2].Value = rows[i].Nov; sheet.Cells[r, 2].Format = currency;
+            sheet.Cells[r, 3].Value = rows[i].Dec; sheet.Cells[r, 3].Format = currency;
+            sheet.Cells[r, 4].Formula = $"=SUM(B{r + 1}:D{r + 1})";
+            sheet.Cells[r, 4].Format = totalFormat;
+        }
+
+        sheet.Rows.Frozen = 2;
+
+        sheet.EndUpdate();
+    }
+}

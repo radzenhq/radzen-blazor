@@ -5,5 +5,6 @@
 
 <div class="rz-spreadsheet-formula-editor">
     <SheetEditor tabindex="-1" @bind-Value=@Editor.Value Focus=@(this.AsNonRenderingEventHandler(OnFocus))
-        Worksheet=@Worksheet Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync)) />
+        Worksheet=@Worksheet Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
+        ReadOnly=@(Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.Editing) == false) />
 </div>
