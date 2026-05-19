@@ -23,6 +23,7 @@
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
     Build your own tool component and dispatch a custom <code>ICommand</code> through <code>ISpreadsheet.ExecuteAsync</code>. Declare a <code>SpreadsheetFeature</code> on the command and your tool participates in <code>ReadOnly</code>, the matching <code>Allow*</code> flag, the <code>CommandExecuting</code> event, and the undo/redo stack for free.
 </RadzenText>
-<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetCustomToolbarCommand">
+<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetCustomToolbarCommand"
+    AdditionalSourceCodePages=@(new [] { "StampReviewedTool.razor" })>
     <SpreadsheetCustomToolbarCommand />
 </RadzenExample>
