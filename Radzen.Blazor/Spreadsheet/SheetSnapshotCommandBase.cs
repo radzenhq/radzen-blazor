@@ -12,6 +12,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public abstract class SheetSnapshotCommandBase : ICommand
 {
+    /// <inheritdoc/>
+    public virtual SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;
+
     /// <summary>
     /// The sheet being operated on.
     /// </summary>

@@ -6,6 +6,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class MoveChartCommand(SheetChart chart, CellAnchor newFrom, CellAnchor? newTo) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Charts;
+
     private readonly SheetChart chart = chart;
     private readonly CellAnchor newFrom = newFrom;
     private readonly CellAnchor? newTo = newTo;

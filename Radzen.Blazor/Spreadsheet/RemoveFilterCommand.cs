@@ -9,6 +9,9 @@ public class RemoveFilterCommand(Worksheet sheet, SheetFilter filter) : ICommand
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.AutoFilter;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Filtering;
+
     private readonly Worksheet sheet = sheet;
     private readonly SheetFilter filter = filter;
 

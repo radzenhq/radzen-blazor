@@ -13,44 +13,30 @@
 @code {
 #nullable enable
 
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     [CascadingParameter]
     public ISpreadsheet? Spreadsheet { get; set; }
 
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.Merging) == false;
 
-    private void OnClick(RadzenSplitButtonItem? item)
+    private async Task OnClick(RadzenSplitButtonItem? item)
     {
-        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
         {
             return;
         }
 
-        var value = item?.Value;
-
-        switch (value)
+        ICommand command = item?.Value switch
         {
-            case "merge-center":
-            case null:
-            {
-                var command = new MergeCellsCommand(Worksheet, Worksheet.Selection.Range, center: true);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-            case "merge":
-            {
-                var command = new MergeCellsCommand(Worksheet, Worksheet.Selection.Range);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-            case "unmerge":
-            {
-                var command = new UnmergeCellsCommand(Worksheet, Worksheet.Selection.Cell);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-        }
+            "merge" => new MergeCellsCommand(Worksheet, Worksheet.Selection.Range),
+            "unmerge" => new UnmergeCellsCommand(Worksheet, Worksheet.Selection.Cell),
+            _ => new MergeCellsCommand(Worksheet, Worksheet.Selection.Range, center: true),
+        };
+
+        await Spreadsheet.ExecuteAsync(command);
     }
 }

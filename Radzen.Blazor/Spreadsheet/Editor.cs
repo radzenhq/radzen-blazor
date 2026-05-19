@@ -29,6 +29,9 @@ public enum EditMode
 /// <param name="view"></param>
 public class AcceptEditCommand(SheetView view) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;
+
     private readonly Worksheet sheet = view.Worksheet;
     private readonly Editor editor = view.Editor;
 

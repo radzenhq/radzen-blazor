@@ -28,6 +28,9 @@ public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int k
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.Sort;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Sorting;
+
     private readonly Worksheet sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
     private readonly RangeRef range = range;
     private readonly SortOrder order = order;

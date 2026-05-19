@@ -78,10 +78,10 @@ public class SheetViewTests
 
         var fromView = view.GetRowPixelRange(2, 4);
 
-        // Row default size is 24, rows 0-1 = 2*24 = 48, row 2 = 24, row 3 = 50, row 4 = 24
-        // Start = 48 + RowHeaderOffset, End = 48 + 24 + 50 + 24 + RowHeaderOffset
-        Assert.Equal(48 + view.RowHeaderOffset, fromView.Start);
-        Assert.Equal(48 + 24 + 50 + 24 + view.RowHeaderOffset, fromView.End);
+        // Row default size is 22, rows 0-1 = 2*22 = 44, row 2 = 22, row 3 = 50, row 4 = 22
+        // Start = 44 + RowHeaderOffset, End = 44 + 22 + 50 + 22 + RowHeaderOffset
+        Assert.Equal(44 + view.RowHeaderOffset, fromView.Start);
+        Assert.Equal(44 + 22 + 50 + 22 + view.RowHeaderOffset, fromView.End);
     }
 
     [Fact]
@@ -92,9 +92,9 @@ public class SheetViewTests
 
         var fromView = view.GetRowPixelRange(5);
 
-        // Row default size is 24, rows 0-4 = 5*24 = 120, row 5 = 24
-        Assert.Equal(120 + view.RowHeaderOffset, fromView.Start);
-        Assert.Equal(144 + view.RowHeaderOffset, fromView.End);
+        // Row default size is 22, rows 0-4 = 5*22 = 110, row 5 = 22
+        Assert.Equal(110 + view.RowHeaderOffset, fromView.Start);
+        Assert.Equal(132 + view.RowHeaderOffset, fromView.End);
     }
 
     [Fact]

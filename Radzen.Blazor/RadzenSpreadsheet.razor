@@ -11,8 +11,17 @@
 
 <div @ref=@Element class=@GetCssClass() style=@Style @attributes=@Attributes tabindex="0">
     <CascadingValue TValue="ISpreadsheet" Value=this IsFixed="true">
+    <CascadingValue Value=@Worksheet TValue="Worksheet">
+        @if (ShowToolbar)
+        {
         <RadzenTabs SelectedIndex="1">
             <Tabs>
+                @if (ChildContent != null)
+                {
+                    @ChildContent
+                }
+                else
+                {
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FileTab))>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <Open WorkbookChanged=@OnWorkbookChangedAsync CsvImportOptions=@CsvImportOptions />
@@ -28,85 +37,88 @@
                         </RadzenStack>
                         <div class="rz-html-editor-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <FontFamily Worksheet=@Worksheet />
-                            <FontSize Worksheet=@Worksheet />
+                            <FontFamily/>
+                            <FontSize/>
                         </RadzenStack>
                         <div class="rz-html-editor-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <Bold Worksheet=@Worksheet />
-                            <Italic Worksheet=@Worksheet />
-                            <Underline Worksheet=@Worksheet />
-                            <Strikethrough Worksheet=@Worksheet />
-                            <Color Worksheet=@Worksheet />
-                            <BackgroundColor Worksheet=@Worksheet />
-                            <CellBorders Worksheet=@Worksheet />
+                            <Bold/>
+                            <Italic/>
+                            <Underline/>
+                            <Strikethrough/>
+                            <Color/>
+                            <BackgroundColor/>
+                            <CellBorders/>
                         </RadzenStack>
                         <div class="rz-html-editor-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <TextAlign Worksheet=@Worksheet />
-                            <VerticalAlign Worksheet=@Worksheet />
-                            <TextWrap Worksheet=@Worksheet />
-                            <MergeCells Worksheet=@Worksheet />
+                            <TextAlign/>
+                            <VerticalAlign/>
+                            <TextWrap/>
+                            <MergeCells/>
                         </RadzenStack>
                         <div class="rz-html-editor-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <ConditionalFormat Worksheet=@Worksheet />
+                            <ConditionalFormat/>
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatTab))>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                        <DataFormat Worksheet=@Worksheet />
-                        <IncreaseDecimals Worksheet=@Worksheet />
-                        <DecreaseDecimals Worksheet=@Worksheet />
+                        <DataFormat/>
+                        <IncreaseDecimals/>
+                        <DecreaseDecimals/>
                         <div class="rz-html-editor-separator"></div>
                         <RadzenButton Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatCells)) Click=@OnFormatCellsAsync
                             Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
-                            Disabled=@(Worksheet?.Selection.Cell == CellRef.Invalid) />
+                            Disabled=@(Worksheet?.Selection.Cell == CellRef.Invalid || !IsFeatureAllowed(SpreadsheetFeature.CellFormatting)) />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_InsertTab))>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <InsertRowAfter Worksheet=@Worksheet />
-                            <InsertRowBefore Worksheet=@Worksheet />
+                            <InsertRowAfter/>
+                            <InsertRowBefore/>
                         </RadzenStack>
                         <div class="rz-html-editor-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <InsertColumnAfter Worksheet=@Worksheet />
-                            <InsertColumnBefore Worksheet=@Worksheet />
+                            <InsertColumnAfter/>
+                            <InsertColumnBefore/>
                         </RadzenStack>
                         <div class="rz-html-editor-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <InsertHyperlink Worksheet=@Worksheet />
-                            <InsertImage Worksheet=@Worksheet />
-                            <InsertTable Worksheet=@Worksheet />
-                            <InsertChart Worksheet=@Worksheet />
+                            <InsertHyperlink/>
+                            <InsertImage/>
+                            <InsertTable/>
+                            <InsertChart/>
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_ViewTab))>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                        <Freeze Worksheet=@Worksheet />
+                        <Freeze/>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_DataTab))>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                        <AutoFilter Worksheet=@Worksheet />
-                        <CustomSort Worksheet=@Worksheet />
+                        <AutoFilter/>
+                        <CustomSort/>
                         <div class="rz-html-editor-separator"></div>
-                        <DataValidation Worksheet=@Worksheet />
+                        <DataValidation/>
                     </RadzenStack>
                 </RadzenTabsItem>
-                <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_TableDesignTab)) Visible=@hasTableSelection>
-                    <TableDesignPanel Worksheet=@Worksheet />
-                </RadzenTabsItem>
+                <TableDesignTab/>
+                }
             </Tabs>
         </RadzenTabs>
+        }
 @if (Worksheet != null)
 {
         <CascadingValue Value="@CellTypes">
+        @if (ShowFormulaBar)
+        {
         <FormulaEditor Worksheet=@Worksheet Editor=@Editor />
+        }
         <VirtualGrid @ref=@grid style="flex: 1" View=@ActiveView>
             <Template>
                 @switch (context)
@@ -145,8 +157,10 @@
                 <ValidationError Worksheet=@Worksheet Context=@context />
             </ChildContent>
         </VirtualGrid>
+        @if (ShowSheetTabs)
+        {
         <div class="rz-spreadsheet-sheet-tabs">
-            <RadzenButton Icon="add" Click=@OnAddSheetAsync Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" class="rz-spreadsheet-add-sheet" />
+            <RadzenButton Icon="add" Click=@OnAddSheetAsync Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" class="rz-spreadsheet-add-sheet" Disabled=@ReadOnly />
             <RadzenTabs SelectedIndex=@sheetIndex Change=@OnSheetTabChanged RenderMode="TabRenderMode.Server" TabPosition="TabPosition.Bottom">
                 <Tabs>
                     @for (var i = 0; i < workbook!.Sheets.Count; i++)
@@ -160,10 +174,10 @@
                                     Variant="Variant.Text"
                                     Size="ButtonSize.ExtraSmall">
                                     <ChildContent>
-                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_Rename)) Value="rename" Icon="edit" />
-                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_Delete)) Value="delete" Icon="delete" Disabled=@(workbook.Sheets.Count <= 1) />
-                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_MoveLeft)) Value="move-left" Icon="chevron_left" Disabled=@(workbook.IndexOf(sheet) == 0) />
-                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_MoveRight)) Value="move-right" Icon="chevron_right" Disabled=@(workbook.IndexOf(sheet) == workbook.Sheets.Count - 1) />
+                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_Rename)) Value="rename" Icon="edit" Disabled=@ReadOnly />
+                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_Delete)) Value="delete" Icon="delete" Disabled=@(ReadOnly || workbook.Sheets.Count <= 1) />
+                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_MoveLeft)) Value="move-left" Icon="chevron_left" Disabled=@(ReadOnly || workbook.IndexOf(sheet) == 0) />
+                                        <RadzenSplitButtonItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_MoveRight)) Value="move-right" Icon="chevron_right" Disabled=@(ReadOnly || workbook.IndexOf(sheet) == workbook.Sheets.Count - 1) />
                                     </ChildContent>
                                 </RadzenSplitButton>
                             </Template>
@@ -172,6 +186,7 @@
                 </Tabs>
             </RadzenTabs>
         </div>
+        }
         <RadzenPopup @ref=@cellMenuPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
             @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
             {
@@ -190,6 +205,7 @@
         </RadzenPopup>
         </CascadingValue>
 }
+    </CascadingValue>
     </CascadingValue>
     <RangePickerBar @ref=@rangePickerBar CancelTitle=@Localize(nameof(RadzenStrings.Spreadsheet_Cancel)) />
 </div>

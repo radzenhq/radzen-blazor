@@ -16,13 +16,15 @@
 @code {
 #nullable enable
 
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     [CascadingParameter]
     public ISpreadsheet? Spreadsheet { get; set; }
 
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.ConditionalFormatting) == false;
 
     private async Task OnClickAsync(RadzenSplitButtonItem? item)
     {
@@ -46,10 +48,10 @@
                 { "RuleType", ruleType }
             });
 
-        if (result is ConditionalFormatBase rule)
+        if (result is ConditionalFormatBase rule && Spreadsheet is not null)
         {
             var command = new ConditionalFormatCommand(Worksheet, Worksheet.Selection.Range, rule);
-            Spreadsheet?.Execute(command);
+            await Spreadsheet.ExecuteAsync(command);
         }
     }
 }

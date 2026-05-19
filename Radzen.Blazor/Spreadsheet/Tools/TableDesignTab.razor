@@ -1,0 +1,73 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenTabsItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_TableDesignTab)) ?? "Table Design") Visible=@IsActive>
+    <TableDesignPanel Worksheet=@Worksheet />
+</RadzenTabsItem>
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private Worksheet? subscribed;
+
+    private bool IsActive
+    {
+        get
+        {
+            if (Worksheet is null) return false;
+            var sel = Worksheet.Selection.Cell;
+            if (sel == CellRef.Invalid) return false;
+            foreach (var t in Worksheet.Tables)
+            {
+                if (t.Range.Contains(sel.Row, sel.Column))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+
+        if (!ReferenceEquals(subscribed, Worksheet))
+        {
+            if (subscribed is not null)
+            {
+                subscribed.Selection.Changed -= OnSelectionChanged;
+                subscribed.AutoFilterChanged -= OnSelectionChanged;
+            }
+
+            subscribed = Worksheet;
+
+            if (subscribed is not null)
+            {
+                subscribed.Selection.Changed += OnSelectionChanged;
+                subscribed.AutoFilterChanged += OnSelectionChanged;
+            }
+        }
+    }
+
+    // RadzenTabsItem.Visible is captured at parameter-set time, so we need an explicit
+    // StateHasChanged() each time selection moves into or out of a table.
+    private void OnSelectionChanged() => StateHasChanged();
+
+    public void Dispose()
+    {
+        if (subscribed is not null)
+        {
+            subscribed.Selection.Changed -= OnSelectionChanged;
+            subscribed.AutoFilterChanged -= OnSelectionChanged;
+        }
+    }
+}

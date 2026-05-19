@@ -25,6 +25,9 @@ class AutofillCommand : ICommand, IProtectedCommand
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.EditCell;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Autofill;
+
     /// <summary>
     /// Computes the autofill target range from the source selection and the cell the user dragged to.
     /// Constrains to the dominant axis (vertical or horizontal).

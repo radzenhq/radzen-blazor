@@ -13,6 +13,9 @@ public class MergeCellsCommand(Worksheet sheet, RangeRef range, bool center = fa
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.FormatCells;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Merging;
+
     private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private readonly bool center = center;

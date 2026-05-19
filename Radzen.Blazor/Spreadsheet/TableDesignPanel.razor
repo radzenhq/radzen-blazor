@@ -219,11 +219,10 @@
         StateHasChanged();
     }
 
-    private void OnConvertToRange()
+    private async Task OnConvertToRange()
     {
-        if (Worksheet is null || CurrentTable is null) return;
-        var cmd = new RemoveTableCommand(Worksheet, CurrentTable);
-        Spreadsheet?.Execute(cmd);
+        if (Worksheet is null || CurrentTable is null || Spreadsheet is null) return;
+        await Spreadsheet.ExecuteAsync(new RemoveTableCommand(Worksheet, CurrentTable));
         StateHasChanged();
     }
 
