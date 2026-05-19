@@ -388,6 +388,14 @@ namespace RadzenBlazorDemos
                     Description = "Embed interactive charts in Blazor spreadsheet cells. Supports column, bar, line, area, pie, donut, and scatter charts with live data binding and XLSX import/export.",
                     Tags = new [] { "spreadsheet", "chart", "charts", "graph", "visualization", "column chart", "bar chart", "line chart", "pie chart", "donut chart", "scatter chart", "area chart", "excel chart", "embedded chart", "data visualization", "xlsx", "dashboard" }
                 },
+                new Example
+                {
+                    Name = "Custom Toolbar",
+                    Path = "spreadsheet-custom-toolbar",
+                    Title = "Blazor Spreadsheet Custom Toolbar | Free UI Components by Radzen",
+                    Description = "Replace the built-in ribbon with your own selection of tools. Reuse the predefined tool components in any order or layout, and add custom tools that dispatch undoable commands.",
+                    Tags = new [] { "spreadsheet", "toolbar", "custom", "custom tools", "ribbon", "childcontent", "command", "icommand", "undo", "extend" }
+                },
             }
         },
         new Example
