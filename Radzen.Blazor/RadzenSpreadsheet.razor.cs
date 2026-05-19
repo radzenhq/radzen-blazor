@@ -128,6 +128,19 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public Dictionary<string, Spreadsheet.SpreadsheetCellType>? CellTypes { get; set; }
 
     /// <summary>
+    /// The index of the active ribbon tab. Defaults to <c>1</c> so the Home tab is
+    /// shown first. Supports two-way binding via <c>@bind-SelectedTabIndex</c>.
+    /// </summary>
+    [Parameter]
+    public int SelectedTabIndex { get; set; } = 1;
+
+    /// <summary>
+    /// Fired when the active ribbon tab changes. Used by <c>@bind-SelectedTabIndex</c>.
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> SelectedTabIndexChanged { get; set; }
+
+    /// <summary>
     /// When <c>true</c>, the spreadsheet rejects every command that mutates the
     /// workbook. The user can still select cells, scroll, and copy. Defaults to
     /// <c>false</c>.
