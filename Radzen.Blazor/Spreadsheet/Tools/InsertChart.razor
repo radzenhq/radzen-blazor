@@ -18,8 +18,15 @@
 </RadzenSplitButton>
 
 @code {
-    private void OnClick(RadzenSplitButtonItem? item)
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Charts;
+
+    private async Task OnClick(RadzenSplitButtonItem? item)
     {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
         var chartType = item?.Value switch
         {
             "bar" => SpreadsheetChartType.Bar,
@@ -31,15 +38,8 @@
             _ => SpreadsheetChartType.Column
         };
 
-        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
-        {
-            return;
-        }
-
         var selection = Worksheet.Selection.Range;
-
         var chart = ChartFactory.CreateFromSelection(Worksheet, selection, chartType);
-        var command = new InsertChartCommand(Worksheet, chart);
-        Spreadsheet?.Execute(command);
+        await Spreadsheet.ExecuteAsync(new InsertChartCommand(Worksheet, chart));
     }
 }

@@ -244,7 +244,13 @@ public partial class ChartOverlay : ComponentBase, IDisposable
                 _ = InvokeAsync(() => OpenEditChartDialogAsync(chart));
                 break;
             case "delete-chart":
-                Spreadsheet?.Execute(new DeleteChartCommand(Worksheet, chart));
+                _ = InvokeAsync(async () =>
+                {
+                    if (Spreadsheet is not null)
+                    {
+                        await Spreadsheet.ExecuteAsync(new DeleteChartCommand(Worksheet, chart));
+                    }
+                });
                 break;
         }
 
@@ -316,7 +322,10 @@ public partial class ChartOverlay : ComponentBase, IDisposable
                     .Select(s => new EditChartSeriesState(s.Name, s.Color, s.Categories, s.Values))
                     .ToList());
 
-            Spreadsheet?.Execute(new EditChartCommand(chart, newState));
+            if (Spreadsheet is not null)
+            {
+                await Spreadsheet.ExecuteAsync(new EditChartCommand(chart, newState));
+            }
             seriesCache.Remove(chart);
             StateHasChanged();
         }

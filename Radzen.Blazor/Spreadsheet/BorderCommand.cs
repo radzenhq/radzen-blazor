@@ -10,6 +10,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public abstract class RangeFormatCommandBase(Worksheet sheet, RangeRef range) : ICommand
 {
+    /// <inheritdoc/>
+    public virtual SpreadsheetFeature? Feature => SpreadsheetFeature.CellFormatting;
+
     /// <summary>
     /// The sheet being operated on.
     /// </summary>

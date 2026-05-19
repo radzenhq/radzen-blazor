@@ -4,12 +4,14 @@
 <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnInsertColumnAfterClick Icon="add_column_right" ButtonType="ButtonType.Button" Disabled=@IsDisabled
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertColumnAfter)) ?? "Insert Column After") />
 @code {
-    private void OnInsertColumnAfterClick()
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;
+
+    private async Task OnInsertColumnAfterClick()
     {
-        if (Worksheet is null)
+        if (Worksheet is null || Spreadsheet is null)
         {
             return;
         }
-        Spreadsheet?.Execute(new InsertColumnAfterCommand(Worksheet, Worksheet.Selection.Range.End.Column));
+        await Spreadsheet.ExecuteAsync(new InsertColumnAfterCommand(Worksheet, Worksheet.Selection.Range.End.Column));
     }
 }

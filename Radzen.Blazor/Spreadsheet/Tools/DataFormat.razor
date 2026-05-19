@@ -3,13 +3,13 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenDropDown @bind-Value=@CurrentFormat Data=@FormatOptions TextProperty="Name" ValueProperty="FormatCode"
+<RadzenDropDown Value=@CurrentFormat ValueChanged=@OnFormatChangedAsync TValue="string" Data=@FormatOptions TextProperty="Name" ValueProperty="FormatCode"
     Disabled=@IsDisabled InputSize="InputSize.Small" Style="width: 130px" />
 
 @code {
 #nullable enable
 
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     [CascadingParameter]
@@ -39,21 +39,28 @@
             }
             return "General";
         }
-        set
-        {
-            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
-            {
-                if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
-                {
-                    var format = value == "General" ? null : value;
-                    var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(format));
-                    Spreadsheet?.Execute(command);
-                }
-            }
-        }
     }
 
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+    private async Task OnFormatChangedAsync(string value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        if (!Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+        {
+            return;
+        }
+
+        var format = value == "General" ? null : value;
+        var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(format));
+        await Spreadsheet.ExecuteAsync(command);
+    }
+
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {

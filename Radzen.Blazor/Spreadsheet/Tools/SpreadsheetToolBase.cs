@@ -13,21 +13,30 @@ namespace Radzen.Blazor.Spreadsheet.Tools;
 public abstract class SpreadsheetToolBase : ComponentBase, IDisposable
 {
     /// <summary>
-    /// Gets or sets the worksheet.
+    /// The active worksheet, cascaded from the host <see cref="Radzen.Blazor.RadzenSpreadsheet"/>.
     /// </summary>
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     /// <summary>
-    /// Gets or sets the spreadsheet instance.
+    /// The host spreadsheet, cascaded from <see cref="Radzen.Blazor.RadzenSpreadsheet"/>.
     /// </summary>
     [CascadingParameter]
     public ISpreadsheet? Spreadsheet { get; set; }
 
     /// <summary>
+    /// Gets the feature this tool drives, or <c>null</c> for tools that never need to
+    /// grey out beyond the default selection check.
+    /// </summary>
+    protected virtual SpreadsheetFeature? Feature => null;
+
+    /// <summary>
     /// Gets whether the tool should be disabled.
     /// </summary>
-    protected virtual bool IsDisabled => Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid;
+    protected virtual bool IsDisabled
+        => Worksheet is null
+        || Worksheet.Selection.Cell == CellRef.Invalid
+        || (Feature is SpreadsheetFeature f && Spreadsheet is not null && !Spreadsheet.IsFeatureAllowed(f));
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)

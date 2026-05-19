@@ -6,6 +6,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class InsertImageCommand(Worksheet sheet, SheetImage image) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Images;
+
     private readonly Worksheet sheet = sheet;
     private readonly SheetImage image = image;
 

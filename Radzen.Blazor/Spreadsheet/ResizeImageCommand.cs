@@ -6,6 +6,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class ResizeImageCommand : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Images;
+
     private readonly SheetImage image;
     private readonly CellAnchor? newFrom;
     private readonly CellAnchor? newTo;

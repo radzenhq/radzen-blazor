@@ -2,13 +2,13 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenToggleButton @bind-Value=@IsAutoFilterEnabled Icon="filter_list" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+<RadzenToggleButton Value=@IsAutoFilterEnabled ValueChanged=@OnToggleAutoFilterAsync Icon="filter_list" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
     ToggleVariant="Variant.Flat" ToggleButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Lighter" />
 
 @code {
 #nullable enable
 
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     [CascadingParameter]
@@ -30,32 +30,33 @@
             // Check if sheet has auto filter
             return Worksheet.AutoFilter.Range is not null;
         }
-        set
+    }
+
+    private async Task OnToggleAutoFilterAsync(bool value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
         {
-            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
+            return;
+        }
+
+        var dataTable = GetCurrentTable();
+        if (dataTable is not null)
+        {
+            var dataTableIndex = GetTableIndex(dataTable);
+            if (dataTableIndex >= 0)
             {
-                // Check if we're in a data table
-                var dataTable = GetCurrentTable();
-                if (dataTable is not null)
-                {
-                    var dataTableIndex = GetTableIndex(dataTable);
-                    if (dataTableIndex >= 0)
-                    {
-                        var command = new TableFilterCommand(Worksheet, dataTableIndex);
-                        Spreadsheet?.Execute(command);
-                    }
-                }
-                else
-                {
-                    // Apply to sheet selection range
-                    var command = new SheetAutoFilterCommand(Worksheet, Worksheet.Selection.Range);
-                    Spreadsheet?.Execute(command);
-                }
+                await Spreadsheet.ExecuteAsync(new TableFilterCommand(Worksheet, dataTableIndex));
             }
+        }
+        else
+        {
+            await Spreadsheet.ExecuteAsync(new SheetAutoFilterCommand(Worksheet, Worksheet.Selection.Range));
         }
     }
 
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.Filtering) == false;
 
     private Table? GetCurrentTable()
     {

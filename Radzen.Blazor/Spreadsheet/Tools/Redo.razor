@@ -10,7 +10,13 @@
     [Parameter]
     public UndoRedoStack? Commands { get; set; }
 
-    private bool IsDisabled => Commands is null || !Commands.CanRedo;
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private bool IsDisabled
+        => Commands is null
+        || !Commands.CanRedo
+        || Spreadsheet?.CanRedo == false;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -32,10 +38,7 @@
         StateHasChanged();
     }
 
-    private void OnRedoAsync()
-    {
-        Commands?.Redo();
-    }
+    private void OnRedoAsync() => Spreadsheet?.Redo();
 
     public void Dispose()
     {
@@ -44,4 +47,4 @@
             Commands.Changed -= OnCommandsChanged;
         }
     }
-} 
+}

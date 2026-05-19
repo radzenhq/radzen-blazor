@@ -10,6 +10,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class ClearValidationCommand(Worksheet sheet, RangeRef range) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.DataValidation;
+
     private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private List<ICellValidator> savedValidators = [];

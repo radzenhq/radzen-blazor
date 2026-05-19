@@ -6,6 +6,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class ResizeChartCommand : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Charts;
+
     private readonly SheetChart chart;
     private readonly CellAnchor? newFrom;
     private readonly CellAnchor? newTo;

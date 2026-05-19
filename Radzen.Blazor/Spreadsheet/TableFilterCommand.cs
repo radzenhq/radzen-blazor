@@ -13,6 +13,9 @@ public class TableFilterCommand : ICommand, IProtectedCommand
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.AutoFilter;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Filtering;
+
     private readonly Worksheet sheet;
     private readonly int tableIndex;
     private readonly bool previousShowFilterButton;
