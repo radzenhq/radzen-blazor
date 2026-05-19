@@ -393,8 +393,8 @@ namespace RadzenBlazorDemos
                     Name = "Custom Toolbar",
                     Path = "spreadsheet-custom-toolbar",
                     Title = "Blazor Spreadsheet Custom Toolbar | Free UI Components by Radzen",
-                    Description = "Replace the built-in ribbon with your own selection of tools. Reuse the predefined tool components in any order or layout, and add custom tools that dispatch undoable commands.",
-                    Tags = new [] { "spreadsheet", "toolbar", "custom", "custom tools", "ribbon", "childcontent", "command", "icommand", "undo", "extend" },
+                    Description = "Replace the built-in toolbar with your own selection of tools. Reuse the predefined tool components in any order or layout, and add custom tools that dispatch undoable commands.",
+                    Tags = new [] { "spreadsheet", "toolbar", "custom", "custom tools", "childcontent", "command", "icommand", "undo", "extend" },
                     Toc = [ new () { Text = "Predefined tools in a custom layout", Anchor = "#predefined-tools" }, new () { Text = "Custom tool with an undoable command", Anchor = "#custom-tool" } ]
                 },
             }
