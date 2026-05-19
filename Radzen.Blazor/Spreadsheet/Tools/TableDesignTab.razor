@@ -22,9 +22,17 @@
     {
         get
         {
-            if (Worksheet is null) return false;
+            if (Worksheet is null)
+            {
+                return false;
+            }
+
             var sel = Worksheet.Selection.Cell;
-            if (sel == CellRef.Invalid) return false;
+            if (sel == CellRef.Invalid)
+            {
+                return false;
+            }
+
             foreach (var t in Worksheet.Tables)
             {
                 if (t.Range.Contains(sel.Row, sel.Column))
