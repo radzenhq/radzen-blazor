@@ -20,10 +20,16 @@
 
     private async Task OnClickAsync()
     {
-        if (Worksheet is null || Spreadsheet is null) return;
+        if (Worksheet is null || Spreadsheet is null)
+        {
+            return;
+        }
 
         var cell = Worksheet.Selection.Cell;
-        if (cell == CellRef.Invalid) return;
+        if (cell == CellRef.Invalid)
+        {
+            return;
+        }
 
         await Spreadsheet.ExecuteAsync(new StampReviewedCommand(Worksheet, cell, Reviewer));
     }
