@@ -11,8 +11,8 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public static class ChartFactory
 {
-    private const long DefaultChartWidthEmu = 4572000;  // ~480px
-    private const long DefaultChartHeightEmu = 2762250; // ~290px
+    private const double DefaultChartWidthPx = 480;
+    private const double DefaultChartHeightPx = 288;
 
     /// <summary>
     /// Creates a chart from the current selection in the worksheet.
@@ -30,8 +30,8 @@ public static class ChartFactory
                 Row = selection.End.Row + 1,
                 Column = selection.Start.Column,
             },
-            Width = DefaultChartWidthEmu,
-            Height = DefaultChartHeightEmu,
+            Width = DefaultChartWidthPx,
+            Height = DefaultChartHeightPx,
             ShowLegend = true,
             LegendPosition = ChartLegendPosition.Right
         };
