@@ -15,7 +15,7 @@
     <CascadingValue Value=@ActiveView?.Commands TValue="UndoRedoStack">
         @if (ShowToolbar)
         {
-        <RadzenTabs SelectedIndex=@SelectedTabIndex SelectedIndexChanged=@SelectedTabIndexChanged>
+        <RadzenTabs SelectedIndex=@SelectedToolsetIndex SelectedIndexChanged=@SelectedToolsetIndexChanged>
             <Tabs>
                 @if (ChildContent != null)
                 {
@@ -108,7 +108,7 @@
                         <DataValidation/>
                     </RadzenStack>
                 </RadzenTabsItem>
-                <TableDesignTab/>
+                <TableDesignToolset />
                 }
             </Tabs>
         </RadzenTabs>
