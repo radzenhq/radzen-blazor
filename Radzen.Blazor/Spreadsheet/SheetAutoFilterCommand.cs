@@ -13,6 +13,9 @@ public class SheetAutoFilterCommand : ICommand, IProtectedCommand
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.AutoFilter;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Filtering;
+
     private readonly Worksheet sheet;
     private readonly RangeRef range;
     private readonly RangeRef? previousRange;

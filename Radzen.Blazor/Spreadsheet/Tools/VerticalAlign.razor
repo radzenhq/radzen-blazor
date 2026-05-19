@@ -2,7 +2,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenSelectBar @bind-Value=@CurrentVerticalAlign Disabled=@IsDisabled Size="ButtonSize.Small">
+<RadzenSelectBar Value=@CurrentVerticalAlign ValueChanged=@OnVerticalAlignChangedAsync TValue="Radzen.VerticalAlign" Disabled=@IsDisabled Size="ButtonSize.Small">
     <Items>
         <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Top Icon="align_vertical_top" />
         <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Middle Icon="align_vertical_center" />
@@ -13,7 +13,7 @@
 @code {
 #nullable enable
 
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     [CascadingParameter]
@@ -29,20 +29,27 @@
             }
             return Radzen.VerticalAlign.Top;
         }
-        set
-        {
-            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
-            {
-                if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
-                {
-                    var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithVerticalAlign(value));
-                    Spreadsheet?.Execute(command);
-                }
-            }
-        }
     }
 
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+    private async Task OnVerticalAlignChangedAsync(Radzen.VerticalAlign value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        if (!Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+        {
+            return;
+        }
+
+        var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithVerticalAlign(value));
+        await Spreadsheet.ExecuteAsync(command);
+    }
+
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {

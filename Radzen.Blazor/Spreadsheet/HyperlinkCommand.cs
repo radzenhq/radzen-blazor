@@ -11,6 +11,9 @@ public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyper
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.InsertHyperlinks;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Hyperlinks;
+
     private readonly Worksheet sheet = sheet;
     private readonly CellRef address = address;
     private readonly Hyperlink? hyperlink = hyperlink;

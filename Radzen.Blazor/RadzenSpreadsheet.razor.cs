@@ -27,9 +27,12 @@ public interface ISpreadsheet
     Task<bool> AcceptAsync();
 
     /// <summary>
-    /// Executes a command through the active view's undo/redo stack.
+    /// Executes a command through the active view's undo/redo stack. Returns
+    /// <c>true</c> when the command ran, <c>false</c> when it was rejected by
+    /// read-only mode, an <c>Allow*</c> flag, sheet protection, or a
+    /// <c>CommandExecuting</c> handler that called <c>PreventDefault()</c>.
     /// </summary>
-    bool Execute(ICommand command);
+    Task<bool> ExecuteAsync(ICommand command);
 
     /// <summary>
     /// Undoes the last command.
@@ -50,6 +53,20 @@ public interface ISpreadsheet
     /// Gets whether there is a command to redo.
     /// </summary>
     bool CanRedo { get; }
+
+    /// <summary>
+    /// Gets whether the spreadsheet is in read-only mode. When <c>true</c>, every
+    /// mutation is rejected regardless of per-feature <c>Allow*</c> flags.
+    /// </summary>
+    bool ReadOnly { get; }
+
+    /// <summary>
+    /// Returns <c>true</c> when the given feature is enabled on the host
+    /// <see cref="RadzenSpreadsheet"/>. Tools should use this to decide whether
+    /// they should appear disabled in the ribbon.
+    /// </summary>
+    /// <param name="feature">The feature to check.</param>
+    bool IsFeatureAllowed(SpreadsheetFeature feature);
 
     /// <summary>
     /// Returns a localized string for the specified key.
@@ -110,6 +127,137 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [Parameter]
     public Dictionary<string, Spreadsheet.SpreadsheetCellType>? CellTypes { get; set; }
 
+    /// <summary>
+    /// When <c>true</c>, the spreadsheet rejects every command that mutates the
+    /// workbook. The user can still select cells, scroll, and copy. Defaults to
+    /// <c>false</c>.
+    /// </summary>
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    /// <summary>
+    /// When <c>true</c> (the default) the ribbon toolbar is rendered above the grid.
+    /// Set to <c>false</c> for kiosk or view-only embeds.
+    /// </summary>
+    [Parameter]
+    public bool ShowToolbar { get; set; } = true;
+
+    /// <summary>
+    /// When <c>true</c> (the default) the formula bar is rendered between the ribbon
+    /// and the grid.
+    /// </summary>
+    [Parameter]
+    public bool ShowFormulaBar { get; set; } = true;
+
+    /// <summary>
+    /// When <c>true</c> (the default) the sheet tab strip is rendered below the grid.
+    /// </summary>
+    [Parameter]
+    public bool ShowSheetTabs { get; set; } = true;
+
+    /// <summary>Allows direct cell editing (type-to-edit, double-click, paste-into-cell, delete-key, autoaccept).</summary>
+    [Parameter] public bool AllowEditing { get; set; } = true;
+
+    /// <summary>Allows filter and auto-filter commands and the filter UI affordances.</summary>
+    [Parameter] public bool AllowFiltering { get; set; } = true;
+
+    /// <summary>Allows single- and multi-key sort commands.</summary>
+    [Parameter] public bool AllowSorting { get; set; } = true;
+
+    /// <summary>Allows drag-to-fill (autofill) gestures.</summary>
+    [Parameter] public bool AllowAutofill { get; set; } = true;
+
+    /// <summary>Allows cell merge and unmerge commands.</summary>
+    [Parameter] public bool AllowMerge { get; set; } = true;
+
+    /// <summary>Allows row and column resize gestures.</summary>
+    [Parameter] public bool AllowResizing { get; set; } = true;
+
+    /// <summary>Allows font, color, alignment, and border formatting commands.</summary>
+    [Parameter] public bool AllowCellFormatting { get; set; } = true;
+
+    /// <summary>Allows inserting, editing, and following hyperlinks.</summary>
+    [Parameter] public bool AllowHyperlinks { get; set; } = true;
+
+    /// <summary>Allows inserting, moving, resizing, and deleting images.</summary>
+    [Parameter] public bool AllowImages { get; set; } = true;
+
+    /// <summary>Allows inserting, editing, moving, resizing, and deleting charts.</summary>
+    [Parameter] public bool AllowCharts { get; set; } = true;
+
+    /// <summary>Allows creating, editing, and removing structured tables.</summary>
+    [Parameter] public bool AllowTables { get; set; } = true;
+
+    /// <summary>Allows adding and clearing data-validation rules.</summary>
+    [Parameter] public bool AllowDataValidation { get; set; } = true;
+
+    /// <summary>Allows adding and clearing conditional formatting rules.</summary>
+    [Parameter] public bool AllowConditionalFormatting { get; set; } = true;
+
+    /// <summary>Allows cut and paste through the system clipboard. Copy is always allowed.</summary>
+    [Parameter] public bool AllowClipboard { get; set; } = true;
+
+    /// <summary>Allows undo and redo of previously executed commands.</summary>
+    [Parameter] public bool AllowUndoRedo { get; set; } = true;
+
+    /// <summary>
+    /// Fires before a command is pushed onto the undo stack. Call
+    /// <see cref="SpreadsheetCommandEventArgs.PreventDefault"/> from the handler to veto
+    /// the command. Fires after <see cref="ReadOnly"/>, the matching <c>Allow*</c> flag,
+    /// and the sheet's <c>Protection</c> have already approved the command.
+    /// </summary>
+    [Parameter]
+    public EventCallback<SpreadsheetCommandEventArgs> CommandExecuting { get; set; }
+
+    /// <summary>
+    /// Replaces the built-in ribbon tabs. When set, the supplied content sits inside the
+    /// ribbon's <see cref="RadzenTabs.Tabs"/> slot — each child should be a
+    /// <see cref="RadzenTabsItem"/>. Add
+    /// <see cref="Radzen.Blazor.Spreadsheet.Tools.TableDesignTab"/> to keep the contextual
+    /// "Table Design" tab.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <inheritdoc/>
+    bool ISpreadsheet.ReadOnly => ReadOnly;
+
+    /// <inheritdoc/>
+    bool ISpreadsheet.IsFeatureAllowed(SpreadsheetFeature feature) => IsFeatureAllowed(feature);
+
+    /// <summary>
+    /// Returns <c>true</c> when the given feature is enabled. <see cref="ReadOnly"/>
+    /// forces every feature off; otherwise the matching <c>Allow*</c> parameter applies.
+    /// </summary>
+    /// <param name="feature">The feature to check.</param>
+    public bool IsFeatureAllowed(SpreadsheetFeature feature)
+    {
+        if (ReadOnly)
+        {
+            return false;
+        }
+
+        return feature switch
+        {
+            SpreadsheetFeature.Editing => AllowEditing,
+            SpreadsheetFeature.Filtering => AllowFiltering,
+            SpreadsheetFeature.Sorting => AllowSorting,
+            SpreadsheetFeature.Autofill => AllowAutofill,
+            SpreadsheetFeature.Merging => AllowMerge,
+            SpreadsheetFeature.Resizing => AllowResizing,
+            SpreadsheetFeature.CellFormatting => AllowCellFormatting,
+            SpreadsheetFeature.Hyperlinks => AllowHyperlinks,
+            SpreadsheetFeature.Images => AllowImages,
+            SpreadsheetFeature.Charts => AllowCharts,
+            SpreadsheetFeature.Tables => AllowTables,
+            SpreadsheetFeature.DataValidation => AllowDataValidation,
+            SpreadsheetFeature.ConditionalFormatting => AllowConditionalFormatting,
+            SpreadsheetFeature.Clipboard => AllowClipboard,
+            SpreadsheetFeature.UndoRedo => AllowUndoRedo,
+            _ => true,
+        };
+    }
+
     /// <inheritdoc/>
     protected override string GetComponentCssClass() => "rz-spreadsheet";
 
@@ -139,84 +287,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             workbookView = null;
             sheetIndex = 0;
         }
-
-        // Always reconcile our worksheet event subscriptions so the contextual
-        // "Table Design" tab can flip its Visible flag whenever the active cell
-        // moves into or out of a table.
-        SubscribeToWorksheetEvents(Worksheet);
     }
 
     private int sheetIndex;
 
     private Worksheet? Worksheet => workbook != null && sheetIndex < workbook.Sheets.Count ? workbook.Sheets[sheetIndex] : null;
-
-    /// <summary>
-    /// True when the active cell sits inside a Table — drives visibility of the contextual
-    /// "Table Design" tab. Maintained as a flag rather than a computed property because
-    /// RadzenTabsItem.Visible is captured at parameter-set time; we need an explicit
-    /// StateHasChanged() each time the value flips.
-    /// </summary>
-    private bool hasTableSelection;
-    private Worksheet? subscribedWorksheet;
-
-    private void SubscribeToWorksheetEvents(Worksheet? next)
-    {
-        if (ReferenceEquals(subscribedWorksheet, next))
-        {
-            return;
-        }
-
-        if (subscribedWorksheet is not null)
-        {
-            subscribedWorksheet.Selection.Changed -= OnTableSelectionMaybeChanged;
-            subscribedWorksheet.AutoFilterChanged -= OnTableSelectionMaybeChanged;
-        }
-
-        subscribedWorksheet = next;
-
-        if (subscribedWorksheet is not null)
-        {
-            subscribedWorksheet.Selection.Changed += OnTableSelectionMaybeChanged;
-            subscribedWorksheet.AutoFilterChanged += OnTableSelectionMaybeChanged;
-        }
-
-        UpdateHasTableSelection();
-    }
-
-    private void OnTableSelectionMaybeChanged() => UpdateHasTableSelection();
-
-    private void UpdateHasTableSelection()
-    {
-        var next = ComputeHasTableSelection();
-        if (next != hasTableSelection)
-        {
-            hasTableSelection = next;
-            StateHasChanged();
-        }
-    }
-
-    private bool ComputeHasTableSelection()
-    {
-        if (Worksheet is null)
-        {
-            return false;
-        }
-
-        var sel = Worksheet.Selection.Cell;
-        if (sel == CellRef.Invalid)
-        {
-            return false;
-        }
-
-        foreach (var t in Worksheet.Tables)
-        {
-            if (t.Range.Contains(sel.Row, sel.Column))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private WorkbookView? workbookView;
 
@@ -225,27 +300,65 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private Editor? Editor => ActiveView?.Editor;
 
     /// <inheritdoc/>
-    public bool Execute(ICommand command)
+    public async Task<bool> ExecuteAsync(ICommand command)
     {
+        ArgumentNullException.ThrowIfNull(command);
+
+        if (ReadOnly)
+        {
+            return false;
+        }
+
+        if (command.Feature is SpreadsheetFeature feature && !IsFeatureAllowed(feature))
+        {
+            return false;
+        }
+
         if (command is Spreadsheet.IProtectedCommand pc && Worksheet?.Protection.IsActionBlocked(pc.RequiredAction) == true)
         {
             return false;
+        }
+
+        if (CommandExecuting.HasDelegate)
+        {
+            var args = new SpreadsheetCommandEventArgs(command);
+            await CommandExecuting.InvokeAsync(args);
+            if (args.DefaultPrevented)
+            {
+                return false;
+            }
         }
 
         return ActiveView?.Commands.Execute(command) ?? false;
     }
 
     /// <inheritdoc/>
-    public void Undo() => ActiveView?.Commands.Undo();
+    public void Undo()
+    {
+        if (ReadOnly || !AllowUndoRedo)
+        {
+            return;
+        }
+
+        ActiveView?.Commands.Undo();
+    }
 
     /// <inheritdoc/>
-    public void Redo() => ActiveView?.Commands.Redo();
+    public void Redo()
+    {
+        if (ReadOnly || !AllowUndoRedo)
+        {
+            return;
+        }
+
+        ActiveView?.Commands.Redo();
+    }
 
     /// <inheritdoc/>
-    public bool CanUndo => ActiveView?.Commands.CanUndo ?? false;
+    public bool CanUndo => !ReadOnly && AllowUndoRedo && (ActiveView?.Commands.CanUndo ?? false);
 
     /// <inheritdoc/>
-    public bool CanRedo => ActiveView?.Commands.CanRedo ?? false;
+    public bool CanRedo => !ReadOnly && AllowUndoRedo && (ActiveView?.Commands.CanRedo ?? false);
 
     private async Task OnWorkbookChangedAsync(Workbook? value)
     {
@@ -275,7 +388,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         await AcceptAsync();
 
-        if (workbook is null || workbook.Protection.LockStructure)
+        if (ReadOnly || workbook is null || workbook.Protection.LockStructure)
         {
             return;
         }
@@ -313,7 +426,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         await AcceptAsync();
 
-        if (workbook is null || workbook.Sheets.Count <= 1 || workbook.Protection.LockStructure)
+        if (ReadOnly || workbook is null || workbook.Sheets.Count <= 1 || workbook.Protection.LockStructure)
         {
             return;
         }
@@ -334,7 +447,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnRenameSheetAsync(Worksheet sheet)
     {
-        if (workbook?.Protection.LockStructure == true)
+        if (ReadOnly || workbook?.Protection.LockStructure == true)
         {
             return;
         }
@@ -356,7 +469,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void OnMoveSheetLeft(Worksheet sheet)
     {
-        if (workbook is null || workbook.Protection.LockStructure)
+        if (ReadOnly || workbook is null || workbook.Protection.LockStructure)
         {
             return;
         }
@@ -380,7 +493,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private void OnMoveSheetRight(Worksheet sheet)
     {
-        if (workbook is null || workbook.Protection.LockStructure)
+        if (ReadOnly || workbook is null || workbook.Protection.LockStructure)
         {
             return;
         }
@@ -490,7 +603,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (filter != null && Worksheet != null)
         {
             var command = new FilterCommand(Worksheet, filter);
-            Execute(command);
+            await ExecuteAsync(command);
         }
 
         if (cellMenuPopup != null)
@@ -509,7 +622,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 if (table.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
                     var command = new SortCommand(Worksheet, table.Range, order, cellMenuColumn);
-                    Execute(command);
+                    await ExecuteAsync(command);
                     break;
                 }
             }
@@ -518,7 +631,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             if (Worksheet.AutoFilter.Range is not null && Worksheet.AutoFilter.Range.Value.Contains(cellMenuRow, cellMenuColumn))
             {
                 var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range.Value, order, cellMenuColumn, skipHeaderRow: true);
-                Execute(command);
+                await ExecuteAsync(command);
             }
         }
 
@@ -547,7 +660,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             foreach (var filter in filtersToRemove)
             {
                 var command = new RemoveFilterCommand(Worksheet, filter);
-                Execute(command);
+                await ExecuteAsync(command);
             }
         }
 
@@ -589,7 +702,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             if (result is SheetFilter filter)
             {
                 var command = new FilterCommand(Worksheet, filter);
-                Execute(command);
+                await ExecuteAsync(command);
             }
         }
     }
@@ -629,18 +742,21 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 Percent = r.Percent,
                 Bottom = r.Bottom,
             };
-            Execute(new FilterCommand(Worksheet, new SheetFilter(criterion, sliceRange)));
+            await ExecuteAsync(new FilterCommand(Worksheet, new SheetFilter(criterion, sliceRange)));
         }
     }
 
-    private void OnCellMenuDynamicFilterAsync(DynamicFilterType type)
+    private async Task OnCellMenuDynamicFilterAsync(DynamicFilterType type)
     {
         if (Worksheet is null)
         {
             return;
         }
 
-        _ = cellMenuPopup?.CloseAsync();
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
 
         var range = ResolveColumnFilterRange();
         if (range == RangeRef.Invalid)
@@ -652,7 +768,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             new CellRef(range.Start.Row, cellMenuColumn),
             new CellRef(range.End.Row, cellMenuColumn));
         var criterion = new DynamicFilterCriterion { Column = cellMenuColumn, Type = type };
-        Execute(new FilterCommand(Worksheet, new SheetFilter(criterion, sliceRange)));
+        await ExecuteAsync(new FilterCommand(Worksheet, new SheetFilter(criterion, sliceRange)));
     }
 
     private RangeRef ResolveColumnFilterRange()
@@ -695,7 +811,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 var format = string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase) ? null : formatCode;
                 var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(format));
-                Execute(command);
+                await ExecuteAsync(command);
             }
         }
     }
@@ -731,7 +847,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 var command = new AcceptEditCommand(ActiveView!);
 
-                var valid = Execute(command);
+                var valid = await ExecuteAsync(command);
 
                 if (!valid && Editor!.Cell is not null)
                 {
@@ -851,22 +967,20 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         shortcuts.Add("Backspace", _ => DeleteSelectedAsync());
     }
 
-    private Task DeleteSelectedAsync()
+    private async Task DeleteSelectedAsync()
     {
         if (Worksheet?.SelectedImage != null)
         {
-            Execute(new DeleteImageCommand(Worksheet, Worksheet.SelectedImage));
+            await ExecuteAsync(new DeleteImageCommand(Worksheet, Worksheet.SelectedImage));
         }
         else if (Worksheet?.SelectedChart != null)
         {
-            Execute(new DeleteChartCommand(Worksheet, Worksheet.SelectedChart));
+            await ExecuteAsync(new DeleteChartCommand(Worksheet, Worksheet.SelectedChart));
         }
         else if (Worksheet != null && Worksheet.Selection.Range != RangeRef.Invalid)
         {
-            Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
+            await ExecuteAsync(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
         }
-
-        return Task.CompletedTask;
     }
 
     private Task UndoAsync()
@@ -899,6 +1013,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task CutSelectionAsync()
     {
+        if (ReadOnly || !AllowClipboard)
+        {
+            return;
+        }
+
         if (Worksheet is not null)
         {
             var text = Worksheet.GetDelimitedString(Worksheet.Selection.Range);
@@ -924,6 +1043,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnPasteAsync(string text)
     {
+        if (ReadOnly || !AllowClipboard || !AllowEditing)
+        {
+            return Task.CompletedTask;
+        }
+
         if (Worksheet is not null && Worksheet.IsCellEditable(Worksheet.Selection.Cell))
         {
             clipboard.Paste(Worksheet, Worksheet.Selection.Cell, text);
@@ -972,7 +1096,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         ContextMenuService.Open(args.Pointer, menuItems,
-            menuArgs => OnContextMenuItemClick(menuArgs, row, column));
+            menuArgs => _ = OnContextMenuItemClick(menuArgs, row, column));
     }
 
     private Table? FindTableAt(int row, int column)
@@ -1021,7 +1145,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteRow)), Value = "delete-row", Icon = "delete" },
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideRow)), Value = "hide-row", Icon = "visibility_off" },
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideRow)), Value = "unhide-row", Icon = "visibility" },
-        }, menuArgs => OnRowContextMenuItemClick(menuArgs, row));
+        }, menuArgs => _ = OnRowContextMenuItemClick(menuArgs, row));
     }
 
     /// <summary>
@@ -1053,7 +1177,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_DeleteColumn)), Value = "delete-column", Icon = "delete" },
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_HideColumn)), Value = "hide-column", Icon = "visibility_off" },
             new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_UnhideColumn)), Value = "unhide-column", Icon = "visibility" },
-        }, menuArgs => OnColumnContextMenuItemClick(menuArgs, column));
+        }, menuArgs => _ = OnColumnContextMenuItemClick(menuArgs, column));
     }
 
     private bool HandleCommonContextMenuAction(string? action)
@@ -1074,7 +1198,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private void OnContextMenuItemClick(MenuItemEventArgs args, int row, int column)
+    private async Task OnContextMenuItemClick(MenuItemEventArgs args, int row, int column)
     {
         if (Worksheet is null)
         {
@@ -1090,13 +1214,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             switch (action)
             {
                 case "clear":
-                    Execute(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
+                    await ExecuteAsync(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
                     break;
                 case "sort-ascending":
-                    Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Ascending, column));
+                    await ExecuteAsync(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Ascending, column));
                     break;
                 case "sort-descending":
-                    Execute(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
+                    await ExecuteAsync(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
                     break;
                 case "convert-table-to-range":
                 case "delete-table":
@@ -1104,7 +1228,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                         var table = FindTableAt(row, column);
                         if (table is not null)
                         {
-                            Execute(new RemoveTableCommand(Worksheet, table));
+                            await ExecuteAsync(new RemoveTableCommand(Worksheet, table));
                         }
                     }
                     break;
@@ -1114,7 +1238,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         StateHasChanged();
     }
 
-    private void OnRowContextMenuItemClick(MenuItemEventArgs args, int row)
+    private async Task OnRowContextMenuItemClick(MenuItemEventArgs args, int row)
     {
         if (Worksheet is null)
         {
@@ -1130,19 +1254,25 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             switch (action)
             {
                 case "insert-row-before":
-                    Execute(new InsertRowBeforeCommand(Worksheet, row));
+                    await ExecuteAsync(new InsertRowBeforeCommand(Worksheet, row));
                     break;
                 case "insert-row-after":
-                    Execute(new InsertRowAfterCommand(Worksheet, row));
+                    await ExecuteAsync(new InsertRowAfterCommand(Worksheet, row));
                     break;
                 case "delete-row":
-                    Execute(new DeleteRowsCommand(Worksheet, row, row));
+                    await ExecuteAsync(new DeleteRowsCommand(Worksheet, row, row));
                     break;
                 case "hide-row":
-                    Worksheet.Rows.Hide(row);
+                    if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
+                    {
+                        Worksheet.Rows.Hide(row);
+                    }
                     break;
                 case "unhide-row":
-                    Worksheet.Rows.Show(row);
+                    if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
+                    {
+                        Worksheet.Rows.Show(row);
+                    }
                     break;
             }
         }
@@ -1150,7 +1280,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         StateHasChanged();
     }
 
-    private void OnColumnContextMenuItemClick(MenuItemEventArgs args, int column)
+    private async Task OnColumnContextMenuItemClick(MenuItemEventArgs args, int column)
     {
         if (Worksheet is null)
         {
@@ -1166,19 +1296,25 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             switch (action)
             {
                 case "insert-column-before":
-                    Execute(new InsertColumnBeforeCommand(Worksheet, column));
+                    await ExecuteAsync(new InsertColumnBeforeCommand(Worksheet, column));
                     break;
                 case "insert-column-after":
-                    Execute(new InsertColumnAfterCommand(Worksheet, column));
+                    await ExecuteAsync(new InsertColumnAfterCommand(Worksheet, column));
                     break;
                 case "delete-column":
-                    Execute(new DeleteColumnsCommand(Worksheet, column, column));
+                    await ExecuteAsync(new DeleteColumnsCommand(Worksheet, column, column));
                     break;
                 case "hide-column":
-                    Worksheet.Columns.Hide(column);
+                    if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
+                    {
+                        Worksheet.Columns.Hide(column);
+                    }
                     break;
                 case "unhide-column":
-                    Worksheet.Columns.Show(column);
+                    if (IsFeatureAllowed(SpreadsheetFeature.Resizing))
+                    {
+                        Worksheet.Columns.Show(column);
+                    }
                     break;
             }
         }
@@ -1188,6 +1324,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task PasteFromClipboardAsync()
     {
+        if (ReadOnly || !AllowClipboard || !AllowEditing)
+        {
+            return;
+        }
+
         if (Worksheet is null || !Worksheet.IsCellEditable(Worksheet.Selection.Cell))
         {
             return;
@@ -1372,7 +1513,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        if (Worksheet is null)
+        if (Worksheet is null || !IsFeatureAllowed(SpreadsheetFeature.Autofill))
         {
             return;
         }
@@ -1414,7 +1555,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// Invoked by JS interop when the pointer is released after an autofill drag.
     /// </summary>
     [JSInvokable]
-    public void OnAutofillPointerUpAsync(PointerEventArgs args)
+    public async Task OnAutofillPointerUpAsync(PointerEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
 
@@ -1426,7 +1567,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             var direction = Spreadsheet.AutofillCommand.GetDirection(autofillSource, fillRange.Value);
             var command = new Spreadsheet.AutofillCommand(Worksheet, autofillSource, fillRange.Value, direction);
-            Execute(command);
+            await ExecuteAsync(command);
 
             Worksheet.Selection.Select(fillRange.Value);
         }
@@ -1595,6 +1736,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public async Task OnCellDoubleClickAsync(CellEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
+
+        if (!IsFeatureAllowed(SpreadsheetFeature.Editing))
+        {
+            return;
+        }
+
         if (Worksheet != null)
         {
             var address = Worksheet.MergedCells.GetMergedRangeStartOrSelf(new CellRef(args.Row, args.Column));
@@ -1667,6 +1814,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             return;
         }
 
+        if (!IsFeatureAllowed(SpreadsheetFeature.Editing))
+        {
+            return;
+        }
+
         var ch = args.Key == "Space" ? ' ' : args.Key[0];
 
         if (char.IsLetterOrDigit(ch) || char.IsPunctuation(ch) || char.IsSymbol(ch) || char.IsSeparator(ch))
@@ -1682,6 +1834,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public async Task<bool> OnColumnResizePointerDownAsync(CellEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
+
+        if (!IsFeatureAllowed(SpreadsheetFeature.Resizing))
+        {
+            return false;
+        }
+
         var result = await AcceptAsync();
 
         if (result)
@@ -1711,6 +1869,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public async Task<bool> OnRowResizePointerDownAsync(CellEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(args);
+
+        if (!IsFeatureAllowed(SpreadsheetFeature.Resizing))
+        {
+            return false;
+        }
+
         var result = await AcceptAsync();
 
         if (result)
@@ -1958,11 +2122,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// Invoked by JS interop when the pointer is released after resizing a drawing.
     /// </summary>
     [JSInvokable]
-    public Task OnDrawingResizePointerUpAsync(PointerEventArgs args)
+    public async Task OnDrawingResizePointerUpAsync(PointerEventArgs args)
     {
         if (activeCapture is not DrawingResizeCapture capture || Worksheet is null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         if (capture.Image is SheetImage image)
@@ -1975,7 +2139,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             image.Height = capture.OriginalHeight;
             image.From = capture.OriginalFrom.Clone();
 
-            Execute(new ResizeImageCommand(image, finalWidth, finalHeight, finalFrom));
+            await ExecuteAsync(new ResizeImageCommand(image, finalWidth, finalHeight, finalFrom));
         }
         else if (capture.Chart is SheetChart chart)
         {
@@ -1987,11 +2151,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             chart.Height = capture.OriginalHeight;
             chart.From = capture.OriginalFrom.Clone();
 
-            Execute(new ResizeChartCommand(chart, finalWidth, finalHeight, finalFrom));
+            await ExecuteAsync(new ResizeChartCommand(chart, finalWidth, finalHeight, finalFrom));
         }
 
         activeCapture = null;
-        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -2138,11 +2301,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// Invoked by JS interop when the pointer is released after moving a drawing.
     /// </summary>
     [JSInvokable]
-    public Task OnDrawingMovePointerUpAsync(PointerEventArgs args)
+    public async Task OnDrawingMovePointerUpAsync(PointerEventArgs args)
     {
         if (activeCapture is not DrawingMoveCapture capture || Worksheet is null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         if (capture.Image is SheetImage image)
@@ -2156,7 +2319,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 image.To = capture.OriginalTo.Clone();
             }
 
-            Execute(new MoveImageCommand(image, finalFrom, finalTo));
+            await ExecuteAsync(new MoveImageCommand(image, finalFrom, finalTo));
         }
         else if (capture.Chart is SheetChart chart)
         {
@@ -2169,19 +2332,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 chart.To = capture.OriginalTo.Clone();
             }
 
-            Execute(new MoveChartCommand(chart, finalFrom, finalTo));
+            await ExecuteAsync(new MoveChartCommand(chart, finalFrom, finalTo));
         }
 
         activeCapture = null;
         StateHasChanged();
-        return Task.CompletedTask;
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         activeCapture = null;
-
-        SubscribeToWorksheetEvents(null);
 
         if (jsRef is not null)
         {

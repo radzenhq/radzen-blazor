@@ -10,6 +10,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class InsertTableCommand(Worksheet sheet, string name, RangeRef range, bool hasHeaders = true) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Tables;
+
     private readonly Worksheet sheet = sheet;
     private readonly string name = name;
     private readonly RangeRef range = range;
@@ -41,6 +44,9 @@ public class InsertTableCommand(Worksheet sheet, string name, RangeRef range, bo
 /// </summary>
 public class RemoveTableCommand(Worksheet sheet, Table table) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Tables;
+
     private readonly Worksheet sheet = sheet;
     private readonly Table table = table;
     private bool removed;

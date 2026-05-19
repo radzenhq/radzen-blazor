@@ -17,17 +17,19 @@
 @code {
 #nullable enable
 
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     [CascadingParameter]
     public ISpreadsheet? Spreadsheet { get; set; }
 
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
 
-    private void OnClick(RadzenSplitButtonItem? item)
+    private async Task OnClick(RadzenSplitButtonItem? item)
     {
-        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
         {
             return;
         }
@@ -36,51 +38,21 @@
         var range = Worksheet.Selection.Range;
         var border = new BorderStyle();
 
-        switch (value)
+        ICommand? command = value switch
         {
-            case "all":
-            case null:
-            {
-                var command = new AllBordersCommand(Worksheet, range, border);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-            case "outside":
-            {
-                var command = new BorderCommand(Worksheet, range, border, border, border, border);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-            case "top":
-            {
-                var command = new BorderCommand(Worksheet, range, top: border, right: null, bottom: null, left: null);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-            case "bottom":
-            {
-                var command = new BorderCommand(Worksheet, range, top: null, right: null, bottom: border, left: null);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-            case "left":
-            {
-                var command = new BorderCommand(Worksheet, range, top: null, right: null, bottom: null, left: border);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-            case "right":
-            {
-                var command = new BorderCommand(Worksheet, range, top: null, right: border, bottom: null, left: null);
-                Spreadsheet?.Execute(command);
-                break;
-            }
-            case "none":
-            {
-                var command = new NoBordersCommand(Worksheet, range);
-                Spreadsheet?.Execute(command);
-                break;
-            }
+            "all" or null => new AllBordersCommand(Worksheet, range, border),
+            "outside" => new BorderCommand(Worksheet, range, border, border, border, border),
+            "top" => new BorderCommand(Worksheet, range, top: border, right: null, bottom: null, left: null),
+            "bottom" => new BorderCommand(Worksheet, range, top: null, right: null, bottom: border, left: null),
+            "left" => new BorderCommand(Worksheet, range, top: null, right: null, bottom: null, left: border),
+            "right" => new BorderCommand(Worksheet, range, top: null, right: border, bottom: null, left: null),
+            "none" => new NoBordersCommand(Worksheet, range),
+            _ => null,
+        };
+
+        if (command is not null)
+        {
+            await Spreadsheet.ExecuteAsync(command);
         }
     }
 }

@@ -14,13 +14,13 @@ namespace Radzen.Blazor.Spreadsheet.Tools;
 public abstract class FormatToggleToolBase : ComponentBase, IDisposable
 {
     /// <summary>
-    /// Gets or sets the worksheet.
+    /// The active worksheet, cascaded from the host <see cref="Radzen.Blazor.RadzenSpreadsheet"/>.
     /// </summary>
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     /// <summary>
-    /// Gets or sets the spreadsheet instance.
+    /// The host spreadsheet, cascaded from <see cref="Radzen.Blazor.RadzenSpreadsheet"/>.
     /// </summary>
     [CascadingParameter]
     public ISpreadsheet? Spreadsheet { get; set; }
@@ -36,7 +36,7 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
     protected abstract Format WithValue(Format format, bool value);
 
     /// <summary>
-    /// Gets or sets the current toggle state, reading from and writing to the selected cell's format.
+    /// Derived state: whether the selected cell's format has this property toggled on.
     /// </summary>
     protected bool IsToggled
     {
@@ -48,24 +48,35 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
             }
             return false;
         }
-        set
+    }
+
+    /// <summary>
+    /// Dispatches a <see cref="FormatCommand"/> to set the toggle to <paramref name="value"/>.
+    /// Used as the <c>ValueChanged</c> callback for the underlying toggle button.
+    /// </summary>
+    protected async Task OnToggledChangedAsync(bool value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
         {
-            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
-            {
-                if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
-                {
-                    var newFormat = WithValue(cell.Format, value);
-                    var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, newFormat);
-                    Spreadsheet?.Execute(command);
-                }
-            }
+            return;
         }
+
+        if (!Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+        {
+            return;
+        }
+
+        var newFormat = WithValue(cell.Format, value);
+        var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, newFormat);
+        await Spreadsheet.ExecuteAsync(command);
     }
 
     /// <summary>
     /// Gets whether the tool should be disabled.
     /// </summary>
-    protected bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+    protected bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)

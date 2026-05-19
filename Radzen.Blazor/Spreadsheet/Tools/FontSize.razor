@@ -2,13 +2,13 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenDropDown @bind-Value=@CurrentFontSize Data=@FontSizes
+<RadzenDropDown Value=@CurrentFontSize ValueChanged=@OnFontSizeChangedAsync TValue="double" Data=@FontSizes
     Disabled=@IsDisabled InputSize="InputSize.Small" Style="width: 65px" />
 
 @code {
 #nullable enable
 
-    [Parameter]
+    [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
 
     [CascadingParameter]
@@ -29,21 +29,28 @@
             }
             return 11;
         }
-        set
-        {
-            if (Worksheet is not null && Worksheet.Selection.Cell != CellRef.Invalid)
-            {
-                if (Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
-                {
-                    double? fontSize = value == 11 ? null : value;
-                    var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithFontSize(fontSize));
-                    Spreadsheet?.Execute(command);
-                }
-            }
-        }
     }
 
-    private bool IsDisabled => Worksheet?.Selection.Cell == CellRef.Invalid;
+    private async Task OnFontSizeChangedAsync(double value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        if (!Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+        {
+            return;
+        }
+
+        double? fontSize = value == 11 ? null : value;
+        var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithFontSize(fontSize));
+        await Spreadsheet.ExecuteAsync(command);
+    }
+
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {

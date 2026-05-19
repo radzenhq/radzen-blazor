@@ -6,6 +6,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class DeleteChartCommand(Worksheet sheet, SheetChart chart) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Charts;
+
     private readonly Worksheet sheet = sheet;
     private readonly SheetChart chart = chart;
 

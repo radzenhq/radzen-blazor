@@ -12,6 +12,8 @@
 @code {
 #nullable enable
 
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Sorting;
+
     private async Task OnClick()
     {
         if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid) return;
@@ -38,10 +40,10 @@
             args,
             new DialogOptions { Width = "640px", ShowClose = true });
 
-        if (result is CustomSortDialog.Result r && r.Keys.Length > 0)
+        if (result is CustomSortDialog.Result r && r.Keys.Length > 0 && Spreadsheet is not null)
         {
             var command = new MultiKeySortCommand(Worksheet, range, r.Keys, skipHeaderRow: r.HasHeaders);
-            Spreadsheet?.Execute(command);
+            await Spreadsheet.ExecuteAsync(command);
         }
     }
 

@@ -20,6 +20,12 @@ public interface ICommand
     /// Unexecutes the command, reverting any changes made by the Execute method.
     /// </summary>
     public void Unexecute();
+    /// <summary>
+    /// Gets the feature this command belongs to, or <c>null</c> if it is not subject to
+    /// host-level feature gating (RadzenSpreadsheet's <c>ReadOnly</c> and <c>Allow*</c>
+    /// parameters).
+    /// </summary>
+    public SpreadsheetFeature? Feature => null;
 }
 
 /// <summary>

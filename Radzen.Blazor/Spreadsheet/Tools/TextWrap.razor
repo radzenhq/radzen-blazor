@@ -1,7 +1,7 @@
 @using Radzen.Documents.Spreadsheet
 @inherits FormatToggleToolBase
 
-<RadzenToggleButton @bind-Value=@IsToggled Icon="wrap_text" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+<RadzenToggleButton Value=@IsToggled ValueChanged=@OnToggledChangedAsync Icon="wrap_text" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
     ToggleVariant="Variant.Flat" ToggleButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Lighter" />
 
 @code {

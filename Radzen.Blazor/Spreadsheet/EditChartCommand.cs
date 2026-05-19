@@ -26,6 +26,9 @@ public record EditChartState(
 /// </summary>
 public class EditChartCommand(SheetChart chart, EditChartState newState) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Charts;
+
     private SpreadsheetChartType oldChartType;
     private string? oldTitle;
     private bool oldShowLegend;

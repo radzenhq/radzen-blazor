@@ -11,6 +11,9 @@ public class UnmergeCellsCommand(Worksheet sheet, CellRef address) : ICommand, I
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.FormatCells;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Merging;
+
     private readonly Worksheet sheet = sheet;
     private readonly CellRef address = address;
     private RangeRef removedRange = RangeRef.Invalid;

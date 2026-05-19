@@ -11,6 +11,8 @@
 </RadzenButton>
 
 @code {
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Images;
+
     private async Task OnFileSelectedAsync(InputFileChangeEventArgs e)
     {
         if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
@@ -40,7 +42,10 @@
             Name = file.Name
         };
 
-        var command = new InsertImageCommand(Worksheet, image);
-        Spreadsheet?.Execute(command);
+        if (Spreadsheet is not null)
+        {
+            var command = new InsertImageCommand(Worksheet, image);
+            await Spreadsheet.ExecuteAsync(command);
+        }
     }
 }

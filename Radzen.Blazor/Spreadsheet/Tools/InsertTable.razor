@@ -12,6 +12,8 @@
 @code {
 #nullable enable
 
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Tables;
+
     private async Task OnClick()
     {
         if (Worksheet is null || Spreadsheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
@@ -75,7 +77,7 @@
             var range = FormulaFormat.TryParseFormula(finalDraft.RangeFormula, out var parsed)
                 ? parsed
                 : initialRange;
-            Spreadsheet.Execute(new InsertTableCommand(Worksheet, finalDraft.Name, range, finalDraft.HasHeaders));
+            await Spreadsheet.ExecuteAsync(new InsertTableCommand(Worksheet, finalDraft.Name, range, finalDraft.HasHeaders));
         }
     }
 }

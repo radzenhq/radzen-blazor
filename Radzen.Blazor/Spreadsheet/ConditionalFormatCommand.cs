@@ -11,6 +11,9 @@ public class ConditionalFormatCommand(Worksheet sheet, RangeRef range, Condition
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.FormatCells;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.ConditionalFormatting;
+
     private readonly Worksheet sheet = sheet;
     private readonly RangeRef range = range;
     private readonly ConditionalFormatBase rule = rule;

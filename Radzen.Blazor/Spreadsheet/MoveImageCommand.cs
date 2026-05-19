@@ -6,6 +6,9 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class MoveImageCommand(SheetImage image, CellAnchor newFrom, CellAnchor? newTo) : ICommand
 {
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Images;
+
     private readonly SheetImage image = image;
     private readonly CellAnchor newFrom = newFrom;
     private readonly CellAnchor? newTo = newTo;

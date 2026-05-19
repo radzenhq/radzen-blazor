@@ -8,6 +8,8 @@
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertHyperlink)) ?? "Insert Hyperlink") />
 
 @code {
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Hyperlinks;
+
     private async Task OnClickAsync()
     {
         if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
@@ -29,10 +31,10 @@
                 { "Text", displayText }
             });
 
-        if (result is Hyperlink hyperlink)
+        if (result is Hyperlink hyperlink && Spreadsheet is not null)
         {
             var command = new HyperlinkCommand(Worksheet, address, hyperlink);
-            Spreadsheet?.Execute(command);
+            await Spreadsheet.ExecuteAsync(command);
         }
     }
 }

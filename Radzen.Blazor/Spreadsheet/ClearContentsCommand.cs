@@ -9,6 +9,9 @@ class ClearContentsCommand(Worksheet sheet, RangeRef range) : ICommand, IProtect
     /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.EditCell;
 
+    /// <inheritdoc/>
+    public SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;
+
     private readonly Dictionary<CellRef, (object? value, string? formula)> snapshot = [];
 
     public bool Execute()
