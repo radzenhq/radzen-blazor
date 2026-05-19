@@ -12,6 +12,7 @@
 <div @ref=@Element class=@GetCssClass() style=@Style @attributes=@Attributes tabindex="0">
     <CascadingValue TValue="ISpreadsheet" Value=this IsFixed="true">
     <CascadingValue Value=@Worksheet TValue="Worksheet">
+    <CascadingValue Value=@ActiveView?.Commands TValue="UndoRedoStack">
         @if (ShowToolbar)
         {
         <RadzenTabs SelectedIndex="1">
@@ -32,8 +33,8 @@
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_HomeTab))>
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <Undo Commands=@ActiveView?.Commands />
-                            <Redo Commands=@ActiveView?.Commands />
+                            <Undo />
+                            <Redo />
                         </RadzenStack>
                         <div class="rz-html-editor-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
@@ -205,6 +206,7 @@
         </RadzenPopup>
         </CascadingValue>
 }
+    </CascadingValue>
     </CascadingValue>
     </CascadingValue>
     <RangePickerBar @ref=@rangePickerBar CancelTitle=@Localize(nameof(RadzenStrings.Spreadsheet_Cancel)) />
