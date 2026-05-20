@@ -489,6 +489,14 @@ public partial class Worksheet
         // Decrease column count
         ColumnCount--;
 
+        // A different cell now occupies the selection if it sat at or after the deleted
+        // column — notify so the formula bar re-reads. Skip when the delete left the
+        // selection past the new bounds (re-reading there would be out of range).
+        if (Selection.Cell != CellRef.Invalid && Selection.Cell.Column >= columnIndex && Selection.Cell.Column < ColumnCount)
+        {
+            Selection.NotifyContentChanged();
+        }
+
         EndUpdate();
     }
 
@@ -522,6 +530,14 @@ public partial class Worksheet
 
         // Decrease row count
         RowCount--;
+
+        // A different cell now occupies the selection if it sat at or after the deleted
+        // row — notify so the formula bar re-reads. Skip when the delete left the
+        // selection past the new bounds (re-reading there would be out of range).
+        if (Selection.Cell != CellRef.Invalid && Selection.Cell.Row >= rowIndex && Selection.Cell.Row < RowCount)
+        {
+            Selection.NotifyContentChanged();
+        }
 
         EndUpdate();
     }
@@ -731,8 +747,6 @@ public partial class Worksheet
 
         BeginUpdate();
 
-        RowCount += count;
-
         // Shift cells down using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftRowsDown(rowIndex, count);
 
@@ -749,6 +763,18 @@ public partial class Worksheet
             var newRow = a.Row >= rowIndex ? a.Row + count : a.Row;
             return new CellRef(newRow, a.Column);
         });
+
+        // Increase the row count last so the axis change event fires after every shift
+        // is in place. Doing it first would re-render the grid (and the selection overlay)
+        // against intermediate geometry with nothing re-rendering afterwards.
+        RowCount += count;
+
+        // The selection stays at the same address, but if it sits at or below the insert
+        // point a different cell now occupies it — notify so the formula bar re-reads.
+        if (Selection.Cell != CellRef.Invalid && Selection.Cell.Row >= rowIndex)
+        {
+            Selection.NotifyContentChanged();
+        }
 
         EndUpdate();
     }
@@ -775,8 +801,6 @@ public partial class Worksheet
 
         BeginUpdate();
 
-        ColumnCount += count;
-
         // Shift cells right using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftColumnsRight(columnIndex, count);
 
@@ -793,6 +817,18 @@ public partial class Worksheet
             var newCol = a.Column >= columnIndex ? a.Column + count : a.Column;
             return new CellRef(a.Row, newCol);
         });
+
+        // Increase the column count last so the axis change event fires after every shift
+        // is in place. Doing it first would re-render the grid (and the selection overlay)
+        // against intermediate geometry with nothing re-rendering afterwards.
+        ColumnCount += count;
+
+        // The selection stays at the same address, but if it sits at or after the insert
+        // point a different cell now occupies it — notify so the formula bar re-reads.
+        if (Selection.Cell != CellRef.Invalid && Selection.Cell.Column >= columnIndex)
+        {
+            Selection.NotifyContentChanged();
+        }
 
         EndUpdate();
     }
