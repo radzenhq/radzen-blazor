@@ -57,13 +57,47 @@ public partial class FormulaEditor : ComponentBase, IDisposable
         }
     }
 
+    private Cell? boundCell;
+
     private void Render()
     {
-        if (Worksheet.Selection.Cell != CellRef.Invalid)
-        {
-            var cell = Worksheet.Cells[Worksheet.Selection.Cell];
+        Cell? cell = Worksheet.Selection.Cell != CellRef.Invalid
+            ? Worksheet.Cells[Worksheet.Selection.Cell]
+            : null;
 
+        // The formula bar is a view of the active cell, so observe that cell's content
+        // (mirroring CellView). This keeps the bar correct when the cell changes for any
+        // reason other than the selection moving — an undo/redo restore, an edit applied
+        // elsewhere, a formula recalculation — none of which raise Selection.Changed.
+        if (!ReferenceEquals(cell, boundCell))
+        {
+            if (boundCell is not null)
+            {
+                boundCell.Changed -= OnActiveCellChanged;
+            }
+
+            boundCell = cell;
+
+            if (boundCell is not null)
+            {
+                boundCell.Changed += OnActiveCellChanged;
+            }
+        }
+
+        if (cell is not null)
+        {
             Editor.Value = cell.GetValue();
+        }
+    }
+
+    private void OnActiveCellChanged(Cell cell)
+    {
+        // Don't clobber what the user is typing into the bar.
+        if (Editor.Mode == EditMode.None)
+        {
+            Editor.Value = cell.GetValue();
+
+            StateHasChanged();
         }
     }
 
@@ -87,6 +121,11 @@ public partial class FormulaEditor : ComponentBase, IDisposable
         if (Worksheet is not null)
         {
             Worksheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        if (boundCell is not null)
+        {
+            boundCell.Changed -= OnActiveCellChanged;
         }
 
         if (Editor is not null)
