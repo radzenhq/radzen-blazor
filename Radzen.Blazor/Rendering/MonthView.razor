@@ -338,8 +338,9 @@
         }
 
         return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end))
-                .OrderBy(item => item.Start)
-                .ThenBy(item => item.End)
+                .OrderByDescending(item => item.End.Subtract(item.Start).TotalDays > 1)
+                .ThenBy(item => item.Start)
+                .ThenByDescending(item => item.End)
                 .ToArray();
     }
 
