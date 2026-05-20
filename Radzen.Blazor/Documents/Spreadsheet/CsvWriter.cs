@@ -8,7 +8,6 @@ namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 
-/// <summary>Writes a single <see cref="Worksheet"/> to a stream in CSV format.</summary>
 class CsvWriter(Worksheet sheet, CsvExportOptions options)
 {
     public void Write(Stream stream)

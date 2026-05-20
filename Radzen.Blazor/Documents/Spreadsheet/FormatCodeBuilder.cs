@@ -5,14 +5,8 @@ namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 
-/// <summary>
-/// Builds format codes from UI state for the Format Cells dialog.
-/// </summary>
 internal static class FormatCodeBuilder
 {
-    /// <summary>
-    /// Builds a format code string from the given parameters.
-    /// </summary>
     public static string Build(NumberFormatCategory category, int decimalPlaces = 2,
         bool useThousandsSeparator = true, string currencySymbol = "$",
         string? selectedPreset = null)
@@ -46,8 +40,5 @@ internal static class FormatCodeBuilder
         return $"{pos};{neg};{zero};{text}";
     }
 
-    /// <summary>
-    /// Gets the available currency symbols.
-    /// </summary>
     public static IReadOnlyList<string> CurrencySymbols { get; } = ["$", "\u20AC", "\u00A3", "\u00A5"];
 }

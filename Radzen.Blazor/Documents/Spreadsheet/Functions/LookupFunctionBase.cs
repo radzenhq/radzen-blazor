@@ -4,10 +4,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Shared implementation for VLOOKUP and HLOOKUP.
-/// Subclasses provide the axis-specific details via a few one-liner overrides.
-/// </summary>
 abstract class LookupFunctionBase : FormulaFunction
 {
     public override FunctionParameter[] Parameters =>
@@ -18,28 +14,12 @@ abstract class LookupFunctionBase : FormulaFunction
         new("is_sorted", ParameterType.Single, isRequired: false)
     ];
 
-    /// <summary>
-    /// Returns (searchCount, resultCount) from the range dimensions.
-    /// VLOOKUP searches rows and indexes columns; HLOOKUP is the opposite.
-    /// </summary>
     protected abstract (int searchCount, int resultCount) GetSearchAndResultCounts(int rows, int columns);
 
-    /// <summary>
-    /// Returns fallback (rows, columns) when the range is not a RangeList.
-    /// VLOOKUP assumes a single-column vector; HLOOKUP assumes a single-row vector.
-    /// </summary>
     protected abstract (int rows, int columns) GetFallbackDimensions(int count);
 
-    /// <summary>
-    /// Returns the flat index into the range for the search cell at position <paramref name="i"/>
-    /// along the search axis (row 0 for HLOOKUP, column 0 for VLOOKUP).
-    /// </summary>
     protected abstract int GetSearchCellIndex(int i, int columns);
 
-    /// <summary>
-    /// Returns the flat index into the range for the result cell given the matched search
-    /// position and the 1-based requested index.
-    /// </summary>
     protected abstract int GetResultCellIndex(int matchPosition, int requestedIndex, int columns);
 
     public override CellData Evaluate(FunctionArguments arguments)

@@ -113,16 +113,8 @@ public class CellStore(Worksheet sheet)
         return false;
     }
 
-    /// <summary>
-    /// Returns all populated cells in the store without creating new cells.
-    /// </summary>
     internal IEnumerable<Cell> GetPopulatedCells() => data.Values;
 
-    /// <summary>
-    /// Removes all empty cells from the store, freeing memory.
-    /// A cell is empty when it has no value, formula, format, or hyperlink.
-    /// </summary>
-    /// <returns>The number of cells removed.</returns>
     internal int Compact()
     {
         var keysToRemove = new List<(int row, int column)>();
@@ -143,20 +135,10 @@ public class CellStore(Worksheet sheet)
         return keysToRemove.Count;
     }
 
-    /// <summary>
-    /// Returns the number of populated cells in the store.
-    /// </summary>
     internal int PopulatedCount => data.Count;
 
-    /// <summary>
-    /// Checks if a cell exists at the specified position without creating it.
-    /// </summary>
     internal bool HasCell(int row, int column) => data.ContainsKey((row, column));
 
-    /// <summary>
-    /// Removes all cells at the specified row and shifts cells from higher rows up by one.
-    /// Only touches populated cells, making this O(populated) instead of O(rows × columns).
-    /// </summary>
     internal void ShiftRowsUp(int deletedRow)
     {
         var toRemove = new List<(int row, int column)>();
@@ -188,10 +170,6 @@ public class CellStore(Worksheet sheet)
         }
     }
 
-    /// <summary>
-    /// Shifts all cells at or after the specified row down by the given count.
-    /// Only touches populated cells, making this O(populated) instead of O(rows × columns).
-    /// </summary>
     internal void ShiftRowsDown(int fromRow, int count)
     {
         var toRekey = new List<((int row, int column) key, Cell cell)>();
@@ -219,10 +197,6 @@ public class CellStore(Worksheet sheet)
         }
     }
 
-    /// <summary>
-    /// Removes all cells at the specified column and shifts cells from higher columns left by one.
-    /// Only touches populated cells, making this O(populated) instead of O(rows × columns).
-    /// </summary>
     internal void ShiftColumnsLeft(int deletedColumn)
     {
         var toRemove = new List<(int row, int column)>();
@@ -254,10 +228,6 @@ public class CellStore(Worksheet sheet)
         }
     }
 
-    /// <summary>
-    /// Shifts all cells at or after the specified column right by the given count.
-    /// Only touches populated cells, making this O(populated) instead of O(rows × columns).
-    /// </summary>
     internal void ShiftColumnsRight(int fromColumn, int count)
     {
         var toRekey = new List<((int row, int column) key, Cell cell)>();

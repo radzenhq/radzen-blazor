@@ -389,7 +389,6 @@ public partial class ChartOverlay : ComponentBase, IDisposable
                 chartBuilder.CloseComponent();
             }
 
-            // Add axes for non-pie/donut charts
             if (chart.ChartType != SpreadsheetChartType.Pie && chart.ChartType != SpreadsheetChartType.Donut)
             {
                 chartBuilder.OpenComponent<RadzenCategoryAxis>(10000);
@@ -399,7 +398,6 @@ public partial class ChartOverlay : ComponentBase, IDisposable
                 chartBuilder.CloseComponent();
             }
 
-            // Add legend if configured
             if (chart.ShowLegend)
             {
                 chartBuilder.OpenComponent<RadzenLegend>(10002);

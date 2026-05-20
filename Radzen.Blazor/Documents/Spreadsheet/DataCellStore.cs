@@ -29,7 +29,6 @@ public class DataCellStore<T>(DataSheet<T> sheet, int pageSize = 20) : CellStore
                     Skip = pageNumber * pageSize
                 });
 
-                // Populate cells for the loaded page
                 for (var i = 0; i < data.Count; i++)
                 {
                     var dataItem = data[i];

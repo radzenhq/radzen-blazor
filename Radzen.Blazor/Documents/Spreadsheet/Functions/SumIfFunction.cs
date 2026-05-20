@@ -45,22 +45,18 @@ class SumIfFunction : FormulaFunction
             var rangeCell = range[i];
             var sumCell = actualSumRange[i];
 
-            // Skip if range cell has an error
             if (rangeCell.IsError)
             {
                 return rangeCell;
             }
 
-            // Skip if sum cell has an error
             if (sumCell.IsError)
             {
                 return sumCell;
             }
 
-            // Check if the range cell matches the criteria
             if (rangeCell.MatchesCriteria(criteria))
             {
-                // Add the corresponding sum cell value if it's a number
                 if (sumCell.Type == CellDataType.Number)
                 {
                     sum += sumCell.GetValueOrDefault<double>();
@@ -68,7 +64,6 @@ class SumIfFunction : FormulaFunction
                 // If sum cell is empty, treat as 0
                 else if (sumCell.IsEmpty)
                 {
-                    // Do nothing, effectively adding 0
                 }
                 // If sum cell is not a number and not empty, skip it
             }
