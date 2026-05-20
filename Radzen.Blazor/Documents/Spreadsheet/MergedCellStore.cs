@@ -106,11 +106,6 @@ public class MergedCellStore
     /// </summary>
     public List<RangeRef> GetOverlappingRanges(RangeRef range) => [.. data.Where(range.Overlaps)];
 
-    /// <summary>
-    /// Adjusts all merged ranges after a row is deleted.
-    /// Ranges fully on the deleted row are removed. Ranges spanning the deleted row shrink.
-    /// Ranges below the deleted row shift up by one.
-    /// </summary>
     internal void ShiftRowsUp(int deletedRow)
     {
         for (int i = data.Count - 1; i >= 0; i--)
@@ -147,10 +142,6 @@ public class MergedCellStore
         }
     }
 
-    /// <summary>
-    /// Adjusts all merged ranges after rows are inserted.
-    /// Ranges at or below the insert point shift down by count.
-    /// </summary>
     internal void ShiftRowsDown(int fromRow, int count)
     {
         for (int i = 0; i < data.Count; i++)
@@ -177,9 +168,6 @@ public class MergedCellStore
         }
     }
 
-    /// <summary>
-    /// Adjusts all merged ranges after a column is deleted.
-    /// </summary>
     internal void ShiftColumnsLeft(int deletedColumn)
     {
         for (int i = data.Count - 1; i >= 0; i--)
@@ -211,9 +199,6 @@ public class MergedCellStore
         }
     }
 
-    /// <summary>
-    /// Adjusts all merged ranges after columns are inserted.
-    /// </summary>
     internal void ShiftColumnsRight(int fromColumn, int count)
     {
         for (int i = 0; i < data.Count; i++)

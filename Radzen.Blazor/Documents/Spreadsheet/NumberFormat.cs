@@ -129,9 +129,6 @@ public static class NumberFormat
         return result;
     }
 
-    /// <summary>
-    /// Determines whether a format code represents a date/time format.
-    /// </summary>
     internal static bool IsDateFormat(string formatCode)
     {
         if (string.IsNullOrEmpty(formatCode))
@@ -375,30 +372,25 @@ public static class NumberFormat
         var absValue = Math.Abs(value);
         var isNegative = value < 0;
 
-        // Percentage: multiply by 100
         if (section.IsPercentage)
         {
             absValue *= 100;
         }
 
-        // Thousands scaling
         for (var i = 0; i < section.ThousandsScale; i++)
         {
             absValue /= 1000;
         }
 
-        // Count integer and decimal placeholders
         var intZeros = section.IntegerZeros;
         var intHashes = section.IntegerHashes;
         var decimalPlaces = section.DecimalPlaces;
         var hasThousands = section.HasThousandsSeparator;
 
-        // Round to decimal places
         absValue = Math.Round(absValue, decimalPlaces, MidpointRounding.AwayFromZero);
 
         var sb = new StringBuilder();
 
-        // Prefix literals
         sb.Append(section.Prefix);
 
         // Add negative sign if this is a single-section format and value is negative
@@ -413,14 +405,11 @@ public static class NumberFormat
             // parens are part of the format literals
         }
 
-        // Split into integer and decimal parts
         var intPart = (long)Math.Truncate(absValue);
         var fracPart = absValue - Math.Truncate(absValue);
 
-        // Format integer part
         var intStr = intPart.ToString(CultureInfo.InvariantCulture);
 
-        // Pad with zeros
         var minIntDigits = Math.Max(intZeros, 1);
         if (intZeros == 0 && intHashes > 0 && intPart == 0)
         {
@@ -433,7 +422,6 @@ public static class NumberFormat
             intStr = intStr.PadLeft(intZeros, '0');
         }
 
-        // Add thousands separators
         if (hasThousands && intStr.Length > 0)
         {
             var formatted = new StringBuilder(intStr.Length + (intStr.Length - 1) / 3);
@@ -451,7 +439,6 @@ public static class NumberFormat
 
         sb.Append(intStr);
 
-        // Format decimal part
         if (decimalPlaces > 0)
         {
             sb.Append('.');
@@ -511,7 +498,6 @@ public static class NumberFormat
             }
         }
 
-        // Suffix (%, etc.)
         sb.Append(section.Suffix);
 
         return sb.ToString();
@@ -546,7 +532,6 @@ public static class NumberFormat
             mantissa = absValue / Math.Pow(10, exponent);
         }
 
-        // Round mantissa to DecimalPlaces
         mantissa = Math.Round(mantissa, section.DecimalPlaces, MidpointRounding.AwayFromZero);
 
         // Check if rounding carried over (e.g., 9.995 → 10.00)
@@ -563,7 +548,6 @@ public static class NumberFormat
             }
         }
 
-        // Format mantissa
         if (section.DecimalPlaces > 0)
         {
             sb.Append(mantissa.ToString("F" + section.DecimalPlaces, CultureInfo.InvariantCulture));
@@ -573,11 +557,10 @@ public static class NumberFormat
             sb.Append(((long)Math.Round(mantissa)).ToString(CultureInfo.InvariantCulture));
         }
 
-        // Format exponent part (e.g. "E+00")
         var expFormat = section.ExponentFormat;
-        var expChar = expFormat[0]; // E or e
-        var expSign = expFormat[1]; // + or -
-        var expDigits = expFormat.Length - 2; // number of 0/# after sign
+        var expChar = expFormat[0];
+        var expSign = expFormat[1];
+        var expDigits = expFormat.Length - 2;
 
         sb.Append(expChar);
 

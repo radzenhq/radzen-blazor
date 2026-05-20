@@ -59,7 +59,6 @@ public abstract class SpreadsheetToolBase : ComponentBase, IDisposable
         StateHasChanged();
     }
 
-    /// <inheritdoc/>
     void IDisposable.Dispose()
     {
         if (Worksheet?.Selection is not null)

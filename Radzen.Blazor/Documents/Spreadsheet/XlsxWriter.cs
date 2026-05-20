@@ -9,9 +9,6 @@ namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 
-/// <summary>
-/// Writes a <see cref="Workbook"/> to a stream in the Open XML Spreadsheet format (XLSX).
-/// </summary>
 class XlsxWriter(Workbook sourceWorkbook)
 {
     private const double EmuPerPixel = 9525.0;
@@ -258,7 +255,6 @@ class XlsxWriter(Workbook sourceWorkbook)
                 mediaPath = $"xl/media/image{globalMediaIndex++}.{ext}";
                 mediaMap[hash] = mediaPath;
 
-                // Write image bytes to archive
                 using (var mediaEntry = archive.CreateEntry(mediaPath).Open())
                 {
                     mediaEntry.Write(image.Data, 0, image.Data.Length);
@@ -269,7 +265,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             var relTarget = "../media/" + mediaPath.Split('/').Last();
             drawingRels.Add((imageRelId, relTarget, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"));
 
-            // Build anchor element
             XElement anchorElement;
             var fromElement = new XElement(xdr + "from",
                 new XElement(xdr + "col", image.From.Column.ToString(CultureInfo.InvariantCulture)),
@@ -328,7 +323,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             drawingDoc.Root!.Add(anchorElement);
         }
 
-        // Write chart anchors
         var chartIndex = 1;
         foreach (var chart in sheet.Charts)
         {
@@ -338,7 +332,6 @@ class XlsxWriter(Workbook sourceWorkbook)
 
             drawingRels.Add((chartRelId, $"../charts/{chartFileName}", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"));
 
-            // Build anchor element
             var fromElement = new XElement(xdr + "from",
                 new XElement(xdr + "col", chart.From.Column.ToString(CultureInfo.InvariantCulture)),
                 new XElement(xdr + "colOff", PixelsToEmu(chart.From.ColumnOffset)),
@@ -389,19 +382,16 @@ class XlsxWriter(Workbook sourceWorkbook)
 
             drawingDoc.Root!.Add(chartAnchor);
 
-            // Save chart XML
             SaveChartXml(archive, chart, chartPath);
 
             chartIndex++;
         }
 
-        // Save drawing XML
         using (var entry = archive.CreateEntry($"xl/drawings/drawing{drawingIndex}.xml").Open())
         {
             drawingDoc.Save(entry);
         }
 
-        // Save drawing relationships
         if (drawingRels.Count > 0)
         {
             var pkgNs = "http://schemas.openxmlformats.org/package/2006/relationships";
@@ -450,7 +440,6 @@ class XlsxWriter(Workbook sourceWorkbook)
         var plotArea = new XElement(c + "plotArea",
             new XElement(c + "layout"));
 
-        // Create chart type group element
         var groupElement = CreateChartGroupElement(chart, c);
         if (groupElement is not null)
         {
@@ -554,7 +543,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             group.Add(new XElement(c + "grouping", new XAttribute("val", grouping)));
         }
 
-        // Add series
         foreach (var series in chart.Series)
         {
             var ser = new XElement(c + "ser",
@@ -901,7 +889,6 @@ class XlsxWriter(Workbook sourceWorkbook)
         var mediaMap = new Dictionary<string, string>();
         var globalMediaIndex = 1;
 
-        // Process each sheet
         for (var i = 0; i < sheets.Count; i++)
         {
             var sheet = sheets[i];
@@ -909,13 +896,11 @@ class XlsxWriter(Workbook sourceWorkbook)
             var sheetName = $"sheet{sheetId}.xml";
             var relId = $"rId{sheetId + 2}";
 
-            // Add sheet relationship (update Target to worksheets subdirectory)
             workbookRelsElement.Add(new XElement(XName.Get("Relationship", pkgNs),
                 new XAttribute("Id", relId),
                 new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"),
                 new XAttribute("Target", $"worksheets/{sheetName}")));
 
-            // Save individual sheet
             SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, sharedStringsDoc, mediaMap, ref globalMediaIndex, ref globalTableIndex);
         }
 
@@ -934,7 +919,6 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("Target", "sharedStrings.xml")));
         }
 
-        // Save workbook relationships
         using var relsEntry = archive.CreateEntry("xl/_rels/workbook.xml.rels").Open();
         workbookRels.Save(relsEntry);
     }
@@ -950,25 +934,18 @@ class XlsxWriter(Workbook sourceWorkbook)
         var sheetDoc = CreateSheetDocument(sheet, sheetId, relId);
         var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
 
-        // Process all rows and cells
         ProcessSheetData(sheet, sheetData, styleTracker, sharedStrings, sharedStringsDoc);
 
-        // Add merged cells
         AddMergedCells(sheet, sheetDoc);
 
-        // Add auto filter
         AddAutoFilter(sheet, sheetDoc);
 
-        // Add data validations
         AddDataValidations(sheet, sheetDoc);
 
-        // Add sheet protection
         AddSheetProtection(sheet, sheetDoc);
 
-        // Add hyperlinks
         var hyperlinkRels = AddHyperlinks(sheet, sheetDoc);
 
-        // Track all sheet relationship entries
         var sheetRelEntries = new List<(string Id, string Type, string Target, bool External)>();
         foreach (var (id, url) in hyperlinkRels)
         {
@@ -1337,14 +1314,12 @@ class XlsxWriter(Workbook sourceWorkbook)
         var cellElement = new XElement(XName.Get("c", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XAttribute("r", new CellRef(row, col).ToString()));
 
-        // Add style reference if cell has formatting
         if (HasCellFormatting(cell))
         {
             var styleId = GetOrCreateCellStyle(cell, styleTracker);
             cellElement.Add(new XAttribute("s", styleId));
         }
 
-        // Add cell value based on type
         AddCellValue(cellElement, cell, sharedStrings, sharedStringsDoc);
 
         return cellElement;
@@ -1497,7 +1472,6 @@ class XlsxWriter(Workbook sourceWorkbook)
         var newId = 164 + styleTracker.NumberFormats.Count;
         styleTracker.NumberFormats[formatCode] = newId;
 
-        // Create numFmt element
         if (styleTracker.NumFmtsElement is null)
         {
             styleTracker.NumFmtsElement = new XElement(XName.Get("numFmts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
@@ -1565,9 +1539,6 @@ class XlsxWriter(Workbook sourceWorkbook)
         styleTracker.FillsElement.Attribute("count")!.Value = (styleTracker.FillStyles.Count + 2).ToString(CultureInfo.InvariantCulture);
     }
 
-    /// <summary>
-    /// Creates a cell style element in the styles document.
-    /// </summary>
     private void CreateCellStyleElement(Cell cell, int fontId, int fillId, int borderId, int numFmtId, StyleTracker styleTracker)
     {
         var xfElement = new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
@@ -1615,9 +1586,6 @@ class XlsxWriter(Workbook sourceWorkbook)
         styleTracker.CellXfsElement.Attribute("count")!.Value = (styleTracker.CellStyles.Count + 1).ToString(CultureInfo.InvariantCulture);
     }
 
-    /// <summary>
-    /// Creates an alignment element for cell formatting.
-    /// </summary>
     private static XElement CreateAlignmentElement(Cell cell)
     {
         var alignmentElement = new XElement(XName.Get("alignment", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"));
@@ -1783,7 +1751,6 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("ref", sheet.AutoFilter.Range.Value.ToString()),
                 new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid));
 
-            // Process each filter and create filterColumn elements
             foreach (var filter in sheet.Filters)
             {
                 var filterColumn = CreateFilterColumn(filter, sheet.AutoFilter.Range.Value);
@@ -2185,7 +2152,6 @@ class XlsxWriter(Workbook sourceWorkbook)
 
         var sheetsElement = workbook.Root!.Element(mainNs + "sheets")!;
 
-        // Add sheet references
         for (var i = 0; i < sheets.Count; i++)
         {
             var sheet = sheets[i];

@@ -22,9 +22,6 @@ public partial class Worksheet
     private readonly HashSet<int> invalidReferenceRows = [];
     private readonly HashSet<int> invalidReferenceColumns = [];
 
-    /// <summary>
-    /// Gets a value indicating whether the sheet is currently being updated.
-    /// </summary>
     internal bool IsUpdating { get; private set; }
 
     private bool isEvaluating;
@@ -117,9 +114,6 @@ public partial class Worksheet
         }
     }
 
-    /// <summary>
-    /// Occurs when the selected image changes.
-    /// </summary>
     internal event Action? SelectedImageChanged;
 
     internal event Action? ImagesChanged;
@@ -161,9 +155,6 @@ public partial class Worksheet
         }
     }
 
-    /// <summary>
-    /// Occurs when the selected chart changes.
-    /// </summary>
     internal event Action? SelectedChartChanged;
 
     internal event Action? ChartsChanged;
@@ -194,9 +185,6 @@ public partial class Worksheet
 
     private readonly HashSet<int> filteredColumns = [];
 
-    /// <summary>
-    /// Gets the set of columns that have filters applied.
-    /// </summary>
     internal IReadOnlySet<int> FilteredColumns => filteredColumns;
 
     /// <summary>
@@ -281,11 +269,6 @@ public partial class Worksheet
         AutoFilter = new(this);
     }
 
-    /// <summary>
-    /// Clamps the specified cell address to ensure it is within the bounds of the sheet.
-    /// </summary>
-    /// <param name="address"></param>
-    /// <returns></returns>
     internal CellRef Clamp(CellRef address)
     {
         var row = Math.Max(0, Math.Min(RowCount - 1, address.Row));
@@ -346,9 +329,6 @@ public partial class Worksheet
         }
     }
 
-    /// <summary>
-    /// Notifies populated cells in the given range that they should re-validate and/or refresh.
-    /// </summary>
     internal void RefreshCells(RangeRef range, bool validate = false)
     {
         foreach (var cellRef in range.GetCells())
@@ -388,13 +368,6 @@ public partial class Worksheet
         Selection.TriggerPendingChange();
     }
 
-    /// <summary>
-    /// Gets a delimited string representation of the specified range in the sheet.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <param name="rowDelimiter"></param>
-    /// <param name="cellDelimiter"></param>
-    /// <returns></returns>
     internal string GetDelimitedString(RangeRef range, string rowDelimiter = "\n", string cellDelimiter = "\t")
     {
         ArgumentNullException.ThrowIfNull(rowDelimiter);
@@ -429,13 +402,6 @@ public partial class Worksheet
 
         return result.ToString().TrimEnd(rowDelimiter.ToCharArray());
     }
-
-    /// <summary>
-    /// Inserts a delimited string into the specified cell address in the sheet, splitting the string into rows and cells based on the specified delimiters.
-    /// </summary>
-    /// <param name="address"></param>
-    /// <param name="value"></param>
-    /// <param name="cellDelimiter"></param>
 
     internal void InsertDelimitedString(CellRef address, string value, string cellDelimiter = "\t")
     {
@@ -477,16 +443,13 @@ public partial class Worksheet
         // Shift column metadata (custom widths, hidden state)
         Columns.ShiftUp(columnIndex);
 
-        // Shift merged cell ranges
         MergedCells.ShiftColumnsLeft(columnIndex);
 
-        // Mark deleted column index as invalid for references
         invalidReferenceColumns.Add(columnIndex);
 
         // Any formulas that reference this column should be turned into =#REF!
         InvalidateFormulasReferencing(column: columnIndex);
 
-        // Decrease column count
         ColumnCount--;
 
         // A different cell now occupies the selection if it sat at or after the deleted
@@ -519,16 +482,13 @@ public partial class Worksheet
         // Shift row metadata (custom heights, hidden state)
         Rows.ShiftUp(rowIndex);
 
-        // Shift merged cell ranges
         MergedCells.ShiftRowsUp(rowIndex);
 
-        // Mark deleted row index as invalid for references
         invalidReferenceRows.Add(rowIndex);
 
         // Any formulas that reference this row should be turned into =#REF!
         InvalidateFormulasReferencing(row: rowIndex);
 
-        // Decrease row count
         RowCount--;
 
         // A different cell now occupies the selection if it sat at or after the deleted
@@ -753,7 +713,6 @@ public partial class Worksheet
         // Shift row metadata (custom heights, hidden state)
         Rows.ShiftDown(rowIndex, count);
 
-        // Shift merged cell ranges
         MergedCells.ShiftRowsDown(rowIndex, count);
 
         // Adjust formulas: shift row indices at or after the insert point
@@ -807,7 +766,6 @@ public partial class Worksheet
         // Shift column metadata (custom widths, hidden state)
         Columns.ShiftDown(columnIndex, count);
 
-        // Shift merged cell ranges
         MergedCells.ShiftColumnsRight(columnIndex, count);
 
         // Adjust formulas: shift column indices at or after the insert point
@@ -845,7 +803,6 @@ public partial class Worksheet
         public static string Rewrite(string original, FormulaSyntaxTree tree, Func<FormulaToken, CellRef> adjust)
         {
             var rewriter = new FormulaRewriter(adjust);
-            // Always start with '=' for formulas
             rewriter.builder.Append('=');
             tree.Root.Accept(rewriter);
             return rewriter.builder.ToString();
@@ -904,7 +861,6 @@ public partial class Worksheet
 
         public override void VisitRange(RangeSyntaxNode rangeSyntaxNode)
         {
-            // Adjust both sides using the provided delegate
             var startToken = rangeSyntaxNode.Start.Token;
             var endToken = rangeSyntaxNode.End.Token;
 

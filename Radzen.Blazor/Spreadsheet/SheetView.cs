@@ -117,7 +117,6 @@ public class SheetView
         {
             if (axis.Frozen > 0)
             {
-                // Calculate position after frozen items
                 for (int index = 0; index < axis.Frozen; index++)
                 {
                     if (!axis.IsHidden(index))

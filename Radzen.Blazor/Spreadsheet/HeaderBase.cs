@@ -119,7 +119,6 @@ public abstract class HeaderBase : CellBase, IDisposable
         return dirty;
     }
 
-    /// <inheritdoc/>
     void IDisposable.Dispose()
     {
         if (Worksheet is not null)

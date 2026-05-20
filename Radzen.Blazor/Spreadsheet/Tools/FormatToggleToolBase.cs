@@ -99,7 +99,6 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
         StateHasChanged();
     }
 
-    /// <inheritdoc/>
     void IDisposable.Dispose()
     {
         if (Worksheet?.Selection is not null)

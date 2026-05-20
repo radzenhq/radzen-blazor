@@ -402,9 +402,6 @@ public class CellData : IComparable, IComparable<CellData>
     /// </summary>
     public bool IsError => Type == CellDataType.Error;
 
-    /// <summary>
-    /// Checks if this cell data is equal to another cell data.
-    /// </summary>
     internal bool IsEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
@@ -427,10 +424,6 @@ public class CellData : IComparable, IComparable<CellData>
         return ((IComparable)Value!).CompareTo(other.Value) == 0;
     }
 
-    /// <summary>
-    /// Checks if this cell data is less than another cell data.
-    /// </summary>
-    /// <param name="other"></param>
     internal bool IsLessThan(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
@@ -443,10 +436,6 @@ public class CellData : IComparable, IComparable<CellData>
         return compareResult < 0;
     }
 
-    /// <summary>
-    /// Checks if this cell data is greater than another cell data.
-    /// </summary>
-    /// <param name="other"></param>
     internal bool IsGreaterThan(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
@@ -459,10 +448,6 @@ public class CellData : IComparable, IComparable<CellData>
         return compareResult > 0;
     }
 
-    /// <summary>
-    /// Checks if this cell data is less than or equal to another cell data.
-    /// </summary>
-    /// <param name="other"></param>
     internal bool IsLessThanOrEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
@@ -475,10 +460,6 @@ public class CellData : IComparable, IComparable<CellData>
         return compareResult <= 0;
     }
 
-    /// <summary>
-    /// Checks if this cell data is greater than or equal to another cell data.
-    /// </summary>
-    /// <param name="other"></param>
     internal bool IsGreaterThanOrEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
@@ -528,11 +509,6 @@ public class CellData : IComparable, IComparable<CellData>
     /// </summary>
     public static CellData FromError(CellError error) => new(error, CellDataType.Error);
 
-    /// <summary>
-    /// Checks if this cell data matches the specified criteria.
-    /// </summary>
-    /// <param name="criteria">The criteria to match against</param>
-    /// <returns>True if this cell matches the criteria, false otherwise</returns>
     internal bool MatchesCriteria(CellData criteria)
     {
         ArgumentNullException.ThrowIfNull(criteria);
@@ -568,7 +544,6 @@ public class CellData : IComparable, IComparable<CellData>
             }
         }
 
-        // Default comparison
         return IsEqualTo(criteria);
     }
 
@@ -623,7 +598,6 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        // Parse the value
         if (!double.TryParse(valueStr, out var numericValue))
         {
             return false;
@@ -644,7 +618,6 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        // Perform the comparison
         return operatorStr switch
         {
             ">" => cellValue > numericValue,
