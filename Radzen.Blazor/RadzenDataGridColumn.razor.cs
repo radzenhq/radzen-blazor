@@ -425,11 +425,12 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets a custom comparer used to order this column when the DataGrid sorts an
-        /// in-memory data source. When set, the grid orders rows by this column's sort value using
-        /// the supplied comparer instead of the default member-path ordering — for example, sorting
-        /// id values by their mapped display text. Ignored for server-side data sources
-        /// (LoadData, OData, or a remote IQueryable provider), which fall back to property-path sorting.
-        /// Custom comparers are also not applied to self-referencing (tree) data.
+        /// in-memory data source. When set, the grid orders rows by this column's sort value
+        /// (the value at the sort property) using the supplied comparer instead of the default
+        /// member-path ordering — for example, sorting id values by their mapped display text.
+        /// It does not apply to server-paged data (LoadData or OData), which sorts on the server,
+        /// or to self-referencing (tree) data. Binding a queryable provider (such as Entity
+        /// Framework) directly to Data together with a comparer evaluates the comparer in memory.
         /// </summary>
         [Parameter]
         public IComparer? SortComparer { get; set; }

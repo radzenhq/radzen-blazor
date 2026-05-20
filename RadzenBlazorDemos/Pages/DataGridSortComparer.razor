@@ -28,7 +28,10 @@
     };
 
     readonly IComparer priorityComparer = Comparer<object>.Create((a, b) =>
-        string.Compare(priorities[(int)a], priorities[(int)b], StringComparison.OrdinalIgnoreCase));
+        string.Compare(PriorityName(a), PriorityName(b), StringComparison.OrdinalIgnoreCase));
+
+    static string PriorityName(object value) =>
+        priorities.TryGetValue((int)value, out var name) ? name : string.Empty;
 
     readonly List<Order> orders = new()
     {
