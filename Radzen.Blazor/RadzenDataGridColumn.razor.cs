@@ -429,6 +429,7 @@ namespace Radzen.Blazor
         /// the supplied comparer instead of the default member-path ordering — for example, sorting
         /// id values by their mapped display text. Ignored for server-side data sources
         /// (LoadData, OData, or a remote IQueryable provider), which fall back to property-path sorting.
+        /// Custom comparers are also not applied to self-referencing (tree) data.
         /// </summary>
         [Parameter]
         public IComparer? SortComparer { get; set; }
