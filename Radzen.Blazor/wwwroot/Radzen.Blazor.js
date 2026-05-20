@@ -3820,7 +3820,7 @@ window.Radzen = {
     },
     setTheme: function (href, wcagHref) {
       const theme = document.getElementById('radzen-theme-link');
-      if (theme && theme.href != href) {
+      if (theme && theme.sheet && theme.sheet.href === theme.href && theme.href != href) {
         theme.href = href;
       }
 
