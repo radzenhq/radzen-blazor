@@ -437,7 +437,14 @@ public partial class CellView : CellBase, IDisposable
 
         await base.SetParametersAsync(parameters);
 
-        if (didRowChange || didColumnChange || didSheetChange)
+        // Rebind when our position changed OR when the cell occupying this position
+        // was swapped out underneath us. Inserting/deleting rows or columns shifts the
+        // underlying Cell objects, but our Row/Column stay fixed, so a parameter-only
+        // check would keep showing the stale cell until the next scroll. Comparing the
+        // held cell against the current occupant catches those structural shifts.
+        var current = Worksheet?.Cells[Row, Column];
+
+        if (didRowChange || didColumnChange || didSheetChange || !ReferenceEquals(cell, current))
         {
             if (cell is not null)
             {
@@ -446,7 +453,7 @@ public partial class CellView : CellBase, IDisposable
 
             if (Worksheet is not null)
             {
-                cell = Worksheet.Cells[Row, Column];
+                cell = current!;
                 cell.Changed += OnCellChanged;
             }
 

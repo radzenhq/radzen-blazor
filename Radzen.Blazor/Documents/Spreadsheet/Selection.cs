@@ -49,6 +49,14 @@ public class Selection(Worksheet sheet)
         TriggerChange();
     }
 
+    /// <summary>
+    /// Re-raises the change event after a row/column insert or delete has swapped the cell
+    /// occupying the current selection. The selection coordinates stay the same, but the cell
+    /// beneath them is now a different one, so selection-dependent UI (the formula bar, toolbar
+    /// state) must re-read the active cell. Honours the sheet's batch update like other changes.
+    /// </summary>
+    internal void NotifyContentChanged() => TriggerChange();
+
     internal void TriggerPendingChange()
     {
         if (pendingChange)
