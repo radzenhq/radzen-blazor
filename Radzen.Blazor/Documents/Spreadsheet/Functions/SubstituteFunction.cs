@@ -70,7 +70,6 @@ class SubstituteFunction : FormulaFunction
                 count++;
                 if (count == instanceNum)
                 {
-                    // Build result: prefix + newText + suffix after oldText
                     var prefix = text.Substring(0, index);
                     var suffix = text.Substring(index + oldText.Length);
                     return CellData.FromString(prefix + newText + suffix);

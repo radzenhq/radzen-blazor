@@ -9,9 +9,6 @@ namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 
-/// <summary>
-/// Reads a <see cref="Workbook"/> from a stream in the Open XML Spreadsheet format (XLSX).
-/// </summary>
 static class XlsxReader
 {
     private const double EmuPerPixel = 9525.0;
@@ -334,37 +331,27 @@ static class XlsxReader
         var sheetDoc = XDocument.Load(sheetStream);
         var sNs = sheetDoc.Root!.Name.Namespace;
 
-        // Parse default row height
         var defaultRowHeight = ParseDefaultRowHeight(sheetDoc, sNs);
 
-        // Parse frozen panes
         ParseFrozenPanes(sheetDoc, sNs, sheet);
 
-        // Parse column widths
         ParseColumnWidths(sheetDoc, sNs, sheet);
 
-        // Parse rows and cells
         ParseRowsAndCells(sheetDoc, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight);
 
-        // Parse merged cells
         ParseMergedCells(sheetDoc, sNs, sheet);
 
-        // Parse auto filter
         ParseAutoFilter(sheetDoc, sNs, sheet);
 
-        // Parse data validations
         ParseDataValidations(sheetDoc, sNs, sheet);
 
-        // Parse hyperlinks
         ParseHyperlinks(archive, sheetInfo, sheetDoc, sNs, sheet);
 
-        // Parse drawings (images)
         ParseDrawings(archive, sheetInfo, sheetDoc, sNs, sheet);
 
         // Parse tables (must run after rows/cells so column-name fallback can read header values)
         ParseTables(archive, sheetInfo, sheetDoc, sNs, sheet);
 
-        // Parse sheet protection
         ParseSheetProtection(sheetDoc, sNs, sheet);
 
         sheet.Name = sheetInfo.Name;
@@ -373,7 +360,6 @@ static class XlsxReader
 
     private static double ParseDefaultRowHeight(XDocument sheetDoc, XNamespace sNs)
     {
-        // Parse default row height from sheet format properties
         var defaultRowHeight = 20.0; // Default fallback
         var sheetFormatPr = sheetDoc.Descendants(sNs + "sheetFormatPr").FirstOrDefault();
         if (sheetFormatPr is not null)
@@ -622,7 +608,6 @@ static class XlsxReader
                 var range = RangeRef.Parse(refAttribute);
                 sheet.AutoFilter.Range = range;
 
-                // Load filter columns
                 var filterColumns = autoFilterElement.Elements(sNs + "filterColumn").ToList();
                 foreach (var filterColumn in filterColumns)
                 {
@@ -730,7 +715,6 @@ static class XlsxReader
             return;
         }
 
-        // Load sheet relationships
         var relMap = new Dictionary<string, string>();
         var sheetFileName = sheetInfo.FullPath.Split('/').Last();
         var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
@@ -850,7 +834,6 @@ static class XlsxReader
             }
         }
 
-        // Parse drawing XML
         XNamespace xdr = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
         XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
 
@@ -873,7 +856,6 @@ static class XlsxReader
                 continue;
             }
 
-            // Parse anchor positions
             var from = ParseCellAnchor(anchor.Element(xdr + "from"), xdr);
             if (from is null)
             {
@@ -947,7 +929,6 @@ static class XlsxReader
                 continue;
             }
 
-            // Resolve image path
             var imagePath = ResolvePath(drawingDir + "/", imageTarget);
             var imageEntry = archive.GetEntry(imagePath);
             if (imageEntry is null)
@@ -955,13 +936,11 @@ static class XlsxReader
                 continue;
             }
 
-            // Read image data
             using var imageStream = imageEntry.Open();
             using var ms = new System.IO.MemoryStream();
             imageStream.CopyTo(ms);
             image.Data = ms.ToArray();
 
-            // Determine content type from extension
             var ext2 = imagePath.Split('.').Last().ToLowerInvariant();
             image.ContentType = ext2 switch
             {
@@ -975,7 +954,6 @@ static class XlsxReader
                 _ => "image/png"
             };
 
-            // Parse name/description
             var nvPicPr = pic.Element(xdr + "nvPicPr");
             var cNvPr = nvPicPr?.Element(xdr + "cNvPr");
             image.Name = cNvPr?.Attribute("name")?.Value;
@@ -1060,14 +1038,12 @@ static class XlsxReader
             return chart;
         }
 
-        // Parse title
         var titleElement = chartElement.Element(c + "title");
         if (titleElement is not null)
         {
             chart.Title = ParseChartTitle(titleElement, c, a);
         }
 
-        // Parse legend
         var legendElement = chartElement.Element(c + "legend");
         if (legendElement is not null)
         {
@@ -1083,7 +1059,6 @@ static class XlsxReader
             };
         }
 
-        // Parse plot area
         var plotArea = chartElement.Element(c + "plotArea");
         if (plotArea is null)
         {
@@ -1113,7 +1088,6 @@ static class XlsxReader
 
             chart.ChartType = chartType.Value;
 
-            // Parse series
             foreach (var ser in groupElement.Elements(c + "ser"))
             {
                 var series = ParseChartSeries(ser, c, a);
@@ -1195,14 +1169,12 @@ static class XlsxReader
     {
         var series = new ChartSeries();
 
-        // Parse index
         var idx = ser.Element(c + "idx")?.Attribute("val")?.Value;
         if (idx is not null && int.TryParse(idx, out var index))
         {
             series.Index = index;
         }
 
-        // Parse title
         var tx = ser.Element(c + "tx");
         if (tx is not null)
         {
@@ -1217,7 +1189,6 @@ static class XlsxReader
             }
         }
 
-        // Parse categories
         var cat = ser.Element(c + "cat");
         if (cat is not null)
         {
@@ -1240,7 +1211,6 @@ static class XlsxReader
             }
         }
 
-        // Parse values
         var val = ser.Element(c + "val");
         if (val is not null)
         {

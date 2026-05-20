@@ -30,18 +30,10 @@ public class Selection(Worksheet sheet)
     /// </summary>
     public event Action? RangeFinalized;
 
-    /// <summary>
-    /// Notifies subscribers that the user has finished a selection gesture
-    /// (pointer-up after a click or drag).
-    /// </summary>
     internal void FinalizeRange() => RangeFinalized?.Invoke();
 
     private bool pendingChange;
 
-    /// <summary>
-    /// Updates the selection to a new cell address and triggers a change event.
-    /// </summary>
-    /// <param name="address"></param>
     internal void Update(CellRef address)
     {
         Cell = address;
@@ -49,12 +41,6 @@ public class Selection(Worksheet sheet)
         TriggerChange();
     }
 
-    /// <summary>
-    /// Re-raises the change event after a row/column insert or delete has swapped the cell
-    /// occupying the current selection. The selection coordinates stay the same, but the cell
-    /// beneath them is now a different one, so selection-dependent UI (the formula bar, toolbar
-    /// state) must re-read the active cell. Honours the sheet's batch update like other changes.
-    /// </summary>
     internal void NotifyContentChanged() => TriggerChange();
 
     internal void TriggerPendingChange()
@@ -79,9 +65,6 @@ public class Selection(Worksheet sheet)
         }
     }
 
-    /// <summary>
-    /// Moves the selection by a specified number of rows and columns.
-    /// </summary>
     internal CellRef Move(int rowOffset, int columnOffset)
     {
         var column = OffsetColumn(columnOffset);
@@ -112,9 +95,6 @@ public class Selection(Worksheet sheet)
         };
     }
 
-    /// <summary>
-    /// Cycles through the selection within the current range, moving by the specified row and column offsets.
-    /// </summary>
     internal CellRef Cycle(int rowOffset, int columnOffset)
     {
         if (Cell == CellRef.Invalid)
@@ -197,9 +177,6 @@ public class Selection(Worksheet sheet)
         TriggerChange();
     }
 
-    /// <summary>
-    /// Checks if the specified address is within the active selection range.
-    /// </summary>
     internal bool IsActive(ColumnRef address) => Range.Contains(address);
 
     internal bool IsActive(RowRef address) => Range.Contains(address);
@@ -298,9 +275,6 @@ public class Selection(Worksheet sheet)
         TriggerChange();
     }
 
-    /// <summary>
-    /// Extends the current selection by a specified number of rows and columns, adjusting the active cell and range accordingly.
-    /// </summary>
     internal CellRef Extend(int rowOffset, int columnOffset)
     {
         if (Cell == CellRef.Invalid || Range == RangeRef.Invalid)

@@ -5,9 +5,6 @@ using System;
 using System.Collections.Generic;
 namespace Radzen.Blazor.Spreadsheet;
 
-/// <summary>
-/// Specifies the direction of an autofill operation.
-/// </summary>
 enum AutofillDirection
 {
     Down,
@@ -16,22 +13,12 @@ enum AutofillDirection
     Left
 }
 
-/// <summary>
-/// Command that fills a target range by repeating a source range pattern.
-/// Supports numeric series, date series, formula adjustment, and plain copy.
-/// </summary>
 class AutofillCommand : ICommand, IProtectedCommand
 {
-    /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.EditCell;
 
-    /// <inheritdoc/>
     public SpreadsheetFeature? Feature => SpreadsheetFeature.Autofill;
 
-    /// <summary>
-    /// Computes the autofill target range from the source selection and the cell the user dragged to.
-    /// Constrains to the dominant axis (vertical or horizontal).
-    /// </summary>
     internal static RangeRef ComputeRange(RangeRef source, CellRef target)
     {
         var rowDelta = 0;
@@ -83,9 +70,6 @@ class AutofillCommand : ICommand, IProtectedCommand
         return RangeRef.Invalid;
     }
 
-    /// <summary>
-    /// Determines the fill direction by comparing the fill range to the source range.
-    /// </summary>
     internal static AutofillDirection GetDirection(RangeRef source, RangeRef fill)
     {
         if (fill.End.Row > source.End.Row)
@@ -376,10 +360,6 @@ class AutofillCommand : ICommand, IProtectedCommand
         }
     }
 
-    /// <summary>
-    /// Attempts to detect an arithmetic numeric or date series in the source values.
-    /// Returns null if no series pattern is detected.
-    /// </summary>
     private static SeriesInfo? DetectSeries(List<object?> sourceValues)
     {
         if (sourceValues.Count < 2)
@@ -464,9 +444,6 @@ class AutofillCommand : ICommand, IProtectedCommand
 
     private abstract class SeriesInfo
     {
-        /// <summary>
-        /// Gets the nth fill value. n is 1-based (1 = first cell past the source boundary).
-        /// </summary>
         public abstract object GetValue(int n, AutofillDirection direction);
     }
 

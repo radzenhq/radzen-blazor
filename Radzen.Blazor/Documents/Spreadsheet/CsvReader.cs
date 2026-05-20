@@ -6,7 +6,6 @@ namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 
-/// <summary>Reads a CSV stream into a <see cref="Workbook"/> with a single sheet.</summary>
 static class CsvReader
 {
     public static Workbook Read(Stream stream, CsvImportOptions options)

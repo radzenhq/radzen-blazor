@@ -20,14 +20,12 @@
         {
             if (Worksheet is null) return false;
 
-            // Check if we're in a data table
             var dataTable = GetCurrentTable();
             if (dataTable is not null)
             {
                 return dataTable.ShowFilterButton;
             }
 
-            // Check if sheet has auto filter
             return Worksheet.AutoFilter.Range is not null;
         }
     }

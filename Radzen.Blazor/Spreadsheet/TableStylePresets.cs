@@ -5,17 +5,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
 
-/// <summary>
-/// Visual presets for the built-in Excel table styles. Each preset captures the colors
-/// and emphasis used by <see cref="Documents.Spreadsheet.Table.TableStyle"/> when rendering
-/// inside <see cref="RadzenSpreadsheet"/>. Presets are generated for the full Excel
-/// palette (Light1..21, Medium1..28, Dark1..11) so every named style produces a
-/// distinct visual output. Colors approximate the Office default theme; precise
-/// Excel theming would require reading <c>theme1.xml</c> from the package.
-/// </summary>
 internal static class TableStylePresets
 {
-    /// <summary>Color set for one named table style.</summary>
     internal sealed record Preset(
         string? HeaderBackground,
         string? HeaderColor,
@@ -62,7 +53,6 @@ internal static class TableStylePresets
 
     private static readonly Dictionary<string, Preset> presets = BuildAll();
 
-    /// <summary>Looks up a preset by name; falls back to a sensible default.</summary>
     internal static Preset Get(string? name)
     {
         if (string.IsNullOrEmpty(name))

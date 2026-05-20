@@ -16,9 +16,6 @@ public class Axis(double size, int count)
     /// </summary>
     public double Size => size;
 
-    /// <summary>
-    /// The total number of items along this axis.
-    /// </summary>
     private int count = count;
 
     /// <summary>
@@ -164,11 +161,6 @@ public class Axis(double size, int count)
         }
     }
 
-    /// <summary>
-    /// Shifts custom sizes and hidden state up after a row/column is deleted.
-    /// Entries at the deleted index are removed; entries above are unchanged;
-    /// entries below are decremented by one.
-    /// </summary>
     internal void ShiftUp(int deletedIndex)
     {
         var newData = new Dictionary<int, double>();
@@ -207,10 +199,6 @@ public class Axis(double size, int count)
         hidden.UnionWith(newHidden);
     }
 
-    /// <summary>
-    /// Shifts custom sizes and hidden state down after rows/columns are inserted.
-    /// Entries at or after the insert point are incremented by count.
-    /// </summary>
     internal void ShiftDown(int fromIndex, int count)
     {
         var newData = new Dictionary<int, double>();
@@ -247,14 +235,8 @@ public class Axis(double size, int count)
         hidden.UnionWith(newHidden);
     }
 
-    /// <summary>
-    /// Returns the indices of all items with a custom (non-default) size.
-    /// </summary>
     internal IEnumerable<int> GetCustomSizedIndices() => data.Keys;
 
-    /// <summary>
-    /// Returns the indices of all hidden items.
-    /// </summary>
     internal IEnumerable<int> GetHiddenIndices() => hidden;
 
     /// <summary>

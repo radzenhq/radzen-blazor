@@ -272,9 +272,6 @@ public class Format
         Locked is null &&
         FormulaHidden is null;
 
-    /// <summary>
-    /// Occurs when the format is changed, allowing for updates to be made to the UI or other components that depend on this format.
-    /// </summary>
     internal event Action? Changed;
 
     internal Format Merge(Format format)

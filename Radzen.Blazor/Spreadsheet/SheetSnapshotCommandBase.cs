@@ -84,7 +84,6 @@ public abstract class SheetSnapshotCommandBase : ICommand
             }
         }
 
-        // Restore backed-up cells
         foreach (var ((row, column), (value, formula, format)) in backupCells)
         {
             var cell = sheet.Cells[row, column];

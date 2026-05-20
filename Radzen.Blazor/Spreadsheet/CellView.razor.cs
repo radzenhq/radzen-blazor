@@ -223,7 +223,6 @@ public partial class CellView : CellBase, IDisposable
 
     private bool ShouldShowMenuForMergedCell()
     {
-        // Check if the current cell is part of a merged range
         var mergedRange = Worksheet.MergedCells.GetMergedRange(new CellRef(Row, Column));
 
         if (mergedRange == RangeRef.Invalid)

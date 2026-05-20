@@ -6,9 +6,6 @@ namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable
 
-/// <summary>
-/// Parses Excel-compatible number format codes into structured <see cref="FormatSection"/> objects.
-/// </summary>
 static class NumberFormatParser
 {
     public static ParsedFormat Parse(string formatCode)
@@ -250,7 +247,6 @@ static class NumberFormatParser
         {
             var c = section[i];
 
-            // Escaped character
             if (c == '\\' && i + 1 < section.Length)
             {
                 tokens.Add(new FormatToken(TokenType.Literal, section[i + 1].ToString()));
@@ -258,7 +254,6 @@ static class NumberFormatParser
                 continue;
             }
 
-            // Quoted literal
             if (c == '"')
             {
                 var end = section.IndexOf('"', i + 1);
@@ -295,7 +290,6 @@ static class NumberFormatParser
                 continue;
             }
 
-            // AM/PM
             if (i + 4 < section.Length &&
                 section.Substring(i, 5).Equals("AM/PM", StringComparison.OrdinalIgnoreCase))
             {
@@ -352,7 +346,6 @@ static class NumberFormatParser
                 }
                 else
                 {
-                    // Look ahead for s
                     for (var j = i + len; j < section.Length; j++)
                     {
                         var nc = section[j];
@@ -447,7 +440,7 @@ static class NumberFormatParser
             if (c is 'E' or 'e' && i + 1 < section.Length && section[i + 1] is '+' or '-')
             {
                 var start = i;
-                i += 2; // skip E and sign
+                i += 2;
                 while (i < section.Length && section[i] is '0' or '#')
                 {
                     i++;

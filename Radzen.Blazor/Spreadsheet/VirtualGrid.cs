@@ -562,7 +562,6 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
         foreach (var range in visibleMergedCells)
         {
-            // Adjust the range to start from the first visible row and column
             var adjustedRange = AdjustRangeForHiddenRowsAndColumns(range);
             
             // Skip if the entire range is hidden

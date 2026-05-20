@@ -266,9 +266,6 @@ public class Cell
     /// </summary>
     public IReadOnlyList<string> ValidationErrors { get; private set; } = [];
 
-    /// <summary>
-    /// Clears the validation errors for the cell.
-    /// </summary>
     internal void ClearValidationErrors()
     {
         ValidationErrors = [];

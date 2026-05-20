@@ -408,7 +408,6 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
                         return null; // Error already set
                     }
                     
-                    // Set the argument based on parameter type
                     if (paramDef.Type == ParameterType.Collection)
                     {
                         if (argumentNodes[argumentIndex] is CellSyntaxNode cellNode)
@@ -427,7 +426,6 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
                 }
                 else if (!paramDef.IsRequired)
                 {
-                    // Optional parameter not provided - skip it
                     continue;
                 }
             }

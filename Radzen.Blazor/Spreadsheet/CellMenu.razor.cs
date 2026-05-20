@@ -86,11 +86,9 @@ public partial class CellMenu : ComponentBase
 
         await base.SetParametersAsync(parameters);
 
-        // Check if any of the key parameters have changed
         if (didRowChange || didColumnChange || didSheetChange)
         {
             InvalidateCache();
-            // Reinitialize the selected filter values
             InitializeSelectedFilterValues();
         }
     }
@@ -209,8 +207,7 @@ public partial class CellMenu : ComponentBase
 
         var totalItems = availableValues.Count + (showBlank ? 1 : 0);
         var selectedCount = availableValues.Count(v => selectedFilterValues.Contains(v.Value));
-        
-        // Add 1 to selected count if blank is selected
+
         if (showBlank && selectedFilterValues.Contains(null))
         {
             selectedCount++;
@@ -314,8 +311,7 @@ public partial class CellMenu : ComponentBase
         var showBlank = ShouldShowBlankOption();
         var totalItems = availableValues.Count + (showBlank ? 1 : 0);
         var selectedCount = availableValues.Count(v => selectedFilterValues.Contains(v.Value));
-        
-        // Add 1 to selected count if blank is selected
+
         if (showBlank && selectedFilterValues.Contains(null))
         {
             selectedCount++;
@@ -336,7 +332,6 @@ public partial class CellMenu : ComponentBase
 
             if (rangeToUse != RangeRef.Invalid)
             {
-                // Create a new range for the current column using the determined range
                 var columnRange = new RangeRef(
                     new CellRef(rangeToUse.Start.Row, Column),
                     new CellRef(rangeToUse.End.Row, Column)

@@ -6,10 +6,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class ClearContentsCommand(Worksheet sheet, RangeRef range) : ICommand, IProtectedCommand
 {
-    /// <inheritdoc/>
     public SheetAction RequiredAction => SheetAction.EditCell;
 
-    /// <inheritdoc/>
     public SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;
 
     private readonly Dictionary<CellRef, (object? value, string? formula)> snapshot = [];

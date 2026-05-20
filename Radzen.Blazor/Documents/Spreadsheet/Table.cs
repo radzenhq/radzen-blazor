@@ -601,17 +601,11 @@ public class TableColumn
 /// </summary>
 public class AutoFilter
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AutoFilter"/> class.
-    /// </summary>
     internal AutoFilter(Worksheet sheet)
     {
         Worksheet = sheet;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AutoFilter"/> class with a range.
-    /// </summary>
     internal AutoFilter(Worksheet sheet, RangeRef range)
     {
         Worksheet = sheet;
