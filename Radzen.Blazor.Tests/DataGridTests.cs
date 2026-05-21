@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -3575,6 +3576,127 @@ namespace Radzen.Blazor.Tests
             component.Find("button.rz-grid-filter-icon").MouseDown();
 
             Assert.NotEmpty(component.FindAll("button.rz-apply-filter"));
+        }
+
+        private sealed class FilterLookupItem
+        {
+            public string Reference { get; set; } = string.Empty;
+            public int Code { get; set; }
+        }
+
+        [Fact]
+        public async Task DataGrid_FilterLookupData_FiltersByValueProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new FilterLookupItem { Reference = "A", Code = 1 },
+                new FilterLookupItem { Reference = "B", Code = 2 },
+                new FilterLookupItem { Reference = "C", Code = 3 },
+            };
+
+            var options = new[]
+            {
+                new { Id = 1, Name = "Urgent" },
+                new { Id = 2, Name = "Normal" },
+                new { Id = 3, Name = "Critical" },
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<FilterLookupItem>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.CheckBoxList);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<FilterLookupItem>));
+                    builder.AddAttribute(1, "Property", nameof(FilterLookupItem.Code));
+                    builder.AddAttribute(2, "FilterLookupData", options);
+                    builder.AddAttribute(3, "FilterLookupTextProperty", "Name");
+                    builder.AddAttribute(4, "FilterLookupValueProperty", "Id");
+                    builder.CloseComponent();
+                });
+            });
+
+            var grid = component.Instance;
+            var column = grid.ColumnsCollection.Single();
+
+            await component.InvokeAsync(() => column.SetFilterValue(new List<int> { 2, 3 }));
+            await component.InvokeAsync(() => grid.Reload());
+
+            var refs = grid.View.ToList().Select(x => x.Reference).OrderBy(x => x).ToArray();
+
+            Assert.Equal(new[] { "B", "C" }, refs);
+        }
+
+        [Fact]
+        public void DataGrid_CheckBoxList_WithoutFilterLookupData_RendersNativeFilter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new FilterLookupItem { Reference = "A", Code = 1 },
+                new FilterLookupItem { Reference = "B", Code = 2 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<FilterLookupItem>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.CheckBoxList);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<FilterLookupItem>));
+                    builder.AddAttribute(1, "Property", nameof(FilterLookupItem.Code));
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Contains("rz-grid-filter-icon", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_FilterLookupData_RendersOptionLabelsFromTextProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[] { new FilterLookupItem { Reference = "A", Code = 1 } };
+            var options = new[]
+            {
+                new { Id = 1, Name = "Urgent" },
+                new { Id = 2, Name = "Normal" },
+                new { Id = 3, Name = "Critical" },
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<FilterLookupItem>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<FilterLookupItem>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.CheckBoxList);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<FilterLookupItem>));
+                    builder.AddAttribute(1, "Property", nameof(FilterLookupItem.Code));
+                    builder.AddAttribute(2, "FilterLookupData", options);
+                    builder.AddAttribute(3, "FilterLookupTextProperty", "Name");
+                    builder.AddAttribute(4, "FilterLookupValueProperty", "Id");
+                    builder.CloseComponent();
+                });
+            });
+
+            component.Find("button.rz-grid-filter-icon").MouseDown();
+
+            var markup = component.Markup;
+            Assert.Contains("Urgent", markup);
+            Assert.Contains("Critical", markup);
         }
 
         private sealed class TrackingEnumerable<T> : IEnumerable<T>

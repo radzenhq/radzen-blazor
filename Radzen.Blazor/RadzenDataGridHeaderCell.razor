@@ -158,18 +158,26 @@
                                     @if (Column.FilterValueTemplate != null)
                                     {
                                         @Column.FilterValueTemplate(Column)
-                                    } 
+                                    }
                                     else
                                     {
                                         <RadzenProgressBarCircular Style="position:absolute;width:100%;" Visible="@isLoading" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
                                         <RadzenListBox AllowVirtualization="@Column.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
                                         TValue="IEnumerable" Value=@(hasPendingCheckBoxFilter ? pendingCheckBoxFilterValue as IEnumerable : Column.GetFilterValue() as IEnumerable) Change="@ListBoxChange"
-                                        Data=@filterValues Count=@filterValuesCount LoadData="@LoadFilterValues" 
-                                        AllowFiltering="@(!string.IsNullOrEmpty(Column.GetFilterProperty()))"
+                                        Data=@(Column.FilterLookupData ?? filterValues)
+                                        TextProperty="@(Column.FilterLookupData != null ? Column.FilterLookupTextProperty : null)"
+                                        ValueProperty="@(Column.FilterLookupData != null ? Column.FilterLookupValueProperty : null)"
+                                        Count="@(Column.FilterLookupData != null ? 0 : filterValuesCount)"
+                                        LoadData="@(Column.FilterLookupData != null ? default(EventCallback<Radzen.LoadDataArgs>) : EventCallback.Factory.Create<Radzen.LoadDataArgs>(this, LoadFilterValues))"
+                                        AllowFiltering="@(Column.FilterLookupData != null ? Column.FilterLookupAllowFiltering : !string.IsNullOrEmpty(Column.GetFilterProperty()))"
                                         Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                         InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueAriaLabel  + Column.GetFilterValue() }})">
                                             <Template>
-                                                @if (context is Enum enumValue)
+                                                @if (Column.FilterLookupData != null)
+                                                {
+                                                    @PropertyAccess.GetItemOrValueFromProperty(context, Column.FilterLookupTextProperty)
+                                                }
+                                                else if (context is Enum enumValue)
                                                 {
                                                     @EnumExtensions.GetDisplayDescription(enumValue, Grid.EnumFilterTranslationFunc)
                                                 }
