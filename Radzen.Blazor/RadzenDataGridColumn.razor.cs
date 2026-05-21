@@ -431,6 +431,9 @@ namespace Radzen.Blazor
         /// It does not apply to server-paged data (LoadData or OData), which sorts on the server,
         /// or to self-referencing (tree) data. Binding a queryable provider (such as Entity
         /// Framework) directly to Data together with a comparer evaluates the comparer in memory.
+        /// Note that when a column with a SortComparer takes part in a multi-column sort, the whole
+        /// sort is performed in memory — every column's sort key is evaluated in memory, not just
+        /// this column's.
         /// </summary>
         [Parameter]
         public IComparer? SortComparer { get; set; }
