@@ -167,7 +167,7 @@
                                         Data=@(Column.FilterLookupData ?? filterValues)
                                         TextProperty="@(Column.FilterLookupData != null ? Column.FilterLookupTextProperty : null)"
                                         ValueProperty="@(Column.FilterLookupData != null ? Column.FilterLookupValueProperty : null)"
-                                        Count="@(Column.FilterLookupData != null ? 0 : filterValuesCount)"
+                                        Count="@filterValuesCount"
                                         LoadData="@(Column.FilterLookupData != null ? default(EventCallback<Radzen.LoadDataArgs>) : EventCallback.Factory.Create<Radzen.LoadDataArgs>(this, LoadFilterValues))"
                                         AllowFiltering="@(Column.FilterLookupData != null ? Column.FilterLookupAllowFiltering : !string.IsNullOrEmpty(Column.GetFilterProperty()))"
                                         Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
