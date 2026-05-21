@@ -1,0 +1,14 @@
+@page "/datagrid-checkboxlist-lookup-filter"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>CheckBoxList Filter with Lookup Data</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Set FilterLookupData with FilterLookupTextProperty and FilterLookupValueProperty on a column to drive the CheckBoxList
+    filter from a lookup source. The Priority column stores an id but the filter shows, searches, and
+    filters by name, while still filtering on the underlying id.
+</RadzenText>
+
+<RadzenExample ComponentName="DataGrid" Example="DataGridCheckBoxListLookupFilter">
+    <DataGridCheckBoxListLookupFilter />
+</RadzenExample>

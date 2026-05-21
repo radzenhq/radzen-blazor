@@ -438,6 +438,41 @@ namespace Radzen.Blazor
         public string FilterProperty { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the data source for the CheckBoxList filter's options. When set, the built-in
+        /// CheckBoxList filter shows these options — using <see cref="FilterLookupTextProperty"/> for the
+        /// label (display and in-dropdown search) and <see cref="FilterLookupValueProperty"/> for the
+        /// value — instead of deriving distinct values from the grid data. Selected values filter the
+        /// column's filter property, so the column's Property should be the underlying value (e.g. an id).
+        /// Applies to FilterMode.CheckBoxList. Mutually exclusive with the grid's LoadColumnFilterData
+        /// event per column: when FilterLookupData is set it supplies the options and LoadColumnFilterData
+        /// is not used for this column.
+        /// </summary>
+        [Parameter]
+        public IEnumerable? FilterLookupData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property of <see cref="FilterLookupData"/> items used as the option label, shown
+        /// in the CheckBoxList filter and used for its search. Ignored when <see cref="FilterLookupData"/> is not set.
+        /// </summary>
+        [Parameter]
+        public string? FilterLookupTextProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property of <see cref="FilterLookupData"/> items used as the option value — the
+        /// value applied to the column filter when an option is selected. Ignored when
+        /// <see cref="FilterLookupData"/> is not set.
+        /// </summary>
+        [Parameter]
+        public string? FilterLookupValueProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the CheckBoxList filter's search box is shown when
+        /// <see cref="FilterLookupData"/> is set. Default is true. Ignored when FilterLookupData is not set.
+        /// </summary>
+        [Parameter]
+        public bool FilterLookupAllowFiltering { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the filter value.
         /// </summary>
         /// <value>The filter value.</value>

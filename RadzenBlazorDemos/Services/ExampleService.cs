@@ -612,6 +612,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "CheckBoxList with Lookup",
+                            Path = "datagrid-checkboxlist-lookup-filter",
+                            Title = "Blazor DataGrid - CheckBoxList Filter with Lookup Data | Free UI Components by Radzen",
+                            Description = "Drive the CheckBoxList filter from a lookup data source: filter by id while showing and searching by name.",
+                            Tags = new [] { "checkboxlist", "lookup", "filter", "filtering", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
                             Name = "CheckBoxList Auto-Apply",
                             Path = "datagrid-checkboxlist-auto-apply-filter",
                             Title = "Blazor DataGrid - CheckBoxList Filter Auto-Apply | Free UI Components by Radzen",
