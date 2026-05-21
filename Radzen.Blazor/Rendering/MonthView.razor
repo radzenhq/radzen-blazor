@@ -9,456 +9,497 @@
 
 
 <div class="rz-view rz-month-view">
-    <div class="rz-view-header">
-        @for (var date = StartDate; date <= StartDate.EndOfWeek(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture); date = date.AddDays(1))
-        {
-            <div class="rz-slot-header">
-                @date.ToString("ddd", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
-            </div>
-        }
-    </div>
-    @{
-        var days = 0;
-    }
-    <div @ref=contentView class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
-         @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
-         @foreach (var week in (weeks ?? new List<Week>()))
-         {
-            if (week?.Bands == null || week?.Days == null) continue;
-            <div class="rz-week">
-                <div class="rz-events">
-                    @for (var bandIndex = 0; bandIndex < week.Bands.Length; bandIndex++)
-                    {
-                        var band = week.Bands[bandIndex];
+	<div class="rz-view-header">
+		@for (var date = StartDate; date <= StartDate.EndOfWeek(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture); date = date.AddDays(1))
+		{
+			<div class="rz-slot-header">
+				@date.ToString("ddd", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
+			</div>
+		}
+	</div>
+	@{
+		var days = 0;
+	}
+	<div @ref=contentView class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
+		 @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
+		@foreach (var week in (weeks ?? new List<Week>()))
+		{
+			var renderedEventsForDates = new Dictionary<DateTime, List<AppointmentData>>();
+			if (week?.Bands == null || week?.Days == null) continue;
+			<div class="rz-week">
+				<div class="rz-events">
+					@for (var bandIndex = 0; bandIndex < week.Bands.Length; bandIndex++)
+					{
+						var fullDay = TimeSpan.FromDays(1);
+						var band = week.Bands[bandIndex];
+						foreach (var info in band)
+						{
+							#region foo
+							var dayIndex = info.DayIndex;
+							var day = week.Days[dayIndex];
+							var slotWidth = 100 / 7.0;
+							var left = dayIndex * slotWidth;
+							double startTimeOffset = 0;
+							if (day.Start.Date == info!.Data!.Start.Date)
+							{
+								// Offset the start by the start time, if this is not a continuation of an event
+								double percentageStart = (info!.Data!.Start.TimeOfDay.TotalSeconds / fullDay.TotalSeconds) * 100;
+								startTimeOffset = (slotWidth / 100) * percentageStart;
+								left += startTimeOffset;
+							}
+							var length = Math.Max(1, Math.Ceiling(info!.Data!.End.Subtract(week.Start).TotalDays) - dayIndex);
+							var width = info.Data.End <= week.End ? (length) * slotWidth : (7 - dayIndex) * slotWidth;
+							width -= startTimeOffset;
 
-                        foreach (var info in band)
-                        {
-                            var dayIndex = info.DayIndex;
-                            var day = week.Days[dayIndex];
-                            var slotWidth = 100 / 7.0;
-                            var left = dayIndex * slotWidth;
-                            var length = Math.Max(1, Math.Ceiling(info!.Data!.End.Subtract(week.Start).TotalDays) - dayIndex);
-                            var width = info.Data.End <= week.End ? (length) * slotWidth : (7 - dayIndex) * slotWidth;
-                            var top = (bandIndex + 1) * 1.5;
-                            var height = 1.5;
+							if (info!.Data!.End.Date < week.End)
+							{
+								var percentage = (info!.Data!.End.TimeOfDay.TotalSeconds / fullDay.TotalSeconds) * 100;
+								var endTimeOffset = slotWidth - ((slotWidth / 100) * percentage);
+								width -= endTimeOffset;
+							}
+							// If the event does not start and end on the start / end of the day then it's rendered in the first row
+							DateTime eventEnd = info.Data.End.AddTicks(-(info.Data.End.Ticks % TimeSpan.TicksPerSecond));
+							#endregion
 
-                            <Appointment Data=@info.Data Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
-                                CssClass="@(CurrentDate >= day.Start && CurrentDate <= day.Start.AddDays(1) && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment), info.Data) ? "rz-state-focused" : "")"
-                                DragStart=@OnAppointmentDragStart />
-                        }
-                    }
-                </div>
-                <div class="rz-slots">
-                @for (var day = 0; day < 7; day ++)
-                {
-                    var dayOfWeek = StartDate.AddDays(days++);
-                    var slot = week.Days[day];
-                    <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
-                        <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" role="button" tabindex="0"
-                             @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation
-                             @onkeydown="@(args => OnDayHeaderKeyDown(args, dayOfWeek))">
-                            @((Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar.GetDayOfMonth(dayOfWeek))
-                            @if (slot.Hidden > 0)
-                            {
-                                <button type="button" class="rz-event-list-btn" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); }) @onclick:stopPropagation>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</button>
-                            }
-                        </div>
-                    </div>
-                }
-                </div>
-            </div>
-         }
-    </div>
+							double top = 3;
+							if (info.Data.Start.TimeOfDay.Ticks == 0 && eventEnd.TimeOfDay == new TimeSpan(23, 59, 59))
+							{
+								if (renderedEventsForDates.TryGetValue(info.Data.Start, out var renderedApptsForCurrentDate))
+								{
+									top = (renderedApptsForCurrentDate.Count() * 1.5) + 3;
+								}
+							}
+							else
+							{   // Booking / Owner block events
+								top = 1.5;
+							}
+							var height = 1.5;
+
+							<Appointment Data=@info.Data Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
+										 CssClass="@(CurrentDate >= day.Start && CurrentDate <= day.Start.AddDays(1) && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment), info.Data) ? "rz-state-focused" : "")"
+										 DragStart=@OnAppointmentDragStart />
+							if (renderedEventsForDates.TryGetValue(info.Data.Start, out var renderedApptsForDate))
+							{
+								renderedApptsForDate.Add(info.Data);
+							}
+							else
+							{
+								renderedEventsForDates.Add(info.Data.Start, new List<AppointmentData> { info.Data });
+							}
+						}
+					}
+				</div>
+				<div class="rz-slots">
+					@for (var day = 0; day < 7; day++)
+					{
+						var dayOfWeek = StartDate.AddDays(days++);
+						var slot = week.Days[day];
+						<div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
+							<div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" role="button" tabindex="0"
+								 @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation
+								 @onkeydown="@(args => OnDayHeaderKeyDown(args, dayOfWeek))">
+								@((Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar.GetDayOfMonth(dayOfWeek))
+								@if (slot.Hidden > 0)
+								{
+									<button type="button" class="rz-event-list-btn" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); }) @onclick:stopPropagation>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</button>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		}
+	</div>
 </div>
 
 @code {
-    class Day
-    {
-        public AppointmentData[]? Appointments { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-        public int Hidden { get; set; }
-    }
+	class Day
+	{
+		public AppointmentData[]? Appointments { get; set; }
+		public DateTime Start { get; set; }
+		public DateTime End { get; set; }
+		public int Hidden { get; set; }
+	}
 
-    class AppointmentRenderInfo
-    {
-        public AppointmentData? Data { get; set; }
-        public int DayIndex { get; set; }
-    }
+	class AppointmentRenderInfo
+	{
+		public AppointmentData? Data { get; set; }
+		public int DayIndex { get; set; }
+	}
 
-    class Week
-    {
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-        public IList<AppointmentRenderInfo>[]? Bands { get; set; }
-        public Day[]? Days { get; set; }
-    }
+	class Week
+	{
+		public DateTime Start { get; set; }
+		public DateTime End { get; set; }
+		public IList<AppointmentRenderInfo>[]? Bands { get; set; }
+		public Day[]? Days { get; set; }
+	}
 
-    Week CreateWeek(DateTime weekStart, DateTime weekEnd)
-    {
-        var bands = Enumerable.Range(0, EffectiveMaxAppointmentsInSlot).Select(_ => new List<AppointmentRenderInfo>()).ToArray();
+	Week CreateWeek(DateTime weekStart, DateTime weekEnd)
+	{
+		var bands = Enumerable.Range(0, EffectiveMaxAppointmentsInSlot).Select(_ => new List<AppointmentRenderInfo>()).ToArray();
 
-        var days = new List<Day>();
-        var start = weekStart;
-        var dayIndex = 0;
+		var days = new List<Day>();
+		var start = weekStart;
+		var dayIndex = 0;
 
-        while (start < weekEnd)
-        {
-            var end = start.AddDays(1);
+		while (start < weekEnd)
+		{
+			var end = start.AddDays(1);
 
-            var appointments = AppointmentsInSlot(start, end);
+			var appointments = AppointmentsInSlot(start, end);
 
-            var slot = new Day { Start = start, End = end, Appointments = appointments };
-            dayIndex = days.Count;
-            days.Add(slot);
+			var slot = new Day { Start = start, End = end, Appointments = appointments };
+			dayIndex = days.Count;
+			days.Add(slot);
 
-            foreach (var appointment in appointments)
-            {
-                var placed = bands.Any(b => b.Any(a => a.Data != null && a.Data.Equals(appointment)));
+			foreach (var appointment in appointments)
+			{
+				var placed = bands.Any(b => b.Any(a => a.Data != null && a.Data.Equals(appointment)));
 
-                if (placed)
-                {
-                    continue;
-                }
+				if (placed)
+				{
+					continue;
+				}
 
-                foreach (var band in bands)
-                {
-                    if (band.Count == 0)
-                    {
-                        band.Add(new AppointmentRenderInfo { Data = appointment, DayIndex = dayIndex });
+				foreach (var band in bands)
+				{
+					if (band.Count == 0)
+					{
+						band.Add(new AppointmentRenderInfo { Data = appointment, DayIndex = dayIndex });
 
-                        placed = true;
+						placed = true;
 
-                        break;
-                    }
-
-                    var lastAppointmentInBand = band[^1];
-                    if (lastAppointmentInBand.Data == null)
-                    {
-                        continue;
-                    }
-                    var lastStart = days[lastAppointmentInBand.DayIndex].Start;
-                    var lastEnd = lastAppointmentInBand.Data.End;
-
-                    if (lastStart == lastEnd && lastEnd == slot.Start)
-                    {
-                        continue;
-                    }
-
-                    // Check if the appointment overlaps with the last appointment in the band
-                    if (lastStart < appointment.End && lastEnd > slot.Start)
-                    {
-                        // Overlap, we cannot place the appointment in this band
-                        continue;
-                    }
-
-                    if (lastStart == appointment.End && lastEnd == slot.Start)
-                    {
-                        // Overlap, we cannot place the appointment in this band
-                        continue;
-                    }
-                    
-                    if(lastAppointmentInBand.Data.Start < slot.Start && lastAppointmentInBand.Data.End > slot.End)
-                    {
-                        // Overlap, we cannot place the appointment in this band
-                        continue;
+						break;
 					}
 
-                    // No overlap, we can add the appointment to this band if there is space for it. A band can contain appointments whose total duration is less than one week.
-                    var bandDuration = band.Sum(a => a.Data != null ? a.Data.End.Subtract(days[a.DayIndex]?.Start ?? DateTime.MinValue).TotalDays : 0);
+					var lastAppointmentInBand = band[^1];
+					if (lastAppointmentInBand.Data == null)
+					{
+						continue;
+					}
+					var lastStart = days[lastAppointmentInBand.DayIndex].Start;
+					var lastEnd = lastAppointmentInBand.Data.End;
 
-                    if (bandDuration < 7)
-                    {
-                        band.Add(new AppointmentRenderInfo { Data = appointment, DayIndex = dayIndex });
+					if (lastStart == lastEnd && lastEnd == slot.Start)
+					{
+						continue;
+					}
 
-                        placed = true;
+					// Check if the appointment overlaps with the last appointment in the band
+					if (lastStart < appointment.End && lastEnd > slot.Start)
+					{
+						// Overlap, we cannot place the appointment in this band
+						continue;
+					}
 
-                        break;
-                    }
-                    else
-                    {
-                        // No space in this band, try the next one
-                        continue;
-                    }
-                }
+					if (lastStart == appointment.End && lastEnd == slot.Start)
+					{
+						// Overlap, we cannot place the appointment in this band
+						continue;
+					}
 
-                if (!placed)
-                {
-                    slot.Hidden++;
-                }
-            }
+					if (lastAppointmentInBand.Data.Start < slot.Start && lastAppointmentInBand.Data.End > slot.End)
+					{
+						// Overlap, we cannot place the appointment in this band
+						continue;
+					}
 
-            start = end;
-        }
+					// No overlap, we can add the appointment to this band if there is space for it. A band can contain appointments whose total duration is less than one week.
+					var bandDuration = band.Sum(a => a.Data != null ? a.Data.End.Subtract(days[a.DayIndex]?.Start ?? DateTime.MinValue).TotalDays : 0);
 
-        return new Week { Start = weekStart, End = weekEnd, Bands = bands.ToArray(), Days = days.ToArray() };
-    }
+					if (bandDuration < 7)
+					{
+						band.Add(new AppointmentRenderInfo { Data = appointment, DayIndex = dayIndex });
 
-    void OnFocus()
-    {
-        if (CurrentDate == default(DateTime)) 
-        { 
-            CurrentDate = StartDate; 
-        }
-    }
+						placed = true;
 
-    [Parameter]
-    public DateTime StartDate { get; set; }
+						break;
+					}
+					else
+					{
+						// No space in this band, try the next one
+						continue;
+					}
+				}
 
-    [Parameter]
-    public DateTime EndDate { get; set; }
+				if (!placed)
+				{
+					slot.Hidden++;
+				}
+			}
 
-    [Parameter]
-    public int? MaxAppointmentsInSlot { get; set; }
+			start = end;
+		}
 
-    private double contentHeight;
-    private DotNetObjectReference<MonthView>? reference;
+		return new Week { Start = weekStart, End = weekEnd, Bands = bands.ToArray(), Days = days.ToArray() };
+	}
 
-    private int EffectiveMaxAppointmentsInSlot
-    {
-        get
-        {
-            if (MaxAppointmentsInSlot != null)
-            {
-                return MaxAppointmentsInSlot.Value;
-            }
+	void OnFocus()
+	{
+		if (CurrentDate == default(DateTime))
+		{
+			CurrentDate = StartDate;
+		}
+	}
 
-            var numberOfWeeks = (int)Math.Max(1, Math.Ceiling((EndDate - StartDate).TotalDays / 7));
+	[Parameter]
+	public DateTime StartDate { get; set; }
 
-            if (contentHeight > 0)
-            {
-                var slotHeight = contentHeight / numberOfWeeks;
-                return Math.Max(0, Convert.ToInt32(Math.Floor(slotHeight / 24)) - 1);
-            }
+	[Parameter]
+	public DateTime EndDate { get; set; }
 
-            return 0;
-        }
-    }
+	[Parameter]
+	public int? MaxAppointmentsInSlot { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            reference = DotNetObjectReference.Create(this);
-            var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", contentView, reference);
-            if (rect.Height > 0 && MaxAppointmentsInSlot == null)
-            {
-                contentHeight = rect.Height;
-                Refresh();
-                StateHasChanged();
-            }
-        }
-    }
+	private double contentHeight;
+	private DotNetObjectReference<MonthView>? reference;
 
-    [JSInvokable]
-    public void Resize(double width, double height)
-    {
-        if (MaxAppointmentsInSlot != null)
-        {
-            return;
-        }
+	private int EffectiveMaxAppointmentsInSlot
+	{
+		get
+		{
+			if (MaxAppointmentsInSlot != null)
+			{
+				return MaxAppointmentsInSlot.Value;
+			}
 
-        if (contentHeight != height)
-        {
-            contentHeight = height;
-            Refresh();
-            StateHasChanged();
-        }
-    }
+			var numberOfWeeks = (int)Math.Max(1, Math.Ceiling((EndDate - StartDate).TotalDays / 7));
 
-    public async ValueTask DisposeAsync()
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", contentView);
-        }
-        catch
-        {
-        }
+			if (contentHeight > 0)
+			{
+				var slotHeight = contentHeight / numberOfWeeks;
+				return Math.Max(0, Convert.ToInt32(Math.Floor(slotHeight / 24)) - 1);
+			}
 
-        reference?.Dispose();
-    }
+			return 0;
+		}
+	}
 
-    [Parameter]
-    public string? MoreText { get; set; }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			reference = DotNetObjectReference.Create(this);
+			var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", contentView, reference);
+			if (rect.Height > 0 && MaxAppointmentsInSlot == null)
+			{
+				contentHeight = rect.Height;
+				Refresh();
+				StateHasChanged();
+			}
+		}
+	}
 
-    [CascadingParameter]
-    public IScheduler? Scheduler { get; set; }
+	[JSInvokable]
+	public void Resize(double width, double height)
+	{
+		if (MaxAppointmentsInSlot != null)
+		{
+			return;
+		}
 
-    [Parameter]
-    public IEnumerable<AppointmentData>? Appointments { get; set; }
+		if (contentHeight != height)
+		{
+			contentHeight = height;
+			Refresh();
+			StateHasChanged();
+		}
+	}
 
-    IDictionary<string, object> Attributes(DateTime start)
-    {
-        if (Scheduler == null)
-            return new Dictionary<string, object>();
-        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInSlot(start, start.AddDays(1)));
-        attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
-        attributes["dropzone"] = "move";
-        return attributes;
-    }
+	public async ValueTask DisposeAsync()
+	{
+		try
+		{
+			await JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", contentView);
+		}
+		catch
+		{
+		}
 
-    async Task OnSlotClick(DateTime date)
-    {
-        if (Scheduler != null)
-            await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)));
-    }
+		reference?.Dispose();
+	}
 
-    async Task OnDayClick(DateTime day)
-    {
-        if (Scheduler != null)
-            await Scheduler.SelectDay(day, AppointmentsInSlot(day, day.AddDays(1)));
-    }
+	[Parameter]
+	public string? MoreText { get; set; }
 
-    async Task OnDayHeaderKeyDown(KeyboardEventArgs args, DateTime day)
-    {
-        var key = args.Code != null ? args.Code : args.Key;
-        if (key == "Enter" || key == "Space")
-        {
-            await OnDayClick(day);
-        }
-    }
+	[CascadingParameter]
+	public IScheduler? Scheduler { get; set; }
 
-    ElementReference contentView;
+	[Parameter]
+	public IEnumerable<AppointmentData>? Appointments { get; set; }
 
-    async Task OnAppointmentClick(AppointmentData data)
-    {
-        if (Scheduler != null)
-        {
-            await Scheduler.SelectAppointment(data);
-            await contentView.FocusAsync();
-        }
-    }
+	IDictionary<string, object> Attributes(DateTime start)
+	{
+		if (Scheduler == null)
+			return new Dictionary<string, object>();
+		var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInSlot(start, start.AddDays(1)));
+		attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
+		attributes["dropzone"] = "move";
+		return attributes;
+	}
 
-    private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
-    {
-        if (Appointments == null || Scheduler == null)
-        {
-            return Array.Empty<AppointmentData>();
-        }
+	async Task OnSlotClick(DateTime date)
+	{
+		if (Scheduler != null)
+			await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)));
+	}
 
-        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end))
-                .OrderByDescending(item => item.End.Subtract(item.Start).TotalDays > 1)
-                .ThenBy(item => item.Start)
-                .ThenByDescending(item => item.End)
-                .ToArray();
-    }
+	async Task OnDayClick(DateTime day)
+	{
+		if (Scheduler != null)
+			await Scheduler.SelectDay(day, AppointmentsInSlot(day, day.AddDays(1)));
+	}
 
-    async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
-    {
-        if (Scheduler == null) return;
-        bool preventDefault = await Scheduler.SelectMore(date, date.AddDays(1), appointments);
+	async Task OnDayHeaderKeyDown(KeyboardEventArgs args, DateTime day)
+	{
+		var key = args.Code != null ? args.Code : args.Key;
+		if (key == "Enter" || key == "Space")
+		{
+			await OnDayClick(day);
+		}
+	}
 
-        if (!preventDefault)
-        {
-            await DialogService.OpenAsync(date.ToString("d", Scheduler.Culture), ds =>
-                @<div class="rz-event-list">
-                    <CascadingValue Value=@Scheduler>
-                        @foreach(var item in appointments)
-                        {
-                            <Appointment Data=@item Click="OnListEventClick" />
-                        }
-                    </CascadingValue>
-                </div>
-            );
-        }
-    }
+	ElementReference contentView;
 
-    private List<Week>? weeks;
+	async Task OnAppointmentClick(AppointmentData data)
+	{
+		if (Scheduler != null)
+		{
+			await Scheduler.SelectAppointment(data);
+			await contentView.FocusAsync();
+		}
+	}
 
-    void Refresh()
-    {
-        weeks = new List<Week>();
+	private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
+	{
+		if (Appointments == null || Scheduler == null)
+		{
+			return Array.Empty<AppointmentData>();
+		}
 
-        for (var date = StartDate; date < EndDate; date = date.AddDays(7))
-        {
-            weeks.Add(CreateWeek(date, date.AddDays(7)));
-        }
-    }
+		return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end))
+				.OrderByDescending(item => item.End.Subtract(item.Start).TotalDays > 1)
+				.ThenBy(item => item.Start)
+				.ThenByDescending(item => item.End)
+				.ToArray();
+	}
 
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        var didAppointmentsChange = parameters.DidParameterChange(nameof(Appointments), Appointments);
-        var didStartDateChange = parameters.DidParameterChange(nameof(StartDate), StartDate);
-        var didEndDateChange = parameters.DidParameterChange(nameof(EndDate), EndDate);
-        var didMaxAppointmentsInSlotChange = parameters.DidParameterChange(nameof(MaxAppointmentsInSlot), MaxAppointmentsInSlot);
+	async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
+	{
+		if (Scheduler == null) return;
+		bool preventDefault = await Scheduler.SelectMore(date, date.AddDays(1), appointments);
 
-        await base.SetParametersAsync(parameters);
+		if (!preventDefault)
+		{
+			await DialogService.OpenAsync(date.ToString("d", Scheduler.Culture), ds =>
+				@<div class="rz-event-list">
+					<CascadingValue Value=@Scheduler>
+						@foreach (var item in appointments)
+						{
+							<Appointment Data=@item Click="OnListEventClick" />
+						}
+					</CascadingValue>
+				</div>
+			);
+		}
+	}
 
-        if (didAppointmentsChange || didStartDateChange || didEndDateChange || didMaxAppointmentsInSlotChange)
-        {
-            Refresh();
-        }
-    }
+	private List<Week>? weeks;
 
-    async Task OnListEventClick(AppointmentData data)
-    {
-        DialogService.Close();
+	void Refresh()
+	{
+		weeks = new List<Week>();
 
-        await OnAppointmentClick(data);
-    }
+		for (var date = StartDate; date < EndDate; date = date.AddDays(7))
+		{
+			weeks.Add(CreateWeek(date, date.AddDays(7)));
+		}
+	}
 
-    DateTime CurrentDate;
-    int currentAppointment = -1;
-    IEnumerable<AppointmentData> currentAppointments = Enumerable.Empty<AppointmentData>();
-    bool preventKeyPress;
-    bool stopKeydownPropagation;
+	public override async Task SetParametersAsync(ParameterView parameters)
+	{
+		var didAppointmentsChange = parameters.DidParameterChange(nameof(Appointments), Appointments);
+		var didStartDateChange = parameters.DidParameterChange(nameof(StartDate), StartDate);
+		var didEndDateChange = parameters.DidParameterChange(nameof(EndDate), EndDate);
+		var didMaxAppointmentsInSlotChange = parameters.DidParameterChange(nameof(MaxAppointmentsInSlot), MaxAppointmentsInSlot);
 
-    async Task OnKeyPress(KeyboardEventArgs args)
-    {
-        var key = args.Code != null ? args.Code : args.Key;
-        var arrow = key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown";
-        var updown = key == "ArrowUp" || key == "ArrowDown";
-        var leftright = key == "ArrowLeft" || key == "ArrowRight";
-        var leftup = key == "ArrowLeft" || key == "ArrowUp";
+		await base.SetParametersAsync(parameters);
 
-        if (arrow && !currentAppointments.Any())
-        {
-            var days = leftright ? 1 : 7;
-            CurrentDate = CurrentDate.AddDays(leftup ? -days : days);
-            currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(EffectiveMaxAppointmentsInSlot);
+		if (didAppointmentsChange || didStartDateChange || didEndDateChange || didMaxAppointmentsInSlotChange)
+		{
+			Refresh();
+		}
+	}
 
-            preventKeyPress = true;
-            stopKeydownPropagation = true;
-        }
-        else if (arrow && currentAppointments.Any())
-        {
-            if (updown)
-            {
-                currentAppointment = Math.Clamp(currentAppointment + (key == "ArrowUp" ? -1 : 1), 0, currentAppointments.Count() - 1);
-            }
-            else
-            {
-                CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
-                currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(EffectiveMaxAppointmentsInSlot);
-            }
+	async Task OnListEventClick(AppointmentData data)
+	{
+		DialogService.Close();
 
-            preventKeyPress = true;
-            stopKeydownPropagation = true;
-        }
-        else if (key == "Enter")
-        {
-            await OnSlotClick(CurrentDate);
-            await contentView.FocusAsync();
+		await OnAppointmentClick(data);
+	}
 
-            preventKeyPress = true;
-            stopKeydownPropagation = true;
-        }
-        else if (key == "Space")
-        {
-            var appointment = currentAppointments.ElementAtOrDefault(currentAppointment);
-            if (appointment != null)
-            {
-                await OnAppointmentClick(appointment);
-            }
+	DateTime CurrentDate;
+	int currentAppointment = -1;
+	IEnumerable<AppointmentData> currentAppointments = Enumerable.Empty<AppointmentData>();
+	bool preventKeyPress;
+	bool stopKeydownPropagation;
 
-            preventKeyPress = true;
-            stopKeydownPropagation = true;
-        }
-        else
-        {
-            preventKeyPress = false;
-            stopKeydownPropagation = false;
-        }
-    }
+	async Task OnKeyPress(KeyboardEventArgs args)
+	{
+		var key = args.Code != null ? args.Code : args.Key;
+		var arrow = key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown";
+		var updown = key == "ArrowUp" || key == "ArrowDown";
+		var leftright = key == "ArrowLeft" || key == "ArrowRight";
+		var leftup = key == "ArrowLeft" || key == "ArrowUp";
+
+		if (arrow && !currentAppointments.Any())
+		{
+			var days = leftright ? 1 : 7;
+			CurrentDate = CurrentDate.AddDays(leftup ? -days : days);
+			currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(EffectiveMaxAppointmentsInSlot);
+
+			preventKeyPress = true;
+			stopKeydownPropagation = true;
+		}
+		else if (arrow && currentAppointments.Any())
+		{
+			if (updown)
+			{
+				currentAppointment = Math.Clamp(currentAppointment + (key == "ArrowUp" ? -1 : 1), 0, currentAppointments.Count() - 1);
+			}
+			else
+			{
+				CurrentDate = CurrentDate.AddDays(key == "ArrowLeft" ? -1 : 1);
+				currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)).Take(EffectiveMaxAppointmentsInSlot);
+			}
+
+			preventKeyPress = true;
+			stopKeydownPropagation = true;
+		}
+		else if (key == "Enter")
+		{
+			await OnSlotClick(CurrentDate);
+			await contentView.FocusAsync();
+
+			preventKeyPress = true;
+			stopKeydownPropagation = true;
+		}
+		else if (key == "Space")
+		{
+			var appointment = currentAppointments.ElementAtOrDefault(currentAppointment);
+			if (appointment != null)
+			{
+				await OnAppointmentClick(appointment);
+			}
+
+			preventKeyPress = true;
+			stopKeydownPropagation = true;
+		}
+		else
+		{
+			preventKeyPress = false;
+			stopKeydownPropagation = false;
+		}
+	}
 }
