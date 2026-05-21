@@ -1,0 +1,45 @@
+@using System.Collections
+
+<RadzenDataGrid AllowSorting="true" AllowPaging="true" PageSize="5" Data="@orders" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Order.Reference)" Title="Reference" />
+        <RadzenDataGridColumn Property="@nameof(Order.PriorityId)" Title="Priority" SortComparer="@priorityComparer">
+            <Template Context="order">
+                @priorities[order.PriorityId]
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    class Order
+    {
+        public string Reference { get; set; } = string.Empty;
+        public int PriorityId { get; set; }
+    }
+
+    // Ids are not in alphabetical order of their names, so sorting by the comparer (which orders by
+    // the mapped name) is visibly different from sorting by the raw PriorityId.
+    static readonly IReadOnlyDictionary<int, string> priorities = new Dictionary<int, string>
+    {
+        [1] = "Urgent",
+        [2] = "Normal",
+        [3] = "Critical"
+    };
+
+    readonly IComparer priorityComparer = Comparer<object>.Create((a, b) =>
+        string.Compare(PriorityName(a), PriorityName(b), StringComparison.OrdinalIgnoreCase));
+
+    static string PriorityName(object value) =>
+        priorities.TryGetValue((int)value, out var name) ? name : string.Empty;
+
+    readonly List<Order> orders = new()
+    {
+        new Order { Reference = "ORD-001", PriorityId = 1 },
+        new Order { Reference = "ORD-002", PriorityId = 2 },
+        new Order { Reference = "ORD-003", PriorityId = 3 },
+        new Order { Reference = "ORD-004", PriorityId = 2 },
+        new Order { Reference = "ORD-005", PriorityId = 1 },
+        new Order { Reference = "ORD-006", PriorityId = 3 }
+    };
+}

@@ -2068,7 +2068,11 @@ namespace Radzen.Blazor
 
                     if (!string.IsNullOrEmpty(orderBy))
                     {
-                        if (typeof(TItem) == typeof(object))
+                        if (HasSortComparer())
+                        {
+                            view = OrderByComparers(view);
+                        }
+                        else if (typeof(TItem) == typeof(object))
                         {
                             var firstItem = view.FirstOrDefault();
                             if (firstItem != null)
@@ -2111,6 +2115,42 @@ namespace Radzen.Blazor
                 return QueryOnlyVisibleColumns ? view
                     .Select(allColumns.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property)).Select(c => c.Property)) : view;
             }
+        }
+
+        RadzenDataGridColumn<TItem>? SortColumn(SortDescriptor descriptor) =>
+            allColumns.FirstOrDefault(c => c.GetSortProperty() == descriptor.Property);
+
+        bool HasSortComparer() => sorts.Any(d => SortColumn(d)?.SortComparer != null);
+
+        static IComparer<object?> ToObjectComparer(IComparer? comparer) =>
+            comparer == null ? Comparer<object?>.Default : Comparer<object?>.Create((a, b) => comparer.Compare(a, b));
+
+        IQueryable<TItem> OrderByComparers(IQueryable<TItem> source)
+        {
+            IOrderedEnumerable<TItem>? ordered = null;
+
+            foreach (var descriptor in sorts)
+            {
+                var column = SortColumn(descriptor);
+                var comparer = ToObjectComparer(column?.SortComparer);
+                Func<TItem, object?> keySelector = item => column != null ? column.GetSortValue(item) : null;
+                var ascending = descriptor.SortOrder != SortOrder.Descending;
+
+                if (ordered == null)
+                {
+                    ordered = ascending
+                        ? source.OrderBy(keySelector, comparer)
+                        : source.OrderByDescending(keySelector, comparer);
+                }
+                else
+                {
+                    ordered = ascending
+                        ? ordered.ThenBy(keySelector, comparer)
+                        : ordered.ThenByDescending(keySelector, comparer);
+                }
+            }
+
+            return (ordered ?? source.AsEnumerable()).AsQueryable();
         }
 
         internal bool IsVirtualizationAllowed()

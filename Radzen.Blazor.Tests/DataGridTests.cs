@@ -3,6 +3,7 @@ using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -3728,5 +3729,187 @@ namespace Radzen.Blazor.Tests
                 public void Reset() => _inner.Reset();
             }
         }
+
+        static IComparer PriorityNameComparer()
+        {
+            var names = new Dictionary<int, string> { [1] = "Urgent", [2] = "Normal", [3] = "Critical" };
+            return Comparer<object>.Create((a, b) =>
+                string.Compare(
+                    names.TryGetValue(Convert.ToInt32(a), out var an) ? an : string.Empty,
+                    names.TryGetValue(Convert.ToInt32(b), out var bn) ? bn : string.Empty,
+                    StringComparison.Ordinal));
+        }
+
+        static IRenderedComponent<RadzenDataGrid<SortComparerItem>> RenderSortComparerGrid(
+            TestContext ctx, SortComparerItem[] data, SortOrder order)
+        {
+            return ctx.RenderComponent<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<SortComparerItem>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowSorting, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<SortComparerItem>));
+                    builder.AddAttribute(1, "Property", nameof(SortComparerItem.Reference));
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(2, typeof(RadzenDataGridColumn<SortComparerItem>));
+                    builder.AddAttribute(3, "Property", nameof(SortComparerItem.Code));
+                    builder.AddAttribute(4, "SortComparer", PriorityNameComparer());
+                    builder.AddAttribute(5, "SortOrder", order);
+                    builder.CloseComponent();
+                });
+            });
+        }
+
+        [Fact]
+        public void DataGrid_SortComparer_OrdersByMappedName_Ascending()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new SortComparerItem { Reference = "A", Code = 1 },
+                new SortComparerItem { Reference = "B", Code = 2 },
+                new SortComparerItem { Reference = "C", Code = 3 },
+            };
+
+            var component = RenderSortComparerGrid(ctx, data, SortOrder.Ascending);
+
+            var order = component.Instance.View.ToList().Select(x => x.Reference).ToArray();
+
+            Assert.Equal(new[] { "C", "B", "A" }, order);
+        }
+
+        [Fact]
+        public void DataGrid_SortComparer_OrdersByMappedName_Descending()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new SortComparerItem { Reference = "A", Code = 1 },
+                new SortComparerItem { Reference = "B", Code = 2 },
+                new SortComparerItem { Reference = "C", Code = 3 },
+            };
+
+            var component = RenderSortComparerGrid(ctx, data, SortOrder.Descending);
+
+            var order = component.Instance.View.ToList().Select(x => x.Reference).ToArray();
+
+            Assert.Equal(new[] { "A", "B", "C" }, order);
+        }
+
+        [Fact]
+        public void DataGrid_SortComparer_ComposesWithSecondaryColumn()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            // Two rows share Code=2 (Normal); secondary sort by Reference breaks the tie.
+            var data = new[]
+            {
+                new SortComparerItem { Reference = "B2", Code = 2 },
+                new SortComparerItem { Reference = "A", Code = 1 },
+                new SortComparerItem { Reference = "B1", Code = 2 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<SortComparerItem>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowSorting, true);
+                parameterBuilder.Add<bool>(p => p.AllowMultiColumnSorting, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<SortComparerItem>));
+                    builder.AddAttribute(1, "Property", nameof(SortComparerItem.Code));
+                    builder.AddAttribute(2, "SortComparer", PriorityNameComparer());
+                    builder.AddAttribute(3, "SortOrder", SortOrder.Ascending);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(4, typeof(RadzenDataGridColumn<SortComparerItem>));
+                    builder.AddAttribute(5, "Property", nameof(SortComparerItem.Reference));
+                    builder.AddAttribute(6, "SortOrder", SortOrder.Ascending);
+                    builder.CloseComponent();
+                });
+            });
+
+            var order = component.Instance.View.ToList().Select(x => x.Reference).ToArray();
+
+            // Primary by mapped name asc: Normal (Code 2) before Urgent (Code 1).
+            // Secondary by Reference asc breaks the Normal tie: B1 before B2.
+            Assert.Equal(new[] { "B1", "B2", "A" }, order);
+        }
+
+        [Fact]
+        public void DataGrid_WithoutSortComparer_OrdersByRawValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new SortComparerItem { Reference = "A", Code = 3 },
+                new SortComparerItem { Reference = "B", Code = 1 },
+                new SortComparerItem { Reference = "C", Code = 2 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<SortComparerItem>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<SortComparerItem>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowSorting, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<SortComparerItem>));
+                    builder.AddAttribute(1, "Property", nameof(SortComparerItem.Reference));
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(2, typeof(RadzenDataGridColumn<SortComparerItem>));
+                    builder.AddAttribute(3, "Property", nameof(SortComparerItem.Code));
+                    builder.AddAttribute(4, "SortOrder", SortOrder.Ascending);
+                    builder.CloseComponent();
+                });
+            });
+
+            var order = component.Instance.View.ToList().Select(x => x.Reference).ToArray();
+
+            // No comparer: default ordering by raw Code value 1,2,3 -> B, C, A
+            Assert.Equal(new[] { "B", "C", "A" }, order);
+        }
+
+        [Fact]
+        public void DataGrid_SortComparer_HandlesValuesMissingFromMap()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            // Code 99 is not in the comparer's map; the comparer treats it as empty string (sorts first asc).
+            var data = new[]
+            {
+                new SortComparerItem { Reference = "A", Code = 1 },
+                new SortComparerItem { Reference = "X", Code = 99 },
+                new SortComparerItem { Reference = "C", Code = 3 },
+            };
+
+            var component = RenderSortComparerGrid(ctx, data, SortOrder.Ascending);
+
+            var order = component.Instance.View.ToList().Select(x => x.Reference).ToArray();
+
+            // "" (X) first, then Critical (C), then Urgent (A)
+            Assert.Equal(new[] { "X", "C", "A" }, order);
+        }
+    }
+
+    public class SortComparerItem
+    {
+        public string Reference { get; set; } = string.Empty;
+        public int Code { get; set; }
     }
 }

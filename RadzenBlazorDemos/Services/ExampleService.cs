@@ -788,6 +788,14 @@ namespace RadzenBlazorDemos
                             Title = "Blazor DataGrid - Sort API | Free UI Components by Radzen",
                             Description = "Set the initial sort order of your RadzenDataGrid via the SortOrder column property.",
                             Tags = new [] { "api", "sort", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
+                            Name = "Custom Sort Comparer",
+                            Path = "datagrid-sort-comparer",
+                            Title = "Blazor DataGrid - Custom Sort Comparer | Free UI Components by Radzen",
+                            Description = "Sort a column with a custom IComparer, for example ordering id values by their mapped display name.",
+                            Tags = new [] { "comparer", "custom", "sort", "datagrid", "table", "dataview" }
                         }
                     }
                 },
