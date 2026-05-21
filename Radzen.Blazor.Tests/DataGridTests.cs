@@ -3542,8 +3542,11 @@ namespace Radzen.Blazor.Tests
             item!.Click();
 
             var grid = component.Instance;
-            var codes = ((System.Collections.IEnumerable)grid.View).Cast<AutoApplyItem>().Select(x => x.Code).Distinct().ToArray();
-            Assert.Equal(new[] { 1 }, codes);
+            component.WaitForAssertion(() =>
+            {
+                var codes = ((System.Collections.IEnumerable)grid.View).Cast<AutoApplyItem>().Select(x => x.Code).Distinct().ToArray();
+                Assert.Equal(new[] { 1 }, codes);
+            }, TimeSpan.FromSeconds(3));
 
             // The popup must stay open after auto-apply so additional options can be selected.
             // Applying the filter with closePopup:false means no popup-closing JS interop runs;
