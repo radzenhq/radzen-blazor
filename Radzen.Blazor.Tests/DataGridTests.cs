@@ -3489,6 +3489,94 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("Nothing to display", component.Markup);
         }
 
+        private sealed class AutoApplyItem
+        {
+            public string Name { get; set; } = string.Empty;
+            public int Code { get; set; }
+        }
+
+        [Fact]
+        public void DataGrid_AutoApplyCheckBoxListFilter_FiltersOnSelectionWithoutApply()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new AutoApplyItem { Name = "A", Code = 1 },
+                new AutoApplyItem { Name = "B", Code = 2 },
+                new AutoApplyItem { Name = "C", Code = 1 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<AutoApplyItem>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.CheckBoxList);
+                parameterBuilder.Add<bool>(p => p.AutoApplyCheckBoxListFilter, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<AutoApplyItem>));
+                    builder.AddAttribute(1, "Property", nameof(AutoApplyItem.Code));
+                    builder.CloseComponent();
+                });
+            });
+
+            // Open the Code filter popup (the filter icon toggles via @onmousedown=ToggleFilter)
+            component.Find("button.rz-grid-filter-icon").MouseDown();
+
+            // Wait for the listbox to load its filter values asynchronously.
+            component.WaitForAssertion(() => Assert.NotEmpty(component.FindAll(".rz-multiselect-item")), TimeSpan.FromSeconds(3));
+
+            // Apply button must NOT be present in auto-apply mode
+            Assert.Empty(component.FindAll("button.rz-apply-filter"));
+
+            // Select the option for Code == 1 in the listbox and confirm the grid filters immediately.
+            // Find the listbox item whose text is "1" and click it.
+            var item = component.FindAll(".rz-multiselect-item")
+                .FirstOrDefault(i => i.TextContent.Trim() == "1");
+            Assert.NotNull(item);
+            item!.Click();
+
+            var grid = component.Instance;
+            var codes = ((System.Collections.IEnumerable)grid.View).Cast<AutoApplyItem>().Select(x => x.Code).Distinct().ToArray();
+            Assert.Equal(new[] { 1 }, codes);
+
+            // The popup must stay open after auto-apply so additional options can be selected.
+            // Applying the filter with closePopup:false means no popup-closing JS interop runs;
+            // closePopup:true would invoke Radzen.closePopup / Radzen.closeAllPopups.
+            Assert.DoesNotContain(ctx.JSInterop.Invocations,
+                i => i.Identifier.Contains("close", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Fact]
+        public void DataGrid_CheckBoxListFilter_RendersApplyButton_WhenAutoApplyOff()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[] { new AutoApplyItem { Name = "A", Code = 1 } };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<AutoApplyItem>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<AutoApplyItem>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.CheckBoxList);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<AutoApplyItem>));
+                    builder.AddAttribute(1, "Property", nameof(AutoApplyItem.Code));
+                    builder.CloseComponent();
+                });
+            });
+
+            component.Find("button.rz-grid-filter-icon").MouseDown();
+
+            Assert.NotEmpty(component.FindAll("button.rz-apply-filter"));
+        }
+
         private sealed class TrackingEnumerable<T> : IEnumerable<T>
         {
             private readonly IEnumerable<T> _source;
