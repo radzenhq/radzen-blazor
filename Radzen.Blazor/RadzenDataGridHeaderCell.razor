@@ -188,7 +188,10 @@
                     {
                         <div class="rz-grid-filter-buttons">
                             <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-clear-filter" Click="@ClearFilter" Text=@Grid.ClearFilterText title="@Grid.ClearFilterText" />
-                            <RadzenButton onmousedown="@getBlur()" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{Column.GetColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
+                            @if (!(Grid.AutoApplyCheckBoxListFilter && filterMode == FilterMode.CheckBoxList))
+                            {
+                                <RadzenButton onmousedown="@getBlur()" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{Column.GetColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
+                            }
                         </div>
                     }
                 </Popup>
@@ -350,43 +353,52 @@ else
         return string.IsNullOrWhiteSpace(Column.HeaderTooltip) ? null : Column.HeaderTooltip;
     }
 
-    void ListBoxChange(object args)
+    async Task ListBoxChange(object args)
     {
         hasPendingCheckBoxFilter = true;
 
         if (args is not IEnumerable enumerable)
         {
             pendingCheckBoxFilterValue = null;
-            return;
-        }
-
-        Type? propertyType = null;
-
-        if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
-        {
-            var collectionType =  PropertyAccess.GetPropertyType(typeof(TItem), Column.Property);
-            if (collectionType != null && collectionType.IsGenericType)
-            {
-                var itemType = collectionType.GenericTypeArguments.FirstOrDefault();
-                if(itemType != null)
-                {
-                    propertyType = PropertyAccess.GetPropertyType(itemType, Column.FilterProperty);
-                }
-            }
         }
         else
         {
-            propertyType = PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty());
+            Type? propertyType = null;
+
+            if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
+            {
+                var collectionType =  PropertyAccess.GetPropertyType(typeof(TItem), Column.Property);
+                if (collectionType != null && collectionType.IsGenericType)
+                {
+                    var itemType = collectionType.GenericTypeArguments.FirstOrDefault();
+                    if(itemType != null)
+                    {
+                        propertyType = PropertyAccess.GetPropertyType(itemType, Column.FilterProperty);
+                    }
+                }
+            }
+            else
+            {
+                propertyType = PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty());
+            }
+
+            if (propertyType == null)
+            {
+                propertyType = Column.FilterPropertyType;
+            }
+
+            pendingCheckBoxFilterValue = enumerable.Cast<object>().Any()
+                ? propertyType != null ? QueryableExtension.ToList(enumerable.AsQueryable().Cast(propertyType)) : enumerable
+                : null;
         }
 
-        if (propertyType == null)
+        if (Grid.AutoApplyCheckBoxListFilter)
         {
-            propertyType = Column.FilterPropertyType;
+            Column.SetFilterValue(pendingCheckBoxFilterValue);
+            hasPendingCheckBoxFilter = false;
+            pendingCheckBoxFilterValue = null;
+            await Grid.ApplyFilter(Column, false);
         }
-
-        pendingCheckBoxFilterValue = enumerable.Cast<object>().Any()
-            ? propertyType != null ? QueryableExtension.ToList(enumerable.AsQueryable().Cast(propertyType)) : enumerable
-            : null;
     }
 
     string getFilterOpen()

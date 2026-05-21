@@ -612,6 +612,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "CheckBoxList Auto-Apply",
+                            Path = "datagrid-checkboxlist-auto-apply-filter",
+                            Title = "Blazor DataGrid - CheckBoxList Filter Auto-Apply | Free UI Components by Radzen",
+                            Description = "Apply CheckBoxList column filters immediately as options are selected, without the Apply button.",
+                            Tags = new [] { "checkboxlist", "auto", "apply", "filter", "filtering", "datagrid", "table", "dataview" }
+                        },
+                        new Example
+                        {
                             Name = "CheckBoxList with OData",
                             Path = "datagrid-checkboxlist-filter-odata",
                             Title = "Blazor DataGrid - Excel Filter with OData | Free UI Components by Radzen",

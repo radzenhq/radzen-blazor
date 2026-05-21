@@ -1,0 +1,26 @@
+
+<RadzenDataGrid AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AutoApplyCheckBoxListFilter="true"
+                AllowPaging="true" PageSize="5" Data="@orders" ColumnWidth="200px">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Order.Reference)" Title="Reference" />
+        <RadzenDataGridColumn Property="@nameof(Order.Status)" Title="Status" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    class Order
+    {
+        public string Reference { get; set; } = "";
+        public string Status { get; set; } = "";
+    }
+
+    readonly List<Order> orders = new()
+    {
+        new Order { Reference = "ORD-001", Status = "Open" },
+        new Order { Reference = "ORD-002", Status = "Shipped" },
+        new Order { Reference = "ORD-003", Status = "Closed" },
+        new Order { Reference = "ORD-004", Status = "Open" },
+        new Order { Reference = "ORD-005", Status = "Shipped" },
+        new Order { Reference = "ORD-006", Status = "Closed" }
+    };
+}

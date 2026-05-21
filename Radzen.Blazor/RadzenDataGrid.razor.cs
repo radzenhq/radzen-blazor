@@ -1612,6 +1612,14 @@ namespace Radzen.Blazor
         public bool AllowFiltering { get; set; }
 
         /// <summary>
+        /// Gets or sets whether CheckBoxList column filters are applied immediately as options are
+        /// selected, instead of requiring the filter popup's Apply button. Default is false.
+        /// </summary>
+        /// <value>True to apply CheckBoxList filters on each selection change; otherwise false.</value>
+        [Parameter]
+        public bool AutoApplyCheckBoxListFilter { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether column resizing is allowed.
         /// </summary>
         /// <value><c>true</c> if column resizing is allowed; otherwise, <c>false</c>.</value>
