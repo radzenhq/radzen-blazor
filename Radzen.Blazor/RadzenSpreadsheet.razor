@@ -24,24 +24,24 @@
                 else
                 {
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FileTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+                    <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <Open WorkbookChanged=@OnWorkbookChangedAsync CsvImportOptions=@CsvImportOptions />
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <Save Workbook=@workbook ActiveWorksheet=@Worksheet FileName=@ExportFileName CsvExportOptions=@CsvExportOptions />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_HomeTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+                    <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <Undo />
                             <Redo />
                         </RadzenStack>
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <FontFamily/>
                             <FontSize/>
                         </RadzenStack>
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <Bold/>
                             <Italic/>
@@ -51,42 +51,42 @@
                             <BackgroundColor/>
                             <CellBorders/>
                         </RadzenStack>
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <TextAlign/>
                             <VerticalAlign/>
                             <TextWrap/>
                             <MergeCells/>
                         </RadzenStack>
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <ConditionalFormat/>
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+                    <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <DataFormat/>
                         <IncreaseDecimals/>
                         <DecreaseDecimals/>
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <RadzenButton Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatCells)) Click=@OnFormatCellsAsync
                             Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
                             Disabled=@(Worksheet?.Selection.Cell == CellRef.Invalid || !IsFeatureAllowed(SpreadsheetFeature.CellFormatting)) />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_InsertTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+                    <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <InsertRowAfter/>
                             <InsertRowBefore/>
                         </RadzenStack>
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <InsertColumnAfter/>
                             <InsertColumnBefore/>
                         </RadzenStack>
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                             <InsertHyperlink/>
                             <InsertImage/>
@@ -96,15 +96,15 @@
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_ViewTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+                    <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <Freeze/>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_DataTab))>
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+                    <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <AutoFilter/>
                         <CustomSort/>
-                        <div class="rz-html-editor-separator"></div>
+                        <div class="rz-toolbar-separator"></div>
                         <DataValidation/>
                     </RadzenStack>
                 </RadzenTabsItem>

@@ -27,61 +27,6 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 
     .rz-tabview-panel {
         padding: 0.25rem;
-
-        --rz-selectbar-border-radius: var(--rz-border-radius);
-        --rz-button-border-radius: var(--rz-border-radius);
-    }
-
-    .rz-tabview-panel .rz-button {
-        
-        .rzi {
-            font-size: 1rem;
-        }
-
-        .rz-button-text {
-            font-size: 0.75rem;
-        }
-    }
-
-    .rz-selectbar.rz-selectbar-horizontal .rz-button {
-        outline: none;
-        border-radius: var(--rz-border-radius) !important;
-    }
-
-    .rz-selectbar.rz-selectbar-horizontal .rz-button:not(:first-child) {
-        margin-inline-start: 0.125rem;
-    }
-
-    .rz-colorpicker {
-        flex-direction: column;
-        gap: 0;
-        justify-content: center;
-        border: 1px solid transparent;
-        border-block-end: 1px solid transparent;
-        box-shadow: none;
-        background-color: transparent;
-        --rz-colorpicker-panel-border: none;
-
-        &.rz-state-disabled {
-            border: 1px solid transparent;
-            border-block-end: 1px solid transparent;
-        }
-
-        .rzi {
-            font-size: 0.875rem;
-        }
-
-        .rz-colorpicker-value {
-            height: 0.25rem;
-            min-height: 0.25rem;
-            max-height: 0.25rem;
-            min-width: 1rem;
-        }
-    }
-
-    .rz-html-editor-separator {
-        margin-inline: 0.125rem;
-        height: 1.25rem;
     }
 }
 
