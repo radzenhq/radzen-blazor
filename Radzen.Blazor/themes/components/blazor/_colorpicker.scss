@@ -283,8 +283,11 @@ button.rz-colorpicker-trigger {
 }
 
 .rz-colorpicker-button {
-  justify-content: flex-end;
   display: flex;
+
+  > .rz-button {
+    flex: 1;
+  }
 }
 
 .rz-colorpicker-section {
