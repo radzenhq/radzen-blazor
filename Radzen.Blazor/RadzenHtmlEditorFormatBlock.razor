@@ -1,9 +1,9 @@
 @using Radzen.Blazor.Rendering
 
 <EditorDropDown Title=@Title Value=@(Editor?.State.FormatBlock ?? "") Change=@OnChange Placeholder="@Placeholder"
-    PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
+    Style="width:120px" PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
     <EditorDropDownItem Text=@NormalText Value="p">
-        <p style="margin:0">@context.Text</p>
+        <p>@context.Text</p>
     </EditorDropDownItem>
     <EditorDropDownItem Text=@Heading1Text Value="h1">
         <h1>@context.Text</h1>

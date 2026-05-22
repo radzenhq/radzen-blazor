@@ -1,13 +1,17 @@
 @if (PreventBlur)
 {
-<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor?.Disabled == true || Disabled || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design)) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@GetTitle()>
-    <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@IsDisabled @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@GetTitle()>
+    <span class="rz-button-box">
+        <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+    </span>
 </button>
 }
 else
 {
-<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor?.Disabled == true || Disabled || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design)) title=@GetTitle()>
-    <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@IsDisabled title=@GetTitle()>
+    <span class="rz-button-box">
+        <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+    </span>
 </button>
 }
 @code {
@@ -52,9 +56,20 @@ else
 
     string? GetTitle() => !string.IsNullOrEmpty(Shortcut) ? $"{Title} ({Shortcut})" : Title;
 
-    string Class => ClassList.Create("rz-html-editor-button")
-        .Add("rz-selected", Selected && Editor?.Disabled != true && EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design))
-        .ToString();
+    bool IsDisabled => Editor?.Disabled == true || Disabled || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design);
+
+    bool IsSelectedActive => Selected && !IsDisabled;
+
+    string Class
+    {
+        get
+        {
+            var baseClasses = IsSelectedActive
+                ? "rz-button rz-toggle-button rz-button-icon-only rz-button-sm rz-variant-flat rz-primary rz-shade-lighter rz-state-active"
+                : "rz-button rz-button-icon-only rz-button-sm rz-variant-text rz-base rz-shade-default";
+            return IsDisabled ? $"{baseClasses} rz-state-disabled" : baseClasses;
+        }
+    }
 
     void Empty()
     {

@@ -1524,22 +1524,10 @@ $rz-timeline-line-color: var(--rz-base-200) !default;
 $editor-border: var(--rz-border-base-600)  !default;
 $editor-border-radius: var(--rz-border-radius) !default;
 $editor-toolbar-background-color: var(--rz-base-background-color) !default;
-$editor-toolbar-item-margin: 0.25rem 0.125rem !default;
-$editor-button-padding: 0.5rem !default;
-$editor-button-background-color: var(--rz-base-background-color) !default;
-$editor-button-color: var(--rz-text-color) !default;
-$editor-button-disabled-color: var(--rz-text-disabled-color) !default;
-$editor-button-selected-background-color: var(--rz-secondary-lighter) !default;
-$editor-button-selected-color: var(--rz-on-secondary-lighter) !default;
-$editor-separator-background-color: var(--rz-base-600) !default;
 $editor-content-background-color: var(--rz-base-background-color) !default;
 
 .rz-html-editor-toolbar {
   font-size: 0.825rem;
-
-  .rz-html-editor-button {
-    @include rz-ripple($pseudo: true);
-  }
 }
 
 // Splitter
