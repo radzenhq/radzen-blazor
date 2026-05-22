@@ -303,6 +303,16 @@
   --rz-colorpicker-focus-outline: #{$colorpicker-focus-outline};
   --rz-colorpicker-focus-outline-offset: #{$colorpicker-focus-outline-offset};
   --rz-colorpicker-value-border-radius: #{$colorpicker-value-border-radius};
+  --rz-colorpicker-value-size-xs: #{$colorpicker-value-size-xs};
+  --rz-colorpicker-value-size-sm: #{$colorpicker-value-size-sm};
+  --rz-colorpicker-value-size-md: #{$colorpicker-value-size-md};
+  --rz-colorpicker-value-size-lg: #{$colorpicker-value-size-lg};
+  --rz-colorpicker-value-size: var(--rz-colorpicker-value-size-md);
+  --rz-colorpicker-trigger-icon-size-xs: #{$colorpicker-trigger-icon-size-xs};
+  --rz-colorpicker-trigger-icon-size-sm: #{$colorpicker-trigger-icon-size-sm};
+  --rz-colorpicker-trigger-icon-size-md: #{$colorpicker-trigger-icon-size-md};
+  --rz-colorpicker-trigger-icon-size-lg: #{$colorpicker-trigger-icon-size-lg};
+  --rz-colorpicker-trigger-icon-size: var(--rz-colorpicker-trigger-icon-size-md);
   --rz-colorpicker-items-gap: #{$colorpicker-items-gap};
   --rz-colorpicker-item-size: #{$colorpicker-item-size};
   --rz-colorpicker-item-border-radius: #{$colorpicker-item-border-radius};
