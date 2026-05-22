@@ -16,6 +16,10 @@
             <RadzenCheckBox @bind-Value=@showButton Name="OKButton" />
             <RadzenLabel Text="Show OK button" Component="OKButton" />
         </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value=@showArrow Name="Arrow" />
+            <RadzenLabel Text="Show arrow" Component="Arrow" />
+        </RadzenStack>
     </RadzenStack>
     <RadzenRow class="rz-my-12">
         <RadzenColumn Size="12" SizeMD="6" class="rz-text-align-center rz-text-align-md-end">
@@ -39,7 +43,7 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6" class="rz-text-align-center rz-text-align-md-start">
             <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mt-md-12">Choose T-Shirt color</RadzenText>
-            <RadzenColorPicker @bind-Value=@color ShowHSV=@showHSV ShowRGBA=@showRGBA ShowColors=@showColors ShowButton=@showButton Change=@OnChange />
+            <RadzenColorPicker @bind-Value=@color ShowHSV=@showHSV ShowRGBA=@showRGBA ShowColors=@showColors ShowButton=@showButton ShowArrow=@showArrow Change=@OnChange />
         </RadzenColumn>
     </RadzenRow>
 
@@ -53,6 +57,7 @@
     bool showRGBA = true;
     bool showColors = true;
     bool showButton = false;
+    bool showArrow = true;
 
     void OnChange(string value)
     {
