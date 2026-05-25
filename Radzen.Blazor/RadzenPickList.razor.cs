@@ -164,7 +164,7 @@ namespace Radzen.Blazor
         public RenderFragment<TItem>? SourceTemplate { get; set; }
         
         /// <summary>
-        /// Gets or sets the target template. Overrides <see cref="TargetTemplate"/>.
+        /// Gets or sets the target template. Overrides <see cref="Template"/>.
         /// </summary>
         /// <value>The target template.</value>
         [Parameter]
