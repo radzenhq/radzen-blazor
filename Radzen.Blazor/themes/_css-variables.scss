@@ -1340,8 +1340,11 @@
 
   /* TimestampPicker */
   --rz-timespanpicker-line-height: #{$timespanpicker-line-height};
-  --rz-timespanpicker-trigger-icon-width: #{$timespanpicker-trigger-icon-width};
-  --rz-timespanpicker-trigger-icon-height: #{$timespanpicker-trigger-icon-height};
+  --rz-timespanpicker-trigger-icon-size-xs: #{$timespanpicker-trigger-icon-size-xs};
+  --rz-timespanpicker-trigger-icon-size-sm: #{$timespanpicker-trigger-icon-size-sm};
+  --rz-timespanpicker-trigger-icon-size-md: #{$timespanpicker-trigger-icon-size-md};
+  --rz-timespanpicker-trigger-icon-size-lg: #{$timespanpicker-trigger-icon-size-lg};
+  --rz-timespanpicker-trigger-icon-size: var(--rz-timespanpicker-trigger-icon-size-md);
   --rz-timespanpicker-trigger-icon-color: #{$timespanpicker-trigger-icon-color};
   --rz-timespanpicker-trigger-icon-hover-color: #{$timespanpicker-trigger-icon-hover-color};
   --rz-timespanpicker-focus-outline: #{$timespanpicker-focus-outline};
