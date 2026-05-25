@@ -1025,6 +1025,10 @@ $numeric-line-height: var(--rz-body-line-height) !default;
 $numeric-input-padding-block: 0.4375rem !default;
 $numeric-input-padding-inline: 0.9375rem 1.25rem !default;
 $numeric-button-width: 1rem !default;
+$numeric-button-width-xs: 0.6875rem !default;
+$numeric-button-height-xs: 0.6875rem !default;
+$numeric-button-width-lg: 1.25rem !default;
+$numeric-button-height-lg: 1.25rem !default;
 
 .rz-numeric {
   .rz-numeric-button {

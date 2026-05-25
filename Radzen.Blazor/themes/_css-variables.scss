@@ -874,11 +874,31 @@
 
   /* Numeric */
   --rz-numeric-line-height: #{$numeric-line-height};
-  --rz-numeric-input-padding-block: #{$numeric-input-padding-block};
-  --rz-numeric-input-padding-inline: #{$numeric-input-padding-inline};
-  --rz-numeric-button-width: #{$numeric-button-width};
-  --rz-numeric-button-height: #{$numeric-button-height};
-  --rz-numeric-button-offset: #{$numeric-button-offset};
+  --rz-numeric-input-padding-block-xs: #{$numeric-input-padding-block-xs};
+  --rz-numeric-input-padding-block-sm: #{$numeric-input-padding-block-sm};
+  --rz-numeric-input-padding-block-md: #{$numeric-input-padding-block-md};
+  --rz-numeric-input-padding-block-lg: #{$numeric-input-padding-block-lg};
+  --rz-numeric-input-padding-block: var(--rz-numeric-input-padding-block-md);
+  --rz-numeric-input-padding-inline-xs: #{$numeric-input-padding-inline-xs};
+  --rz-numeric-input-padding-inline-sm: #{$numeric-input-padding-inline-sm};
+  --rz-numeric-input-padding-inline-md: #{$numeric-input-padding-inline-md};
+  --rz-numeric-input-padding-inline-lg: #{$numeric-input-padding-inline-lg};
+  --rz-numeric-input-padding-inline: var(--rz-numeric-input-padding-inline-md);
+  --rz-numeric-button-width-xs: #{$numeric-button-width-xs};
+  --rz-numeric-button-width-sm: #{$numeric-button-width-sm};
+  --rz-numeric-button-width-md: #{$numeric-button-width-md};
+  --rz-numeric-button-width-lg: #{$numeric-button-width-lg};
+  --rz-numeric-button-width: var(--rz-numeric-button-width-md);
+  --rz-numeric-button-height-xs: #{$numeric-button-height-xs};
+  --rz-numeric-button-height-sm: #{$numeric-button-height-sm};
+  --rz-numeric-button-height-md: #{$numeric-button-height-md};
+  --rz-numeric-button-height-lg: #{$numeric-button-height-lg};
+  --rz-numeric-button-height: var(--rz-numeric-button-height-md);
+  --rz-numeric-button-offset-xs: #{$numeric-button-offset-xs};
+  --rz-numeric-button-offset-sm: #{$numeric-button-offset-sm};
+  --rz-numeric-button-offset-md: #{$numeric-button-offset-md};
+  --rz-numeric-button-offset-lg: #{$numeric-button-offset-lg};
+  --rz-numeric-button-offset: var(--rz-numeric-button-offset-md);
   --rz-numeric-button-border-radius: #{$numeric-button-border-radius};
   --rz-numeric-button-background-color: #{$numeric-button-background-color};
   --rz-numeric-button-disabled-background-color: #{$numeric-button-disabled-background-color};
