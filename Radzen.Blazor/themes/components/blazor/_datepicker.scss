@@ -1,5 +1,8 @@
-$datepicker-trigger-icon-width: var(--rz-icon-size) !default;
-$datepicker-trigger-icon-height: $datepicker-trigger-icon-width !default;
+$datepicker-trigger-icon-size: var(--rz-icon-size) !default;
+$datepicker-trigger-icon-size-xs: 1rem !default;
+$datepicker-trigger-icon-size-sm: 1rem !default;
+$datepicker-trigger-icon-size-md: $datepicker-trigger-icon-size !default;
+$datepicker-trigger-icon-size-lg: $datepicker-trigger-icon-size !default;
 $datepicker-trigger-icon-color: var(--rz-input-value-color) !default;
 $datepicker-trigger-icon-hover-color: var(--rz-input-value-color) !default;
 $datepicker-line-height: 1.25rem !default;
@@ -78,7 +81,7 @@ $timepicker-border: none !default;
   }
 
   &:has(.rz-datepicker-trigger) > .rz-inputtext {
-    padding-inline-end: calc(1rem + var(--rz-datepicker-trigger-icon-width));
+    padding-inline-end: calc(1rem + var(--rz-datepicker-trigger-icon-size));
   }
 
   &:not(.rz-state-disabled) {
@@ -125,9 +128,9 @@ $timepicker-border: none !default;
   }
 
   color: var(--rz-datepicker-trigger-icon-color);
-  width: var(--rz-datepicker-trigger-icon-width);
-  height: var(--rz-datepicker-trigger-icon-height);
-  font-size: var(--rz-datepicker-trigger-icon-height);
+  width: var(--rz-datepicker-trigger-icon-size);
+  height: var(--rz-datepicker-trigger-icon-size);
+  font-size: var(--rz-datepicker-trigger-icon-size);
 
   &:not(.rz-state-disabled) {
     &:hover {
@@ -167,6 +170,14 @@ $timepicker-border: none !default;
     inset-block-start: 50%;
     inset-inline-end: 0.625rem;
     transform: translateY(-50%);
+}
+
+.rz-datepicker.rz-input-xs {
+  --rz-datepicker-trigger-icon-size: var(--rz-datepicker-trigger-icon-size-xs);
+}
+
+.rz-datepicker.rz-input-sm {
+  --rz-datepicker-trigger-icon-size: var(--rz-datepicker-trigger-icon-size-sm);
 }
 
 .rz-datepicker-popup-container {
