@@ -150,11 +150,25 @@ namespace Radzen.Blazor
         public string? DisabledProperty { get; set; }
 
         /// <summary>
-        /// Gets or sets the source template
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment<TItem>? Template { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the source template. Overrides <see cref="Template"/>.
         /// </summary>
         /// <value>The source template.</value>
         [Parameter]
-        public RenderFragment<TItem>? Template { get; set; }
+        public RenderFragment<TItem>? SourceTemplate { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the target template. Overrides <see cref="TargetTemplate"/>.
+        /// </summary>
+        /// <value>The target template.</value>
+        [Parameter]
+        public RenderFragment<TItem>? TargetTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the select all text.
@@ -238,7 +252,41 @@ namespace Radzen.Blazor
             }
         }
 
-        private RenderFragment<dynamic>? ListBoxTemplate => Template != null ? item => Template((TItem)item) : null;
+        private RenderFragment<dynamic>? SourceListBoxTemplate
+        {
+            get
+            {
+                if (SourceTemplate != null)
+                {
+                    return item => SourceTemplate(item);
+                }
+
+                if (Template != null)
+                {
+                    return item => Template(item);
+                }
+
+                return null;
+            }
+        }
+
+        private RenderFragment<dynamic>? TargetListBoxTemplate
+        {
+            get
+            {
+                if (TargetTemplate != null)
+                {
+                    return item => TargetTemplate(item);
+                }
+
+                if (Template != null)
+                {
+                    return item => Template(item);
+                }
+
+                return null;
+            }
+        }
 
         /// <summary>
         /// Gets or sets value if filtering is allowed.

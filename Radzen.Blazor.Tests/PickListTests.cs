@@ -2,12 +2,13 @@ using Bunit;
 using Xunit;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor.Tests
 {
     public class PickListTests
     {
-        class Item
+        public class Item
         {
             public int Id { get; set; }
             public string Name { get; set; }
@@ -293,6 +294,48 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("Source custom empty", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_Renders_SourceTemplate_OverridesTemplate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            List<Item> data = [new() { Id = 1, Name = "Item" }];
+
+            RenderFragment<Item> templateFragment = _ =>
+                builder => builder.AddContent(0, "regular template");
+
+            RenderFragment<Item> sourceTemplateFragment = _ =>
+                builder => builder.AddContent(0, "source template");
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters => parameters
+                .Add(p => p.Template, templateFragment)
+                .Add(p => p.SourceTemplate, sourceTemplateFragment)
+                .Add(p => p.Source, data));
+
+            Assert.Contains("source template", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_Renders_TargetTemplate_OverridesTemplate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            List<Item> data = [new() { Id = 1, Name = "Item" }];
+
+            RenderFragment<Item> templateFragment = _ =>
+                builder => builder.AddContent(0, "regular template");
+
+            RenderFragment<Item> targetTemplateFragment = _ =>
+                builder => builder.AddContent(0, "target template");
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters => parameters
+                    .Add(p => p.Template, templateFragment)
+                    .Add(p => p.TargetTemplate, targetTemplateFragment)
+                    .Add(p => p.Target, data));
+
+            Assert.Contains("target template", component.Markup);
         }
 
         [Fact]
