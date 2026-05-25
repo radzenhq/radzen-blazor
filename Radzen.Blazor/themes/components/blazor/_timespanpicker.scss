@@ -1,6 +1,9 @@
 $timespanpicker-line-height: 1.25rem !default;
-$timespanpicker-trigger-icon-width: var(--rz-icon-size) !default;
-$timespanpicker-trigger-icon-height: $timespanpicker-trigger-icon-width !default;
+$timespanpicker-trigger-icon-size: var(--rz-icon-size) !default;
+$timespanpicker-trigger-icon-size-xs: 1rem !default;
+$timespanpicker-trigger-icon-size-sm: 1rem !default;
+$timespanpicker-trigger-icon-size-md: $timespanpicker-trigger-icon-size !default;
+$timespanpicker-trigger-icon-size-lg: $timespanpicker-trigger-icon-size !default;
 $timespanpicker-trigger-icon-color: var(--rz-input-value-color) !default;
 $timespanpicker-trigger-icon-hover-color: var(--rz-input-value-color) !default;
 $timespanpicker-focus-outline: var(--rz-outline-focus) !default;
@@ -33,7 +36,7 @@ $timespanpicker-unit-label-color: var(--rz-text-tertiary-color) !default;
   }
 
   &:has(.rz-timespanpicker-trigger) > .rz-inputtext {
-    padding-inline-end: calc(1rem + var(--rz-timespanpicker-trigger-icon-width));
+    padding-inline-end: calc(1rem + var(--rz-timespanpicker-trigger-icon-size));
   }
 
   &:has(.rz-dropdown-clear-icon) > .rz-inputtext {
@@ -41,7 +44,7 @@ $timespanpicker-unit-label-color: var(--rz-text-tertiary-color) !default;
   }
 
   &:has(.rz-timespanpicker-trigger):has(.rz-dropdown-clear-icon) > .rz-inputtext {
-    padding-inline-end: calc(var(--rz-dropdown-trigger-icon-width) + 1rem + var(--rz-timespanpicker-trigger-icon-width));
+    padding-inline-end: calc(var(--rz-dropdown-trigger-icon-width) + 1rem + var(--rz-timespanpicker-trigger-icon-size));
   }
 
   &:not(.rz-state-disabled) {
@@ -93,9 +96,9 @@ $timespanpicker-unit-label-color: var(--rz-text-tertiary-color) !default;
   }
 
   color: var(--rz-timespanpicker-trigger-icon-color);
-  width: var(--rz-timespanpicker-trigger-icon-width);
-  height: var(--rz-timespanpicker-trigger-icon-height);
-  font-size: var(--rz-timespanpicker-trigger-icon-height);
+  width: var(--rz-timespanpicker-trigger-icon-size);
+  height: var(--rz-timespanpicker-trigger-icon-size);
+  font-size: var(--rz-timespanpicker-trigger-icon-size);
 
   &:not(.rz-state-disabled) {
     &:hover {
@@ -180,9 +183,17 @@ $timespanpicker-unit-label-color: var(--rz-text-tertiary-color) !default;
 
 .rz-timespanpicker-signpicker {
   align-self: stretch;
-  
+
   > .rz-button {
     flex: 1;
     --rz-selectbar-border-radius: var(--rz-input-border-radius);
   }
+}
+
+.rz-timespanpicker.rz-input-xs {
+  --rz-timespanpicker-trigger-icon-size: var(--rz-timespanpicker-trigger-icon-size-xs);
+}
+
+.rz-timespanpicker.rz-input-sm {
+  --rz-timespanpicker-trigger-icon-size: var(--rz-timespanpicker-trigger-icon-size-sm);
 }
