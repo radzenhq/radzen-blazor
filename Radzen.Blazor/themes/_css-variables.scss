@@ -350,8 +350,11 @@
   --rz-datalist-item-background-color: #{$datalist-item-background-color};
 
   /* DatePicker */
-  --rz-datepicker-trigger-icon-width: #{$datepicker-trigger-icon-width};
-  --rz-datepicker-trigger-icon-height: #{$datepicker-trigger-icon-height};
+  --rz-datepicker-trigger-icon-size-xs: #{$datepicker-trigger-icon-size-xs};
+  --rz-datepicker-trigger-icon-size-sm: #{$datepicker-trigger-icon-size-sm};
+  --rz-datepicker-trigger-icon-size-md: #{$datepicker-trigger-icon-size-md};
+  --rz-datepicker-trigger-icon-size-lg: #{$datepicker-trigger-icon-size-lg};
+  --rz-datepicker-trigger-icon-size: var(--rz-datepicker-trigger-icon-size-md);
   --rz-datepicker-line-height: #{$datepicker-line-height};
   --rz-datepicker-trigger-icon-color: #{$datepicker-trigger-icon-color};
   --rz-datepicker-trigger-icon-hover-color: #{$datepicker-trigger-icon-hover-color};
