@@ -1,8 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 
 #nullable enable
 
@@ -47,7 +47,7 @@ namespace Radzen.Blazor
 
         private string WcagHref => ThemeService.WcagHref;
 
-        private string IconFontPath => ThemeService.Embedded ? $"_content/Radzen.Blazor/fonts" : "fonts";
+        private string IconFontPath => ThemeService.Embedded ? $"_content/HolidayRentPro.Radzen.Blazor/fonts" : "fonts";
 
         private string IconFontHref => $"{IconFontPath}/MaterialSymbolsOutlined.woff2";
 

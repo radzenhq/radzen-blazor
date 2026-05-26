@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -479,7 +478,7 @@ namespace Radzen
         internal string WcagHref => $"{Path}/{Theme}-wcag.css?v={Version}";
 
         private string Path => Embedded
-            ? $"_content/Radzen.Blazor/css"
+            ? $"_content/HolidayRentPro.Radzen.Blazor/css"
             : !string.IsNullOrEmpty(CssPath)
                 ? CssPath
                 : "css";
