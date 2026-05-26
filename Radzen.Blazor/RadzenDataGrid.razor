@@ -324,7 +324,7 @@
             <text>
                 @if (AllowFiltering && column.Filterable && column.Columns == null && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
                 {
-                    <div class="rz-cell-filter">
+                    <div class="rz-cell-filter" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
                         <div class="rz-cell-filter-content">
                             @if (column.FilterTemplate != null)
                             {

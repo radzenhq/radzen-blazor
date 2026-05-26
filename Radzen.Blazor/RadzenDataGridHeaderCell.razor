@@ -207,9 +207,7 @@
         </div>
         @if (Grid.allColumns.Any(c => c.Parent != null) && Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Simple || filterMode == FilterMode.SimpleWithMenu))
         {
-            <div @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
-                @Grid.RenderSimpleFilter(Column, filterMode)
-            </div>
+            @Grid.RenderSimpleFilter(Column, filterMode)
         }
     </th>
 }
