@@ -118,6 +118,15 @@ namespace Radzen.Blazor
                     "Radzen.createNumeric", Element, IsInteger(),
                     Culture.NumberFormat.NumberDecimalSeparator, minArg, maxArg, IsNullable);
             }
+
+            if (pendingSelectionStart.HasValue && JSRuntime != null)
+            {
+                var start = pendingSelectionStart.Value;
+                var end = pendingSelectionEnd ?? start;
+                pendingSelectionStart = null;
+                pendingSelectionEnd = null;
+                await JSRuntime.InvokeVoidAsync("Radzen.setSelectionRange", input, start, end);
+            }
         }
 
         /// <inheritdoc />
@@ -676,21 +685,6 @@ namespace Radzen.Blazor
         bool stopKeydownPropagation;
         int? pendingSelectionStart;
         int? pendingSelectionEnd;
-
-        /// <inheritdoc />
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (pendingSelectionStart.HasValue && JSRuntime != null)
-            {
-                var start = pendingSelectionStart.Value;
-                var end = pendingSelectionEnd ?? start;
-                pendingSelectionStart = null;
-                pendingSelectionEnd = null;
-                await JSRuntime.InvokeVoidAsync("Radzen.setSelectionRange", input, start, end);
-            }
-        }
 
         async Task OnKeyPress(KeyboardEventArgs args)
         {
