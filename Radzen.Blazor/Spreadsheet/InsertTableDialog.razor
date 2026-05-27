@@ -1,7 +1,6 @@
 @using Radzen.Blazor
 @using Radzen.Documents.Spreadsheet
-@inject DialogService DialogService
-@inject Localizer Localizer
+@inherits SpreadsheetDialogBase
 
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
@@ -38,8 +37,6 @@
     [Parameter] public InsertTableDraft Draft { get; set; } = default!;
     [Parameter] public string? FocusFieldId { get; set; }
 
-    private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
-
     private void OnNameChanged(string value) => Draft.Name = value ?? string.Empty;
     private void OnHasHeadersChanged(bool value) => Draft.HasHeaders = value;
     private void OnRangeFormulaChanged(string? value) => Draft.RangeFormula = value ?? string.Empty;
@@ -53,10 +50,5 @@
     {
         Draft.Name = Draft.Name.Trim();
         DialogService.Close(Draft);
-    }
-
-    private void OnCancel()
-    {
-        DialogService.Close(null);
     }
 }
