@@ -158,6 +158,50 @@ public partial class CellMenu : ComponentBase
         }
     }
 
+    private sealed class FilterColumnVisitor : FilterCriterionVisitorBase
+    {
+        public HashSet<int> Columns { get; } = [];
+
+        protected override void DefaultVisit(FilterCriterion criterion)
+        {
+            if (criterion is FilterCriterionLeaf leaf)
+            {
+                Columns.Add(leaf.Column);
+            }
+        }
+
+        public override void Visit(TopFilterCriterion criterion) => Columns.Add(criterion.Column);
+
+        public override void Visit(DynamicFilterCriterion criterion) => Columns.Add(criterion.Column);
+
+        public override void Visit(CellColorFilterCriterion criterion) => Columns.Add(criterion.Column);
+    }
+
+    internal static bool IsRowHiddenByOtherColumnFilter(Worksheet worksheet, int row, int currentColumn)
+    {
+        foreach (var filter in worksheet.Filters)
+        {
+            if (FilterTargetsOnlyColumn(filter, currentColumn))
+            {
+                continue;
+            }
+
+            if (!filter.Criterion.Matches(worksheet, row))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool FilterTargetsOnlyColumn(SheetFilter filter, int column)
+    {
+        var visitor = new FilterColumnVisitor();
+        filter.Criterion.Accept(visitor);
+        return visitor.Columns.Count == 1 && visitor.Columns.Contains(column);
+    }
+
     private async Task OnSortAscendingAsync()
     {
         await SortAscending.InvokeAsync();
@@ -357,16 +401,7 @@ public partial class CellMenu : ComponentBase
     }
 
     private bool HasFilterApplied()
-    {
-        foreach (var filter in Worksheet.Filters)
-        {
-            if (filter.Range.Contains(Row, Column))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+        => Worksheet.Filters.Any(f => f.Range.Contains(Row, Column));
 
     private List<(string Text, object? Value)> LoadAvailableValues()
     {
@@ -392,27 +427,7 @@ public partial class CellMenu : ComponentBase
             // Start from the second row (header row + 1)
             for (int row = rangeToUse.Start.Row + 1; row <= rangeToUse.End.Row; row++)
             {
-                // Check if this row is hidden by a filter that affects the current column
-                bool shouldSkipRow = false;
-                
-                foreach (var filter in Worksheet.Filters)
-                {
-                    // If the filter affects the current column, we should include the value
-                    // regardless of whether the row is hidden
-                    if (filter.Range.Contains(row, Column))
-                    {
-                        continue;
-                    }
-                    
-                    // If the filter affects a different range and the row is hidden, skip it
-                    if (Worksheet.Rows.IsHidden(row))
-                    {
-                        shouldSkipRow = true;
-                        break;
-                    }
-                }
-
-                if (shouldSkipRow)
+                if (IsRowHiddenByOtherColumnFilter(Worksheet, row, Column))
                 {
                     continue;
                 }
