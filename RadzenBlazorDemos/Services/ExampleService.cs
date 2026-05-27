@@ -342,14 +342,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Data Binding",
-                    Path = "spreadsheet-data-binding",
-                    Title = "Blazor Spreadsheet Data Binding | Free UI Components by Radzen",
-                    Description = "Bind the Radzen Blazor Spreadsheet to data using DataSheet with IQueryable.",
-                    Tags = new [] { "spreadsheet", "data", "binding", "datasheet", "iqueryable" }
-                },
-                new Example
-                {
                     Name = "Multiple Sheets",
                     Path = "spreadsheet-multiple-sheets",
                     Title = "Blazor Spreadsheet Multiple Sheets | Free UI Components by Radzen",
