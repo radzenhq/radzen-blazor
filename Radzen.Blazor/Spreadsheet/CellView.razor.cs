@@ -109,7 +109,7 @@ public partial class CellView : CellBase, IDisposable
     private string Class => ClassList.Create("rz-spreadsheet-cell")
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
                                      .Add("rz-spreadsheet-frozen-column", FrozenState.HasFlag(FrozenState.Column))
-                                     .Add($"rz-spreadsheet-cell-{cell.ValueType.ToString().ToLowerInvariant()}", cell is not null)
+                                     .Add($"rz-spreadsheet-cell-{cell?.ValueType.ToString().ToLowerInvariant()}", cell is not null)
                                      .Add("rz-spreadsheet-cell-invalid", cell?.HasValidationErrors == true)
                                      .ToString();
 
@@ -269,11 +269,7 @@ public partial class CellView : CellBase, IDisposable
             return;
         }
 
-        Documents.Spreadsheet.Table? table = null;
-        foreach (var t in Worksheet.Tables)
-        {
-            if (t.Range.Contains(Row, Column)) { table = t; break; }
-        }
+        var table = Worksheet.GetTableContaining(Row, Column);
         if (table is null)
         {
             return;
@@ -312,8 +308,8 @@ public partial class CellView : CellBase, IDisposable
             //   - Columns only    → odd data-col offset gets the alt color, all rows.
             //   - Both on         → alt color appears only when BOTH row AND col offsets
             //                       are odd. Other intersections keep the base color.
-            var rowOdd = ((Row - dataStart) & 1) == 1;
-            var colOdd = ((Column - table.Range.Start.Column) & 1) == 1;
+            var rowOdd = (Row - dataStart) % 2 != 0;
+            var colOdd = (Column - table.Range.Start.Column) % 2 != 0;
 
             if (table.ShowBandedRows && table.ShowBandedColumns)
             {
@@ -441,7 +437,14 @@ public partial class CellView : CellBase, IDisposable
         // underlying Cell objects, but our Row/Column stay fixed, so a parameter-only
         // check would keep showing the stale cell until the next scroll. Comparing the
         // held cell against the current occupant catches those structural shifts.
-        var current = Worksheet?.Cells[Row, Column];
+        Cell? current = null;
+        if (Worksheet is not null)
+        {
+            var lookupRef = new CellRef(Row, Column);
+            var mergedRange = Worksheet.MergedCells.GetMergedRange(lookupRef);
+            var anchor = mergedRange == RangeRef.Invalid ? lookupRef : mergedRange.Start;
+            current = Worksheet.Cells[anchor.Row, anchor.Column];
+        }
 
         if (didRowChange || didColumnChange || didSheetChange || !ReferenceEquals(cell, current))
         {
@@ -490,22 +493,7 @@ public partial class CellView : CellBase, IDisposable
         }
     }
 
-    private bool IsInsideAnyTable()
-    {
-        if (Worksheet?.Tables is null)
-        {
-            return false;
-        }
-
-        foreach (var t in Worksheet.Tables)
-        {
-            if (t.Range.Contains(Row, Column))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    private bool IsInsideAnyTable() => Worksheet?.GetTableContaining(Row, Column) is not null;
 
     void IDisposable.Dispose()
     {
