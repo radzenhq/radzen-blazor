@@ -268,7 +268,7 @@ public static class NumberFormat
             }
         }
 
-        var sb = new StringBuilder();
+        var sb = StringBuilderCache.Acquire();
         var tokens = section.Tokens;
 
         for (var i = 0; i < tokens.Count; i++)
@@ -338,7 +338,7 @@ public static class NumberFormat
             }
         }
 
-        return sb.ToString();
+        return StringBuilderCache.GetStringAndRelease(sb);
     }
 
     private static string FormatNumber(FormatSection section, double value)
@@ -374,7 +374,7 @@ public static class NumberFormat
 
         absValue = Math.Round(absValue, decimalPlaces, MidpointRounding.AwayFromZero);
 
-        var sb = new StringBuilder();
+        var sb = StringBuilderCache.Acquire();
 
         sb.Append(section.Prefix);
 
@@ -479,12 +479,12 @@ public static class NumberFormat
 
         sb.Append(section.Suffix);
 
-        return sb.ToString();
+        return StringBuilderCache.GetStringAndRelease(sb);
     }
 
     private static string FormatScientific(FormatSection section, double value)
     {
-        var sb = new StringBuilder();
+        var sb = StringBuilderCache.Acquire();
         sb.Append(section.Prefix);
 
         var isNegative = value < 0;
@@ -558,6 +558,6 @@ public static class NumberFormat
         sb.Append(Math.Abs(exponent).ToString(CultureInfo.InvariantCulture).PadLeft(expDigits, '0'));
         sb.Append(section.Suffix);
 
-        return sb.ToString();
+        return StringBuilderCache.GetStringAndRelease(sb);
     }
 }

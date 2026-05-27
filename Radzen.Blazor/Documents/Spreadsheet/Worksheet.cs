@@ -684,7 +684,7 @@ public partial class Worksheet
                 }
             }
 
-            var rebuilt = new StringBuilder();
+            var rebuilt = StringBuilderCache.Acquire();
             foreach (var t in tokens)
             {
                 if (t.Type == FormulaTokenType.None)
@@ -694,7 +694,7 @@ public partial class Worksheet
 
                 rebuilt.Append(t.Value);
             }
-            cell.Formula = rebuilt.ToString();
+            cell.Formula = StringBuilderCache.GetStringAndRelease(rebuilt);
         }
     }
 
