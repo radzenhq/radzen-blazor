@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -46,16 +47,21 @@ public readonly struct ColumnRef(int column) : IEquatable<ColumnRef>
             throw new ArgumentOutOfRangeException(nameof(column), "Column index must be non-negative.");
         }
 
-        Span<char> buffer = stackalloc char[7];
-        var pos = buffer.Length;
+        var sb = StringBuilderCache.Acquire();
+        var start = sb.Length;
         column++;
         while (column > 0)
         {
             column--;
-            buffer[--pos] = (char)('A' + column % 26);
+            sb.Append((char)('A' + column % 26));
             column /= 26;
         }
-        return new string(buffer[pos..]);
+        // Digits were appended least-significant first; reverse in place.
+        for (int i = start, j = sb.Length - 1; i < j; i++, j--)
+        {
+            (sb[i], sb[j]) = (sb[j], sb[i]);
+        }
+        return StringBuilderCache.GetStringAndRelease(sb);
     }
 
     /// <inheritdoc/>
