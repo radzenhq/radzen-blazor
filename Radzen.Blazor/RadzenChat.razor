@@ -8,14 +8,20 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()" >
         <!-- Chat Header -->
-        @if (!string.IsNullOrWhiteSpace(Title) || ShowClearButton || ShowUsers)
+        @if (TitleContent != null || !string.IsNullOrWhiteSpace(Title) || ShowClearButton || ShowUsers)
         {       
             <RadzenStack class="rz-chat-header" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                    @if (!string.IsNullOrWhiteSpace(Title))
+                    <span class="rz-chat-header-title">
+                    @if (TitleContent != null)
                     {
-                        <span class="rz-chat-header-title">@Title</span>
+                        @TitleContent
                     }
+                    else if (!string.IsNullOrWhiteSpace(Title))
+                    {
+                        @Title
+                    }
+                    </span>
                     @if (ShowUsers && Users.Any())
                     {
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" class="rz-chat-users">
@@ -24,7 +30,7 @@
                                 <RadzenStack class="rz-chat-participant-avatar" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0" title="@participant.Name">
                                     @if (!string.IsNullOrEmpty(participant.AvatarUrl))
                                     {
-                                        <img src="@participant.AvatarUrl" alt="@participant.Name" class="rz-chat-participant-image" />
+                                        <img src="@participant.AvatarUrl" alt="@participant.Name" class="rz-chat-participant-image"/>
                                     }
                                     else
                                     {

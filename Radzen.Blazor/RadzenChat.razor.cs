@@ -218,10 +218,16 @@ namespace Radzen.Blazor
         public string? MultipleUsersTypingFormat { get; set; } = "{0} and {1} others are typing...";
 
         /// <summary>
-        /// Gets or sets the title displayed in the chat header.
+        /// Gets or sets the title displayed in the chat header. <see cref="TitleContent" /> has preference over this property.
         /// </summary>
         [Parameter]
         public string? Title { get; set; }
+
+        /// <summary>
+        /// Gets or sets the custom title content rendered in the chat header.
+        /// </summary>
+        [Parameter]
+        public RenderFragment? TitleContent { get; set; }
 
         /// <summary>
         /// Gets or sets the placeholder text for the input field.

@@ -28,6 +28,27 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void RadzenChat_ShouldRenderWithTitleContent()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.TitleContent, builder =>
+                {
+                    builder.OpenComponent<RadzenBadge>(0);
+                    builder.AddAttribute(1, nameof(RadzenBadge.Text), "Chat Badge");
+                    builder.CloseComponent();
+                })
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, new List<ChatUser>())
+                .Add(p => p.Messages, new List<ChatMessage>())
+                .Add(p => p.EmptyMessage, "No messages yet!")
+            );
+
+            Assert.Contains("Chat Badge", component.Markup);
+        }
+
+        [Fact]
         public void RadzenChat_ShouldShowEmptyMessageWhenNoMessages()
         {
             using var ctx = new TestContext();
@@ -40,6 +61,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.EmptyMessage, "No messages yet!")
             );
 
+            Assert.Contains("Test Chat", component.Markup);
             Assert.Contains("No messages yet!", component.Markup);
         }
 
