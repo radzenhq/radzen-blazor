@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -8,21 +6,29 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Command to merge a range of cells.
 /// </summary>
-public class MergeCellsCommand(Worksheet sheet, RangeRef range, bool center = false) : ICommand, IProtectedCommand
+public class MergeCellsCommand : RangeSnapshotCommandBase
 {
     /// <inheritdoc/>
-    public SheetAction RequiredAction => SheetAction.FormatCells;
+    public override SheetAction RequiredAction => SheetAction.FormatCells;
 
     /// <inheritdoc/>
-    public SpreadsheetFeature? Feature => SpreadsheetFeature.Merging;
+    public override SpreadsheetFeature? Feature => SpreadsheetFeature.Merging;
 
-    private readonly Worksheet sheet = sheet;
-    private readonly RangeRef range = range;
-    private readonly bool center = center;
-    private readonly Dictionary<CellRef, (object? Value, string? Formula, Format Format)> savedCells = [];
+    private readonly RangeRef range;
+    private readonly bool center;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MergeCellsCommand"/> class.
+    /// </summary>
+    public MergeCellsCommand(Worksheet sheet, RangeRef range, bool center = false)
+        : base(sheet)
+    {
+        this.range = range;
+        this.center = center;
+    }
 
     /// <inheritdoc/>
-    public bool Execute()
+    protected override bool DoExecute()
     {
         if (range.Start == range.End)
         {
@@ -37,12 +43,11 @@ public class MergeCellsCommand(Worksheet sheet, RangeRef range, bool center = fa
 
         foreach (var cellRef in range.GetCells())
         {
-            var cell = sheet.Cells[cellRef.Row, cellRef.Column];
-
-            savedCells[cellRef] = (cell.Value, cell.Formula, cell.Format.Clone());
+            Capture(cellRef);
 
             if (cellRef != range.Start)
             {
+                var cell = sheet.Cells[cellRef.Row, cellRef.Column];
                 cell.Value = null;
             }
         }
@@ -59,25 +64,10 @@ public class MergeCellsCommand(Worksheet sheet, RangeRef range, bool center = fa
     }
 
     /// <inheritdoc/>
-    public void Unexecute()
+    public override void Unexecute()
     {
         sheet.MergedCells.Remove(range);
 
-        foreach (var kvp in savedCells)
-        {
-            if (sheet.Cells.TryGet(kvp.Key.Row, kvp.Key.Column, out var cell))
-            {
-                cell.Format = kvp.Value.Format.Clone();
-
-                if (kvp.Value.Formula is not null)
-                {
-                    cell.Formula = kvp.Value.Formula;
-                }
-                else
-                {
-                    cell.Value = kvp.Value.Value;
-                }
-            }
-        }
+        RestoreSnapshot();
     }
 }
