@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,9 @@ namespace Radzen.Documents.Spreadsheet;
 
 class CsvWriter(Worksheet sheet, CsvExportOptions options)
 {
+    private readonly string quote = options.QuoteChar.ToString();
+    private readonly string doubleQuote = new string(options.QuoteChar, 2);
+
     public void Write(Stream stream)
     {
         // Write the encoding's BOM (if any) once, manually. Encoding.GetBytes does not
@@ -27,27 +31,35 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
 
     private string BuildContent()
     {
-        var populated = sheet.Cells.GetPopulatedCells()
-            .Where(c => c.Value is not null || !string.IsNullOrEmpty(c.Formula))
-            .ToList();
+        // Single pass: collect non-empty cells into a flat dict + track bounds.
+        var cells = new Dictionary<(int Row, int Column), Cell>();
+        var maxRow = -1;
+        var maxCol = -1;
+        foreach (var cell in sheet.Cells.GetPopulatedCells())
+        {
+            if (cell.Value is null && string.IsNullOrEmpty(cell.Formula))
+            {
+                continue;
+            }
+            cells[(cell.Address.Row, cell.Address.Column)] = cell;
+            if (cell.Address.Row > maxRow)
+            {
+                maxRow = cell.Address.Row;
+            }
+            if (cell.Address.Column > maxCol)
+            {
+                maxCol = cell.Address.Column;
+            }
+        }
 
-        if (populated.Count == 0)
+        if (cells.Count == 0)
         {
             return string.Empty;
         }
 
-        var maxRow = populated.Max(c => c.Address.Row);
-        var maxCol = populated.Max(c => c.Address.Column);
-
-        // row -> col -> cell, for O(1) lookups during emission
-        var rowMap = populated
-            .GroupBy(c => c.Address.Row)
-            .ToDictionary(g => g.Key, g => g.ToDictionary(c => c.Address.Column));
-
         var sb = new StringBuilder();
         for (var r = 0; r <= maxRow; r++)
         {
-            rowMap.TryGetValue(r, out var cols);
             for (var c = 0; c <= maxCol; c++)
             {
                 if (c > 0)
@@ -55,7 +67,7 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
                     sb.Append(options.Separator);
                 }
 
-                var field = cols is not null && cols.TryGetValue(c, out var cell)
+                var field = cells.TryGetValue((r, c), out var cell)
                     ? FormatCell(cell)
                     : string.Empty;
 
@@ -126,7 +138,6 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
 
     private string Wrap(string field)
     {
-        var q = options.QuoteChar.ToString();
-        return q + field.Replace(q, q + q, StringComparison.Ordinal) + q;
+        return quote + field.Replace(quote, doubleQuote, StringComparison.Ordinal) + quote;
     }
 }
