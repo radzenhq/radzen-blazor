@@ -57,7 +57,7 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
             return string.Empty;
         }
 
-        var sb = new StringBuilder();
+        var sb = StringBuilderCache.Acquire();
         for (var r = 0; r <= maxRow; r++)
         {
             for (var c = 0; c <= maxCol; c++)
@@ -76,7 +76,7 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
             sb.Append(options.LineEnding);
         }
 
-        return sb.ToString();
+        return StringBuilderCache.GetStringAndRelease(sb);
     }
 
     private static string FormatCell(Cell cell)
