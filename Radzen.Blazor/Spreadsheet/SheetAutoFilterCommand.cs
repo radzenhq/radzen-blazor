@@ -18,7 +18,7 @@ public class SheetAutoFilterCommand : ICommand, IProtectedCommand
 
     private readonly Worksheet sheet;
     private readonly RangeRef range;
-    private readonly RangeRef? previousRange;
+    private RangeRef? previousRange;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SheetAutoFilterCommand"/> class.
@@ -30,12 +30,13 @@ public class SheetAutoFilterCommand : ICommand, IProtectedCommand
         ArgumentNullException.ThrowIfNull(sheet);
         this.sheet = sheet;
         this.range = range;
-        this.previousRange = sheet.AutoFilter.Range;
     }
 
     /// <inheritdoc/>
     public bool Execute()
     {
+        previousRange = sheet.AutoFilter.Range;
+
         if (sheet.AutoFilter.Range is null)
         {
             sheet.AutoFilter.Range = range;
