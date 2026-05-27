@@ -21,16 +21,17 @@ public sealed class FormulaEngine
     private readonly Worksheet sheet;
 
     /// <summary>
-    /// Creates a new engine with an internal scratch worksheet (1024 × 100 cells).
+    /// Creates a new engine with an internal worksheet sized to Excel's limits
+    /// (1,048,576 rows × 16,384 columns).
     /// </summary>
     public FormulaEngine()
     {
         workbook = new Workbook();
-        sheet = workbook.AddSheet("Engine", 1024, 100);
+        sheet = workbook.AddSheet("Engine", 1_048_576, 16_384);
     }
 
     /// <summary>
-    /// The function registry. Use <c>Functions.Add(new YourFormulaFunction())</c> to
+    /// The function registry. Use <c>Functions.Add&lt;YourFormulaFunction&gt;()</c> to
     /// extend the formula library with custom functions.
     /// </summary>
     public FunctionStore Functions => sheet.FunctionRegistry;
@@ -69,18 +70,13 @@ public sealed class FormulaEngine
 
     /// <summary>
     /// Evaluates an ad-hoc expression against the current engine state, returning the
-    /// result without leaving a permanent cell behind.
+    /// result without writing to any cell.
     /// </summary>
     public object? Evaluate(string expression)
     {
         ArgumentException.ThrowIfNullOrEmpty(expression);
         var formula = expression[0] == '=' ? expression : "=" + expression;
-
-        // Reserve the last cell of the internal sheet as the eval scratch slot.
-        // Callers using A1-style references stay clear of this corner.
-        var cell = sheet.Cells[sheet.RowCount - 1, sheet.ColumnCount - 1];
-        cell.Formula = formula;
-        return cell.Value;
+        return sheet.EvaluateExpression(formula).Value;
     }
 }
 

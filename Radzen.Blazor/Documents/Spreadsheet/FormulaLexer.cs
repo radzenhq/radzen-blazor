@@ -258,13 +258,6 @@ internal class FormulaLexer(string expression, bool strict = true)
             case '#':
                 return ScanErrorLiteral();
             case '=':
-
-                if (TryAdvance('>'))
-                {
-                    Advance(1);
-                    return new FormulaToken(FormulaTokenType.EqualsGreaterThan, ">=");
-                }
-
                 Advance(1);
                 return new FormulaToken(FormulaTokenType.Equals, "=");
             case '>':
@@ -693,7 +686,7 @@ internal class FormulaLexer(string expression, bool strict = true)
                         value.UlongValue = val;
                     }
                 }
-                else if (!hasUSuffix & hasLSuffix)
+                else if (!hasUSuffix && hasLSuffix)
                 {
                     if (val <= Int64.MaxValue)
                     {

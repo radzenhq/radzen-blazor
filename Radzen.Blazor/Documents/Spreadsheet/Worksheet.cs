@@ -118,7 +118,11 @@ public partial class Worksheet
 
     internal event Action? ImagesChanged;
 
-    internal void AddImage(SheetImage image) { images.Add(image); ImagesChanged?.Invoke(); }
+    internal void AddImage(SheetImage image)
+    {
+        images.Add(image);
+        ImagesChanged?.Invoke();
+    }
 
     internal bool RemoveImage(SheetImage image)
     {
@@ -162,7 +166,11 @@ public partial class Worksheet
     /// <summary>
     /// Adds a chart to the sheet.
     /// </summary>
-    public void AddChart(SheetChart chart) { charts.Add(chart); ChartsChanged?.Invoke(); }
+    public void AddChart(SheetChart chart)
+    {
+        charts.Add(chart);
+        ChartsChanged?.Invoke();
+    }
 
     /// <summary>
     /// Removes a chart from the sheet.
@@ -213,7 +221,7 @@ public partial class Worksheet
             return true;
         }
 
-        return Cells.TryGet(address.Row, address.Column, out var cell) ? !cell.Format.IsLocked : false;
+        return Cells.TryGet(address.Row, address.Column, out var cell) && !cell.Format.IsLocked;
     }
 
     /// <summary>
@@ -250,6 +258,21 @@ public partial class Worksheet
     {
         ArgumentNullException.ThrowIfNull(table);
         return tables.Remove(table);
+    }
+
+    /// <summary>
+    /// Gets the table containing the cell at the given row/column, or null if none.
+    /// </summary>
+    public Table? GetTableContaining(int row, int column)
+    {
+        for (int i = 0; i < tables.Count; i++)
+        {
+            if (tables[i].Range.Contains(row, column))
+            {
+                return tables[i];
+            }
+        }
+        return null;
     }
 
     /// <summary>
@@ -292,13 +315,33 @@ public partial class Worksheet
         else
         {
             isEvaluating = true;
-            var visitor = new FormulaEvaluator(this, cell);
-            var eval = visitor.Evaluate(tree.Root);
-            cell.Data = eval;
-            isEvaluating = false;
+            try
+            {
+                var visitor = new FormulaEvaluator(this, cell);
+                var eval = visitor.Evaluate(tree.Root);
+                cell.Data = eval;
+            }
+            finally
+            {
+                isEvaluating = false;
+            }
         }
 
         cell.OnChanged();
+    }
+
+    internal CellData EvaluateExpression(string expression)
+    {
+        var tree = FormulaParser.Parse(expression);
+
+        if (tree.Errors.Count > 0)
+        {
+            return CellData.FromError(CellError.Name);
+        }
+
+        var context = new Cell(this, new CellRef(0, 0));
+        var visitor = new FormulaEvaluator(this, context);
+        return visitor.Evaluate(tree.Root);
     }
 
     internal void OnCellValueChanged(Cell cell)
@@ -400,7 +443,11 @@ public partial class Worksheet
             result.Append(rowDelimiter);
         }
 
-        return result.ToString().TrimEnd(rowDelimiter.ToCharArray());
+        if (result.Length >= rowDelimiter.Length)
+        {
+            result.Length -= rowDelimiter.Length;
+        }
+        return result.ToString();
     }
 
     internal void InsertDelimitedString(CellRef address, string value, string cellDelimiter = "\t")
@@ -448,7 +495,7 @@ public partial class Worksheet
         invalidReferenceColumns.Add(columnIndex);
 
         // Any formulas that reference this column should be turned into =#REF!
-        InvalidateFormulasReferencing(column: columnIndex);
+        InvalidateFormulasReferencing(cellRef => cellRef.Column == columnIndex);
 
         ColumnCount--;
 
@@ -487,7 +534,7 @@ public partial class Worksheet
         invalidReferenceRows.Add(rowIndex);
 
         // Any formulas that reference this row should be turned into =#REF!
-        InvalidateFormulasReferencing(row: rowIndex);
+        InvalidateFormulasReferencing(cellRef => cellRef.Row == rowIndex);
 
         RowCount--;
 
@@ -505,7 +552,7 @@ public partial class Worksheet
     private void AdjustFormulas(Func<FormulaToken, CellRef> adjust)
     {
         // Snapshot to avoid collection-modified errors when setting Formula triggers graph updates
-        foreach (var cell in Cells.GetPopulatedCells().ToList())
+        foreach (var cell in graph.FormulaCells.ToList())
         {
             if (cell.FormulaSyntaxTree is null || string.IsNullOrEmpty(cell.Formula))
             {
@@ -524,45 +571,20 @@ public partial class Worksheet
 
     internal static string AdjustFormulaForCopy(string formula, int rowDelta, int colDelta)
     {
-        // Expect formula starts with '='; lexer scans tokens including '=' and cells
-        var tokens = FormulaLexer.Scan(formula, false);
+        var tree = FormulaParser.Parse(formula);
 
-        for (int i = 0; i < tokens.Count; i++)
+        if (tree.Errors.Count > 0)
         {
-            var t = tokens[i];
-            if (t.Type == FormulaTokenType.CellIdentifier)
-            {
-                var addr = t.Address;
-                var newRow = addr.IsRowAbsolute ? addr.Row : addr.Row + rowDelta;
-                var newCol = addr.IsColumnAbsolute ? addr.Column : addr.Column + colDelta;
-
-                var sb = new StringBuilder();
-                if (addr.IsColumnAbsolute)
-                {
-                    sb.Append('$');
-                }
-                sb.Append(ColumnRef.ToString(newCol));
-                if (addr.IsRowAbsolute)
-                {
-                    sb.Append('$');
-                }
-                sb.Append(newRow + 1);
-
-                t.Value = sb.ToString();
-                tokens[i] = t;
-            }
+            return formula;
         }
 
-        var result = new StringBuilder();
-        foreach (var t in tokens)
+        return FormulaRewriter.Rewrite(formula, tree, token =>
         {
-            if (t.Type == FormulaTokenType.None)
-            {
-                break;
-            }
-            result.Append(t.Value);
-        }
-        return result.ToString();
+            var addr = token.Address;
+            var newRow = addr.IsRowAbsolute ? addr.Row : addr.Row + rowDelta;
+            var newCol = addr.IsColumnAbsolute ? addr.Column : addr.Column + colDelta;
+            return new CellRef(newRow, newCol) { Worksheet = addr.Worksheet };
+        });
     }
 
     internal void PasteRange(Worksheet sourceSheet, RangeRef source, CellRef destinationStart, FormulaAdjustment adjustment)
@@ -629,10 +651,10 @@ public partial class Worksheet
         }
     }
 
-    private void InvalidateFormulasReferencing(int? row = null, int? column = null)
+    internal void InvalidateFormulasReferencing(Predicate<CellRef> isInvalidated)
     {
         // Snapshot to avoid collection-modified errors when setting Formula triggers graph updates
-        foreach (var cell in Cells.GetPopulatedCells().ToList())
+        foreach (var cell in graph.FormulaCells.ToList())
         {
             var tree = cell.FormulaSyntaxTree;
             if (tree is null)
@@ -640,49 +662,57 @@ public partial class Worksheet
                 continue;
             }
 
-            bool hasRef;
+            var hasRef = tree.Find(node => node switch
+            {
+                CellSyntaxNode c => isInvalidated(c.Token.Address),
+                RangeSyntaxNode r => RangeContainsInvalidated(r, isInvalidated),
+                _ => false,
+            }).Count > 0;
 
-            if (row.HasValue)
+            if (!hasRef)
             {
-                var rowIndex = row.Value;
-                hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.Address.Row == rowIndex
-                    || node is RangeSyntaxNode r && r.Start.Token.Address.Row <= rowIndex && r.End.Token.Address.Row >= rowIndex).Count > 0;
-            }
-            else
-            {
-                var columnIndex = column!.Value;
-                hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.Address.Column == columnIndex
-                    || node is RangeSyntaxNode r && r.Start.Token.Address.Column <= columnIndex && r.End.Token.Address.Column >= columnIndex).Count > 0;
+                continue;
             }
 
-            if (hasRef)
+            var tokens = FormulaLexer.Scan(cell.Formula!, false);
+            for (var i = 0; i < tokens.Count; i++)
             {
-                var tokens = FormulaLexer.Scan(cell.Formula!, false);
-                for (int i = 0; i < tokens.Count; i++)
+                var t = tokens[i];
+                if (t.Type == FormulaTokenType.CellIdentifier && isInvalidated(t.Address))
                 {
-                    var t = tokens[i];
-                    if (t.Type == FormulaTokenType.CellIdentifier)
-                    {
-                        if ((row.HasValue && t.Address.Row == row.Value) ||
-                            (column.HasValue && t.Address.Column == column.Value))
-                        {
-                            tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
-                        }
-                    }
+                    tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
                 }
-                var rebuilt = new StringBuilder();
-                foreach (var t in tokens)
-                {
-                    if (t.Type == FormulaTokenType.None)
-                    {
-                        break;
-                    }
+            }
 
-                    rebuilt.Append(t.Value);
+            var rebuilt = new StringBuilder();
+            foreach (var t in tokens)
+            {
+                if (t.Type == FormulaTokenType.None)
+                {
+                    break;
                 }
-                cell.Formula = rebuilt.ToString();
+
+                rebuilt.Append(t.Value);
+            }
+            cell.Formula = rebuilt.ToString();
+        }
+    }
+
+    private static bool RangeContainsInvalidated(RangeSyntaxNode range, Predicate<CellRef> isInvalidated)
+    {
+        var start = range.Start.Token.Address;
+        var end = range.End.Token.Address;
+        for (var r = start.Row; r <= end.Row; r++)
+        {
+            for (var c = start.Column; c <= end.Column; c++)
+            {
+                if (isInvalidated(new CellRef(r, c)))
+                {
+                    return true;
+                }
             }
         }
+        return false;
     }
 
     /// <summary>
@@ -832,6 +862,8 @@ public partial class Worksheet
             var token = cellSyntaxNode.Token;
             var adjusted = adjust(token);
 
+            AppendWorksheetPrefix(token.Address.Worksheet);
+
             if (token.Address.IsColumnAbsolute)
             {
                 builder.Append('$');
@@ -876,6 +908,8 @@ public partial class Worksheet
                 (startCell, endCell) = CellRef.Swap(startCell, endCell);
             }
 
+            AppendWorksheetPrefix(startToken.Address.Worksheet);
+
             if (startToken.Address.IsColumnAbsolute)
             {
                 builder.Append('$');
@@ -899,6 +933,45 @@ public partial class Worksheet
                 builder.Append('$');
             }
             builder.Append(endCell.Row + 1);
+        }
+
+        private void AppendWorksheetPrefix(string? worksheet)
+        {
+            if (string.IsNullOrEmpty(worksheet))
+            {
+                return;
+            }
+
+            if (NeedsQuoting(worksheet))
+            {
+                builder.Append('\'');
+                builder.Append(worksheet.Replace("'", "''", StringComparison.Ordinal));
+                builder.Append('\'');
+            }
+            else
+            {
+                builder.Append(worksheet);
+            }
+
+            builder.Append('!');
+        }
+
+        private static bool NeedsQuoting(string name)
+        {
+            if (char.IsDigit(name[0]))
+            {
+                return true;
+            }
+
+            foreach (var ch in name)
+            {
+                if (ch == ' ' || ch == '\'')
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static string TokenToOperator(FormulaToken token)
