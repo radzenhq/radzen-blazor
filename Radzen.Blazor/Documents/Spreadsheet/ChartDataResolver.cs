@@ -103,7 +103,15 @@ public static class ChartDataResolver
                     }
                 }
             }
-            catch
+            catch (ArgumentException)
+            {
+                // Fall through to cache
+            }
+            catch (FormatException)
+            {
+                // Fall through to cache
+            }
+            catch (IndexOutOfRangeException)
             {
                 // Fall through to cache
             }
@@ -155,7 +163,23 @@ public static class ChartDataResolver
                     }
                 }
             }
-            catch
+            catch (ArgumentException)
+            {
+                // Fall through to cache
+            }
+            catch (FormatException)
+            {
+                // Fall through to cache
+            }
+            catch (IndexOutOfRangeException)
+            {
+                // Fall through to cache
+            }
+            catch (InvalidCastException)
+            {
+                // Fall through to cache
+            }
+            catch (OverflowException)
             {
                 // Fall through to cache
             }

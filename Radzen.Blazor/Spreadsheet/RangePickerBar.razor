@@ -44,7 +44,19 @@
         {
             await JSRuntime.InvokeVoidAsync("Radzen.beginRangePickKeyHandler", selfRef);
         }
-        catch
+        catch (JSDisconnectedException)
+        {
+            // Tolerate missing JS during prerender; the bar is purely interactive.
+        }
+        catch (JSException)
+        {
+            // Tolerate missing JS during prerender; the bar is purely interactive.
+        }
+        catch (ObjectDisposedException)
+        {
+            // Tolerate missing JS during prerender; the bar is purely interactive.
+        }
+        catch (TaskCanceledException)
         {
             // Tolerate missing JS during prerender; the bar is purely interactive.
         }
@@ -101,7 +113,10 @@
         if (selfRef is not null)
         {
             try { await JSRuntime.InvokeVoidAsync("Radzen.endRangePickKeyHandler"); }
-            catch { }
+            catch (JSDisconnectedException) { }
+            catch (JSException) { }
+            catch (ObjectDisposedException) { }
+            catch (TaskCanceledException) { }
         }
 
         visible = false;
