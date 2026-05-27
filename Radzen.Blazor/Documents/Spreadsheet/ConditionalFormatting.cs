@@ -103,7 +103,10 @@ public class ConditionalFormatStore
 
             foreach (var rule in kvp.Value)
             {
-                var candidate = rule.GetFormat(cell);
+                var candidate = rule is Top10Rule top
+                    ? top.GetFormat(cell, kvp.Key)
+                    : rule.GetFormat(cell);
+
                 if (candidate is null)
                 {
                     continue;
