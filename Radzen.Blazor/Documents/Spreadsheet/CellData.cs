@@ -329,7 +329,15 @@ public class CellData : IComparable, IComparable<CellData>
             {
                 return Convert.ChangeType(Value, conversionType, CultureInfo.InvariantCulture);
             }
-            catch (Exception)
+            catch (InvalidCastException)
+            {
+                return null;
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+            catch (OverflowException)
             {
                 return null;
             }
@@ -406,7 +414,7 @@ public class CellData : IComparable, IComparable<CellData>
     {
         ArgumentNullException.ThrowIfNull(other);
         // special handling of empty cell vs empty string.
-        if (other.IsEmpty && string.IsNullOrEmpty(Value?.ToString()) || IsEmpty && string.IsNullOrEmpty(other.Value?.ToString()))
+        if ((other.IsEmpty && string.IsNullOrEmpty(Value?.ToString())) || (IsEmpty && string.IsNullOrEmpty(other.Value?.ToString())))
         {
             return true;
         }
@@ -475,7 +483,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return Value is null ? -1 : Value.GetHashCode();
+        return HashCode.Combine(Type, Value);
     }
 
     internal CellData(object value, CellDataType type)
@@ -552,7 +560,6 @@ public class CellData : IComparable, IComparable<CellData>
         return criteria.StartsWith(">=", StringComparison.Ordinal) ||
                criteria.StartsWith("<=", StringComparison.Ordinal) ||
                criteria.StartsWith("<>", StringComparison.Ordinal) ||
-               criteria.StartsWith("!=", StringComparison.Ordinal) ||
                criteria.StartsWith('>') ||
                criteria.StartsWith('<');
     }
@@ -578,7 +585,7 @@ public class CellData : IComparable, IComparable<CellData>
             operatorStr = "<=";
             valueStr = criteria[2..].Trim();
         }
-        else if (criteria.StartsWith("<>", StringComparison.Ordinal) || criteria.StartsWith("!=", StringComparison.Ordinal))
+        else if (criteria.StartsWith("<>", StringComparison.Ordinal))
         {
             operatorStr = "<>";
             valueStr = criteria[2..].Trim();
@@ -624,7 +631,7 @@ public class CellData : IComparable, IComparable<CellData>
             "<" => cellValue < numericValue,
             ">=" => cellValue >= numericValue,
             "<=" => cellValue <= numericValue,
-            "<>" or "!=" => cellValue != numericValue,
+            "<>" => cellValue != numericValue,
             _ => false
         };
     }
