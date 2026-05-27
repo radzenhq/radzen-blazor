@@ -16,7 +16,22 @@
     [CascadingParameter]
     public ISpreadsheet? Spreadsheet { get; set; }
 
-    private Worksheet? subscribed;
+    private readonly EventBinding<Worksheet> worksheetBinding;
+
+    public TableDesignToolset()
+    {
+        worksheetBinding = new EventBinding<Worksheet>(
+            w =>
+            {
+                w.Selection.Changed += OnSelectionChanged;
+                w.AutoFilterChanged += OnSelectionChanged;
+            },
+            w =>
+            {
+                w.Selection.Changed -= OnSelectionChanged;
+                w.AutoFilterChanged -= OnSelectionChanged;
+            });
+    }
 
     private bool IsActive
     {
@@ -44,26 +59,9 @@
         }
     }
 
-    public override async Task SetParametersAsync(ParameterView parameters)
+    protected override void OnParametersSet()
     {
-        await base.SetParametersAsync(parameters);
-
-        if (!ReferenceEquals(subscribed, Worksheet))
-        {
-            if (subscribed is not null)
-            {
-                subscribed.Selection.Changed -= OnSelectionChanged;
-                subscribed.AutoFilterChanged -= OnSelectionChanged;
-            }
-
-            subscribed = Worksheet;
-
-            if (subscribed is not null)
-            {
-                subscribed.Selection.Changed += OnSelectionChanged;
-                subscribed.AutoFilterChanged += OnSelectionChanged;
-            }
-        }
+        worksheetBinding.Bind(Worksheet);
     }
 
     // RadzenTabsItem.Visible is captured at parameter-set time, so we need an explicit
@@ -72,10 +70,6 @@
 
     public void Dispose()
     {
-        if (subscribed is not null)
-        {
-            subscribed.Selection.Changed -= OnSelectionChanged;
-            subscribed.AutoFilterChanged -= OnSelectionChanged;
-        }
+        worksheetBinding.Dispose();
     }
 }

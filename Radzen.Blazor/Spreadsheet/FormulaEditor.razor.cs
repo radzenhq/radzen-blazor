@@ -28,22 +28,31 @@ public partial class FormulaEditor : ComponentBase, IDisposable
     [CascadingParameter]
     public ISpreadsheet Spreadsheet { get; set; } = default!;
 
-    /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
+    private readonly EventBinding<Selection> selectionBinding;
+    private readonly EventBinding<Editor> editorBinding;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FormulaEditor"/> class.
+    /// </summary>
+    public FormulaEditor()
     {
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+
+        editorBinding = new EventBinding<Editor>(
+            e => e.ValueChanged += OnEditorValueChanged,
+            e => e.ValueChanged -= OnEditorValueChanged);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+        editorBinding.Bind(Worksheet is not null ? Editor : null);
+
         if (Worksheet is not null)
         {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-            Editor.ValueChanged -= OnEditorValueChanged;
-        }
-
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-            Editor.ValueChanged += OnEditorValueChanged;
-
             Render();
         }
     }
@@ -118,19 +127,12 @@ public partial class FormulaEditor : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding.Dispose();
+        editorBinding.Dispose();
 
         if (boundCell is not null)
         {
             boundCell.Changed -= OnActiveCellChanged;
-        }
-
-        if (Editor is not null)
-        {
-            Editor.ValueChanged -= OnEditorValueChanged;
         }
     }
 

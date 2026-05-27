@@ -1,6 +1,5 @@
 using System;
 using Microsoft.AspNetCore.Components;
-using System.Threading.Tasks;
 
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
@@ -22,23 +21,24 @@ public partial class SelectionOverlay : IDisposable
     [Parameter]
     public IVirtualGridContext Context { get; set; } = default!;
 
-    /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
+    private readonly EventBinding<Selection> selectionBinding;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SelectionOverlay"/> class.
+    /// </summary>
+    public SelectionOverlay()
     {
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
-
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
     }
 
- 
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+    }
+
     private void OnSelectionChanged()
     {
         StateHasChanged();
@@ -46,9 +46,6 @@ public partial class SelectionOverlay : IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding.Dispose();
     }
 }

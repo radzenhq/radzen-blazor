@@ -78,20 +78,22 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
         => Worksheet?.Selection.Cell == CellRef.Invalid
         || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
 
-    /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
+    private readonly EventBinding<Selection> selectionBinding;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FormatToggleToolBase"/> class.
+    /// </summary>
+    protected FormatToggleToolBase()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
 
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
     }
 
     private void OnSelectionChanged()
@@ -101,9 +103,6 @@ public abstract class FormatToggleToolBase : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding.Dispose();
     }
 }
