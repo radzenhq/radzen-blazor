@@ -58,6 +58,18 @@ public abstract class HeaderBase : CellBase, IDisposable
     /// </summary>
     protected abstract bool CheckIsSelected(Selection selection);
 
+    private readonly EventBinding<Selection> selectionBinding;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HeaderBase"/> class.
+    /// </summary>
+    protected HeaderBase()
+    {
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
+
     /// <inheritdoc/>
     protected override void OnInitialized()
     {
@@ -67,19 +79,11 @@ public abstract class HeaderBase : CellBase, IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
-
         var didIndexChange = parameters.TryGetValue<int>(IndexParameterName, out var index) && Index != index;
 
         await base.SetParametersAsync(parameters);
 
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
+        selectionBinding.Bind(Worksheet?.Selection);
 
         if (didIndexChange)
         {
@@ -103,15 +107,17 @@ public abstract class HeaderBase : CellBase, IDisposable
         {
             var selection = Worksheet.Selection;
 
-            if (CheckIsActive(selection) != active)
+            var newActive = CheckIsActive(selection);
+            if (newActive != active)
             {
-                active = !active;
+                active = newActive;
                 dirty = true;
             }
 
-            if (CheckIsSelected(selection) != selected)
+            var newSelected = CheckIsSelected(selection);
+            if (newSelected != selected)
             {
-                selected = !selected;
+                selected = newSelected;
                 dirty = true;
             }
         }
@@ -121,9 +127,6 @@ public abstract class HeaderBase : CellBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding.Dispose();
     }
 }

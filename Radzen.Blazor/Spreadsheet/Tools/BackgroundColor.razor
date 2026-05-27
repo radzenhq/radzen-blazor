@@ -45,19 +45,18 @@
         => Worksheet?.Selection.Cell == CellRef.Invalid
         || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
 
-    public override async Task SetParametersAsync(ParameterView parameters)
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public BackgroundColor()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
 
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
     }
 
     private void OnSelectionChanged()
@@ -67,9 +66,6 @@
 
     public void Dispose()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding.Dispose();
     }
-} 
+}
