@@ -83,14 +83,17 @@ internal static class FormatExtensions
         format.BorderBottom?.AppendCss(sb, "bottom");
         format.BorderLeft?.AppendCss(sb, "left");
 
-        if (format.VerticalAlign != VerticalAlign.Top || format.TextAlign != TextAlign.Left)
+        var effectiveVerticalAlign = format.VerticalAlign ?? VerticalAlign.Top;
+        var effectiveTextAlign = format.TextAlign ?? TextAlign.Left;
+
+        if (effectiveVerticalAlign != VerticalAlign.Top || effectiveTextAlign != TextAlign.Left)
         {
             sb.Append("display: flex;");
 
-            if (format.VerticalAlign != VerticalAlign.Top)
+            if (effectiveVerticalAlign != VerticalAlign.Top)
             {
                 sb.Append("align-items: ");
-                sb.Append(format.VerticalAlign switch
+                sb.Append(effectiveVerticalAlign switch
                 {
                     VerticalAlign.Top => "flex-start",
                     VerticalAlign.Middle => "center",
@@ -100,10 +103,10 @@ internal static class FormatExtensions
                 sb.Append(';');
             }
 
-            if (format.TextAlign != TextAlign.Left)
+            if (effectiveTextAlign != TextAlign.Left)
             {
                 sb.Append("justify-content: ");
-                sb.Append(format.TextAlign switch
+                sb.Append(effectiveTextAlign switch
                 {
                     TextAlign.Center => "center",
                     TextAlign.Right => "flex-end",

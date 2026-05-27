@@ -1,5 +1,6 @@
 using Radzen.Blazor.Rendering;
 using System;
+using System.Linq;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -140,14 +141,14 @@ public class Format
     public bool IsFormulaHidden => FormulaHidden ?? false;
 
     /// <summary>
-    /// Gets or sets the text alignment in the format.
+    /// Gets or sets the text alignment in the format. Null means unset (default left).
     /// </summary>
-    public TextAlign TextAlign { get; set; } = TextAlign.Left;
+    public TextAlign? TextAlign { get; set; }
 
     /// <summary>
-    /// Gets or sets the vertical alignment in the format.
+    /// Gets or sets the vertical alignment in the format. Null means unset (default top).
     /// </summary>
-    public VerticalAlign VerticalAlign { get; set; } = VerticalAlign.Top;
+    public VerticalAlign? VerticalAlign { get; set; }
 
     /// <summary>
     /// Gets or sets the font family.
@@ -249,126 +250,116 @@ public class Format
         }
     }
 
+    internal event Action? Changed;
+
+    private sealed record FormatPropertyDescriptor(
+        string Name,
+        Func<Format, object?> Getter,
+        Action<Format, object?> Setter,
+        Func<Format, bool> IsSet,
+        Func<object?, object?>? CopyValue = null)
+    {
+        public object? Copy(object? value) => CopyValue is null ? value : CopyValue(value);
+    }
+
+    private static readonly FormatPropertyDescriptor[] Properties =
+    [
+        new("Bold",
+            f => f.Bold,
+            (f, v) => f.Bold = (bool)v!,
+            f => f.Bold),
+        new("Italic",
+            f => f.Italic,
+            (f, v) => f.Italic = (bool)v!,
+            f => f.Italic),
+        new("Underline",
+            f => f.Underline,
+            (f, v) => f.Underline = (bool)v!,
+            f => f.Underline),
+        new("Strikethrough",
+            f => f.Strikethrough,
+            (f, v) => f.Strikethrough = (bool)v!,
+            f => f.Strikethrough),
+        new("WrapText",
+            f => f.WrapText,
+            (f, v) => f.WrapText = (bool)v!,
+            f => f.WrapText),
+        new("Locked",
+            f => f.Locked,
+            (f, v) => f.Locked = (bool?)v,
+            f => f.Locked is not null),
+        new("FormulaHidden",
+            f => f.FormulaHidden,
+            (f, v) => f.FormulaHidden = (bool?)v,
+            f => f.FormulaHidden is not null),
+        new("TextAlign",
+            f => f.TextAlign,
+            (f, v) => f.TextAlign = (TextAlign?)v,
+            f => f.TextAlign is not null),
+        new("VerticalAlign",
+            f => f.VerticalAlign,
+            (f, v) => f.VerticalAlign = (VerticalAlign?)v,
+            f => f.VerticalAlign is not null),
+        new("FontFamily",
+            f => f.FontFamily,
+            (f, v) => f.FontFamily = (string?)v,
+            f => f.FontFamily is not null),
+        new("FontSize",
+            f => f.FontSize,
+            (f, v) => f.FontSize = (double?)v,
+            f => f.FontSize is not null),
+        new("Color",
+            f => f.Color,
+            (f, v) => f.Color = (string?)v,
+            f => f.Color is not null),
+        new("BackgroundColor",
+            f => f.BackgroundColor,
+            (f, v) => f.BackgroundColor = (string?)v,
+            f => f.BackgroundColor is not null),
+        // NumberFormat uses string.IsNullOrEmpty for IsSet to preserve original IsDefault semantics
+        // (empty string was considered default even though the setter fires Changed for null -> "").
+        new("NumberFormat",
+            f => f.NumberFormat,
+            (f, v) => f.NumberFormat = (string?)v,
+            f => !string.IsNullOrEmpty(f.NumberFormat)),
+        new("BorderTop",
+            f => f.BorderTop,
+            (f, v) => f.BorderTop = (BorderStyle?)v,
+            f => f.BorderTop is not null,
+            v => ((BorderStyle?)v)?.Clone()),
+        new("BorderRight",
+            f => f.BorderRight,
+            (f, v) => f.BorderRight = (BorderStyle?)v,
+            f => f.BorderRight is not null,
+            v => ((BorderStyle?)v)?.Clone()),
+        new("BorderBottom",
+            f => f.BorderBottom,
+            (f, v) => f.BorderBottom = (BorderStyle?)v,
+            f => f.BorderBottom is not null,
+            v => ((BorderStyle?)v)?.Clone()),
+        new("BorderLeft",
+            f => f.BorderLeft,
+            (f, v) => f.BorderLeft = (BorderStyle?)v,
+            f => f.BorderLeft is not null,
+            v => ((BorderStyle?)v)?.Clone()),
+    ];
+
     /// <summary>
     /// Gets a value indicating whether all format properties are at their default values.
     /// </summary>
-    public bool IsDefault =>
-        Color is null &&
-        BackgroundColor is null &&
-        !Bold &&
-        !Italic &&
-        !Underline &&
-        !Strikethrough &&
-        !WrapText &&
-        FontFamily is null &&
-        FontSize is null &&
-        BorderTop is null &&
-        BorderRight is null &&
-        BorderBottom is null &&
-        BorderLeft is null &&
-        TextAlign == TextAlign.Left &&
-        VerticalAlign == VerticalAlign.Top &&
-        string.IsNullOrEmpty(NumberFormat) &&
-        Locked is null &&
-        FormulaHidden is null;
-
-    internal event Action? Changed;
+    public bool IsDefault => Properties.All(p => !p.IsSet(this));
 
     internal Format Merge(Format format)
     {
         ArgumentNullException.ThrowIfNull(format);
         var merged = Clone();
-
-        if (format.Color is not null)
+        foreach (var p in Properties)
         {
-            merged.Color = format.Color;
+            if (p.IsSet(format))
+            {
+                p.Setter(merged, p.Copy(p.Getter(format)));
+            }
         }
-
-        if (format.BackgroundColor is not null)
-        {
-            merged.BackgroundColor = format.BackgroundColor;
-        }
-
-        if (format.Bold)
-        {
-            merged.Bold = true;
-        }
-
-        if (format.Italic)
-        {
-            merged.Italic = true;
-        }
-
-        if (format.Underline)
-        {
-            merged.Underline = true;
-        }
-
-        if (format.Strikethrough)
-        {
-            merged.Strikethrough = true;
-        }
-
-        if (format.WrapText)
-        {
-            merged.WrapText = true;
-        }
-
-        if (format.TextAlign != TextAlign.Left)
-        {
-            merged.TextAlign = format.TextAlign;
-        }
-
-        if (format.VerticalAlign != VerticalAlign.Top)
-        {
-            merged.VerticalAlign = format.VerticalAlign;
-        }
-
-        if (format.NumberFormat is not null)
-        {
-            merged.NumberFormat = format.NumberFormat;
-        }
-
-        if (format.FontFamily is not null)
-        {
-            merged.FontFamily = format.FontFamily;
-        }
-
-        if (format.FontSize is not null)
-        {
-            merged.FontSize = format.FontSize;
-        }
-
-        if (format.BorderTop is not null)
-        {
-            merged.BorderTop = format.BorderTop.Clone();
-        }
-
-        if (format.BorderRight is not null)
-        {
-            merged.BorderRight = format.BorderRight.Clone();
-        }
-
-        if (format.BorderBottom is not null)
-        {
-            merged.BorderBottom = format.BorderBottom.Clone();
-        }
-
-        if (format.BorderLeft is not null)
-        {
-            merged.BorderLeft = format.BorderLeft.Clone();
-        }
-
-        if (format.Locked is not null)
-        {
-            merged.Locked = format.Locked;
-        }
-
-        if (format.FormulaHidden is not null)
-        {
-            merged.FormulaHidden = format.FormulaHidden;
-        }
-
         return merged;
     }
 
@@ -425,7 +416,7 @@ public class Format
     /// <summary>
     /// This method is used to create a copy of the current format with a new text alignment setting.
     /// </summary>
-    public Format WithTextAlign(TextAlign textAlign)
+    public Format WithTextAlign(TextAlign? textAlign)
     {
         var clone = Clone();
         clone.TextAlign = textAlign;
@@ -435,7 +426,7 @@ public class Format
     /// <summary>
     /// This method is used to create a copy of the current format with a new vertical alignment setting.
     /// </summary>
-    public Format WithVerticalAlign(VerticalAlign verticalAlign)
+    public Format WithVerticalAlign(VerticalAlign? verticalAlign)
     {
         var clone = Clone();
         clone.VerticalAlign = verticalAlign;
@@ -510,27 +501,12 @@ public class Format
     /// </summary>
     public Format Clone()
     {
-        return new Format
+        var clone = new Format();
+        foreach (var p in Properties)
         {
-            Color = Color,
-            BackgroundColor = BackgroundColor,
-            Bold = Bold,
-            Italic = Italic,
-            Underline = Underline,
-            Strikethrough = Strikethrough,
-            WrapText = WrapText,
-            TextAlign = TextAlign,
-            VerticalAlign = VerticalAlign,
-            NumberFormat = NumberFormat,
-            FontFamily = FontFamily,
-            FontSize = FontSize,
-            BorderTop = BorderTop?.Clone(),
-            BorderRight = BorderRight?.Clone(),
-            BorderBottom = BorderBottom?.Clone(),
-            BorderLeft = BorderLeft?.Clone(),
-            Locked = Locked,
-            FormulaHidden = FormulaHidden
-        };
+            p.Setter(clone, p.Copy(p.Getter(this)));
+        }
+        return clone;
     }
 
     /// <summary>

@@ -211,7 +211,7 @@ class XlsxWriter(Workbook sourceWorkbook)
     }
 
     private record struct FontKey(string? Color, bool Bold, bool Italic, bool Underline, bool Strikethrough, string? FontFamily, double? FontSize);
-    private record struct CellStyleKey(int FontId, int FillId, int BorderId, TextAlign TextAlign, VerticalAlign VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden, bool QuotePrefix);
+    private record struct CellStyleKey(int FontId, int FillId, int BorderId, TextAlign? TextAlign, VerticalAlign? VerticalAlign, bool WrapText, int NumFmtId, bool? Locked, bool? FormulaHidden, bool QuotePrefix);
     private record struct BorderKey(string? TopStyle, string? TopColor, string? RightStyle, string? RightColor, string? BottomStyle, string? BottomColor, string? LeftStyle, string? LeftColor);
 
     private class StyleTracker
@@ -1185,7 +1185,7 @@ class XlsxWriter(Workbook sourceWorkbook)
     private static XElement? CreateColumns(Worksheet sheet)
     {
         var colElements = Enumerable.Range(0, sheet.ColumnCount)
-            .Where(col => sheet.Columns[col] != sheet.Columns.Size)
+            .Where(col => Math.Abs(sheet.Columns[col] - sheet.Columns.Size) > 1e-6)
             .Select(col => new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 new XAttribute("min", col + 1),
                 new XAttribute("max", col + 1),
@@ -1294,7 +1294,7 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute("r", row + 1));
 
         // Only persist height if it differs from the default
-        if (sheet.Rows[row] != sheet.Rows.Size)
+        if (Math.Abs(sheet.Rows[row] - sheet.Rows.Size) > 1e-6)
         {
             rowElement.Add(new XAttribute("ht", sheet.Rows[row]));
             rowElement.Add(new XAttribute("customHeight", "1"));
@@ -1553,7 +1553,7 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute("applyBorder", borderId > 0 ? "1" : "0"));
 
         // Add alignment if not default
-        if (cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top || cell.Format.WrapText)
+        if (cell.Format.TextAlign is not null || cell.Format.VerticalAlign is not null || cell.Format.WrapText)
         {
             var alignmentElement = CreateAlignmentElement(cell);
             xfElement.Add(alignmentElement);
@@ -1590,7 +1590,7 @@ class XlsxWriter(Workbook sourceWorkbook)
     {
         var alignmentElement = new XElement(XName.Get("alignment", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"));
 
-        if (cell.Format.TextAlign != TextAlign.Left)
+        if (cell.Format.TextAlign is not null)
         {
             var horizontalAlign = cell.Format.TextAlign switch
             {
@@ -1602,7 +1602,7 @@ class XlsxWriter(Workbook sourceWorkbook)
             alignmentElement.Add(new XAttribute("horizontal", horizontalAlign));
         }
 
-        if (cell.Format.VerticalAlign != VerticalAlign.Top)
+        if (cell.Format.VerticalAlign is not null)
         {
             var verticalAlign = cell.Format.VerticalAlign switch
             {
