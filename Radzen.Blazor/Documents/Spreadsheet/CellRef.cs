@@ -24,7 +24,7 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
     public int Row { get; } = row;
     /// <summary>
     /// Gets the column index of the cell reference.
-    /// The column index is zero-based, so the first column (A1) corresponds to
+    /// The column index is zero-based, so the first column (A1) corresponds to 0.
     /// </summary>
     public int Column { get; } = column;
 
