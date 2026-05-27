@@ -26,7 +26,6 @@ public enum EditMode
 /// <summary>
 /// Represents a command to accept edits made in the spreadsheet editor.
 /// </summary>
-/// <param name="view"></param>
 public class AcceptEditCommand(SheetView view) : ICommand
 {
     /// <inheritdoc/>
@@ -75,7 +74,6 @@ public class AcceptEditCommand(SheetView view) : ICommand
 /// <summary>
 /// Represents an editor for a spreadsheet, allowing users to edit cell values or formulas.
 /// </summary>
-/// <param name="sheet"></param>
 public class Editor(Worksheet sheet)
 {
     /// <summary>
@@ -101,9 +99,6 @@ public class Editor(Worksheet sheet)
     /// <summary>
     /// Starts editing a cell in the spreadsheet with the specified address and value.
     /// </summary>
-    /// <param name="address"></param>
-    /// <param name="value"></param>
-    /// <param name="mode"></param>
     public void StartEdit(CellRef address, string? value, EditMode mode = EditMode.Cell)
     {
         if (!sheet.IsCellEditable(address))
@@ -152,7 +147,6 @@ public class Editor(Worksheet sheet)
     /// <summary>
     /// Accepts the current value in the editor, applying it to the cell if valid.
     /// </summary>
-    /// <returns></returns>
     public bool Accept()
     {
         var result = true;
