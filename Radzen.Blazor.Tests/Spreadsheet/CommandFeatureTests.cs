@@ -30,31 +30,17 @@ public class CommandFeatureTests
     }
 
     [Fact]
-    public void InsertRowAfter_IsEditing()
+    public void InsertRow_IsEditing()
     {
         var sheet = NewSheet();
-        Assert.Equal(SpreadsheetFeature.Editing, new InsertRowAfterCommand(sheet, 0).Feature);
+        Assert.Equal(SpreadsheetFeature.Editing, new InsertRowCommand(sheet, 0).Feature);
     }
 
     [Fact]
-    public void InsertRowBefore_IsEditing()
+    public void InsertColumn_IsEditing()
     {
         var sheet = NewSheet();
-        Assert.Equal(SpreadsheetFeature.Editing, new InsertRowBeforeCommand(sheet, 0).Feature);
-    }
-
-    [Fact]
-    public void InsertColumnAfter_IsEditing()
-    {
-        var sheet = NewSheet();
-        Assert.Equal(SpreadsheetFeature.Editing, new InsertColumnAfterCommand(sheet, 0).Feature);
-    }
-
-    [Fact]
-    public void InsertColumnBefore_IsEditing()
-    {
-        var sheet = NewSheet();
-        Assert.Equal(SpreadsheetFeature.Editing, new InsertColumnBeforeCommand(sheet, 0).Feature);
+        Assert.Equal(SpreadsheetFeature.Editing, new InsertColumnCommand(sheet, 0).Feature);
     }
 
     [Fact]
@@ -205,14 +191,14 @@ public class CommandFeatureTests
     public void MoveImage_IsImages()
     {
         var image = new SheetImage { From = new CellAnchor { Row = 0, Column = 0 }, Width = 100, Height = 100 };
-        Assert.Equal(SpreadsheetFeature.Images, new MoveImageCommand(image, new CellAnchor { Row = 1, Column = 1 }, null).Feature);
+        Assert.Equal(SpreadsheetFeature.Images, new MoveAnchoredCommand<SheetImage>(image, new CellAnchor { Row = 1, Column = 1 }, null, SpreadsheetFeature.Images).Feature);
     }
 
     [Fact]
     public void ResizeImage_IsImages()
     {
         var image = new SheetImage { From = new CellAnchor { Row = 0, Column = 0 }, Width = 100, Height = 100 };
-        Assert.Equal(SpreadsheetFeature.Images, new ResizeImageCommand(image, 200, 200).Feature);
+        Assert.Equal(SpreadsheetFeature.Images, new ResizeAnchoredCommand<SheetImage>(image, 200, 200, SpreadsheetFeature.Images).Feature);
     }
 
     [Fact]
@@ -235,14 +221,14 @@ public class CommandFeatureTests
     public void MoveChart_IsCharts()
     {
         var chart = new SheetChart { From = new CellAnchor { Row = 0, Column = 0 } };
-        Assert.Equal(SpreadsheetFeature.Charts, new MoveChartCommand(chart, new CellAnchor { Row = 1, Column = 1 }, null).Feature);
+        Assert.Equal(SpreadsheetFeature.Charts, new MoveAnchoredCommand<SheetChart>(chart, new CellAnchor { Row = 1, Column = 1 }, null, SpreadsheetFeature.Charts).Feature);
     }
 
     [Fact]
     public void ResizeChart_IsCharts()
     {
         var chart = new SheetChart { From = new CellAnchor { Row = 0, Column = 0 } };
-        Assert.Equal(SpreadsheetFeature.Charts, new ResizeChartCommand(chart, 200, 200).Feature);
+        Assert.Equal(SpreadsheetFeature.Charts, new ResizeAnchoredCommand<SheetChart>(chart, 200, 200, SpreadsheetFeature.Charts).Feature);
     }
 
     [Fact]
