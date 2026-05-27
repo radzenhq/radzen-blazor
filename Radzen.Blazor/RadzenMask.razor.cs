@@ -130,6 +130,12 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
+        protected override string? GetId()
+        {
+            return Name ?? base.GetId();
+        }
+
+        /// <inheritdoc />
         protected override void OnAfterRender(bool firstRender)
         {
             base.OnAfterRender(firstRender);

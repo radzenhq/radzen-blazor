@@ -58,6 +58,20 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Mask_Renders_IdFromNameParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenMask>();
+
+            var value = "DateOfBirth";
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Name, value));
+
+            Assert.Contains(@$"id=""{value}""", component.Markup);
+        }
+
+        [Fact]
         public void Mask_Renders_TabIndexParameter()
         {
             using var ctx = new TestContext();
