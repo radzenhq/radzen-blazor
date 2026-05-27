@@ -25,7 +25,7 @@
         {
             if (Worksheet?.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell) == true)
             {
-                return cell.Format.VerticalAlign;
+                return cell.Format.VerticalAlign ?? Radzen.VerticalAlign.Top;
             }
             return Radzen.VerticalAlign.Top;
         }
@@ -51,19 +51,18 @@
         => Worksheet?.Selection.Cell == CellRef.Invalid
         || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
 
-    public override async Task SetParametersAsync(ParameterView parameters)
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public VerticalAlign()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
 
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
     }
 
     private void OnSelectionChanged()
@@ -73,9 +72,6 @@
 
     public void Dispose()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding.Dispose();
     }
-} 
+}

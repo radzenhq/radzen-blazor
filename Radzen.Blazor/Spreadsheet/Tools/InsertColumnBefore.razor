@@ -12,6 +12,6 @@
         {
             return;
         }
-        await Spreadsheet.ExecuteAsync(new InsertColumnBeforeCommand(Worksheet, Worksheet.Selection.Range.Start.Column));
+        await Spreadsheet.ExecuteAsync(new InsertColumnCommand(Worksheet, Worksheet.Selection.Range.Start.Column));
     }
 }

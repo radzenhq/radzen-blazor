@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 using Radzen.Documents.Spreadsheet;
@@ -38,20 +37,22 @@ public abstract class SpreadsheetToolBase : ComponentBase, IDisposable
         || Worksheet.Selection.Cell == CellRef.Invalid
         || (Feature is SpreadsheetFeature f && Spreadsheet is not null && !Spreadsheet.IsFeatureAllowed(f));
 
-    /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
+    private readonly EventBinding<Selection> selectionBinding;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SpreadsheetToolBase"/> class.
+    /// </summary>
+    protected SpreadsheetToolBase()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
 
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
     }
 
     private void OnSelectionChanged()
@@ -61,9 +62,6 @@ public abstract class SpreadsheetToolBase : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding.Dispose();
     }
 }

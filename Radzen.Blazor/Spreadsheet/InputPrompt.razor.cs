@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 
@@ -31,30 +30,28 @@ public partial class InputPrompt : IDisposable
     private string? style;
     private string? className;
 
-    /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
+    private readonly EventBinding<Selection> selectionBinding;
+    private readonly EventBinding<IVirtualGridContext> contextBinding;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InputPrompt"/> class.
+    /// </summary>
+    public InputPrompt()
     {
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
 
-        if (Context is not null)
-        {
-            Context.Scrolled -= OnScroll;
-        }
+        contextBinding = new EventBinding<IVirtualGridContext>(
+            c => c.Scrolled += OnScroll,
+            c => c.Scrolled -= OnScroll);
+    }
 
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
-
-        if (Context is not null)
-        {
-            Context.Scrolled += OnScroll;
-        }
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+        contextBinding.Bind(Context);
     }
 
     private void OnSelectionChanged()
@@ -121,14 +118,7 @@ public partial class InputPrompt : IDisposable
 
     void IDisposable.Dispose()
     {
-        if (Worksheet is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
-
-        if (Context is not null)
-        {
-            Context.Scrolled -= OnScroll;
-        }
+        selectionBinding.Dispose();
+        contextBinding.Dispose();
     }
 }

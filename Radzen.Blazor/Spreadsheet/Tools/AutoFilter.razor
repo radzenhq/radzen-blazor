@@ -40,11 +40,7 @@
         var dataTable = GetCurrentTable();
         if (dataTable is not null)
         {
-            var dataTableIndex = GetTableIndex(dataTable);
-            if (dataTableIndex >= 0)
-            {
-                await Spreadsheet.ExecuteAsync(new TableFilterCommand(Worksheet, dataTableIndex));
-            }
+            await Spreadsheet.ExecuteAsync(new TableFilterCommand(Worksheet, dataTable));
         }
         else
         {
@@ -74,34 +70,18 @@
         return null;
     }
 
-    private int GetTableIndex(Table table)
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public AutoFilter()
     {
-        if (Worksheet?.Tables is null) return -1;
-
-        for (int i = 0; i < Worksheet.Tables.Count; i++)
-        {
-            if (Worksheet.Tables[i] == table)
-            {
-                return i;
-            }
-        }
-
-        return -1;
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
     }
 
-    public override async Task SetParametersAsync(ParameterView parameters)
+    protected override void OnParametersSet()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
-
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed += OnSelectionChanged;
-        }
+        selectionBinding.Bind(Worksheet?.Selection);
     }
 
     private void OnSelectionChanged()
@@ -111,9 +91,6 @@
 
     public void Dispose()
     {
-        if (Worksheet?.Selection is not null)
-        {
-            Worksheet.Selection.Changed -= OnSelectionChanged;
-        }
+        selectionBinding.Dispose();
     }
-} 
+}

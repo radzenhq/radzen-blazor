@@ -49,22 +49,33 @@ public partial class CellEditor : ComponentBase, IDisposable
     private string? className;
     private Type? customEditorType;
 
-    /// <inheritdoc />
-    public override async Task SetParametersAsync(ParameterView parameters)
+    private readonly EventBinding<Editor> editorBinding;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CellEditor"/> class.
+    /// </summary>
+    public CellEditor()
     {
+        editorBinding = new EventBinding<Editor>(
+            e =>
+            {
+                e.Changed += OnEditModeChanged;
+                e.ValueChanged += OnEditorValueChanged;
+            },
+            e =>
+            {
+                e.Changed -= OnEditModeChanged;
+                e.ValueChanged -= OnEditorValueChanged;
+            });
+    }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        editorBinding.Bind(Worksheet is not null ? Editor : null);
+
         if (Worksheet is not null)
         {
-            Editor.Changed -= OnEditModeChanged;
-            Editor.ValueChanged -= OnEditorValueChanged;
-        }
-
-        await base.SetParametersAsync(parameters);
-
-        if (Worksheet is not null)
-        {
-            Editor.Changed += OnEditModeChanged;
-            Editor.ValueChanged += OnEditorValueChanged;
-
             Render();
         }
     }
@@ -183,7 +194,6 @@ public partial class CellEditor : ComponentBase, IDisposable
 
     void IDisposable.Dispose()
     {
-        Editor.Changed -= OnEditModeChanged;
-        Editor.ValueChanged -= OnEditorValueChanged;
+        editorBinding.Dispose();
     }
 }

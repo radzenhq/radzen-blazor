@@ -185,6 +185,26 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
     private VirtualRegion region = new();
 
+    private readonly EventBinding<Worksheet> worksheetBinding;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="VirtualGrid"/> class.
+    /// </summary>
+    public VirtualGrid()
+    {
+        worksheetBinding = new EventBinding<Worksheet>(
+            w =>
+            {
+                w.Rows.Changed += OnChanged;
+                w.Columns.Changed += OnChanged;
+            },
+            w =>
+            {
+                w.Rows.Changed -= OnChanged;
+                w.Columns.Changed -= OnChanged;
+            });
+    }
+
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -203,19 +223,12 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
     {
         var previousView = View;
 
-        if (View is not null)
-        {
-            View.Worksheet.Rows.Changed -= OnChanged;
-            View.Worksheet.Columns.Changed -= OnChanged;
-        }
-
         await base.SetParametersAsync(parameters);
 
+        worksheetBinding.Bind(View?.Worksheet);
+
         if (View is not null)
         {
-            View.Worksheet.Rows.Changed += OnChanged;
-            View.Worksheet.Columns.Changed += OnChanged;
-
             if (previousView is not null && View != previousView && region is not null)
             {
                 previousView.ScrollLeft = ScrollLeft;
@@ -562,15 +575,12 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
         foreach (var range in visibleMergedCells)
         {
-            var adjustedRange = AdjustRangeForHiddenRowsAndColumns(range);
-            
-            // Skip if the entire range is hidden
-            if (adjustedRange is null)
+            if (IsRangeEntirelyHidden(range))
             {
                 continue;
             }
 
-            var ranges = MergedCells.SplitRange(adjustedRange.Value, Rows.Frozen, Columns.Frozen);
+            var ranges = MergedCells.SplitRange(range, Rows.Frozen, Columns.Frozen);
 
             foreach (var splitRange in ranges)
             {
@@ -610,32 +620,39 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
         return state;
     }
 
-    private RangeRef? AdjustRangeForHiddenRowsAndColumns(RangeRef range)
+    private bool IsRangeEntirelyHidden(RangeRef range)
     {
-        var row = range.Start.Row;
-
-        while (row <= range.End.Row && Rows.IsHidden(row))
+        var anyVisibleRow = false;
+        for (var r = range.Start.Row; r <= range.End.Row; r++)
         {
-            row++;
+            if (!Rows.IsHidden(r))
+            {
+                anyVisibleRow = true;
+                break;
+            }
         }
 
-        var column = range.Start.Column;
-
-        while (column <= range.End.Column && Columns.IsHidden(column))
+        if (!anyVisibleRow)
         {
-            column++;
+            return true;
         }
 
-        if (row > range.End.Row || column > range.End.Column)
+        var anyVisibleColumn = false;
+        for (var c = range.Start.Column; c <= range.End.Column; c++)
         {
-            return null;
+            if (!Columns.IsHidden(c))
+            {
+                anyVisibleColumn = true;
+                break;
+            }
         }
 
-        return new RangeRef(new CellRef(row, column), range.End);
+        return !anyVisibleColumn;
     }
 
     ValueTask IAsyncDisposable.DisposeAsync()
     {
+        worksheetBinding.Dispose();
         reference?.Dispose();
 
         return ValueTask.CompletedTask;

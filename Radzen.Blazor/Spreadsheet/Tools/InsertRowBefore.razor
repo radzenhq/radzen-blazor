@@ -13,6 +13,6 @@
             return;
         }
 
-        await Spreadsheet.ExecuteAsync(new InsertRowBeforeCommand(Worksheet, Worksheet.Selection.Range.Start.Row));
+        await Spreadsheet.ExecuteAsync(new InsertRowCommand(Worksheet, Worksheet.Selection.Range.Start.Row));
     }
 }
