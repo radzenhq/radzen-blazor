@@ -70,7 +70,7 @@ public class RowColumnCommandTests
         sheet.Cells[1, 0].Value = 1d; // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
 
-        var cmd = new InsertRowAfterCommand(sheet, 1); // after row 1 -> insert at index 2
+        var cmd = new InsertRowCommand(sheet, 2); // after row 1 -> insert at index 2
         Assert.True(view.Commands.Execute(cmd));
 
         Assert.Equal(5, sheet.RowCount);
@@ -94,7 +94,7 @@ public class RowColumnCommandTests
         sheet.Cells[1, 0].Value = 1d; // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
 
-        var cmd = new InsertRowBeforeCommand(sheet, 1); // before row 1 -> insert at index 1
+        var cmd = new InsertRowCommand(sheet, 1); // before row 1 -> insert at index 1
         Assert.True(view.Commands.Execute(cmd));
 
         Assert.Equal(5, sheet.RowCount);
@@ -120,7 +120,7 @@ public class RowColumnCommandTests
         for (int r = 0; r < 6; r++) sheet.Cells[r, 0].Value = r + 1;
 
         // Simulate selection rows 1..3 (0-based), last is 3 -> insert after 3 at index 4
-        var cmd = new InsertRowAfterCommand(sheet, 3);
+        var cmd = new InsertRowCommand(sheet, 4);
         Assert.True(view.Commands.Execute(cmd));
 
         Assert.Equal(7, sheet.RowCount);
@@ -144,7 +144,7 @@ public class RowColumnCommandTests
         for (int r = 0; r < 6; r++) sheet.Cells[r, 0].Value = r + 1;
 
         // Simulate selection rows 2..4 (first is 2) -> insert at index 2
-        var cmd = new InsertRowBeforeCommand(sheet, 2);
+        var cmd = new InsertRowCommand(sheet, 2);
         Assert.True(view.Commands.Execute(cmd));
 
         Assert.Equal(7, sheet.RowCount);
@@ -167,7 +167,7 @@ public class RowColumnCommandTests
         for (int c = 0; c < 6; c++) sheet.Cells[0, c].Value = c + 1;
 
         // Simulate selection columns 1..3 (last is 3) -> insert after col 3 at index 4
-        var cmd = new InsertColumnAfterCommand(sheet, 3);
+        var cmd = new InsertColumnCommand(sheet, 4);
         Assert.True(view.Commands.Execute(cmd));
 
         Assert.Equal(7, sheet.ColumnCount);
@@ -189,7 +189,7 @@ public class RowColumnCommandTests
         for (int c = 0; c < 6; c++) sheet.Cells[0, c].Value = c + 1;
 
         // Simulate selection columns 2..4 (first is 2) -> insert at index 2
-        var cmd = new InsertColumnBeforeCommand(sheet, 2);
+        var cmd = new InsertColumnCommand(sheet, 2);
         Assert.True(view.Commands.Execute(cmd));
 
         Assert.Equal(7, sheet.ColumnCount);
@@ -269,7 +269,7 @@ public class RowColumnCommandTests
         sheet.Cells[1, 0].Value = 1d;   // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
 
-        var cmd = new InsertColumnBeforeCommand(sheet, 0); // before A
+        var cmd = new InsertColumnCommand(sheet, 0); // before A
         Assert.True(view.Commands.Execute(cmd));
 
         Assert.Equal(6, sheet.ColumnCount);
@@ -294,7 +294,7 @@ public class RowColumnCommandTests
         sheet.Cells[1, 0].Value = 1d;   // A2
         sheet.Cells[1, 1].Formula = "=A2+10"; // B2
 
-        var cmd = new InsertColumnAfterCommand(sheet, 0); // after A
+        var cmd = new InsertColumnCommand(sheet, 1); // after A
         Assert.True(view.Commands.Execute(cmd));
 
         Assert.Equal(6, sheet.ColumnCount);

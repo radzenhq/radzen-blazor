@@ -60,7 +60,7 @@ public class CellAnchor
 /// <summary>
 /// Represents a floating image on a spreadsheet sheet.
 /// </summary>
-public class SheetImage
+public class SheetImage : IAnchoredDrawing
 {
     /// <summary>
     /// Gets or sets the anchor mode.
