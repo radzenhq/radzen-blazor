@@ -1,77 +1,89 @@
 #nullable enable
 
-using System;
-using System.Text;
-using System.Text.RegularExpressions;
-
 namespace Radzen.Documents.Spreadsheet;
 
 static class Wildcard
 {
-    private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(100);
-
-    static Regex BuildRegex(string pattern, bool full)
+    private static bool Match(string text, int textIndex, string pattern, bool allowTrailing)
     {
-        var builder = StringBuilderCache.Acquire(pattern.Length);
+        int t = textIndex;
+        int p = 0;
+        int starP = -1;
+        int starT = -1;
 
-        for (int i = 0; i < pattern.Length; i++)
+        while (t < text.Length)
         {
-            var ch = pattern[i];
-            if (ch == '~')
+            if (p < pattern.Length)
             {
-                if (i + 1 < pattern.Length)
+                char pc = pattern[p];
+                if (pc == '~' && p + 1 < pattern.Length)
                 {
-                    var next = pattern[++i];
-                    builder.Append(Regex.Escape(next.ToString()));
+                    if (CharEquals(text[t], pattern[p + 1]))
+                    {
+                        t++;
+                        p += 2;
+                        continue;
+                    }
                 }
-                else
+                else if (pc == '*')
                 {
-                    builder.Append(Regex.Escape("~"));
+                    starP = p++;
+                    starT = t;
+                    continue;
+                }
+                else if (pc == '?')
+                {
+                    t++;
+                    p++;
+                    continue;
+                }
+                else if (CharEquals(text[t], pc))
+                {
+                    t++;
+                    p++;
+                    continue;
                 }
             }
-            else if (ch == '*')
+            else if (allowTrailing)
             {
-                builder.Append(".*");
+                return true;
             }
-            else if (ch == '?')
-            {
-                builder.Append('.');
-            }
-            else
-            {
-                builder.Append(Regex.Escape(ch.ToString()));
-            }
-        }
 
-        var regexBody = StringBuilderCache.GetStringAndRelease(builder);
-        var regexPattern = full ? "^" + regexBody + "$" : regexBody;
-        return new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled, RegexTimeout);
-    }
-
-    public static bool IsFullMatch(string text, string pattern)
-    {
-        try
-        {
-            return BuildRegex(pattern, full: true).IsMatch(text);
-        }
-        catch (RegexMatchTimeoutException)
-        {
+            if (starP >= 0)
+            {
+                p = starP + 1;
+                t = ++starT;
+                continue;
+            }
             return false;
         }
+
+        while (p < pattern.Length && pattern[p] == '*')
+        {
+            p++;
+        }
+        return p == pattern.Length || (p == pattern.Length - 1 && pattern[p] == '~');
     }
+
+    private static bool CharEquals(char a, char b)
+        => char.ToUpperInvariant(a) == char.ToUpperInvariant(b);
+
+    public static bool IsFullMatch(string text, string pattern)
+        => Match(text, 0, pattern, allowTrailing: false);
 
     public static int FindFirstIndex(string text, string pattern, int startIndex)
     {
-        try
+        if (startIndex < 0)
         {
-            var rx = BuildRegex(pattern, full: false);
-            var input = startIndex > 0 ? text[startIndex..] : text;
-            var match = rx.Match(input);
-            return match.Success ? startIndex + match.Index : -1;
+            startIndex = 0;
         }
-        catch (RegexMatchTimeoutException)
+        for (int s = startIndex; s <= text.Length; s++)
         {
-            return -1;
+            if (Match(text, s, pattern, allowTrailing: true))
+            {
+                return s;
+            }
         }
+        return -1;
     }
 }
