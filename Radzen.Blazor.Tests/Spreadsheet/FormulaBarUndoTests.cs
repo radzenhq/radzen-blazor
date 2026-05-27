@@ -32,7 +32,7 @@ public class FormulaBarUndoTests : TestContext
         // It shows the active cell's value.
         Assert.Equal("X", view.Editor.Value);
 
-        var command = new InsertColumnBeforeCommand(sheet, 2);
+        var command = new InsertColumnCommand(sheet, 2);
 
         // Drive the edits on the renderer's dispatcher so the formula bar can re-render.
         await cut.InvokeAsync(() => command.Execute());   // C1 empties (X shifts to D1)

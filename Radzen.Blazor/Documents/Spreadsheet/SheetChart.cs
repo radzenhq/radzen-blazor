@@ -42,7 +42,7 @@ public enum SpreadsheetChartType
 /// <summary>
 /// Represents a floating chart on a spreadsheet sheet.
 /// </summary>
-public class SheetChart
+public class SheetChart : IAnchoredDrawing
 {
     /// <summary>
     /// Gets or sets the anchor mode.

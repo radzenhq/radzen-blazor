@@ -1335,10 +1335,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             switch (action)
             {
                 case "insert-row-before":
-                    await ExecuteAsync(new InsertRowBeforeCommand(Worksheet, row));
+                    await ExecuteAsync(new InsertRowCommand(Worksheet, row));
                     break;
                 case "insert-row-after":
-                    await ExecuteAsync(new InsertRowAfterCommand(Worksheet, row));
+                    await ExecuteAsync(new InsertRowCommand(Worksheet, row + 1));
                     break;
                 case "delete-row":
                     await ExecuteAsync(new DeleteRowsCommand(Worksheet, row, row));
@@ -1377,10 +1377,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             switch (action)
             {
                 case "insert-column-before":
-                    await ExecuteAsync(new InsertColumnBeforeCommand(Worksheet, column));
+                    await ExecuteAsync(new InsertColumnCommand(Worksheet, column));
                     break;
                 case "insert-column-after":
-                    await ExecuteAsync(new InsertColumnAfterCommand(Worksheet, column));
+                    await ExecuteAsync(new InsertColumnCommand(Worksheet, column + 1));
                     break;
                 case "delete-column":
                     await ExecuteAsync(new DeleteColumnsCommand(Worksheet, column, column));
@@ -2220,7 +2220,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             image.Height = capture.OriginalHeight;
             image.From = capture.OriginalFrom.Clone();
 
-            await ExecuteAsync(new ResizeImageCommand(image, finalWidth, finalHeight, finalFrom));
+            await ExecuteAsync(new ResizeAnchoredCommand<SheetImage>(image, finalWidth, finalHeight, SpreadsheetFeature.Images, finalFrom));
         }
         else if (capture.Chart is SheetChart chart)
         {
@@ -2232,7 +2232,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             chart.Height = capture.OriginalHeight;
             chart.From = capture.OriginalFrom.Clone();
 
-            await ExecuteAsync(new ResizeChartCommand(chart, finalWidth, finalHeight, finalFrom));
+            await ExecuteAsync(new ResizeAnchoredCommand<SheetChart>(chart, finalWidth, finalHeight, SpreadsheetFeature.Charts, finalFrom));
         }
 
         activeCapture = null;
@@ -2400,7 +2400,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 image.To = capture.OriginalTo.Clone();
             }
 
-            await ExecuteAsync(new MoveImageCommand(image, finalFrom, finalTo));
+            await ExecuteAsync(new MoveAnchoredCommand<SheetImage>(image, finalFrom, finalTo, SpreadsheetFeature.Images));
         }
         else if (capture.Chart is SheetChart chart)
         {
@@ -2413,7 +2413,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 chart.To = capture.OriginalTo.Clone();
             }
 
-            await ExecuteAsync(new MoveChartCommand(chart, finalFrom, finalTo));
+            await ExecuteAsync(new MoveAnchoredCommand<SheetChart>(chart, finalFrom, finalTo, SpreadsheetFeature.Charts));
         }
 
         activeCapture = null;

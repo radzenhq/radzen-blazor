@@ -149,7 +149,7 @@ public class ImageTests
     {
         var image = CreateTestImage();
         var newFrom = new CellAnchor { Row = 5, Column = 3, RowOffset = 100, ColumnOffset = 200 };
-        var command = new MoveImageCommand(image, newFrom, null);
+        var command = new MoveAnchoredCommand<SheetImage>(image, newFrom, null, SpreadsheetFeature.Images);
 
         command.Execute();
 
@@ -164,7 +164,7 @@ public class ImageTests
         var originalRow = image.From.Row;
         var originalCol = image.From.Column;
         var newFrom = new CellAnchor { Row = 5, Column = 3 };
-        var command = new MoveImageCommand(image, newFrom, null);
+        var command = new MoveAnchoredCommand<SheetImage>(image, newFrom, null, SpreadsheetFeature.Images);
         command.Execute();
 
         command.Unexecute();
@@ -180,7 +180,7 @@ public class ImageTests
         image.AnchorMode = DrawingAnchorMode.OneCellAnchor;
         image.Width = 1000;
         image.Height = 2000;
-        var command = new ResizeImageCommand(image, 3000, 4000);
+        var command = new ResizeAnchoredCommand<SheetImage>(image, 3000, 4000, SpreadsheetFeature.Images);
 
         command.Execute();
 
@@ -195,7 +195,7 @@ public class ImageTests
         image.AnchorMode = DrawingAnchorMode.OneCellAnchor;
         image.Width = 1000;
         image.Height = 2000;
-        var command = new ResizeImageCommand(image, 3000, 4000);
+        var command = new ResizeAnchoredCommand<SheetImage>(image, 3000, 4000, SpreadsheetFeature.Images);
         command.Execute();
 
         command.Unexecute();
@@ -209,7 +209,7 @@ public class ImageTests
     {
         var image = CreateTwoCellImage();
         var newTo = new CellAnchor { Row = 10, Column = 8, RowOffset = 500, ColumnOffset = 600 };
-        var command = new ResizeImageCommand(image, newTo);
+        var command = new ResizeAnchoredCommand<SheetImage>(image, newTo, SpreadsheetFeature.Images);
 
         command.Execute();
 
@@ -224,7 +224,7 @@ public class ImageTests
         var originalToRow = image.To!.Row;
         var originalToCol = image.To.Column;
         var newTo = new CellAnchor { Row = 10, Column = 8 };
-        var command = new ResizeImageCommand(image, newTo);
+        var command = new ResizeAnchoredCommand<SheetImage>(image, newTo, SpreadsheetFeature.Images);
         command.Execute();
 
         command.Unexecute();
