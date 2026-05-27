@@ -46,18 +46,16 @@ public readonly struct ColumnRef(int column) : IEquatable<ColumnRef>
             throw new ArgumentOutOfRangeException(nameof(column), "Column index must be non-negative.");
         }
 
-        var result = string.Empty;
-
+        Span<char> buffer = stackalloc char[7];
+        var pos = buffer.Length;
         column++;
-
         while (column > 0)
         {
             column--;
-            result = (char)('A' + column % 26) + result;
+            buffer[--pos] = (char)('A' + column % 26);
             column /= 26;
         }
-
-        return result;
+        return new string(buffer[pos..]);
     }
 
     /// <inheritdoc/>
