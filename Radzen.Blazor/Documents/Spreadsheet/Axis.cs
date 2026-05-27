@@ -33,7 +33,6 @@ public class Axis(double size, int count)
             }
 
             count = value;
-            InvalidateIndex();
             TriggerChange();
         }
     }
@@ -63,7 +62,6 @@ public class Axis(double size, int count)
     public void EndUpdate()
     {
         isUpdating = false;
-        InvalidateIndex();
         Changed?.Invoke();
     }
 
@@ -94,7 +92,6 @@ public class Axis(double size, int count)
         if (!IsHidden(index))
         {
             hidden.Add(index);
-            InvalidateIndex();
             TriggerChange();
         }
     }
@@ -107,7 +104,6 @@ public class Axis(double size, int count)
         if (IsHidden(index))
         {
             hidden.Remove(index);
-            InvalidateIndex();
             TriggerChange();
         }
     }
@@ -120,7 +116,6 @@ public class Axis(double size, int count)
         if (hidden.Count > 0)
         {
             hidden.Clear();
-            InvalidateIndex();
             TriggerChange();
         }
     }
@@ -142,7 +137,6 @@ public class Axis(double size, int count)
         set
         {
             data[index] = value;
-            InvalidateIndex();
             TriggerChange();
         }
     }
@@ -163,7 +157,6 @@ public class Axis(double size, int count)
             }
 
             frozen = value;
-            InvalidateIndex();
             TriggerChange();
         }
     }
@@ -174,8 +167,6 @@ public class Axis(double size, int count)
 
         DictionaryShift.Remap(data, Remap);
         DictionaryShift.Remap(hidden, Remap);
-
-        InvalidateIndex();
     }
 
     internal void ShiftDown(int fromIndex, int count)
@@ -184,8 +175,6 @@ public class Axis(double size, int count)
 
         DictionaryShift.Remap(data, Remap);
         DictionaryShift.Remap(hidden, Remap);
-
-        InvalidateIndex();
     }
 
     internal IEnumerable<int> GetCustomSizedIndices() => data.Keys;
@@ -216,214 +205,5 @@ public class Axis(double size, int count)
 
             return total + size * (Count - data.Count - hidden.Count + hiddenCustomCount);
         }
-    }
-
-    private int[]? stopIndices;
-    private double[]? stopPositions;
-    private bool indexDirty = true;
-
-    internal void InvalidateIndex()
-    {
-        indexDirty = true;
-    }
-
-    private void EnsureIndex()
-    {
-        if (!indexDirty)
-        {
-            return;
-        }
-
-        // Collect indices that need a stop: any custom-sized or hidden index in [0, Count).
-        var stopSet = new SortedSet<int>();
-        foreach (var key in data.Keys)
-        {
-            if (key >= 0 && key < count)
-            {
-                stopSet.Add(key);
-            }
-        }
-        foreach (var key in hidden)
-        {
-            if (key >= 0 && key < count)
-            {
-                stopSet.Add(key);
-            }
-        }
-
-        var stopCount = stopSet.Count;
-        stopIndices = new int[stopCount];
-        stopPositions = new double[stopCount];
-
-        var position = 0d;
-        var prevIndex = 0;
-        var i = 0;
-        foreach (var stop in stopSet)
-        {
-            // Add the default-sized contribution for indices in [prevIndex, stop).
-            position += size * (stop - prevIndex);
-            stopIndices[i] = stop;
-            stopPositions[i] = position;
-
-            // Add the contribution of `stop` itself if visible.
-            var stopSize = data.TryGetValue(stop, out var custom) ? custom : size;
-            if (!hidden.Contains(stop))
-            {
-                position += stopSize;
-            }
-
-            prevIndex = stop + 1;
-            i++;
-        }
-
-        indexDirty = false;
-    }
-
-    /// <summary>
-    /// Gets the pixel position of the start of the given index. Returns the total size when <paramref name="index"/> equals <see cref="Count"/>.
-    /// </summary>
-    public double GetPositionOf(int index)
-    {
-        if (index <= 0)
-        {
-            return 0;
-        }
-
-        EnsureIndex();
-
-        var stops = stopIndices!;
-        var positions = stopPositions!;
-
-        if (stops.Length == 0)
-        {
-            return size * index;
-        }
-
-        // Find the largest stop index strictly less than `index`.
-        var lo = 0;
-        var hi = stops.Length - 1;
-        var found = -1;
-        while (lo <= hi)
-        {
-            var mid = (lo + hi) >>> 1;
-            if (stops[mid] < index)
-            {
-                found = mid;
-                lo = mid + 1;
-            }
-            else
-            {
-                hi = mid - 1;
-            }
-        }
-
-        if (found < 0)
-        {
-            // `index` is before the first stop: all preceding indices are default-sized.
-            return size * index;
-        }
-
-        var basePosition = positions[found];
-        var baseIndex = stops[found];
-
-        // Add the stop's own visible contribution.
-        var baseSize = data.TryGetValue(baseIndex, out var custom) ? custom : size;
-        if (!hidden.Contains(baseIndex))
-        {
-            basePosition += baseSize;
-        }
-
-        // Add default-sized indices in (baseIndex, index).
-        basePosition += size * (index - baseIndex - 1);
-        return basePosition;
-    }
-
-    /// <summary>
-    /// Gets the index containing the given pixel position. Returns <see cref="Count"/> when <paramref name="pixel"/> is past the total size.
-    /// </summary>
-    public int GetIndexAt(double pixel)
-    {
-        if (pixel <= 0 || count == 0)
-        {
-            return 0;
-        }
-
-        EnsureIndex();
-
-        var stops = stopIndices!;
-        var positions = stopPositions!;
-        var total = Total;
-
-        if (pixel >= total)
-        {
-            return count;
-        }
-
-        if (stops.Length == 0)
-        {
-            if (size <= 0)
-            {
-                return 0;
-            }
-
-            var idx = (int)(pixel / size);
-            return idx >= count ? count : idx;
-        }
-
-        // Binary search for the largest stop whose stored position is <= pixel.
-        var lo = 0;
-        var hi = stops.Length - 1;
-        var found = -1;
-        while (lo <= hi)
-        {
-            var mid = (lo + hi) >>> 1;
-            if (positions[mid] <= pixel)
-            {
-                found = mid;
-                lo = mid + 1;
-            }
-            else
-            {
-                hi = mid - 1;
-            }
-        }
-
-        if (found < 0)
-        {
-            // pixel is before the first stop's position: all preceding indices are default-sized.
-            if (size <= 0)
-            {
-                return 0;
-            }
-
-            var idx = (int)(pixel / size);
-            return idx >= count ? count : idx;
-        }
-
-        var baseIndex = stops[found];
-        var basePosition = positions[found];
-
-        // Is `pixel` inside the stop itself?
-        var stopSize = data.TryGetValue(baseIndex, out var custom) ? custom : size;
-        var isHidden = hidden.Contains(baseIndex);
-        var stopEnd = basePosition + (isHidden ? 0 : stopSize);
-
-        if (pixel < stopEnd)
-        {
-            return baseIndex;
-        }
-
-        // Past the stop — walk default-sized indices.
-        if (size <= 0)
-        {
-            // Avoid divide-by-zero; return the next index after the stop.
-            var nextIdx = baseIndex + 1;
-            return nextIdx >= count ? count : nextIdx;
-        }
-
-        var offset = pixel - stopEnd;
-        var stepsBeyond = (int)(offset / size);
-        var result = baseIndex + 1 + stepsBeyond;
-        return result >= count ? count : result;
     }
 }
