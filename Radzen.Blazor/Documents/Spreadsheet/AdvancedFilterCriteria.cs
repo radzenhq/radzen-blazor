@@ -156,21 +156,7 @@ public class TopFilterCriterion : FilterCriterion
     }
 
     internal static bool TryCoerceToDouble(object? value, out double result)
-    {
-        switch (value)
-        {
-            case double d: result = d; return true;
-            case int i: result = i; return true;
-            case long l: result = l; return true;
-            case float f: result = f; return true;
-            case decimal m: result = (double)m; return true;
-            case DateTime dt: result = dt.ToOADate(); return true;
-            case string s when double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var n):
-                result = n; return true;
-        }
-        result = default;
-        return false;
-    }
+        => NumericCoercion.TryCoerceToDouble(value, out result);
 }
 
 /// <summary>
@@ -278,10 +264,10 @@ public class DynamicFilterCriterion : FilterCriterion
             DynamicFilterType.October => d.Month == 10,
             DynamicFilterType.November => d.Month == 11,
             DynamicFilterType.December => d.Month == 12,
-            DynamicFilterType.Quarter1 => d.Month is >= 1 and <= 3,
-            DynamicFilterType.Quarter2 => d.Month is >= 4 and <= 6,
-            DynamicFilterType.Quarter3 => d.Month is >= 7 and <= 9,
-            DynamicFilterType.Quarter4 => d.Month is >= 10 and <= 12,
+            DynamicFilterType.Quarter1 => QuarterOf(d.Month) == 1,
+            DynamicFilterType.Quarter2 => QuarterOf(d.Month) == 2,
+            DynamicFilterType.Quarter3 => QuarterOf(d.Month) == 3,
+            DynamicFilterType.Quarter4 => QuarterOf(d.Month) == 4,
             _ => false,
         };
     }
@@ -304,9 +290,10 @@ public class DynamicFilterCriterion : FilterCriterion
             return false;
         }
 
-        var quarterOf = (int month) => (month - 1) / 3 + 1;
-        return quarterOf(d.Month) == quarterOf(reference.Month);
+        return QuarterOf(d.Month) == QuarterOf(reference.Month);
     }
+
+    private static int QuarterOf(int month) => (month - 1) / 3 + 1;
 
     private static bool TryGetDate(object? value, out DateTime date)
     {
@@ -317,7 +304,7 @@ public class DynamicFilterCriterion : FilterCriterion
                 return true;
             case double d:
                 try { date = DateTime.FromOADate(d); return true; }
-                catch { date = default; return false; }
+                catch (ArgumentException) { date = default; return false; }
             case string s when DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed):
                 date = parsed;
                 return true;
