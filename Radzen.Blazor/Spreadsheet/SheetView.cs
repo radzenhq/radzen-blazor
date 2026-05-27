@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Radzen.Documents.Spreadsheet;
@@ -110,60 +111,60 @@ public class SheetView
 
     private static IndexRange GetIndexRange(Axis axis, double start, double end, bool includeFrozen = false)
     {
-        var currentPosition = 0d;
-        var startOffset = 0d;
-
-        if (!includeFrozen)
+        if (axis.Count == 0)
         {
-            if (axis.Frozen > 0)
-            {
-                for (int index = 0; index < axis.Frozen; index++)
-                {
-                    if (!axis.IsHidden(index))
-                    {
-                        currentPosition += axis[index];
-                    }
-                }
-            }
+            return new IndexRange(0, 0, 0);
         }
 
-        // Find start index - include items that start before the viewport end
-        int startIndex = includeFrozen ? 0 : axis.Frozen;
+        var frozenOffset = includeFrozen ? 0d : axis.GetPositionOf(axis.Frozen);
+        var firstIndex = includeFrozen ? 0 : axis.Frozen;
+        var maxIndex = axis.Count - 1;
 
-        for (; startIndex < axis.Count - 1; startIndex++)
+        // Find the first visible index whose end exceeds `start` (interpreted in
+        // the same frame the old loop used — currentPosition started at frozenOffset
+        // and `start` is in scrollable coordinates).
+        var absoluteStart = start + frozenOffset;
+        var absoluteEnd = end + frozenOffset;
+
+        var startIndex = axis.GetIndexAt(absoluteStart);
+        if (startIndex < firstIndex)
         {
-            if (axis.IsHidden(startIndex))
-            {
-                continue;
-            }
-
-            var segmentSize = axis[startIndex];
-
-            if (currentPosition + segmentSize > start)
-            {
-                startOffset = start - currentPosition;
-                break;
-            }
-
-            currentPosition += segmentSize;
+            startIndex = firstIndex;
+        }
+        if (startIndex > maxIndex)
+        {
+            startIndex = maxIndex;
         }
 
-        // Find end index - include items that end after the viewport start
-        int endIndex;
-        for (endIndex = startIndex; endIndex < axis.Count - 1; endIndex++)
+        // Skip hidden indices at the start (they contribute 0 size; GetIndexAt may have
+        // landed on one if the pixel sits exactly at the start of a hidden run).
+        while (startIndex < maxIndex && axis.IsHidden(startIndex))
         {
-            if (axis.IsHidden(endIndex))
-            {
-                continue;
-            }
+            startIndex++;
+        }
 
-            var segmentSize = axis[endIndex];
-            currentPosition += segmentSize;
+        var startPosition = axis.GetPositionOf(startIndex);
+        // Match the old loop quirk: it iterated `startIndex < Count - 1`, so landing on
+        // the last index meant the loop exited without ever assigning startOffset, leaving
+        // it at the initial 0. Preserve that observable behavior.
+        var startOffset = startIndex == maxIndex ? 0d : Math.Max(0, absoluteStart - startPosition);
 
-            if (currentPosition >= end)
-            {
-                break;
-            }
+        // Find the first visible index whose end is at or past `end`.
+        var endIndex = axis.GetIndexAt(absoluteEnd);
+        if (endIndex > maxIndex)
+        {
+            endIndex = maxIndex;
+        }
+        if (endIndex < startIndex)
+        {
+            endIndex = startIndex;
+        }
+
+        // Skip hidden indices at the end the same way as start: if GetIndexAt lands on a
+        // hidden row, advance to the next visible one (cap at maxIndex).
+        while (endIndex < maxIndex && axis.IsHidden(endIndex))
+        {
+            endIndex++;
         }
 
         return new IndexRange(startIndex, endIndex, startOffset);
@@ -171,31 +172,8 @@ public class SheetView
 
     private static PixelRange GetPixelRange(Axis axis, int startIndex, int endIndex)
     {
-        double start;
-        double end;
-        var currentPosition = 0d;
-
-        for (var index = 0; index < startIndex; index++)
-        {
-            if (!axis.IsHidden(index))
-            {
-                var segmentSize = axis[index];
-                currentPosition += segmentSize;
-            }
-        }
-        start = currentPosition;
-
-        for (var index = startIndex; index <= endIndex; index++)
-        {
-            if (!axis.IsHidden(index))
-            {
-                var segmentSize = axis[index];
-                currentPosition += segmentSize;
-            }
-        }
-
-        end = currentPosition;
-
+        var start = axis.GetPositionOf(startIndex);
+        var end = axis.GetPositionOf(endIndex + 1);
         return new PixelRange(start, end);
     }
 

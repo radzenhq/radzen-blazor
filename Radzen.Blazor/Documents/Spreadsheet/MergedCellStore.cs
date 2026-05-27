@@ -106,120 +106,84 @@ public class MergedCellStore
     /// </summary>
     public List<RangeRef> GetOverlappingRanges(RangeRef range) => [.. data.Where(range.Overlaps)];
 
-    internal void ShiftRowsUp(int deletedRow)
+    internal void ShiftRowsUp(int deletedRow) =>
+        ShiftAxisOnDelete(deletedRow, isRow: true);
+
+    internal void ShiftRowsDown(int fromRow, int count) =>
+        ShiftAxisOnInsert(fromRow, count, isRow: true);
+
+    internal void ShiftColumnsLeft(int deletedColumn) =>
+        ShiftAxisOnDelete(deletedColumn, isRow: false);
+
+    internal void ShiftColumnsRight(int fromColumn, int count) =>
+        ShiftAxisOnInsert(fromColumn, count, isRow: false);
+
+    private void ShiftAxisOnDelete(int deletedIndex, bool isRow)
     {
         for (int i = data.Count - 1; i >= 0; i--)
         {
             var range = data[i];
+            var start = isRow ? range.Start.Row : range.Start.Column;
+            var end = isRow ? range.End.Row : range.End.Column;
 
-            if (range.Start.Row > deletedRow)
+            if (start > deletedIndex)
             {
-                // Entirely below — shift up
-                var shifted = new RangeRef(
-                    new CellRef(range.Start.Row - 1, range.Start.Column),
-                    new CellRef(range.End.Row - 1, range.End.Column));
-                ReplaceAt(i, shifted);
+                // Entirely past the deleted index — shift toward it by one
+                ReplaceAt(i, Translate(range, isRow, -1, -1));
             }
-            else if (range.End.Row >= deletedRow && range.Start.Row <= deletedRow)
+            else if (end >= deletedIndex && start <= deletedIndex)
             {
-                // Spans or sits on the deleted row
-                if (range.Start.Row == range.End.Row)
+                // Spans or sits on the deleted index
+                if (start == end)
                 {
-                    // Entirely on the deleted row — remove
+                    // Entirely on the deleted index — remove
                     UnindexRange(range);
                     data.RemoveAt(i);
                 }
                 else
                 {
-                    // Shrink: end row decreases by one
-                    var shrunk = new RangeRef(
-                        range.Start,
-                        new CellRef(range.End.Row - 1, range.End.Column));
-                    ReplaceAt(i, shrunk);
+                    // Shrink: end decreases by one
+                    ReplaceAt(i, Translate(range, isRow, 0, -1));
                 }
             }
-            // Entirely above — no change
+            // Entirely before — no change
         }
     }
 
-    internal void ShiftRowsDown(int fromRow, int count)
+    private void ShiftAxisOnInsert(int fromIndex, int count, bool isRow)
     {
         for (int i = 0; i < data.Count; i++)
         {
             var range = data[i];
+            var start = isRow ? range.Start.Row : range.Start.Column;
+            var end = isRow ? range.End.Row : range.End.Column;
 
-            if (range.Start.Row >= fromRow)
+            if (start >= fromIndex)
             {
-                // Entirely at or below — shift down
-                var shifted = new RangeRef(
-                    new CellRef(range.Start.Row + count, range.Start.Column),
-                    new CellRef(range.End.Row + count, range.End.Column));
-                ReplaceAt(i, shifted);
+                // Entirely at or after — shift both endpoints
+                ReplaceAt(i, Translate(range, isRow, count, count));
             }
-            else if (range.End.Row >= fromRow)
+            else if (end >= fromIndex)
             {
-                // Starts above, ends at or below — expand
-                var expanded = new RangeRef(
-                    range.Start,
-                    new CellRef(range.End.Row + count, range.End.Column));
-                ReplaceAt(i, expanded);
+                // Starts before, ends at or after — expand
+                ReplaceAt(i, Translate(range, isRow, 0, count));
             }
-            // Entirely above — no change
+            // Entirely before — no change
         }
     }
 
-    internal void ShiftColumnsLeft(int deletedColumn)
+    private static RangeRef Translate(RangeRef range, bool isRow, int startDelta, int endDelta)
     {
-        for (int i = data.Count - 1; i >= 0; i--)
+        if (isRow)
         {
-            var range = data[i];
-
-            if (range.Start.Column > deletedColumn)
-            {
-                var shifted = new RangeRef(
-                    new CellRef(range.Start.Row, range.Start.Column - 1),
-                    new CellRef(range.End.Row, range.End.Column - 1));
-                ReplaceAt(i, shifted);
-            }
-            else if (range.End.Column >= deletedColumn && range.Start.Column <= deletedColumn)
-            {
-                if (range.Start.Column == range.End.Column)
-                {
-                    UnindexRange(range);
-                    data.RemoveAt(i);
-                }
-                else
-                {
-                    var shrunk = new RangeRef(
-                        range.Start,
-                        new CellRef(range.End.Row, range.End.Column - 1));
-                    ReplaceAt(i, shrunk);
-                }
-            }
+            return new RangeRef(
+                new CellRef(range.Start.Row + startDelta, range.Start.Column),
+                new CellRef(range.End.Row + endDelta, range.End.Column));
         }
-    }
 
-    internal void ShiftColumnsRight(int fromColumn, int count)
-    {
-        for (int i = 0; i < data.Count; i++)
-        {
-            var range = data[i];
-
-            if (range.Start.Column >= fromColumn)
-            {
-                var shifted = new RangeRef(
-                    new CellRef(range.Start.Row, range.Start.Column + count),
-                    new CellRef(range.End.Row, range.End.Column + count));
-                ReplaceAt(i, shifted);
-            }
-            else if (range.End.Column >= fromColumn)
-            {
-                var expanded = new RangeRef(
-                    range.Start,
-                    new CellRef(range.End.Row, range.End.Column + count));
-                ReplaceAt(i, expanded);
-            }
-        }
+        return new RangeRef(
+            new CellRef(range.Start.Row, range.Start.Column + startDelta),
+            new CellRef(range.End.Row, range.End.Column + endDelta));
     }
 
     private void ReplaceAt(int i, RangeRef newRange)
@@ -231,36 +195,35 @@ public class MergedCellStore
 
     internal List<RangeRef> SplitRange(RangeRef range, int frozenRows, int frozenColumns)
     {
-        var result = new List<RangeRef>();
+        var crossesRow = range.Start.Row < frozenRows && range.End.Row >= frozenRows;
+        var crossesColumn = range.Start.Column < frozenColumns && range.End.Column >= frozenColumns;
 
-        if (range.Start.Row < frozenRows && range.End.Row >= frozenRows)
+        if (crossesRow && crossesColumn)
         {
-            if (range.Start.Column < frozenColumns && range.End.Column >= frozenColumns)
-            {
-                // Split into 4 regions
-                result.Add(new RangeRef(range.Start, new CellRef(frozenRows - 1, frozenColumns - 1)));
-                result.Add(new RangeRef(new CellRef(frozenRows, range.Start.Column), new CellRef(range.End.Row, frozenColumns - 1)));
-                result.Add(new RangeRef(new CellRef(range.Start.Row, frozenColumns), new CellRef(frozenRows - 1, range.End.Column)));
-                result.Add(new RangeRef(new CellRef(frozenRows, frozenColumns), range.End));
-            }
-            else
-            {
-                // Split into 2 regions vertically
-                result.Add(new RangeRef(range.Start, new CellRef(frozenRows - 1, range.End.Column)));
-                result.Add(new RangeRef(new CellRef(frozenRows, range.Start.Column), range.End));
-            }
+            return
+            [
+                new(range.Start, new CellRef(frozenRows - 1, frozenColumns - 1)),
+                new(new CellRef(frozenRows, range.Start.Column), new CellRef(range.End.Row, frozenColumns - 1)),
+                new(new CellRef(range.Start.Row, frozenColumns), new CellRef(frozenRows - 1, range.End.Column)),
+                new(new CellRef(frozenRows, frozenColumns), range.End),
+            ];
         }
-        else if (range.Start.Column < frozenColumns && range.End.Column >= frozenColumns)
+        if (crossesRow)
         {
-            // Split into 2 regions horizontally
-            result.Add(new RangeRef(range.Start, new CellRef(range.End.Row, frozenColumns - 1)));
-            result.Add(new RangeRef(new CellRef(range.Start.Row, frozenColumns), range.End));
+            return
+            [
+                new(range.Start, new CellRef(frozenRows - 1, range.End.Column)),
+                new(new CellRef(frozenRows, range.Start.Column), range.End),
+            ];
         }
-        else
+        if (crossesColumn)
         {
-            result.Add(range);
+            return
+            [
+                new(range.Start, new CellRef(range.End.Row, frozenColumns - 1)),
+                new(new CellRef(range.Start.Row, frozenColumns), range.End),
+            ];
         }
-
-        return result;
+        return [range];
     }
 }

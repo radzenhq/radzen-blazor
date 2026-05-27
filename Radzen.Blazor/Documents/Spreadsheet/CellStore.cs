@@ -139,121 +139,37 @@ public class CellStore(Worksheet sheet)
 
     internal bool HasCell(int row, int column) => data.ContainsKey((row, column));
 
-    internal void ShiftRowsUp(int deletedRow)
+    private static void UpdateCellAddress((int row, int column) oldKey, (int row, int column) newKey, Cell cell)
     {
-        var toRemove = new List<(int row, int column)>();
-        var toRekey = new List<((int row, int column) key, Cell cell)>();
-
-        foreach (var kvp in data)
+        if (oldKey != newKey)
         {
-            if (kvp.Key.row == deletedRow)
-            {
-                toRemove.Add(kvp.Key);
-            }
-            else if (kvp.Key.row > deletedRow)
-            {
-                toRekey.Add((kvp.Key, kvp.Value));
-            }
-        }
-
-        foreach (var key in toRemove)
-        {
-            data.Remove(key);
-        }
-
-        foreach (var (key, cell) in toRekey)
-        {
-            data.Remove(key);
-            var newRow = key.row - 1;
-            data[(newRow, key.column)] = cell;
-            cell.Address = new CellRef(newRow, key.column);
+            cell.Address = new CellRef(newKey.row, newKey.column);
         }
     }
 
-    internal void ShiftRowsDown(int fromRow, int count)
-    {
-        var toRekey = new List<((int row, int column) key, Cell cell)>();
+    internal void ShiftRowsUp(int deletedRow) =>
+        DictionaryShift.Remap<(int row, int column), Cell>(data, k =>
+            k.row < deletedRow ? k :
+            k.row == deletedRow ? null :
+            (k.row - 1, k.column),
+            UpdateCellAddress);
 
-        foreach (var kvp in data)
-        {
-            if (kvp.Key.row >= fromRow)
-            {
-                toRekey.Add((kvp.Key, kvp.Value));
-            }
-        }
+    internal void ShiftRowsDown(int fromRow, int count) =>
+        DictionaryShift.Remap<(int row, int column), Cell>(data, k =>
+            k.row < fromRow ? k : (k.row + count, k.column),
+            UpdateCellAddress);
 
-        // Remove all affected entries first to avoid key conflicts
-        foreach (var (key, _) in toRekey)
-        {
-            data.Remove(key);
-        }
+    internal void ShiftColumnsLeft(int deletedColumn) =>
+        DictionaryShift.Remap<(int row, int column), Cell>(data, k =>
+            k.column < deletedColumn ? k :
+            k.column == deletedColumn ? null :
+            (k.row, k.column - 1),
+            UpdateCellAddress);
 
-        // Add back at new positions
-        foreach (var (key, cell) in toRekey)
-        {
-            var newRow = key.row + count;
-            data[(newRow, key.column)] = cell;
-            cell.Address = new CellRef(newRow, key.column);
-        }
-    }
-
-    internal void ShiftColumnsLeft(int deletedColumn)
-    {
-        var toRemove = new List<(int row, int column)>();
-        var toRekey = new List<((int row, int column) key, Cell cell)>();
-
-        foreach (var kvp in data)
-        {
-            if (kvp.Key.column == deletedColumn)
-            {
-                toRemove.Add(kvp.Key);
-            }
-            else if (kvp.Key.column > deletedColumn)
-            {
-                toRekey.Add((kvp.Key, kvp.Value));
-            }
-        }
-
-        foreach (var key in toRemove)
-        {
-            data.Remove(key);
-        }
-
-        foreach (var (key, cell) in toRekey)
-        {
-            data.Remove(key);
-            var newCol = key.column - 1;
-            data[(key.row, newCol)] = cell;
-            cell.Address = new CellRef(key.row, newCol);
-        }
-    }
-
-    internal void ShiftColumnsRight(int fromColumn, int count)
-    {
-        var toRekey = new List<((int row, int column) key, Cell cell)>();
-
-        foreach (var kvp in data)
-        {
-            if (kvp.Key.column >= fromColumn)
-            {
-                toRekey.Add((kvp.Key, kvp.Value));
-            }
-        }
-
-        // Remove all affected entries first to avoid key conflicts
-        foreach (var (key, _) in toRekey)
-        {
-            data.Remove(key);
-        }
-
-        // Add back at new positions
-        foreach (var (key, cell) in toRekey)
-        {
-            var newCol = key.column + count;
-            data[(key.row, newCol)] = cell;
-            cell.Address = new CellRef(key.row, newCol);
-        }
-    }
+    internal void ShiftColumnsRight(int fromColumn, int count) =>
+        DictionaryShift.Remap<(int row, int column), Cell>(data, k =>
+            k.column < fromColumn ? k : (k.row, k.column + count),
+            UpdateCellAddress);
 
     private readonly Dictionary<RangeRef, string> customTypes = [];
 
