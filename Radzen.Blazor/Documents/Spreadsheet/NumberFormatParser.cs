@@ -230,11 +230,28 @@ static class NumberFormatParser
             }
         }
 
-        return new FormatSection(
-            tokens, index, isDate, isPercentage, hasThousands, thousandsScale,
-            integerZeros, integerHashes, decimalPlaces, decimalZeros, is12Hour, hasParens,
-            hasDigitPlaceholders, prefix.ToString(), isPercentage ? "%" : suffix.ToString(),
-            isScientific, exponentFormat, decimalSpacePlaceholders, sectionColor);
+        return new FormatSection
+        {
+            Tokens = tokens,
+            Index = index,
+            IsDate = isDate,
+            IsPercentage = isPercentage,
+            HasThousandsSeparator = hasThousands,
+            ThousandsScale = thousandsScale,
+            IntegerZeros = integerZeros,
+            IntegerHashes = integerHashes,
+            DecimalPlaces = decimalPlaces,
+            DecimalZeros = decimalZeros,
+            Is12Hour = is12Hour,
+            HasParens = hasParens,
+            HasDigitPlaceholders = hasDigitPlaceholders,
+            Prefix = prefix.ToString(),
+            Suffix = isPercentage ? "%" + suffix.ToString() : suffix.ToString(),
+            IsScientific = isScientific,
+            ExponentFormat = exponentFormat,
+            DecimalSpacePlaceholders = decimalSpacePlaceholders,
+            Color = sectionColor,
+        };
     }
 
     private static List<FormatToken> Tokenize(string section)
@@ -534,51 +551,23 @@ internal sealed class FormatToken
 
 internal sealed class FormatSection
 {
-    public List<FormatToken> Tokens { get; }
-    public int Index { get; }
-    public bool IsDate { get; }
-    public bool IsPercentage { get; }
-    public bool HasThousandsSeparator { get; }
-    public int ThousandsScale { get; }
-    public int IntegerZeros { get; }
-    public int IntegerHashes { get; }
-    public int DecimalPlaces { get; }
-    public int DecimalZeros { get; }
-    public bool Is12Hour { get; }
-    public bool HasParens { get; }
-    public bool HasDigitPlaceholders { get; }
-    public string Prefix { get; }
-    public string Suffix { get; }
-    public bool IsScientific { get; }
-    public string ExponentFormat { get; }
-    public int DecimalSpacePlaceholders { get; }
-    public string? Color { get; }
-
-    public FormatSection(List<FormatToken> tokens, int index, bool isDate, bool isPercentage,
-        bool hasThousandsSeparator, int thousandsScale, int integerZeros, int integerHashes,
-        int decimalPlaces, int decimalZeros, bool is12Hour, bool hasParens,
-        bool hasDigitPlaceholders, string prefix, string suffix,
-        bool isScientific, string exponentFormat, int decimalSpacePlaceholders,
-        string? color)
-    {
-        Tokens = tokens;
-        Index = index;
-        IsDate = isDate;
-        IsPercentage = isPercentage;
-        HasThousandsSeparator = hasThousandsSeparator;
-        ThousandsScale = thousandsScale;
-        IntegerZeros = integerZeros;
-        IntegerHashes = integerHashes;
-        DecimalPlaces = decimalPlaces;
-        DecimalZeros = decimalZeros;
-        Is12Hour = is12Hour;
-        HasParens = hasParens;
-        HasDigitPlaceholders = hasDigitPlaceholders;
-        Prefix = prefix;
-        Suffix = suffix;
-        IsScientific = isScientific;
-        ExponentFormat = exponentFormat;
-        DecimalSpacePlaceholders = decimalSpacePlaceholders;
-        Color = color;
-    }
+    public List<FormatToken> Tokens { get; init; } = new();
+    public int Index { get; init; }
+    public bool IsDate { get; init; }
+    public bool IsPercentage { get; init; }
+    public bool HasThousandsSeparator { get; init; }
+    public int ThousandsScale { get; init; }
+    public int IntegerZeros { get; init; }
+    public int IntegerHashes { get; init; }
+    public int DecimalPlaces { get; init; }
+    public int DecimalZeros { get; init; }
+    public bool Is12Hour { get; init; }
+    public bool HasParens { get; init; }
+    public bool HasDigitPlaceholders { get; init; }
+    public string Prefix { get; init; } = string.Empty;
+    public string Suffix { get; init; } = string.Empty;
+    public bool IsScientific { get; init; }
+    public string ExponentFormat { get; init; } = string.Empty;
+    public int DecimalSpacePlaceholders { get; init; }
+    public string? Color { get; init; }
 }
