@@ -81,7 +81,7 @@ public class Selection(Worksheet sheet)
         {
             > 0 => MergeEnd(Cell).Row + rowOffset,
             < 0 => MergeStart(Cell).Row + rowOffset,
-            0 => Cell.Row + rowOffset
+            _ => Cell.Row
         };
     }
 
@@ -91,7 +91,7 @@ public class Selection(Worksheet sheet)
         {
             > 0 => MergeEnd(Cell).Column + columnOffset,
             < 0 => MergeStart(Cell).Column + columnOffset,
-            0 => Cell.Column + columnOffset
+            _ => Cell.Column
         };
     }
 
@@ -346,27 +346,13 @@ public class Selection(Worksheet sheet)
         return cell;
     }
 
-    private CellRef MergeStart(CellRef address)
+    private CellRef MergeStart(CellRef address) => MergeCorner(address, r => r.Start);
+
+    private CellRef MergeEnd(CellRef address) => MergeCorner(address, r => r.End);
+
+    private CellRef MergeCorner(CellRef address, Func<RangeRef, CellRef> selector)
     {
         var mergedRange = sheet.MergedCells.GetMergedRange(address);
-
-        if (mergedRange != RangeRef.Invalid)
-        {
-            return mergedRange.Start;
-        }
-
-        return address;
-    }
-
-    private CellRef MergeEnd(CellRef address)
-    {
-        var mergedRange = sheet.MergedCells.GetMergedRange(address);
-
-        if (mergedRange != RangeRef.Invalid)
-        {
-            return mergedRange.End;
-        }
-
-        return address;
+        return mergedRange != RangeRef.Invalid ? selector(mergedRange) : address;
     }
 }
