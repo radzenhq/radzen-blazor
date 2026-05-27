@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Radzen.Documents.Spreadsheet;
 
 namespace Radzen.Blazor.Spreadsheet;
@@ -10,31 +9,47 @@ namespace Radzen.Blazor.Spreadsheet;
 /// Sort a range using one or more <see cref="SortKey"/> levels. Supports undo/redo by
 /// snapshotting affected cells before sorting.
 /// </summary>
-public class MultiKeySortCommand(Worksheet sheet, RangeRef range, SortKey[] keys, bool skipHeaderRow = false) : ICommand, IProtectedCommand
+public class MultiKeySortCommand : RangeSnapshotCommandBase
 {
     /// <inheritdoc/>
-    public SheetAction RequiredAction => SheetAction.Sort;
+    public override SheetAction RequiredAction => SheetAction.Sort;
 
     /// <inheritdoc/>
-    public SpreadsheetFeature? Feature => SpreadsheetFeature.Sorting;
+    public override SpreadsheetFeature? Feature => SpreadsheetFeature.Sorting;
 
-    private readonly Worksheet sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
-    private readonly RangeRef range = range;
-    private readonly SortKey[] keys = keys ?? throw new ArgumentNullException(nameof(keys));
-    private readonly bool skipHeaderRow = skipHeaderRow;
-    private readonly Dictionary<CellRef, (object? value, string? formula, Format? format)> cells = [];
+    private readonly RangeRef range;
+    private readonly SortKey[] keys;
+    private readonly bool skipHeaderRow;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MultiKeySortCommand"/> class.
+    /// </summary>
+    public MultiKeySortCommand(Worksheet sheet, RangeRef range, SortKey[] keys, bool skipHeaderRow = false)
+        : base(sheet)
+    {
+        this.range = range;
+        this.keys = keys ?? throw new ArgumentNullException(nameof(keys));
+        this.skipHeaderRow = skipHeaderRow;
+    }
 
     /// <inheritdoc/>
-    public bool Execute()
+    protected override bool DoExecute()
     {
         if (range == RangeRef.Invalid || keys.Length == 0)
         {
             return false;
         }
 
-        Snapshot();
-
         var startRow = range.Start.Row + (skipHeaderRow ? 1 : 0);
+
+        for (var row = startRow; row <= range.End.Row; row++)
+        {
+            for (var col = range.Start.Column; col <= range.End.Column; col++)
+            {
+                Capture(new CellRef(row, col));
+            }
+        }
+
         var sortRange = new RangeRef(new CellRef(startRow, range.Start.Column), range.End);
         sheet.Sort(sortRange, keys);
 
@@ -42,37 +57,13 @@ public class MultiKeySortCommand(Worksheet sheet, RangeRef range, SortKey[] keys
     }
 
     /// <inheritdoc/>
-    public void Unexecute()
+    public override void Unexecute()
     {
         if (range == RangeRef.Invalid)
         {
             return;
         }
 
-        foreach (var (cellRef, (value, formula, format)) in cells)
-        {
-            var target = sheet.Cells[cellRef];
-            target.Value = value;
-            target.Formula = formula;
-            if (format is not null)
-            {
-                target.Format = format;
-            }
-        }
-    }
-
-    private void Snapshot()
-    {
-        cells.Clear();
-        var startRow = range.Start.Row + (skipHeaderRow ? 1 : 0);
-        for (var row = startRow; row <= range.End.Row; row++)
-        {
-            for (var col = range.Start.Column; col <= range.End.Column; col++)
-            {
-                var addr = new CellRef(row, col);
-                var cell = sheet.Cells[addr];
-                cells[addr] = (cell.Value, cell.Formula, cell.Format?.Clone());
-            }
-        }
+        RestoreSnapshot();
     }
 }

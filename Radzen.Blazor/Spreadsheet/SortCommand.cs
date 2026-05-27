@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 using Radzen.Documents.Spreadsheet;
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -9,15 +6,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents a command to sort a range in a spreadsheet, supporting undo and redo operations.
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of the <see cref="SortCommand"/> class.
-/// </remarks>
-/// <param name="sheet">The sheet containing the range to sort.</param>
-/// <param name="range">The range to sort.</param>
-/// <param name="order">The sort order (ascending or descending).</param>
-/// <param name="keyIndex">The column index to sort by.</param>
-/// <param name="skipHeaderRow">If true, skips the first row (header) when sorting.</param>
-public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int keyIndex, bool skipHeaderRow = false) : ICommand, IProtectedCommand
+public class SortCommand : RangeSnapshotCommandBase
 {
     /// <summary>
     /// Convenience factory for the multi-key sort variant.
@@ -26,29 +15,51 @@ public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int k
         new(sheet, range, keys, skipHeaderRow);
 
     /// <inheritdoc/>
-    public SheetAction RequiredAction => SheetAction.Sort;
+    public override SheetAction RequiredAction => SheetAction.Sort;
 
     /// <inheritdoc/>
-    public SpreadsheetFeature? Feature => SpreadsheetFeature.Sorting;
+    public override SpreadsheetFeature? Feature => SpreadsheetFeature.Sorting;
 
-    private readonly Worksheet sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
-    private readonly RangeRef range = range;
-    private readonly SortOrder order = order;
-    private readonly int keyIndex = keyIndex;
-    private readonly bool skipHeaderRow = skipHeaderRow;
-    private readonly Dictionary<CellRef, (object? value, string? formula, Format? format)> cells = [];
+    private readonly RangeRef range;
+    private readonly SortOrder order;
+    private readonly int keyIndex;
+    private readonly bool skipHeaderRow;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SortCommand"/> class.
+    /// </summary>
+    /// <param name="sheet">The sheet containing the range to sort.</param>
+    /// <param name="range">The range to sort.</param>
+    /// <param name="order">The sort order (ascending or descending).</param>
+    /// <param name="keyIndex">The column index to sort by.</param>
+    /// <param name="skipHeaderRow">If true, skips the first row (header) when sorting.</param>
+    public SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int keyIndex, bool skipHeaderRow = false)
+        : base(sheet)
+    {
+        this.range = range;
+        this.order = order;
+        this.keyIndex = keyIndex;
+        this.skipHeaderRow = skipHeaderRow;
+    }
 
     /// <inheritdoc/>
-    public bool Execute()
+    protected override bool DoExecute()
     {
         if (range == RangeRef.Invalid)
         {
             return false;
         }
 
-        Store();
-
         var startRow = range.Start.Row + (skipHeaderRow ? 1 : 0);
+
+        for (var row = startRow; row <= range.End.Row; row++)
+        {
+            for (var column = range.Start.Column; column <= range.End.Column; column++)
+            {
+                Capture(new CellRef(row, column));
+            }
+        }
+
         var sortRange = new RangeRef(new CellRef(startRow, range.Start.Column), range.End);
         sheet.Sort(sortRange, order, keyIndex);
 
@@ -56,46 +67,13 @@ public class SortCommand(Worksheet sheet, RangeRef range, SortOrder order, int k
     }
 
     /// <inheritdoc/>
-    public void Unexecute()
+    public override void Unexecute()
     {
         if (range == RangeRef.Invalid)
         {
             return;
         }
 
-        Restore();
+        RestoreSnapshot();
     }
-
-    private void Store()
-    {
-        cells.Clear();
-        var startRow = range.Start.Row + (skipHeaderRow ? 1 : 0);
-        for (var row = startRow; row <= range.End.Row; row++)
-        {
-            for (var column = range.Start.Column; column <= range.End.Column; column++)
-            {
-                var cellRef = new CellRef(row, column);
-                var cell = sheet.Cells[cellRef];
-                var format = cell.Format;
-                var formatClone = format?.Clone();
-                cells[cellRef] = (cell.Value, cell.Formula, formatClone);
-            }
-        }
-    }
-
-    private void Restore()
-    {
-        foreach (var kvp in cells)
-        {
-            var cellRef = kvp.Key;
-            var (value, formula, format) = kvp.Value;
-            var targetCell = sheet.Cells[cellRef];
-            targetCell.Value = value;
-            targetCell.Formula = formula;
-            if (format is not null)
-            {
-                targetCell.Format = format;
-            }
-        }
-    }
-} 
+}

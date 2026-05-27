@@ -13,11 +13,11 @@ enum AutofillDirection
     Left
 }
 
-class AutofillCommand : ICommand, IProtectedCommand
+class AutofillCommand : RangeSnapshotCommandBase
 {
-    public SheetAction RequiredAction => SheetAction.EditCell;
+    public override SheetAction RequiredAction => SheetAction.EditCell;
 
-    public SpreadsheetFeature? Feature => SpreadsheetFeature.Autofill;
+    public override SpreadsheetFeature? Feature => SpreadsheetFeature.Autofill;
 
     internal static RangeRef ComputeRange(RangeRef source, CellRef target)
     {
@@ -90,28 +90,25 @@ class AutofillCommand : ICommand, IProtectedCommand
         return AutofillDirection.Left;
     }
 
-    private readonly Worksheet sheet;
     private readonly RangeRef source;
     private readonly RangeRef target;
     private readonly AutofillDirection direction;
-    private readonly Dictionary<(int row, int column), (object? value, string? formula, Format? format)> snapshot = [];
 
     public AutofillCommand(Worksheet sheet, RangeRef source, RangeRef target, AutofillDirection direction)
+        : base(sheet)
     {
-        this.sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
         this.source = source;
         this.target = target;
         this.direction = direction;
     }
 
-    public bool Execute()
+    protected override bool DoExecute()
     {
         if (source == RangeRef.Invalid || target == RangeRef.Invalid)
         {
             return false;
         }
 
-        // Snapshot target cells for undo
         for (var row = target.Start.Row; row <= target.End.Row; row++)
         {
             for (var column = target.Start.Column; column <= target.End.Column; column++)
@@ -121,18 +118,7 @@ class AutofillCommand : ICommand, IProtectedCommand
                     continue;
                 }
 
-                object? value = null;
-                string? formula = null;
-                Format? format = null;
-
-                if (sheet.Cells.TryGet(row, column, out var cell))
-                {
-                    value = cell.Value;
-                    formula = cell.Formula;
-                    format = cell.Format?.Clone();
-                }
-
-                snapshot[(row, column)] = (value, formula, format);
+                Capture(new CellRef(row, column));
             }
         }
 
@@ -154,9 +140,9 @@ class AutofillCommand : ICommand, IProtectedCommand
 
         sheet.EndUpdate();
 
-        foreach (var (row, column) in snapshot.Keys)
+        foreach (var cellRef in snapshot.Keys)
         {
-            if (sheet.Cells.TryGet(row, column, out var cell))
+            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
             {
                 cell.OnChanged();
             }
@@ -165,35 +151,17 @@ class AutofillCommand : ICommand, IProtectedCommand
         return true;
     }
 
-    public void Unexecute()
+    public override void Unexecute()
     {
         sheet.BeginUpdate();
 
-        foreach (var ((row, column), (value, formula, format)) in snapshot)
-        {
-            var cell = sheet.Cells[row, column];
-
-            if (formula is not null)
-            {
-                cell.Formula = formula;
-            }
-            else
-            {
-                cell.Formula = null;
-                cell.Value = value;
-            }
-
-            if (format is not null)
-            {
-                cell.Format = format;
-            }
-        }
+        RestoreSnapshot();
 
         sheet.EndUpdate();
 
-        foreach (var (row, column) in snapshot.Keys)
+        foreach (var cellRef in snapshot.Keys)
         {
-            if (sheet.Cells.TryGet(row, column, out var cell))
+            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
             {
                 cell.OnChanged();
             }
@@ -241,7 +209,6 @@ class AutofillCommand : ICommand, IProtectedCommand
                 }
             }
 
-            // Detect series once per column
             var series = DetectSeries(sourceValues);
 
             var fillIndex = 0;
@@ -254,13 +221,11 @@ class AutofillCommand : ICommand, IProtectedCommand
 
                 var dstCell = sheet.Cells[row, column];
 
-                // Copy format
                 if (sourceFormats[sourceIndex] is not null)
                 {
                     dstCell.Format = sourceFormats[sourceIndex]!.Clone();
                 }
 
-                // Handle formula
                 if (!string.IsNullOrEmpty(sourceFormulas[sourceIndex]))
                 {
                     var adjusted = Worksheet.AdjustFormulaForCopy(sourceFormulas[sourceIndex]!, rowDelta, 0);
@@ -268,7 +233,6 @@ class AutofillCommand : ICommand, IProtectedCommand
                 }
                 else if (series is not null)
                 {
-                    // Continue the series from the end (or start for reverse)
                     var n = fillIndex + 1;
                     dstCell.Value = series.GetValue(n, direction);
                 }
@@ -360,6 +324,12 @@ class AutofillCommand : ICommand, IProtectedCommand
         }
     }
 
+    // Tolerance for numeric arithmetic-progression detection; loose enough to absorb accumulated floating-point error, tight enough to reject deliberately uneven steps.
+    private const double NumericStepEpsilon = 1e-7;
+
+    // Tolerance for date-step equality, expressed in days (~86 ms); tight enough to distinguish "off by a second" series, loose enough for round-trips through ToOADate/double.
+    private const double DateStepEpsilonInDays = 1e-6;
+
     private static SeriesInfo? DetectSeries(List<object?> sourceValues)
     {
         if (sourceValues.Count < 2)
@@ -367,7 +337,6 @@ class AutofillCommand : ICommand, IProtectedCommand
             return null;
         }
 
-        // Try numeric series — CellData stores all numbers as double
         var numbers = new List<double>();
 
         foreach (var v in sourceValues)
@@ -390,7 +359,7 @@ class AutofillCommand : ICommand, IProtectedCommand
 
             for (var i = 2; i < numbers.Count; i++)
             {
-                if (Math.Abs((numbers[i] - numbers[i - 1]) - diff) > 1e-10)
+                if (Math.Abs((numbers[i] - numbers[i - 1]) - diff) > NumericStepEpsilon)
                 {
                     isArithmetic = false;
                     break;
@@ -403,7 +372,6 @@ class AutofillCommand : ICommand, IProtectedCommand
             }
         }
 
-        // Try date series
         var dates = new List<DateTime>();
 
         foreach (var v in sourceValues)
@@ -426,7 +394,7 @@ class AutofillCommand : ICommand, IProtectedCommand
 
             for (var i = 2; i < dates.Count; i++)
             {
-                if (Math.Abs((dates[i] - dates[i - 1]).TotalDays - dayDiff) > 0.001)
+                if (Math.Abs((dates[i] - dates[i - 1]).TotalDays - dayDiff) > DateStepEpsilonInDays)
                 {
                     isConstant = false;
                     break;
