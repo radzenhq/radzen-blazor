@@ -46,7 +46,11 @@ internal static class FormulaFormat
             range = RangeRef.Parse(trimmed);
             return true;
         }
-        catch
+        catch (ArgumentException)
+        {
+            return false;
+        }
+        catch (FormatException)
         {
             return false;
         }

@@ -41,10 +41,16 @@ public class DataCellStore<T>(DataSheet<T> sheet, int pageSize = 20) : CellStore
                     }
                 }
             }
-            catch
+            catch (OperationCanceledException)
             {
-                // Reset page so the next access retries
                 page = -1;
+                throw;
+            }
+            catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+            {
+                page = -1;
+                System.Diagnostics.Debug.WriteLine($"DataCellStore.FetchPageAsync failed for page {pageNumber}: {ex}");
+                Console.Error.WriteLine($"DataCellStore.FetchPageAsync failed for page {pageNumber}: {ex}");
             }
         }
     }
