@@ -1,7 +1,6 @@
 @using Radzen.Blazor
 @using Radzen.Documents.Spreadsheet
-@inject DialogService DialogService
-@inject Localizer Localizer
+@inherits SpreadsheetDialogBase
 
 <RadzenStack Gap="1rem" Style="min-width:320px">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
@@ -29,8 +28,6 @@
     /// <summary>Result returned by the dialog.</summary>
     public sealed record Result(int Count, bool Percent, bool Bottom);
 
-    private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
-
     private bool bottom;          // false = top, true = bottom
     private bool percent;         // false = items, true = percent
     private int count = 10;
@@ -48,5 +45,4 @@
     ];
 
     private void OnOk() => DialogService.Close(new Result(count, percent, bottom));
-    private void OnCancel() => DialogService.Close(null);
 }

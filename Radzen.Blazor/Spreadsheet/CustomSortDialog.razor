@@ -2,8 +2,7 @@
 @using System.Linq
 @using Radzen.Blazor
 @using Radzen.Documents.Spreadsheet
-@inject DialogService DialogService
-@inject Localizer Localizer
+@inherits SpreadsheetDialogBase
 
 <RadzenStack Gap="1rem" Style="min-width:560px">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
@@ -100,8 +99,6 @@
     /// <summary>The result returned via DialogService when the user clicks OK.</summary>
     public sealed record Result(SortKey[] Keys, bool HasHeaders);
 
-    private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
-
     private sealed class Level
     {
         public int ColumnIndex { get; set; }
@@ -132,15 +129,18 @@
         new(L(nameof(RadzenStrings.Spreadsheet_SortOrderDescending)), SortOrder.Descending),
     ];
 
+    private string FormatColumnName(int number) =>
+        string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_ColumnFormat)), number);
+
     protected override void OnInitialized()
     {
         columnOptions = ColumnNames
-            .Select((n, i) => new ColumnOption(string.IsNullOrEmpty(n) ? $"Column {i + 1}" : n, i))
+            .Select((n, i) => new ColumnOption(string.IsNullOrEmpty(n) ? FormatColumnName(i + 1) : n, i))
             .ToList();
         if (columnOptions.Count == 0)
         {
             for (var i = 0; i < Math.Max(1, Range.Columns); i++)
-                columnOptions.Add(new ColumnOption($"Column {i + 1}", i));
+                columnOptions.Add(new ColumnOption(FormatColumnName(i + 1), i));
         }
         levels.Add(new Level { ColumnIndex = 0 });
     }
@@ -174,6 +174,4 @@
 
         DialogService.Close(new Result(keys, hasHeaders));
     }
-
-    private void OnCancel() => DialogService.Close(null);
 }

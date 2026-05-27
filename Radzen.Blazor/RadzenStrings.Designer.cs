@@ -223,6 +223,21 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_ValueRange { get { return ResourceManager.GetString("Spreadsheet_ValueRange", resourceCulture); } }
         public static string Spreadsheet_SeriesTitle { get { return ResourceManager.GetString("Spreadsheet_SeriesTitle", resourceCulture); } }
         public static string Spreadsheet_AddSeries { get { return ResourceManager.GetString("Spreadsheet_AddSeries", resourceCulture); } }
+        public static string Spreadsheet_SeriesFormat { get { return ResourceManager.GetString("Spreadsheet_SeriesFormat", resourceCulture); } }
+        public static string Spreadsheet_ChartType_Column { get { return ResourceManager.GetString("Spreadsheet_ChartType_Column", resourceCulture); } }
+        public static string Spreadsheet_ChartType_Bar { get { return ResourceManager.GetString("Spreadsheet_ChartType_Bar", resourceCulture); } }
+        public static string Spreadsheet_ChartType_StackedColumn { get { return ResourceManager.GetString("Spreadsheet_ChartType_StackedColumn", resourceCulture); } }
+        public static string Spreadsheet_ChartType_StackedBar { get { return ResourceManager.GetString("Spreadsheet_ChartType_StackedBar", resourceCulture); } }
+        public static string Spreadsheet_ChartType_Line { get { return ResourceManager.GetString("Spreadsheet_ChartType_Line", resourceCulture); } }
+        public static string Spreadsheet_ChartType_Area { get { return ResourceManager.GetString("Spreadsheet_ChartType_Area", resourceCulture); } }
+        public static string Spreadsheet_ChartType_StackedArea { get { return ResourceManager.GetString("Spreadsheet_ChartType_StackedArea", resourceCulture); } }
+        public static string Spreadsheet_ChartType_Pie { get { return ResourceManager.GetString("Spreadsheet_ChartType_Pie", resourceCulture); } }
+        public static string Spreadsheet_ChartType_Donut { get { return ResourceManager.GetString("Spreadsheet_ChartType_Donut", resourceCulture); } }
+        public static string Spreadsheet_ChartType_Scatter { get { return ResourceManager.GetString("Spreadsheet_ChartType_Scatter", resourceCulture); } }
+        public static string Spreadsheet_LegendPosition_Right { get { return ResourceManager.GetString("Spreadsheet_LegendPosition_Right", resourceCulture); } }
+        public static string Spreadsheet_LegendPosition_Left { get { return ResourceManager.GetString("Spreadsheet_LegendPosition_Left", resourceCulture); } }
+        public static string Spreadsheet_LegendPosition_Top { get { return ResourceManager.GetString("Spreadsheet_LegendPosition_Top", resourceCulture); } }
+        public static string Spreadsheet_LegendPosition_Bottom { get { return ResourceManager.GetString("Spreadsheet_LegendPosition_Bottom", resourceCulture); } }
         public static string Spreadsheet_InsertHyperlink { get { return ResourceManager.GetString("Spreadsheet_InsertHyperlink", resourceCulture); } }
         public static string Spreadsheet_InsertImage { get { return ResourceManager.GetString("Spreadsheet_InsertImage", resourceCulture); } }
         public static string Spreadsheet_InsertChart { get { return ResourceManager.GetString("Spreadsheet_InsertChart", resourceCulture); } }
