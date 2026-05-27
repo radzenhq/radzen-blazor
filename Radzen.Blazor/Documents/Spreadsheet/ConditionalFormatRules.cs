@@ -1,5 +1,6 @@
 using System;
-using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -20,39 +21,11 @@ public class GreaterThanRule : ConditionalFormatBase
     public override Format? GetFormat(Cell cell)
     {
         ArgumentNullException.ThrowIfNull(cell);
-        if (TryGetNumber(cell, out var number) && number > Value)
+        if (NumericCoercion.TryCoerceToDouble(cell.Value, out var number) && number > Value)
         {
             return Format;
         }
         return null;
-    }
-
-    internal static bool TryGetNumber(Cell cell, out double number)
-    {
-        number = 0;
-
-        switch (cell.Value)
-        {
-            case double d:
-                number = d;
-                return true;
-            case int i:
-                number = i;
-                return true;
-            case float f:
-                number = f;
-                return true;
-            case decimal dec:
-                number = (double)dec;
-                return true;
-            case long l:
-                number = l;
-                return true;
-            case not null:
-                return double.TryParse(cell.Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
-            default:
-                return false;
-        }
     }
 }
 
@@ -71,7 +44,7 @@ public class LessThanRule : ConditionalFormatBase
     public override Format? GetFormat(Cell cell)
     {
         ArgumentNullException.ThrowIfNull(cell);
-        if (GreaterThanRule.TryGetNumber(cell, out var number) && number < Value)
+        if (NumericCoercion.TryCoerceToDouble(cell.Value, out var number) && number < Value)
         {
             return Format;
         }
@@ -97,7 +70,7 @@ public class BetweenRule : ConditionalFormatBase
     public override Format? GetFormat(Cell cell)
     {
         ArgumentNullException.ThrowIfNull(cell);
-        if (GreaterThanRule.TryGetNumber(cell, out var number) && number >= Minimum && number <= Maximum)
+        if (NumericCoercion.TryCoerceToDouble(cell.Value, out var number) && number >= Minimum && number <= Maximum)
         {
             return Format;
         }
@@ -124,7 +97,7 @@ public class EqualToRule : ConditionalFormatBase
         {
             return Format;
         }
-        if (GreaterThanRule.TryGetNumber(cell, out var number) && Value is double dv && number == dv)
+        if (NumericCoercion.TryCoerceToDouble(cell.Value, out var number) && Value is double dv && number == dv)
         {
             return Format;
         }
@@ -157,8 +130,15 @@ public class TextContainsRule : ConditionalFormatBase
 }
 
 /// <summary>
-/// Conditional format rule that applies when the cell value is in the top N values.
+/// Conditional format rule that applies when the cell value is in the top (or bottom) N distinct values of its range.
 /// </summary>
+/// <remarks>
+/// Selection follows Excel semantics: it ranks the DISTINCT numeric values within the range and matches any cell
+/// whose value is at or beyond the resulting threshold (so ties at the threshold are all included). Because the
+/// rule needs the full range to compute the threshold, evaluation is performed by
+/// <see cref="ConditionalFormatStore.Calculate(Cell)"/>; calling <see cref="GetFormat(Cell)"/> directly returns
+/// <see langword="null"/>.
+/// </remarks>
 public class Top10Rule : ConditionalFormatBase
 {
     /// <summary>Gets or sets how many top values to highlight.</summary>
@@ -174,10 +154,47 @@ public class Top10Rule : ConditionalFormatBase
     public override Format? GetFormat(Cell cell)
     {
         ArgumentNullException.ThrowIfNull(cell);
-        if (GreaterThanRule.TryGetNumber(cell, out _))
-        {
-            return Format;
-        }
         return null;
+    }
+
+    internal Format? GetFormat(Cell cell, RangeRef range)
+    {
+        ArgumentNullException.ThrowIfNull(cell);
+
+        if (Count <= 0)
+        {
+            return null;
+        }
+
+        if (!NumericCoercion.TryCoerceToDouble(cell.Value, out var cellValue))
+        {
+            return null;
+        }
+
+        var sheet = cell.Worksheet;
+        var distinct = new HashSet<double>();
+        foreach (var address in range.GetCells())
+        {
+            var other = sheet.Cells[address];
+            if (NumericCoercion.TryCoerceToDouble(other.Value, out var v))
+            {
+                distinct.Add(v);
+            }
+        }
+
+        if (distinct.Count == 0)
+        {
+            return null;
+        }
+
+        var ordered = Bottom
+            ? distinct.OrderBy(v => v).ToList()
+            : distinct.OrderByDescending(v => v).ToList();
+
+        var index = Math.Min(Count, ordered.Count) - 1;
+        var threshold = ordered[index];
+
+        var matches = Bottom ? cellValue <= threshold : cellValue >= threshold;
+        return matches ? Format : null;
     }
 }

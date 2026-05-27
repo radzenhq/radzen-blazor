@@ -2,7 +2,6 @@ namespace Radzen.Documents.Spreadsheet;
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 #nullable enable
 
@@ -27,21 +26,6 @@ public class SheetFilter(FilterCriterion criterion, RangeRef range)
 /// </summary>
 public abstract class FilterCriterion
 {
-    /// <summary>
-    /// Throws <see cref="ArgumentNullException" /> when the visitor is null.
-    /// </summary>
-    protected static void ThrowIfNullVisitor(IFilterCriterionVisitor visitor)
-    {
-        ArgumentNullException.ThrowIfNull(visitor);
-    }
-
-    /// <summary>
-    /// Throws <see cref="ArgumentNullException" /> when the sheet is null.
-    /// </summary>
-    protected static void ThrowIfNullSheet(Worksheet sheet)
-    {
-        ArgumentNullException.ThrowIfNull(sheet);
-    }
     /// <summary>
     /// Determines whether the specified row in the given sheet matches the filter criterion.
     /// </summary>
@@ -171,6 +155,14 @@ public interface IFilterCriterionVisitor
 /// </summary>
 public abstract class FilterCriterionVisitorBase : IFilterCriterionVisitor
 {
+    /// <summary>
+    /// Default visit handler invoked by every Visit overload that is not
+    /// otherwise overridden. Override to provide a common fallback for unhandled criteria.
+    /// </summary>
+    protected virtual void DefaultVisit(FilterCriterion criterion)
+    {
+    }
+
     /// <inheritdoc/>
     public virtual void Visit(OrCriterion criterion)
     {
@@ -194,89 +186,55 @@ public abstract class FilterCriterionVisitorBase : IFilterCriterionVisitor
     }
 
     /// <inheritdoc/>
-    public virtual void Visit(EqualToCriterion criterion)
-    {
-    }
+    public virtual void Visit(EqualToCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(GreaterThanCriterion criterion)
-    {
-    }
+    public virtual void Visit(GreaterThanCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(InListCriterion criterion)
-    {
-    }
+    public virtual void Visit(InListCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(IsNullCriterion criterion)
-    {
-    }
+    public virtual void Visit(IsNullCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(LessThanCriterion criterion)
-    {
-    }
+    public virtual void Visit(LessThanCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(GreaterThanOrEqualCriterion criterion)
-    {
-    }
+    public virtual void Visit(GreaterThanOrEqualCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(LessThanOrEqualCriterion criterion)
-    {
-    }
+    public virtual void Visit(LessThanOrEqualCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(NotEqualToCriterion criterion)
-    {
-    }
+    public virtual void Visit(NotEqualToCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(StartsWithCriterion criterion)
-    {
-    }
+    public virtual void Visit(StartsWithCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(DoesNotStartWithCriterion criterion)
-    {
-    }
+    public virtual void Visit(DoesNotStartWithCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(EndsWithCriterion criterion)
-    {
-    }
+    public virtual void Visit(EndsWithCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(DoesNotEndWithCriterion criterion)
-    {
-    }
+    public virtual void Visit(DoesNotEndWithCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(ContainsCriterion criterion)
-    {
-    }
+    public virtual void Visit(ContainsCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(DoesNotContainCriterion criterion)
-    {
-    }
+    public virtual void Visit(DoesNotContainCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(TopFilterCriterion criterion)
-    {
-    }
+    public virtual void Visit(TopFilterCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(DynamicFilterCriterion criterion)
-    {
-    }
+    public virtual void Visit(DynamicFilterCriterion criterion) => DefaultVisit(criterion);
 
     /// <inheritdoc/>
-    public virtual void Visit(CellColorFilterCriterion criterion)
-    {
-    }
+    public virtual void Visit(CellColorFilterCriterion criterion) => DefaultVisit(criterion);
 }
 
 /// <summary>
@@ -292,7 +250,6 @@ public class OrCriterion : FilterCriterion
     /// <inheritdoc/>
     public override bool Matches(Worksheet sheet, int row)
     {
-        ThrowIfNullSheet(sheet);
         foreach (var criterion in Criteria)
         {
             if (criterion.Matches(sheet, row))
@@ -307,7 +264,7 @@ public class OrCriterion : FilterCriterion
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -325,7 +282,6 @@ public class AndCriterion : FilterCriterion
     /// <inheritdoc/>
     public override bool Matches(Worksheet sheet, int row)
     {
-        ThrowIfNullSheet(sheet);
         foreach (var criterion in Criteria)
         {
             if (!criterion.Matches(sheet, row))
@@ -340,7 +296,7 @@ public class AndCriterion : FilterCriterion
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -358,9 +314,9 @@ public abstract class FilterCriterionLeaf : FilterCriterion
     /// <inheritdoc/>
     public override bool Matches(Worksheet sheet, int row)
     {
-        ThrowIfNullSheet(sheet);
-        var cell = sheet.Cells[row, Column];
-        return Matches(cell.Value);
+        ArgumentNullException.ThrowIfNull(sheet);
+        var value = sheet.Cells.TryGet(row, Column, out var cell) ? cell.Value : null;
+        return Matches(value);
     }
 
     /// <summary>
@@ -375,32 +331,7 @@ public abstract class FilterCriterionLeaf : FilterCriterion
     /// <param name="result"></param>
     /// <returns></returns>
     protected static bool TryCoerce(object? value, out double result)
-    {
-        switch (value)
-        {
-            case double d:
-                result = d;
-                return true;
-            case int i:
-                result = i;
-                return true;
-            case long l:
-                result = l;
-                return true;
-            case float f:
-                result = f;
-                return true;
-            case decimal dec:
-                result = (double)dec;
-                return true;
-            case string str when double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out var number):
-                result = number;
-                return true;
-        }
-
-        result = default;
-        return false;
-    }
+        => NumericCoercion.TryCoerceToDouble(value, out result);
 }
 
 /// <summary>
@@ -472,7 +403,7 @@ public class EqualToCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -488,7 +419,7 @@ public class GreaterThanCriterion : NumericFilterCriterion
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -504,7 +435,7 @@ public class LessThanCriterion : NumericFilterCriterion
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -520,7 +451,7 @@ public class GreaterThanOrEqualCriterion : NumericFilterCriterion
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -536,7 +467,7 @@ public class LessThanOrEqualCriterion : NumericFilterCriterion
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -575,7 +506,7 @@ public class NotEqualToCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -623,7 +554,7 @@ public class InListCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -642,7 +573,7 @@ public class IsNullCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -652,15 +583,6 @@ public class IsNullCriterion : FilterCriterionLeaf
 /// </summary>
 public abstract class StringFilterCriterion : FilterCriterionLeaf
 {
-    /// <summary>
-    /// Throws <see cref="ArgumentNullException" /> when string inputs are null.
-    /// </summary>
-    protected static void ThrowIfNullStrings(string stringValue, string stringCriterion)
-    {
-        ArgumentNullException.ThrowIfNull(stringValue);
-        ArgumentNullException.ThrowIfNull(stringCriterion);
-    }
-
     /// <summary>
     /// Gets or sets the value that this filter criterion checks against.
     /// </summary>
@@ -694,14 +616,14 @@ public class StartsWithCriterion : StringFilterCriterion
     /// <inheritdoc/>
     protected override bool Matches(string stringValue, string stringCriterion)
     {
-        ThrowIfNullStrings(stringValue, stringCriterion);
+        ArgumentNullException.ThrowIfNull(stringValue);
         return stringValue.StartsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -714,14 +636,14 @@ public class DoesNotStartWithCriterion : StringFilterCriterion
     /// <inheritdoc/>
     protected override bool Matches(string stringValue, string stringCriterion)
     {
-        ThrowIfNullStrings(stringValue, stringCriterion);
+        ArgumentNullException.ThrowIfNull(stringValue);
         return !stringValue.StartsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -734,14 +656,14 @@ public class EndsWithCriterion : StringFilterCriterion
     /// <inheritdoc/>
     protected override bool Matches(string stringValue, string stringCriterion)
     {
-        ThrowIfNullStrings(stringValue, stringCriterion);
+        ArgumentNullException.ThrowIfNull(stringValue);
         return stringValue.EndsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -754,14 +676,14 @@ public class DoesNotEndWithCriterion : StringFilterCriterion
     /// <inheritdoc/>
     protected override bool Matches(string stringValue, string stringCriterion)
     {
-        ThrowIfNullStrings(stringValue, stringCriterion);
+        ArgumentNullException.ThrowIfNull(stringValue);
         return !stringValue.EndsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -774,14 +696,14 @@ public class ContainsCriterion : StringFilterCriterion
     /// <inheritdoc/>
     protected override bool Matches(string stringValue, string stringCriterion)
     {
-        ThrowIfNullStrings(stringValue, stringCriterion);
+        ArgumentNullException.ThrowIfNull(stringValue);
         return stringValue.Contains(stringCriterion, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }
@@ -794,14 +716,14 @@ public class DoesNotContainCriterion : StringFilterCriterion
     /// <inheritdoc/>
     protected override bool Matches(string stringValue, string stringCriterion)
     {
-        ThrowIfNullStrings(stringValue, stringCriterion);
+        ArgumentNullException.ThrowIfNull(stringValue);
         return !stringValue.Contains(stringCriterion, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor)
     {
-        ThrowIfNullVisitor(visitor);
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.Visit(this);
     }
 }

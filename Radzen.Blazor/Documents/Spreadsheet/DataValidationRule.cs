@@ -132,23 +132,7 @@ public class DataValidationRule : ICellValidator
     /// <summary>
     /// Gets the list items for List type validation, parsed from Formula1.
     /// </summary>
-    public IReadOnlyList<string> ListItems
-    {
-        get
-        {
-            if (Type != DataValidationType.List || string.IsNullOrEmpty(Formula1))
-            {
-                return [];
-            }
-
-            if (Formula1.StartsWith('='))
-            {
-                return [];
-            }
-
-            return Formula1.Split(',').Select(s => s.Trim().Trim('"')).ToList();
-        }
-    }
+    public IReadOnlyList<string> ListItems => GetListItems(null);
 
     /// <summary>
     /// Gets the list items for List type validation, resolving cell range references from the given sheet.
@@ -160,9 +144,9 @@ public class DataValidationRule : ICellValidator
             return [];
         }
 
-        if (Formula1.StartsWith('=') && sheet is not null)
+        if (Formula1.StartsWith('='))
         {
-            return ResolveListFromRange(sheet);
+            return sheet is not null ? ResolveListFromRange(sheet) : [];
         }
 
         return Formula1.Split(',').Select(s => s.Trim().Trim('"')).ToList();
@@ -194,7 +178,11 @@ public class DataValidationRule : ICellValidator
 
             return items;
         }
-        catch
+        catch (ArgumentException)
+        {
+            return [];
+        }
+        catch (FormatException)
         {
             return [];
         }
@@ -271,7 +259,7 @@ public class DataValidationRule : ICellValidator
     {
         if (cell.Value is DateTime dateValue)
         {
-            var serialDate = dateValue.ToOADate();
+            var serialDate = dateValue.ToNumber();
             return CompareValue(serialDate);
         }
 
@@ -342,7 +330,23 @@ public class DataValidationRule : ICellValidator
 
             return false;
         }
-        catch
+        catch (ArgumentException)
+        {
+            return false;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
+        catch (InvalidCastException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
         {
             return false;
         }
@@ -379,10 +383,9 @@ public class DataValidationRule : ICellValidator
             return result;
         }
 
-        // Try parsing as a date and converting to OLE Automation date
         if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateResult))
         {
-            return dateResult.ToOADate();
+            return dateResult.ToNumber();
         }
 
         return null;
