@@ -86,16 +86,13 @@ public partial class Worksheet
         }
 
         // Use OrderBy to keep stability across multiple keys.
-        IOrderedEnumerable<(int originalIndex, List<Cell> cells)>? ordered = null;
-        foreach (var key in keys)
+        var ordered = rows.OrderBy(row => row, BuildComparer(keys[0]));
+        for (var i = 1; i < keys.Length; i++)
         {
-            var k = key;
-            ordered = ordered is null
-                ? rows.OrderBy(row => row, BuildComparer(k))
-                : ordered.ThenBy(row => row, BuildComparer(k));
+            ordered = ordered.ThenBy(row => row, BuildComparer(keys[i]));
         }
 
-        var sortedRows = ordered!.ToList();
+        var sortedRows = ordered.ToList();
 
         for (var i = 0; i < sortedRows.Count; i++)
         {
@@ -236,8 +233,6 @@ public partial class Worksheet
             ? StringComparison.Ordinal
             : StringComparison.OrdinalIgnoreCase);
     }
-
-    private static int Compare(object? x, object? y) => Compare(x, y, caseSensitive: false);
 
     private static int IndexInList(string[] list, string? value, bool caseSensitive)
     {
