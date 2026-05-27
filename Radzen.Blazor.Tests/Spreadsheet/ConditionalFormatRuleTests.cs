@@ -62,6 +62,86 @@ public class ConditionalFormatRuleTests
     }
 
     [Fact]
+    public void Top10Rule_Top3_MatchesTopThreeValues()
+    {
+        var sheet = new Worksheet(10, 10);
+        sheet.Cells[0, 0].Value = 1;
+        sheet.Cells[1, 0].Value = 2;
+        sheet.Cells[2, 0].Value = 3;
+        sheet.Cells[3, 0].Value = 4;
+        sheet.Cells[4, 0].Value = 5;
+
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(4, 0));
+        var rule = new Top10Rule { Count = 3, Bottom = false, Format = new Format { Bold = true } };
+        sheet.ConditionalFormats.Add(range, rule);
+
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[0, 0]));
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[1, 0]));
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[2, 0]));
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[3, 0]));
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[4, 0]));
+    }
+
+    [Fact]
+    public void Top10Rule_Bottom2_MatchesLowestTwoValues()
+    {
+        var sheet = new Worksheet(10, 10);
+        sheet.Cells[0, 0].Value = 1;
+        sheet.Cells[1, 0].Value = 2;
+        sheet.Cells[2, 0].Value = 3;
+        sheet.Cells[3, 0].Value = 4;
+        sheet.Cells[4, 0].Value = 5;
+
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(4, 0));
+        var rule = new Top10Rule { Count = 2, Bottom = true, Format = new Format { Italic = true } };
+        sheet.ConditionalFormats.Add(range, rule);
+
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[0, 0]));
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[1, 0]));
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[2, 0]));
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[3, 0]));
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[4, 0]));
+    }
+
+    [Fact]
+    public void Top10Rule_TiesAtThreshold_IncludeAllTiedValues()
+    {
+        var sheet = new Worksheet(10, 10);
+        sheet.Cells[0, 0].Value = 5;
+        sheet.Cells[1, 0].Value = 5;
+        sheet.Cells[2, 0].Value = 5;
+        sheet.Cells[3, 0].Value = 1;
+
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(3, 0));
+        var rule = new Top10Rule { Count = 2, Bottom = false, Format = new Format { Bold = true } };
+        sheet.ConditionalFormats.Add(range, rule);
+
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[0, 0]));
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[1, 0]));
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[2, 0]));
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[3, 0]));
+    }
+
+    [Fact]
+    public void Top10Rule_IgnoresNonNumericCellsButFormatsOnlyMatchingNumerics()
+    {
+        var sheet = new Worksheet(10, 10);
+        sheet.Cells[0, 0].Value = "text";
+        sheet.Cells[1, 0].Value = 10;
+        sheet.Cells[2, 0].Value = 20;
+        sheet.Cells[3, 0].Value = 30;
+
+        var range = new RangeRef(new CellRef(0, 0), new CellRef(3, 0));
+        var rule = new Top10Rule { Count = 1, Bottom = false, Format = new Format { Bold = true } };
+        sheet.ConditionalFormats.Add(range, rule);
+
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[0, 0]));
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[1, 0]));
+        Assert.Null(sheet.ConditionalFormats.Calculate(sheet.Cells[2, 0]));
+        Assert.NotNull(sheet.ConditionalFormats.Calculate(sheet.Cells[3, 0]));
+    }
+
+    [Fact]
     public void ConditionalFormatCommand_ExecuteAndUnexecute()
     {
         var sheet = new Worksheet(10, 10);
