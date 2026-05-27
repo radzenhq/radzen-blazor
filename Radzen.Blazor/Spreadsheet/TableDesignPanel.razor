@@ -111,11 +111,7 @@
             if (Worksheet is null) return null;
             var sel = Worksheet.Selection.Cell;
             if (sel == CellRef.Invalid) return null;
-            foreach (var t in Worksheet.Tables)
-            {
-                if (t.Range.Contains(sel.Row, sel.Column)) return t;
-            }
-            return null;
+            return Worksheet.GetTableContaining(sel.Row, sel.Column);
         }
     }
 
@@ -137,18 +133,23 @@
     }
 
     private sealed record TotalsOption(string Text, TotalsCalculation Value);
-    private TotalsOption[] TotalsOptions =>
-    [
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsNone)), TotalsCalculation.None),
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsSum)), TotalsCalculation.Sum),
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsAverage)), TotalsCalculation.Average),
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsCount)), TotalsCalculation.Count),
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsCountNumbers)), TotalsCalculation.CountNumbers),
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsMin)), TotalsCalculation.Min),
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsMax)), TotalsCalculation.Max),
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsStdDev)), TotalsCalculation.StdDev),
-        new(L(nameof(RadzenStrings.Spreadsheet_TotalsVar)), TotalsCalculation.Var),
-    ];
+    private TotalsOption[] TotalsOptions = [];
+
+    protected override void OnInitialized()
+    {
+        TotalsOptions =
+        [
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsNone)), TotalsCalculation.None),
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsSum)), TotalsCalculation.Sum),
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsAverage)), TotalsCalculation.Average),
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsCount)), TotalsCalculation.Count),
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsCountNumbers)), TotalsCalculation.CountNumbers),
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsMin)), TotalsCalculation.Min),
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsMax)), TotalsCalculation.Max),
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsStdDev)), TotalsCalculation.StdDev),
+            new(L(nameof(RadzenStrings.Spreadsheet_TotalsVar)), TotalsCalculation.Var),
+        ];
+    }
 
     private void CommitTotals(TableColumn col, TotalsCalculation calc)
     {
