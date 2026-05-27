@@ -18,6 +18,6 @@ public class ValueFunctionTests
     {
         var sheet = new Worksheet(10, 10);
         sheet.Cells["A1"].Formula = "=VALUE(\"16:48:00\")-VALUE(\"12:00:00\")";
-        Assert.Equal(0.2d, sheet.Cells["A1"].Data.Value);
+        Assert.Equal(0.2d, (double)sheet.Cells["A1"].Data.Value!, precision: 10);
     }
 }
