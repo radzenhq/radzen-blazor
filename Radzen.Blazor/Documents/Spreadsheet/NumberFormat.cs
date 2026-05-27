@@ -205,35 +205,20 @@ public static class NumberFormat
 
     private static bool TryGetNumber(object? value, CellDataType type, out double number)
     {
-        number = 0;
-
-        switch (value)
+        if (value is string)
         {
-            case double d:
-                number = d;
-                return true;
-            case int i:
-                number = i;
-                return true;
-            case float f:
-                number = f;
-                return true;
-            case decimal dec:
-                number = (double)dec;
-                return true;
-            case long l:
-                number = l;
-                return true;
-            case DateTime dt:
-                number = dt.ToNumber();
-                return true;
-            default:
-                if (type == CellDataType.Number || type == CellDataType.Date)
-                {
-                    return double.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
-                }
+            number = 0;
+            if (type != CellDataType.Number && type != CellDataType.Date)
+            {
                 return false;
+            }
         }
+        else if (NumericCoercion.TryCoerceToDouble(value, out number))
+        {
+            return true;
+        }
+
+        return double.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out number);
     }
 
     private static FormatSection SelectSection(ParsedFormat parsed, double value)
@@ -377,9 +362,9 @@ public static class NumberFormat
             absValue *= 100;
         }
 
-        for (var i = 0; i < section.ThousandsScale; i++)
+        if (section.ThousandsScale > 0)
         {
-            absValue /= 1000;
+            absValue /= Math.Pow(1000, section.ThousandsScale);
         }
 
         var intZeros = section.IntegerZeros;
@@ -397,12 +382,6 @@ public static class NumberFormat
         if (isNegative && section.Index == 0 && !section.HasParens)
         {
             sb.Append('-');
-        }
-
-        // Opening paren for negative section with parens
-        if (section.HasParens)
-        {
-            // parens are part of the format literals
         }
 
         var intPart = (long)Math.Truncate(absValue);
