@@ -1994,6 +1994,76 @@ namespace Radzen.Blazor.Tests
             Assert.Null(column.GetSecondFilterValue());
         }
 
+        [Fact]
+        public void DataGrid_SimpleWithMenuMode_FilterMenuIdsRemainBoundToColumn_AfterHidingColumn()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new { Id = 1, FirstName = "Anna", LastName = "Lee" },
+                new { Id = 2, FirstName = "Bob",  LastName = "Kim" },
+            };
+
+            bool hideId = false;
+
+            RenderFragment Columns(RenderTreeBuilder builder)
+            {
+                builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                builder.AddAttribute(1, "Property", "Id");
+                builder.AddAttribute(2, "Title", "Id");
+                builder.AddAttribute(3, "Visible", !hideId);
+                builder.CloseComponent();
+
+                builder.OpenComponent(4, typeof(RadzenDataGridColumn<dynamic>));
+                builder.AddAttribute(5, "Property", "FirstName");
+                builder.AddAttribute(6, "Title", "First Name");
+                builder.CloseComponent();
+
+                builder.OpenComponent(7, typeof(RadzenDataGridColumn<dynamic>));
+                builder.AddAttribute(8, "Property", "LastName");
+                builder.AddAttribute(9, "Title", "Last Name");
+                builder.CloseComponent();
+
+                return null;
+            }
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder => Columns(builder));
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.SimpleWithMenu);
+            });
+
+            hideId = true;
+            component.SetParametersAndRender(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder => Columns(builder));
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.SimpleWithMenu);
+            });
+
+            var firstNameColumn = component.Instance.ColumnsCollection.Single(c => c.Property == "FirstName");
+            var lastNameColumn = component.Instance.ColumnsCollection.Single(c => c.Property == "LastName");
+
+            var menuButtons = component.FindAll("button.rz-filter-button").ToList();
+            Assert.Equal(2, menuButtons.Count);
+
+            var firstNameMenuId = $"{component.Instance.PopupID}FirstName{firstNameColumn.UniqueID}fm";
+            var lastNameMenuId = $"{component.Instance.PopupID}LastName{lastNameColumn.UniqueID}fm";
+
+            Assert.Contains(menuButtons, b => b.GetAttribute("onclick")?.Contains(firstNameMenuId) == true);
+            Assert.Contains(menuButtons, b => b.GetAttribute("onclick")?.Contains(lastNameMenuId) == true);
+
+            var popupIds = component.FindAll("div.rz-overlaypanel[role='menu']").Select(d => d.Id).ToList();
+            Assert.Contains(firstNameMenuId, popupIds);
+            Assert.Contains(lastNameMenuId, popupIds);
+        }
+
         // Combined FilterMode and data type tests
         [Fact]
         public void DataGrid_SimpleMode_SupportsStringColumns()
