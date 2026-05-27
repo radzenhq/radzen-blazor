@@ -43,7 +43,6 @@ public enum CellError
 
 class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisitor
 {
-    private readonly Worksheet sheet = sheet;
     private object? value;
     private readonly HashSet<Cell> evaluationStack = [];
 
@@ -202,13 +201,8 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
                     res = l / r;
                     break;
             }
-            // Excel uses up to 15 significant digits; apply rounding to minimize binary artifacts
-            res = Math.Round(res, 15, MidpointRounding.AwayFromZero);
             value = CellData.FromNumber(res);
-            return;
         }
-
-        throw new InvalidOperationException($"Unsupported operator: {binaryExpressionSyntaxNode.Operator}");
     }
 
     public void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
@@ -475,7 +469,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
         if (!string.IsNullOrEmpty(start.Worksheet))
         {
             var wb = sheet.Workbook;
-            startSheet = wb.Sheets.FirstOrDefault(s => string.Equals(s.Name, start.Worksheet, StringComparison.OrdinalIgnoreCase)) ?? startSheet;
+            startSheet = wb.GetSheet(start.Worksheet) ?? startSheet;
             if (!string.Equals(startSheet.Name, start.Worksheet, StringComparison.OrdinalIgnoreCase))
             {
                 value = CellData.FromError(CellError.Ref);
@@ -487,7 +481,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
         var endSheet = startSheet;
         if (!string.IsNullOrEmpty(end.Worksheet))
         {
-            endSheet = sheet.Workbook.Sheets.FirstOrDefault(s => string.Equals(s.Name, end.Worksheet, StringComparison.OrdinalIgnoreCase)) ?? endSheet;
+            endSheet = sheet.Workbook.GetSheet(end.Worksheet) ?? endSheet;
             if (!string.Equals(endSheet.Name, end.Worksheet, StringComparison.OrdinalIgnoreCase) || endSheet != startSheet)
             {
                 value = CellData.FromError(CellError.Ref);

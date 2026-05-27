@@ -22,30 +22,49 @@ internal class CellDependencyGraph
 
     public IEnumerable<Cell> GetTopologicallySortedDependencies() => GetTopologicallySortedDependencies(dependencies.Keys);
 
+    public IEnumerable<Cell> FormulaCells => dependencies.Keys;
+
     private List<Cell> GetTopologicallySortedDependencies(IEnumerable<Cell> cells)
     {
         var visited = new HashSet<Cell>();
         var result = new List<Cell>();
-
-        void Visit(Cell cell)
-        {
-            if (!visited.Add(cell))
-            {
-                return;
-            }
-
-            foreach (var dependentCell in GetDependentCells(cell))
-            {
-                Visit(dependentCell);
-            }
-            result.Add(cell);
-        }
+        var stack = new Stack<(Cell Cell, bool ChildrenExpanded)>();
 
         foreach (var cell in cells)
         {
-            if (!visited.Contains(cell))
+            if (visited.Contains(cell))
             {
-                Visit(cell);
+                continue;
+            }
+
+            stack.Push((cell, false));
+
+            while (stack.Count > 0)
+            {
+                var (current, childrenExpanded) = stack.Pop();
+
+                if (childrenExpanded)
+                {
+                    result.Add(current);
+                    continue;
+                }
+
+                if (!visited.Add(current))
+                {
+                    continue;
+                }
+
+                stack.Push((current, true));
+
+                var children = GetDependentCells(current).ToList();
+                for (var i = children.Count - 1; i >= 0; i--)
+                {
+                    var child = children[i];
+                    if (!visited.Contains(child))
+                    {
+                        stack.Push((child, false));
+                    }
+                }
             }
         }
 
