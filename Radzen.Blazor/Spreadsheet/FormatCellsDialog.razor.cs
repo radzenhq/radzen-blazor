@@ -12,7 +12,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Dialog for formatting cells in a spreadsheet.
 /// </summary>
-public partial class FormatCellsDialog : ComponentBase
+public partial class FormatCellsDialog : SpreadsheetDialogBase
 {
     /// <summary>
     /// The current format of the selected cell.
@@ -31,17 +31,6 @@ public partial class FormatCellsDialog : ComponentBase
     /// </summary>
     [Parameter]
     public CellDataType ValueType { get; set; }
-
-    /// <summary>
-    /// The dialog service instance.
-    /// </summary>
-    [Inject]
-    public DialogService DialogService { get; set; } = default!;
-
-    [Inject]
-    Localizer Localizer { get; set; } = default!;
-
-    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     private NumberFormatCategory selectedCategory = NumberFormatCategory.General;
     private string customFormatCode = "General";
@@ -152,10 +141,5 @@ public partial class FormatCellsDialog : ComponentBase
     private void OnOk()
     {
         DialogService.Close(customFormatCode);
-    }
-
-    private void OnCancel()
-    {
-        DialogService.Close();
     }
 }

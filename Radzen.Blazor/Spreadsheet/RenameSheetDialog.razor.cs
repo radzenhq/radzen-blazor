@@ -10,7 +10,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Dialog for renaming a sheet in a spreadsheet.
 /// </summary>
-public partial class RenameSheetDialog : ComponentBase
+public partial class RenameSheetDialog : SpreadsheetDialogBase
 {
     /// <summary>
     /// The current name of the sheet.
@@ -23,17 +23,6 @@ public partial class RenameSheetDialog : ComponentBase
     /// </summary>
     [Parameter]
     public IReadOnlyList<string> ExistingNames { get; set; } = [];
-
-    /// <summary>
-    /// The dialog service instance.
-    /// </summary>
-    [Inject]
-    public DialogService DialogService { get; set; } = default!;
-
-    [Inject]
-    Localizer Localizer { get; set; } = default!;
-
-    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     private string? error;
 
@@ -55,10 +44,5 @@ public partial class RenameSheetDialog : ComponentBase
         }
 
         DialogService.Close(Name);
-    }
-
-    private void OnCancel()
-    {
-        DialogService.Close();
     }
 }

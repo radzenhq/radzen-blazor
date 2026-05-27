@@ -559,6 +559,51 @@
   <data name="Spreadsheet_AddSeries" xml:space="preserve">
     <value>Add Series</value>
   </data>
+  <data name="Spreadsheet_SeriesFormat" xml:space="preserve">
+    <value>Series {0}</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Column" xml:space="preserve">
+    <value>Column</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Bar" xml:space="preserve">
+    <value>Bar</value>
+  </data>
+  <data name="Spreadsheet_ChartType_StackedColumn" xml:space="preserve">
+    <value>Stacked Column</value>
+  </data>
+  <data name="Spreadsheet_ChartType_StackedBar" xml:space="preserve">
+    <value>Stacked Bar</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Line" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Area" xml:space="preserve">
+    <value>Area</value>
+  </data>
+  <data name="Spreadsheet_ChartType_StackedArea" xml:space="preserve">
+    <value>Stacked Area</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Pie" xml:space="preserve">
+    <value>Pie</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Donut" xml:space="preserve">
+    <value>Donut</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Scatter" xml:space="preserve">
+    <value>Scatter</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition_Right" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition_Left" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition_Top" xml:space="preserve">
+    <value>Top</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition_Bottom" xml:space="preserve">
+    <value>Bottom</value>
+  </data>
   <!-- Spreadsheet: Insert tab tooltips -->
   <data name="Spreadsheet_InsertHyperlink" xml:space="preserve">
     <value>Insert Hyperlink</value>

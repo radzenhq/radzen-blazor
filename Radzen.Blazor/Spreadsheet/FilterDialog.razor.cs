@@ -10,7 +10,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Dialog for filtering data in a spreadsheet.
 /// </summary>
-public partial class FilterDialog : ComponentBase
+public partial class FilterDialog : SpreadsheetDialogBase
 {
     enum FilterOperator
     {
@@ -60,17 +60,6 @@ public partial class FilterDialog : ComponentBase
     /// </summary>
     [Parameter]
     public int Row { get; set; }
-
-    /// <summary>
-    /// The dialog service instance.
-    /// </summary>
-    [Inject]
-    public DialogService DialogService { get; set; } = default!;
-
-    [Inject]
-    Localizer Localizer { get; set; } = default!;
-
-    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     /// <summary>
     /// Optional existing filter criterion to populate default values.
@@ -163,11 +152,6 @@ public partial class FilterDialog : ComponentBase
     {
         var filter = CreateFilter();
         DialogService.Close(filter);
-    }
-
-    private void OnCancel()
-    {
-        DialogService.Close();
     }
 
     private SheetFilter? CreateFilter()
