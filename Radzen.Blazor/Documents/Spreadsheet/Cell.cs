@@ -34,6 +34,10 @@ public class Cell
 
         set
         {
+            if (ReferenceEquals(format, value))
+            {
+                return;
+            }
             format?.Changed -= OnFormatChanged;
 
             format = value;
@@ -57,9 +61,11 @@ public class Cell
             QuotePrefix = QuotePrefix,
             Hyperlink = Hyperlink?.Clone(),
         };
-        // Format is shared by reference (Format itself is mutable, but the same
-        // semantics apply as in CopyFrom, which mirrors this behavior).
-        clone.format = format;
+        if (format is not null)
+        {
+            clone.format = format.Clone();
+            clone.format.Changed += clone.OnFormatChanged;
+        }
         return clone;
     }
 
@@ -122,6 +128,10 @@ public class Cell
         get => Data.Value;
         set
         {
+            if (Equals(Data.Value, value) && !QuotePrefix)
+            {
+                return;
+            }
             Data = new CellData(value);
             QuotePrefix = false;
 
@@ -139,20 +149,8 @@ public class Cell
             return Formula;
         }
 
-        var text = Value switch
-        {
-            null => null,
-            CellError error => error.ToString(),
-            string str => str,
-            _ => Value.ToString()
-        };
-
-        if (QuotePrefix && text is not null)
-        {
-            return "'" + text;
-        }
-
-        return text;
+        var text = GetValueAsString();
+        return QuotePrefix && text is not null ? "'" + text : text;
     }
 
     /// <summary>
@@ -227,6 +225,10 @@ public class Cell
         get => formula;
         set
         {
+            if (formula == value)
+            {
+                return;
+            }
             formula = value;
             FormulaSyntaxTree = value is not null ? FormulaParser.Parse(value) : null;
             if (value is not null)
@@ -240,7 +242,7 @@ public class Cell
     /// <summary>
     /// Gets a value indicating whether this cell has no meaningful content (no value, formula, format, or hyperlink).
     /// </summary>
-    public bool IsEmpty => Value is null && Formula is null && format is null && Hyperlink is null;
+    public bool IsEmpty => Value is null && Formula is null && format is null && Hyperlink is null && !QuotePrefix;
 
     /// <summary>
     /// Gets the address of the cell.
