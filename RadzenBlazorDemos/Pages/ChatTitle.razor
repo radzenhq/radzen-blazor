@@ -1,0 +1,98 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Text="Title Content RenderFragment" />
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenChat @ref="basicChat"
+                CurrentUserId="user1"
+                Users="@users"
+                Messages="@messages"
+                MessagesChanged="@OnMessagesChanged"
+                Placeholder="Type your message..."
+                Style="height: 500px;"
+                ShowTypingIndicator="true"
+                MessageAdded="@OnMessageAdded"
+                MessageSent="@OnMessageSent"
+                ChatCleared="@OnChatCleared"
+                TypingChanged="@OnTypingChanged">
+        <TitleContent>
+            <RadzenBadge>Chat Title Bade</RadzenBadge>
+        </TitleContent>
+    </RadzenChat>
+</RadzenStack>
+
+<EventConsole @ref="console" Style="min-height: 230px;" />
+
+@code {
+    RadzenChat basicChat;
+    EventConsole console;
+    
+    private List<ChatUser> users = new();
+    private List<ChatMessage> messages = new();
+
+    protected override void OnInitialized()
+    {
+        // Initialize users
+        users.AddRange(new[]
+        {
+            new ChatUser { Id = "user1", Name = "John Doe", Color = "#1976d2" },
+            new ChatUser { Id = "user2", Name = "Jane Smith", Color = "#388e3c" },
+            new ChatUser { Id = "user3", Name = "Bob Johnson", Color = "#f57c00" }
+        });
+
+        // Add some sample messages
+        messages.AddRange(new[]
+        {
+            new ChatMessage { Content = "Welcome to the team chat! 👋", UserId = "user1", Timestamp = DateTime.Now.AddMinutes(-30) },
+            new ChatMessage { Content = "Thanks John! Looking forward to working together.", UserId = "user2", Timestamp = DateTime.Now.AddMinutes(-29) },
+            new ChatMessage { Content = "Same here! Let's make this project amazing! 🚀", UserId = "user3", Timestamp = DateTime.Now.AddMinutes(-28) }
+        });
+    }
+
+    void OnMessageAdded(ChatMessage message)
+    {
+        var participant = users.FirstOrDefault(p => p.Id == message.UserId);
+        var participantName = participant?.Name ?? "Unknown";
+        console.Log($"Message added: {participantName} - {message.Content.Substring(0, Math.Min(50, message.Content.Length))}...", 
+                   message.UserId == "user1" ? AlertStyle.Info : AlertStyle.Success);
+    }
+
+    void OnMessageSent(ChatMessage message)
+    {
+        console.Log($"Message sent: {message.Content}", AlertStyle.Info);
+    }
+
+    void OnMessagesChanged(IEnumerable<ChatMessage> newMessages)
+    {
+        messages = newMessages.ToList();
+        StateHasChanged();
+    }
+
+    void OnChatCleared()
+    {
+        console.Log("Chat cleared", AlertStyle.Warning);
+    }
+
+    async Task SimulateJaneTyping()
+    {
+        if (basicChat == null)
+        {
+            return;
+        }
+
+        await basicChat.SetUserTyping("user2", true);
+        await Task.Delay(1500);
+        await basicChat.SetUserTyping("user2", false);
+    }
+
+    void OnTypingChanged(ChatTypingEventArgs args)
+    {
+        // In a real app you would broadcast this via SignalR to other clients.
+        console.Log($"TypingChanged: {args.UserId} => {args.IsTyping}", AlertStyle.Info);
+    }
+}
