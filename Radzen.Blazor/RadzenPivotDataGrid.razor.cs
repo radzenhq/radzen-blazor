@@ -413,6 +413,19 @@ namespace Radzen.Blazor
         private List<List<ColumnHeaderCell>>? _columnHeaderRows;
         private List<PivotBodyRow>? _cachedPivotRows;
         private List<List<object>>? _cachedColumnLeaves;
+        private ColumnHeaderNode? _columnHeaderTree;
+        private Dictionary<string, List<TItem>>? _columnTotalBuckets;
+        private readonly Dictionary<string, (Type? Type, bool IsNumeric)> _aggregateTypeCache = new();
+
+        private void InvalidatePivotCache()
+        {
+            _columnHeaderRows = null;
+            _cachedPivotRows = null;
+            _cachedColumnLeaves = null;
+            _columnHeaderTree = null;
+            _columnTotalBuckets = null;
+            _aggregateTypeCache.Clear();
+        }
 
         // Filter functionality
         private RadzenPivotField<TItem>? currentFilterField;
@@ -463,8 +476,7 @@ namespace Radzen.Blazor
             {
                 if (_columnHeaderRows == null)
                 {
-                    var root = BuildColumnHeaderTree();
-                    _columnHeaderRows = FlattenColumnHeaderTree(root);
+                    _columnHeaderRows = FlattenColumnHeaderTree(ColumnHeaderTreeRoot);
                 }
                 return _columnHeaderRows!;
             }
@@ -497,6 +509,37 @@ namespace Radzen.Blazor
                     _cachedColumnLeaves = GetColumnHeaderLeaves();
                 }
                 return _cachedColumnLeaves!;
+            }
+        }
+
+        /// <summary>
+        /// Gets the cached column header tree, shared by header rows and column leaves.
+        /// </summary>
+        private ColumnHeaderNode ColumnHeaderTreeRoot
+        {
+            get
+            {
+                if (_columnHeaderTree == null)
+                {
+                    _columnHeaderTree = BuildColumnHeaderTree();
+                }
+                return _columnHeaderTree!;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current page items bucketed by column leaf, used for column totals.
+        /// </summary>
+        private Dictionary<string, List<TItem>> ColumnTotalBuckets
+        {
+            get
+            {
+                if (_columnTotalBuckets == null)
+                {
+                    var items = PagedView as List<TItem> ?? PagedView.ToList();
+                    _columnTotalBuckets = GroupItemsByColumnLeaf(items, CachedColumnLeaves);
+                }
+                return _columnTotalBuckets!;
             }
         }
 
@@ -616,18 +659,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnDataChanged()
         {
-            _columnHeaderRows = null;
-            _cachedPivotRows = null;
-            _cachedColumnLeaves = null;
+            InvalidatePivotCache();
             base.OnDataChanged();
         }
 
         /// <inheritdoc />
         public async override Task Reload()
         {
-            _columnHeaderRows = null;
-            _cachedPivotRows = null;
-            _cachedColumnLeaves = null;
+            InvalidatePivotCache();
             _view = null;
 
             if (Data != null && !LoadData.HasDelegate)
@@ -694,9 +733,7 @@ namespace Radzen.Blazor
             if (!pivotFields.Any(f => f.Property == field.Property))
             {
                 pivotFields.Add(field);
-                _columnHeaderRows = null;
-                _cachedPivotRows = null;
-                _cachedColumnLeaves = null;
+                InvalidatePivotCache();
 
                 UpdateSelected();
 
@@ -721,9 +758,7 @@ namespace Radzen.Blazor
                     pivotColumns.Add(column);
                 }
 
-                _columnHeaderRows = null;
-                _cachedPivotRows = null;
-                _cachedColumnLeaves = null;
+                InvalidatePivotCache();
 
                 UpdateSelected();
 
@@ -748,9 +783,7 @@ namespace Radzen.Blazor
                     pivotRows.Add(row);
                 }
 
-                _columnHeaderRows = null;
-                _cachedPivotRows = null;
-                _cachedColumnLeaves = null;
+                InvalidatePivotCache();
 
                 UpdateSelected();
 
@@ -775,9 +808,7 @@ namespace Radzen.Blazor
                     pivotAggregates.Add(aggregate);
                 }
 
-                _columnHeaderRows = null;
-                _cachedPivotRows = null;
-                _cachedColumnLeaves = null;
+                InvalidatePivotCache();
 
                 UpdateSelected();
 
@@ -790,9 +821,7 @@ namespace Radzen.Blazor
             if (allPivotColumns.Remove(column))
             {
                 pivotColumns.Remove(column);
-                _columnHeaderRows = null;
-                _cachedPivotRows = null;
-                _cachedColumnLeaves = null;
+                InvalidatePivotCache();
                 StateHasChanged();
             }
         }
@@ -802,9 +831,7 @@ namespace Radzen.Blazor
             if (allPivotRows.Remove(row))
             {
                 pivotRows.Remove(row);
-                _columnHeaderRows = null;
-                _cachedPivotRows = null;
-                _cachedColumnLeaves = null;
+                InvalidatePivotCache();
                 StateHasChanged();
             }
         }
@@ -813,9 +840,7 @@ namespace Radzen.Blazor
         {
             if (pivotFields.Remove(row))
             {
-                _columnHeaderRows = null;
-                _cachedPivotRows = null;
-                _cachedColumnLeaves = null;
+                InvalidatePivotCache();
                 StateHasChanged();
             }
         }
@@ -825,9 +850,7 @@ namespace Radzen.Blazor
             if (allPivotAggregates.Remove(aggregate))
             {
                 pivotAggregates.Remove(aggregate);
-                _columnHeaderRows = null;
-                _cachedPivotRows = null;
-                _cachedColumnLeaves = null;
+                InvalidatePivotCache();
                 StateHasChanged();
             }
         }
@@ -920,16 +943,17 @@ namespace Radzen.Blazor
 
                     // Render value cells for each column combination
                     var colLeaves = CachedColumnLeaves;
-                    foreach (var colPath in colLeaves)
+                    var aggregateCount = pivotAggregates.Count;
+                    for (int colLeafIndex = 0; colLeafIndex < colLeaves.Count; colLeafIndex++)
                     {
-                        foreach (var aggregate in pivotAggregates)
+                        for (int aggIndex = 0; aggIndex < aggregateCount; aggIndex++)
                         {
+                            var aggregate = pivotAggregates[aggIndex];
                             builder.OpenElement(8, "td");
                             builder.AddAttribute(9, "class", "rz-pivot-value-cell");
                             builder.AddAttribute(10, "style", $"text-align: {aggregate.TextAlign.ToString().ToLowerInvariant()}");
-                            
-                            // Find the value for this specific row and column combination
-                            var valueIndex = colLeaves.IndexOf(colPath) * pivotAggregates.Count + pivotAggregates.IndexOf(aggregate);
+
+                            var valueIndex = colLeafIndex * aggregateCount + aggIndex;
                             if (valueIndex < pivotRow.ValueCells.Count)
                             {
                                 var cellValue = pivotRow.ValueCells[valueIndex];
@@ -943,7 +967,7 @@ namespace Radzen.Blazor
                                     builder.AddContent(11, aggregate.FormatValue(cellValue!));
                                 }
                             }
-                            
+
                             builder.CloseElement();
                         }
                     }
@@ -951,14 +975,15 @@ namespace Radzen.Blazor
                     // Render total cells for each aggregate (only if ShowRowsTotals is true)
                     if (ShowRowsTotals)
                     {
-                        foreach (var aggregate in pivotAggregates)
+                        var items = pivotRow.Items.AsQueryable();
+                        for (int aggIndex = 0; aggIndex < pivotAggregates.Count; aggIndex++)
                         {
+                            var aggregate = pivotAggregates[aggIndex];
                             builder.OpenElement(12, "td");
                             builder.AddAttribute(13, "class", $"rz-pivot-total-cell {GetFrozenTotalCellClass()}");
-                            builder.AddAttribute(14, "style", $"inset-inline-end: {(pivotAggregates.Count - 1 - pivotAggregates.IndexOf(aggregate)) * 120}px");
-                            
+                            builder.AddAttribute(14, "style", $"inset-inline-end: {(pivotAggregates.Count - 1 - aggIndex) * 120}px");
+
                             // Calculate row total for this specific aggregate
-                            var items = GetRowItems(pivotRow);
                             var rowTotal = GetAggregateValue(items, aggregate);
 
                             if (aggregate.RowTotalTemplate != null)
@@ -1014,30 +1039,19 @@ namespace Radzen.Blazor
                 }
 
                 var colLeaves = CachedColumnLeaves;
+                var totalBuckets = ColumnTotalBuckets;
                 foreach (var colPath in colLeaves)
                 {
+                    totalBuckets.TryGetValue(ColumnPathKey(colPath), out var bucket);
+                    var bucketView = bucket != null && bucket.Count > 0 ? bucket.AsQueryable() : null;
+
                     foreach (var aggregate in pivotAggregates)
                     {
                         builder.OpenElement(seq++, "td");
                         builder.AddAttribute(seq++, "class", "rz-pivot-footer-value");
                         builder.AddAttribute(seq++, "style", $"text-align: {aggregate.TextAlign.ToString().ToLowerInvariant()}");
 
-                        var items = PagedView;
-
-                        for (int i = 0; i < colPath.Count && i < pivotColumns.Count; i++)
-                        {
-                            var pivotColumn = pivotColumns[i];
-                            if (pivotColumn?.Property != null)
-                            {
-                                var property = pivotColumn.Property;
-                                var value = ExpressionSerializer.FormatValue(colPath[i]) ?? "";
-                                items = property.Contains("it[", StringComparison.Ordinal) ? 
-                                    items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
-                            }
-
-                        }
-
-                        var total = GetAggregateValue(items, aggregate);
+                        var total = bucketView != null ? GetAggregateValue(bucketView, aggregate) : null;
 
                         if (aggregate.ColumnTotalTemplate != null && total != null)
                         {
@@ -1087,40 +1101,6 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets the items for a specific row.
-        /// </summary>
-        /// <param name="pivotRow">The pivot row data.</param>
-        /// <returns>The items for this row.</returns>
-        private IQueryable<TItem> GetRowItems(PivotBodyRow pivotRow)
-        {
-            if (Data == null || pivotRows.Count == 0)
-                return Enumerable.Empty<TItem>().AsQueryable();
-
-            var items = PagedView;
-
-            // Filter items based on row header values. Ignore padded row header cells (they have null PathKey).
-            for (int i = 0; i < pivotRow.RowHeaderCells.Count && i < pivotRows.Count; i++)
-            {
-                var cell = pivotRow.RowHeaderCells[i];
-                if (cell.PathKey == null)
-                {
-                    continue; // Skip padding cells added to align depths
-                }
-
-                var pr = pivotRows[i];
-                if (pr?.Property != null)
-                {
-                    var property = pr.Property;
-                    var value = ExpressionSerializer.FormatValue(cell.Value ?? "") ?? "";
-                    items = property.Contains("it[", StringComparison.Ordinal) ?
-                           items.Where($@"it => {property} == {value}") : items.Where($@"i => i.{property} == {value}");
-                }
-            }
-
-            return items;
-        }
-
-        /// <summary>
         /// Toggles the drill down state for a column group.
         /// </summary>
         /// <param name="pathKey">The path key identifying the column group.</param>
@@ -1137,9 +1117,7 @@ namespace Radzen.Blazor
                 _collapsedColumnGroups[pathKey] = false;
             }
 
-            _columnHeaderRows = null;
-            _cachedPivotRows = null;
-            _cachedColumnLeaves = null;
+            InvalidatePivotCache();
             StateHasChanged();
 
             await Task.CompletedTask;
@@ -1162,9 +1140,7 @@ namespace Radzen.Blazor
                 _collapsedRowGroups[pathKey] = false;
             }
 
-            _columnHeaderRows = null;
-            _cachedPivotRows = null;
-            _cachedColumnLeaves = null;
+            InvalidatePivotCache();
             StateHasChanged();
 
             await Task.CompletedTask;
@@ -1194,6 +1170,20 @@ namespace Radzen.Blazor
             return GetAggregateValue(items, aggregate);
         }
 
+        // Resolves and caches the aggregate property's type and whether it is numeric,
+        // avoiding repeated reflection for every aggregated cell.
+        private (Type? Type, bool IsNumeric) GetAggregatePropertyInfo(RadzenPivotAggregate<TItem> aggregate)
+        {
+            var key = aggregate.Property ?? string.Empty;
+            if (!_aggregateTypeCache.TryGetValue(key, out var info))
+            {
+                var propertyType = aggregate.Property != null ? PropertyAccess.GetPropertyType(typeof(TItem), aggregate.Property) : typeof(object);
+                info = (propertyType, propertyType != null && PropertyAccess.IsNumeric(propertyType));
+                _aggregateTypeCache[key] = info;
+            }
+            return info;
+        }
+
         /// <summary>
         /// Gets the aggregate value for items.
         /// </summary>
@@ -1209,8 +1199,9 @@ namespace Radzen.Blazor
 
             try
             {
-                var propertyType = aggregate.Property != null ? PropertyAccess.GetPropertyType(typeof(TItem), aggregate.Property) : typeof(object);
-                var isNumeric = propertyType != null && PropertyAccess.IsNumeric(propertyType);
+                var info = GetAggregatePropertyInfo(aggregate);
+                var propertyType = info.Type;
+                var isNumeric = info.IsNumeric;
 
                 IQueryable values;
 
@@ -1344,6 +1335,10 @@ namespace Radzen.Blazor
                 {
                     BuildRowHeaderTreeRecursive(child, group.Items?.Cast<TItem>().AsQueryable() ?? Enumerable.Empty<TItem>().AsQueryable(), level + 1, currentPath);
                 }
+                else
+                {
+                    child.Items = group.Items?.Cast<TItem>().AsQueryable() ?? Enumerable.Empty<TItem>().AsQueryable();
+                }
                 node.Children.Add(child);
             }
         }
@@ -1361,34 +1356,13 @@ namespace Radzen.Blazor
             if (node.Level == pivotRows.Count)
             {
                 // Leaf: render a row
+                var rowItems = node.Items as List<TItem> ?? node.Items.ToList();
                 var row = new PivotBodyRow
                 {
-                    RowHeaderCells = new List<RowHeaderCell>(prefix)
+                    RowHeaderCells = new List<RowHeaderCell>(prefix),
+                    Items = rowItems
                 };
-                // For each column header leaf, aggregate values
-                var colLeaves = CachedColumnLeaves;
-                foreach (var colPath in colLeaves)
-                {
-                    foreach (var aggregate in pivotAggregates)
-                    {
-                        // Find items matching this row and column
-                        var items = node.Items;
-                        for (int i = 0; i < colPath.Count; i++)
-                        {
-                            var pivotColumn = pivotColumns[i];
-                            if (pivotColumn?.Property != null)
-                            {
-                                var property = pivotColumn.Property;
-                                var value = ExpressionSerializer.FormatValue(colPath[i]) ?? "";
-                                items = property.Contains("it[", StringComparison.Ordinal) ?
-                                    items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
-                            }
-                        }
-                        row.ValueCells.Add(items.Count() > 0 ? GetAggregateValue(items, aggregate) : null!); // Explicitly allow null in list
-                    }
-                    row.VisibleColumnLeaves.Add(colPath);
-                }
-
+                PopulateValueCells(row, rowItems);
                 result.Add(row);
             }
             else
@@ -1407,46 +1381,14 @@ namespace Radzen.Blazor
                     
                     if (child.IsCollapsed)
                     {
-                        // For collapsed groups, create a single row with aggregated values
+                        // For collapsed groups, create a single row with values aggregated across all descendants.
+                        var rowItems = child.Items as List<TItem> ?? child.Items.ToList();
                         var collapsedRow = new PivotBodyRow
                         {
-                            RowHeaderCells = new List<RowHeaderCell>(newPrefix)
+                            RowHeaderCells = new List<RowHeaderCell>(newPrefix),
+                            Items = rowItems
                         };
-                        var colLeaves = CachedColumnLeaves;
-                        foreach (var colPath in colLeaves)
-                        {
-                            foreach (var aggregate in pivotAggregates)
-                            {
-                                // Find items matching this row path and column
-                                var items = PagedView;
-                                // Filter by row path
-                                for (int i = 0; i < newPrefix.Count && i < pivotRows.Count; i++)
-                                {
-                                    var pivotRow = pivotRows[i];
-                                    if (pivotRow?.Property != null)
-                                    {
-                                        var property = pivotRow.Property;
-                                        var value = ExpressionSerializer.FormatValue(newPrefix[i].Value) ?? "";
-                                        items = property.Contains("it[", StringComparison.Ordinal) ?
-                                            items.Where($@"it => {property} == {value}") : items.Where($@"i => i.{property} == {value}");
-                                    }
-                                }
-                                // Filter by column path
-                                for (int i = 0; i < colPath.Count; i++)
-                                {
-                                    var pivotColumn = pivotColumns[i];
-                                    if (pivotColumn?.Property != null)
-                                    {
-                                        var property = pivotColumn.Property;
-                                        var value = ExpressionSerializer.FormatValue(colPath[i]) ?? "";
-                                        items = property.Contains("it[", StringComparison.Ordinal) ?
-                                            items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
-                                    }
-                                }
-                                collapsedRow.ValueCells.Add(items?.Count() > 0 ? GetAggregateValue(items!, aggregate) : null!);
-                            }
-                            collapsedRow.VisibleColumnLeaves.Add(colPath);
-                        }
+                        PopulateValueCells(collapsedRow, rowItems);
                         result.Add(collapsedRow);
                     }
                     else
@@ -1457,10 +1399,114 @@ namespace Radzen.Blazor
             }
         }
 
+        // Computes the value cells for a row by bucketing its items by column leaf in a single pass,
+        // then aggregating each bucket - instead of re-filtering the items per cell.
+        private void PopulateValueCells(PivotBodyRow row, IList<TItem> rowItems)
+        {
+            var colLeaves = CachedColumnLeaves;
+            if (colLeaves.Count == 0)
+            {
+                return;
+            }
+
+            var buckets = GroupItemsByColumnLeaf(rowItems, colLeaves);
+
+            foreach (var colPath in colLeaves)
+            {
+                buckets.TryGetValue(ColumnPathKey(colPath), out var bucket);
+                var bucketView = bucket != null && bucket.Count > 0 ? bucket.AsQueryable() : null;
+
+                foreach (var aggregate in pivotAggregates)
+                {
+                    row.ValueCells.Add(bucketView != null ? GetAggregateValue(bucketView, aggregate) : null!);
+                }
+
+                row.VisibleColumnLeaves.Add(colPath);
+            }
+        }
+
+        // Buckets items by the column leaf they belong to. Each item is assigned to the shortest
+        // column-value prefix that is an actual leaf, which handles collapsed (shorter) column paths.
+        private Dictionary<string, List<TItem>> GroupItemsByColumnLeaf(IList<TItem> items, List<List<object>> colLeaves)
+        {
+            var buckets = new Dictionary<string, List<TItem>>();
+
+            if (items.Count == 0 || pivotColumns.Count == 0 || colLeaves.Count == 0)
+            {
+                return buckets;
+            }
+
+            var leafKeys = new HashSet<string>();
+            foreach (var leaf in colLeaves)
+            {
+                leafKeys.Add(ColumnPathKey(leaf));
+            }
+
+            // Extract each column's values once, aligned with the items order.
+            var query = items.AsQueryable();
+            var columnValues = new List<List<object?>>(pivotColumns.Count);
+            foreach (var col in pivotColumns)
+            {
+                var values = new List<object?>(items.Count);
+                foreach (var value in (System.Collections.IEnumerable)query.Select(col.Property!))
+                {
+                    values.Add(value);
+                }
+                columnValues.Add(values);
+            }
+
+            var path = new List<object?>(pivotColumns.Count);
+            for (int i = 0; i < items.Count; i++)
+            {
+                path.Clear();
+                string? matchKey = null;
+                for (int level = 0; level < pivotColumns.Count; level++)
+                {
+                    path.Add(columnValues[level][i]);
+                    var key = ColumnPathKey(path);
+                    if (leafKeys.Contains(key))
+                    {
+                        matchKey = key;
+                        break;
+                    }
+                }
+
+                if (matchKey == null)
+                {
+                    continue;
+                }
+
+                if (!buckets.TryGetValue(matchKey, out var bucket))
+                {
+                    bucket = new List<TItem>();
+                    buckets[matchKey] = bucket;
+                }
+                bucket.Add(items[i]);
+            }
+
+            return buckets;
+        }
+
+        private static string ColumnPathKey(System.Collections.IEnumerable path)
+        {
+            var builder = new System.Text.StringBuilder();
+            var first = true;
+            foreach (var value in path)
+            {
+                if (!first)
+                {
+                    builder.Append('|');
+                }
+                builder.Append(value?.ToString() ?? string.Empty);
+                first = false;
+            }
+            return builder.ToString();
+        }
+
         // Get all column header leaf paths (for value cell mapping)
         private List<List<object>> GetColumnHeaderLeaves()
         {
-            var tree = BuildColumnHeaderTree();
+            var tree = ColumnHeaderTreeRoot;
             var leaves = new List<List<object>>();
             GetColumnHeaderLeavesRecursive(tree, new List<object>(), leaves);
             return leaves;
@@ -1581,6 +1627,7 @@ namespace Radzen.Blazor
             public List<RowHeaderCell> RowHeaderCells { get; set; } = new List<RowHeaderCell>();
             public List<object?> ValueCells { get; set; } = new List<object?>();
             public List<List<object>> VisibleColumnLeaves { get; set; } = new List<List<object>>();
+            public List<TItem> Items { get; set; } = new List<TItem>();
         }
 
         // Returns the union of all visible column leaves for the current view
