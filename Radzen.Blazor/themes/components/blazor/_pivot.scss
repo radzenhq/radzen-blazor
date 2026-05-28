@@ -582,7 +582,7 @@
                 background-color: var(--rz-grid-header-background-color);
                 color: var(--rz-grid-header-color);
                 position: sticky;
-                z-index: 2;
+                z-index: 4;
                 min-width: var(--rz-pivot-row-header-width, 140px);
                 white-space: nowrap;
                 overflow: hidden;
@@ -618,6 +618,8 @@
                 color: var(--rz-grid-header-color);
                 border: var(--rz-grid-cell-border);
                 font-size: var(--rz-grid-cell-font-size);
+                position: sticky;
+                z-index: 4;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
