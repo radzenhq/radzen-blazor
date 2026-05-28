@@ -12,16 +12,14 @@
         {       
             <RadzenStack class="rz-chat-header" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                    <span class="rz-chat-header-title">
                     @if (TitleContent != null)
                     {
-                        @TitleContent
+                        <span class="rz-chat-header-title">@TitleContent</span>
                     }
                     else if (!string.IsNullOrWhiteSpace(Title))
                     {
-                        @Title
+                        <span class="rz-chat-header-title">@Title</span>
                     }
-                    </span>
                     @if (ShowUsers && Users.Any())
                     {
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" class="rz-chat-users">
