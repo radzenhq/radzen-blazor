@@ -231,6 +231,27 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Tabs_ChangeHandlerThrows_StillRendersSelectedTab()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Change, (int _) => throw new System.InvalidOperationException("boom"))
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
+            );
+
+            Assert.Contains("First-Content", component.Markup);
+
+            var secondTab = component.FindAll("button[role='tab']")[1];
+            var ex = Record.Exception(() => secondTab.Click());
+
+            Assert.NotNull(ex);
+            Assert.Contains("Second-Content", component.Markup);
+            Assert.DoesNotContain("First-Content", component.Markup);
+        }
+
+        [Fact]
         public void Tabs_NonNavigationKeyDown_DoesNotBlockSubsequentRenders()
         {
             using var ctx = new TestContext();

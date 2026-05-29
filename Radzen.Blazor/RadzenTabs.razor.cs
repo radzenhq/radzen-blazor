@@ -210,22 +210,27 @@ namespace Radzen.Blazor
 
             SetFocusedIndex();
 
-            if (raiseChange)
+            try
             {
-                await Change.InvokeAsync(selectedIndex);
-
-                await SelectedIndexChanged.InvokeAsync(selectedIndex);
-
-                try
+                if (raiseChange)
                 {
-                    await Element.FocusAsync(preventScroll: true);
-                }
-                catch (JSDisconnectedException)
-                {
+                    await Change.InvokeAsync(selectedIndex);
+
+                    await SelectedIndexChanged.InvokeAsync(selectedIndex);
+
+                    try
+                    {
+                        await Element.FocusAsync(preventScroll: true);
+                    }
+                    catch (JSDisconnectedException)
+                    {
+                    }
                 }
             }
-
-            StateHasChanged();
+            finally
+            {
+                StateHasChanged();
+            }
         }
 
         /// <inheritdoc />
@@ -342,9 +347,15 @@ namespace Radzen.Blazor
                 }
 
                 shouldRender = false;
-                await Change.InvokeAsync(selectedIndex);
-                await SelectedIndexChanged.InvokeAsync(selectedIndex);
-                shouldRender = true;
+                try
+                {
+                    await Change.InvokeAsync(selectedIndex);
+                    await SelectedIndexChanged.InvokeAsync(selectedIndex);
+                }
+                finally
+                {
+                    shouldRender = true;
+                }
 
                 try
                 {
