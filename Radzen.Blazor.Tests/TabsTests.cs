@@ -181,6 +181,56 @@ namespace Radzen.Blazor.Tests
         };
 
         [Fact]
+        public void Tabs_KeyDownInPanelContent_DoesNotReRenderContent()
+        {
+            using var ctx = new TestContext();
+
+            var contentRenderCount = 0;
+            RenderFragment content = b => { contentRenderCount++; b.AddContent(0, "Panel-Content"); };
+
+            RenderFragment tabs = builder =>
+            {
+                builder.OpenComponent(0, typeof(RadzenTabsItem));
+                builder.AddAttribute(1, "Text", "First");
+                builder.AddAttribute(2, "ChildContent", content);
+                builder.CloseComponent();
+            };
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, tabs)
+            );
+
+            Assert.Contains("Panel-Content", component.Markup);
+
+            var renderCountBefore = contentRenderCount;
+
+            var panel = component.Find("div.rz-tabview-panel");
+            panel.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA" });
+            panel.KeyDown(new KeyboardEventArgs { Key = "b", Code = "KeyB" });
+
+            Assert.Equal(renderCountBefore, contentRenderCount);
+        }
+
+        [Fact]
+        public void Tabs_EscapeKeyDownInPanelContent_UpdatesPropagation()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content")))
+            );
+
+            var renderCountBefore = component.RenderCount;
+
+            var panel = component.Find("div.rz-tabview-panel");
+            panel.KeyDown(new KeyboardEventArgs { Key = "Escape", Code = "Escape" });
+
+            Assert.True(component.RenderCount > renderCountBefore);
+        }
+
+        [Fact]
         public void Tabs_NonNavigationKeyDown_DoesNotBlockSubsequentRenders()
         {
             using var ctx = new TestContext();

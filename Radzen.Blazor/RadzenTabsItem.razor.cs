@@ -192,11 +192,32 @@ namespace Radzen.Blazor
             GC.SuppressFinalize(this);
         }
 
+        bool suppressNextRender;
+
+        /// <inheritdoc />
+        protected override bool ShouldRender()
+        {
+            if (suppressNextRender)
+            {
+                suppressNextRender = false;
+                return false;
+            }
+
+            return true;
+        }
+
         bool stopKeydownPropagation = true;
         void OnGuardKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code ?? args.Key;
-            stopKeydownPropagation = key != "Escape";
+            var stop = key != "Escape";
+
+            if (stop == stopKeydownPropagation)
+            {
+                suppressNextRender = true;
+            }
+
+            stopKeydownPropagation = stop;
         }
 
         string getStyle()
