@@ -216,7 +216,13 @@ namespace Radzen.Blazor
 
                 await SelectedIndexChanged.InvokeAsync(selectedIndex);
 
-                await Element.FocusAsync(preventScroll: true);
+                try
+                {
+                    await Element.FocusAsync(preventScroll: true);
+                }
+                catch (JSDisconnectedException)
+                {
+                }
             }
 
             StateHasChanged();
@@ -290,7 +296,13 @@ namespace Radzen.Blazor
             if (JSRuntime != null && RenderMode == TabRenderMode.Client && previousSelectedIndex != selectedIndex)
             {
                 previousSelectedIndex = selectedIndex;
-                await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
+                }
+                catch (JSDisconnectedException)
+                {
+                }
             }
 
             await base.OnAfterRenderAsync(firstRender);
@@ -321,14 +333,26 @@ namespace Radzen.Blazor
                 previousSelectedIndex = selectedIndex;
                 SetFocusedIndex();
 
-                await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
+                }
+                catch (JSDisconnectedException)
+                {
+                }
 
                 shouldRender = false;
                 await Change.InvokeAsync(selectedIndex);
                 await SelectedIndexChanged.InvokeAsync(selectedIndex);
                 shouldRender = true;
 
-                await Element.FocusAsync(preventScroll: true);
+                try
+                {
+                    await Element.FocusAsync(preventScroll: true);
+                }
+                catch (JSDisconnectedException)
+                {
+                }
             }
         }
 
