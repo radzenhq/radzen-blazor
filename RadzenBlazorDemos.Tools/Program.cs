@@ -1528,8 +1528,6 @@ class Program
         sb.AppendLine("User-agent: *");
         sb.AppendLine("Content-Signal: ai-train=yes, search=yes, ai-input=yes");
         sb.AppendLine($"Sitemap: {BaseUrl}/sitemap.xml");
-        sb.AppendLine("Disallow: /llms.txt");
-        sb.AppendLine("Disallow: /*.md$");
         File.WriteAllText(filePath, sb.ToString(), new UTF8Encoding(false));
     }
 }
