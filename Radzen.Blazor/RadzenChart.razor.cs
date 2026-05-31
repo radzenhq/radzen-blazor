@@ -700,6 +700,7 @@ namespace Radzen.Blazor
 
         RenderFragment? tooltip;
         object? tooltipData;
+        IChartSeries? tooltipSeries;
         double mouseX;
         double mouseY;
 
@@ -832,32 +833,10 @@ namespace Radzen.Blazor
         [JSInvokable]
         public async Task Click(double x, double y)
         {
-            IChartSeries? closestSeries = null;
-            object? closestSeriesData = null;
-            double closestSeriesDistanceSquared = ClickTolerance * ClickTolerance;
-
             var queryX = x - MarginLeft;
             var queryY = y - MarginTop;
 
-            foreach (var series in Series)
-            {
-                if (series.Visible)
-                {
-                    var (seriesData, seriesDataPoint) = series.DataAt(queryX, queryY);
-                    if (seriesData != null)
-                    {
-                        double xDelta = queryX - seriesDataPoint.X;
-                        double yDelta = queryY - seriesDataPoint.Y;
-                        double squaredDistance = xDelta * xDelta + yDelta * yDelta;
-                        if (squaredDistance < closestSeriesDistanceSquared)
-                        {
-                            closestSeries = series;
-                            closestSeriesData = seriesData;
-                            closestSeriesDistanceSquared = squaredDistance;
-                        }
-                    }
-                }
-            }
+            var (closestSeries, closestSeriesData) = FindClosestSeries(queryX, queryY, ClickTolerance);
 
             if (closestSeriesData != null && closestSeries != null)
             {
@@ -939,54 +918,97 @@ namespace Radzen.Blazor
             }
         }
 
+        // A column/bar series reports a hit anywhere inside its filled region by returning the cursor
+        // position itself, so its distance is always 0 and it would always beat a line/scatter/bubble
+        // marker drawn on top of it. Give point series priority: pick the closest point series within
+        // tolerance first, and only fall back to area series when no point series qualifies.
+        internal (IChartSeries?, object?) FindClosestSeries(double queryX, double queryY, double tolerance)
+        {
+            var ordered = Series.OrderBy(s => s.RenderingOrder).Reverse().ToList();
+
+            var pointHit = ClosestSeries(ordered.Where(s => !IsAreaSeries(s)), queryX, queryY, tolerance);
+            if (pointHit.Item1 != null)
+            {
+                return pointHit;
+            }
+
+            return ClosestSeries(ordered.Where(IsAreaSeries), queryX, queryY, tolerance);
+        }
+
+        private static (IChartSeries?, object?) ClosestSeries(IEnumerable<IChartSeries> candidates, double queryX, double queryY, double tolerance)
+        {
+            IChartSeries? closestSeries = null;
+            object? closestData = null;
+            var closestDistanceSquared = tolerance * tolerance;
+
+            foreach (var series in candidates)
+            {
+                if (!series.Visible)
+                {
+                    continue;
+                }
+
+                var (data, point) = series.DataAt(queryX, queryY);
+                if (data != null)
+                {
+                    var xDelta = queryX - point.X;
+                    var yDelta = queryY - point.Y;
+                    var squaredDistance = xDelta * xDelta + yDelta * yDelta;
+                    if (squaredDistance < closestDistanceSquared)
+                    {
+                        closestSeries = series;
+                        closestData = data;
+                        closestDistanceSquared = squaredDistance;
+                    }
+                }
+            }
+
+            return (closestSeries, closestData);
+        }
+
+        private static bool IsAreaSeries(IChartSeries series)
+        {
+            return series is IChartColumnSeries
+                || series is IChartBarSeries
+                || series is IChartStackedColumnSeries
+                || series is IChartStackedBarSeries
+                || series is IChartFullStackedColumnSeries
+                || series is IChartFullStackedBarSeries;
+        }
+
         internal async Task DisplayTooltip()
         {
             if (Tooltip.Visible)
             {
-                var orderedSeries = Series.OrderBy(s => s.RenderingOrder).Reverse();
-                IChartSeries? closestSeries = null;
-                object? closestSeriesData = null;
-                double closestSeriesDistanceSquared = TooltipTolerance * TooltipTolerance;
-
                 var queryX = mouseX - MarginLeft;
                 var queryY = mouseY - MarginTop;
 
-                foreach (var series in orderedSeries)
+                foreach (var series in Series.OrderBy(s => s.RenderingOrder).Reverse())
                 {
-                    if (series.Visible)
+                    if (!series.Visible)
                     {
-                        foreach (var overlay in series.Overlays.Reverse())
-                        {
-                            if (overlay.Visible && overlay.Contains(queryX, queryY, TooltipTolerance))
-                            {
-                                tooltipData = null;
-                                tooltip = overlay.RenderTooltip(queryX, queryY);
-                                var tooltipPosition = overlay.GetTooltipPosition(queryX, queryY);
-                                TooltipService?.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
-                                {
-                                    ColorScheme = ColorScheme
-                                });
-                                await Task.Yield();
+                        continue;
+                    }
 
-                                return;
-                            }
-                        }
-
-                        var (seriesData, seriesDataPoint) = series.DataAt(queryX, queryY);
-                        if (seriesData != null)
+                    foreach (var overlay in series.Overlays.Reverse())
+                    {
+                        if (overlay.Visible && overlay.Contains(queryX, queryY, TooltipTolerance))
                         {
-                            double xDelta = queryX - seriesDataPoint.X;
-                            double yDelta = queryY - seriesDataPoint.Y;
-                            double squaredDistance = xDelta * xDelta + yDelta * yDelta;
-                            if (squaredDistance < closestSeriesDistanceSquared)
+                            tooltipData = null;
+                            tooltip = overlay.RenderTooltip(queryX, queryY);
+                            var tooltipPosition = overlay.GetTooltipPosition(queryX, queryY);
+                            TooltipService?.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
                             {
-                                closestSeries = series;
-                                closestSeriesData = seriesData;
-                                closestSeriesDistanceSquared = squaredDistance;
-                            }
+                                ColorScheme = ColorScheme
+                            });
+                            await Task.Yield();
+
+                            return;
                         }
                     }
                 }
+
+                var (closestSeries, closestSeriesData) = FindClosestSeries(queryX, queryY, TooltipTolerance);
 
                 if (closestSeriesData != null && closestSeries != null)
                 {
@@ -1021,9 +1043,10 @@ namespace Radzen.Blazor
                         SharedPointsAtSnap = null;
                     }
 
-                    if (closestSeriesData != tooltipData)
+                    if (closestSeriesData != tooltipData || !ReferenceEquals(closestSeries, tooltipSeries))
                     {
                         tooltipData = closestSeriesData;
+                        tooltipSeries = closestSeries;
                         tooltip = closestSeries.RenderTooltip(closestSeriesData);
 
                         // Split mode draws its own in-chart overlay — don't also open the popup tooltip.
@@ -1061,6 +1084,7 @@ namespace Radzen.Blazor
             if (tooltip != null)
             {
                 tooltipData = null;
+                tooltipSeries = null;
                 tooltip = null;
 
                 TooltipService?.Close();
@@ -1094,6 +1118,7 @@ namespace Radzen.Blazor
             if (IsJSRuntimeAvailable)
             {
                 tooltipData = data;
+                tooltipSeries = series;
                 tooltip = series.RenderTooltip(data);
                 var point = series.GetTooltipPosition(data);
                 TooltipService?.OpenChartTooltip(Element, point.X + MarginLeft, point.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
