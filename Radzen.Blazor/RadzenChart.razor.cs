@@ -331,17 +331,25 @@ namespace Radzen.Blazor
         /// <returns></returns>
         protected bool ShouldRenderAxes()
         {
-            var pieType = typeof(RadzenPieSeries<>);
-            var donutType = typeof(RadzenDonutSeries<>);
-            var funnelType = typeof(RadzenFunnelSeries<>);
-            var pyramidType = typeof(RadzenPyramidSeries<>);
+            return !Series.All(IsPolarSeries);
+        }
 
-            return !Series.All(series =>
+        // Pie, donut, funnel and pyramid series are radial - they have no value/category axes.
+        private static bool IsPolarSeries(IChartSeries series)
+        {
+            var type = series.GetType();
+
+            if (!type.IsGenericType)
             {
-                var type = series.GetType().GetGenericTypeDefinition();
+                return false;
+            }
 
-                return type == pieType || type == donutType || type == funnelType || type == pyramidType;
-            });
+            var definition = type.GetGenericTypeDefinition();
+
+            return definition == typeof(RadzenPieSeries<>)
+                || definition == typeof(RadzenDonutSeries<>)
+                || definition == typeof(RadzenFunnelSeries<>)
+                || definition == typeof(RadzenPyramidSeries<>);
         }
 
         internal bool ShouldInvertAxes()
@@ -918,21 +926,21 @@ namespace Radzen.Blazor
             }
         }
 
-        // A column/bar series reports a hit anywhere inside its filled region by returning the cursor
+        // A column/bar/pie series reports a hit anywhere inside its filled region by returning the cursor
         // position itself, so its distance is always 0 and it would always beat a line/scatter/bubble
         // marker drawn on top of it. Give point series priority: pick the closest point series within
-        // tolerance first, and only fall back to area series when no point series qualifies.
+        // tolerance first, and only fall back to region series when no point series qualifies.
         internal (IChartSeries?, object?) FindClosestSeries(double queryX, double queryY, double tolerance)
         {
             var ordered = Series.OrderBy(s => s.RenderingOrder).Reverse().ToList();
 
-            var pointHit = ClosestSeries(ordered.Where(s => !IsAreaSeries(s)), queryX, queryY, tolerance);
+            var pointHit = ClosestSeries(ordered.Where(s => !IsRegionSeries(s)), queryX, queryY, tolerance);
             if (pointHit.Item1 != null)
             {
                 return pointHit;
             }
 
-            return ClosestSeries(ordered.Where(IsAreaSeries), queryX, queryY, tolerance);
+            return ClosestSeries(ordered.Where(IsRegionSeries), queryX, queryY, tolerance);
         }
 
         private static (IChartSeries?, object?) ClosestSeries(IEnumerable<IChartSeries> candidates, double queryX, double queryY, double tolerance)
@@ -966,14 +974,17 @@ namespace Radzen.Blazor
             return (closestSeries, closestData);
         }
 
-        private static bool IsAreaSeries(IChartSeries series)
+        // True for series that fill a region (columns, bars, stacks and the radial pie/donut/funnel/pyramid),
+        // i.e. whose DataAt returns the cursor itself rather than a discrete data point.
+        private static bool IsRegionSeries(IChartSeries series)
         {
             return series is IChartColumnSeries
                 || series is IChartBarSeries
                 || series is IChartStackedColumnSeries
                 || series is IChartStackedBarSeries
                 || series is IChartFullStackedColumnSeries
-                || series is IChartFullStackedBarSeries;
+                || series is IChartFullStackedBarSeries
+                || IsPolarSeries(series);
         }
 
         internal async Task DisplayTooltip()
