@@ -1675,6 +1675,15 @@ namespace RadzenBlazorDemos
                     Path = "splitter",
                     Icon = "\ue42a",
                     Tags = new [] { "splitter", "layout"}
+                },
+                new Example
+                {
+                    Name = "WidgetGrid",
+                    New = true,
+                    Description = "Demonstration and configuration of the Blazor RadzenWidgetGrid component for building dashboards with draggable and resizable widgets.",
+                    Path = "widget-grid",
+                    Icon = "\ue871",
+                    Tags = new [] { "widget", "grid", "dashboard", "drag", "resize", "layout" }
                 }
             }
         },
