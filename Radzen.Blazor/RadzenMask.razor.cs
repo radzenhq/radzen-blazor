@@ -136,6 +136,12 @@ namespace Radzen.Blazor
             return GetClassList("rz-textbox").AddInputSize(InputSize).ToString();
         }
 
+        /// <inheritdoc />
+        protected override string? GetId()
+        {
+            return Name ?? base.GetId();
+        }
+
         IJSObjectReference? _jsRef;
         bool _jsParamsChanged;
 
