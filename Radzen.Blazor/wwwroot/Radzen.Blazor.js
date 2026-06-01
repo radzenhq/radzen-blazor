@@ -3263,6 +3263,20 @@ window.Radzen = {
     document.removeEventListener('touchmove', ref.touchMoveHandler)
     document.removeEventListener('touchend', ref.mouseUpHandler);
   },
+  capturePointer: function (el, pointerId) {
+    try {
+      if (el && el.setPointerCapture) {
+        el.setPointerCapture(pointerId);
+      }
+    } catch (e) { /* ignore */ }
+  },
+  releasePointer: function (el, pointerId) {
+    try {
+      if (el && el.releasePointerCapture && (!el.hasPointerCapture || el.hasPointerCapture(pointerId))) {
+        el.releasePointerCapture(pointerId);
+      }
+    } catch (e) { /* ignore */ }
+  },
   startColumnReorder: function(id, gridId, gridRef) {
       var grid = document.getElementById(gridId);
       var el = document.getElementById(id + '-drag');
