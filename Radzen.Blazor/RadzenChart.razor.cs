@@ -335,21 +335,28 @@ namespace Radzen.Blazor
         }
 
         // Pie, donut, funnel and pyramid series are radial - they have no value/category axes.
+        // Walk the base chain so user subclasses (e.g. class MyPie : RadzenPieSeries<MyItem>) are matched too.
         private static bool IsPolarSeries(IChartSeries series)
         {
-            var type = series.GetType();
-
-            if (!type.IsGenericType)
+            for (var type = series.GetType(); type != null; type = type.BaseType)
             {
-                return false;
+                if (!type.IsGenericType)
+                {
+                    continue;
+                }
+
+                var definition = type.GetGenericTypeDefinition();
+
+                if (definition == typeof(RadzenPieSeries<>)
+                    || definition == typeof(RadzenDonutSeries<>)
+                    || definition == typeof(RadzenFunnelSeries<>)
+                    || definition == typeof(RadzenPyramidSeries<>))
+                {
+                    return true;
+                }
             }
 
-            var definition = type.GetGenericTypeDefinition();
-
-            return definition == typeof(RadzenPieSeries<>)
-                || definition == typeof(RadzenDonutSeries<>)
-                || definition == typeof(RadzenFunnelSeries<>)
-                || definition == typeof(RadzenPyramidSeries<>);
+            return false;
         }
 
         internal bool ShouldInvertAxes()
