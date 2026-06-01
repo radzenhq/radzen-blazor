@@ -65,6 +65,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_IdFromNameParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
