@@ -2056,8 +2056,8 @@ namespace Radzen.Blazor.Tests
             var firstNameMenuId = $"{component.Instance.PopupID}FirstName{firstNameColumn.UniqueID}fm";
             var lastNameMenuId = $"{component.Instance.PopupID}LastName{lastNameColumn.UniqueID}fm";
 
-            Assert.Contains(menuButtons, b => b.GetAttribute("onclick")?.Contains(firstNameMenuId) == true);
-            Assert.Contains(menuButtons, b => b.GetAttribute("onclick")?.Contains(lastNameMenuId) == true);
+            Assert.Contains(menuButtons, b => b.GetAttribute("aria-controls") == firstNameMenuId);
+            Assert.Contains(menuButtons, b => b.GetAttribute("aria-controls") == lastNameMenuId);
 
             var popupIds = component.FindAll("div.rz-overlaypanel[role='menu']").Select(d => d.Id).ToList();
             Assert.Contains(firstNameMenuId, popupIds);
