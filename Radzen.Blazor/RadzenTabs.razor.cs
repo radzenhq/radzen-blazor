@@ -225,6 +225,9 @@ namespace Radzen.Blazor
                     catch (JSDisconnectedException)
                     {
                     }
+                    catch (JSException)
+                    {
+                    }
                 }
             }
             finally
@@ -362,6 +365,9 @@ namespace Radzen.Blazor
                     await Element.FocusAsync(preventScroll: true);
                 }
                 catch (JSDisconnectedException)
+                {
+                }
+                catch (JSException)
                 {
                 }
             }

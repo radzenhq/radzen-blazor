@@ -1,6 +1,7 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -249,6 +250,49 @@ namespace Radzen.Blazor.Tests
             Assert.NotNull(ex);
             Assert.Contains("Second-Content", component.Markup);
             Assert.DoesNotContain("First-Content", component.Markup);
+        }
+
+        [Fact]
+        public void Tabs_FocusAsyncThrowsJSException_DoesNotPropagate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop
+                .SetupVoid("Blazor._internal.domWrapper.focus", _ => true)
+                .SetException(new JSException("Unable to focus an invalid element."));
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
+            );
+
+            var secondTab = component.FindAll("button[role='tab']")[1];
+            var ex = Record.Exception(() => secondTab.Click());
+
+            Assert.Null(ex);
+            Assert.Contains("Second-Content", component.Markup);
+            Assert.DoesNotContain("First-Content", component.Markup);
+        }
+
+        [Fact]
+        public void Tabs_ClientRender_FocusAsyncThrowsJSException_DoesNotPropagate()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop
+                .SetupVoid("Blazor._internal.domWrapper.focus", _ => true)
+                .SetException(new JSException("Unable to focus an invalid element."));
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.RenderMode, TabRenderMode.Client)
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
+            );
+
+            var secondTab = component.FindAll("button[role='tab']")[1];
+            var ex = Record.Exception(() => secondTab.Click());
+
+            Assert.Null(ex);
         }
 
         [Fact]
