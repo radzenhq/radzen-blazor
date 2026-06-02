@@ -1,0 +1,37 @@
+@inherits RadzenComponent
+
+@if (Grid != null && Visible)
+{
+    <div @ref=@Element id=@GetId() class=@GetCssClass() style=@GetWidgetStyle() @attributes=@Attributes>
+        @if (ShowHeader)
+        {
+            <div class="rz-widget-grid-item-header @(Grid.CanMove ? "rz-widget-grid-item-header-draggable" : null)"
+                 style=@GetHeaderStyle()
+                 @onpointerdown=@OnHeaderPointerDown @onpointerdown:preventDefault=@Grid.CanMove>
+                @if (Grid.CanMove)
+                {
+                    <RadzenIcon Icon="drag_indicator" class="rz-widget-grid-item-drag-handle" Style=@GetDragHandleStyle() />
+                }
+                @if (HeaderTemplate != null)
+                {
+                    @HeaderTemplate
+                }
+                else
+                {
+                    @if (!string.IsNullOrEmpty(Icon))
+                    {
+                        <RadzenIcon Icon=@Icon class="rz-widget-grid-item-icon" Style=@GetIconStyle() />
+                    }
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Span" class="rz-widget-grid-item-title" Style=@GetTitleStyle()>@Title</RadzenText>
+                }
+            </div>
+        }
+        <div class="rz-widget-grid-item-content" style=@GetContentStyle()>
+            @ChildContent
+        </div>
+        @if (Grid.CanResize)
+        {
+            <div class="rz-widget-grid-item-resize-handle" style=@GetResizeHandleStyle() @onpointerdown=@OnResizePointerDown @onpointerdown:preventDefault=true></div>
+        }
+    </div>
+}
