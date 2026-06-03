@@ -30,6 +30,13 @@ namespace Radzen.Blazor
         [Parameter]
         public string TimeFormat { get; set; } = "h tt";
 
+        /// <summary>
+        /// Gets or sets the text displayed for appointments that span more than one day. Set to <c>Multi-day</c> by default.
+        /// </summary>
+        /// <value>The multi-day text.</value>
+        [Parameter]
+        public string MultiDayText { get; set; } = "Multi-day";
+
         /// <inheritdoc />
         public override string Title
         {
@@ -48,7 +55,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets number of days to view. Set to <c>2</c> by default.
+        /// Gets or sets number of days to view. Set to <c>1</c> by default.
         /// </summary>
         /// <value>The number of days.</value>
         [Parameter]
