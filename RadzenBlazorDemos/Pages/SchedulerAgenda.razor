@@ -11,10 +11,10 @@
 </RadzenStack>
 
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
-TextProperty="Text" SelectedIndex="0" AgendaMultiDayText="Spans more than one day"
+TextProperty="Text" SelectedIndex="0"
 SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
 AppointmentMove=@OnAppointmentMove >
-    <RadzenAgendaView NumberOfDays="@sliderNumberOfDays" />
+    <RadzenAgendaView NumberOfDays="@sliderNumberOfDays" MultiDayText="Spans more than one day" />
     <RadzenDayView />
     <RadzenWeekView />
     <RadzenMonthView />

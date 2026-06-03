@@ -14,8 +14,6 @@
         {
             var slotDate = date;
             var appointments = AppointmentsInSlot(date, date.AddDays(1));
-            // ensure appointments are ordered by start date, then by end date
-            appointments = appointments.OrderBy(item => item.Start).ThenBy(item => item.End).ToArray() ?? Array.Empty<AppointmentData>();
 
             <RadzenStack Orientation="Orientation.Horizontal" Gap="0">
                 <div class="rz-slot-header-agenda">
@@ -30,7 +28,7 @@
                 </div>
                 <div class="rz-slot-agenda">
                     <div @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(slotDate)></div>
-                    <AgendaSlotEvents StartDate=@StartDate EndDate=@EndDate Appointments=@appointments CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment" AppointmentDragStart=@OnAppointmentDragStart />
+                    <AgendaSlotEvents Appointments=@appointments MultiDayText=@MultiDayText CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment" AppointmentDragStart=@OnAppointmentDragStart />
                 </div>
             </RadzenStack>
         }
@@ -40,9 +38,9 @@
 @code {
     void OnFocus()
     {
-        if (CurrentDate == default(DateTime)) 
-        { 
-            CurrentDate = StartDate; 
+        if (CurrentDate == default(DateTime))
+        {
+            CurrentDate = StartDate;
         }
     }
 
@@ -52,16 +50,13 @@
     public DateTime StartDate { get; set; }
 
     [Parameter]
-    public TimeSpan StartTime { get; set; }
-
-    [Parameter]
     public DateTime EndDate { get; set; }
 
     [Parameter]
-    public TimeSpan EndTime { get; set; }
+    public string? TimeFormat { get; set; }
 
     [Parameter]
-    public string? TimeFormat { get; set; }
+    public string MultiDayText { get; set; } = "Multi-day";
 
     [Parameter]
     public IList<AppointmentData>? Appointments { get; set; }
@@ -71,13 +66,12 @@
 
     private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
     {
-        if (Appointments == null)
+        if (Appointments == null || Scheduler == null)
         {
             return Array.Empty<AppointmentData>();
         }
 
-        if (Scheduler == null) return Array.Empty<AppointmentData>();
-        return Appointments?.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray() ?? Array.Empty<AppointmentData>();
+        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenBy(item => item.End).ToArray();
     }
 
     async Task OnSlotClick(DateTime date)
@@ -90,11 +84,9 @@
 
     async Task OnDayClick(DateTime day)
     {
-        var dayStart = day.Date.Add(StartTime);
-        var dayEnd = day.Date.Add(EndTime);
         if (Scheduler != null)
         {
-            await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd));
+            await Scheduler.SelectDay(day.Date, AppointmentsInSlot(day.Date, day.Date.AddDays(1)));
         }
     }
 
@@ -117,32 +109,27 @@
 
     DateTime CurrentDate;
     int currentAppointment = -1;
-    IEnumerable<AppointmentData> currentAppointments = Enumerable.Empty<AppointmentData>();
     bool preventKeyPress;
     bool stopKeydownPropagation;
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {
         var key = args.Code != null ? args.Code : args.Key;
-        var arrow = key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown";
         var updown = key == "ArrowUp" || key == "ArrowDown";
-        var leftright = key == "ArrowLeft" || key == "ArrowRight";
 
-        var dayStart = CurrentDate.Date.Add(StartTime);
-        var dayEnd = CurrentDate.Date.Add(EndTime);
-        currentAppointments = AppointmentsInSlot(dayStart, dayEnd);
+        var currentAppointments = AppointmentsInSlot(CurrentDate.Date, CurrentDate.Date.AddDays(1));
 
-        if (updown && currentAppointments.Any())
+        if (updown && currentAppointments.Length > 0)
         {
-            currentAppointment = Math.Clamp(currentAppointment + (key == "ArrowUp" ? -1 : 1), 0, currentAppointments.Count() - 1);
+            currentAppointment = Math.Clamp(currentAppointment + (key == "ArrowUp" ? -1 : 1), 0, currentAppointments.Length - 1);
 
             preventKeyPress = true;
             stopKeydownPropagation = true;
         }
-        else if (updown && !currentAppointments.Any())
+        else if (updown)
         {
             var newDate = CurrentDate.AddDays(key == "ArrowUp" ? -1 : 1);
-            if (newDate >= CurrentDate.Date.Add(StartTime) && newDate < CurrentDate.Date.Add(EndTime))
+            if (newDate >= StartDate && newDate < EndDate)
             {
                 CurrentDate = newDate;
             }
@@ -160,9 +147,9 @@
         }
         else if (key == "Space")
         {
-            if (currentAppointments.Any() && Scheduler != null)
+            if (currentAppointments.Length > 0 && currentAppointment >= 0 && currentAppointment < currentAppointments.Length && Scheduler != null)
             {
-                await Scheduler.SelectAppointment(currentAppointments.ElementAt(currentAppointment));
+                await Scheduler.SelectAppointment(currentAppointments[currentAppointment]);
                 await view.FocusAsync();
             }
 

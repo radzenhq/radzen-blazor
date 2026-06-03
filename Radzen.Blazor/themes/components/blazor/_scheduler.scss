@@ -244,6 +244,14 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
 
 .rz-event-agenda {
   position: unset;
+
+  .rz-event-agenda-title {
+    font-weight: bold;
+  }
+
+  .rz-event-agenda-time {
+    font-style: italic;
+  }
 }
 
 .rz-view-content-agenda {

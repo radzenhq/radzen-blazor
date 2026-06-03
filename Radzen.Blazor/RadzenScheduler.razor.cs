@@ -149,13 +149,6 @@ namespace Radzen.Blazor
         public string PrevText { get => prevText ?? Localize(nameof(RadzenStrings.Scheduler_PrevText)); set => prevText = value; }
 
         /// <summary>
-        /// Gets or sets the text for multi-day appointments in an Agenda view. Set to <c>Multi-day</c> by default.
-        /// </summary>
-        /// <value>The multi-day text.</value>
-        [Parameter]
-        public string AgendaMultiDayText { get; set; } = "Multi-day";
-
-        /// <summary>
         /// Gets or sets the initial date displayed by the selected view. Set to <c>DateTime.Today</c> by default.
         /// </summary>
         /// <value>The date.</value>
@@ -434,7 +427,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public RenderFragment RenderAppointment(AppointmentData item, bool isAgenda = false)
+        public RenderFragment RenderAppointment(AppointmentData item)
         {
             ArgumentNullException.ThrowIfNull(item);
 
@@ -444,27 +437,7 @@ namespace Radzen.Blazor
                 return Template(context);
             }
 
-            if (isAgenda)
-            {
-                string timeDisplay;
-
-                timeDisplay = item.Start.ToShortDateString() != item.End.ToShortDateString() ? AgendaMultiDayText : $"{item.Start.ToShortTimeString()} - {item.End.ToShortTimeString()}";
-
-                return builder => {
-                    builder.OpenElement(0,"div");
-                    builder.AddAttribute(1, "style", "font-weight: bold;");
-                    builder.AddContent(2, item.Text);
-                    builder.CloseElement();
-                    builder.OpenElement(3, "div");
-                    builder.AddAttribute(4, "style", "font-style: italic;");
-                    builder.AddContent(5, $"{timeDisplay}");
-                    builder.CloseElement();
-                };
-            }
-            else
-            {
-                return builder => builder.AddContent(0, item.Text);
-            }
+            return builder => builder.AddContent(0, item.Text);
         }
 
         /// <inheritdoc />
