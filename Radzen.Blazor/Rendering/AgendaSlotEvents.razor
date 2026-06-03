@@ -1,0 +1,75 @@
+@using Radzen.Blazor
+
+<div class="rz-events">
+    <RadzenStack Orientation="Orientation.Vertical">
+    @{
+        var focusedAppointment = Appointments?
+            .Where(i => i.Start.Date == CurrentDate.Date)
+            .OrderBy(i => i.Start)
+            .ThenByDescending(i => i.End)
+            .ElementAtOrDefault(CurrentAppointment);
+
+        foreach (var appointment in Appointments ?? Enumerable.Empty<AppointmentData>())
+        {
+            var isFocused = CurrentDate.Date >= appointment.Start.Date
+                && CurrentDate.Date <= appointment.End.Date
+                && object.Equals(focusedAppointment, appointment);
+
+            <div>
+                <Appointment Data=@appointment Click=@OnAppointmentSelect
+                        CssClass="@($"rz-event-agenda{(isFocused ? " rz-state-focused" : string.Empty)}")"
+                        DragStart=@OnAppointmentDragStart>
+                    <div class="rz-event-agenda-title">
+                        @if (Scheduler != null)
+                        {
+                            @Scheduler.RenderAppointment(appointment)
+                        }
+                    </div>
+                    <div class="rz-event-agenda-time">
+                        @GetTimeDisplay(appointment)
+                    </div>
+                </Appointment>
+            </div>
+        }
+    }
+    </RadzenStack>
+</div>
+@code {
+    [Parameter]
+    public int CurrentAppointment { get; set; } = -1;
+
+    [Parameter]
+    public DateTime CurrentDate { get; set; }
+
+    [CascadingParameter]
+    public IScheduler? Scheduler { get; set; }
+
+    [Parameter]
+    public string MultiDayText { get; set; } = "Multi-day";
+
+    [Parameter]
+    public EventCallback<AppointmentData> AppointmentDragStart { get; set; }
+
+    [Parameter]
+    public IList<AppointmentData>? Appointments { get; set; }
+
+    async Task OnAppointmentSelect(AppointmentData data)
+    {
+        if (Scheduler != null)
+        {
+            await Scheduler.SelectAppointment(data);
+        }
+    }
+
+    public async Task OnAppointmentDragStart(AppointmentData Data)
+    {
+        await AppointmentDragStart.InvokeAsync(Data);
+    }
+
+    private string GetTimeDisplay(AppointmentData appointment)
+    {
+        return appointment.Start.ToShortDateString() != appointment.End.ToShortDateString()
+            ? MultiDayText
+            : $"{appointment.Start.ToShortTimeString()} - {appointment.End.ToShortTimeString()}";
+    }
+}
