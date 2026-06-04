@@ -77,7 +77,7 @@ namespace Radzen.Blazor
         /// <value>The template.</value>
         [Parameter]
         public RenderFragment<TItem>? Template { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the additional content to be rendered in place of the default navigation buttons in the scheduler.
         /// This property allows for complete customization of the navigation controls, replacing the native date navigation buttons (such as year, month, and day) with user-defined content or buttons.
@@ -762,6 +762,7 @@ namespace Radzen.Blazor
                 return Height;
             }
         }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {

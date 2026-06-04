@@ -60,8 +60,11 @@
       set in a .csproj may not be available yet for Conditions here.
       IsPacking *is* set by `dotnet pack`, so use that to switch DebugType for symbol packages.
     -->
-    <DebugType Condition="'$(IsPacking)' == 'true'">portable</DebugType>
-    <DebugType Condition="'$(IsPacking)' != 'true'">embedded</DebugType>
+    <!-- Produce portable PDBs for local Debug builds so the debugger can load symbols for project references.
+         Keep embedded PDBs when building non-Debug local builds to preserve existing behavior when desired.
+         Always use portable when packing (IsPacking==true). -->
+    <DebugType Condition="'$(Configuration)' == 'Debug' Or '$(IsPacking)' == 'true'">portable</DebugType>
+    <DebugType Condition="'$(Configuration)' != 'Debug' And '$(IsPacking)' != 'true'">embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Label="Demos and Tests Project Configuration" Condition="$(MSBuildProjectName.Contains('Demos')) OR $(MSBuildProjectName.Contains('Tests'))">

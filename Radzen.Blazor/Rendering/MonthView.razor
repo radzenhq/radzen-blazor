@@ -1,7 +1,9 @@
+@using System.Diagnostics
+@using System.Drawing
+@using Microsoft.JSInterop
 @using Radzen
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
-@using Microsoft.JSInterop
 @inject DialogService DialogService
 @inject IJSRuntime JSRuntime
 @inherits DropableViewBase
@@ -73,16 +75,19 @@
         }
         else
         {
+            var renderedEvents = new List<AppointmentData>();
+            // Altered code to bodge event times
             foreach (var week in (weeks ?? new List<Week>()))
             {
-                var renderedEventsForDates = new Dictionary<DateTime, List<AppointmentData>>();
+                var renderedAppointments = new List<RenderedAppointment>();
                 if (week?.Bands == null || week?.Days == null) continue;
                 <div class="rz-week">
                     <div class="rz-events">
                         @for (var bandIndex = 0; bandIndex < week.Bands.Length; bandIndex++)
                         {
                             var fullDay = TimeSpan.FromDays(1);
-                            var band = week.Bands[bandIndex];
+                            var band = week.Bands[bandIndex].ToList();
+                            //double topTot = 0.5;
                             foreach (var info in band)
                             {
                                 #region foo
@@ -109,33 +114,24 @@
                                     width -= endTimeOffset;
                                 }
                                 DateTime eventEnd = info.Data.End.AddTicks(-(info.Data.End.Ticks % TimeSpan.TicksPerSecond));
+
                                 #endregion
+                                double top = 1;
+                                var currRenderedAppt = new RenderedAppointment(left, width, info.Data.Text != null ? info.Data.Text : "");
+                                var intersecting = renderedAppointments.Where(a => a.Intersects(currRenderedAppt)).ToList();
+                                intersecting.Count(async=> )                                                       
 
-                                double top = 3; // Default top value for events that span a single day
-                                if (info.Data.Start.TimeOfDay.Ticks == 0 && eventEnd.TimeOfDay == new TimeSpan(23, 59, 59))
-                                {
-                                    if (renderedEventsForDates.TryGetValue(info.Data.Start, out var renderedApptsForCurrentDate))
-                                    {   // We stack all day events on top of each other, so top is worked out based on the number of all day events already rendered
-                                        top = (renderedApptsForCurrentDate.Count() * 1.5) + 3;
-                                    }
-                                }
-                                else
-                                {   // If the event does not start and end on the start / end of the day then it's rendered in the first row
-                                    top = 1.5;
-                                }
+                                var foo = renderedAppointments.SelectMany(appt => appt.GetOverlapping(renderedAppointments)).ToList();
+
+                                var intersectCount = renderedAppointments.Count(appt => currRenderedAppt.Intersects(appt));
+                                top = (intersectCount * 1.5) + 1;
                                 var height = 1.5;
-
                                 <Appointment Data=@info.Data Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
                                              CssClass="@(CurrentDate >= day.Start && CurrentDate <= day.Start.AddDays(1) && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment), info.Data) ? "rz-state-focused" : "")"
                                              DragStart=@OnAppointmentDragStart />
-                                if (renderedEventsForDates.TryGetValue(info.Data.Start, out var renderedApptsForDate))
-                                {
-                                    renderedApptsForDate.Add(info.Data);
-                                }
-                                else
-                                {
-                                    renderedEventsForDates.Add(info.Data.Start, new List<AppointmentData> { info.Data });
-                                }
+
+                                renderedAppointments.Add(currRenderedAppt);
+
                             }
                         }
                     </div>
@@ -165,6 +161,63 @@
 </div>
 
 @code {
+
+    private class RenderedAppointment
+    {
+        public RenderedAppointment(double left, double width, string name)
+        {
+            Left = left;
+            Width = width;
+            Name = name;
+        }
+        public double Left = 0;
+        public double Width = 0;
+        public double Right => Left + Width;
+        public string Name { get; set; } = "";
+
+        public override string ToString()
+        {
+            return Name;
+        }
+        /// <summary>
+        /// Checks if a given double falls within the range defined by the Start and End properties. If End is null, it treats the range as open-ended, meaning that any date after Start would be considered in range. The method returns true if the date is greater than or equal to Start and less than or equal to End (or if End is null, just greater than or equal to Start). Otherwise, it returns false.
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public bool IsInRange(double d)
+        {
+            return (d >= Left) && (d <= Right);
+        }
+        public List<RenderedAppointment> GetOverlapping(List<RenderedAppointment> appts){
+            return appts.Where(appt => appt.Intersects(this)).ToList();
+        }
+
+        public bool Intersects(RenderedAppointment appt)
+        {
+            if (this == appt)
+            {
+                return false;
+            }
+            else if (IsInRange(appt.Left) && IsInRange(appt.Right))
+            {
+                return true;
+            }
+            else if (IsInRange(appt.Left))
+            {
+                return true;
+            }
+            else if (IsInRange(appt.Right))
+            {
+                return true;
+            }
+            else if (appt.IsInRange(Left) && appt.IsInRange(Right))
+            {
+                return true;
+            }
+            return false;
+        }
+    }
+
     class Day
     {
         public AppointmentData[]? Appointments { get; set; }
@@ -294,14 +347,17 @@
             CurrentDate = StartDate;
         }
     }
+    /// <summary>
+    /// Gets or sets a value indicating whether the scheduler should render appointments using the altered code or the existing code. Set to <c>true</c> by default.
+    /// </summary>
+    [Parameter]
+    public bool RenderEventTimesExactly { get; set; } = true;
 
     [Parameter]
     public DateTime StartDate { get; set; }
 
     [Parameter]
     public DateTime EndDate { get; set; }
-    [Parameter]
-    public bool RenderEventTimesExactly { get; set; } = true;
     [Parameter]
     public int? MaxAppointmentsInSlot { get; set; }
 
@@ -432,6 +488,7 @@
         }
 
         return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end))
+                .OrderBy(item => item.Start)
                 .OrderByDescending(item => item.End.Subtract(item.Start).TotalDays > 1)
                 .ThenBy(item => item.Start)
                 .ThenByDescending(item => item.End)

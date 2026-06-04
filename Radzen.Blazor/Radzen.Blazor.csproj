@@ -4,13 +4,13 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <NoWarn>BL9993;BL0007;BL0005</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <TargetFrameworks>net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <RazorLangVersion>7.0</RazorLangVersion>
     <LangVersion>latest</LangVersion>
     <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
     <PackageId>HolidayRentPro.Radzen.Blazor</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>HolidayRentPro / Radzen</Authors>
     <Description>A fork of the Radzen project for HolidayRentPro</Description>

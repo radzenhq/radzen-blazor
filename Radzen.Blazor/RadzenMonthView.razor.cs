@@ -24,6 +24,11 @@ namespace Radzen.Blazor
         {
             get => Scheduler?.CurrentDate.ToString("MMMM yyyy", Scheduler.Culture ?? System.Globalization.CultureInfo.CurrentCulture) ?? "";
         }
+        /// <summary>
+        /// Gets or sets a value indicating whether the scheduler should render appointments using the altered code or the existing code. Set to <c>true</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool RenderEventTimesExactly { get; set; } = true;
 
         /// <inheritdoc />
         [Parameter]
