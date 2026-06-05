@@ -795,3 +795,11 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
         text-overflow: ellipsis;
     }
 }
+
+.rz-spreadsheet-dialog-actions {
+    margin-top: 0.5rem;
+
+    .rz-button {
+        min-width: 6rem;
+    }
+}

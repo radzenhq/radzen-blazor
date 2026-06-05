@@ -832,7 +832,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             };
 
             var result = await DialogService.OpenAsync<FormatCellsDialog>(
-                Localize(nameof(RadzenStrings.Spreadsheet_FormatCellsTitle)), parameters, new DialogOptions { Width = "600px", Height = "480px" });
+                Localize(nameof(RadzenStrings.Spreadsheet_FormatCellsTitle)), parameters, new DialogOptions { Width = "600px" });
 
             if (result is string formatCode)
             {

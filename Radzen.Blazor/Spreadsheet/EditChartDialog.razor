@@ -4,58 +4,60 @@
 @inherits SpreadsheetDialogBase
 
 <RadzenStack Gap="0" Style="max-height: 70vh; display: flex; flex-direction: column">
-<RadzenStack Gap="1rem" Style="padding: 1rem; overflow-y: auto; flex: 1">
-    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ChartType))>
-        <RadzenDropDown Value=@Draft.ChartType Change=@(v => Draft.ChartType = (SpreadsheetChartType)v) Data=@chartTypes TextProperty="Text" ValueProperty="Value" Style="width: 100%" />
-    </RadzenFormField>
-    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ChartTitle))>
-        <RadzenTextBox Value=@Draft.Title Change=@(v => Draft.Title = v) Style="width: 100%" />
-    </RadzenFormField>
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenCheckBox Value=@Draft.ShowLegend Change=@((bool v) => Draft.ShowLegend = v) TValue="bool" />
-        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowLegend)) />
+<RadzenStack Gap="0.5rem" Style="padding: 0.25rem; overflow-y: auto; flex: 1">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ChartType)) Component="chartType" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenDropDown Value=@Draft.ChartType Change=@(v => Draft.ChartType = (SpreadsheetChartType)v) Data=@chartTypes TextProperty="Text" ValueProperty="Value" Name="chartType" InputSize="InputSize.Small" Style="flex: 1" />
     </RadzenStack>
-    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_LegendPosition))>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ChartTitle)) Component="chartTitle" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenTextBox Value=@Draft.Title Change=@(v => Draft.Title = v) Name="chartTitle" InputSize="InputSize.Small" Style="flex: 1" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Style="padding-inline-start: 8.5rem">
+        <RadzenCheckBox Value=@Draft.ShowLegend Change=@((bool v) => Draft.ShowLegend = v) TValue="bool" Name="showLegend" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowLegend)) Component="showLegend" class="rz-text-subtitle2" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_LegendPosition)) Component="legendPosition" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
         <RadzenDropDown Value=@Draft.LegendPosition Change=@(v => Draft.LegendPosition = (ChartLegendPosition)v) Data=@legendPositions TextProperty="Text" ValueProperty="Value"
-            Disabled=@(!Draft.ShowLegend) Style="width: 100%" />
-    </RadzenFormField>
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            Disabled=@(!Draft.ShowLegend) Name="legendPosition" InputSize="InputSize.Small" Style="flex: 1" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Style="margin-top: 0.5rem">
         <RadzenText TextStyle="TextStyle.Subtitle1" Text=@L(nameof(RadzenStrings.Spreadsheet_Series)) />
-        <RadzenButton Icon="add" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click=@OnAddSeries
-            title=@L(nameof(RadzenStrings.Spreadsheet_AddSeries)) />
+        <RadzenButton Icon="add" Text=@L(nameof(RadzenStrings.Spreadsheet_AddSeries)) ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.ExtraSmall" Click=@OnAddSeries />
     </RadzenStack>
     @foreach (var entry in Draft.Series)
     {
         var index = entry.Index;
         var categoryFieldId = CategoryFieldId(index);
         var valueFieldId = ValueFieldId(index);
+        var seriesTitleFieldId = $"seriesTitle_{index}";
         <RadzenFieldset Text=@(entry.Name ?? FormatSeriesName(index + 1))>
             <RadzenStack Gap="0.5rem">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_SeriesTitle)) Style="flex: 1">
-                        <RadzenTextBox Value=@entry.Name Change=@(v => entry.Name = v) Style="width: 100%" />
-                    </RadzenFormField>
-                    <RadzenColorPicker Value=@entry.Color Change=@(v => entry.Color = v) ShowHSV=false ShowRGBA=false ShowButton=false />
+                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_SeriesTitle)) Component=@seriesTitleFieldId class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                    <RadzenTextBox Value=@entry.Name Change=@(v => entry.Name = v) Name=@seriesTitleFieldId InputSize="InputSize.Small" Style="flex: 1" />
+                    <RadzenColorPicker Value=@entry.Color Change=@(v => entry.Color = v) ShowHSV=false ShowRGBA=false ShowButton=false InputSize="InputSize.Small" />
                     <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Size="ButtonSize.Small"
                         Click=@(() => OnRemoveSeries(entry)) Disabled=@(Draft.Series.Count <= 1) />
                 </RadzenStack>
-                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
-                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange)) />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange)) class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
                     <RangePicker Value=@entry.Categories ValueChanged=@(v => entry.Categories = v)
                         OnPickRequested=@(() => RequestPick(categoryFieldId, entry.Categories ?? string.Empty))
-                        ShouldFocusOnLoad=@(FocusFieldId == categoryFieldId) />
+                        ShouldFocusOnLoad=@(FocusFieldId == categoryFieldId) InputSize="InputSize.Small" Style="flex: 1" />
                 </RadzenStack>
-                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
-                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange)) />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange)) class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
                     <RangePicker Value=@entry.Values ValueChanged=@(v => entry.Values = v)
                         OnPickRequested=@(() => RequestPick(valueFieldId, entry.Values ?? string.Empty))
-                        ShouldFocusOnLoad=@(FocusFieldId == valueFieldId) />
+                        ShouldFocusOnLoad=@(FocusFieldId == valueFieldId) InputSize="InputSize.Small" Style="flex: 1" />
                 </RadzenStack>
             </RadzenStack>
         </RadzenFieldset>
     }
     </RadzenStack>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Style="padding: 1rem; border-top: 1px solid var(--rz-border-color)">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="rz-spreadsheet-dialog-actions">
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
     </RadzenStack>

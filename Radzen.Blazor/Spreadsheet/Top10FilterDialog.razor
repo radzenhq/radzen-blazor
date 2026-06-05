@@ -4,17 +4,17 @@
 
 <RadzenStack Gap="1rem" Style="min-width:320px">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Top10Show)) />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Top10Show)) class="rz-text-subtitle2" />
         <RadzenDropDown TValue="bool" Data=@DirectionOptions
             TextProperty="Text" ValueProperty="Value"
-            @bind-Value=@bottom Style="width:90px" />
-        <RadzenNumeric TValue="int" @bind-Value=@count Min="1" Max="100" Style="width:80px" />
+            @bind-Value=@bottom InputSize="InputSize.Small" />
+        <RadzenNumeric TValue="int" @bind-Value=@count Min="1" Max="100" InputSize="InputSize.Small" />
         <RadzenDropDown TValue="bool" Data=@UnitOptions
             TextProperty="Text" ValueProperty="Value"
-            @bind-Value=@percent Style="width:110px" />
+            @bind-Value=@percent InputSize="InputSize.Small" />
     </RadzenStack>
 
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End" class="rz-spreadsheet-dialog-actions">
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined"
             Click=@OnCancel />
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat"

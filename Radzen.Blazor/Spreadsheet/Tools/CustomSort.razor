@@ -38,7 +38,7 @@
         var result = await DialogService.OpenAsync<CustomSortDialog>(
             Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CustomSort)) ?? "Custom Sort",
             args,
-            new DialogOptions { Width = "640px", ShowClose = true });
+            new DialogOptions { Width = "800px", ShowClose = true });
 
         if (result is CustomSortDialog.Result r && r.Keys.Length > 0 && Spreadsheet is not null)
         {
