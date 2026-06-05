@@ -258,19 +258,19 @@
     <value>Sample</value>
   </data>
   <data name="Spreadsheet_DecimalPlaces" xml:space="preserve">
-    <value>Decimal places:</value>
+    <value>Decimal places</value>
   </data>
   <data name="Spreadsheet_UseThousandsSeparator" xml:space="preserve">
     <value>Use 1000 separator</value>
   </data>
   <data name="Spreadsheet_Symbol" xml:space="preserve">
-    <value>Symbol:</value>
+    <value>Symbol</value>
   </data>
   <data name="Spreadsheet_Type" xml:space="preserve">
-    <value>Type:</value>
+    <value>Type</value>
   </data>
   <data name="Spreadsheet_FormatCode" xml:space="preserve">
-    <value>Format code:</value>
+    <value>Format code</value>
   </data>
   <!-- Spreadsheet: ConditionalFormat tool -->
   <data name="Spreadsheet_Conditional" xml:space="preserve">
@@ -720,7 +720,7 @@
     <value>Comma-separated</value>
   </data>
   <data name="Spreadsheet_SortLevelCase" xml:space="preserve">
-    <value>Case</value>
+    <value>Case sensitive</value>
   </data>
   <data name="Spreadsheet_SortLevelAddLevel" xml:space="preserve">
     <value>Add level</value>

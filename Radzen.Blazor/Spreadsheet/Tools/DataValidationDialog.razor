@@ -2,115 +2,135 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
-<RadzenStack Gap="1rem" Style="padding: 1rem; min-width: 400px">
-    <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ValidationType))>
-        <RadzenDropDown @bind-Value=@ValidationType Data=@ValidationTypes TextProperty="Name" ValueProperty="Value" Style="width: 100%" Change=@OnTypeChanged />
-    </RadzenFormField>
+<RadzenStack Gap="0.5rem" Style="min-width: 400px">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ValidationType)) Component="validationType" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenDropDown @bind-Value=@ValidationType Data=@ValidationTypes TextProperty="Name" ValueProperty="Value" Name="validationType" InputSize="InputSize.Small" Style="flex: 1" Change=@OnTypeChanged />
+    </RadzenStack>
 
     @if (ValidationType != DataValidationType.List && ValidationType != DataValidationType.Custom)
     {
-        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Operator))>
-            <RadzenDropDown @bind-Value=@Operator Data=@Operators TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
-        </RadzenFormField>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Operator)) Component="operator" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+            <RadzenDropDown @bind-Value=@Operator Data=@Operators TextProperty="Name" ValueProperty="Value" Name="operator" InputSize="InputSize.Small" Style="flex: 1" />
+        </RadzenStack>
     }
 
     @if (ValidationType == DataValidationType.Custom)
     {
-        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Formula))>
-            <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
-        </RadzenFormField>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Formula)) Component="formula" class="rz-text-subtitle2" Style="align-self: start" />
+            <RadzenTextBox @bind-Value=@Formula1 Name="formula" InputSize="InputSize.Small" Style="width: 100%" />
+        </RadzenStack>
     }
     else if (ValidationType == DataValidationType.List)
     {
-        <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_ValuesCommaSeparated))>
-            <RadzenTextArea @bind-Value=@Formula1 Rows="3" Style="width: 100%" />
-        </RadzenFormField>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Start">
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ValuesCommaSeparated)) Component="valuesList" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+            <RadzenTextArea @bind-Value=@Formula1 Name="valuesList" Rows="3" InputSize="InputSize.Small" Style="flex: 1" />
+        </RadzenStack>
     }
     else if (Operator == DataValidationOperator.Between || Operator == DataValidationOperator.NotBetween)
     {
         @if (ValidationType == DataValidationType.Date)
         {
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum))>
-                <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
-            </RadzenFormField>
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum))>
-                <RadzenDatePicker @bind-Value=@Formula2Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
-            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum)) Component="minimum" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Name="minimum" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum)) Component="maximum" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenDatePicker @bind-Value=@Formula2Date DateFormat="yyyy-MM-dd" Name="maximum" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
         }
         else if (ValidationType == DataValidationType.Time)
         {
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum))>
-                <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
-            </RadzenFormField>
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum))>
-                <RadzenDatePicker @bind-Value=@Formula2Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
-            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum)) Component="minimum" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Name="minimum" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum)) Component="maximum" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenDatePicker @bind-Value=@Formula2Date ShowTime="true" TimeOnly="true" Name="maximum" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
         }
         else
         {
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum))>
-                <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
-            </RadzenFormField>
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum))>
-                <RadzenTextBox @bind-Value=@Formula2 Style="width: 100%" />
-            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum)) Component="minimum" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenTextBox @bind-Value=@Formula1 Name="minimum" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum)) Component="maximum" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenTextBox @bind-Value=@Formula2 Name="maximum" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
         }
     }
     else
     {
         @if (ValidationType == DataValidationType.Date)
         {
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Value))>
-                <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Style="width: 100%" />
-            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Value)) Component="value" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenDatePicker @bind-Value=@Formula1Date DateFormat="yyyy-MM-dd" Name="value" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
         }
         else if (ValidationType == DataValidationType.Time)
         {
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Value))>
-                <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Style="width: 100%" />
-            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Value)) Component="value" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenDatePicker @bind-Value=@Formula1Date ShowTime="true" TimeOnly="true" Name="value" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
         }
         else
         {
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Value))>
-                <RadzenTextBox @bind-Value=@Formula1 Style="width: 100%" />
-            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Value)) Component="value" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                <RadzenTextBox @bind-Value=@Formula1 Name="value" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
         }
     }
 
-    <RadzenCheckBox @bind-Value=@AllowBlank TValue="bool" />
-    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_AllowBlank)) Component="AllowBlank" Style="margin-left: 0.5rem" />
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Style="padding-inline-start: 8.5rem">
+        <RadzenCheckBox @bind-Value=@AllowBlank TValue="bool" Name="allowBlank" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_AllowBlank)) Component="allowBlank" class="rz-text-subtitle2" />
+    </RadzenStack>
 
     <RadzenFieldset Text=@L(nameof(RadzenStrings.Spreadsheet_ErrorAlert))>
         <RadzenStack Gap="0.5rem">
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Style))>
-                <RadzenDropDown @bind-Value=@ErrorStyle Data=@ErrorStyles TextProperty="Name" ValueProperty="Value" Style="width: 100%" />
-            </RadzenFormField>
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Title))>
-                <RadzenTextBox @bind-Value=@ErrorTitle Style="width: 100%" />
-            </RadzenFormField>
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Message))>
-                <RadzenTextArea @bind-Value=@ErrorMessage Rows="2" Style="width: 100%" />
-            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Style)) Component="errorStyle" class="rz-text-subtitle2" Style="width: 7rem; text-align: end" />
+                <RadzenDropDown @bind-Value=@ErrorStyle Data=@ErrorStyles TextProperty="Name" ValueProperty="Value" Name="errorStyle" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Title)) Component="errorTitle" class="rz-text-subtitle2" Style="width: 7rem; text-align: end" />
+                <RadzenTextBox @bind-Value=@ErrorTitle Name="errorTitle" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Start">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Message)) Component="errorMessage" class="rz-text-subtitle2" Style="width: 7rem; text-align: end" />
+                <RadzenTextArea @bind-Value=@ErrorMessage Name="errorMessage" Rows="2" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenFieldset>
 
     <RadzenFieldset Text=@L(nameof(RadzenStrings.Spreadsheet_InputPrompt))>
         <RadzenStack Gap="0.5rem">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                <RadzenCheckBox @bind-Value=@ShowInputMessage TValue="bool" />
-                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowInputMessage)) />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Style="padding-inline-start: 7.5rem">
+                <RadzenCheckBox @bind-Value=@ShowInputMessage TValue="bool" Name="showInputMessage" />
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowInputMessage)) Component="showInputMessage" class="rz-text-subtitle2" />
             </RadzenStack>
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Title))>
-                <RadzenTextBox @bind-Value=@InputTitle Style="width: 100%" />
-            </RadzenFormField>
-            <RadzenFormField Text=@L(nameof(RadzenStrings.Spreadsheet_Message))>
-                <RadzenTextArea @bind-Value=@InputMessage Rows="2" Style="width: 100%" />
-            </RadzenFormField>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Title)) Component="inputTitle" class="rz-text-subtitle2" Style="width: 7rem; text-align: end" />
+                <RadzenTextBox @bind-Value=@InputTitle Name="inputTitle" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Start">
+                <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Message)) Component="inputMessage" class="rz-text-subtitle2" Style="width: 7rem; text-align: end" />
+                <RadzenTextArea @bind-Value=@InputMessage Name="inputMessage" Rows="2" InputSize="InputSize.Small" Style="flex: 1" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenFieldset>
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="rz-spreadsheet-dialog-actions">
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
     </RadzenStack>

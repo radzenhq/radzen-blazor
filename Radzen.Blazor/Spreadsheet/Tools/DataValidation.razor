@@ -38,7 +38,8 @@
             return;
         }
 
-        var result = await DialogService.OpenAsync<DataValidationDialog>(Spreadsheet.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationTitle)));
+        var result = await DialogService.OpenAsync<DataValidationDialog>(Spreadsheet.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationTitle)),
+            null, new DialogOptions { Width = "520px" });
 
         if (result is DataValidationRule rule)
         {

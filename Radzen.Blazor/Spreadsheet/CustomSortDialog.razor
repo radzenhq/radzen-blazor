@@ -4,85 +4,85 @@
 @using Radzen.Documents.Spreadsheet
 @inherits SpreadsheetDialogBase
 
-<RadzenStack Gap="1rem" Style="min-width:560px">
+<RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableRange)) />
-        <RadzenLabel Text=@($"{Range.Start}:{Range.End}") />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableRange)) class="rz-text-subtitle2" />
+        <RadzenLabel Text=@($"{Range.Start}:{Range.End}") class="rz-text-subtitle2" />
         <span style="flex:1"></span>
         <RadzenCheckBox @bind-Value=@hasHeaders Name="hasHeadersCheck" TValue="bool" />
-        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_SortHasHeaders)) Component="hasHeadersCheck" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_SortHasHeaders)) Component="hasHeadersCheck" class="rz-text-subtitle2" />
     </RadzenStack>
 
-    <table class="rz-data-grid" style="width:100%">
-        <thead>
-            <tr>
-                <th style="width:32px"></th>
-                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelColumn))</th>
-                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelSortOn))</th>
-                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelOrder))</th>
-                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelCustomList))</th>
-                <th>@L(nameof(RadzenStrings.Spreadsheet_SortLevelCase))</th>
-                <th style="width:80px"></th>
-            </tr>
-        </thead>
-        <tbody>
+    <RadzenTable class="rz-density-compact" Style="height: 200px">
+        <RadzenTableHeader>
+            <RadzenTableHeaderRow>
+                <RadzenTableHeaderCell Style="width:32px" />
+                <RadzenTableHeaderCell Style="width:160px"><span class="rz-column-title rz-ps-0">@L(nameof(RadzenStrings.Spreadsheet_SortLevelColumn))</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="width:120px"><span class="rz-column-title rz-ps-0">@L(nameof(RadzenStrings.Spreadsheet_SortLevelSortOn))</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="width:130px"><span class="rz-column-title rz-ps-0">@L(nameof(RadzenStrings.Spreadsheet_SortLevelOrder))</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell><span class="rz-column-title rz-ps-0">@L(nameof(RadzenStrings.Spreadsheet_SortLevelCustomList))</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="width:60px"><span class="rz-column-title rz-ps-0" title=@L(nameof(RadzenStrings.Spreadsheet_SortLevelCase))>Aa</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="width:120px" />
+            </RadzenTableHeaderRow>
+        </RadzenTableHeader>
+        <RadzenTableBody>
             @for (var i = 0; i < levels.Count; i++)
             {
                 var idx = i;
                 var level = levels[idx];
-                <tr>
-                    <td>@(idx + 1)</td>
-                    <td>
+                <RadzenTableRow>
+                    <RadzenTableCell>@(idx + 1)</RadzenTableCell>
+                    <RadzenTableCell>
                         <RadzenDropDown TValue="int" Data=@columnOptions
                             TextProperty="@nameof(ColumnOption.Text)" ValueProperty="@nameof(ColumnOption.Value)"
                             Value=@level.ColumnIndex
                             Change=@(v => level.ColumnIndex = (int)v)
-                            Style="width:100%" />
-                    </td>
-                    <td>
+                            InputSize="InputSize.Small" Style="width:100%" />
+                    </RadzenTableCell>
+                    <RadzenTableCell>
                         <RadzenDropDown TValue="SortOn" Data=@SortOnOptions
                             TextProperty="@nameof(SortOnOption.Text)" ValueProperty="@nameof(SortOnOption.Value)"
                             Value=@level.SortOn
                             Change=@(v => level.SortOn = (SortOn)v)
-                            Style="width:120px" />
-                    </td>
-                    <td>
+                            InputSize="InputSize.Small" Style="width:100%" />
+                    </RadzenTableCell>
+                    <RadzenTableCell>
                         <RadzenDropDown TValue="SortOrder" Data=@OrderOptions
                             TextProperty="@nameof(OrderOption.Text)" ValueProperty="@nameof(OrderOption.Value)"
                             Value=@level.Order
                             Change=@(v => level.Order = (SortOrder)v)
-                            Style="width:140px" />
-                    </td>
-                    <td>
+                            InputSize="InputSize.Small" Style="width:100%" />
+                    </RadzenTableCell>
+                    <RadzenTableCell>
                         <RadzenTextBox @bind-Value=@level.CustomListText
                             Placeholder=@L(nameof(RadzenStrings.Spreadsheet_SortLevelCustomListPlaceholder))
-                            Style="width:100%" />
-                    </td>
-                    <td>
+                            InputSize="InputSize.Small" Style="width:100%" />
+                    </RadzenTableCell>
+                    <RadzenTableCell>
                         <RadzenCheckBox @bind-Value=@level.CaseSensitive TValue="bool" />
-                    </td>
-                    <td>
-                        <RadzenButton Icon="arrow_upward" ButtonStyle="ButtonStyle.Light"
+                    </RadzenTableCell>
+                    <RadzenTableCell Style="white-space: nowrap">
+                        <RadzenButton Icon="arrow_upward" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text"
                             Size="ButtonSize.Small" Disabled=@(idx == 0)
                             Click=@(() => Move(idx, -1)) />
-                        <RadzenButton Icon="arrow_downward" ButtonStyle="ButtonStyle.Light"
+                        <RadzenButton Icon="arrow_downward" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text"
                             Size="ButtonSize.Small" Disabled=@(idx == levels.Count - 1)
                             Click=@(() => Move(idx, 1)) />
-                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Light"
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text"
                             Size="ButtonSize.Small" Disabled=@(levels.Count == 1)
                             Click=@(() => RemoveLevel(idx)) />
-                    </td>
-                </tr>
+                    </RadzenTableCell>
+                </RadzenTableRow>
             }
-        </tbody>
-    </table>
+        </RadzenTableBody>
+    </RadzenTable>
 
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
         <RadzenButton Icon="add" Text=@L(nameof(RadzenStrings.Spreadsheet_SortLevelAddLevel))
-            ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" Click=@AddLevel />
+            ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Small" Click=@AddLevel />
     </RadzenStack>
 
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End" class="rz-spreadsheet-dialog-actions">
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined"
             Click=@OnCancel />
         <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat"
