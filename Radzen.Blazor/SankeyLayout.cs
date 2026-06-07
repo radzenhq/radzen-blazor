@@ -295,7 +295,7 @@ namespace Radzen.Blazor
             {
                 if (node.TargetLinks.Count > 0)
                 {
-                    var y = node.TargetLinks.Sum(l => (l.SourceNode?.Y ?? 0 + l.Y0) * l.Value) / node.ComputedValue;
+                    var y = node.TargetLinks.Sum(l => ((l.SourceNode?.Y ?? 0) + l.Y0) * l.Value) / node.ComputedValue;
                     node.Y += (y - node.Y) * alpha;
                 }
             }
@@ -361,7 +361,7 @@ namespace Radzen.Blazor
             {
                 if (node.SourceLinks.Count > 0)
                 {
-                    var y = node.SourceLinks.Sum(l => (l.TargetNode?.Y ?? 0 + l.Y1) * l.Value) / node.ComputedValue;
+                    var y = node.SourceLinks.Sum(l => ((l.TargetNode?.Y ?? 0) + l.Y1) * l.Value) / node.ComputedValue;
                     node.Y += (y - node.Y) * alpha;
                 }
             }
