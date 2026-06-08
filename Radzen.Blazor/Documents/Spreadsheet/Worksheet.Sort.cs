@@ -94,6 +94,14 @@ public partial class Worksheet
 
         var sortedRows = ordered.ToList();
 
+        // Write every reordered cell, then recalc once. Without the batch, each
+        // CopyFrom re-triggers formula evaluation, which on a sheet with aggregate
+        // formulas (e.g. SUM over the sorted range) is O(N^2) per sort.
+        Batch(() => WriteSortedRows(range, sortedRows));
+    }
+
+    private void WriteSortedRows(RangeRef range, List<(int originalIndex, List<Cell> cells)> sortedRows)
+    {
         for (var i = 0; i < sortedRows.Count; i++)
         {
             var (_, cells) = sortedRows[i];

@@ -57,10 +57,14 @@ public class Cell
         var clone = new Cell(Worksheet, Address)
         {
             Data = new CellData(Value),
-            Formula = Formula,
             QuotePrefix = QuotePrefix,
             Hyperlink = Hyperlink?.Clone(),
         };
+        // Assign the formula via the backing field, not the property: the setter
+        // registers the cell in the worksheet dependency graph and triggers a recalc.
+        // A clone is a detached snapshot/transport copy and must stay out of the graph.
+        clone.formula = formula;
+        clone.FormulaSyntaxTree = FormulaSyntaxTree;
         if (format is not null)
         {
             clone.format = format.Clone();
