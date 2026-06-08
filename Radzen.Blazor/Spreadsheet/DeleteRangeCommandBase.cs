@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using Radzen.Documents.Spreadsheet;
@@ -10,21 +9,11 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Base class for row and column delete commands. Captures only the cells that will be removed
 /// or whose formulas reference the deleted range, then performs the delete. Undo re-inserts
-/// the blank rows/columns and restores the captured cells in place.
+/// the blank rows/columns and restores the captured cells in place. Snapshot/restore plumbing
+/// is inherited from <see cref="RangeSnapshotCommandBase"/>.
 /// </summary>
-public abstract class DeleteRangeCommandBase : ICommand, IProtectedCommand
+public abstract class DeleteRangeCommandBase : RangeSnapshotCommandBase
 {
-    /// <inheritdoc/>
-    public SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;
-
-    /// <inheritdoc/>
-    public abstract SheetAction RequiredAction { get; }
-
-    /// <summary>
-    /// The worksheet being operated on.
-    /// </summary>
-    protected readonly Worksheet sheet;
-
     /// <summary>
     /// The first index in the range to delete (inclusive).
     /// </summary>
@@ -35,8 +24,6 @@ public abstract class DeleteRangeCommandBase : ICommand, IProtectedCommand
     /// </summary>
     protected readonly int endIndex;
 
-    private readonly Dictionary<CellRef, (object? value, string? formula, Format? format)> snapshot = [];
-
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteRangeCommandBase"/> class.
     /// </summary>
@@ -44,8 +31,9 @@ public abstract class DeleteRangeCommandBase : ICommand, IProtectedCommand
     /// <param name="startIndex">The first row/column index to delete (inclusive).</param>
     /// <param name="endIndex">The last row/column index to delete (inclusive).</param>
     protected DeleteRangeCommandBase(Worksheet sheet, int startIndex, int endIndex)
+        : base(sheet)
     {
-        this.sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
+        ArgumentNullException.ThrowIfNull(sheet);
         this.startIndex = startIndex;
         this.endIndex = endIndex;
     }
@@ -56,16 +44,15 @@ public abstract class DeleteRangeCommandBase : ICommand, IProtectedCommand
     protected int Count => endIndex - startIndex + 1;
 
     /// <inheritdoc/>
-    public bool Execute()
+    protected override bool DoExecute()
     {
-        snapshot.Clear();
         CaptureAffectedCells();
         DeleteRange();
         return true;
     }
 
     /// <inheritdoc/>
-    public void Unexecute()
+    public override void Unexecute()
     {
         ReinsertRange();
         RestoreSnapshot();
@@ -98,31 +85,7 @@ public abstract class DeleteRangeCommandBase : ICommand, IProtectedCommand
         {
             if (IsInsideRange(cell.Address) || ReferencesRange(cell))
             {
-                snapshot[cell.Address] = (cell.Value, cell.Formula, cell.Format?.Clone());
-            }
-        }
-    }
-
-    private void RestoreSnapshot()
-    {
-        foreach (var entry in snapshot)
-        {
-            var cellRef = entry.Key;
-            var (value, formula, format) = entry.Value;
-            var cell = sheet.Cells[cellRef.Row, cellRef.Column];
-
-            if (formula is not null)
-            {
-                cell.Formula = formula;
-            }
-            else
-            {
-                cell.Value = value;
-            }
-
-            if (format is not null)
-            {
-                cell.Format = format;
+                Capture(cell.Address);
             }
         }
     }
