@@ -63,4 +63,16 @@ public class FunctionArguments(Cell currentCell)
         var value = Get(parameterName);
         return value as List<CellData>;
     }
+
+    /// <summary>
+    /// Gets the argument groups for a <see cref="ParameterType.Group"/> parameter. Each inner list is one
+    /// argument's cells with its range shape preserved (a single cell is a one-element list).
+    /// </summary>
+    /// <param name="parameterName">The name of the parameter.</param>
+    /// <returns>The list of argument groups, or null if not found.</returns>
+    public List<List<CellData>>? GetGroups(string parameterName)
+    {
+        var value = Get(parameterName);
+        return value as List<List<CellData>>;
+    }
 }

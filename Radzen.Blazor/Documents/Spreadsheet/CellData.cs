@@ -379,7 +379,7 @@ public class CellData : IComparable, IComparable<CellData>
 
         if (Type == other.Type)
         {
-            return ((IComparable)Value).CompareTo((IComparable)other.Value);
+            return CompareValues(Value, other.Value);
         }
 
         return Type.CompareTo(other.Type);
@@ -410,6 +410,18 @@ public class CellData : IComparable, IComparable<CellData>
     /// </summary>
     public bool IsError => Type == CellDataType.Error;
 
+    // Excel compares text case-insensitively (=, <>, lookups, criteria all ignore case). Route every
+    // string-vs-string comparison through OrdinalIgnoreCase so equality and ordering stay consistent.
+    private static int CompareValues(object? left, object? right)
+    {
+        if (left is string ls && right is string rs)
+        {
+            return string.Compare(ls, rs, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return ((IComparable)left!).CompareTo(right);
+    }
+
     internal bool IsEqualTo(CellData other)
     {
         ArgumentNullException.ThrowIfNull(other);
@@ -429,7 +441,7 @@ public class CellData : IComparable, IComparable<CellData>
             return other.Value is null && Value is null;
         }
 
-        return ((IComparable)Value!).CompareTo(other.Value) == 0;
+        return CompareValues(Value!, other.Value) == 0;
     }
 
     internal bool IsLessThan(CellData other)
@@ -440,7 +452,7 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        var compareResult = ((IComparable)Value).CompareTo(other.Value);
+        var compareResult = CompareValues(Value, other.Value);
         return compareResult < 0;
     }
 
@@ -452,7 +464,7 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        var compareResult = ((IComparable)Value).CompareTo(other.Value);
+        var compareResult = CompareValues(Value, other.Value);
         return compareResult > 0;
     }
 
@@ -464,7 +476,7 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        var compareResult = ((IComparable)Value).CompareTo(other.Value);
+        var compareResult = CompareValues(Value, other.Value);
         return compareResult <= 0;
     }
 
@@ -476,7 +488,7 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        var compareResult = ((IComparable)Value).CompareTo(other.Value);
+        var compareResult = CompareValues(Value, other.Value);
         return compareResult >= 0;
     }
 
@@ -532,85 +544,102 @@ public class CellData : IComparable, IComparable<CellData>
             return IsEmpty;
         }
 
-        // Handle string criteria with wildcards
+        // String criteria carries Excel's operator/wildcard syntax; other types are direct equality.
         if (criteria.Type == CellDataType.String)
         {
-            var criteriaString = criteria.GetValueOrDefault<string>() ?? "";
-            var cellString = ToString() ?? "";
-
-            // Check for wildcard patterns
-            if (criteriaString.Contains('*', StringComparison.Ordinal) ||
-                criteriaString.Contains('?', StringComparison.Ordinal))
-            {
-                return Wildcard.IsFullMatch(cellString, criteriaString);
-            }
-
-            // Check for comparison expressions
-            if (IsComparisonExpression(criteriaString))
-            {
-                return EvaluateComparisonExpression(criteriaString);
-            }
+            return MatchesStringCriteria(criteria.GetValueOrDefault<string>() ?? "");
         }
 
         return IsEqualTo(criteria);
     }
 
-    private static bool IsComparisonExpression(string criteria)
+    private bool MatchesStringCriteria(string criteria)
     {
-        return criteria.StartsWith(">=", StringComparison.Ordinal) ||
-               criteria.StartsWith("<=", StringComparison.Ordinal) ||
-               criteria.StartsWith("<>", StringComparison.Ordinal) ||
-               criteria.StartsWith('>') ||
-               criteria.StartsWith('<');
+        var (op, operand) = SplitCriteriaOperator(criteria);
+
+        // Ordering operators are numeric/date only.
+        if (op is ">" or "<" or ">=" or "<=")
+        {
+            return EvaluateNumericComparison(op, operand);
+        }
+
+        // op is "=", "<>", or "" (default equality). "<>" is the negation of equality and is TRUE for
+        // incomparable cells (text vs number, blank, etc.) - that is what "not equal" means in Excel.
+        var isEqual = MatchesEquality(operand);
+        return op == "<>" ? !isEqual : isEqual;
     }
 
-    private bool EvaluateComparisonExpression(string criteria)
+    private static (string op, string operand) SplitCriteriaOperator(string criteria)
     {
-        if (IsEmpty)
-        {
-            return false;
-        }
-
-        // Extract the operator and value
-        string operatorStr;
-        string valueStr;
-
         if (criteria.StartsWith(">=", StringComparison.Ordinal))
         {
-            operatorStr = ">=";
-            valueStr = criteria[2..].Trim();
+            return (">=", criteria[2..].Trim());
         }
-        else if (criteria.StartsWith("<=", StringComparison.Ordinal))
+
+        if (criteria.StartsWith("<=", StringComparison.Ordinal))
         {
-            operatorStr = "<=";
-            valueStr = criteria[2..].Trim();
+            return ("<=", criteria[2..].Trim());
         }
-        else if (criteria.StartsWith("<>", StringComparison.Ordinal))
+
+        if (criteria.StartsWith("<>", StringComparison.Ordinal))
         {
-            operatorStr = "<>";
-            valueStr = criteria[2..].Trim();
+            return ("<>", criteria[2..]);
         }
-        else if (criteria.StartsWith('>'))
+
+        if (criteria.StartsWith('>'))
         {
-            operatorStr = ">";
-            valueStr = criteria[1..].Trim();
+            return (">", criteria[1..].Trim());
         }
-        else if (criteria.StartsWith('<'))
+
+        if (criteria.StartsWith('<'))
         {
-            operatorStr = "<";
-            valueStr = criteria[1..].Trim();
+            return ("<", criteria[1..].Trim());
         }
-        else
+
+        if (criteria.StartsWith('='))
         {
+            return ("=", criteria[1..]);
+        }
+
+        return ("", criteria);
+    }
+
+    private bool MatchesEquality(string operand)
+    {
+        var cellString = ToString() ?? "";
+
+        if (operand.Contains('*', StringComparison.Ordinal) || operand.Contains('?', StringComparison.Ordinal))
+        {
+            return Wildcard.IsFullMatch(cellString, operand);
+        }
+
+        // A numeric operand compares numerically against numeric/date cells (so "20" matches the number 20).
+        if (double.TryParse(operand, NumberStyles.Any, CultureInfo.InvariantCulture, out var numericOperand))
+        {
+            return Type switch
+            {
+                CellDataType.Number => GetValueOrDefault<double>() == numericOperand,
+                CellDataType.Date => GetValueOrDefault<DateTime>().ToNumber() == numericOperand,
+                _ => false
+            };
+        }
+
+        if (IsEmpty)
+        {
+            return operand.Length == 0;
+        }
+
+        return string.Equals(cellString, operand, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool EvaluateNumericComparison(string op, string operand)
+    {
+        if (!double.TryParse(operand, NumberStyles.Any, CultureInfo.InvariantCulture, out var numericValue))
+        {
+            // Text-ordering comparisons (e.g. ">m") are not supported.
             return false;
         }
 
-        if (!double.TryParse(valueStr, out var numericValue))
-        {
-            return false;
-        }
-
-        // Convert cell data to number for comparison
         double cellValue;
         if (Type == CellDataType.Number)
         {
@@ -625,13 +654,12 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        return operatorStr switch
+        return op switch
         {
             ">" => cellValue > numericValue,
             "<" => cellValue < numericValue,
             ">=" => cellValue >= numericValue,
             "<=" => cellValue <= numericValue,
-            "<>" => cellValue != numericValue,
             _ => false
         };
     }

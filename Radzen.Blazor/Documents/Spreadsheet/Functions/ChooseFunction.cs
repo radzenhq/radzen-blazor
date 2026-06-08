@@ -9,14 +9,16 @@ class ChooseFunction : FormulaFunction
     public override FunctionParameter[] Parameters =>
     [
         new("index_num", ParameterType.Single, isRequired: true),
-        new("value", ParameterType.Sequence, isRequired: true)
+        // Group (not Sequence) so each value argument stays selectable; flattening would let the index
+        // pick a cell out of a range instead of the whole argument.
+        new("value", ParameterType.Group, isRequired: true)
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var values = arguments.GetSequence("value");
+        var groups = arguments.GetGroups("value");
 
-        if (values is null)
+        if (groups is null)
         {
             return CellData.FromError(CellError.Value);
         }
@@ -26,11 +28,14 @@ class ChooseFunction : FormulaFunction
             return error!;
         }
 
-        if (idx < 1 || idx > values.Count)
+        if (idx < 1 || idx > groups.Count)
         {
             return CellData.FromError(CellError.Value);
         }
 
-        return values[idx - 1];
+        // Engine has no array spill; a multi-cell selected argument yields its first cell.
+        var selected = groups[idx - 1];
+
+        return selected.Count > 0 ? selected[0] : CellData.FromError(CellError.Value);
     }
 }

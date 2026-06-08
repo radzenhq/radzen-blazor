@@ -112,4 +112,40 @@ public abstract class FormulaFunction
 
         return true;
     }
+
+    /// <summary>
+    /// Tries to get a numeric parameter from the function arguments, coercing booleans and numeric text.
+    /// </summary>
+    protected static bool TryGetNumber(FunctionArguments arguments, string parameterName, bool isRequired, double? defaultValue, out double value, out CellData? error)
+    {
+        ArgumentNullException.ThrowIfNull(arguments);
+        value = 0;
+        error = null;
+        var arg = arguments.GetSingle(parameterName);
+
+        if (arg is null)
+        {
+            if (isRequired)
+            {
+                error = CellData.FromError(CellError.Value);
+                return false;
+            }
+            value = defaultValue ?? 0;
+            return true;
+        }
+
+        if (arg.IsError)
+        {
+            error = arg;
+            return false;
+        }
+
+        if (!arg.TryCoerceToNumber(out value, allowBooleans: true, nonNumericTextAsZero: false))
+        {
+            error = CellData.FromError(CellError.Value);
+            return false;
+        }
+
+        return true;
+    }
 }

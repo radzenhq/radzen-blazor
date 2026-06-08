@@ -32,4 +32,20 @@ public class ChooseFunctionTests
         sheet.Cells["A1"].Formula = "=CHOOSE(5,1,2,3)";
         Assert.Equal(CellError.Value, sheet.Cells["A1"].Value);
     }
+
+    [Fact]
+    public void ShouldSelectArgumentNotFlattenedCellWhenArgumentIsRange()
+    {
+        sheet.Cells["A1"].Value = 1;
+        sheet.Cells["A2"].Value = 2;
+        sheet.Cells["A3"].Value = 3;
+        sheet.Cells["B1"].Value = 99;
+        sheet.Cells["B2"].Value = 98;
+        sheet.Cells["B3"].Value = 97;
+
+        // The 2nd argument is the range B1:B3; CHOOSE must return that argument (its first cell, 99),
+        // not the 2nd flattened cell (A2).
+        sheet.Cells["C1"].Formula = "=CHOOSE(2,A1:A3,B1:B3)";
+        Assert.Equal(99d, sheet.Cells["C1"].Value);
+    }
 }

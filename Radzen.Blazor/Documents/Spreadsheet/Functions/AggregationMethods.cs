@@ -105,6 +105,82 @@ static class AggregationMethods
         sorted.Sort();
         return CellData.FromNumber(sorted[k - 1]);
     }
+
+    public static CellData Product(List<double> items)
+    {
+        // Excel PRODUCT() with no numeric values returns 0.
+        if (items.Count == 0)
+        {
+            return CellData.FromNumber(0);
+        }
+        double product = 1;
+        foreach (var d in items)
+        {
+            product *= d;
+        }
+        return CellData.FromNumber(product);
+    }
+
+    public static CellData Mode(List<double> items)
+    {
+        var counts = new Dictionary<double, int>();
+        foreach (var d in items)
+        {
+            counts[d] = counts.TryGetValue(d, out var c) ? c + 1 : 1;
+        }
+
+        // First value (in input order) reaching the highest frequency > 1; #N/A if all unique.
+        double best = 0;
+        var bestCount = 1;
+        foreach (var d in items)
+        {
+            if (counts[d] > bestCount)
+            {
+                best = d;
+                bestCount = counts[d];
+            }
+        }
+
+        return bestCount > 1 ? CellData.FromNumber(best) : CellData.FromError(CellError.NA);
+    }
+
+    public static CellData VarS(List<double> items) => Variance(items, sample: true);
+
+    public static CellData VarP(List<double> items) => Variance(items, sample: false);
+
+    public static CellData StdevS(List<double> items) => Sqrt(Variance(items, sample: true));
+
+    public static CellData StdevP(List<double> items) => Sqrt(Variance(items, sample: false));
+
+    private static CellData Variance(List<double> items, bool sample)
+    {
+        var n = items.Count;
+        if (sample ? n < 2 : n < 1)
+        {
+            return CellData.FromError(CellError.Div0);
+        }
+
+        double mean = 0;
+        foreach (var d in items)
+        {
+            mean += d;
+        }
+        mean /= n;
+
+        double sumSquares = 0;
+        foreach (var d in items)
+        {
+            var diff = d - mean;
+            sumSquares += diff * diff;
+        }
+
+        return CellData.FromNumber(sumSquares / (sample ? n - 1 : n));
+    }
+
+    private static CellData Sqrt(CellData variance)
+    {
+        return variance.IsError ? variance : CellData.FromNumber(Math.Sqrt(variance.GetValueOrDefault<double>()));
+    }
 }
 
 

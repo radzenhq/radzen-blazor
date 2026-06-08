@@ -20,7 +20,14 @@ public enum ParameterType
     /// <summary>
     /// Multiple single values (repeating single parameters).
     /// </summary>
-    Sequence
+    Sequence,
+
+    /// <summary>
+    /// All remaining arguments, each kept as its own group (range shape preserved) rather than
+    /// flattened. Used by functions with repeating range/criteria pairs or multiple arrays
+    /// (COUNTIFS, SUMIFS, SUMPRODUCT, IFS, SWITCH, CHOOSE).
+    /// </summary>
+    Group
 }
 
 /// <summary>
