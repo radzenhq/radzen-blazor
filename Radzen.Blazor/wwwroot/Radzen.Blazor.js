@@ -2143,6 +2143,40 @@ window.Radzen = {
     window.removeEventListener('resize', Radzen[id]);
     window.addEventListener('resize', Radzen[id]);
 
+    if (window.visualViewport && parent &&
+        (popup.classList.contains('rz-dropdown-panel') || popup.classList.contains('rz-multiselect-panel'))) {
+        var itemsWrapper = popup.querySelector('.rz-dropdown-items-wrapper, .rz-multiselect-items-wrapper');
+        if (itemsWrapper) {
+            popup.__originalWrapperMaxHeight = itemsWrapper.style.maxHeight;
+            popup.__originalPopupTop = popup.style.top;
+            popup.__viewportResizeHandler = function () {
+                if (popup.style.display !== 'block') return;
+                var vv = window.visualViewport;
+                var viewportTop = vv.offsetTop;
+                var viewportBottom = viewportTop + vv.height;
+                var pRect = parent.getBoundingClientRect();
+                var popRect = popup.getBoundingClientRect();
+                if (popRect.top >= viewportTop - 1 && popRect.bottom <= viewportBottom + 1) {
+                    itemsWrapper.style.maxHeight = popup.__originalWrapperMaxHeight;
+                    popup.style.top = popup.__originalPopupTop;
+                    return;
+                }
+                var spaceBelow = viewportBottom - pRect.bottom - 5;
+                var spaceAbove = pRect.top - viewportTop - 5;
+                var sTop = /Edge/.test(navigator.userAgent) ? document.body.scrollTop : document.documentElement.scrollTop;
+                if (spaceBelow >= spaceAbove) {
+                    popup.style.top = (pRect.bottom + sTop) + 'px';
+                    itemsWrapper.style.maxHeight = Math.max(60, spaceBelow) + 'px';
+                } else {
+                    itemsWrapper.style.maxHeight = Math.max(60, spaceAbove) + 'px';
+                    var newHeight = popup.getBoundingClientRect().height;
+                    popup.style.top = (pRect.top - newHeight + sTop) + 'px';
+                }
+            };
+            window.visualViewport.addEventListener('resize', popup.__viewportResizeHandler);
+        }
+    }
+
     var p = parent;
     while (p && p != document.body) {
         if (p.scrollWidth > p.clientWidth || p.scrollHeight > p.clientHeight) {
@@ -2255,6 +2289,18 @@ window.Radzen = {
     if (popup && popup.__escapeHandler) {
         popup.removeEventListener('keydown', popup.__escapeHandler, true);
         delete popup.__escapeHandler;
+    }
+    if (popup && popup.__viewportResizeHandler) {
+        if (window.visualViewport) {
+            window.visualViewport.removeEventListener('resize', popup.__viewportResizeHandler);
+        }
+        var wrapperToReset = popup.querySelector('.rz-dropdown-items-wrapper, .rz-multiselect-items-wrapper');
+        if (wrapperToReset && popup.__originalWrapperMaxHeight !== undefined) {
+            wrapperToReset.style.maxHeight = popup.__originalWrapperMaxHeight;
+        }
+        delete popup.__viewportResizeHandler;
+        delete popup.__originalWrapperMaxHeight;
+        delete popup.__originalPopupTop;
     }
     document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
