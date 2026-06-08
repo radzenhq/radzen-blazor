@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -38,13 +39,17 @@ namespace Radzen.Blazor
         [Parameter]
         public double OffsetY { get; set; }
 
-        /// <summary>Determines the visibility of the data labels. Set to <c>true</c> by default.</summary>
+        /// <summary> Determines the visibility of the data labels. Set to <c>true</c> by default. </summary>
         [Parameter]
         public bool Visible { get; set; } = true;
 
-        /// <summary>Defines the fill color of the component.</summary>
+        /// <summary> Defines the fill color of the component. </summary>
         [Parameter]
         public string? Fill { get; set; }
+
+        /// <summary> Allows custom formatting of data labels. </summary>
+        [Parameter]
+        public Func<object, string>? Formatter { get; set; }
 
         /// <summary>
         /// Gets the CSS class for the data labels.

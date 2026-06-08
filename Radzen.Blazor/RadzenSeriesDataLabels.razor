@@ -42,7 +42,7 @@
                         builder.AddContent(1,
                                 @<g>
                                     <Text @key="@($"{label.Position}-{(Chart != null ? Chart.Series.IndexOf(series) : -1)}")"
-                                            Value="@label.Text" Position="@label.Position" Fill="@Fill" TextAnchor="@label.TextAnchor" class="@GetSeriesDataLabelClass()" />
+                                     Value="@(Formatter != null ? Formatter(label.Text) : label.Text)" Position="@label.Position" Fill="@Fill" TextAnchor="@label.TextAnchor" class="@GetSeriesDataLabelClass()" />
                                 </g>
                         );
                     }
