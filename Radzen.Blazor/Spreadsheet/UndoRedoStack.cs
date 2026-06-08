@@ -35,6 +35,16 @@ public class UndoRedoStack
 {
     private readonly Stack<ICommand> undoStack = new();
     private readonly Stack<ICommand> redoStack = new();
+    private readonly Worksheet worksheet;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UndoRedoStack"/> class bound to the
+    /// worksheet whose commands it batches.
+    /// </summary>
+    public UndoRedoStack(Worksheet worksheet)
+    {
+        this.worksheet = worksheet ?? throw new ArgumentNullException(nameof(worksheet));
+    }
 
     /// <summary>
     /// Event raised when the undo or redo stacks change.
@@ -57,7 +67,7 @@ public class UndoRedoStack
     public bool Execute(ICommand command)
     {
         ArgumentNullException.ThrowIfNull(command);
-        var result = command.Execute();
+        var result = worksheet.Batch(command.Execute);
 
         if (result)
         {
@@ -78,7 +88,7 @@ public class UndoRedoStack
         if (undoStack.Count > 0)
         {
             var command = undoStack.Pop();
-            command.Unexecute();
+            worksheet.Batch(command.Unexecute);
             redoStack.Push(command);
             Changed?.Invoke();
         }
@@ -92,7 +102,7 @@ public class UndoRedoStack
         if (redoStack.Count > 0)
         {
             var command = redoStack.Pop();
-            var result = command.Execute();
+            var result = worksheet.Batch(command.Execute);
 
             if (result)
             {

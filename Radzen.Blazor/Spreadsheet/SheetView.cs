@@ -19,7 +19,7 @@ public class SheetView
     /// <summary>
     /// Gets the per-sheet undo/redo stack.
     /// </summary>
-    public UndoRedoStack Commands { get; } = new();
+    public UndoRedoStack Commands { get; }
 
     /// <summary>
     /// Gets the per-sheet editor.
@@ -52,6 +52,7 @@ public class SheetView
     public SheetView(Worksheet sheet)
     {
         Worksheet = sheet ?? throw new System.ArgumentNullException(nameof(sheet));
+        Commands = new UndoRedoStack(sheet);
         Editor = new Editor(sheet);
     }
 
