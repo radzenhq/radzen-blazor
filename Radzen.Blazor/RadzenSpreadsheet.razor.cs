@@ -1073,19 +1073,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// Invoked by JS interop to paste text from the clipboard into the current selection.
     /// </summary>
     [JSInvokable]
-    public Task OnPasteAsync(string text)
+    public async Task OnPasteAsync(string text)
     {
         if (!IsFeatureAllowed(SpreadsheetFeature.Clipboard) || !IsFeatureAllowed(SpreadsheetFeature.Editing))
         {
-            return Task.CompletedTask;
+            return;
         }
 
         if (Worksheet is not null && Worksheet.IsCellEditable(Worksheet.Selection.Cell))
         {
-            clipboard.Paste(Worksheet, Worksheet.Selection.Cell, text);
+            await ExecuteAsync(new PasteCommand(clipboard, Worksheet, Worksheet.Selection.Cell, text));
         }
-
-        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -1418,11 +1416,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (!string.IsNullOrEmpty(text))
         {
-            clipboard.Paste(Worksheet, Worksheet.Selection.Cell, text);
+            await ExecuteAsync(new PasteCommand(clipboard, Worksheet, Worksheet.Selection.Cell, text));
         }
         else
         {
-            clipboard.Paste(Worksheet, Worksheet.Selection.Cell);
+            await ExecuteAsync(new PasteCommand(clipboard, Worksheet, Worksheet.Selection.Cell, null));
         }
     }
 

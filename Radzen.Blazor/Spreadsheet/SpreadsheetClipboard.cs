@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 
 using Radzen.Documents.Spreadsheet;
@@ -68,6 +69,59 @@ class SpreadsheetClipboard
         {
             targetSheet.InsertDelimitedString(destinationStart, pastedText);
         }
+    }
+
+    /// <summary>
+    /// Returns the destination range a paste at <paramref name="destinationStart"/> would overwrite
+    /// (internal-clipboard size when <paramref name="pastedText"/> still matches what was copied,
+    /// otherwise the size of the delimited text), or <see cref="RangeRef.Invalid"/> if nothing pastes.
+    /// </summary>
+    public RangeRef GetPasteRange(Worksheet targetSheet, CellRef destinationStart, string? pastedText)
+    {
+        if (range.HasValue && sheet is not null && !string.IsNullOrEmpty(csv) && (pastedText is null || pastedText == csv))
+        {
+            var source = range.Value;
+            return new RangeRef(destinationStart, new CellRef(destinationStart.Row + source.Rows - 1, destinationStart.Column + source.Columns - 1));
+        }
+
+        if (string.IsNullOrEmpty(pastedText))
+        {
+            return RangeRef.Invalid;
+        }
+
+        var lines = pastedText.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+        var rowCount = Math.Min(lines.Length, targetSheet.RowCount - destinationStart.Row);
+
+        var columnCount = 0;
+        foreach (var line in lines)
+        {
+            columnCount = Math.Max(columnCount, line.Split('\t').Length);
+        }
+        columnCount = Math.Min(columnCount, targetSheet.ColumnCount - destinationStart.Column);
+
+        if (rowCount <= 0 || columnCount <= 0)
+        {
+            return RangeRef.Invalid;
+        }
+
+        return new RangeRef(destinationStart, new CellRef(destinationStart.Row + rowCount - 1, destinationStart.Column + columnCount - 1));
+    }
+
+    /// <summary>
+    /// Returns true when the pending operation is a cut whose source lives on
+    /// <paramref name="targetSheet"/>, so the source range can be snapshotted and restored as part
+    /// of the same undoable paste. Cross-sheet moves are not covered (per-sheet undo stacks).
+    /// </summary>
+    public bool TryGetMoveSource(Worksheet targetSheet, out RangeRef source)
+    {
+        if (operation == ClipboardOperation.Move && range.HasValue && ReferenceEquals(sheet, targetSheet))
+        {
+            source = range.Value;
+            return true;
+        }
+
+        source = RangeRef.Invalid;
+        return false;
     }
 
     private void ClearInternal()

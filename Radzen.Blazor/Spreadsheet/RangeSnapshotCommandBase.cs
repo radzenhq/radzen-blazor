@@ -70,9 +70,16 @@ public abstract class RangeSnapshotCommandBase : ICommand, IProtectedCommand
     /// <summary>
     /// Restores the captured cells back into the sheet using the formula-or-value convention.
     /// </summary>
-    protected void RestoreSnapshot()
+    protected void RestoreSnapshot() => Restore(snapshot);
+
+    /// <summary>
+    /// Writes the captured (value/formula/format) state of <paramref name="cells"/> back into the sheet.
+    /// </summary>
+    protected void Restore(IReadOnlyDictionary<CellRef, (object? value, string? formula, Format? format)> cells)
     {
-        foreach (var entry in snapshot)
+        ArgumentNullException.ThrowIfNull(cells);
+
+        foreach (var entry in cells)
         {
             var cellRef = entry.Key;
             var (value, formula, format) = entry.Value;
