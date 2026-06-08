@@ -127,8 +127,15 @@ class AutofillCommand : RangeSnapshotCommandBase
             return false;
         }
 
-        sheet.BeginUpdate();
+        sheet.Batch(Fill);
 
+        NotifyChanged();
+
+        return true;
+    }
+
+    private void Fill()
+    {
         if (direction == AutofillDirection.Down || direction == AutofillDirection.Up)
         {
             FillVertical();
@@ -137,9 +144,10 @@ class AutofillCommand : RangeSnapshotCommandBase
         {
             FillHorizontal();
         }
+    }
 
-        sheet.EndUpdate();
-
+    private void NotifyChanged()
+    {
         foreach (var cellRef in snapshot.Keys)
         {
             if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
@@ -147,25 +155,13 @@ class AutofillCommand : RangeSnapshotCommandBase
                 cell.OnChanged();
             }
         }
-
-        return true;
     }
 
     public override void Unexecute()
     {
-        sheet.BeginUpdate();
+        sheet.Batch(RestoreSnapshot);
 
-        RestoreSnapshot();
-
-        sheet.EndUpdate();
-
-        foreach (var cellRef in snapshot.Keys)
-        {
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                cell.OnChanged();
-            }
-        }
+        NotifyChanged();
     }
 
     private void FillVertical()

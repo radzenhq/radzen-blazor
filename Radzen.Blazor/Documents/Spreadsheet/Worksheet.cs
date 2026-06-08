@@ -22,7 +22,9 @@ public partial class Worksheet
     private readonly HashSet<int> invalidReferenceRows = [];
     private readonly HashSet<int> invalidReferenceColumns = [];
 
-    internal bool IsUpdating { get; private set; }
+    private int updateDepth;
+
+    internal bool IsUpdating => updateDepth > 0;
 
     private bool isEvaluating;
 
@@ -389,19 +391,33 @@ public partial class Worksheet
     }
 
     /// <summary>
-    /// Begins an update operation on the sheet, preventing immediate evaluation of formulas and changes.
+    /// Begins an update operation on the sheet, suspending formula evaluation until the
+    /// matching <see cref="EndUpdate"/>. Calls nest: evaluation resumes only when the
+    /// outermost <see cref="EndUpdate"/> runs.
     /// </summary>
     public void BeginUpdate()
     {
-        IsUpdating = true;
+        updateDepth++;
     }
 
     /// <summary>
-    /// Ends the update operation on the sheet, triggering evaluation of all formulas and pending changes.
+    /// Ends an update operation. When this balances the outermost <see cref="BeginUpdate"/>,
+    /// all formulas are re-evaluated once and pending changes are flushed. An unmatched call
+    /// (no open update) is a no-op.
     /// </summary>
     public void EndUpdate()
     {
-        IsUpdating = false;
+        if (updateDepth == 0)
+        {
+            return;
+        }
+
+        updateDepth--;
+
+        if (updateDepth > 0)
+        {
+            return;
+        }
 
         foreach (var cell in graph.GetTopologicallySortedDependencies())
         {
@@ -409,6 +425,46 @@ public partial class Worksheet
         }
 
         Selection.TriggerPendingChange();
+    }
+
+    /// <summary>
+    /// Runs <paramref name="action"/> inside a single update batch: formula evaluation is
+    /// suspended for the duration and runs once afterwards, even if <paramref name="action"/>
+    /// throws. Nests safely with other batches and direct Begin/EndUpdate calls.
+    /// </summary>
+    public void Batch(Action action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        BeginUpdate();
+        try
+        {
+            action();
+        }
+        finally
+        {
+            EndUpdate();
+        }
+    }
+
+    /// <summary>
+    /// Runs <paramref name="func"/> inside a single update batch and returns its result.
+    /// Formula evaluation is suspended for the duration and runs once afterwards, even if
+    /// <paramref name="func"/> throws. Nests safely with other batches.
+    /// </summary>
+    public T Batch<T>(Func<T> func)
+    {
+        ArgumentNullException.ThrowIfNull(func);
+
+        BeginUpdate();
+        try
+        {
+            return func();
+        }
+        finally
+        {
+            EndUpdate();
+        }
     }
 
     internal string GetDelimitedString(RangeRef range, string rowDelimiter = "\n", string cellDelimiter = "\t")
@@ -482,8 +538,11 @@ public partial class Worksheet
             throw new ArgumentOutOfRangeException(nameof(columnIndex));
         }
 
-        BeginUpdate();
+        Batch(() => DeleteColumnCore(columnIndex));
+    }
 
+    private void DeleteColumnCore(int columnIndex)
+    {
         // Shift cells left using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftColumnsLeft(columnIndex);
 
@@ -506,8 +565,6 @@ public partial class Worksheet
         {
             Selection.NotifyContentChanged();
         }
-
-        EndUpdate();
     }
 
     /// <summary>
@@ -521,8 +578,11 @@ public partial class Worksheet
             throw new ArgumentOutOfRangeException(nameof(rowIndex));
         }
 
-        BeginUpdate();
+        Batch(() => DeleteRowCore(rowIndex));
+    }
 
+    private void DeleteRowCore(int rowIndex)
+    {
         // Shift cells up using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftRowsUp(rowIndex);
 
@@ -545,8 +605,6 @@ public partial class Worksheet
         {
             Selection.NotifyContentChanged();
         }
-
-        EndUpdate();
     }
 
     private void AdjustFormulas(Func<FormulaToken, CellRef> adjust)
@@ -597,9 +655,27 @@ public partial class Worksheet
         var rowDelta = destinationStart.Row - source.Start.Row;
         var colDelta = destinationStart.Column - source.Start.Column;
 
-        BeginUpdate();
+        List<Cell> cells;
 
-        var cells  = new List<Cell>();
+        BeginUpdate();
+        try
+        {
+            cells = PasteRangeCore(sourceSheet, source, rowDelta, colDelta, adjustment);
+        }
+        finally
+        {
+            EndUpdate();
+        }
+
+        foreach (var cell in cells)
+        {
+            cell.OnChanged();
+        }
+    }
+
+    private List<Cell> PasteRangeCore(Worksheet sourceSheet, RangeRef source, int rowDelta, int colDelta, FormulaAdjustment adjustment)
+    {
+        var cells = new List<Cell>();
 
         for (var sr = source.Start.Row; sr <= source.End.Row; sr++)
         {
@@ -643,12 +719,7 @@ public partial class Worksheet
             }
         }
 
-        EndUpdate();
-
-        foreach (var cell in cells)
-        {
-            cell.OnChanged();
-        }
+        return cells;
     }
 
     internal void InvalidateFormulasReferencing(Predicate<CellRef> isInvalidated)
@@ -735,8 +806,11 @@ public partial class Worksheet
         }
 #endif
 
-        BeginUpdate();
+        Batch(() => InsertRowCore(rowIndex, count));
+    }
 
+    private void InsertRowCore(int rowIndex, int count)
+    {
         // Shift cells down using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftRowsDown(rowIndex, count);
 
@@ -764,8 +838,6 @@ public partial class Worksheet
         {
             Selection.NotifyContentChanged();
         }
-
-        EndUpdate();
     }
 
     /// <summary>
@@ -788,8 +860,11 @@ public partial class Worksheet
         }
 #endif
 
-        BeginUpdate();
+        Batch(() => InsertColumnCore(columnIndex, count));
+    }
 
+    private void InsertColumnCore(int columnIndex, int count)
+    {
         // Shift cells right using sparse operation - O(populated cells) instead of O(rows × columns)
         Cells.ShiftColumnsRight(columnIndex, count);
 
@@ -817,8 +892,6 @@ public partial class Worksheet
         {
             Selection.NotifyContentChanged();
         }
-
-        EndUpdate();
     }
     class FormulaRewriter : FormulaSyntaxNodeVisitorBase
     {
