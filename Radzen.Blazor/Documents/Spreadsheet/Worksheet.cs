@@ -367,7 +367,11 @@ public partial class Worksheet
 
         if (!IsUpdating)
         {
-            foreach (var c in graph.GetTopologicallySortedDependencies())
+            // Re-evaluate the changed cell and its transitive dependents only. The per-cell
+            // overload returns the dependents but not the cell itself, so evaluate it first.
+            EvaluateFormula(cell);
+
+            foreach (var c in graph.GetTopologicallySortedDependencies(cell))
             {
                 EvaluateFormula(c);
             }
