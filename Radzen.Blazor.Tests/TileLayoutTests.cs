@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Tests
 {
-    public class WidgetGridTests
+    public class TileLayoutTests
     {
         private static TestContext CreateContext(Rect rect = null)
         {
@@ -19,33 +19,33 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void WidgetGrid_Renders_WithClassName()
+        public void TileLayout_Renders_WithClassName()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>();
+            var component = ctx.RenderComponent<RadzenTileLayout>();
 
-            Assert.Contains("rz-widget-grid", component.Markup);
-            Assert.Contains("rz-widget-grid-cells", component.Markup);
+            Assert.Contains("rz-tile-layout", component.Markup);
+            Assert.Contains("rz-tile-layout-cells", component.Markup);
         }
 
         [Fact]
-        public void WidgetGrid_Renders_StyleParameter()
+        public void TileLayout_Renders_StyleParameter()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
                 parameters.Add(p => p.Style, "height: 400px;"));
 
             Assert.Contains("height: 400px;", component.Markup);
         }
 
         [Fact]
-        public void WidgetGrid_Renders_ColumnsAndGap()
+        public void TileLayout_Renders_ColumnsAndGap()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 6);
                 parameters.Add(p => p.Gap, 12);
@@ -58,11 +58,11 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void WidgetGrid_Renders_FixedRows()
+        public void TileLayout_Renders_FixedRows()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Rows, 4);
                 parameters.Add(p => p.RowHeight, 80);
@@ -72,125 +72,125 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void WidgetGridItem_Renders_Placement()
+        public void TileLayoutItem_Renders_Placement()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
-                parameters.AddChildContent<RadzenWidgetGridItem>(item =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
                 {
-                    item.Add(i => i.Title, "Widget");
+                    item.Add(i => i.Title, "Tile");
                     item.Add(i => i.Col, 2);
                     item.Add(i => i.Row, 3);
                     item.Add(i => i.ColSpan, 4);
                     item.Add(i => i.RowSpan, 2);
                 }));
 
-            Assert.Contains("rz-widget-grid-item", component.Markup);
+            Assert.Contains("rz-tile-layout-item", component.Markup);
             Assert.Contains("grid-column: 2 / span 4; grid-row: 3 / span 2;", component.Markup);
-            Assert.Contains("Widget", component.Markup);
+            Assert.Contains("Tile", component.Markup);
         }
 
         [Fact]
-        public void WidgetGridItem_Renders_TitleAndIcon()
+        public void TileLayoutItem_Renders_TitleAndIcon()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
-                parameters.AddChildContent<RadzenWidgetGridItem>(item =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
                 {
                     item.Add(i => i.Title, "Sales");
                     item.Add(i => i.Icon, "paid");
                 }));
 
-            Assert.Contains("rz-widget-grid-item-header", component.Markup);
+            Assert.Contains("rz-tile-layout-item-header", component.Markup);
             Assert.Contains("Sales", component.Markup);
             Assert.Contains("paid", component.Markup);
         }
 
         [Fact]
-        public void WidgetGridItem_EditMode_RendersHandles()
+        public void TileLayoutItem_EditMode_RendersHandles()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.EditMode, true);
-                parameters.AddChildContent<RadzenWidgetGridItem>(item => item.Add(i => i.Title, "W"));
+                parameters.AddChildContent<RadzenTileLayoutItem>(item => item.Add(i => i.Title, "T"));
             });
 
-            Assert.Contains("rz-widget-grid-item-resize-handle", component.Markup);
-            Assert.Contains("rz-widget-grid-item-header-draggable", component.Markup);
+            Assert.Contains("rz-tile-layout-item-resize-handle", component.Markup);
+            Assert.Contains("rz-tile-layout-item-header-draggable", component.Markup);
         }
 
         [Fact]
-        public void WidgetGridItem_ViewMode_HidesHandles()
+        public void TileLayoutItem_ViewMode_HidesHandles()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.EditMode, false);
-                parameters.AddChildContent<RadzenWidgetGridItem>(item => item.Add(i => i.Title, "W"));
+                parameters.AddChildContent<RadzenTileLayoutItem>(item => item.Add(i => i.Title, "T"));
             });
 
-            Assert.DoesNotContain("rz-widget-grid-item-resize-handle", component.Markup);
-            Assert.DoesNotContain("rz-widget-grid-item-header-draggable", component.Markup);
+            Assert.DoesNotContain("rz-tile-layout-item-resize-handle", component.Markup);
+            Assert.DoesNotContain("rz-tile-layout-item-header-draggable", component.Markup);
         }
 
         [Fact]
-        public void WidgetGrid_ShowGrid_RendersOverlay()
+        public void TileLayout_ShowGrid_RendersOverlay()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.ShowGrid, true);
                 parameters.Add(p => p.Columns, 3);
                 parameters.Add(p => p.Rows, 2);
             });
 
-            Assert.Contains("rz-widget-grid-overlay", component.Markup);
-            Assert.Contains("rz-widget-grid-overlay-cell", component.Markup);
-            Assert.Contains("background-color: var(--rz-widget-grid-overlay-background-color, var(--rz-primary-lighter));", component.Markup);
-            Assert.Contains("border: 1px dashed var(--rz-widget-grid-overlay-border-color, var(--rz-primary));", component.Markup);
+            Assert.Contains("rz-tile-layout-overlay", component.Markup);
+            Assert.Contains("rz-tile-layout-overlay-cell", component.Markup);
+            Assert.Contains("background-color: var(--rz-tile-layout-overlay-background-color, var(--rz-primary-lighter));", component.Markup);
+            Assert.Contains("border: 1px dashed var(--rz-tile-layout-overlay-border-color, var(--rz-primary));", component.Markup);
             // 3 columns x 2 rows = 6 overlay cells.
-            var count = component.FindAll(".rz-widget-grid-overlay-cell").Count;
+            var count = component.FindAll(".rz-tile-layout-overlay-cell").Count;
             Assert.Equal(6, count);
         }
 
         [Fact]
-        public void WidgetGrid_HideGrid_DoesNotRenderOverlay()
+        public void TileLayout_HideGrid_DoesNotRenderOverlay()
         {
             using var ctx = CreateContext();
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.ShowGrid, false);
                 parameters.Add(p => p.Columns, 3);
                 parameters.Add(p => p.Rows, 2);
             });
 
-            Assert.DoesNotContain("rz-widget-grid-overlay", component.Markup);
-            Assert.DoesNotContain("rz-widget-grid-overlay-cell", component.Markup);
+            Assert.DoesNotContain("rz-tile-layout-overlay", component.Markup);
+            Assert.DoesNotContain("rz-tile-layout-overlay-cell", component.Markup);
         }
 
         [Fact]
-        public void WidgetGrid_Move_CommitsAndRaisesChange()
+        public void TileLayout_Move_CommitsAndRaisesChange()
         {
             using var ctx = CreateContext();
 
             var changedCol = -1;
-            RadzenWidgetGridItem changedItem = null;
+            RadzenTileLayoutItem changedItem = null;
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 12);
                 parameters.Add(p => p.EditMode, true);
-                parameters.Add(p => p.Change, EventCallback.Factory.Create<RadzenWidgetGridItem>(this, i => changedItem = i));
-                parameters.AddChildContent<RadzenWidgetGridItem>(item =>
+                parameters.Add(p => p.Change, EventCallback.Factory.Create<RadzenTileLayoutItem>(this, i => changedItem = i));
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
                 {
-                    item.Add(i => i.Title, "W");
+                    item.Add(i => i.Title, "T");
                     item.Add(i => i.Col, 2);
                     item.Add(i => i.Row, 1);
                     item.Add(i => i.ColChanged, EventCallback.Factory.Create<int>(this, v => changedCol = v));
@@ -198,10 +198,10 @@ namespace Radzen.Blazor.Tests
             });
 
             // cellWidth = (1200 - 11*8)/12 = 92.67; stride = 100.67. dx ~ 101 => +1 column.
-            var header = component.Find(".rz-widget-grid-item-header");
+            var header = component.Find(".rz-tile-layout-item-header");
             header.TriggerEvent("onpointerdown", new PointerEventArgs { ClientX = 100, ClientY = 100, PointerId = 1, Buttons = 1 });
 
-            var cells = component.Find(".rz-widget-grid-cells");
+            var cells = component.Find(".rz-tile-layout-cells");
             cells.TriggerEvent("onpointermove", new PointerEventArgs { ClientX = 201, ClientY = 100, PointerId = 1, Buttons = 1 });
             cells.TriggerEvent("onpointerup", new PointerEventArgs { ClientX = 201, ClientY = 100, PointerId = 1, Buttons = 0 });
 
@@ -211,20 +211,20 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void WidgetGrid_Resize_CommitsRowSpan()
+        public void TileLayout_Resize_CommitsRowSpan()
         {
             using var ctx = CreateContext();
 
             var changedRowSpan = -1;
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 12);
                 parameters.Add(p => p.RowHeight, 80);
                 parameters.Add(p => p.EditMode, true);
-                parameters.AddChildContent<RadzenWidgetGridItem>(item =>
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
                 {
-                    item.Add(i => i.Title, "W");
+                    item.Add(i => i.Title, "T");
                     item.Add(i => i.Col, 1);
                     item.Add(i => i.Row, 1);
                     item.Add(i => i.RowSpan, 1);
@@ -233,10 +233,10 @@ namespace Radzen.Blazor.Tests
             });
 
             // strideY = RowHeight + Gap = 88. dy ~ 88 => +1 row span.
-            var handle = component.Find(".rz-widget-grid-item-resize-handle");
+            var handle = component.Find(".rz-tile-layout-item-resize-handle");
             handle.TriggerEvent("onpointerdown", new PointerEventArgs { ClientX = 100, ClientY = 100, PointerId = 1, Buttons = 1 });
 
-            var cells = component.Find(".rz-widget-grid-cells");
+            var cells = component.Find(".rz-tile-layout-cells");
             cells.TriggerEvent("onpointermove", new PointerEventArgs { ClientX = 100, ClientY = 188, PointerId = 1, Buttons = 1 });
             cells.TriggerEvent("onpointerup", new PointerEventArgs { ClientX = 100, ClientY = 188, PointerId = 1, Buttons = 0 });
 
@@ -244,47 +244,47 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void WidgetGrid_PointerUpWithoutMove_DoesNotRaiseChange()
+        public void TileLayout_PointerUpWithoutMove_DoesNotRaiseChange()
         {
             using var ctx = CreateContext();
 
             var changeRaised = false;
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.EditMode, true);
-                parameters.Add(p => p.Change, EventCallback.Factory.Create<RadzenWidgetGridItem>(this, _ => changeRaised = true));
-                parameters.AddChildContent<RadzenWidgetGridItem>(item =>
+                parameters.Add(p => p.Change, EventCallback.Factory.Create<RadzenTileLayoutItem>(this, _ => changeRaised = true));
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
                 {
-                    item.Add(i => i.Title, "W");
+                    item.Add(i => i.Title, "T");
                     item.Add(i => i.Col, 2);
                     item.Add(i => i.Row, 2);
                 });
             });
 
-            var header = component.Find(".rz-widget-grid-item-header");
+            var header = component.Find(".rz-tile-layout-item-header");
             header.TriggerEvent("onpointerdown", new PointerEventArgs { ClientX = 100, ClientY = 100, PointerId = 1, Buttons = 1 });
 
-            var cells = component.Find(".rz-widget-grid-cells");
+            var cells = component.Find(".rz-tile-layout-cells");
             cells.TriggerEvent("onpointerup", new PointerEventArgs { ClientX = 100, ClientY = 100, PointerId = 1, Buttons = 0 });
 
             Assert.False(changeRaised);
         }
 
         [Fact]
-        public void WidgetGrid_Move_ClampsWithinBounds()
+        public void TileLayout_Move_ClampsWithinBounds()
         {
             using var ctx = CreateContext();
 
             var changedCol = -1;
 
-            var component = ctx.RenderComponent<RadzenWidgetGrid>(parameters =>
+            var component = ctx.RenderComponent<RadzenTileLayout>(parameters =>
             {
                 parameters.Add(p => p.Columns, 12);
                 parameters.Add(p => p.EditMode, true);
-                parameters.AddChildContent<RadzenWidgetGridItem>(item =>
+                parameters.AddChildContent<RadzenTileLayoutItem>(item =>
                 {
-                    item.Add(i => i.Title, "W");
+                    item.Add(i => i.Title, "T");
                     item.Add(i => i.Col, 1);
                     item.Add(i => i.Row, 1);
                     item.Add(i => i.ColSpan, 3);
@@ -292,10 +292,10 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var header = component.Find(".rz-widget-grid-item-header");
+            var header = component.Find(".rz-tile-layout-item-header");
             header.TriggerEvent("onpointerdown", new PointerEventArgs { ClientX = 0, ClientY = 0, PointerId = 1, Buttons = 1 });
 
-            var cells = component.Find(".rz-widget-grid-cells");
+            var cells = component.Find(".rz-tile-layout-cells");
             // Drag far to the right - should clamp so Col + ColSpan - 1 <= Columns => Col <= 10.
             cells.TriggerEvent("onpointermove", new PointerEventArgs { ClientX = 5000, ClientY = 0, PointerId = 1, Buttons = 1 });
             cells.TriggerEvent("onpointerup", new PointerEventArgs { ClientX = 5000, ClientY = 0, PointerId = 1, Buttons = 0 });

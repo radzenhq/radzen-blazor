@@ -11,27 +11,27 @@ using Radzen.Blazor.Rendering;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// A dashboard grid that lays out <see cref="RadzenWidgetGridItem" /> widgets on a configurable
-    /// column/row grid. When <see cref="EditMode" /> is enabled widgets can be moved by dragging their
-    /// header and resized from the bottom-right corner. Widget positions are snapped to grid cells and
+    /// A dashboard layout that arranges <see cref="RadzenTileLayoutItem" /> tiles on a configurable
+    /// column/row grid. When <see cref="EditMode" /> is enabled tiles can be moved by dragging their
+    /// header and resized from the bottom-right corner. Tile positions are snapped to grid cells and
     /// reported through two-way bindable parameters and the <see cref="Change" /> callback.
     /// </summary>
     /// <example>
     /// <code>
-    /// &lt;RadzenWidgetGrid Columns="12" RowHeight="80" EditMode="true" ShowGrid="true" Change=@OnChange&gt;
-    ///     &lt;RadzenWidgetGridItem Title="Sales" Col="1" Row="1" ColSpan="6" RowSpan="2"&gt;
+    /// &lt;RadzenTileLayout Columns="12" RowHeight="80" EditMode="true" ShowGrid="true" Change=@OnChange&gt;
+    ///     &lt;RadzenTileLayoutItem Title="Sales" Col="1" Row="1" ColSpan="6" RowSpan="2"&gt;
     ///         ...
-    ///     &lt;/RadzenWidgetGridItem&gt;
-    ///     &lt;RadzenWidgetGridItem Title="Visitors" Col="7" Row="1" ColSpan="6" RowSpan="2"&gt;
+    ///     &lt;/RadzenTileLayoutItem&gt;
+    ///     &lt;RadzenTileLayoutItem Title="Visitors" Col="7" Row="1" ColSpan="6" RowSpan="2"&gt;
     ///         ...
-    ///     &lt;/RadzenWidgetGridItem&gt;
-    /// &lt;/RadzenWidgetGrid&gt;
+    ///     &lt;/RadzenTileLayoutItem&gt;
+    /// &lt;/RadzenTileLayout&gt;
     /// </code>
     /// </example>
-    public partial class RadzenWidgetGrid : RadzenComponent
+    public partial class RadzenTileLayout : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the widgets to display. Should contain <see cref="RadzenWidgetGridItem" /> components.
+        /// Gets or sets the tiles to display. Should contain <see cref="RadzenTileLayoutItem" /> components.
         /// </summary>
         /// <value>The child content render fragment.</value>
         [Parameter]
@@ -45,7 +45,7 @@ namespace Radzen.Blazor
         public int Columns { get; set; } = 12;
 
         /// <summary>
-        /// Gets or sets the number of rows in the grid. When <c>0</c> the grid grows automatically to fit its widgets.
+        /// Gets or sets the number of rows in the grid. When <c>0</c> the grid grows automatically to fit its tiles.
         /// </summary>
         /// <value>The row count. Default is <c>0</c> (auto).</value>
         [Parameter]
@@ -66,22 +66,22 @@ namespace Radzen.Blazor
         public double Gap { get; set; } = 8;
 
         /// <summary>
-        /// Gets or sets a value indicating whether widgets can be moved and resized.
-        /// When <c>false</c> the grid is read-only.
+        /// Gets or sets a value indicating whether tiles can be moved and resized.
+        /// When <c>false</c> the layout is read-only.
         /// </summary>
         /// <value><c>true</c> to allow editing; otherwise <c>false</c>. Default is <c>false</c>.</value>
         [Parameter]
         public bool EditMode { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether widgets can be moved while in <see cref="EditMode" />.
+        /// Gets or sets a value indicating whether tiles can be moved while in <see cref="EditMode" />.
         /// </summary>
         /// <value><c>true</c> to allow moving; otherwise <c>false</c>. Default is <c>true</c>.</value>
         [Parameter]
         public bool AllowMove { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether widgets can be resized while in <see cref="EditMode" />.
+        /// Gets or sets a value indicating whether tiles can be resized while in <see cref="EditMode" />.
         /// </summary>
         /// <value><c>true</c> to allow resizing; otherwise <c>false</c>. Default is <c>true</c>.</value>
         [Parameter]
@@ -95,17 +95,17 @@ namespace Radzen.Blazor
         public bool ShowGrid { get; set; }
 
         /// <summary>
-        /// Gets or sets the callback raised after a widget has been moved or resized.
+        /// Gets or sets the callback raised after a tile has been moved or resized.
         /// </summary>
-        /// <value>The change callback. The argument is the affected widget.</value>
+        /// <value>The change callback. The argument is the affected tile.</value>
         [Parameter]
-        public EventCallback<RadzenWidgetGridItem> Change { get; set; }
+        public EventCallback<RadzenTileLayoutItem> Change { get; set; }
 
-        private readonly List<RadzenWidgetGridItem> items = new();
+        private readonly List<RadzenTileLayoutItem> items = new();
 
         private ElementReference cellsElement;
 
-        private RadzenWidgetGridItem? activeItem;
+        private RadzenTileLayoutItem? activeItem;
         private bool resizing;
         private double startClientX;
         private double startClientY;
@@ -143,10 +143,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-widget-grid";
+            return "rz-tile-layout";
         }
 
-        internal void AddItem(RadzenWidgetGridItem item)
+        internal void AddItem(RadzenTileLayoutItem item)
         {
             if (!items.Contains(item))
             {
@@ -155,7 +155,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal void RemoveItem(RadzenWidgetGridItem item)
+        internal void RemoveItem(RadzenTileLayoutItem item)
         {
             if (items.Remove(item))
             {
@@ -175,17 +175,17 @@ namespace Radzen.Blazor
             }
         }
 
-        internal Task StartMove(RadzenWidgetGridItem item, PointerEventArgs args)
+        internal Task StartMove(RadzenTileLayoutItem item, PointerEventArgs args)
         {
             return StartDrag(item, args, false);
         }
 
-        internal Task StartResize(RadzenWidgetGridItem item, PointerEventArgs args)
+        internal Task StartResize(RadzenTileLayoutItem item, PointerEventArgs args)
         {
             return StartDrag(item, args, true);
         }
 
-        private async Task StartDrag(RadzenWidgetGridItem item, PointerEventArgs args, bool isResize)
+        private async Task StartDrag(RadzenTileLayoutItem item, PointerEventArgs args, bool isResize)
         {
             if (JSRuntime == null)
             {
@@ -339,7 +339,7 @@ namespace Radzen.Blazor
         private static string GetOverlayCellStyle(int column, int row)
         {
             return string.Create(CultureInfo.InvariantCulture,
-                $"grid-column: {column}; grid-row: {row}; box-sizing: border-box; background-color: var(--rz-widget-grid-overlay-background-color, var(--rz-primary-lighter)); border: 1px dashed var(--rz-widget-grid-overlay-border-color, var(--rz-primary)); border-radius: var(--rz-widget-grid-item-border-radius, var(--rz-border-radius)); opacity: 0.35;");
+                $"grid-column: {column}; grid-row: {row}; box-sizing: border-box; background-color: var(--rz-tile-layout-overlay-background-color, var(--rz-primary-lighter)); border: 1px dashed var(--rz-tile-layout-overlay-border-color, var(--rz-primary)); border-radius: var(--rz-tile-layout-item-border-radius, var(--rz-border-radius)); opacity: 0.35;");
         }
 
         /// <inheritdoc />
@@ -353,7 +353,7 @@ namespace Radzen.Blazor
                 }
                 catch
                 {
-                    // Ignore - the grid is being disposed.
+                    // Ignore - the layout is being disposed.
                 }
             }
 

@@ -6,30 +6,30 @@ using Microsoft.AspNetCore.Components.Web;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// A widget displayed inside a <see cref="RadzenWidgetGrid" />. Each widget occupies a
+    /// A tile displayed inside a <see cref="RadzenTileLayout" />. Each tile occupies a
     /// rectangular area of the grid defined by its <see cref="Col" />, <see cref="Row" />,
     /// <see cref="ColSpan" /> and <see cref="RowSpan" /> and can be moved and resized while the
-    /// parent grid is in edit mode.
+    /// parent layout is in edit mode.
     /// </summary>
     /// <example>
     /// <code>
-    /// &lt;RadzenWidgetGrid Columns="12" EditMode="true"&gt;
-    ///     &lt;RadzenWidgetGridItem Title="Sales" Icon="paid" Col="1" Row="1" ColSpan="4" RowSpan="2"&gt;
+    /// &lt;RadzenTileLayout Columns="12" EditMode="true"&gt;
+    ///     &lt;RadzenTileLayoutItem Title="Sales" Icon="paid" Col="1" Row="1" ColSpan="4" RowSpan="2"&gt;
     ///         Content
-    ///     &lt;/RadzenWidgetGridItem&gt;
-    /// &lt;/RadzenWidgetGrid&gt;
+    ///     &lt;/RadzenTileLayoutItem&gt;
+    /// &lt;/RadzenTileLayout&gt;
     /// </code>
     /// </example>
-    public partial class RadzenWidgetGridItem : RadzenComponent
+    public partial class RadzenTileLayoutItem : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the parent grid.
+        /// Gets or sets the parent layout.
         /// </summary>
         [CascadingParameter]
-        public RadzenWidgetGrid? Grid { get; set; }
+        public RadzenTileLayout? Layout { get; set; }
 
         /// <summary>
-        /// Gets or sets the body content of the widget.
+        /// Gets or sets the body content of the tile.
         /// </summary>
         /// <value>The body content render fragment.</value>
         [Parameter]
@@ -44,7 +44,7 @@ namespace Radzen.Blazor
         public RenderFragment? HeaderTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the widget title displayed in the default header.
+        /// Gets or sets the tile title displayed in the default header.
         /// </summary>
         /// <value>The title.</value>
         [Parameter]
@@ -58,7 +58,7 @@ namespace Radzen.Blazor
         public string? Icon { get; set; }
 
         /// <summary>
-        /// Gets or sets the one-based column the widget starts at.
+        /// Gets or sets the one-based column the tile starts at.
         /// </summary>
         /// <value>The start column. Default is <c>1</c>.</value>
         [Parameter]
@@ -72,7 +72,7 @@ namespace Radzen.Blazor
         public EventCallback<int> ColChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets the one-based row the widget starts at.
+        /// Gets or sets the one-based row the tile starts at.
         /// </summary>
         /// <value>The start row. Default is <c>1</c>.</value>
         [Parameter]
@@ -86,7 +86,7 @@ namespace Radzen.Blazor
         public EventCallback<int> RowChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets how many columns the widget spans.
+        /// Gets or sets how many columns the tile spans.
         /// </summary>
         /// <value>The column span. Default is <c>1</c>.</value>
         [Parameter]
@@ -100,7 +100,7 @@ namespace Radzen.Blazor
         public EventCallback<int> ColSpanChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets how many rows the widget spans.
+        /// Gets or sets how many rows the tile spans.
         /// </summary>
         /// <value>The row span. Default is <c>1</c>.</value>
         [Parameter]
@@ -125,13 +125,13 @@ namespace Radzen.Blazor
         private int previousColSpan;
         private int previousRowSpan;
 
-        private bool ShowHeader => Grid != null && (Grid.CanMove || HeaderTemplate != null
+        private bool ShowHeader => Layout != null && (Layout.CanMove || HeaderTemplate != null
             || !string.IsNullOrEmpty(Title) || !string.IsNullOrEmpty(Icon));
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return IsDragging ? "rz-widget-grid-item rz-widget-grid-item-active" : "rz-widget-grid-item";
+            return IsDragging ? "rz-tile-layout-item rz-tile-layout-item-active" : "rz-tile-layout-item";
         }
 
         /// <inheritdoc />
@@ -144,7 +144,7 @@ namespace Radzen.Blazor
             CurrentColSpan = previousColSpan = ColSpan;
             CurrentRowSpan = previousRowSpan = RowSpan;
 
-            Grid?.AddItem(this);
+            Layout?.AddItem(this);
         }
 
         /// <inheritdoc />
@@ -229,22 +229,22 @@ namespace Radzen.Blazor
             return changed;
         }
 
-        private string GetWidgetStyle()
+        private string GetTileStyle()
         {
-            var widgetStyle = string.Create(CultureInfo.InvariantCulture,
-                $"grid-column: {CurrentCol} / span {CurrentColSpan}; grid-row: {CurrentRow} / span {CurrentRowSpan}; box-sizing: border-box; display: flex; flex-direction: column; position: relative; min-width: 0; min-height: 0; overflow: hidden; background-color: var(--rz-widget-grid-item-background-color, var(--rz-base-background-color)); border: var(--rz-widget-grid-item-border, var(--rz-border-normal)); border-radius: var(--rz-widget-grid-item-border-radius, var(--rz-border-radius)); box-shadow: var(--rz-widget-grid-item-shadow, var(--rz-shadow-1)); z-index: {(IsDragging ? 3 : 1)};");
+            var tileStyle = string.Create(CultureInfo.InvariantCulture,
+                $"grid-column: {CurrentCol} / span {CurrentColSpan}; grid-row: {CurrentRow} / span {CurrentRowSpan}; box-sizing: border-box; display: flex; flex-direction: column; position: relative; min-width: 0; min-height: 0; overflow: hidden; background-color: var(--rz-tile-layout-item-background-color, var(--rz-base-background-color)); border: var(--rz-tile-layout-item-border, var(--rz-border-normal)); border-radius: var(--rz-tile-layout-item-border-radius, var(--rz-border-radius)); box-shadow: var(--rz-tile-layout-item-shadow, var(--rz-shadow-1)); z-index: {(IsDragging ? 3 : 1)};");
 
-            return string.IsNullOrEmpty(Style) ? widgetStyle : $"{widgetStyle} {Style}";
+            return string.IsNullOrEmpty(Style) ? tileStyle : $"{tileStyle} {Style}";
         }
 
         private string GetHeaderStyle()
         {
-            var interactiveStyle = Grid != null && Grid.CanMove
+            var interactiveStyle = Layout != null && Layout.CanMove
                 ? "cursor: move; touch-action: none;"
                 : string.Empty;
 
             return string.Create(CultureInfo.InvariantCulture,
-                $"box-sizing: border-box; display: flex; flex: 0 0 auto; align-items: center; gap: 0.25rem; padding: 0.5rem 0.75rem; background-color: var(--rz-widget-grid-item-header-background-color, var(--rz-base-100)); border-bottom: var(--rz-widget-grid-item-border, var(--rz-border-normal)); user-select: none; {interactiveStyle}");
+                $"box-sizing: border-box; display: flex; flex: 0 0 auto; align-items: center; gap: 0.25rem; padding: 0.5rem 0.75rem; background-color: var(--rz-tile-layout-item-header-background-color, var(--rz-base-100)); border-bottom: var(--rz-tile-layout-item-border, var(--rz-border-normal)); user-select: none; {interactiveStyle}");
         }
 
         private static string GetDragHandleStyle()
@@ -274,24 +274,24 @@ namespace Radzen.Blazor
 
         private async Task OnHeaderPointerDown(PointerEventArgs args)
         {
-            if (Grid != null && Grid.CanMove)
+            if (Layout != null && Layout.CanMove)
             {
-                await Grid.StartMove(this, args);
+                await Layout.StartMove(this, args);
             }
         }
 
         private async Task OnResizePointerDown(PointerEventArgs args)
         {
-            if (Grid != null && Grid.CanResize)
+            if (Layout != null && Layout.CanResize)
             {
-                await Grid.StartResize(this, args);
+                await Layout.StartResize(this, args);
             }
         }
 
         /// <inheritdoc />
         public override void Dispose()
         {
-            Grid?.RemoveItem(this);
+            Layout?.RemoveItem(this);
             base.Dispose();
         }
     }
