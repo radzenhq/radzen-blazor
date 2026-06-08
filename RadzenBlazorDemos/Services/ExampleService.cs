@@ -1678,12 +1678,12 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "WidgetGrid",
+                    Name = "TileLayout",
                     New = true,
-                    Description = "Demonstration and configuration of the Blazor RadzenWidgetGrid component for building dashboards with draggable and resizable widgets.",
-                    Path = "widget-grid",
+                    Description = "Demonstration and configuration of the Blazor RadzenTileLayout component for building dashboards with draggable and resizable tiles.",
+                    Path = "tile-layout",
                     Icon = "\ue871",
-                    Tags = new [] { "widget", "grid", "dashboard", "drag", "resize", "layout" }
+                    Tags = new [] { "tile", "layout", "grid", "dashboard", "drag", "resize" }
                 }
             }
         },

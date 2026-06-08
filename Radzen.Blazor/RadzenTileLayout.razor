@@ -4,7 +4,7 @@
 {
     <div @ref=@Element id=@GetId() style=@GetGridStyle() @attributes=@Attributes class=@GetCssClass()>
         <div @ref=@cellsElement id="@(GetId())-cells"
-             class="rz-widget-grid-cells @(EditMode ? "rz-widget-grid-editable" : null) @(activeItem != null ? "rz-widget-grid-dragging" : null)"
+             class="rz-tile-layout-cells @(EditMode ? "rz-tile-layout-editable" : null) @(activeItem != null ? "rz-tile-layout-dragging" : null)"
              style=@GetCellsStyle()
              @onpointermove=@OnPointerMove
              @onpointerup=@OnPointerUp
@@ -15,12 +15,12 @@
             </CascadingValue>
             @if (ShowGrid)
             {
-                <div class="rz-widget-grid-overlay" style=@GetOverlayStyle() aria-hidden="true">
+                <div class="rz-tile-layout-overlay" style=@GetOverlayStyle() aria-hidden="true">
                     @for (var r = 1; r <= OverlayRows; r++)
                     {
                         @for (var c = 1; c <= Columns; c++)
                         {
-                            <div class="rz-widget-grid-overlay-cell" style=@GetOverlayCellStyle(c, r)></div>
+                            <div class="rz-tile-layout-overlay-cell" style=@GetOverlayCellStyle(c, r)></div>
                         }
                     }
                 </div>
