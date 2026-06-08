@@ -265,7 +265,7 @@ namespace RadzenBlazorDemos
                     Name = "Formulas",
                     Path = "spreadsheet-formulas",
                     Title = "Blazor Spreadsheet Formulas | Free UI Components by Radzen",
-                    Description = "Use 70+ built-in formula functions including SUM, AVERAGE, VLOOKUP, IF, and more.",
+                    Description = "Use built-in formula functions including SUM, AVERAGE, VLOOKUP, IF, and more.",
                     Tags = new [] { "spreadsheet", "formula", "function", "sum", "average", "vlookup", "if", "calculate" }
                 },
                 new Example

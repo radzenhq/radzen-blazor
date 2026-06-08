@@ -12,7 +12,7 @@ namespace Radzen.Documents.Spreadsheet;
 /// <para>
 /// Formula syntax matches Excel — leading <c>=</c> optional. Supports the full
 /// function library registered with the engine plus operators, ranges
-/// (<c>=SUM(A1:A10)</c>), and 65+ built-in functions (SUM, AVERAGE, IF, VLOOKUP, …).
+/// (<c>=SUM(A1:A10)</c>), and built-in functions (SUM, AVERAGE, IF, VLOOKUP, …).
 /// </para>
 /// </summary>
 public sealed class FormulaEngine
