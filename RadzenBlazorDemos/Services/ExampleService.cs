@@ -256,7 +256,7 @@ namespace RadzenBlazorDemos
                     Name = "Overview",
                     Path = "spreadsheet",
                     Title = "Free Open-Source Blazor Spreadsheet Component | Radzen",
-                    Description = "Free open-source Blazor Spreadsheet component with Excel-like editing, 70+ formulas, cell formatting, filtering, sorting, data validation, conditional formatting, frozen panes, XLSX import/export, clipboard, autofill, undo/redo, multiple sheets, virtualization, custom cell types, and data binding.",
+                    Description = "Free open-source Blazor Spreadsheet component with Excel-like editing, formulas, cell formatting, filtering, sorting, data validation, conditional formatting, frozen panes, XLSX import/export, clipboard, autofill, undo/redo, multiple sheets, virtualization, custom cell types, and data binding.",
                     Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" },
                     Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ]
                 },
