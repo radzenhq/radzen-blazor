@@ -1315,8 +1315,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     break;
             }
         }
-
-        StateHasChanged();
     }
 
     private async Task OnRowContextMenuItemClick(MenuItemEventArgs args, int row)
@@ -1357,8 +1355,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     break;
             }
         }
-
-        StateHasChanged();
     }
 
     private async Task OnColumnContextMenuItemClick(MenuItemEventArgs args, int column)
@@ -1399,8 +1395,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     break;
             }
         }
-
-        StateHasChanged();
     }
 
     private async Task PasteFromClipboardAsync()
@@ -2013,7 +2007,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             var delta = pointer.ClientX - capture.StartX;
             var newWidth = Math.Max(24, capture.StartWidth + delta);
             Worksheet.Columns[capture.Column] = newWidth;
-            StateHasChanged();
         }
 
         return Task.CompletedTask;
@@ -2026,7 +2019,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             var delta = pointer.ClientY - capture.StartY;
             var newHeight = Math.Max(16, capture.StartHeight + delta);
             Worksheet.Rows[capture.Row] = newHeight;
-            StateHasChanged();
         }
 
         return Task.CompletedTask;
