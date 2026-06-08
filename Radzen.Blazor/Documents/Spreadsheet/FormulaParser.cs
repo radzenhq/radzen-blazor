@@ -482,6 +482,19 @@ internal class FormulaParser
     {
         var token = Expect(FormulaTokenType.Identifier);
 
+        // Support dotted function names (STDEV.S, MODE.SNGL, RANK.EQ): the lexer splits them into
+        // Identifier '.' Identifier, so re-join into one name token spanning both so the registry resolves them.
+        if (Peek().Type == FormulaTokenType.Dot)
+        {
+            Advance(1);
+            var suffix = Expect(FormulaTokenType.Identifier);
+            token = new FormulaToken(FormulaTokenType.Identifier, $"{token.Value}.{suffix.Value}")
+            {
+                Start = token.Start,
+                End = suffix.End
+            };
+        }
+
         var openParenToken = Expect(FormulaTokenType.OpenParen);
 
         var arguments = new List<FormulaSyntaxNode>();

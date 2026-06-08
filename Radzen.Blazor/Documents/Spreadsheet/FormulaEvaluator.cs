@@ -351,8 +351,9 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             
             // Check if we have enough arguments for required parameters
             // But only if this is not a repeating parameter (repeating parameters can handle empty lists)
-            if (paramDef.IsRequired && 
-                paramDef.Type != ParameterType.Sequence && 
+            if (paramDef.IsRequired &&
+                paramDef.Type != ParameterType.Sequence &&
+                paramDef.Type != ParameterType.Group &&
                 argumentIndex >= argumentNodes.Count)
             {
                 value = CellData.FromError(CellError.Value);
@@ -390,6 +391,25 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
                     argumentIndex++;
                 }
                 functionArguments.Set(paramDef.Name, allArguments);
+            }
+            else if (paramDef.Type == ParameterType.Group)
+            {
+                // Collect all remaining arguments WITHOUT flattening - each stays its own group so
+                // (range, criteria) pairs and array shapes survive. A single cell is a one-element list
+                // (not a RangeList); consumers use the `as RangeList` / default-1xN convention.
+                var groups = new List<List<CellData>>();
+                while (argumentIndex < argumentNodes.Count)
+                {
+                    var argument = ProcessArgument(argumentNodes[argumentIndex], function);
+                    if (argument is null)
+                    {
+                        return null; // Error already set
+                    }
+
+                    groups.Add(argument);
+                    argumentIndex++;
+                }
+                functionArguments.Set(paramDef.Name, groups);
             }
             else
             {
