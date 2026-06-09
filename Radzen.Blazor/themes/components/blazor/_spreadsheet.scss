@@ -324,9 +324,13 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     position: absolute;
     @extend %dropdown-panel;
     width: 300px;
-    padding: var(--rz-tooltip-padding);
     overflow: auto;
     box-sizing: content-box;
+    
+    .rz-autocomplete-items {
+        max-height: min(240px, 40vh);
+        overflow-y: auto;
+    }
 }
 
 .rz-spreadsheet-frozen-row {
@@ -532,8 +536,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-cell-menu-filter {
-    flex: 1;
-    height: 200px;
+    max-height: min(200px, 40vh);
     overflow-y: auto;
     padding: calc(var(--rz-dialog-content-padding) - max(var(--rz-context-menu-padding-block), var(--rz-context-menu-padding-inline)));
     border-top: var(--rz-border-normal);
