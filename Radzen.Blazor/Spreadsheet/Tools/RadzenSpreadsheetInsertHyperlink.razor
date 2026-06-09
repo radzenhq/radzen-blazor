@@ -1,0 +1,42 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Blazor.Spreadsheet.Tools
+@using Radzen.Documents.Spreadsheet
+@inherits RadzenSpreadsheetToolBase
+@inject DialogService DialogService
+
+<RadzenButton Icon="link" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click=@OnClickAsync Size="ButtonSize.Small"
+    title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertHyperlink)) ?? "Insert Hyperlink") />
+
+@code {
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Hyperlinks;
+
+    private async Task OnClickAsync()
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var address = Worksheet.Selection.Cell;
+        Worksheet.Cells.TryGet(address.Row, address.Column, out var cell);
+
+        var existing = cell?.Hyperlink;
+        var url = existing?.Url ?? "";
+        var displayText = existing?.Text ?? cell?.Value?.ToString() ?? "";
+
+        var result = await DialogService.OpenAsync<HyperlinkDialog>(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertHyperlinkTitle)) ?? "Insert Hyperlink",
+            new Dictionary<string, object?>
+            {
+                { "Url", url },
+                { "Text", displayText }
+            });
+
+        if (result is Hyperlink hyperlink && Spreadsheet is not null)
+        {
+            var command = new HyperlinkCommand(Worksheet, address, hyperlink);
+            await Spreadsheet.ExecuteAsync(command);
+        }
+    }
+}

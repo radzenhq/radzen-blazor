@@ -3,7 +3,6 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
-@using Radzen.Blazor.Spreadsheet.Tools
 @using Radzen.Blazor.Rendering
 @inject DialogService DialogService
 @inject ContextMenuService ContextMenuService
@@ -25,50 +24,50 @@
                 {
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FileTab))>
                     <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                        <Open WorkbookChanged=@OnWorkbookChangedAsync CsvImportOptions=@CsvImportOptions />
+                        <RadzenSpreadsheetOpen CsvImportOptions=@CsvImportOptions />
                         <div class="rz-toolbar-separator"></div>
-                        <Save Workbook=@workbook ActiveWorksheet=@Worksheet FileName=@ExportFileName CsvExportOptions=@CsvExportOptions />
+                        <RadzenSpreadsheetSave FileName=@ExportFileName CsvExportOptions=@CsvExportOptions />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_HomeTab))>
                     <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <Undo />
-                            <Redo />
+                            <RadzenSpreadsheetUndo />
+                            <RadzenSpreadsheetRedo />
                         </RadzenStack>
                         <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <FontFamily/>
-                            <FontSize/>
+                            <RadzenSpreadsheetFontFamily/>
+                            <RadzenSpreadsheetFontSize/>
                         </RadzenStack>
                         <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <Bold/>
-                            <Italic/>
-                            <Underline/>
-                            <Strikethrough/>
-                            <Color/>
-                            <BackgroundColor/>
-                            <CellBorders/>
+                            <RadzenSpreadsheetBold/>
+                            <RadzenSpreadsheetItalic/>
+                            <RadzenSpreadsheetUnderline/>
+                            <RadzenSpreadsheetStrikethrough/>
+                            <RadzenSpreadsheetColor/>
+                            <RadzenSpreadsheetBackgroundColor/>
+                            <RadzenSpreadsheetCellBorders/>
                         </RadzenStack>
                         <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <TextAlign/>
-                            <VerticalAlign/>
-                            <TextWrap/>
-                            <MergeCells/>
+                            <RadzenSpreadsheetTextAlign/>
+                            <RadzenSpreadsheetVerticalAlign/>
+                            <RadzenSpreadsheetTextWrap/>
+                            <RadzenSpreadsheetMergeCells/>
                         </RadzenStack>
                         <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <ConditionalFormat/>
+                            <RadzenSpreadsheetConditionalFormat/>
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatTab))>
                     <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                        <DataFormat/>
-                        <IncreaseDecimals/>
-                        <DecreaseDecimals/>
+                        <RadzenSpreadsheetDataFormat/>
+                        <RadzenSpreadsheetIncreaseDecimals/>
+                        <RadzenSpreadsheetDecreaseDecimals/>
                         <div class="rz-toolbar-separator"></div>
                         <RadzenButton Text=@Localize(nameof(RadzenStrings.Spreadsheet_FormatCells)) Click=@OnFormatCellsAsync
                             Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
@@ -78,37 +77,37 @@
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_InsertTab))>
                     <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <InsertRowAfter/>
-                            <InsertRowBefore/>
+                            <RadzenSpreadsheetInsertRowAfter/>
+                            <RadzenSpreadsheetInsertRowBefore/>
                         </RadzenStack>
                         <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <InsertColumnAfter/>
-                            <InsertColumnBefore/>
+                            <RadzenSpreadsheetInsertColumnAfter/>
+                            <RadzenSpreadsheetInsertColumnBefore/>
                         </RadzenStack>
                         <div class="rz-toolbar-separator"></div>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                            <InsertHyperlink/>
-                            <InsertImage/>
-                            <InsertTable/>
-                            <InsertChart/>
+                            <RadzenSpreadsheetInsertHyperlink/>
+                            <RadzenSpreadsheetInsertImage/>
+                            <RadzenSpreadsheetInsertTable/>
+                            <RadzenSpreadsheetInsertChart/>
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_ViewTab))>
                     <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                        <Freeze/>
+                        <RadzenSpreadsheetFreeze/>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text=@Localize(nameof(RadzenStrings.Spreadsheet_DataTab))>
                     <RadzenStack class="rz-toolbar" Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-                        <AutoFilter/>
-                        <CustomSort/>
+                        <RadzenSpreadsheetAutoFilter/>
+                        <RadzenSpreadsheetCustomSort/>
                         <div class="rz-toolbar-separator"></div>
-                        <DataValidation/>
+                        <RadzenSpreadsheetDataValidation/>
                     </RadzenStack>
                 </RadzenTabsItem>
-                <TableDesignToolset />
+                <RadzenSpreadsheetTableDesignToolset />
                 }
             </Tabs>
         </RadzenTabs>

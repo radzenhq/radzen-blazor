@@ -1,0 +1,46 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inherits RadzenSpreadsheetToolBase
+
+<RadzenSplitButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+    Disabled=@IsDisabled Click=@OnClick
+    Icon="bar_chart" Text="Chart"
+    title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertChart)) ?? "Insert Chart")>
+    <ChildContent>
+        <RadzenSplitButtonItem Text="Column Chart" Value="column" Icon="bar_chart" />
+        <RadzenSplitButtonItem Text="Bar Chart" Value="bar" Icon="align_horizontal_left" />
+        <RadzenSplitButtonItem Text="Line Chart" Value="line" Icon="show_chart" />
+        <RadzenSplitButtonItem Text="Area Chart" Value="area" Icon="area_chart" />
+        <RadzenSplitButtonItem Text="Pie Chart" Value="pie" Icon="pie_chart" />
+        <RadzenSplitButtonItem Text="Donut Chart" Value="donut" Icon="donut_large" />
+        <RadzenSplitButtonItem Text="Scatter Chart" Value="scatter" Icon="scatter_plot" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Charts;
+
+    private async Task OnClick(RadzenSplitButtonItem? item)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        var chartType = item?.Value switch
+        {
+            "bar" => SpreadsheetChartType.Bar,
+            "line" => SpreadsheetChartType.Line,
+            "area" => SpreadsheetChartType.Area,
+            "pie" => SpreadsheetChartType.Pie,
+            "donut" => SpreadsheetChartType.Donut,
+            "scatter" => SpreadsheetChartType.Scatter,
+            _ => SpreadsheetChartType.Column
+        };
+
+        var selection = Worksheet.Selection.Range;
+        var chart = ChartFactory.CreateFromSelection(Worksheet, selection, chartType);
+        await Spreadsheet.ExecuteAsync(new InsertChartCommand(Worksheet, chart));
+    }
+}

@@ -27,6 +27,13 @@ public interface ISpreadsheet
     Task<bool> AcceptAsync();
 
     /// <summary>
+    /// Replaces the displayed workbook, resets the active sheet and cached view, and
+    /// raises <c>WorkbookChanged</c>. Used by the Open tool so it works in any toolbar.
+    /// </summary>
+    /// <param name="workbook">The workbook to display.</param>
+    Task LoadWorkbookAsync(Workbook workbook);
+
+    /// <summary>
     /// Executes a command through the active view's undo/redo stack. Returns
     /// <c>true</c> when the command ran, <c>false</c> when it was rejected by
     /// read-only mode, an <c>Allow*</c> flag, sheet protection, or a
@@ -231,7 +238,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// Replaces the built-in toolsets. When set, the supplied content sits inside the
     /// toolbar's <see cref="RadzenTabs.Tabs"/> slot — each child should be a
     /// <see cref="RadzenTabsItem"/>. Add
-    /// <see cref="Radzen.Blazor.Spreadsheet.Tools.TableDesignToolset"/> to keep the
+    /// <see cref="RadzenSpreadsheetTableDesignToolset"/> to keep the
     /// contextual "Table Design" toolset.
     /// </summary>
     [Parameter]
@@ -309,9 +316,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (didWorkbookChange)
         {
-            workbook = Workbook;
-            workbookView = null;
-            sheetIndex = 0;
+            SetActiveWorkbook(Workbook);
         }
     }
 
@@ -386,17 +391,29 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// <inheritdoc/>
     public bool CanRedo => !ReadOnly && AllowUndoRedo && (ActiveView?.Commands.CanRedo ?? false);
 
-    private async Task OnWorkbookChangedAsync(Workbook? value)
+    /// <inheritdoc/>
+    public async Task LoadWorkbookAsync(Workbook workbook)
     {
-        workbook = value;
+        SetActiveWorkbook(workbook);
 
-        await WorkbookChanged.InvokeAsync(value);
+        await CloseMenusAsync();
+        cellMenuRow = cellMenuColumn = -1;
+        validationListRow = validationListColumn = -1;
+
+        StateHasChanged();
+
+        await WorkbookChanged.InvokeAsync(workbook);
     }
 
-    private async Task OnSheetTabChanged(int index)
+    private void SetActiveWorkbook(Workbook? value)
     {
-        await AcceptAsync();
+        workbook = value;
+        workbookView = null;
+        sheetIndex = 0;
+    }
 
+    private async Task CloseMenusAsync()
+    {
         if (cellMenuPopup != null)
         {
             await cellMenuPopup.CloseAsync();
@@ -406,6 +423,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             await validationListPopup.CloseAsync();
         }
+    }
+
+    private async Task OnSheetTabChanged(int index)
+    {
+        await AcceptAsync();
+
+        await CloseMenusAsync();
 
         sheetIndex = index;
     }

@@ -1,0 +1,79 @@
+@namespace Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@using Microsoft.JSInterop
+@using System.IO
+@inject IJSRuntime JSRuntime
+
+<RadzenSplitButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Icon="download" ButtonType="ButtonType.Button" Size="ButtonSize.Small"
+    Disabled=@(Workbook is null) Click=@OnClickAsync>
+    <ChildContent>
+        <RadzenSplitButtonItem Text="Excel (.xlsx)" Icon="table_view" Value="xlsx" />
+        <RadzenSplitButtonItem Text="CSV (.csv)" Icon="description" Value="csv" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public Worksheet? Worksheet { get; set; }
+
+    private Workbook? Workbook => Worksheet?.Workbook;
+
+    [Parameter]
+    public string FileName { get; set; } = "sheet.xlsx";
+
+    [Parameter]
+    public CsvExportOptions? CsvExportOptions { get; set; }
+
+    private async Task OnClickAsync(RadzenSplitButtonItem? item)
+    {
+        if (Workbook is null) return;
+
+        // Primary button (item is null) defaults to Excel.
+        if (item is null || item.Value == "xlsx")
+        {
+            await DownloadXlsxAsync();
+        }
+        else if (item.Value == "csv")
+        {
+            await DownloadCsvAsync();
+        }
+    }
+
+    private async Task DownloadXlsxAsync()
+    {
+        var stream = new MemoryStream();
+        Workbook!.SaveToStream(stream);
+        stream.Position = 0;
+
+        using var streamRef = new DotNetStreamReference(stream);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", FileName, streamRef);
+    }
+
+    private async Task DownloadCsvAsync()
+    {
+        var options = CsvExportOptions is null
+            ? new CsvExportOptions { Sheet = Worksheet }
+            : new CsvExportOptions
+            {
+                Separator = CsvExportOptions.Separator,
+                QuoteChar = CsvExportOptions.QuoteChar,
+                Quoting = CsvExportOptions.Quoting,
+                Encoding = CsvExportOptions.Encoding,
+                LineEnding = CsvExportOptions.LineEnding,
+                Sheet = CsvExportOptions.Sheet ?? Worksheet,
+            };
+
+        var stream = new MemoryStream();
+        Workbook!.SaveAsCsv(stream, options);
+        stream.Position = 0;
+
+        using var streamRef = new DotNetStreamReference(stream);
+        var csvName = string.IsNullOrEmpty(FileName)
+            ? "sheet.csv"
+            : Path.ChangeExtension(FileName, ".csv");
+
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", csvName, streamRef);
+    }
+}

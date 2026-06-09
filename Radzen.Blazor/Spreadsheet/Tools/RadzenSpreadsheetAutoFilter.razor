@@ -1,0 +1,97 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenToggleButton Value=@IsAutoFilterEnabled ValueChanged=@OnToggleAutoFilterAsync Icon="filter_list" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+    ToggleVariant="Variant.Flat" ToggleButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Lighter" />
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private bool IsAutoFilterEnabled
+    {
+        get
+        {
+            if (Worksheet is null) return false;
+
+            var dataTable = GetCurrentTable();
+            if (dataTable is not null)
+            {
+                return dataTable.ShowFilterButton;
+            }
+
+            return Worksheet.AutoFilter.Range is not null;
+        }
+    }
+
+    private async Task OnToggleAutoFilterAsync(bool value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        var dataTable = GetCurrentTable();
+        if (dataTable is not null)
+        {
+            await Spreadsheet.ExecuteAsync(new TableFilterCommand(Worksheet, dataTable));
+        }
+        else
+        {
+            await Spreadsheet.ExecuteAsync(new SheetAutoFilterCommand(Worksheet, Worksheet.Selection.Range));
+        }
+    }
+
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.Filtering) == false;
+
+    private Table? GetCurrentTable()
+    {
+        if (Worksheet?.Tables is null) return null;
+
+        var selectedCell = Worksheet.Selection.Cell;
+        if (selectedCell == CellRef.Invalid) return null;
+
+        foreach (var table in Worksheet.Tables)
+        {
+            if (table.Range.Contains(selectedCell.Row, selectedCell.Column))
+            {
+                return table;
+            }
+        }
+
+        return null;
+    }
+
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public RadzenSpreadsheetAutoFilter()
+    {
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
+
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        selectionBinding.Dispose();
+    }
+}

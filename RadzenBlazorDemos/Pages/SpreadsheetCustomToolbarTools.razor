@@ -1,33 +1,32 @@
 @using Radzen.Blazor.Spreadsheet
-@using Radzen.Blazor.Spreadsheet.Tools
 @using Radzen.Documents.Spreadsheet
 
 <RadzenSpreadsheet Workbook=@workbook style="height: 500px">
     <RadzenTabsItem Text="File">
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-            <Open />
-            <Save />
+            <RadzenSpreadsheetOpen />
+            <RadzenSpreadsheetSave />
         </RadzenStack>
     </RadzenTabsItem>
     <RadzenTabsItem Text="Edit">
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
-            <Undo />
-            <Redo />
+            <RadzenSpreadsheetUndo />
+            <RadzenSpreadsheetRedo />
             <div class="rz-toolbar-separator"></div>
-            <Bold />
-            <Italic />
-            <Underline />
+            <RadzenSpreadsheetBold />
+            <RadzenSpreadsheetItalic />
+            <RadzenSpreadsheetUnderline />
             <div class="rz-toolbar-separator"></div>
-            <Color />
-            <BackgroundColor />
+            <RadzenSpreadsheetColor />
+            <RadzenSpreadsheetBackgroundColor />
             <div class="rz-toolbar-separator"></div>
-            <MergeCells />
+            <RadzenSpreadsheetMergeCells />
             <div class="rz-toolbar-separator"></div>
-            <AutoFilter />
-            <CustomSort />
+            <RadzenSpreadsheetAutoFilter />
+            <RadzenSpreadsheetCustomSort />
         </RadzenStack>
     </RadzenTabsItem>
-    <TableDesignToolset />
+    <RadzenSpreadsheetTableDesignToolset />
 </RadzenSpreadsheet>
 
 @code {

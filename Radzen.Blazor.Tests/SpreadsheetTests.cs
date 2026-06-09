@@ -158,7 +158,7 @@ public class SpreadsheetTests
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
-            p.AddChildContent<Radzen.Blazor.Spreadsheet.Tools.TableDesignToolset>(tab =>
+            p.AddChildContent<Radzen.Blazor.RadzenSpreadsheetTableDesignToolset>(tab =>
                 tab.Add(t => t.Worksheet, sheet));
         });
 
@@ -178,7 +178,7 @@ public class SpreadsheetTests
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
         {
             p.Add(x => x.Workbook, wb);
-            p.AddChildContent<Radzen.Blazor.Spreadsheet.Tools.TableDesignToolset>(tab =>
+            p.AddChildContent<Radzen.Blazor.RadzenSpreadsheetTableDesignToolset>(tab =>
                 tab.Add(t => t.Worksheet, sheet));
         });
 
