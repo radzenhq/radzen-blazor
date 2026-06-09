@@ -198,6 +198,7 @@ public class CellStore(Worksheet sheet)
         {
             customTypes[range] = type;
         }
+        Worksheet.OnChromeChanged();
     }
 
     /// <summary>

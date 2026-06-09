@@ -46,7 +46,7 @@ public class SheetAutoFilterCommand : ICommand, IProtectedCommand
             sheet.AutoFilter.Range = null;
         }
 
-        sheet.OnAutoFilterChanged();
+        sheet.OnChromeChanged();
 
         return true;
     }
@@ -55,6 +55,6 @@ public class SheetAutoFilterCommand : ICommand, IProtectedCommand
     public void Unexecute()
     {
         sheet.AutoFilter.Range = previousRange;
-        sheet.OnAutoFilterChanged();
+        sheet.OnChromeChanged();
     }
 }

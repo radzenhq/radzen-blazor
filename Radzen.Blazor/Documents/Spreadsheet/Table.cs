@@ -133,7 +133,7 @@ public class Table
                 ShrinkToExcludeHeaderRow();
             }
             showHeaderRow = value;
-            Worksheet.OnAutoFilterChanged();
+            Worksheet.OnChromeChanged();
         }
     }
 
@@ -220,7 +220,7 @@ public class Table
                 showTotals = false;
             }
 
-            Worksheet.OnAutoFilterChanged();
+            Worksheet.OnChromeChanged();
         }
     }
 
@@ -261,7 +261,7 @@ public class Table
             }
 
             showFilterButton = value;
-            Worksheet.OnAutoFilterChanged();
+            Worksheet.OnChromeChanged();
         }
     }
 
@@ -269,28 +269,28 @@ public class Table
     public bool ShowBandedRows
     {
         get => showBandedRows;
-        set { showBandedRows = value; Worksheet.OnAutoFilterChanged(); }
+        set { showBandedRows = value; Worksheet.OnChromeChanged(); }
     }
 
     /// <summary>Whether banded column striping is applied. Defaults to false.</summary>
     public bool ShowBandedColumns
     {
         get => showBandedColumns;
-        set { showBandedColumns = value; Worksheet.OnAutoFilterChanged(); }
+        set { showBandedColumns = value; Worksheet.OnChromeChanged(); }
     }
 
     /// <summary>Highlights the first column (typically a label column).</summary>
     public bool HighlightFirstColumn
     {
         get => highlightFirstColumn;
-        set { highlightFirstColumn = value; Worksheet.OnAutoFilterChanged(); }
+        set { highlightFirstColumn = value; Worksheet.OnChromeChanged(); }
     }
 
     /// <summary>Highlights the last column (typically a totals column).</summary>
     public bool HighlightLastColumn
     {
         get => highlightLastColumn;
-        set { highlightLastColumn = value; Worksheet.OnAutoFilterChanged(); }
+        set { highlightLastColumn = value; Worksheet.OnChromeChanged(); }
     }
 
     /// <summary>
@@ -300,7 +300,7 @@ public class Table
     public string? TableStyle
     {
         get => tableStyle;
-        set { tableStyle = value; Worksheet.OnAutoFilterChanged(); }
+        set { tableStyle = value; Worksheet.OnChromeChanged(); }
     }
 
     /// <summary>The columns of the table, in left-to-right order.</summary>
@@ -373,7 +373,7 @@ public class Table
 
         range = newRange;
         Filter = new AutoFilter(Worksheet, range);
-        Worksheet.OnAutoFilterChanged();
+        Worksheet.OnChromeChanged();
     }
 
     /// <summary>

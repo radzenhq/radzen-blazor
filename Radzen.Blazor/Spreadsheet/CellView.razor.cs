@@ -427,7 +427,7 @@ public partial class CellView : CellBase, IDisposable
 
         if (didSheetChange && Worksheet is not null)
         {
-            Worksheet.AutoFilterChanged -= OnAutoFilterChanged;
+            Worksheet.ChromeChanged -= OnChromeChanged;
         }
 
         await base.SetParametersAsync(parameters);
@@ -465,7 +465,7 @@ public partial class CellView : CellBase, IDisposable
 
         if (didSheetChange && Worksheet is not null)
         {
-            Worksheet.AutoFilterChanged += OnAutoFilterChanged;
+            Worksheet.ChromeChanged += OnChromeChanged;
         }
     }
 
@@ -474,18 +474,20 @@ public partial class CellView : CellBase, IDisposable
         StateHasChanged();
     }
 
-    private void OnAutoFilterChanged()
+    private void OnChromeChanged()
     {
         var show = ShouldShowCellMenu();
-        if (showCellMenu != show)
+        var renderer = ResolveRendererType();
+        if (showCellMenu != show || customRendererType != renderer)
         {
             showCellMenu = show;
+            customRendererType = renderer;
             StateHasChanged();
             return;
         }
 
         // Table style toggles (ShowBandedRows, TableStyle, ShowHeaderRow, etc.) all
-        // fire AutoFilterChanged. Re-render when the cell is inside a table so the
+        // fire ChromeChanged. Re-render when the cell is inside a table so the
         // table-style overrides in AppendStyle pick up the new values.
         if (IsInsideAnyTable())
         {
@@ -504,7 +506,7 @@ public partial class CellView : CellBase, IDisposable
 
         if (Worksheet is not null)
         {
-            Worksheet.AutoFilterChanged -= OnAutoFilterChanged;
+            Worksheet.ChromeChanged -= OnChromeChanged;
         }
     }
 }

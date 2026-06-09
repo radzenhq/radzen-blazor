@@ -250,6 +250,7 @@ public partial class Worksheet
 
         var table = new Table(this, name, range, hasHeaders, totalsRowShown);
         tables.Add(table);
+        OnChromeChanged();
         return table;
     }
 
@@ -259,7 +260,20 @@ public partial class Worksheet
     public bool RemoveTable(Table table)
     {
         ArgumentNullException.ThrowIfNull(table);
-        return tables.Remove(table);
+        var removed = tables.Remove(table);
+        OnChromeChanged();
+        return removed;
+    }
+
+    /// <summary>
+    /// Raised when sheet chrome (table styling, custom cell types, validation, auto filter)
+    /// changes and dependent cell views must refresh.
+    /// </summary>
+    public event Action? ChromeChanged;
+
+    internal void OnChromeChanged()
+    {
+        ChromeChanged?.Invoke();
     }
 
     /// <summary>
@@ -289,7 +303,7 @@ public partial class Worksheet
         Selection = new(this);
         MergedCells = new();
         Cells = new CellStore(this);
-        Validation = new();
+        Validation = new ValidationStore(this);
         ConditionalFormats = new();
         AutoFilter = new(this);
     }

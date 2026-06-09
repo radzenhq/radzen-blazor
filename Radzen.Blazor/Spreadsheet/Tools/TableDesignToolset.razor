@@ -24,12 +24,12 @@
             w =>
             {
                 w.Selection.Changed += OnSelectionChanged;
-                w.AutoFilterChanged += OnSelectionChanged;
+                w.ChromeChanged += OnSelectionChanged;
             },
             w =>
             {
                 w.Selection.Changed -= OnSelectionChanged;
-                w.AutoFilterChanged -= OnSelectionChanged;
+                w.ChromeChanged -= OnSelectionChanged;
             });
     }
 

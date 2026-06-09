@@ -46,6 +46,16 @@ public class NumberValidator : ICellValidator
 public class ValidationStore
 {
     private readonly Dictionary<RangeRef, List<ICellValidator>> validators = [];
+    private readonly Worksheet? worksheet;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidationStore"/> class.
+    /// </summary>
+    /// <param name="worksheet">The owning worksheet, notified via <c>ChromeChanged</c> when validation changes. May be null for a standalone store.</param>
+    public ValidationStore(Worksheet? worksheet = null)
+    {
+        this.worksheet = worksheet;
+    }
 
     /// <summary>
     /// Gets all ranges that have validation rules.
@@ -77,6 +87,7 @@ public class ValidationStore
         }
 
         list.Add(validator);
+        worksheet?.OnChromeChanged();
     }
 
     /// <summary>
@@ -92,6 +103,7 @@ public class ValidationStore
             {
                 validators.Remove(range);
             }
+            worksheet?.OnChromeChanged();
             return removed;
         }
         return false;
@@ -110,12 +122,13 @@ public class ValidationStore
     /// </summary>
     public IReadOnlyList<ICellValidator> GetValidatorsForCell(CellRef cellRef)
     {
-        var result = new List<ICellValidator>();
+        List<ICellValidator>? result = null;
         foreach (var (_, list) in GetMatchingRanges(cellRef))
         {
+            result ??= [];
             result.AddRange(list);
         }
-        return result;
+        return result ?? (IReadOnlyList<ICellValidator>)Array.Empty<ICellValidator>();
     }
 
     /// <summary>
@@ -125,6 +138,7 @@ public class ValidationStore
     {
         if (validators.Remove(range, out var list))
         {
+            worksheet?.OnChromeChanged();
             return list;
         }
         return [];

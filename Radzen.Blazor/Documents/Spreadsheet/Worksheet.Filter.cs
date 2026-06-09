@@ -731,16 +731,6 @@ public class DoesNotContainCriterion : StringFilterCriterion
 public partial class Worksheet
 {
     /// <summary>
-    /// Gets or sets the range for the auto filter applied to the sheet.
-    /// </summary>
-    public event Action? AutoFilterChanged;
-
-    internal void OnAutoFilterChanged()
-    {
-        AutoFilterChanged?.Invoke();
-    }
-
-    /// <summary>
     /// Gets the auto filter for this sheet. Always non-null. Set its Range property to enable or disable.
     /// </summary>
     public AutoFilter AutoFilter { get; private set; } = default!;
