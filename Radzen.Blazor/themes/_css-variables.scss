@@ -67,6 +67,16 @@
   --rz-transition-all: #{$rz-transition-all};
   --rz-expander-transition: #{$rz-expander-transition};
 
+  /* Motion easing & duration tokens (Material 3) */
+  --rz-easing-emphasized: #{$rz-easing-emphasized};
+  --rz-easing-emphasized-decelerate: #{$rz-easing-emphasized-decelerate};
+  --rz-easing-emphasized-accelerate: #{$rz-easing-emphasized-accelerate};
+  --rz-easing-spring: #{$rz-easing-spring};
+  --rz-duration-short: #{$rz-duration-short};
+  --rz-duration-medium: #{$rz-duration-medium};
+  --rz-duration-long: #{$rz-duration-long};
+  --rz-ripple-duration: #{$rz-ripple-duration};
+
   /* Layout Body */
   --rz-layout-body-margin: #{$layout-body-margin};
   --rz-layout-body-padding: #{$layout-body-padding};

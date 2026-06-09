@@ -59,7 +59,7 @@
       opacity: 0;
       background-position: center;
       background: radial-gradient(circle, currentColor 1%, transparent 1%) center/15000%;
-      transition: background-size 0.8s, opacity 0.8s;
+      transition: background-size var(--rz-ripple-duration, 0.8s), opacity var(--rz-ripple-duration, 0.8s);
       pointer-events: none;
     }
 
@@ -78,7 +78,7 @@
   } @else {
 
     background-position: center;
-    transition: background-size 0.8s;
+    transition: background-size var(--rz-ripple-duration, 0.8s);
     background: radial-gradient(circle, transparent 1%, $ripple-background 1%)  center/15000%;
 
     &:active {
