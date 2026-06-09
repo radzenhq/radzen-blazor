@@ -47,11 +47,13 @@ public class ChartOverlay : DrawingOverlayBase<SheetChart>
             {
                 w.ChartsChanged += OnChartsChanged;
                 w.SelectedChartChanged += OnChanged;
+                w.DrawingGeometryChanged += OnDrawingGeometryChanged;
             },
             w =>
             {
                 w.ChartsChanged -= OnChartsChanged;
                 w.SelectedChartChanged -= OnChanged;
+                w.DrawingGeometryChanged -= OnDrawingGeometryChanged;
             });
     }
 

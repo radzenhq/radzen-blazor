@@ -23,11 +23,13 @@ public class ImageOverlay : DrawingOverlayBase<SheetImage>
             {
                 w.ImagesChanged += OnChanged;
                 w.SelectedImageChanged += OnChanged;
+                w.DrawingGeometryChanged += OnDrawingGeometryChanged;
             },
             w =>
             {
                 w.ImagesChanged -= OnChanged;
                 w.SelectedImageChanged -= OnChanged;
+                w.DrawingGeometryChanged -= OnDrawingGeometryChanged;
             });
     }
 

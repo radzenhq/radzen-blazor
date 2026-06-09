@@ -65,6 +65,15 @@ public abstract class DrawingOverlayBase<TDrawing> : ComponentBase, IDisposable 
     /// <summary>Sets the worksheet's selected drawing to this one.</summary>
     protected abstract void SelectDrawing(TDrawing drawing);
 
+    /// <summary>Repaints this overlay when a drawing of its own kind changes geometry during a drag.</summary>
+    protected void OnDrawingGeometryChanged(IAnchoredDrawing drawing)
+    {
+        if (drawing is TDrawing)
+        {
+            StateHasChanged();
+        }
+    }
+
     /// <summary>Optional context-menu handler. No-op by default.</summary>
     protected virtual void OnDrawingContextMenu(MouseEventArgs e, TDrawing drawing)
     {

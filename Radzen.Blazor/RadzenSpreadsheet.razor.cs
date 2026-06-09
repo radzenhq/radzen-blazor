@@ -299,7 +299,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     private IReadOnlyList<string> validationListItems = [];
     private RangeRef autofillSource = RangeRef.Invalid;
     private PointerEventArgs? autofillStartPointer;
-    private RangeRef? autofillPreviewRange;
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -1619,8 +1618,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (fillRange != RangeRef.Invalid)
         {
-            autofillPreviewRange = fillRange;
-            StateHasChanged();
+            Worksheet.AutofillPreview = fillRange;
         }
     }
 
@@ -1632,9 +1630,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        var fillRange = autofillPreviewRange;
+        var fillRange = Worksheet?.AutofillPreview;
 
-        autofillPreviewRange = null;
+        if (Worksheet is not null)
+        {
+            Worksheet.AutofillPreview = null;
+        }
 
         if (autofillSource != RangeRef.Invalid && Worksheet is not null && fillRange is not null && fillRange.Value != autofillSource)
         {
@@ -1647,8 +1648,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         autofillSource = RangeRef.Invalid;
         autofillStartPointer = null;
-
-        StateHasChanged();
     }
 
     private CellRef GetAutofillTarget(PointerEventArgs args)
@@ -2064,6 +2063,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         public SheetImage? Image { get; set; }
         public SheetChart? Chart { get; set; }
+        public IAnchoredDrawing? Drawing => Image ?? (IAnchoredDrawing?)Chart;
         public string Direction { get; set; } = "";
         public double StartX { get; set; }
         public double StartY { get; set; }
@@ -2076,6 +2076,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         public SheetImage? Image { get; set; }
         public SheetChart? Chart { get; set; }
+        public IAnchoredDrawing? Drawing => Image ?? (IAnchoredDrawing?)Chart;
         public double StartX { get; set; }
         public double StartY { get; set; }
         public CellAnchor OriginalFrom { get; set; } = default!;
@@ -2126,7 +2127,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        if (activeCapture is not DrawingResizeCapture capture)
+        if (activeCapture is not DrawingResizeCapture capture || Worksheet is null)
         {
             return Task.CompletedTask;
         }
@@ -2150,7 +2151,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             NormalizeAnchor(capture.Chart.From);
         }
 
-        StateHasChanged();
+        if (capture.Drawing is not null)
+        {
+            Worksheet.OnDrawingGeometryChanged(capture.Drawing);
+        }
+
         return Task.CompletedTask;
     }
 
@@ -2364,7 +2369,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             NormalizeAnchor(to);
         }
 
-        StateHasChanged();
+        if (capture.Drawing is not null)
+        {
+            Worksheet.OnDrawingGeometryChanged(capture.Drawing);
+        }
         return Task.CompletedTask;
     }
 
@@ -2406,8 +2414,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             await ExecuteAsync(new MoveAnchoredCommand<SheetChart>(chart, finalFrom, finalTo, SpreadsheetFeature.Charts));
         }
 
+        if (capture.Drawing is not null)
+        {
+            Worksheet.OnDrawingGeometryChanged(capture.Drawing);
+        }
+
         activeCapture = null;
-        StateHasChanged();
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

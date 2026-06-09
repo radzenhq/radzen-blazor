@@ -12,9 +12,9 @@
         }
     }
 
-    @if (AutofillRange is not null)
+    @if (Worksheet?.AutofillPreview is not null)
     {
-        @foreach (var range in Context.GetRanges(AutofillRange.Value))
+        @foreach (var range in Context.GetRanges(Worksheet.AutofillPreview.Value))
         {
             <AutofillItem Context=@Context Range=@range.Range Worksheet=@Worksheet FrozenRow=@range.FrozenRow
                           FrozenColumn=@range.FrozenColumn Top=@range.Top Left=@range.Left Bottom=@range.Bottom Right=@range.Right />

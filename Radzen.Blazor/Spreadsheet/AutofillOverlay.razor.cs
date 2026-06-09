@@ -24,13 +24,8 @@ public partial class AutofillOverlay : IDisposable
     [Parameter]
     public IVirtualGridContext Context { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the autofill preview range. Null when no drag is in progress.
-    /// </summary>
-    [Parameter]
-    public RangeRef? AutofillRange { get; set; }
-
     private readonly EventBinding<Selection> selectionBinding;
+    private readonly EventBinding<Worksheet> worksheetBinding;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AutofillOverlay"/> class.
@@ -38,17 +33,22 @@ public partial class AutofillOverlay : IDisposable
     public AutofillOverlay()
     {
         selectionBinding = new EventBinding<Selection>(
-            s => s.Changed += OnSelectionChanged,
-            s => s.Changed -= OnSelectionChanged);
+            s => s.Changed += OnChanged,
+            s => s.Changed -= OnChanged);
+
+        worksheetBinding = new EventBinding<Worksheet>(
+            w => w.AutofillPreviewChanged += OnChanged,
+            w => w.AutofillPreviewChanged -= OnChanged);
     }
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {
         selectionBinding.Bind(Worksheet?.Selection);
+        worksheetBinding.Bind(Worksheet);
     }
 
-    private void OnSelectionChanged()
+    private void OnChanged()
     {
         StateHasChanged();
     }
@@ -64,5 +64,6 @@ public partial class AutofillOverlay : IDisposable
     void IDisposable.Dispose()
     {
         selectionBinding.Dispose();
+        worksheetBinding.Dispose();
     }
 }

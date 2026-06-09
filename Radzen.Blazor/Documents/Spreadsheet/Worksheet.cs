@@ -98,6 +98,23 @@ public partial class Worksheet
     /// </summary>
     public IReadOnlyList<SheetImage> Images => images;
 
+    internal RangeRef? AutofillPreview
+    {
+        get => autofillPreview;
+        set
+        {
+            if (autofillPreview != value)
+            {
+                autofillPreview = value;
+                AutofillPreviewChanged?.Invoke();
+            }
+        }
+    }
+
+    private RangeRef? autofillPreview;
+
+    internal event Action? AutofillPreviewChanged;
+
     private SheetImage? selectedImage;
 
     /// <summary>
@@ -119,6 +136,10 @@ public partial class Worksheet
     internal event Action? SelectedImageChanged;
 
     internal event Action? ImagesChanged;
+
+    internal event Action<IAnchoredDrawing>? DrawingGeometryChanged;
+
+    internal void OnDrawingGeometryChanged(IAnchoredDrawing drawing) => DrawingGeometryChanged?.Invoke(drawing);
 
     internal void AddImage(SheetImage image)
     {
