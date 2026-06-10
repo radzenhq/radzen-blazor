@@ -26,7 +26,7 @@ namespace Radzen.Blazor
 
         private Localizer? localizer;
         internal Localizer Localizer => localizer ??= Services.GetService<Localizer>() ?? Localizer.Default;
-        string Localize(string key) => Localizer.Get(key, CultureInfo.CurrentUICulture);
+        string Localize(string key) => Localizer.Get(key, Editor?.UICulture ?? CultureInfo.CurrentUICulture);
 
         /// <summary>
         /// The RadzenHtmlEditor component which this tool is part of.

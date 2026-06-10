@@ -27,6 +27,7 @@ builder.Services.AddSingleton(sp =>
 });
 
 // Add Radzen.Blazor services
+builder.Services.AddScoped<ILocalizer, DemoLocalizer>();
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenQueryStringThemeService();
 

@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using System.Globalization;
+using Bunit;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen;
 using Radzen.Blazor;
@@ -105,6 +108,51 @@ public class LocalizerTests
         var result = string.Format(template, "Sheet2");
 
         Assert.Equal("A sheet named 'Sheet2' already exists.", result);
+    }
+
+    [Theory]
+    [InlineData("de")]
+    [InlineData("fr")]
+    [InlineData("es")]
+    [InlineData("it")]
+    [InlineData("ja")]
+    public void Localizer_Resolves_Builtin_Translations_For_Culture(string lang)
+    {
+        var culture = new CultureInfo(lang);
+
+        var cancel = Localizer.Default.Get(nameof(RadzenStrings.Spreadsheet_Cancel), culture);
+
+        // The built-in satellite resource must resolve and translate Cancel away from English.
+        Assert.NotEqual("Cancel", cancel);
+        Assert.False(string.IsNullOrWhiteSpace(cancel));
+    }
+
+    [Fact]
+    public void Localizer_Translates_Known_Strings()
+    {
+        Assert.Equal("Abbrechen", Localizer.Default.Get(nameof(RadzenStrings.Spreadsheet_Cancel), new CultureInfo("de")));
+        Assert.Equal("Aujourd'hui", Localizer.Default.Get(nameof(RadzenStrings.Scheduler_TodayText), new CultureInfo("fr")));
+        Assert.Equal("キャンセル", Localizer.Default.Get(nameof(RadzenStrings.Spreadsheet_Cancel), new CultureInfo("ja")));
+    }
+
+    [Fact]
+    public void DataGrid_Uses_DefaultUICulture_Cascade_For_Localized_Strings()
+    {
+        using var ctx = new TestContext();
+        ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+        ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+        ctx.Services.AddRadzenComponents();
+
+        var component = ctx.RenderComponent<CascadingValue<CultureInfo>>(parameters => parameters
+            .Add(p => p.Name, nameof(RadzenComponent.DefaultUICulture))
+            .Add(p => p.Value, new CultureInfo("de"))
+            .AddChildContent<RadzenDataGrid<dynamic>>(grid => grid
+                .Add(g => g.Data, (IEnumerable<dynamic>)new[] { new { Id = 1 } })
+                .Add(g => g.AllowGrouping, true)));
+
+        // German translation of DataGrid_GroupPanelText must appear via the cascade + satellite resource.
+        Assert.Contains("Ziehen Sie eine Spaltenüberschrift", component.Markup);
+        Assert.DoesNotContain("Drag a column header here", component.Markup);
     }
 
     private class TestLocalizer : ILocalizer

@@ -27,7 +27,7 @@ namespace Radzen.Blazor
 
         private Localizer? localizer;
         internal Localizer Localizer => localizer ??= Services.GetService<Localizer>() ?? Localizer.Default;
-        string Localize(string key) => Localizer.Get(key, CultureInfo.CurrentUICulture);
+        string Localize(string key) => Localizer.Get(key, Editor?.UICulture ?? CultureInfo.CurrentUICulture);
 
         IList<RadzenHtmlEditorFontNameItem> fonts = new List<RadzenHtmlEditorFontNameItem>();
 

@@ -24,7 +24,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets a localized string for the specified resource key.
         /// </summary>
-        public string Localize(string key) => Localizer.Get(key, CultureInfo.CurrentUICulture);
+        public string Localize(string key) => Localizer.Get(key, Scheduler?.UICulture ?? CultureInfo.CurrentUICulture);
 
         /// <summary>
         /// Gets the title of the view. It is displayed in the RadzenScheduler title area.

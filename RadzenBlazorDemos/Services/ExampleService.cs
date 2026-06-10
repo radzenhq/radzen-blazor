@@ -57,7 +57,7 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Toc = [ new () { Text = "How it works", Anchor = "#how-it-works" }, new () { Text = "ILocalizer", Anchor = "#ilocalizer" }, new () { Text = "Satellite assemblies", Anchor = "#satellite-assemblies" }, new () { Text = "Parameter override", Anchor = "#parameter-override" }, new () { Text = "Resource keys", Anchor = "#resource-keys" }, new () { Text = "Culture resolution", Anchor = "#culture" }, new () { Text = "Priority order", Anchor = "#priority" } ],
+            Toc = [ new () { Text = "Live demo", Anchor = "#live-demo" }, new () { Text = "How it works", Anchor = "#how-it-works" }, new () { Text = "ILocalizer", Anchor = "#ilocalizer" }, new () { Text = "Satellite assemblies", Anchor = "#satellite-assemblies" }, new () { Text = "Parameter override", Anchor = "#parameter-override" }, new () { Text = "Resource keys", Anchor = "#resource-keys" }, new () { Text = "Culture resolution", Anchor = "#culture" }, new () { Text = "Priority order", Anchor = "#priority" } ],
             Name = "Localization",
             New = true,
             Path = "/localization",

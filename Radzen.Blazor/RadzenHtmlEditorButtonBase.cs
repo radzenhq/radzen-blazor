@@ -24,7 +24,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets a localized string for the specified resource key.
         /// </summary>
-        public string Localize(string key) => Localizer.Get(key, CultureInfo.CurrentUICulture);
+        public string Localize(string key) => Localizer.Get(key, Editor?.UICulture ?? CultureInfo.CurrentUICulture);
 
         /// <summary>
         /// The RadzenHtmlEditor component which this tool is part of.

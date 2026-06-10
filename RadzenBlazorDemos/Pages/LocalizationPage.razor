@@ -11,6 +11,19 @@
     Radzen Blazor Components support resource-based localization out of the box. All user-facing text (labels, tooltips, ARIA labels, filter operators, paging text, etc.) can be translated using .NET's standard localization infrastructure.
 </RadzenText>
 
+<RadzenText Anchor="localization#live-demo" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Live demo
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Pick a language to translate the components below. Radzen Blazor ships with built-in translations for German, French, Spanish, Italian and Japanese. Open the filter menu, the column picker, the group panel and the paging summary on the grid, and the date picker, to see the localized strings update instantly.
+</RadzenText>
+<RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-8">
+    This demo switches culture at runtime via an <code>ILocalizer</code> (Option 1 below). On Blazor WebAssembly that is the simplest way to change language in place, because satellite assemblies are only downloaded for the culture the app starts with. Server-rendered apps can rely on the satellite <code>.resx</code> files (Option 2) directly.
+</RadzenAlert>
+<RadzenExample ComponentName="Localization" Example="LocalizationLive">
+    <LocalizationLive />
+</RadzenExample>
+
 <RadzenText Anchor="localization#how-it-works" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     How it works
 </RadzenText>

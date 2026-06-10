@@ -24,9 +24,17 @@ public abstract class SpreadsheetDialogBase : ComponentBase
     internal Localizer Localizer { get; set; } = default!;
 
     /// <summary>
+    /// The UI culture cascaded from a parent component. Dialogs render outside the component that
+    /// opened them, so this resolves only when a <c>DefaultUICulture</c> cascade is set above the
+    /// dialog host; otherwise <see cref="L"/> falls back to <see cref="CultureInfo.CurrentUICulture"/>.
+    /// </summary>
+    [CascadingParameter(Name = "DefaultUICulture")]
+    protected CultureInfo? DefaultUICulture { get; set; }
+
+    /// <summary>
     /// Returns the localized string for the specified resource key in the current UI culture.
     /// </summary>
-    protected string L(string key) => Localizer.Get(key, CultureInfo.CurrentUICulture);
+    protected string L(string key) => Localizer.Get(key, DefaultUICulture ?? CultureInfo.CurrentUICulture);
 
     /// <summary>
     /// Closes the dialog without returning a result.

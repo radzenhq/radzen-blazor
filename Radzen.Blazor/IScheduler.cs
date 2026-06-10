@@ -172,5 +172,10 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The culture.</value>
         CultureInfo Culture { get; set; }
+        /// <summary>
+        /// Gets the UI culture used for localized strings. Defaults to <see cref="Culture"/>.
+        /// </summary>
+        /// <value>The UI culture.</value>
+        CultureInfo UICulture => Culture;
     }
 }

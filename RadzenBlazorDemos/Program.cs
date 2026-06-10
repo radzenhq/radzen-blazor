@@ -15,6 +15,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddDbContextFactory<NorthwindContext>();
 
+builder.Services.AddScoped<ILocalizer, DemoLocalizer>();
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenQueryStringThemeService();
 

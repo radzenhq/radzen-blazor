@@ -1878,12 +1878,10 @@ namespace Radzen.Blazor
                 _currentDate = default(DateTime);
             }
 
-            if (parameters.DidParameterChange(nameof(Min), Min) || parameters.DidParameterChange(nameof(Max), Max))
-            {
-                var min = parameters.GetValueOrDefault<DateTime?>(nameof(Min));
-                var max = parameters.GetValueOrDefault<DateTime?>(nameof(Max));
-                UpdateYearsAndMonths(min, max);
-            }
+            var shouldUpdateYearsAndMonths = parameters.DidParameterChange(nameof(Min), Min)
+                || parameters.DidParameterChange(nameof(Max), Max)
+                || parameters.DidParameterChange(nameof(Culture), Culture)
+                || parameters.DidParameterChange(nameof(DefaultCulture), DefaultCulture);
 
             var shouldClose = false;
 
@@ -1896,6 +1894,11 @@ namespace Radzen.Blazor
             var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
 
             await base.SetParametersAsync(parameters);
+
+            if (shouldUpdateYearsAndMonths)
+            {
+                UpdateYearsAndMonths(Min, Max);
+            }
 
             if (disabledChanged)
             {

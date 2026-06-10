@@ -140,7 +140,7 @@ public class ChartOverlay : DrawingOverlayBase<SheetChart>
         StateHasChanged();
     }
 
-    private string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+    private string L(string key) => Localizer.Get(key, Spreadsheet?.UICulture ?? System.Globalization.CultureInfo.CurrentUICulture);
 
     private void OnChartContextMenuItemClick(MenuItemEventArgs args, SheetChart chart)
     {

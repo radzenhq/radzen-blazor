@@ -52,6 +52,11 @@ public interface ISpreadsheet
     void Redo();
 
     /// <summary>
+    /// Gets the UI culture used for localized strings. Defaults to <see cref="System.Globalization.CultureInfo.CurrentUICulture"/>.
+    /// </summary>
+    System.Globalization.CultureInfo UICulture => System.Globalization.CultureInfo.CurrentUICulture;
+
+    /// <summary>
     /// Gets whether there is a command to undo.
     /// </summary>
     bool CanUndo { get; }
