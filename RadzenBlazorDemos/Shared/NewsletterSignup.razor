@@ -1,0 +1,184 @@
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div id="@containerId" class="rz-mx-auto rz-text-align-center" style="max-width: 480px;">
+    @if (subscribed)
+    {
+        <RadzenText TextStyle="TextStyle.Body1">
+            Almost done. Check your inbox and confirm your subscription.
+        </RadzenText>
+    }
+    else
+    {
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-2">Radzen Blazor Newsletter</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
+            Get an email when new components and releases ship. Unsubscribe anytime.
+        </RadzenText>
+        <RadzenTemplateForm TItem="SubscriptionModel" Data="@model" Submit="@OnSubmit">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+                <RadzenStack Gap="0.25rem" Style="flex: 1; max-width: 320px;">
+                    <RadzenTextBox @bind-Value="@model.Email" Name="Email" Placeholder="Your email" aria-label="Email address" Style="width: 100%;" />
+                    <RadzenRequiredValidator Component="Email" Text="Email is required." />
+                    <RadzenEmailValidator Component="Email" Text="Please enter a valid email address." />
+                </RadzenStack>
+                <RadzenButton Text="Subscribe" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" IsBusy="@loading" />
+            </RadzenStack>
+            <altcha-widget challengeurl="https://app.radzen.com/api/newsletter/challenge" auto="onload" hidefooter hidelogo style="display:none"></altcha-widget>
+        </RadzenTemplateForm>
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" ShowIcon Variant="Variant.Flat" Size="AlertSize.Small" AllowClose="false" class="rz-mt-2">
+                @error
+            </RadzenAlert>
+        }
+    }
+</div>
+
+@code {
+    string containerId = $"newsletter-{Guid.NewGuid():N}";
+    bool subscribed;
+    bool loading;
+    string error;
+
+    SubscriptionModel model = new();
+
+    IJSObjectReference altchaModule;
+
+    class SubscriptionModel
+    {
+        public string Email { get; set; }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            altchaModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/altcha.min.js");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (altchaModule is not null)
+        {
+            try { await altchaModule.DisposeAsync(); } catch { }
+        }
+    }
+
+    async Task OnSubmit()
+    {
+        error = null;
+        loading = true;
+
+        try
+        {
+            var altchaPayload = await GetAltchaPayload();
+
+            // The page-load challenge can be missing (fetch failed) or expired (long-lived
+            // page). Re-solve a fresh one and retry once before reporting an error.
+            if (string.IsNullOrEmpty(altchaPayload))
+            {
+                altchaPayload = await SolveFreshAltcha();
+            }
+
+            var response = await Subscribe(altchaPayload);
+
+            if (!response.IsSuccessStatusCode && response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                altchaPayload = await SolveFreshAltcha();
+
+                if (!string.IsNullOrEmpty(altchaPayload))
+                {
+                    response = await Subscribe(altchaPayload);
+                }
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                subscribed = true;
+            }
+            else
+            {
+                error = await GetErrorMessage(response);
+                await ResetAltcha();
+            }
+        }
+        catch
+        {
+            error = "An error occurred. Please try again.";
+            await ResetAltcha();
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    async Task<HttpResponseMessage> Subscribe(string altchaPayload)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://app.radzen.com/api/newsletter/subscribe");
+
+        if (!string.IsNullOrEmpty(altchaPayload))
+        {
+            request.Headers.Add("X-Altcha", altchaPayload);
+        }
+        request.Content = new StringContent(
+            System.Text.Json.JsonSerializer.Serialize(new { email = model.Email }),
+            System.Text.Encoding.UTF8,
+            "application/json");
+
+        return await Http.SendAsync(request);
+    }
+
+    async Task<string> GetAltchaPayload()
+    {
+        return await JSRuntime.InvokeAsync<string>("eval",
+            $"document.querySelector('#{containerId} input[name=\"altcha\"]')?.value");
+    }
+
+    async Task<string> SolveFreshAltcha()
+    {
+        await ResetAltcha();
+
+        for (var i = 0; i < 20; i++)
+        {
+            await Task.Delay(250);
+
+            var payload = await GetAltchaPayload();
+
+            if (!string.IsNullOrEmpty(payload))
+            {
+                return payload;
+            }
+        }
+
+        return null;
+    }
+
+    // Replace the widget with a fresh clone so it solves a new challenge after a failed attempt.
+    async Task ResetAltcha()
+    {
+        await JSRuntime.InvokeVoidAsync("eval",
+            $"(function(){{var e=document.querySelector('#{containerId} altcha-widget');if(e){{var c=e.cloneNode(false);for(var a of e.attributes)c.setAttribute(a.name,a.value);e.parentNode.replaceChild(c,e);}}}})()");
+    }
+
+    async Task<string> GetErrorMessage(HttpResponseMessage response)
+    {
+        try
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            var json = System.Text.Json.JsonDocument.Parse(body);
+
+            if (json.RootElement.TryGetProperty("message", out var messageProp))
+            {
+                return messageProp.GetString();
+            }
+        }
+        catch
+        {
+        }
+
+        return "Subscription failed. Please try again.";
+    }
+}
