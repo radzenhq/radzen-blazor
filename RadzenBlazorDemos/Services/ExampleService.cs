@@ -2746,6 +2746,22 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Reference Lines & Bands",
+                            Path = "chart-reference-line",
+                            Description = "Radzen Blazor Chart with reference line and reference band overlays that highlight targets, thresholds and acceptable ranges.",
+                            Tags = new [] { "chart", "graph", "reference", "line", "band", "target", "threshold", "limit", "range", "overlay" },
+                            New = true
+                        },
+                        new Example
+                        {
+                            Name = "Synchronized Charts",
+                            Path = "chart-sync",
+                            Description = "Radzen Blazor Charts with a shared SyncGroup display a synchronized crosshair, active data points and tooltips across multiple charts.",
+                            Tags = new [] { "chart", "graph", "sync", "synchronized", "crosshair", "tooltip", "dashboard", "linked", "export" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Pareto Chart",
                             Path = "chart-pareto",
                             Description = "Radzen Blazor Chart combining column and line series to create a Pareto chart with cumulative percentages.",
@@ -2772,8 +2788,8 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Live Chart",
                             Path = "live-chart",
-                            Description = "Radzen Blazor live updating chart with real-time data using ObservableCollection and timer.",
-                            Tags = new [] { "chart", "graph", "live", "real-time", "update", "timer", "observable" },
+                            Description = "Radzen Blazor live updating line chart streaming real-time data over a rolling window - like a CPU or telemetry monitor.",
+                            Tags = new [] { "chart", "graph", "live", "real-time", "streaming", "update", "timer", "monitor", "telemetry" },
                             New = true
                         },
                     }

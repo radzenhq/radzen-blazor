@@ -22,7 +22,7 @@
         </RadzenStack>
     </RadzenCard>
 
-   <RadzenChart>
+   <RadzenChart Animate="true">
         <RadzenChartTooltipOptions Shared="@sharedTooltip" />
         <RadzenLineSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue">
             <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" />
@@ -34,7 +34,7 @@
         </RadzenLineSeries>
         <RadzenCategoryAxis Padding="20" />
         <RadzenValueAxis Formatter="@FormatAsUSD">
-            <RadzenGridLines Visible="true" />
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
             <RadzenAxisTitle Text="Revenue in USD" />
         </RadzenValueAxis>
     </RadzenChart>

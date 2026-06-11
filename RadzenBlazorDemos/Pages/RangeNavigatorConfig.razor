@@ -23,11 +23,10 @@
             <RadzenAxisTitle Text="Price (USD)" />
         </RadzenValueAxis>
         <RadzenLegend Position="LegendPosition.Bottom" />
+        <RadzenChartRangeNavigator Height="80" ShowHandleLabels="true" HandleLabelFormatString="{0:MMM dd, yyyy}">
+            <RadzenRangeNavigatorLineSeries Data="@stockData" CategoryProperty="Date" ValueProperty="Close" Stroke="#1E88E5" />
+        </RadzenChartRangeNavigator>
     </RadzenChart>
-
-    <RadzenRangeNavigator @bind-Start="@start" @bind-End="@end" Style="height: 80px; margin-top: 16px;" ShowHandleLabels="true" HandleLabelFormatString="{0:MMM dd, yyyy}">
-        <RadzenRangeNavigatorLineSeries Data="@stockData" CategoryProperty="Date" ValueProperty="Close" Stroke="#1E88E5" />
-    </RadzenRangeNavigator>
 </RadzenStack>
 
 @code {

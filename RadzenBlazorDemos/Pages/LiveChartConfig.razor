@@ -1,102 +1,102 @@
-@using System.Timers
 @implements IDisposable
 
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
-    <RadzenRow>
-        <RadzenColumn Size="12">
-            <RadzenChart @ref="chart" Style="height: 480px">
-                <RadzenLineSeries Data="@data" CategoryProperty="Time" ValueProperty="Value" Title="CPU Usage"
-                    Stroke="var(--rz-warning)" StrokeWidth="2">
-                </RadzenLineSeries>
-                <RadzenCategoryAxis FormatString="{0:mm:ss}">
-                    <RadzenAxisTitle Text="Time (s)" />
-                </RadzenCategoryAxis>
-                <RadzenValueAxis Min="0" Max="100" FormatString="{0}%">
-                    <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="CPU Usage" />
-                </RadzenValueAxis>
-                <RadzenChartTooltipOptions Visible="false" />
-                <RadzenLegend Visible="false" />
-            </RadzenChart>
-        </RadzenColumn>
-    </RadzenRow>
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenButton Click="@TogglePlay" Icon="@(running ? "pause" : "play_arrow")" Text="@(running ? "Pause" : "Play")" ButtonStyle="ButtonStyle.Primary" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart AnimateDataUpdates="true">
+        <RadzenChartTooltipOptions />
+        <RadzenLineSeries Smooth="true" Data="@cpu" CategoryProperty="Time" ValueProperty="Value" Title="CPU">
+            <RadzenSeriesValueLabel />
+        </RadzenLineSeries>
+        <RadzenLineSeries Smooth="true" Data="@memory" CategoryProperty="Time" ValueProperty="Value" Title="Memory">
+            <RadzenSeriesValueLabel />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Step="@TimeSpan.FromSeconds(5)" FormatString="{0:HH:mm:ss}" />
+        <RadzenValueAxis Min="0" Max="100" Step="25" FormatString="{0}%">
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
+            <RadzenAxisTitle Text="Usage" />
+        </RadzenValueAxis>
+    </RadzenChart>
 </RadzenStack>
 
 @code {
-    RadzenChart chart;
-    System.Timers.Timer timer;
-    ElapsedEventHandler timerElapsedHandler;
-    Random random = new Random();
-    double currentValue = 50;
-    const int MaxPoints = 40;
-
-    class CpuDataItem
+    class DataItem
     {
         public DateTime Time { get; set; }
         public double Value { get; set; }
     }
 
-    List<CpuDataItem> items = new List<CpuDataItem>();
-    IList<CpuDataItem> data;
+    const int WindowSize = 30;
+
+    List<DataItem> cpu = new();
+    List<DataItem> memory = new();
+
+    Random random = new();
+    System.Threading.Timer timer;
+    bool running = true;
+
+    double cpuValue = 50;
+    double memoryValue = 40;
 
     protected override void OnInitialized()
     {
         var now = DateTime.Now;
 
-        for (int i = MaxPoints; i > 0; i--)
+        // Seed the rolling window with initial data.
+        for (var index = WindowSize - 1; index >= 0; index--)
         {
-            currentValue = NextValue();
-            items.Add(new CpuDataItem
-            {
-                Time = now.AddMilliseconds(-i * 500),
-                Value = currentValue
-            });
+            AddPoint(now.AddMilliseconds(-500 * index));
         }
 
-        data = items;
-
-        timer = new System.Timers.Timer(500);
-        timerElapsedHandler = async (s, e) => await InvokeAsync(() => UpdateChart());
-        timer.Elapsed += timerElapsedHandler;
-        timer.Start();
+        timer = new System.Threading.Timer(OnTimer, null, dueTime: 500, period: 500);
     }
 
-    double NextValue()
+    void OnTimer(object state)
     {
-        var change = (random.NextDouble() - 0.5) * 20;
-        currentValue = Math.Clamp(currentValue + change, 5, 95);
-        return Math.Round(currentValue, 1);
-    }
-
-    void UpdateChart()
-    {
-        items.Add(new CpuDataItem
+        if (!running)
         {
-            Time = DateTime.Now,
-            Value = NextValue()
-        });
-
-        if (items.Count > MaxPoints)
-        {
-            items.RemoveAt(0);
+            return;
         }
 
-        // Assign a new list reference to trigger the series parameter change detection
-        data = new List<CpuDataItem>(items);
+        AddPoint(DateTime.Now);
 
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    void AddPoint(DateTime time)
+    {
+        cpuValue = Math.Clamp(cpuValue + (random.NextDouble() - 0.5) * 20, 5, 95);
+        memoryValue = Math.Clamp(memoryValue + (random.NextDouble() - 0.5) * 10, 5, 95);
+
+        // Assign new list instances so the chart detects the data change.
+        cpu = Append(cpu, new DataItem { Time = time, Value = Math.Round(cpuValue, 1) });
+        memory = Append(memory, new DataItem { Time = time, Value = Math.Round(memoryValue, 1) });
+    }
+
+    static List<DataItem> Append(List<DataItem> items, DataItem item)
+    {
+        var result = new List<DataItem>(items) { item };
+
+        // Keep a rolling window - drop the oldest point.
+        if (result.Count > WindowSize)
+        {
+            result.RemoveAt(0);
+        }
+
+        return result;
+    }
+
+    void TogglePlay()
+    {
+        running = !running;
     }
 
     public void Dispose()
     {
-        if (timer != null && timerElapsedHandler != null)
-        {
-            timer.Elapsed -= timerElapsedHandler;
-            timerElapsedHandler = null;
-        }
-
-        timer?.Stop();
         timer?.Dispose();
-        timer = null;
     }
 }
