@@ -883,9 +883,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override void Dispose()
         {
-            if (IsJSRuntimeAvailable)
+            if (IsJSRuntimeAvailable && JSRuntime != null)
             {
-                JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
+                JSRuntime.InvokeVoid("Radzen.destroyResizable", Element);
+                JSRuntime.InvokeVoidAsync("Radzen.disposeElement", Element);
             }
 
             base.Dispose();
@@ -895,19 +896,6 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return $"rz-spider-chart rz-scheme-{ColorScheme.ToString().ToLowerInvariant()}";
-        }
-
-        /// <inheritdoc />
-        public override void Dispose()
-        {
-            if (IsJSRuntimeAvailable && JSRuntime != null)
-            {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", Element);
-            }
-
-            base.Dispose();
-
-            GC.SuppressFinalize(this);
         }
     }
 
