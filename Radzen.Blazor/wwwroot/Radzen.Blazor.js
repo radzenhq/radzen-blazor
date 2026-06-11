@@ -3631,6 +3631,7 @@ window.Radzen = {
                     ); } catch { }
 
                     document.removeEventListener('pointerup', Radzen[el].mouseUpHandler);
+                    document.removeEventListener('pointercancel', Radzen[el].mouseUpHandler);
                     document.removeEventListener('pointermove', Radzen[el].mouseMoveHandler);
                     el.removeEventListener('touchmove', preventDefaultAndStopPropagation);
                     Radzen[el] = null;
@@ -3638,6 +3639,11 @@ window.Radzen = {
             },
             mouseMoveHandler: function(e) {
                 if (Radzen[el]) {
+
+                    if (e.buttons === 0) {
+                        Radzen[el].mouseUpHandler(e);
+                        return;
+                    }
 
                     try { splitter.invokeMethodAsync(
                         'RadzenSplitter.OnPaneResizing'
@@ -3691,6 +3697,7 @@ window.Radzen = {
             ev.stopPropagation();
         };
           document.addEventListener('pointerup', Radzen[el].mouseUpHandler);
+          document.addEventListener('pointercancel', Radzen[el].mouseUpHandler);
           document.addEventListener('pointermove', Radzen[el].mouseMoveHandler);
           el.addEventListener('touchmove', preventDefaultAndStopPropagation, { passive: false });
     },
