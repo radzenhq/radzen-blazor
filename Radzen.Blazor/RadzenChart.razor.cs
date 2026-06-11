@@ -1580,18 +1580,37 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Exports the chart plot area and axes as an image and downloads it in the browser.
+        /// Returns the SVG markup of the rendered chart as a string.
+        /// The plot area and axes are included, with theme styles inlined so the SVG renders standalone.
         /// Legends and tooltips are HTML overlays and are not included.
+        /// To download it, pass the result to the <c>Radzen.downloadFile</c> JavaScript helper.
         /// </summary>
-        /// <param name="fileName">The download file name. The extension determines the format - <c>.svg</c> exports vector graphics, anything else exports PNG.</param>
-        public async Task ExportAsync(string fileName = "chart.png")
+        /// <returns>
+        /// A <see cref="Task{String}"/> representing the asynchronous operation. The task result contains the SVG markup of the chart.
+        /// </returns>
+        public async Task<string> ToSvg()
+        {
+            if (IsJSRuntimeAvailable && JSRuntime != null)
+            {
+                return await JSRuntime.InvokeAsync<string>("Radzen.chartToSvg", Element);
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Renders the chart as a PNG image and downloads it in the browser.
+        /// The plot area and axes are included; legends and tooltips are HTML overlays and are not included.
+        /// </summary>
+        /// <param name="fileName">The download file name. Default is <c>chart.png</c>.</param>
+        public async Task ToPng(string fileName = "chart.png")
         {
             ArgumentNullException.ThrowIfNull(fileName);
 
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
-                var format = fileName.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) ? "svg" : "png";
-                await JSRuntime.InvokeVoidAsync("Radzen.exportChart", Element, fileName, format);
+                var svg = await ToSvg();
+                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName);
             }
         }
 

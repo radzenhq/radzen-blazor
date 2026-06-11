@@ -3243,10 +3243,10 @@ window.Radzen = {
     var rect = ref.getBoundingClientRect();
     return { width: rect.width, height: rect.height };
   },
-  exportChart: async function (ref, fileName, format) {
+  chartToSvg: function (ref) {
     // The legend contains small swatch SVGs - the plot is the chart element's direct svg child.
     var svg = ref && ref.querySelector(':scope > svg');
-    if (!svg) return;
+    if (!svg) return '';
 
     var clone = svg.cloneNode(true);
     // Series colors and most chart styling come from CSS classes which are not available in a
@@ -3276,18 +3276,13 @@ window.Radzen = {
     clone.setAttribute('height', rect.height);
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
-    var serialized = new XMLSerializer().serializeToString(clone);
+    return new XMLSerializer().serializeToString(clone);
+  },
+  downloadSvgAsPng: async function (svg, fileName) {
+    if (!svg) return;
+
     // Use data: URLs rather than blob: URLs - Content-Security-Policy headers commonly disallow blob: images.
-    var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(serialized);
-
-    if (format === 'svg') {
-      var a = document.createElement('a');
-      a.href = svgUrl;
-      a.download = fileName;
-      a.click();
-      return;
-    }
-
+    var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     var img = new Image();
     await new Promise(function (resolve, reject) {
       img.onload = resolve;
@@ -3295,10 +3290,12 @@ window.Radzen = {
       img.src = svgUrl;
     });
 
+    var width = img.naturalWidth || img.width;
+    var height = img.naturalHeight || img.height;
     var scale = Math.max(2, window.devicePixelRatio || 1);
     var canvas = document.createElement('canvas');
-    canvas.width = Math.round(rect.width * scale);
-    canvas.height = Math.round(rect.height * scale);
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
     var ctx = canvas.getContext('2d');
     var background = getComputedStyle(document.body).backgroundColor;
     if (background && background !== 'rgba(0, 0, 0, 0)') {
@@ -3307,10 +3304,13 @@ window.Radzen = {
     }
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    var link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
-    link.download = fileName;
-    link.click();
+    var self = this;
+    await new Promise(function (resolve) {
+      canvas.toBlob(function (blob) {
+        self.downloadFile(fileName, blob, 'image/png');
+        resolve();
+      }, 'image/png');
+    });
   },
   createChart: function (ref, instance, mouseMoveInterval) {
     var inside = false;

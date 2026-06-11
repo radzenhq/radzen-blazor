@@ -279,10 +279,10 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Returns the SVG markup of the rendered QR code as a string.
+        /// Returns the SVG markup of the rendered barcode as a string.
         /// </summary>
         /// <returns>
-        /// A <see cref="Task{String}"/> representing the asynchronous operation. The task result contains the SVG markup of the QR code.
+        /// A <see cref="Task{String}"/> representing the asynchronous operation. The task result contains the SVG markup of the barcode.
         /// </returns>
         public async Task<string> ToSvg()
         {
@@ -291,6 +291,19 @@ namespace Radzen.Blazor
                 return await JSRuntime.InvokeAsync<string>("Radzen.outerHTML", Element);
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Renders the barcode as a PNG image and downloads it in the browser.
+        /// </summary>
+        /// <param name="fileName">The download file name. Default is <c>barcode.png</c>.</param>
+        public async Task ToPng(string fileName = "barcode.png")
+        {
+            if (JSRuntime != null)
+            {
+                var svg = await ToSvg();
+                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName);
+            }
         }
     }
 }
