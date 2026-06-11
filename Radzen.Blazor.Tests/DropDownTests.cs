@@ -898,5 +898,41 @@ namespace Radzen.Blazor.Tests
             Assert.NotNull(filterInput.GetAttribute("aria-expanded"));
             Assert.Equal("list", filterInput.GetAttribute("aria-autocomplete"));
         }
+
+        [Fact]
+        public void DropDown_ConsumerSuppliedAriaLabel_OverridesComputedAriaLabel()
+        {
+            using var ctx = new TestContext();
+
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.AddUnmatched("aria-label", "Filter by status");
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+
+            Assert.Equal("Filter by status", combobox.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void DropDown_WithoutConsumerAriaLabel_FallsBackToComputedAriaLabel()
+        {
+            using var ctx = new TestContext();
+
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Value, 1);
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+
+            Assert.Equal("Item 1", combobox.GetAttribute("aria-label"));
+        }
     }
 }
