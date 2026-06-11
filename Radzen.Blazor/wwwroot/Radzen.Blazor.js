@@ -2921,7 +2921,12 @@ window.Radzen = {
     ref.resizeHandler = function () {
       var rect = ref.getBoundingClientRect();
 
-      try { instance.invokeMethodAsync('Resize', rect.width, rect.height); } catch { }
+      try {
+        var promise = instance.invokeMethodAsync('Resize', rect.width, rect.height);
+        if (promise && typeof promise.catch === 'function') {
+          promise.catch(function () { });
+        }
+      } catch { }
     };
 
     if (window.ResizeObserver) {

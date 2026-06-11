@@ -585,12 +585,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override void Dispose()
         {
-            base.Dispose();
-
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
-                JSRuntime.InvokeVoid("Radzen.destroyResizable", Element);
+                JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", Element);
             }
+
+            base.Dispose();
 
             GC.SuppressFinalize(this);
         }
