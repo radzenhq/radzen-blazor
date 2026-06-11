@@ -177,15 +177,8 @@ namespace Radzen.Blazor
 
             var tickDistance = Math.Max(80, (int)(Width / 8));
             CategoryScale.Step = null;
-            var tickInfo = CategoryScale.Ticks(tickDistance);
-            var step = tickInfo.Step;
 
-            if (step <= 0)
-            {
-                return ticks;
-            }
-
-            for (var value = tickInfo.Start; value <= tickInfo.End; value += step)
+            foreach (var value in CategoryScale.TickValues(tickDistance))
             {
                 var fraction = (value - inputStart) / (inputEnd - inputStart);
 

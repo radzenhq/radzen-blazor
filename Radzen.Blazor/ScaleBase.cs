@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -42,6 +43,36 @@ namespace Radzen.Blazor
         abstract public (double Start, double End, double Step) Ticks(int distance);
 
         /// <summary>
+        /// The values at which axis ticks are rendered. The default implementation enumerates
+        /// <see cref="Ticks(int)" /> uniformly; scales with non-uniform intervals (e.g. calendar months) override it.
+        /// </summary>
+        /// <param name="distance">The desired distance between ticks in pixels.</param>
+        public virtual IEnumerable<double> TickValues(int distance)
+        {
+            var (start, end, step) = Ticks(distance);
+
+            if (step <= 0 || !double.IsFinite(step) || !double.IsFinite(start) || !double.IsFinite(end))
+            {
+                yield return start;
+                yield break;
+            }
+
+            if (IsLogarithmic)
+            {
+                for (var value = start; value <= end; value *= step)
+                {
+                    yield return value;
+                }
+                yield break;
+            }
+
+            for (var value = (decimal)start; value <= (decimal)end; value += (decimal)step)
+            {
+                yield return (double)value;
+            }
+        }
+
+        /// <summary>
         /// Converts the specified value to a value from this scale with optional padding.
         /// </summary>
         /// <param name="value">The value.</param>
@@ -68,7 +99,7 @@ namespace Radzen.Blazor
         /// Gets or sets the step.
         /// </summary>
         /// <value>The step.</value>
-        public object? Step { get; set; }
+        public virtual object? Step { get; set; }
 
         /// <summary>
         /// Resizes the scale to the specified values.

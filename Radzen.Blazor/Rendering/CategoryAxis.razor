@@ -4,8 +4,9 @@
 {
     <g class="rz-axis rz-category-axis">
     <Line class="rz-line" X1="@Math.Min(x1, x2)" Y1="@y1" X2="@Math.Max(x1, x2)" Y2="@y1" Stroke="@(XAxis?.Stroke)" StrokeWidth="@(XAxis?.StrokeWidth ?? 0)" LineType="@(XAxis?.LineType ?? LineType.Solid)" />
-    @for (var idx = start; idx <= end; idx += step)
+    @foreach (var tick in tickValues)
     {
+        var idx = (decimal)tick;
         var value = Chart?.CategoryScale?.Value((double)idx);
         var x = Chart?.CategoryScale?.Scale((double)idx, true) ?? 0;
 
@@ -46,6 +47,7 @@
     decimal start;
     decimal end;
     decimal step;
+    System.Collections.Generic.List<double> tickValues = new();
     double x1;
     double x2;
     double y1;
@@ -80,6 +82,7 @@
         start = (decimal)ticks.Start;
         end = (decimal)ticks.End;
         step = (decimal)ticks.Step;
+        tickValues = Chart.CategoryScale.TickValues(XAxis?.TickDistance ?? 0).ToList();
 
         x1 = Chart.CategoryScale.Scale(ticks.Start);
         x2 = Chart.CategoryScale.Scale(ticks.End);
@@ -109,11 +112,11 @@
         {
             rotate = null;
 
-            var tickWidth = Math.Abs(x2 - x1) / ((double)end - (double)start);
+            var tickWidth = Math.Abs(x2 - x1) / Math.Max(1, tickValues.Count - 1);
 
-            for (var idx = start; idx <= end; idx += step)
+            foreach (var tick in tickValues)
             {
-                var value = Chart.CategoryScale.Value((double)idx);
+                var value = Chart.CategoryScale.Value(tick);
                 var text = XAxis != null ? XAxis.Format(Chart.CategoryScale, value) : "";
 
                 var textWidth = TextMeasurer.TextWidth(text) - 8;
