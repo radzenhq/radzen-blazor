@@ -47,6 +47,9 @@
                     <RadzenRow class="rz-mx-auto" Style="max-width: 1600px;">
                         <RadzenColumn Size="12" SizeMD=@(example?.Toc != null ? 10 : 12)>
                             @Body
+                            <div class="rz-mt-12">
+                                <NewsletterSignup />
+                            </div>
                             <RadzenCard class="rz-mt-12 rz-display-block rz-p-6 rz-p-md-12 rz-pb-12 rz-background-color-base-darker dark" Style="overflow: hidden; ">
                                 <RadzenRow AlignItems="AlignItems.Center" Gap="0px" class="rz-pb-12 rz-mb-4">
                                     <RadzenColumn SizeMD="12" class="rz-p-0 rz-pb-12 rz-mb-12">
@@ -85,9 +88,6 @@
                                     </RadzenColumn>
                                 </RadzenRow>
                             </RadzenCard>
-                            <div class="rz-mt-12">
-                                <NewsletterSignup />
-                            </div>
                             <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" class="rz-mt-12">
                                 <span>Radzen Blazor Components, &copy; 2018-2026 Radzen.</span> <br />
                                 <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</RadzenLink> licensed under
