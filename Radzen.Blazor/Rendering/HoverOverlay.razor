@@ -1,0 +1,33 @@
+@using Radzen.Blazor
+@implements IDisposable
+
+@Chart?.RenderCrosshair()
+@Chart?.RenderActivePoint()
+
+@code {
+    [Parameter]
+    public RadzenChart? Chart { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Chart != null)
+        {
+            Chart.HoverOverlay = this;
+        }
+    }
+
+    // Invoked by the chart when the cursor or the active data point moves. Re-renders only this
+    // overlay so hover tracking never triggers a full chart re-render.
+    internal void Refresh()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Chart != null && ReferenceEquals(Chart.HoverOverlay, this))
+        {
+            Chart.HoverOverlay = null;
+        }
+    }
+}

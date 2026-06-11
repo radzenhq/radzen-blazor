@@ -70,6 +70,163 @@ namespace Radzen.Blazor
         public bool AllowSeriesHover { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets the minimum interval in milliseconds between mouse move notifications which drive the tooltip, crosshair and hover tracking.
+        /// Mouse moves are coalesced to animation frames; this value imposes an additional delay between dispatches.
+        /// Defaults to <c>0</c> (every animation frame) on WebAssembly and <c>50</c> on Blazor Server to limit SignalR traffic.
+        /// </summary>
+        /// <value>The mouse move throttle in milliseconds.</value>
+        [Parameter]
+        public int? MouseMoveThrottle { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether series animate when the chart first renders.
+        /// Series are revealed with a left-to-right wipe. The animation respects the user's reduced motion preference.
+        /// </summary>
+        /// <value><c>true</c> if the initial render is animated; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Animate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the duration of the initial render animation in milliseconds.
+        /// </summary>
+        /// <value>The animation duration in milliseconds. Default is <c>700</c>.</value>
+        [Parameter]
+        public double AnimationDuration { get; set; } = 700;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether line and area series morph smoothly when their data changes.
+        /// Best suited for live dashboards where values update in place. Not applied while zooming or panning.
+        /// Supported in Chromium and Firefox; other browsers update instantly.
+        /// </summary>
+        /// <value><c>true</c> to animate data updates; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool AnimateDataUpdates { get; set; }
+
+        /// <summary>
+        /// Gets or sets the synchronization group of the chart. Charts which share the same group display
+        /// a synchronized crosshair and active data points: hovering one chart highlights the same category in the others.
+        /// Charts in a group should plot the same kind of category (e.g. the same dates).
+        /// </summary>
+        /// <value>The synchronization group. Default is <c>null</c> (not synchronized).</value>
+        [Parameter]
+        public string? SyncGroup { get; set; }
+
+        private static readonly object syncGroupsLock = new object();
+        private static readonly Dictionary<string, List<RadzenChart>> syncGroups = new Dictionary<string, List<RadzenChart>>();
+        private string? registeredSyncGroup;
+
+        // Plot-local X of the category hovered in another chart of the same SyncGroup. Drives the
+        // synchronized crosshair and active points when the cursor is not over this chart.
+        internal double? SyncedPlotX { get; private set; }
+
+        private void RegisterSyncGroup()
+        {
+            if (registeredSyncGroup == SyncGroup)
+            {
+                return;
+            }
+
+            UnregisterSyncGroup();
+
+            if (SyncGroup != null)
+            {
+                lock (syncGroupsLock)
+                {
+                    if (!syncGroups.TryGetValue(SyncGroup, out var charts))
+                    {
+                        charts = new List<RadzenChart>();
+                        syncGroups[SyncGroup] = charts;
+                    }
+                    charts.Add(this);
+                }
+                registeredSyncGroup = SyncGroup;
+            }
+        }
+
+        private void UnregisterSyncGroup()
+        {
+            if (registeredSyncGroup == null)
+            {
+                return;
+            }
+
+            lock (syncGroupsLock)
+            {
+                if (syncGroups.TryGetValue(registeredSyncGroup, out var charts))
+                {
+                    charts.Remove(this);
+                    if (charts.Count == 0)
+                    {
+                        syncGroups.Remove(registeredSyncGroup);
+                    }
+                }
+            }
+            registeredSyncGroup = null;
+        }
+
+        private void BroadcastSyncedHover(double x, double y)
+        {
+            if (registeredSyncGroup == null)
+            {
+                return;
+            }
+
+            List<RadzenChart> targets;
+            lock (syncGroupsLock)
+            {
+                targets = syncGroups.TryGetValue(registeredSyncGroup, out var charts)
+                    ? charts.Where(chart => !ReferenceEquals(chart, this)).ToList()
+                    : new List<RadzenChart>();
+            }
+
+            // Broadcast only while the cursor is inside the plot area
+            double? categoryValue = null;
+            if ((x >= 0 || y >= 0) && Width.HasValue && Height.HasValue)
+            {
+                var plotWidth = Width.Value - MarginLeft - MarginRight;
+                var plotHeight = Height.Value - MarginTop - MarginBottom;
+                var queryX = x - MarginLeft;
+                var queryY = y - MarginTop;
+
+                if (queryX >= 0 && queryX <= plotWidth && queryY >= 0 && queryY <= plotHeight)
+                {
+                    categoryValue = (double)Convert.ChangeType(PixelToValue(CategoryScale, queryX), typeof(double), CultureInfo.InvariantCulture);
+                }
+            }
+
+            foreach (var target in targets)
+            {
+                target.SetSyncedHover(categoryValue);
+            }
+        }
+
+        private void SetSyncedHover(double? categoryValue)
+        {
+            double? plotX = null;
+
+            if (categoryValue != null)
+            {
+                var x = CategoryScale.Scale(categoryValue.Value, true);
+                if (x >= 0 && x <= CategoryScale.OutputSize)
+                {
+                    plotX = x;
+                }
+            }
+
+            if (SyncedPlotX != plotX)
+            {
+                SyncedPlotX = plotX;
+                HoverOverlay?.Refresh();
+                TooltipOverlay?.Refresh();
+            }
+        }
+
+        internal string? GetChartStyle()
+        {
+            return Animate ? $"--rz-chart-animation-duration: {AnimationDuration.ToInvariantString()}ms;{Style}" : Style;
+        }
+
+        /// <summary>
         /// Gets whether the chart is currently rendered in a right-to-left context.
         /// When <c>true</c>, the category axis direction is reversed and the value axis renders on the right side.
         /// </summary>
@@ -796,8 +953,6 @@ namespace Radzen.Blazor
             mouseX = x;
             mouseY = y;
 
-            var crosshairOrSplit = AnyAxisCrosshairVisible() || (Tooltip != null && Tooltip.Split);
-
             // JS sends (-1, -1) on mouseleave. Clear hover state and re-render to hide the crosshair.
             if (x < 0 && y < 0)
             {
@@ -808,9 +963,16 @@ namespace Radzen.Blazor
                     SnapPlotY = -1;
                     HoveredSeries = null;
                     SharedPointsAtSnap = null;
-                    if (crosshairOrSplit)
+                    // The crosshair and active point live in the hover overlay, the split/axis/synced tooltip
+                    // boxes in the tooltip overlay - both re-render independently of the (potentially
+                    // expensive) chart.
+                    if (Tooltip != null && (Tooltip.Split || AxisTooltipTrigger))
                     {
-                        StateHasChanged();
+                        TooltipOverlay?.Refresh();
+                    }
+                    if (AnyAxisCrosshairVisible() || ActivePointEnabled || (Tooltip != null && Tooltip.Split))
+                    {
+                        HoverOverlay?.Refresh();
                     }
                 }
             }
@@ -818,12 +980,14 @@ namespace Radzen.Blazor
             {
                 MouseInside = true;
                 // The crosshair follows the cursor even when no data point is in tooltip range,
-                // so re-render on every move when the feature is enabled.
-                if (crosshairOrSplit)
+                // so refresh on every move when the feature is enabled.
+                if (AnyAxisCrosshairVisible())
                 {
-                    StateHasChanged();
+                    HoverOverlay?.Refresh();
                 }
             }
+
+            BroadcastSyncedHover(x, y);
 
             await DisplayTooltip();
         }
@@ -981,6 +1145,59 @@ namespace Radzen.Blazor
             return (closestSeries, closestData);
         }
 
+        // Resolves the effective tooltip trigger - Auto means Axis when the category crosshair is on
+        // or the chart belongs to a sync group (both imply category-tracking interactions).
+        internal bool AxisTooltipTrigger
+        {
+            get
+            {
+                return (Tooltip?.Trigger ?? ChartTooltipTrigger.Auto) switch
+                {
+                    ChartTooltipTrigger.Axis => true,
+                    ChartTooltipTrigger.Point => false,
+                    _ => CategoryAxis?.Crosshair?.Visible == true || SyncGroup != null,
+                };
+            }
+        }
+
+        // Axis-trigger matching: the data point nearest to the cursor by X across all point series,
+        // ties at the same category resolved by vertical distance. No tolerance - any position inside
+        // the plot matches, like crosshairs and synced charts.
+        private (IChartSeries?, object?) ClosestSeriesByCategory(double queryX, double queryY)
+        {
+            IChartSeries? closestSeries = null;
+            object? closestData = null;
+            var bestX = double.MaxValue;
+            var bestY = double.MaxValue;
+
+            foreach (var series in Series.OrderBy(s => s.RenderingOrder).Reverse())
+            {
+                if (!series.Visible || IsRegionSeries(series))
+                {
+                    continue;
+                }
+
+                var (data, point) = series.DataAt(queryX, queryY);
+                if (data == null)
+                {
+                    continue;
+                }
+
+                var dx = Math.Abs(point.X - queryX);
+                var dy = Math.Abs(point.Y - queryY);
+
+                if (dx < bestX - 0.5 || (Math.Abs(dx - bestX) <= 0.5 && dy < bestY))
+                {
+                    bestX = dx;
+                    bestY = dy;
+                    closestSeries = series;
+                    closestData = data;
+                }
+            }
+
+            return (closestSeries, closestData);
+        }
+
         // True for series that fill a region (columns, bars, stacks and the radial pie/donut/funnel/pyramid),
         // i.e. whose DataAt returns the cursor itself rather than a discrete data point.
         private static bool IsRegionSeries(IChartSeries series)
@@ -1026,7 +1243,30 @@ namespace Radzen.Blazor
                     }
                 }
 
-                var (closestSeries, closestSeriesData) = FindClosestSeries(queryX, queryY, TooltipTolerance);
+                var axisMode = AxisTooltipTrigger;
+                var cursorInPlot = false;
+
+                if (Width.HasValue && Height.HasValue)
+                {
+                    var plotWidth = Width.Value - MarginLeft - MarginRight;
+                    var plotHeight = Height.Value - MarginTop - MarginBottom;
+                    cursorInPlot = queryX >= 0 && queryX <= plotWidth && queryY >= 0 && queryY <= plotHeight;
+                }
+
+                IChartSeries? closestSeries = null;
+                object? closestSeriesData = null;
+
+                // In axis mode the crosshair, tooltip and active point work as one unit gated by the
+                // plot area; outside it nothing matches and everything hides together.
+                if (!axisMode || cursorInPlot)
+                {
+                    (closestSeries, closestSeriesData) = FindClosestSeries(queryX, queryY, TooltipTolerance);
+
+                    if (closestSeriesData == null && axisMode)
+                    {
+                        (closestSeries, closestSeriesData) = ClosestSeriesByCategory(queryX, queryY);
+                    }
+                }
 
                 if (closestSeriesData != null && closestSeries != null)
                 {
@@ -1036,7 +1276,7 @@ namespace Radzen.Blazor
                     SnapPlotY = snap.Y;
                     HoveredSeries = closestSeries;
 
-                    if (Tooltip.Split)
+                    if (Tooltip.Split || (Tooltip.Shared && ActivePointEnabled))
                     {
                         // Collect all visible series' nearest points at the snapped X so the split
                         // overlay can render a small tooltip per series anchored to its own Y.
@@ -1067,8 +1307,8 @@ namespace Radzen.Blazor
                         tooltipSeries = closestSeries;
                         tooltip = closestSeries.RenderTooltip(closestSeriesData);
 
-                        // Split mode draws its own in-chart overlay — don't also open the popup tooltip.
-                        if (!Tooltip.Split)
+                        // Split and axis modes draw their own in-chart overlay — don't also open the popup tooltip.
+                        if (!Tooltip.Split && !axisMode)
                         {
                             TooltipService?.OpenChartTooltip(Element, snap.X + MarginLeft, snap.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
                             {
@@ -1078,24 +1318,33 @@ namespace Radzen.Blazor
                         await Task.Yield();
                     }
 
-                    if (snapChanged && (AnyAxisCrosshairVisible() || Tooltip.Split))
+                    if (snapChanged)
                     {
-                        StateHasChanged();
+                        if (Tooltip.Split || axisMode)
+                        {
+                            TooltipOverlay?.Refresh();
+                        }
+                        if (AnyAxisCrosshairVisible() || ActivePointEnabled || Tooltip.Split)
+                        {
+                            HoverOverlay?.Refresh();
+                        }
                     }
                     return;
                 }
             }
 
+            var cleared = false;
+
             if (SnapPlotX >= 0 || SnapPlotY >= 0)
             {
-                var crosshairOrSplit = AnyAxisCrosshairVisible() || Tooltip.Split;
                 SnapPlotX = -1;
                 SnapPlotY = -1;
                 HoveredSeries = null;
                 SharedPointsAtSnap = null;
-                if (crosshairOrSplit)
+                cleared = true;
+                if (AnyAxisCrosshairVisible() || ActivePointEnabled || Tooltip.Split)
                 {
-                    StateHasChanged();
+                    HoverOverlay?.Refresh();
                 }
             }
 
@@ -1104,9 +1353,16 @@ namespace Radzen.Blazor
                 tooltipData = null;
                 tooltipSeries = null;
                 tooltip = null;
+                cleared = true;
 
                 TooltipService?.Close();
                 await Task.Yield();
+            }
+
+            // After the hover state is fully cleared so the in-chart tooltip box hides with it.
+            if (cleared && (Tooltip.Split || AxisTooltipTrigger))
+            {
+                TooltipOverlay?.Refresh();
             }
         }
 
@@ -1163,7 +1419,8 @@ namespace Radzen.Blazor
 
                 if (Visible && JSRuntime != null)
                 {
-                    var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createChart", Element, Reference);
+                    var mouseMoveThrottle = MouseMoveThrottle ?? (JSRuntime is IJSInProcessRuntime ? 0 : 50);
+                    var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createChart", Element, Reference, mouseMoveThrottle);
 
                     if (!widthAndHeightAreSet)
                     {
@@ -1248,6 +1505,8 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
+            RegisterSyncGroup();
+
             if ((viewStartChanged || viewEndChanged) && !isInternalZoom)
             {
                 ZoomStart = ViewStart;
@@ -1320,10 +1579,28 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Exports the chart plot area and axes as an image and downloads it in the browser.
+        /// Legends and tooltips are HTML overlays and are not included.
+        /// </summary>
+        /// <param name="fileName">The download file name. The extension determines the format - <c>.svg</c> exports vector graphics, anything else exports PNG.</param>
+        public async Task ExportAsync(string fileName = "chart.png")
+        {
+            ArgumentNullException.ThrowIfNull(fileName);
+
+            if (IsJSRuntimeAvailable && JSRuntime != null)
+            {
+                var format = fileName.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) ? "svg" : "png";
+                await JSRuntime.InvokeVoidAsync("Radzen.exportChart", Element, fileName, format);
+            }
+        }
+
         /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
+
+            UnregisterSyncGroup();
 
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
@@ -1343,14 +1620,203 @@ namespace Radzen.Blazor
                 css += " rz-chart-series-hover";
             }
 
+            if (Animate)
+            {
+                css += " rz-chart-animate";
+            }
+
+            if (AllowZoom || AllowPan)
+            {
+                css += " rz-chart-zoomable";
+            }
+
             return css;
+        }
+
+        // True when the active data point highlight (enlarged dot + halo at the tooltip's data point) should render.
+        private bool ActivePointEnabled => Tooltip != null && Tooltip.Visible && Tooltip.HighlightDataPoint;
+
+        // The overlay component which renders the crosshair and the active data point. It re-renders
+        // independently of the chart so hover tracking does not trigger a full chart re-render
+        // (axes can be expensive to format).
+        internal HoverOverlay? HoverOverlay { get; set; }
+
+        // The overlay component which renders the split and synced tooltip boxes (the HTML layer).
+        internal TooltipOverlay? TooltipOverlay { get; set; }
+
+        // Set by a RadzenChartRangeNavigator child component. When present the chart renders a
+        // range navigator below the plot, bound to the chart's view range.
+        internal RadzenChartRangeNavigator? RangeNavigator { get; set; }
+
+        // Vertical intervals occupied by RadzenSeriesValueLabel pills during the current render pass.
+        // Cleared at the start of every chart render so labels can nudge apart when series values are close.
+        private readonly List<(double Top, double Bottom)> valueLabelReservations = new List<(double Top, double Bottom)>();
+
+        internal void ResetValueLabelLayout()
+        {
+            valueLabelReservations.Clear();
+        }
+
+        // Reserves a vertical slot for a value label. Returns the desired Y when free; otherwise the
+        // nearest non-overlapping Y, preferring the smaller displacement (labels render in series order).
+        internal double ReserveValueLabelSlot(double desiredY, double height, double plotHeight)
+        {
+            var half = height / 2;
+            var y = Math.Clamp(desiredY, half, Math.Max(half, plotHeight - half));
+
+            bool Overlaps(double candidate)
+            {
+                foreach (var (top, bottom) in valueLabelReservations)
+                {
+                    if (candidate - half < bottom && candidate + half > top)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            if (Overlaps(y))
+            {
+                for (var offset = 1.0; offset <= plotHeight; offset += 1)
+                {
+                    if (y + offset + half <= plotHeight && !Overlaps(y + offset))
+                    {
+                        y += offset;
+                        break;
+                    }
+                    if (y - offset - half >= 0 && !Overlaps(y - offset))
+                    {
+                        y -= offset;
+                        break;
+                    }
+                }
+            }
+
+            valueLabelReservations.Add((y - half, y + half));
+            return y;
+        }
+
+        // Applies a view range coming from the attached range navigator - same semantics as wheel zoom.
+        internal async Task OnRangeNavigatorViewChanged(double start, double end)
+        {
+            var newStart = Math.Clamp(Math.Min(start, end), 0, 1);
+            var newEnd = Math.Clamp(Math.Max(start, end), 0, 1);
+
+            if (newStart == ZoomStart && newEnd == ZoomEnd)
+            {
+                return;
+            }
+
+            ZoomStart = newStart;
+            ZoomEnd = newEnd;
+
+            isInternalZoom = true;
+            try
+            {
+                await NotifyZoomChanged();
+                await Refresh();
+            }
+            finally
+            {
+                isInternalZoom = false;
+            }
+        }
+
+        internal RenderFragment RenderActivePoint()
+        {
+            return builder =>
+            {
+                var synced = !MouseInside && SyncedPlotX.HasValue;
+
+                if (!ActivePointEnabled || (!MouseInside && !synced) || (MouseInside && SnapPlotX < 0 && SnapPlotY < 0))
+                {
+                    return;
+                }
+
+                var points = new List<(IChartSeries Series, double X, double Y)>();
+
+                if (synced)
+                {
+                    // Another chart in the SyncGroup is hovered - highlight every series at its category.
+                    foreach (var series in Series.OrderBy(s => s.RenderingOrder))
+                    {
+                        if (!series.Visible || IsRegionSeries(series))
+                        {
+                            continue;
+                        }
+
+                        var (data, point) = series.DataAt(SyncedPlotX!.Value, 0);
+                        if (data != null)
+                        {
+                            points.Add((series, point.X, point.Y));
+                        }
+                    }
+                }
+                else if (Tooltip!.Shared && SharedPointsAtSnap != null)
+                {
+                    foreach (var (series, _, point) in SharedPointsAtSnap)
+                    {
+                        if (!IsRegionSeries(series))
+                        {
+                            points.Add((series, point.X, point.Y));
+                        }
+                    }
+                }
+                else if (HoveredSeries != null && !IsRegionSeries(HoveredSeries))
+                {
+                    points.Add((HoveredSeries, SnapPlotX, SnapPlotY));
+                }
+
+                if (points.Count == 0)
+                {
+                    return;
+                }
+
+                builder.OpenElement(0, "g");
+                builder.AddAttribute(1, "class", "rz-chart-active-points");
+                builder.AddAttribute(2, "pointer-events", "none");
+
+                foreach (var (series, x, y) in points)
+                {
+                    var index = Series.IndexOf(series);
+                    var size = Math.Max(3, series.MarkerSize);
+                    var cx = x.ToInvariantString();
+                    var cy = y.ToInvariantString();
+
+                    builder.OpenElement(3, "g");
+                    builder.SetKey(index);
+                    builder.AddAttribute(4, "class", $"rz-series-{index} rz-active-point");
+
+                    builder.OpenElement(5, "circle");
+                    builder.AddAttribute(6, "class", "rz-active-point-halo");
+                    builder.AddAttribute(7, "cx", cx);
+                    builder.AddAttribute(8, "cy", cy);
+                    builder.AddAttribute(9, "r", (size * 2.4).ToInvariantString());
+                    builder.CloseElement();
+
+                    builder.OpenElement(10, "circle");
+                    builder.AddAttribute(11, "class", "rz-active-point-dot");
+                    builder.AddAttribute(12, "cx", cx);
+                    builder.AddAttribute(13, "cy", cy);
+                    builder.AddAttribute(14, "r", size.ToInvariantString());
+                    builder.CloseElement();
+
+                    builder.CloseElement();
+                }
+
+                builder.CloseElement();
+            };
         }
 
         internal RenderFragment RenderCrosshair()
         {
             return builder =>
             {
-                if (!MouseInside || Tooltip == null || !Tooltip.Visible)
+                // Synced mode: another chart in the same SyncGroup is hovered - show the X crosshair at its category.
+                var synced = !MouseInside && SyncedPlotX.HasValue;
+
+                if ((!MouseInside && !synced) || Tooltip == null || !Tooltip.Visible)
                 {
                     return;
                 }
@@ -1373,13 +1839,21 @@ namespace Radzen.Blazor
                 var valueCrosshair = hoveredValueAxis?.Crosshair;
 
                 var snapX = categoryCrosshair?.Snap ?? true;
-                var queryX = mouseX - MarginLeft;
+                var queryX = synced ? SyncedPlotX!.Value : mouseX - MarginLeft;
                 var queryY = mouseY - MarginTop;
+
+                // The crosshair is confined to the plot area so it appears and disappears together
+                // with the tooltip and active point (cursor over axes/margins shows nothing).
+                if (!synced && (queryX < 0 || queryX > plotWidth || queryY < 0 || queryY > plotHeight))
+                {
+                    return;
+                }
                 double lineX = snapX ? (NearestDataPointX(queryX, queryY) ?? queryX) : queryX;
                 var lineY = queryY;
 
                 var showX = categoryCrosshair?.Visible == true && lineX >= 0 && lineX <= plotWidth;
-                var showY = valueCrosshair?.Visible == true && lineY >= 0 && lineY <= plotHeight;
+                // The synced cursor has no Y position - only the category line is shown.
+                var showY = !synced && valueCrosshair?.Visible == true && lineY >= 0 && lineY <= plotHeight;
 
                 if (!showX && !showY)
                 {
@@ -1552,22 +2026,40 @@ namespace Radzen.Blazor
             builder.CloseRegion();
         }
 
-        internal RenderFragment RenderSplitTooltip()
+        // Per-series tooltip data at the category hovered in another chart of the SyncGroup.
+        // The popup tooltip is a single global element, so synced charts render split-style boxes instead.
+        private List<(IChartSeries Series, object Data, Point Point)> SyncedPoints()
+        {
+            var list = new List<(IChartSeries Series, object Data, Point Point)>();
+
+            foreach (var series in Series.OrderBy(s => s.RenderingOrder))
+            {
+                if (!series.Visible || IsRegionSeries(series))
+                {
+                    continue;
+                }
+
+                var (data, _) = series.DataAt(SyncedPlotX!.Value, 0);
+                if (data != null)
+                {
+                    list.Add((series, data, series.GetTooltipPosition(data)));
+                }
+            }
+
+            return list;
+        }
+
+        // True when the last tooltip overlay render produced a category tooltip box. The overlay reads it
+        // after rendering so the entrance animation only plays when the box first appears.
+        internal bool CategoryTooltipRendered { get; private set; }
+
+        internal RenderFragment RenderTooltipOverlay()
         {
             return builder =>
             {
-                if (!MouseInside || Tooltip == null || !Tooltip.Split || !Tooltip.Visible)
-                {
-                    return;
-                }
+                CategoryTooltipRendered = false;
 
-                var points = SharedPointsAtSnap;
-                if (points == null || points.Count == 0)
-                {
-                    return;
-                }
-
-                if (!Width.HasValue || !Height.HasValue)
+                if (Tooltip == null || !Tooltip.Visible || !Width.HasValue || !Height.HasValue)
                 {
                     return;
                 }
@@ -1575,6 +2067,45 @@ namespace Radzen.Blazor
                 var plotWidth = Width.Value - MarginLeft - MarginRight;
                 var plotHeight = Height.Value - MarginTop - MarginBottom;
                 if (plotWidth <= 0 || plotHeight <= 0)
+                {
+                    return;
+                }
+
+                if (!MouseInside || !Tooltip.Split)
+                {
+                    // Single category tooltip box - the hovered chart in axis mode and sync receivers
+                    // render the same box so source and receivers are visually identical.
+                    IChartSeries? series = null;
+                    object? data = null;
+                    Point? boxAnchor = null;
+
+                    if (MouseInside && AxisTooltipTrigger && SnapPlotX >= 0 && tooltipSeries != null && tooltipData != null)
+                    {
+                        series = tooltipSeries;
+                        data = tooltipData;
+                        boxAnchor = new Point { X = SnapPlotX, Y = SnapPlotY };
+                    }
+                    else if (!MouseInside && SyncedPlotX.HasValue)
+                    {
+                        var synced = SyncedPoints();
+                        if (synced.Count > 0)
+                        {
+                            (series, data, boxAnchor) = synced[0];
+                        }
+                    }
+
+                    if (series == null || data == null || boxAnchor == null)
+                    {
+                        return;
+                    }
+
+                    CategoryTooltipRendered = true;
+                    RenderCategoryTooltipBox(builder, series, data, boxAnchor, plotWidth, plotHeight);
+                    return;
+                }
+
+                var points = SharedPointsAtSnap;
+                if (points == null || points.Count == 0)
                 {
                     return;
                 }
@@ -1696,6 +2227,49 @@ namespace Radzen.Blazor
 
                 builder.CloseElement(); // container div
             };
+        }
+
+        // The category tooltip box used by axis-trigger tooltips and sync receivers. Anchored next to
+        // the snapped data point, flipped left when it would spill off the plot. Position transitions
+        // (glide between categories) and the entrance animation come from the stylesheet.
+        private void RenderCategoryTooltipBox(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder,
+            IChartSeries series, object data, Point anchor, double plotWidth, double plotHeight)
+        {
+            const double gap = 10;
+            const double estTooltipHeight = 64;
+
+            var anchorX = anchor.X + MarginLeft;
+            var anchorY = anchor.Y + MarginTop;
+            var rightSide = anchorX + gap + 180 <= MarginLeft + plotWidth;
+            var top = Math.Max(MarginTop, Math.Min(MarginTop + plotHeight - estTooltipHeight, anchorY - estTooltipHeight / 2));
+
+            string positionStyle;
+            if (rightSide)
+            {
+                positionStyle = $"left: {(anchorX + gap).ToInvariantString()}px;";
+            }
+            else
+            {
+                positionStyle = $"right: {(Width!.Value - (anchorX - gap)).ToInvariantString()}px;";
+            }
+
+            var borderSide = rightSide ? "border-left" : "border-right";
+            var entering = !(TooltipOverlay?.BoxWasVisible ?? false);
+
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "rz-chart-split-tooltip");
+            builder.AddAttribute(2, "style", "position: absolute; inset: 0; pointer-events: none; overflow: hidden;");
+
+            builder.OpenElement(3, "div");
+            builder.AddAttribute(4, "class", $"rz-chart-category-tooltip{(entering ? " rz-chart-tooltip-appear" : "")}");
+            builder.AddAttribute(5, "style",
+                $"position: absolute; top: {top.ToInvariantString()}px; {positionStyle} " +
+                $"{borderSide}: 3px solid {series.Color}; pointer-events: none;");
+
+            builder.AddContent(6, series.RenderTooltip(data));
+
+            builder.CloseElement();
+            builder.CloseElement();
         }
 
     }

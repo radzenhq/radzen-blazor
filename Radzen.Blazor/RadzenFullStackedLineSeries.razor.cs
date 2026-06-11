@@ -12,6 +12,9 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of data items in the series.</typeparam>
     public partial class RadzenFullStackedLineSeries<TItem> : CartesianSeries<TItem>, IChartFullStackedAreaSeries
     {
+        /// <inheritdoc />
+        protected internal override bool ShowLineInLegend => true;
+
         /// <summary>
         /// Specifies the color of the line.
         /// </summary>

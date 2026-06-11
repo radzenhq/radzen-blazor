@@ -3025,12 +3025,22 @@ window.Radzen = {
       return Math.round(value).toString();
     }
 
+    // Mutates the existing text node rather than assigning textContent - replacing the text
+    // node breaks Blazor's reference to it and subsequent server-rendered updates stop applying.
+    function setLabelText(el, text) {
+      if (el.firstChild && el.firstChild.nodeType === 3) {
+        el.firstChild.nodeValue = text;
+      } else {
+        el.textContent = text;
+      }
+    }
+
     function updateLabels(start, end) {
       if (!ref.navLabelInputEnd) return;
       var labels = ref.querySelectorAll('.rz-range-nav-label');
       if (labels.length >= 2) {
-        labels[0].textContent = formatLabel(start);
-        labels[1].textContent = formatLabel(end);
+        setLabelText(labels[0], formatLabel(start));
+        setLabelText(labels[1], formatLabel(end));
         // Flip label direction when near edges
         labels[0].className = 'rz-range-nav-label ' + (start < 0.1 ? 'rz-range-nav-label-end' : 'rz-range-nav-label-start');
         labels[1].className = 'rz-range-nav-label ' + (end > 0.9 ? 'rz-range-nav-label-start' : 'rz-range-nav-label-end');
@@ -3233,16 +3243,107 @@ window.Radzen = {
     var rect = ref.getBoundingClientRect();
     return { width: rect.width, height: rect.height };
   },
-  createChart: function (ref, instance) {
+  exportChart: async function (ref, fileName, format) {
+    // The legend contains small swatch SVGs - the plot is the chart element's direct svg child.
+    var svg = ref && ref.querySelector(':scope > svg');
+    if (!svg) return;
+
+    var clone = svg.cloneNode(true);
+    // Series colors and most chart styling come from CSS classes which are not available in a
+    // standalone SVG document - bake the computed values into inline styles on the clone.
+    var props = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap',
+      'stroke-linejoin', 'opacity', 'font-size', 'font-family', 'font-weight', 'font-variant-numeric',
+      'text-anchor', 'dominant-baseline', 'stop-color', 'stop-opacity'];
+    var bake = function (source, target) {
+      var computed = getComputedStyle(source);
+      var style = '';
+      for (var i = 0; i < props.length; i++) {
+        var value = computed.getPropertyValue(props[i]);
+        if (value && value !== 'none' || props[i] === 'fill' || props[i] === 'stroke') {
+          style += props[i] + ':' + value + ';';
+        }
+      }
+      target.setAttribute('style', style);
+    };
+    var sources = svg.querySelectorAll('*');
+    var targets = clone.querySelectorAll('*');
+    for (var i = 0; i < sources.length; i++) {
+      bake(sources[i], targets[i]);
+    }
+
+    var rect = svg.getBoundingClientRect();
+    clone.setAttribute('width', rect.width);
+    clone.setAttribute('height', rect.height);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    var serialized = new XMLSerializer().serializeToString(clone);
+    // Use data: URLs rather than blob: URLs - Content-Security-Policy headers commonly disallow blob: images.
+    var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(serialized);
+
+    if (format === 'svg') {
+      var a = document.createElement('a');
+      a.href = svgUrl;
+      a.download = fileName;
+      a.click();
+      return;
+    }
+
+    var img = new Image();
+    await new Promise(function (resolve, reject) {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = svgUrl;
+    });
+
+    var scale = Math.max(2, window.devicePixelRatio || 1);
+    var canvas = document.createElement('canvas');
+    canvas.width = Math.round(rect.width * scale);
+    canvas.height = Math.round(rect.height * scale);
+    var ctx = canvas.getContext('2d');
+    var background = getComputedStyle(document.body).backgroundColor;
+    if (background && background !== 'rgba(0, 0, 0, 0)') {
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    var link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = fileName;
+    link.click();
+  },
+  createChart: function (ref, instance, mouseMoveInterval) {
     var inside = false;
-    ref.mouseMoveHandler = this.throttle(function (e) {
+    // Coalesce mouse moves to animation frames so the crosshair/tooltip track the cursor
+    // smoothly; mouseMoveInterval imposes a minimum delay between dispatches (Blazor Server).
+    var interval = mouseMoveInterval || 0;
+    var lastDispatch = 0;
+    var pendingMove = null;
+    var moveRafId = null;
+
+    function dispatchMouseMove() {
+      moveRafId = null;
+      if (!pendingMove) return;
+      var now = performance.now();
+      if (interval > 0 && now - lastDispatch < interval) {
+        moveRafId = requestAnimationFrame(dispatchMouseMove);
+        return;
+      }
+      lastDispatch = now;
+      var move = pendingMove;
+      pendingMove = null;
+      try { suppressDisposed(instance.invokeMethodAsync('MouseMove', move.x, move.y)); } catch { }
+    }
+
+    ref.mouseMoveHandler = function (e) {
       if (inside) {
         var rect = ref.getBoundingClientRect();
-        var x = e.clientX - rect.left;
-        var y = e.clientY - rect.top;
-        try { suppressDisposed(instance.invokeMethodAsync('MouseMove', x, y)); } catch { }
-     }
-    }, 100);
+        pendingMove = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        if (!moveRafId) {
+          moveRafId = requestAnimationFrame(dispatchMouseMove);
+        }
+      }
+    };
     ref.mouseEnterHandler = function () {
         inside = true;
     };
@@ -5281,6 +5382,9 @@ window.Radzen = {
         }
     },
     openChartTooltip: function (chart, x, y, id, instance, callback) {
+        var existing = document.getElementById(id);
+        var wasOpen = existing && existing.style.display != 'none' && existing.offsetParent != null;
+
         Radzen.closeTooltip(id);
 
         var chartRect = chart.getBoundingClientRect();
@@ -5293,6 +5397,17 @@ window.Radzen = {
             return;
         }
         var tooltipContent = popup.children[0];
+
+        // Play the entrance animation only when the tooltip was not already open,
+        // so it doesn't re-trigger while the cursor sweeps across data points.
+        var inner = tooltipContent.querySelector('.rz-chart-tooltip-content');
+        if (inner) {
+            inner.classList.remove('rz-chart-tooltip-enter');
+            if (!wasOpen) {
+                void inner.offsetWidth;
+                inner.classList.add('rz-chart-tooltip-enter');
+            }
+        }
         var tooltipContentRect = tooltipContent.getBoundingClientRect();
         var tooltipContentClassName = 'rz-top-chart-tooltip';
         if (y - tooltipContentRect.height < 0) {

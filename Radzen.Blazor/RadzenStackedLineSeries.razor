@@ -28,9 +28,11 @@
         var style = $"clip-path: url(#{Chart?.ClipPath}); -webkit-clip-path: url(#{Chart?.ClipPath});";
         var topPath = pathGenerator.Path(topPoints);
         var line = $"M {topPath}";
-        var key = $"{line}-{LineType}";
+        var animate = Chart?.AnimateDataUpdates == true;
+        // With update animation the element must survive data changes so the CSS d transition can morph it.
+        var key = animate ? $"animated-{LineType}" : $"{line}-{LineType}";
 
-        <Path @key="@key" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+        <Path @key="@key" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" Transition="@animate" />
       }
       <Markers Visible="@Markers.Visible" Series="@this" Data="@topPoints" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
     </g>;

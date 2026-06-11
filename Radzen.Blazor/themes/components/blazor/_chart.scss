@@ -1,4 +1,6 @@
 $chart-axis-color: var(--rz-base-300) !default;
+$chart-grid-line-color: color-mix(in srgb, var(--rz-chart-axis-color) 50%, transparent) !default;
+$chart-area-opacity: 0.6 !default;
 $chart-axis-label-color: var(--rz-text-secondary-color) !default;
 $chart-axis-font-size: 0.875rem !default;
 $chart-legend-font-size: 0.875rem !default;
@@ -79,7 +81,12 @@ $chart-color-schemes: (
 }
 
 .rz-area-series {
-  fill-opacity: 0.8;
+  fill-opacity: var(--rz-chart-area-opacity);
+}
+
+.rz-area-series .rz-area-gradient,
+.rz-full-stacked-area-series .rz-area-gradient {
+  fill-opacity: 1;
 }
 
 .rz-chart-axis-crosshair-label {
@@ -91,6 +98,54 @@ $chart-color-schemes: (
     font-size: var(--rz-chart-tooltip-font-size);
     dominant-baseline: central;
   }
+}
+
+// Initial render animation (scoped to Animate=true via .rz-chart-animate) - series
+// are revealed with a left-to-right wipe. Runs once per series element lifetime.
+@keyframes rz-series-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rz-series-reveal-rtl {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.rz-chart-animate {
+  .rz-line-series,
+  .rz-area-series,
+  .rz-full-stacked-area-series {
+    animation: rz-series-reveal var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+[dir='rtl'] .rz-chart-animate {
+  .rz-line-series,
+  .rz-area-series,
+  .rz-full-stacked-area-series {
+    animation-name: rz-series-reveal-rtl;
+  }
+}
+
+// Data-update morphing (scoped to AnimateDataUpdates=true) - the path geometry is emitted as a
+// CSS d property so changes between same-structure paths transition smoothly. Browsers without
+// CSS d support fall back to the d attribute and update instantly. Disabled on zoomable charts
+// where path changes come from zoom/pan rather than data.
+.rz-path-transition {
+  transition: d 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rz-chart-zoomable .rz-path-transition {
+  transition: none;
 }
 
 // Series hover styles (scoped to AllowSeriesHover=true via .rz-chart-series-hover)
@@ -192,6 +247,7 @@ $chart-color-schemes: (
     $index: index($colors, $color);
     .rz-scheme-#{$scheme} {
       .rz-series-#{$index - 1} {
+        --rz-series-color: #{$color};
         fill: $color;
         stroke: $color;
       }
@@ -203,6 +259,7 @@ $chart-color-schemes: (
       }
 
       .rz-series-item-#{$index - 1} {
+        --rz-series-color: #{$color};
         fill: $color;
         stroke: $color;
 
@@ -216,6 +273,65 @@ $chart-color-schemes: (
 
 .rz-marker {
   stroke: var(--rz-chart-marker-stroke);
+}
+
+// Last-value label - a pill anchored at the right edge of the plot showing the latest value.
+.rz-series-value-label {
+  rect {
+    fill: var(--rz-series-color);
+    stroke: none;
+  }
+
+  text {
+    // Black or white, whichever contrasts with the pill color (the lightness flip resolves to
+    // white below 0.72 OKLCH lightness and black above). The threshold follows perceptual (APCA)
+    // contrast across all theme palettes - saturated mid-tones read better with white text than
+    // the WCAG 2.x formula suggests. Older browsers keep the fallback.
+    fill: var(--rz-chart-marker-stroke);
+    fill: oklch(from var(--rz-series-color) calc((0.72 - l) * infinity) 0 h);
+    stroke: none;
+    font-size: 0.75rem;
+    dominant-baseline: central;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// Active data point highlight - dot + halo at the data point the tooltip refers to.
+// cx/cy are SVG2 geometry properties, so the dot glides between data points.
+.rz-active-point {
+  circle {
+    transition: cx 0.15s ease-out, cy 0.15s ease-out;
+  }
+
+  .rz-active-point-halo {
+    fill: var(--rz-series-color);
+    fill-opacity: 0.15;
+    stroke: none;
+  }
+
+  .rz-active-point-dot {
+    fill: var(--rz-series-color);
+    fill-opacity: 1;
+    stroke: var(--rz-chart-marker-stroke);
+    stroke-width: 2;
+  }
+}
+
+// Marker hover grow (transform-box keeps the scale centered on the marker itself)
+.rz-line-series .rz-marker,
+.rz-area-series .rz-marker,
+.rz-scatter-series .rz-marker {
+  cursor: pointer;
+
+  > * {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.15s ease-out;
+  }
+
+  &:hover > * {
+    transform: scale(1.35);
+  }
 }
 
 .rz-area-series .rz-marker {
@@ -243,16 +359,18 @@ $chart-color-schemes: (
 }
 
 .rz-axis .rz-grid-line {
-  stroke: var(--rz-chart-axis-color);
+  stroke: var(--rz-chart-grid-line-color);
 }
 
 .rz-tick-text {
   stroke: none;
   fill: var(--rz-chart-axis-label-color);
+  font-variant-numeric: tabular-nums;
 }
 
 .rz-series-data-label {
   fill: var(--rz-chart-axis-label-color);
+  font-variant-numeric: tabular-nums;
 }
 
 .rz-value-axis .rz-tick-text {
@@ -361,11 +479,37 @@ $chart-color-schemes: (
 .rz-chart-tooltip-content {
   background: var(--rz-chart-tooltip-background);
   color: var(--rz-chart-tooltip-color);
-  box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.18), 0 2px 6px -2px rgba(0, 0, 0, 0.1);
   padding: 0.5rem;
   border-radius: var(--rz-chart-tooltip-border-radius);
   white-space: nowrap;
   font-size: var(--rz-chart-tooltip-font-size);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes rz-chart-tooltip-enter {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.rz-chart-tooltip-content.rz-chart-tooltip-enter {
+  animation: rz-chart-tooltip-enter 0.12s ease-out;
+}
+
+// Category tooltip box (axis-trigger tooltips and sync receivers): the entrance animation plays
+// once when the box appears; afterwards it glides between categories via position transitions.
+.rz-chart-category-tooltip {
+  transition: top 0.15s ease-out, left 0.15s ease-out, right 0.15s ease-out;
+}
+
+.rz-chart-tooltip-appear .rz-chart-tooltip-content {
+  animation: rz-chart-tooltip-enter 0.12s ease-out;
 }
 
 .rz-chart-tooltip {

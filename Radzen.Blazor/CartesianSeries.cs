@@ -415,7 +415,24 @@ namespace Radzen.Blazor
                 builder.OpenRegion(0);
                 foreach (var overlay in Overlays)
                 {
-                    if (overlay.Visible)
+                    if (overlay.Visible && !overlay.RenderOnTop)
+                    {
+                        builder.AddContent(1, overlay.Render(categoryScale, valueScale));
+                    }
+                }
+                builder.CloseRegion();
+            });
+        }
+
+        /// <inheritdoc />
+        public RenderFragment RenderTopOverlays(ScaleBase categoryScale, ScaleBase valueScale)
+        {
+            return new RenderFragment(builder =>
+            {
+                builder.OpenRegion(0);
+                foreach (var overlay in Overlays)
+                {
+                    if (overlay.Visible && overlay.RenderOnTop)
                     {
                         builder.AddContent(1, overlay.Render(categoryScale, valueScale));
                     }
@@ -679,9 +696,15 @@ namespace Radzen.Blazor
                 builder.AddAttribute(6, nameof(LegendItem.Text), GetTitle());
                 builder.AddAttribute(7, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
                 builder.AddAttribute(8, nameof(LegendItem.Clickable), clickable);
+                builder.AddAttribute(9, nameof(LegendItem.ShowLine), ShowLineInLegend);
                 builder.CloseComponent();
             };
         }
+
+        /// <summary>
+        /// Specifies whether the legend swatch displays a line indicator instead of a filled marker. Overridden by line series.
+        /// </summary>
+        protected internal virtual bool ShowLineInLegend => false;
 
         /// <inheritdoc />
         public double MarkerSize

@@ -64,10 +64,19 @@ namespace Radzen.Blazor
         public bool Smooth { get; set; }
 
         /// <summary>
-        /// Gets or sets the fill opacity.
+        /// Gets or sets the fill opacity. When <see cref="FillMode"/> is <see cref="FillMode.Gradient"/> this is the opacity at the top of the gradient.
         /// </summary>
         [Parameter]
         public double FillOpacity { get; set; } = 0.3;
+
+        /// <summary>
+        /// Specifies how the area below the line is filled. Set to <see cref="FillMode.Gradient"/> by default - the area fades from the fill color towards the baseline.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Gradient"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Gradient;
+
+        private readonly string gradientId = $"rzNavGradient{Guid.NewGuid():N}";
 
         private IList<TItem> Items { get; set; } = new List<TItem>();
 
@@ -188,12 +197,41 @@ namespace Radzen.Blazor
                 builder.OpenElement(0, "g");
                 builder.AddAttribute(1, "class", "rz-range-nav-series");
 
-                builder.OpenElement(2, "path");
-                builder.AddAttribute(3, "d", area);
-                builder.AddAttribute(4, "fill", fill);
-                builder.AddAttribute(5, "stroke", "none");
-                builder.AddAttribute(6, "opacity", FillOpacity.ToInvariantString());
-                builder.CloseElement();
+                if (FillMode == FillMode.Gradient)
+                {
+                    builder.OpenRegion(20);
+                    builder.OpenElement(0, "defs");
+                    builder.OpenElement(1, "linearGradient");
+                    builder.AddAttribute(2, "id", gradientId);
+                    builder.AddAttribute(3, "x1", "0");
+                    builder.AddAttribute(4, "y1", "0");
+                    builder.AddAttribute(5, "x2", "0");
+                    builder.AddAttribute(6, "y2", "1");
+                    builder.OpenElement(7, "stop");
+                    builder.AddAttribute(8, "offset", "0");
+                    builder.AddAttribute(9, "style", $"stop-color: {fill}; stop-opacity: {FillOpacity.ToInvariantString()}");
+                    builder.CloseElement();
+                    builder.OpenElement(10, "stop");
+                    builder.AddAttribute(11, "offset", "1");
+                    builder.AddAttribute(12, "style", $"stop-color: {fill}; stop-opacity: 0.02");
+                    builder.CloseElement();
+                    builder.CloseElement();
+                    builder.CloseElement();
+                    builder.CloseRegion();
+                }
+
+                if (FillMode != FillMode.None)
+                {
+                    builder.OpenElement(2, "path");
+                    builder.AddAttribute(3, "d", area);
+                    builder.AddAttribute(4, "fill", FillMode == FillMode.Gradient ? $"url(#{gradientId})" : fill);
+                    builder.AddAttribute(5, "stroke", "none");
+                    if (FillMode != FillMode.Gradient)
+                    {
+                        builder.AddAttribute(6, "opacity", FillOpacity.ToInvariantString());
+                    }
+                    builder.CloseElement();
+                }
 
                 builder.OpenElement(7, "path");
                 builder.AddAttribute(8, "d", line);

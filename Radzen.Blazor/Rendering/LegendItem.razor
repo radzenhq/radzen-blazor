@@ -3,7 +3,15 @@
 <span class="rz-legend-item" style="@Style" @onclick="@OnClick" @attributes="@MouseEventAttributes" role="button" aria-disabled="@(!Clickable).ToString().ToLowerInvariant()" tabindex="@(Clickable ? "0" : "-1")" @onkeypress="@OnKeyPress" @onkeypress:preventDefault=@preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
     <svg width="@((MarkerSize * 2).ToInvariantString())" height="@((MarkerSize * 2).ToInvariantString())">
         <g class="rz-series-@Index @Class">
-            <Marker X="@MarkerSize" Y="@MarkerSize" Type="@(MarkerType == MarkerType.None ? MarkerType.Square : MarkerType)" Fill="@Color" Size="@MarkerSize" />
+            @if (ShowLine)
+            {
+                <line class="rz-legend-item-line" x1="0" y1="@MarkerSize.ToInvariantString()" x2="@((MarkerSize * 2).ToInvariantString())" y2="@MarkerSize.ToInvariantString()" stroke-width="2" stroke-linecap="round"></line>
+                <Marker X="@MarkerSize" Y="@MarkerSize" Type="@(MarkerType == MarkerType.None ? MarkerType.Circle : MarkerType)" Fill="@Color" Size="@(MarkerSize * 0.6)" />
+            }
+            else
+            {
+                <Marker X="@MarkerSize" Y="@MarkerSize" Type="@(MarkerType == MarkerType.None ? MarkerType.Square : MarkerType)" Fill="@Color" Size="@MarkerSize" />
+            }
         </g>
     </svg>
     <span class="rz-legend-item-text">@Text</span>
@@ -39,6 +47,9 @@
 
     [Parameter]
     public bool Clickable { get; set; } = true;
+
+    [Parameter]
+    public bool ShowLine { get; set; }
 
     [Parameter]
     public int Index { get; set; }

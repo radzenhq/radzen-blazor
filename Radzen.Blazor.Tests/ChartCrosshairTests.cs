@@ -177,9 +177,17 @@ namespace Radzen.Blazor.Tests
             // With 3 evenly-spaced categories on a 400px-wide chart, the snapped X cannot equal an arbitrary
             // cursor offset. We assert the line position is one of a small set of category-aligned X values
             // by re-rendering at three distinct cursor positions and confirming we get at most 3 unique x1.
+            // The crosshair is confined to the plot area (hidden over margins/legend), so cursor positions
+            // are derived from the rendered series path rather than hardcoded chart-relative values.
+            var translate = System.Text.RegularExpressions.Regex.Match(chart.Markup, @"translate\(([\d.]+),");
+            var marginLeft = double.Parse(translate.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+            var seriesPath = System.Text.RegularExpressions.Regex.Match(chart.Markup, @"rz-line-series[\s\S]*?M\s+[\d.]+\s+[\d.]+\s+L\s+[\d.]+\s+[\d.]+\s+L\s+([\d.]+)\s+[\d.]+");
+            var lastCategoryX = double.Parse(seriesPath.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+
             var positions = new System.Collections.Generic.HashSet<string>();
-            foreach (var cx in new[] { 60.0, 200.0, 340.0 })
+            foreach (var fraction in new[] { 0.15, 0.5, 0.85 })
             {
+                var cx = marginLeft + lastCategoryX * fraction;
                 await chart.InvokeAsync(() => chart.Instance.MouseMove(cx, 100));
                 positions.Add(chart.Find("g.rz-chart-crosshair line").GetAttribute("x1") ?? string.Empty);
             }

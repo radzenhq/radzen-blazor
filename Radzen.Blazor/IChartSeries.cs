@@ -52,6 +52,15 @@ namespace Radzen.Blazor
         RenderFragment RenderOverlays(ScaleBase categoryScale, ScaleBase valueScale);
 
         /// <summary>
+        /// Renders the overlays which display above all series (see <see cref="IChartSeriesOverlay.RenderOnTop" />),
+        /// so later series cannot draw over them.
+        /// </summary>
+        /// <param name="categoryScale">The category scale.</param>
+        /// <param name="valueScale">The value scale.</param>
+        /// <returns>RenderFragment.</returns>
+        RenderFragment RenderTopOverlays(ScaleBase categoryScale, ScaleBase valueScale) => builder => { };
+
+        /// <summary>
         /// Renders the series tooltip.
         /// </summary>
         /// <param name="data">The data.</param>
