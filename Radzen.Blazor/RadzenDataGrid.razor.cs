@@ -220,7 +220,7 @@ namespace Radzen.Blazor
             }
 
             var filter = isOData == true ?
-                    allColumns.Where(c => c.GetVisible()).ToList().ToODataFilterString<TItem>() : allColumns.Where(c => c.GetVisible()).ToList().ToFilterString<TItem>();
+                    allColumns.ToList().ToODataFilterString<TItem>() : allColumns.ToList().ToFilterString<TItem>();
             var loadDataArgs = $"{request.StartIndex}|{top}{GetOrderBy()}{filter}";
 
             if (lastLoadDataArgs != loadDataArgs)
@@ -2575,10 +2575,10 @@ namespace Radzen.Blazor
             Query.Top = PageSize;
             Query.OrderBy = orderBy;
 
-            Query.GetFilter = () => allColumns.Where(c => c.GetVisible()).ToList().ToFilterString<TItem>();
+            Query.GetFilter = () => allColumns.ToList().ToFilterString<TItem>();
 
             filters = allColumns.ToList()
-                .Where(c => c.Filterable && c.GetVisible() && (c.GetFilterValue() != null
+                .Where(c => c.Filterable && (c.GetFilterValue() != null
                     || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
                     || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
                 .Select(c => new FilterDescriptor()
@@ -2603,7 +2603,7 @@ namespace Radzen.Blazor
                     Skip = start,
                     Top = top,
                     OrderBy = orderBy,
-                    GetFilter = () => IsOData() ? allColumns.Where(c => c.GetVisible()).ToList().ToODataFilterString<TItem>() : allColumns.Where(c => c.GetVisible()).ToList().ToFilterString<TItem>(),
+                    GetFilter = () => IsOData() ? allColumns.ToList().ToODataFilterString<TItem>() : allColumns.ToList().ToFilterString<TItem>(),
                     Filters = filters,
                     Sorts = sorts
                 });

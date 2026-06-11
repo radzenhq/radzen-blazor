@@ -3978,6 +3978,46 @@ namespace Radzen.Blazor.Tests
             // "" (X) first, then Critical (C), then Urgent (A)
             Assert.Equal(new[] { "X", "C", "A" }, order);
         }
+
+        [Fact]
+        public void DataGrid_LoadData_PreservesHiddenColumnFilter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new[]
+            {
+                new { Name = "Alice", Country = "BG" },
+                new { Name = "Bob", Country = "DE" },
+            };
+
+            LoadDataArgs capturedArgs = null;
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Name");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(2, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(3, "Property", "Country");
+                    builder.AddAttribute(4, "Visible", false);
+                    builder.AddAttribute(5, "FilterValue", "BG");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<LoadDataArgs>(p => p.LoadData, args => { capturedArgs = args; });
+            });
+
+            component.InvokeAsync(() => component.Instance.Reload());
+
+            Assert.NotNull(capturedArgs);
+            Assert.Contains(capturedArgs.Filters, f => f.Property == "Country");
+        }
     }
 
     public class SortComparerItem
