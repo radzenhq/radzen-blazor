@@ -4,11 +4,10 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Style="margin: 0;">Hover either chart - the other follows</RadzenText>
-            <RadzenButton Text="Export PNG" Icon="download" Variant="Variant.Outlined" Size="ButtonSize.Small" Click="@(() => revenueChart!.ExportAsync("revenue.png"))" />
         </RadzenStack>
     </RadzenCard>
 
-    <RadzenChart @ref="revenueChart" SyncGroup="dashboard" Style="height: 240px;">
+    <RadzenChart SyncGroup="dashboard" Style="height: 240px;">
         <RadzenAreaSeries Smooth="true" Data="@revenue" CategoryProperty="Date" ValueProperty="Value" Title="Revenue" />
         <RadzenCategoryAxis FormatString="{0:MMM}">
             <RadzenAxisCrosshair Visible="true" />
@@ -36,7 +35,6 @@
         public double Value { get; set; }
     }
 
-    RadzenChart? revenueChart;
 
     DataItem[] revenue = Array.Empty<DataItem>();
     DataItem[] orders = Array.Empty<DataItem>();
