@@ -2355,6 +2355,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Data Labels",
+                            Path = "chart-data-labels",
+                            Description = "Radzen Blazor Chart data labels with configurable position, background chip, overlap hiding, display strategy and formatting.",
+                            Tags = new [] { "chart", "graph", "label", "data labels", "values", "format", "overlap" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Crosshair",
                             Path = "chart-crosshair",
                             Title = "Blazor Chart - Crosshair | Free UI Components by Radzen",

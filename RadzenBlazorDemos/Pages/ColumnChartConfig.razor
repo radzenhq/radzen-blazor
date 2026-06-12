@@ -7,6 +7,20 @@
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
                 <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
             </RadzenStack>
+            @if (showDataLabels)
+            {
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Label Position" Component="labelPosition" />
+                    <RadzenSelectBar @bind-Value="@labelPosition" TValue="DataLabelPosition" Size="ButtonSize.Small" Name="labelPosition">
+                        <Items>
+                            <RadzenSelectBarItem Value="DataLabelPosition.Auto" Text="Auto" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Top" Text="Top" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Inside" Text="Inside" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Center" Text="Center" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenStack>
+            }
         </RadzenStack>
     </RadzenCard>
     <RadzenRow>
@@ -14,10 +28,10 @@
             <h4>Auto-size column series</h4>
             <RadzenChart>
                 <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
@@ -31,10 +45,10 @@
             <h4>Custom size column series</h4>
             <RadzenChart>
                 <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" Width="20" />
                 <RadzenCategoryAxis Padding="20" />
@@ -49,10 +63,10 @@
             <h4>Range fills column series</h4>
             <RadzenChart>
                 <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
@@ -67,6 +81,7 @@
 
 @code {
     bool showDataLabels = false;
+    DataLabelPosition labelPosition = DataLabelPosition.Auto;
 
     class DataItem
     {

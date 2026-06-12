@@ -2,9 +2,13 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true">
+                <RadzenChartTooltipOptions Shared="true" />
                 <RadzenAreaSeries Data="@alpha" CategoryProperty="Month" ValueProperty="Return" Title="Alpha Fund" />
                 <RadzenAreaSeries Data="@beta" CategoryProperty="Month" ValueProperty="Return" Title="Beta Fund" />
                 <RadzenAreaSeries Data="@gamma" CategoryProperty="Month" ValueProperty="Return" Title="Gamma Fund" />
+                <RadzenCategoryAxis>
+                    <RadzenAxisCrosshair Visible="true" />
+                </RadzenCategoryAxis>
                 <RadzenValueAxis FormatString="{0}%">
                     <RadzenGridLines Visible="true" />
                 </RadzenValueAxis>
