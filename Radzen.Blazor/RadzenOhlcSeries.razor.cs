@@ -93,6 +93,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override string Color => BullStroke ?? string.Empty;
 
+        /// <inheritdoc />
+        public override bool ShowActivePoint => false;
+
         internal Func<TItem, double> Open
         {
             get

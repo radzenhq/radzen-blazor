@@ -115,6 +115,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override string Color => Fill ?? string.Empty;
 
+        /// <inheritdoc />
+        public override bool ShowActivePoint => false;
+
         internal Func<TItem, double> LowerWhisker
         {
             get

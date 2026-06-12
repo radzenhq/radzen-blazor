@@ -8,15 +8,9 @@
     break;
 
     case MarkerType.Square:
-        <path d="@($"M {(X-Size).ToInvariantString()} {(Y-Size).ToInvariantString()} L {(X+Size).ToInvariantString()} {(Y-Size).ToInvariantString()} L {(X+Size).ToInvariantString()} {(Y+Size).ToInvariantString()} L {(X-Size).ToInvariantString()} {(Y + Size).ToInvariantString()} Z")" stroke="@Stroke" fill="@Fill" stroke-width="@StrokeWidth.ToInvariantString()" @onclick="@Click"></path>
-    break;
-
     case MarkerType.Triangle:
-        <path d="@($"M {(X-Size).ToInvariantString()} {(Y+Size).ToInvariantString()} L {X.ToInvariantString()} {(Y-Size).ToInvariantString()} L {(X+Size).ToInvariantString()} {(Y+Size).ToInvariantString()} Z")" stroke="@Stroke" fill="@Fill" stroke-width="@StrokeWidth.ToInvariantString()" @onclick="@Click"></path>
-    break;
-
     case MarkerType.Diamond:
-        <path d="@($"M {(X-Size).ToInvariantString()} {Y.ToInvariantString()} L {X.ToInvariantString()} {(Y-Size).ToInvariantString()} L {(X+Size).ToInvariantString()} {Y.ToInvariantString()} L {X.ToInvariantString()} {(Y + Size).ToInvariantString()} Z")" stroke="@Stroke" fill="@Fill" stroke-width="@StrokeWidth.ToInvariantString()" @onclick="@Click"></path>
+        <path d="@MarkerPath.For(Type, X, Y, Size)" stroke="@Stroke" fill="@Fill" stroke-width="@StrokeWidth.ToInvariantString()" @onclick="@Click"></path>
     break;
 }
 </g>

@@ -78,6 +78,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override string Color => Stroke ?? string.Empty;
 
+        /// <inheritdoc />
+        public override bool ShowActivePoint => false;
+
         /// <summary>
         /// Gets a delegate that returns the High value from a data item.
         /// </summary>
