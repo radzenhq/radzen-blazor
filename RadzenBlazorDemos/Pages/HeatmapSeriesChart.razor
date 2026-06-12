@@ -1,6 +1,6 @@
 @using System.Collections.Generic
 
-<RadzenChart>
+<RadzenChart Animate="true">
     <RadzenHeatmapSeries Data="@cells" CategoryProperty="X" ValueProperty="Y" IntensityProperty="Lux"
                          ColorRange="@ranges" IntensityLabel="Lux" Title="Illuminance" />
     <RadzenCategoryAxis Min="-0.5" Max="5.5" Step="1">
