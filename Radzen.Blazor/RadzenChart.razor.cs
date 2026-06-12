@@ -696,9 +696,10 @@ namespace Radzen.Blazor
 
             MarginTop = 32;
 
-            if (IsRTL && !ShouldInvertAxes())
+            if (IsRTL)
             {
-                // RTL (non-bar charts): value axis on the right, additional axes on the left
+                // RTL mirrors the horizontal layout: the vertical axis labels render on the right
+                // for all chart types, additional axes on the left.
                 MarginRight = valueAxisSize;
                 MarginLeft = 32 + additionalAxesWidth;
             }
@@ -714,14 +715,15 @@ namespace Radzen.Blazor
             {
                 if (Legend.Position == LegendPosition.Right || Legend.Position == LegendPosition.Left)
                 {
-                    var rtlNonBar = IsRTL && !ShouldInvertAxes();
+                    // The legend keeps its configured physical side in RTL; only the axis label
+                    // space moves to the side the axis actually renders on.
                     if (Legend.Position == LegendPosition.Right)
                     {
-                        MarginRight = legendSize + 16 + (rtlNonBar ? valueAxisSize : additionalAxesWidth);
+                        MarginRight = legendSize + 16 + (IsRTL ? valueAxisSize : additionalAxesWidth);
                     }
                     else
                     {
-                        MarginLeft = legendSize + 16 + (rtlNonBar ? additionalAxesWidth : valueAxisSize);
+                        MarginLeft = legendSize + 16 + (IsRTL ? additionalAxesWidth : valueAxisSize);
                     }
                 }
                 else if (Legend.Position == LegendPosition.Top || Legend.Position == LegendPosition.Bottom)
@@ -753,11 +755,12 @@ namespace Radzen.Blazor
             var valueStart = Height != null ? Height.Value - MarginBottom : 0;
             var valueEnd = MarginTop;
 
-            // RTL flips the horizontal axis direction.
-            // For normal charts, horizontal = category axis. For bar charts (inverted), horizontal = value axis.
-            var invertedAxes = ShouldInvertAxes();
-            var categoryReversed = CategoryAxis.Inverted != (IsRTL && !invertedAxes);
-            var valueReversed = ValueAxis.Inverted != (IsRTL && invertedAxes);
+            // RTL flips the horizontal axis direction. CategoryScale always maps to horizontal pixels and
+            // ValueScale to vertical pixels - bar charts swap which DATA flows through them, but RTL must
+            // always reverse the horizontal scale (for bars that makes values grow right-to-left) and
+            // leave the vertical scale alone (the bar category order does not change in RTL).
+            var categoryReversed = CategoryAxis.Inverted != IsRTL;
+            var valueReversed = ValueAxis.Inverted;
 
             CategoryScale.Output = new ScaleRange
             {
@@ -836,7 +839,8 @@ namespace Radzen.Blazor
 
                 var cs = MarginLeft;
                 var ce = Width.Value - MarginRight;
-                var catReversed = CategoryAxis.Inverted != (IsRTL && !ShouldInvertAxes());
+                // RTL always reverses the horizontal scale - see UpdateScales.
+                var catReversed = CategoryAxis.Inverted != IsRTL;
                 CategoryScale.Output = new ScaleRange
                 {
                     Start = catReversed ? ce : cs,
@@ -851,7 +855,8 @@ namespace Radzen.Blazor
 
                 var vs = Height.Value - MarginBottom;
                 var ve = MarginTop;
-                var valReversed = ValueAxis.Inverted != (IsRTL && ShouldInvertAxes());
+                // The vertical scale is not affected by RTL - see UpdateScales.
+                var valReversed = ValueAxis.Inverted;
                 ValueScale.Output = new ScaleRange
                 {
                     Start = valReversed ? ve : vs,
