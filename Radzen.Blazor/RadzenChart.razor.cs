@@ -1679,6 +1679,26 @@ namespace Radzen.Blazor
         internal void ResetValueLabelLayout()
         {
             valueLabelReservations.Clear();
+            dataLabelReservations.Clear();
+        }
+
+        // Rectangles occupied by data labels during the current render pass. Used to hide
+        // overlapping labels across all series (first series in render order wins).
+        private readonly List<(double X, double Y, double Width, double Height)> dataLabelReservations = new List<(double X, double Y, double Width, double Height)>();
+
+        // Reserves a data label rectangle. Returns false when it intersects an already reserved one.
+        internal bool ReserveDataLabelRect(double x, double y, double width, double height)
+        {
+            foreach (var (rx, ry, rw, rh) in dataLabelReservations)
+            {
+                if (x < rx + rw && x + width > rx && y < ry + rh && y + height > ry)
+                {
+                    return false;
+                }
+            }
+
+            dataLabelReservations.Add((x, y, width, height));
+            return true;
         }
 
         // Reserves a vertical slot for a value label. Returns the desired Y when free; otherwise the
@@ -1765,7 +1785,7 @@ namespace Radzen.Blazor
                     // Another chart in the SyncGroup is hovered - highlight every series at its category.
                     foreach (var series in Series.OrderBy(s => s.RenderingOrder))
                     {
-                        if (!series.Visible || IsRegionSeries(series))
+                        if (!series.Visible || IsRegionSeries(series) || !series.ShowActivePoint)
                         {
                             continue;
                         }
@@ -1781,13 +1801,13 @@ namespace Radzen.Blazor
                 {
                     foreach (var (series, _, point) in SharedPointsAtSnap)
                     {
-                        if (!IsRegionSeries(series))
+                        if (!IsRegionSeries(series) && series.ShowActivePoint)
                         {
                             points.Add((series, point.X, point.Y));
                         }
                     }
                 }
-                else if (HoveredSeries != null && !IsRegionSeries(HoveredSeries))
+                else if (HoveredSeries != null && !IsRegionSeries(HoveredSeries) && HoveredSeries.ShowActivePoint)
                 {
                     points.Add((HoveredSeries, SnapPlotX, SnapPlotY));
                 }
@@ -1805,26 +1825,45 @@ namespace Radzen.Blazor
                 {
                     var index = Series.IndexOf(series);
                     var size = Math.Max(3, series.MarkerSize);
-                    var cx = x.ToInvariantString();
-                    var cy = y.ToInvariantString();
+
+                    // The halo and dot render centered at (0, 0) and the group is positioned with a CSS
+                    // transform - transform transitions glide between data points in every browser, unlike
+                    // path geometry. An explicit series color (custom Stroke/Fill) overrides the scheme
+                    // color the stylesheet derives from the series index.
+                    var style = $"transform: translate({x.ToInvariantString()}px, {y.ToInvariantString()}px)";
+                    if (!string.IsNullOrEmpty(series.Color))
+                    {
+                        style = $"--rz-series-color: {series.Color}; {style}";
+                    }
 
                     builder.OpenElement(3, "g");
                     builder.SetKey(index);
                     builder.AddAttribute(4, "class", $"rz-series-{index} rz-active-point");
+                    builder.AddAttribute(5, "style", style);
 
-                    builder.OpenElement(5, "circle");
-                    builder.AddAttribute(6, "class", "rz-active-point-halo");
-                    builder.AddAttribute(7, "cx", cx);
-                    builder.AddAttribute(8, "cy", cy);
-                    builder.AddAttribute(9, "r", (size * 2.4).ToInvariantString());
+                    builder.OpenElement(6, "circle");
+                    builder.AddAttribute(7, "class", "rz-active-point-halo");
+                    builder.AddAttribute(8, "r", (size * 2.4).ToInvariantString());
                     builder.CloseElement();
 
-                    builder.OpenElement(10, "circle");
-                    builder.AddAttribute(11, "class", "rz-active-point-dot");
-                    builder.AddAttribute(12, "cx", cx);
-                    builder.AddAttribute(13, "cy", cy);
-                    builder.AddAttribute(14, "r", size.ToInvariantString());
-                    builder.CloseElement();
+                    // The dot inherits the series' marker shape so the highlight identifies the series
+                    // by shape as well as color.
+                    var markerPath = Rendering.MarkerPath.For(series.MarkerType, 0, 0, size);
+
+                    if (markerPath.Length > 0)
+                    {
+                        builder.OpenElement(9, "path");
+                        builder.AddAttribute(10, "class", "rz-active-point-dot");
+                        builder.AddAttribute(11, "d", markerPath);
+                        builder.CloseElement();
+                    }
+                    else
+                    {
+                        builder.OpenElement(12, "circle");
+                        builder.AddAttribute(13, "class", "rz-active-point-dot");
+                        builder.AddAttribute(14, "r", size.ToInvariantString());
+                        builder.CloseElement();
+                    }
 
                     builder.CloseElement();
                 }

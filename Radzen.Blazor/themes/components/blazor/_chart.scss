@@ -297,11 +297,10 @@ $chart-color-schemes: (
 }
 
 // Active data point highlight - dot + halo at the data point the tooltip refers to.
-// cx/cy are SVG2 geometry properties, so the dot glides between data points.
+// The shapes render centered at (0, 0) and the group is positioned via an inline CSS transform,
+// so the highlight glides between data points in every browser regardless of the dot's shape.
 .rz-active-point {
-  circle {
-    transition: cx 0.15s ease-out, cy 0.15s ease-out;
-  }
+  transition: transform 0.15s ease-out;
 
   .rz-active-point-halo {
     fill: var(--rz-series-color);
@@ -368,9 +367,40 @@ $chart-color-schemes: (
   font-variant-numeric: tabular-nums;
 }
 
+.rz-series-data-label,
+.rz-series-data-label-fill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  stroke: none;
+  // True vertical centering inside the chip (alignment-baseline is inconsistent across browsers).
+  dominant-baseline: central;
+}
+
 .rz-series-data-label {
   fill: var(--rz-chart-axis-label-color);
-  font-variant-numeric: tabular-nums;
+}
+
+// Background chip behind data labels for readability over series fills.
+.rz-series-data-label-chip {
+  fill: var(--rz-chart-tooltip-background);
+  fill-opacity: 0.9;
+  stroke: var(--rz-chart-grid-line-color);
+  stroke-width: 1;
+}
+
+// Outlined text appearance - a halo in the chart background color keeps labels readable
+// over series fills without the weight of a chip.
+.rz-series-data-label-outline {
+  stroke: var(--rz-base-background-color);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+// Data labels fade in with the initial render animation.
+.rz-chart-animate .rz-series-data-label-group {
+  animation: rz-chart-tooltip-enter var(--rz-chart-animation-duration, 700ms) ease-out;
 }
 
 .rz-value-axis .rz-tick-text {

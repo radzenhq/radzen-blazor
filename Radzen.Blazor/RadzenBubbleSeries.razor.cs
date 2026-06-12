@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -153,6 +154,62 @@ namespace Radzen.Blazor
             }
 
             return yValue;
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
+            var chart = RequireChart();
+            var list = new List<ChartDataLabel>();
+
+            if (!Items.Any())
+            {
+                return list;
+            }
+
+            // Labels offset from the bubble edge rather than its center - the fixed scatter offset
+            // would land inside large bubbles.
+            const double gap = 12;
+            const double inset = 12;
+            var sizeValues = Items.Select(item => Math.Abs(Size(item))).ToList();
+            var minValue = sizeValues.Min();
+            var maxValue = sizeValues.Max();
+            var va = chart.GetValueAxis(ValueAxisName);
+            var vs = chart.GetValueScale(ValueAxisName);
+
+            foreach (var d in Items)
+            {
+                var anchorX = TooltipX(d);
+                var anchorY = TooltipY(d);
+                var radius = GetBubbleRadius(d, minValue, maxValue);
+                var value = Value(d);
+
+                var y = position switch
+                {
+                    DataLabelPosition.Bottom => anchorY + radius + gap,
+                    DataLabelPosition.Inside => anchorY - radius + inset,
+                    DataLabelPosition.Center => anchorY,
+                    // Auto, Top: above the bubble's top edge.
+                    _ => anchorY - radius - gap,
+                };
+
+                list.Add(new ChartDataLabel
+                {
+                    Position = new Point { X = anchorX + offsetX, Y = y + offsetY },
+                    Anchor = new Point { X = anchorX, Y = anchorY },
+                    Value = value,
+                    TextAnchor = "middle",
+                    Text = va.Format(vs, value)
+                });
+            }
+
+            return list;
         }
     }
 }

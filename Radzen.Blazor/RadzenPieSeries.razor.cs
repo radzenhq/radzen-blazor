@@ -504,27 +504,56 @@ namespace Radzen.Blazor
             return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY} Z";
         }
 
+        /// <summary>
+        /// Returns the inner radius used for data label placement - <c>0</c> for pie, the hole radius for donut.
+        /// </summary>
+        internal virtual double LabelInnerRadius(double outerRadius)
+        {
+            return 0;
+        }
+
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
+        {
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
         {
             var list = new List<ChartDataLabel>();
 
             if(Data != null)
             {
+                const double gap = 16;
+                const double inset = 16;
+
                 foreach (var d in PositiveItems)
                 {
                     var x = TooltipX(d) - CenterX;
                     var y = TooltipY(d) - CenterY;
 
-                    // find angle and add offset
+                    // find angle and add offset (offsetY rotates the label around the center, in degrees)
                     var phi = Math.Atan2(y, x);
 
                     phi += Polar.ToRadian(offsetY % 360);
 
-                    var textAnchor = phi >= -1.5 && phi <= 1.5 ? "start" : "end";
+                    // the slice's outer radius at its mid-angle
+                    var radius = Math.Sqrt(x * x + y * y);
 
-                    // find radius
-                    var hyp = Math.Sqrt(x * x + y * y) + offsetX + 16;
+                    var (hyp, textAnchor) = position switch
+                    {
+                        DataLabelPosition.Inside => (radius - inset, "middle"),
+                        DataLabelPosition.Center => (LabelInnerRadius(radius) + (radius - LabelInnerRadius(radius)) / 2, "middle"),
+                        // Auto, Top, Bottom: outside the slice along its mid-angle.
+                        _ => (radius + gap, phi >= -1.5 && phi <= 1.5 ? "start" : "end"),
+                    };
+
+                    hyp += offsetX;
+
+                    // the point on the slice's outer edge - the renderer flips clipping Auto labels across it
+                    var anchorX = CenterX + radius * Math.Cos(phi);
+                    var anchorY = CenterY + radius * Math.Sin(phi);
 
                     // move along the radius and rotate
                     x = CenterX + hyp * Math.Cos(phi);
@@ -537,6 +566,8 @@ namespace Radzen.Blazor
                         {
                             TextAnchor = textAnchor,
                             Position = new Point { X = x, Y = y },
+                            Anchor = new Point { X = anchorX, Y = anchorY },
+                            Value = Value(d),
                             Text = chart.ValueAxis.Format(chart.ValueScale, Value(d))
                         });
                     }

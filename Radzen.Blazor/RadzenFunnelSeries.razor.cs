@@ -223,6 +223,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
             var list = new List<ChartDataLabel>();
 
             if (Data == null || !Items.Any())
@@ -232,15 +238,26 @@ namespace Radzen.Blazor
 
             var orderedItems = GetOrderedItems();
             var count = orderedItems.Count;
-            var maxValue = orderedItems.Max(Value);
             var segHeight = AvailableHeight / count;
+            const double inset = 12;
 
             for (int i = 0; i < count; i++)
             {
                 var item = orderedItems[i];
                 var value = Value(item);
-                var topWidth = AvailableWidth * (value / maxValue);
-                var y = TopY + i * segHeight + segHeight / 2;
+                var edge1 = TopY + i * segHeight;
+                var edge2 = edge1 + segHeight;
+                var center = edge1 + segHeight / 2;
+
+                // Top/Bottom hug the segment edges from the inside - a label outside its segment
+                // would read as the neighboring segment's value. Inside is an alias of Center:
+                // segment values map to width, so there is no value end to inset from.
+                var y = position switch
+                {
+                    DataLabelPosition.Top => Math.Min(edge1, edge2) + inset,
+                    DataLabelPosition.Bottom => Math.Max(edge1, edge2) - inset,
+                    _ => center,
+                };
 
                 var chart = RequireChart();
                 if (chart != null)
@@ -249,6 +266,8 @@ namespace Radzen.Blazor
                     {
                         TextAnchor = "middle",
                         Position = new Point { X = CenterX + offsetX, Y = y + offsetY },
+                        Anchor = new Point { X = CenterX, Y = center },
+                        Value = value,
                         Text = chart.ValueAxis.Format(chart.ValueScale, value)
                     });
                 }

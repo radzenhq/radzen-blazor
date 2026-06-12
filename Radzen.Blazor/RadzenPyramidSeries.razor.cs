@@ -264,6 +264,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
             var list = new List<ChartDataLabel>();
 
             if (Data == null || !Items.Any())
@@ -274,12 +280,12 @@ namespace Radzen.Blazor
             var sorted = GetSortedItems();
             var count = sorted.Count;
             var fractions = GetCumulativeYFractions(sorted);
+            const double inset = 12;
 
             for (int i = 0; i < count; i++)
             {
                 var item = sorted[i];
                 var value = Value(item);
-                var midFraction = (fractions[i] + fractions[i + 1]) / 2;
                 var segmentHeight = Math.Abs((fractions[i + 1] - fractions[i]) * AvailableHeight);
 
                 // Skip labels for segments that are too thin to display text
@@ -288,7 +294,19 @@ namespace Radzen.Blazor
                     continue;
                 }
 
-                var y = TopY + midFraction * AvailableHeight;
+                var edge1 = TopY + fractions[i] * AvailableHeight;
+                var edge2 = TopY + fractions[i + 1] * AvailableHeight;
+                var center = edge1 + (edge2 - edge1) / 2;
+
+                // Top/Bottom hug the segment edges from the inside - a label outside its segment
+                // would read as the neighboring segment's value. Inside is an alias of Center:
+                // segment values map to height/width, so there is no value end to inset from.
+                var y = position switch
+                {
+                    DataLabelPosition.Top => Math.Min(edge1, edge2) + inset,
+                    DataLabelPosition.Bottom => Math.Max(edge1, edge2) - inset,
+                    _ => center,
+                };
 
                 var chart = RequireChart();
                 if (chart != null)
@@ -297,6 +315,8 @@ namespace Radzen.Blazor
                     {
                         TextAnchor = "middle",
                         Position = new Point { X = CenterX + offsetX, Y = y + offsetY },
+                        Anchor = new Point { X = CenterX, Y = center },
+                        Value = value,
                         Text = chart.ValueAxis.Format(chart.ValueScale, value)
                     });
                 }

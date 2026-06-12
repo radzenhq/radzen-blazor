@@ -119,6 +119,21 @@ namespace Radzen.Blazor
         /// Returns data chart position
         /// </summary>
         IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY);
+
+        /// <summary>
+        /// Gets the data labels for the series at the specified <see cref="DataLabelPosition" />.
+        /// The default implementation ignores the position and returns <see cref="GetDataLabels(double, double)" />.
+        /// </summary>
+        /// <param name="offsetX">The horizontal offset.</param>
+        /// <param name="offsetY">The vertical offset.</param>
+        /// <param name="position">The requested label position.</param>
+        IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position) => GetDataLabels(offsetX, offsetY);
+        /// <summary>
+        /// Specifies whether the chart highlights the hovered data point of this series with an active point
+        /// dot. Range-style series (candlestick, OHLC, high-low, box plot) opt out - a single dot cannot
+        /// represent their value range. The default is <c>true</c>.
+        /// </summary>
+        bool ShowActivePoint => true;
         /// <summary>
         /// Returns series median
         /// </summary>

@@ -292,6 +292,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
             var list = new List<ChartDataLabel>();
             var chart = Chart;
             if (chart == null)
@@ -299,19 +305,37 @@ namespace Radzen.Blazor
                 return list;
             }
 
-            (string Anchor, int Sign) position;
-
             if (Data != null)
             {
+                const double gap = 8;
+                const double verticalGap = 16;
+                var ticks = chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance);
+                var x0 = chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+
                 foreach (var d in Data)
                 {
-                    position = Value(d) < 0 ? ("end", -1) : Value(d) == 0 ? ("middle", 0) : ("start", 1);
+                    var value = Value(d);
+                    var sign = value < 0 ? -1 : value == 0 ? 0 : 1;
+                    var end = TooltipX(d);
+                    var anchorY = TooltipY(d);
+
+                    var (x, y, textAnchor) = position switch
+                    {
+                        DataLabelPosition.Top => (end, anchorY - verticalGap, "middle"),
+                        DataLabelPosition.Bottom => (end, anchorY + verticalGap, "middle"),
+                        DataLabelPosition.Inside => (end - gap * sign, anchorY, sign < 0 ? "start" : sign > 0 ? "end" : "middle"),
+                        DataLabelPosition.Center => (end + (x0 - end) / 2, anchorY, "middle"),
+                        // Auto: outside the value end of the bar, sign-aware.
+                        _ => (end + gap * sign, anchorY, sign < 0 ? "end" : sign > 0 ? "start" : "middle"),
+                    };
 
                     list.Add(new ChartDataLabel
                     {
-                        Position = new Point() { X = TooltipX(d) + offsetX + (8 * position.Sign), Y = TooltipY(d) + offsetY },
-                        TextAnchor = position.Anchor,
-                        Text = chart.ValueAxis.Format(chart.CategoryScale, Value(d))
+                        Position = new Point() { X = x + offsetX, Y = y + offsetY },
+                        Anchor = new Point() { X = end, Y = anchorY },
+                        Value = value,
+                        TextAnchor = textAnchor,
+                        Text = chart.ValueAxis.Format(chart.CategoryScale, value)
                     });
                 }
             }

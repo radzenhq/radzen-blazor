@@ -336,6 +336,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
             if (Chart == null)
             {
                 return Enumerable.Empty<ChartDataLabel>();
@@ -345,12 +351,25 @@ namespace Radzen.Blazor
             var stackedColumnSeries = StackedColumnSeries;
             var columnIndex = ColumnIndex;
             var category = ComposeCategory(Chart.CategoryScale);
+            const double inset = 12;
 
             foreach (var data in Items)
             {
-                var top = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
-                var bottom = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
-                var y = top + (bottom - top) / 2;
+                // GetColumnTop returns the value end of the segment (sign-aware), GetColumnBottom the base end.
+                var end = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
+                var baseY = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
+                var center = end + (baseY - end) / 2;
+
+                // Top/Bottom hug the segment edges from the inside - a label outside its segment along the
+                // stacking axis would read as a value of the neighboring series.
+                var y = position switch
+                {
+                    DataLabelPosition.Top => Math.Min(end, baseY) + inset,
+                    DataLabelPosition.Bottom => Math.Max(end, baseY) - inset,
+                    DataLabelPosition.Inside => end + inset * Math.Sign(baseY - end),
+                    // Auto, Center: the middle of the segment.
+                    _ => center,
+                };
 
                 var categoryValue = category(data);
                 var total = GetCategoryTotal(categoryValue, stackedColumnSeries);
@@ -359,6 +378,9 @@ namespace Radzen.Blazor
                 list.Add(new ChartDataLabel
                 {
                     Position = new Point { X = TooltipX(data) + offsetX, Y = y + offsetY },
+                    Anchor = new Point { X = TooltipX(data), Y = center },
+                    // The label displays the percentage - formatting and MinMax operate on it.
+                    Value = percentage,
                     TextAnchor = "middle",
                     Text = string.Format(CultureInfo.InvariantCulture, "{0:0.##}%", percentage)
                 });

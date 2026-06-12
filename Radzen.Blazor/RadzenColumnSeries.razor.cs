@@ -242,22 +242,48 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
-            var list = new List<ChartDataLabel>();
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
 
-            int sign;
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
+            var list = new List<ChartDataLabel>();
 
             var chart = RequireChart();
             if (Data != null)
             {
+                const double gap = 16;
+                const double inset = 12;
+                var vs = chart.GetValueScale(ValueAxisName);
+                var va = chart.GetValueAxis(ValueAxisName);
+                var ticks = vs.Ticks(va.TickDistance);
+                var y0 = vs.Scale(Math.Max(0, ticks.Start));
+
                 foreach (var d in Data)
                 {
-                    sign = Value(d) < 0 ? -1 : Value(d) == 0 ? 0 : 1;
+                    var value = Value(d);
+                    var sign = value < 0 ? -1 : value == 0 ? 0 : 1;
+                    var anchorX = TooltipX(d);
+                    var end = TooltipY(d);
+
+                    var y = position switch
+                    {
+                        DataLabelPosition.Top => end - gap,
+                        DataLabelPosition.Bottom => end + gap,
+                        DataLabelPosition.Inside => end + inset * sign,
+                        DataLabelPosition.Center => end + (y0 - end) / 2,
+                        // Auto: outside the value end of the column, sign-aware.
+                        _ => end - gap * sign,
+                    };
 
                     list.Add(new ChartDataLabel
                     {
-                        Position = new Point() { X = TooltipX(d) + offsetX, Y = TooltipY(d) - offsetY - (16 * sign) },
+                        Position = new Point() { X = anchorX + offsetX, Y = y - offsetY },
+                        Anchor = new Point() { X = anchorX, Y = end },
+                        Value = value,
                         TextAnchor = "middle",
-                        Text = chart.GetValueAxis(ValueAxisName).Format(chart.GetValueScale(ValueAxisName), Value(d))
+                        Text = va.Format(vs, value)
                     });
                 }
             }

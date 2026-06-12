@@ -444,6 +444,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public abstract string Color { get; }
 
+        /// <summary>
+        /// Specifies whether the chart highlights the hovered data point of this series with an active point
+        /// dot. Range-style series override this to <c>false</c> - a single dot cannot represent their value range.
+        /// </summary>
+        public virtual bool ShowActivePoint => true;
+
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
@@ -968,11 +974,52 @@ namespace Radzen.Blazor
 
             foreach (var d in Items)
             {
+                var value = Value(d);
                 list.Add(new ChartDataLabel
                 {
                     Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
+                    Anchor = new Point { X = TooltipX(d), Y = TooltipY(d) },
+                    Value = value,
                     TextAnchor = "middle",
-                    Text = chart.GetValueAxis(ValueAxisName).Format(chart.GetValueScale(ValueAxisName), Value(d))
+                    Text = chart.GetValueAxis(ValueAxisName).Format(chart.GetValueScale(ValueAxisName), value)
+                });
+            }
+
+            return list;
+        }
+
+        /// <inheritdoc />
+        public virtual IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
+            if (position == DataLabelPosition.Auto)
+            {
+                // Each series' tuned default placement; the renderer edge-flips via Anchor when clipping.
+                return GetDataLabels(offsetX, offsetY);
+            }
+
+            var chart = RequireChart();
+            var list = new List<ChartDataLabel>();
+            const double gap = 16;
+
+            foreach (var d in Items)
+            {
+                var anchorX = TooltipX(d);
+                var anchorY = TooltipY(d);
+                var y = position switch
+                {
+                    DataLabelPosition.Top => anchorY - gap,
+                    DataLabelPosition.Bottom => anchorY + gap,
+                    _ => anchorY,
+                };
+                var value = Value(d);
+
+                list.Add(new ChartDataLabel
+                {
+                    Position = new Point { X = anchorX + offsetX, Y = y + offsetY },
+                    Anchor = new Point { X = anchorX, Y = anchorY },
+                    Value = value,
+                    TextAnchor = "middle",
+                    Text = chart.GetValueAxis(ValueAxisName).Format(chart.GetValueScale(ValueAxisName), value)
                 });
             }
 
