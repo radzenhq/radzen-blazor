@@ -27,8 +27,9 @@
         var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();;
         var className = $"rz-column-series rz-series-{chart.Series.IndexOf(this)}";
 
+        var groupStyle = $"--rz-zero-y: {y0.ToInvariantString()}px";
         return
-        @<g class="@className">
+        @<g class="@className" style="@groupStyle">
             @foreach(var data in Items)
             {
                 var x = category(data) - bandWidth / 2 + index * width + index * padding;

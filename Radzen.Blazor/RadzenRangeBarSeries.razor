@@ -33,8 +33,9 @@
         var min = Min;
         var max = Max;
 
+        var groupStyle = $"--rz-zero-x: {chart.CategoryScale.Scale(Math.Max(0, chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance).Start)).ToInvariantString()}px";
         return
-        @<g class="@className">
+        @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
             {
                 var cy = category(data) - bandHeight / 2 + index * height + index * padding;

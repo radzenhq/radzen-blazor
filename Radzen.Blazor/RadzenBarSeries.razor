@@ -42,8 +42,9 @@
         var height = barHeight / barSeries.Count - padding + padding / barSeries.Count;
         var className = $"rz-bar-series rz-series-{chart.Series.IndexOf(this)}";
 
+        var groupStyle = $"--rz-zero-x: {x0.ToInvariantString()}px";
         return
-        @<g class="@className">
+        @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
             {
                 var y = category(data) - barHeight / 2 + index * height + index * padding;

@@ -120,18 +120,116 @@ $chart-color-schemes: (
   }
 }
 
-.rz-chart-animate {
-  .rz-line-series,
-  .rz-area-series,
-  .rz-full-stacked-area-series {
-    animation: rz-series-reveal var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+// Columns grow vertically from the zero axis - positives up, negatives down. The series
+// emits the zero line's pixel position as --rz-zero-y, and the keyframes conjugate the
+// scale around it in the series' own coordinate space.
+@keyframes rz-series-grow-y {
+  from {
+    transform: translateY(var(--rz-zero-y, 0px)) scaleY(0) translateY(calc(-1 * var(--rz-zero-y, 0px)));
+  }
+  to {
+    transform: translateY(var(--rz-zero-y, 0px)) scaleY(1) translateY(calc(-1 * var(--rz-zero-y, 0px)));
   }
 }
 
-[dir='rtl'] .rz-chart-animate {
+// Bars grow horizontally from the zero axis - positives right, negatives left.
+@keyframes rz-series-grow-x {
+  from {
+    transform: translateX(var(--rz-zero-x, 0px)) scaleX(0) translateX(calc(-1 * var(--rz-zero-x, 0px)));
+  }
+  to {
+    transform: translateX(var(--rz-zero-x, 0px)) scaleX(1) translateX(calc(-1 * var(--rz-zero-x, 0px)));
+  }
+}
+
+// Top-down reveal - funnels appear to pour.
+@keyframes rz-series-reveal-down {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+// Per-marker pop for point series (scatter/bubble).
+@keyframes rz-marker-pop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Scale + fade from the center for polar series (pie/donut/spider).
+@keyframes rz-series-scale-in {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Plain fade for matrix series (heatmap/contour).
+@keyframes rz-series-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.rz-chart-animate {
+  // Time-series shapes reveal with a left-to-right wipe. Waterfall joins them - its columns
+  // read as a left-to-right sequence of steps.
   .rz-line-series,
+  .rz-stacked-line-series,
+  .rz-full-stacked-line-series,
   .rz-area-series,
-  .rz-full-stacked-area-series {
+  .rz-full-stacked-area-series,
+  .rz-range-area-series,
+  .rz-waterfall-series {
+    animation: rz-series-reveal var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // Columns expand vertically from the zero axis (positives up, negatives down).
+  // The stacked variants share rz-column-series.
+  .rz-column-series,
+  .rz-full-stacked-column-series,
+  .rz-range-column-series {
+    animation: rz-series-grow-y var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // Bars expand horizontally from the zero axis (positives right, negatives left) -
+  // direction-agnostic, so no RTL variant is needed.
+  .rz-bar-series,
+  .rz-full-stacked-bar-series,
+  .rz-range-bar-series,
+  .rz-bullet-series {
+    animation: rz-series-grow-x var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // The horizontal waterfall reads as a top-to-bottom sequence of steps.
+  .rz-horizontal-waterfall-series {
+    animation: rz-series-reveal-down var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+*[dir=rtl] .rz-chart-animate {
+  .rz-line-series,
+  .rz-stacked-line-series,
+  .rz-full-stacked-line-series,
+  .rz-area-series,
+  .rz-full-stacked-area-series,
+  .rz-range-area-series,
+  .rz-waterfall-series {
     animation-name: rz-series-reveal-rtl;
   }
 }

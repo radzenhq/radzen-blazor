@@ -36,8 +36,9 @@
         var rangeColors = GetRangeColors();
         var rangeThresholds = GetRangeThresholds();
 
+        var groupStyle = $"--rz-zero-x: {x0.ToInvariantString()}px";
         return
-        @<g class="@className">
+        @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
             {
                 var cy = category(data);

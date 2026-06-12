@@ -23,8 +23,9 @@
 
         var className = $"rz-full-stacked-bar-series rz-series-{Chart?.Series.IndexOf(this)}";
 
+        var groupStyle = $"--rz-zero-x: {(Chart?.CategoryScale?.Scale(Math.Max(0, ticks?.Start ?? 0)) ?? 0).ToInvariantString()}px";
         return
-        @<g class="@className">
+        @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
             {
                 var y = GetBarTop(data, category);
