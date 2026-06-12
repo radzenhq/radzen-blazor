@@ -273,7 +273,6 @@ namespace Radzen.Blazor
                         DataLabelPosition.Bottom => end + gap,
                         DataLabelPosition.Inside => end + inset * sign,
                         DataLabelPosition.Center => end + (y0 - end) / 2,
-                        // Auto: outside the value end of the column, sign-aware.
                         _ => end - gap * sign,
                     };
 

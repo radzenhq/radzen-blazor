@@ -8,7 +8,7 @@
         </RadzenStack>
     </RadzenCard>
 
-    <RadzenChart Style="width: 100%; height: 500px;">
+    <RadzenChart Animate="true" Style="width: 100%; height: 500px;">
         <RadzenPyramidSeries Data="@levels" CategoryProperty="Level" ValueProperty="Count"
                             Inverted="@inverted"
                             StrokeWidth="1" Strokes="@(new[] { "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)", "var(--rz-base-background-color)" })">

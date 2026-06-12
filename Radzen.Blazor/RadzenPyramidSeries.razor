@@ -29,7 +29,7 @@
                     var stroke = PickColor(index, Strokes);
                     var arcClassName = $"rz-series-item-{index}";
 
-                    <g class="@arcClassName">
+                    <g class="@arcClassName" style="@($"--rz-segment-order: {index}")">
                         <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
                     </g>
                 }

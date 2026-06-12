@@ -993,7 +993,6 @@ namespace Radzen.Blazor
         {
             if (position == DataLabelPosition.Auto)
             {
-                // Each series' tuned default placement; the renderer edge-flips via Anchor when clipping.
                 return GetDataLabels(offsetX, offsetY);
             }
 

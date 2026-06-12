@@ -533,25 +533,22 @@ namespace Radzen.Blazor
                     var x = TooltipX(d) - CenterX;
                     var y = TooltipY(d) - CenterY;
 
-                    // find angle and add offset (offsetY rotates the label around the center, in degrees)
+                    // find angle and add offset
                     var phi = Math.Atan2(y, x);
 
                     phi += Polar.ToRadian(offsetY % 360);
 
-                    // the slice's outer radius at its mid-angle
                     var radius = Math.Sqrt(x * x + y * y);
 
                     var (hyp, textAnchor) = position switch
                     {
                         DataLabelPosition.Inside => (radius - inset, "middle"),
                         DataLabelPosition.Center => (LabelInnerRadius(radius) + (radius - LabelInnerRadius(radius)) / 2, "middle"),
-                        // Auto, Top, Bottom: outside the slice along its mid-angle.
                         _ => (radius + gap, phi >= -1.5 && phi <= 1.5 ? "start" : "end"),
                     };
 
                     hyp += offsetX;
 
-                    // the point on the slice's outer edge - the renderer flips clipping Auto labels across it
                     var anchorX = CenterX + radius * Math.Cos(phi);
                     var anchorY = CenterY + radius * Math.Sin(phi);
 

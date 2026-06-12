@@ -25,7 +25,6 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double LabelInnerRadius(double outerRadius)
         {
-            // Matches the rendered hole size so Center labels sit in the middle of the ring.
             return InnerRadius ?? outerRadius / 2;
         }
     }

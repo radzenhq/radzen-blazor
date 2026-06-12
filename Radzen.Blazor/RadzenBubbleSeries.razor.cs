@@ -173,8 +173,6 @@ namespace Radzen.Blazor
                 return list;
             }
 
-            // Labels offset from the bubble edge rather than its center - the fixed scatter offset
-            // would land inside large bubbles.
             const double gap = 12;
             const double inset = 12;
             var sizeValues = Items.Select(item => Math.Abs(Size(item))).ToList();
@@ -195,7 +193,6 @@ namespace Radzen.Blazor
                     DataLabelPosition.Bottom => anchorY + radius + gap,
                     DataLabelPosition.Inside => anchorY - radius + inset,
                     DataLabelPosition.Center => anchorY,
-                    // Auto, Top: above the bubble's top edge.
                     _ => anchorY - radius - gap,
                 };
 

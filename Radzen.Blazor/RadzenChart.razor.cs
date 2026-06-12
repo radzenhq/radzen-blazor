@@ -115,8 +115,6 @@ namespace Radzen.Blazor
         private static readonly Dictionary<string, List<RadzenChart>> syncGroups = new Dictionary<string, List<RadzenChart>>();
         private string? registeredSyncGroup;
 
-        // Plot-local X of the category hovered in another chart of the same SyncGroup. Drives the
-        // synchronized crosshair and active points when the cursor is not over this chart.
         internal double? SyncedPlotX { get; private set; }
 
         private void RegisterSyncGroup()
@@ -179,7 +177,6 @@ namespace Radzen.Blazor
                     : new List<RadzenChart>();
             }
 
-            // Broadcast only while the cursor is inside the plot area
             double? categoryValue = null;
             if ((x >= 0 || y >= 0) && Width.HasValue && Height.HasValue)
             {
@@ -698,8 +695,6 @@ namespace Radzen.Blazor
 
             if (IsRTL)
             {
-                // RTL mirrors the horizontal layout: the vertical axis labels render on the right
-                // for all chart types, additional axes on the left.
                 MarginRight = valueAxisSize;
                 MarginLeft = 32 + additionalAxesWidth;
             }
@@ -715,8 +710,6 @@ namespace Radzen.Blazor
             {
                 if (Legend.Position == LegendPosition.Right || Legend.Position == LegendPosition.Left)
                 {
-                    // The legend keeps its configured physical side in RTL; only the axis label
-                    // space moves to the side the axis actually renders on.
                     if (Legend.Position == LegendPosition.Right)
                     {
                         MarginRight = legendSize + 16 + (IsRTL ? valueAxisSize : additionalAxesWidth);
@@ -755,10 +748,6 @@ namespace Radzen.Blazor
             var valueStart = Height != null ? Height.Value - MarginBottom : 0;
             var valueEnd = MarginTop;
 
-            // RTL flips the horizontal axis direction. CategoryScale always maps to horizontal pixels and
-            // ValueScale to vertical pixels - bar charts swap which DATA flows through them, but RTL must
-            // always reverse the horizontal scale (for bars that makes values grow right-to-left) and
-            // leave the vertical scale alone (the bar category order does not change in RTL).
             var categoryReversed = CategoryAxis.Inverted != IsRTL;
             var valueReversed = ValueAxis.Inverted;
 
@@ -839,7 +828,6 @@ namespace Radzen.Blazor
 
                 var cs = MarginLeft;
                 var ce = Width.Value - MarginRight;
-                // RTL always reverses the horizontal scale - see UpdateScales.
                 var catReversed = CategoryAxis.Inverted != IsRTL;
                 CategoryScale.Output = new ScaleRange
                 {
@@ -855,7 +843,6 @@ namespace Radzen.Blazor
 
                 var vs = Height.Value - MarginBottom;
                 var ve = MarginTop;
-                // The vertical scale is not affected by RTL - see UpdateScales.
                 var valReversed = ValueAxis.Inverted;
                 ValueScale.Output = new ScaleRange
                 {
@@ -973,9 +960,6 @@ namespace Radzen.Blazor
                     SnapPlotY = -1;
                     HoveredSeries = null;
                     SharedPointsAtSnap = null;
-                    // The crosshair and active point live in the hover overlay, the split/axis/synced tooltip
-                    // boxes in the tooltip overlay - both re-render independently of the (potentially
-                    // expensive) chart.
                     if (Tooltip != null && (Tooltip.Split || AxisTooltipTrigger))
                     {
                         TooltipOverlay?.Refresh();
@@ -990,7 +974,6 @@ namespace Radzen.Blazor
             {
                 MouseInside = true;
                 // The crosshair follows the cursor even when no data point is in tooltip range,
-                // so refresh on every move when the feature is enabled.
                 if (AnyAxisCrosshairVisible())
                 {
                     HoverOverlay?.Refresh();
@@ -1155,8 +1138,6 @@ namespace Radzen.Blazor
             return (closestSeries, closestData);
         }
 
-        // Resolves the effective tooltip trigger - Auto means Axis when the category crosshair is on
-        // or the chart belongs to a sync group (both imply category-tracking interactions).
         internal bool AxisTooltipTrigger
         {
             get
@@ -1170,9 +1151,6 @@ namespace Radzen.Blazor
             }
         }
 
-        // Axis-trigger matching: the data point nearest to the cursor by X across all point series,
-        // ties at the same category resolved by vertical distance. No tolerance - any position inside
-        // the plot matches, like crosshairs and synced charts.
         private (IChartSeries?, object?) ClosestSeriesByCategory(double queryX, double queryY)
         {
             IChartSeries? closestSeries = null;
@@ -1266,8 +1244,6 @@ namespace Radzen.Blazor
                 IChartSeries? closestSeries = null;
                 object? closestSeriesData = null;
 
-                // In axis mode the crosshair, tooltip and active point work as one unit gated by the
-                // plot area; outside it nothing matches and everything hides together.
                 if (!axisMode || cursorInPlot)
                 {
                     (closestSeries, closestSeriesData) = FindClosestSeries(queryX, queryY, TooltipTolerance);
@@ -1317,7 +1293,6 @@ namespace Radzen.Blazor
                         tooltipSeries = closestSeries;
                         tooltip = closestSeries.RenderTooltip(closestSeriesData);
 
-                        // Split and axis modes draw their own in-chart overlay — don't also open the popup tooltip.
                         if (!Tooltip.Split && !axisMode)
                         {
                             TooltipService?.OpenChartTooltip(Element, snap.X + MarginLeft, snap.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
@@ -1369,7 +1344,6 @@ namespace Radzen.Blazor
                 await Task.Yield();
             }
 
-            // After the hover state is fully cleared so the in-chart tooltip box hides with it.
             if (cleared && (Tooltip.Split || AxisTooltipTrigger))
             {
                 TooltipOverlay?.Refresh();
@@ -1662,23 +1636,14 @@ namespace Radzen.Blazor
             return css;
         }
 
-        // True when the active data point highlight (enlarged dot + halo at the tooltip's data point) should render.
         private bool ActivePointEnabled => Tooltip != null && Tooltip.Visible && Tooltip.HighlightDataPoint;
 
-        // The overlay component which renders the crosshair and the active data point. It re-renders
-        // independently of the chart so hover tracking does not trigger a full chart re-render
-        // (axes can be expensive to format).
         internal HoverOverlay? HoverOverlay { get; set; }
 
-        // The overlay component which renders the split and synced tooltip boxes (the HTML layer).
         internal TooltipOverlay? TooltipOverlay { get; set; }
 
-        // Set by a RadzenChartRangeNavigator child component. When present the chart renders a
-        // range navigator below the plot, bound to the chart's view range.
         internal RadzenChartRangeNavigator? RangeNavigator { get; set; }
 
-        // Vertical intervals occupied by RadzenSeriesValueLabel pills during the current render pass.
-        // Cleared at the start of every chart render so labels can nudge apart when series values are close.
         private readonly List<(double Top, double Bottom)> valueLabelReservations = new List<(double Top, double Bottom)>();
 
         internal void ResetValueLabelLayout()
@@ -1687,11 +1652,8 @@ namespace Radzen.Blazor
             dataLabelReservations.Clear();
         }
 
-        // Rectangles occupied by data labels during the current render pass. Used to hide
-        // overlapping labels across all series (first series in render order wins).
         private readonly List<(double X, double Y, double Width, double Height)> dataLabelReservations = new List<(double X, double Y, double Width, double Height)>();
 
-        // Reserves a data label rectangle. Returns false when it intersects an already reserved one.
         internal bool ReserveDataLabelRect(double x, double y, double width, double height)
         {
             foreach (var (rx, ry, rw, rh) in dataLabelReservations)
@@ -1706,8 +1668,6 @@ namespace Radzen.Blazor
             return true;
         }
 
-        // Reserves a vertical slot for a value label. Returns the desired Y when free; otherwise the
-        // nearest non-overlapping Y, preferring the smaller displacement (labels render in series order).
         internal double ReserveValueLabelSlot(double desiredY, double height, double plotHeight)
         {
             var half = height / 2;
@@ -1746,7 +1706,6 @@ namespace Radzen.Blazor
             return y;
         }
 
-        // Applies a view range coming from the attached range navigator - same semantics as wheel zoom.
         internal async Task OnRangeNavigatorViewChanged(double start, double end)
         {
             var newStart = Math.Clamp(Math.Min(start, end), 0, 1);
@@ -1787,7 +1746,6 @@ namespace Radzen.Blazor
 
                 if (synced)
                 {
-                    // Another chart in the SyncGroup is hovered - highlight every series at its category.
                     foreach (var series in Series.OrderBy(s => s.RenderingOrder))
                     {
                         if (!series.Visible || IsRegionSeries(series) || !series.ShowActivePoint)
@@ -1831,10 +1789,6 @@ namespace Radzen.Blazor
                     var index = Series.IndexOf(series);
                     var size = Math.Max(3, series.MarkerSize);
 
-                    // The halo and dot render centered at (0, 0) and the group is positioned with a CSS
-                    // transform - transform transitions glide between data points in every browser, unlike
-                    // path geometry. An explicit series color (custom Stroke/Fill) overrides the scheme
-                    // color the stylesheet derives from the series index.
                     var style = $"transform: translate({x.ToInvariantString()}px, {y.ToInvariantString()}px)";
                     if (!string.IsNullOrEmpty(series.Color))
                     {
@@ -1851,8 +1805,6 @@ namespace Radzen.Blazor
                     builder.AddAttribute(8, "r", (size * 2.4).ToInvariantString());
                     builder.CloseElement();
 
-                    // The dot inherits the series' marker shape so the highlight identifies the series
-                    // by shape as well as color.
                     var markerPath = Rendering.MarkerPath.For(series.MarkerType, 0, 0, size);
 
                     if (markerPath.Length > 0)
@@ -1881,7 +1833,6 @@ namespace Radzen.Blazor
         {
             return builder =>
             {
-                // Synced mode: another chart in the same SyncGroup is hovered - show the X crosshair at its category.
                 var synced = !MouseInside && SyncedPlotX.HasValue;
 
                 if ((!MouseInside && !synced) || Tooltip == null || !Tooltip.Visible)
@@ -1910,8 +1861,6 @@ namespace Radzen.Blazor
                 var queryX = synced ? SyncedPlotX!.Value : mouseX - MarginLeft;
                 var queryY = mouseY - MarginTop;
 
-                // The crosshair is confined to the plot area so it appears and disappears together
-                // with the tooltip and active point (cursor over axes/margins shows nothing).
                 if (!synced && (queryX < 0 || queryX > plotWidth || queryY < 0 || queryY > plotHeight))
                 {
                     return;
@@ -1920,7 +1869,6 @@ namespace Radzen.Blazor
                 var lineY = queryY;
 
                 var showX = categoryCrosshair?.Visible == true && lineX >= 0 && lineX <= plotWidth;
-                // The synced cursor has no Y position - only the category line is shown.
                 var showY = !synced && valueCrosshair?.Visible == true && lineY >= 0 && lineY <= plotHeight;
 
                 if (!showX && !showY)
@@ -2094,8 +2042,6 @@ namespace Radzen.Blazor
             builder.CloseRegion();
         }
 
-        // Per-series tooltip data at the category hovered in another chart of the SyncGroup.
-        // The popup tooltip is a single global element, so synced charts render split-style boxes instead.
         private List<(IChartSeries Series, object Data, Point Point)> SyncedPoints()
         {
             var list = new List<(IChartSeries Series, object Data, Point Point)>();
@@ -2117,8 +2063,6 @@ namespace Radzen.Blazor
             return list;
         }
 
-        // True when the last tooltip overlay render produced a category tooltip box. The overlay reads it
-        // after rendering so the entrance animation only plays when the box first appears.
         internal bool CategoryTooltipRendered { get; private set; }
 
         internal RenderFragment RenderTooltipOverlay()
@@ -2141,8 +2085,6 @@ namespace Radzen.Blazor
 
                 if (!MouseInside || !Tooltip.Split)
                 {
-                    // Single category tooltip box - the hovered chart in axis mode and sync receivers
-                    // render the same box so source and receivers are visually identical.
                     IChartSeries? series = null;
                     object? data = null;
                     Point? boxAnchor = null;
@@ -2297,9 +2239,6 @@ namespace Radzen.Blazor
             };
         }
 
-        // The category tooltip box used by axis-trigger tooltips and sync receivers. Anchored next to
-        // the snapped data point, flipped left when it would spill off the plot. Position transitions
-        // (glide between categories) and the entrance animation come from the stylesheet.
         private void RenderCategoryTooltipBox(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder,
             IChartSeries series, object data, Point anchor, double plotWidth, double plotHeight)
         {

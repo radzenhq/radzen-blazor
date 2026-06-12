@@ -63,7 +63,6 @@
         var plotWidth = Chart.CategoryScale.OutputSize;
         var plotHeight = Chart.ValueScale.OutputSize;
 
-        // The data point nearest to the right edge of the plot is the latest visible value.
         var (data, point) = series.DataAt(plotWidth + 10, 0);
 
         if (data == null)
@@ -71,8 +70,6 @@
             return null!;
         }
 
-        // GetDataLabels formats the value the same way data labels do; match by X since
-        // some series bake a Y offset into the label position.
         var label = series.GetDataLabels(0, 0).OrderBy(l => Math.Abs(l.Position.X - point.X)).FirstOrDefault();
 
         if (label == null || string.IsNullOrEmpty(label.Text))
@@ -86,12 +83,8 @@
         var paddingX = 6.0;
         var boxWidth = text.Length * 7.5 + paddingX * 2;
         var boxHeight = 18.0;
-        // Anchored to the right edge of the plot, vertically at the latest value - like a price label.
-        // The chart nudges the slot when another series' label would overlap (reserve includes a 4px gap).
         var x = plotWidth - boxWidth - 4;
         var y = Chart.ReserveValueLabelSlot(point.Y, boxHeight + 4, plotHeight);
-        // An explicit Fill overrides the series color; the stylesheet derives both the pill
-        // background and a readable text color (black or white) from this custom property.
         var style = Fill != null ? $"--rz-series-color: {Fill};" : null;
 
         return

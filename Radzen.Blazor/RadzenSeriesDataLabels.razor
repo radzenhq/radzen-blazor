@@ -75,7 +75,6 @@
                         _ => textX - width / 2,
                     };
 
-                    // Auto position: flip labels which would clip the plot edges to the other side of the point.
                     if (Position == DataLabelPosition.Auto && label.Anchor != null)
                     {
                         if (y - height / 2 < 0 || y + height / 2 > plotHeight)
@@ -87,8 +86,6 @@
                             }
                         }
 
-                        // Horizontal flip for start/end anchored labels (horizontal bar series): a label
-                        // clipping the plot side flips to the other side of the anchor, inside the bar.
                         var rect = RectX(x, textAnchor);
                         if (rect < 0 || rect + width > plotWidth)
                         {
@@ -111,8 +108,6 @@
                         continue;
                     }
 
-                    // Optical centering: digits have no descenders, so the centered em box leaves the
-                    // ink sitting slightly high inside the chip - nudge down by a pixel.
                     var position = new Point { X = x, Y = chip ? y + 1 : y };
 
                     builder.AddContent(1,
@@ -164,7 +159,6 @@
 
         if (!string.IsNullOrEmpty(FormatString) && label.Value != null)
         {
-            // CurrentCulture matches the axis FormatTick behavior.
             return string.Format(CultureInfo.CurrentCulture, FormatString, label.Value);
         }
 

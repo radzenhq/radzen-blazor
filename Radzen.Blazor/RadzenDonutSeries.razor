@@ -38,9 +38,11 @@
         var radius = CurrentRadius;
         var innerRadius = InnerRadius ?? radius / 2;
         var items = PositiveItems;
+        var centerStyle = $"--rz-pie-cx: {x.ToInvariantString()}px; --rz-pie-cy: {y.ToInvariantString()}px";
+
         return
         @<g>
-            <g class="@className">
+            <g class="@className" style="@centerStyle">
                 @if (items.Any())
                 {
                     var sum = items.Sum(Value);
@@ -64,7 +66,7 @@
                         var stroke = PickColor(index, Strokes);
                         var explodeStyle = ExplodeOffset > 0 ? $"--rz-explode-x: {(ExplodeOffset * Math.Cos(DegToRad(midAngle))).ToInvariantString()}px; --rz-explode-y: {(-ExplodeOffset * Math.Sin(DegToRad(midAngle))).ToInvariantString()}px" : "";
 
-                        <g class="@arcClassName" style="@explodeStyle">
+                        <g class="@arcClassName" style="@($"--rz-segment-order: {index};{explodeStyle}")">
                             @if (ExplodeOffset > 0)
                             {
                                 <path class="rz-hit-area" d="@d" style="fill: transparent; stroke: none; pointer-events: fill" />

@@ -87,7 +87,6 @@
             </defs>
         }
         var animate = chart.AnimateDataUpdates;
-        // With update animation the elements must survive data changes so the CSS d transition can morph them.
         var lineKey = animate ? $"animated-line-{LineType}" : line;
 
         @if (FillMode != FillMode.None)

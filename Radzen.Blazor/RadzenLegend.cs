@@ -43,8 +43,6 @@ namespace Radzen.Blazor
             }
             else
             {
-                // Top/Bottom: items flow horizontally and wrap onto multiple rows. Reserve height for
-                // every wrapped row so the legend never overlaps the plot when there are many series.
                 var available = chart.MeasuredWidth ?? 0;
 
                 if (available > 0)

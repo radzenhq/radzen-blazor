@@ -9,8 +9,6 @@ namespace Radzen.Blazor
     {
         private object? step;
 
-        // True when Step was computed by Fit rather than assigned externally (the axis Step parameter).
-        // Calendar-aligned ticks apply only without an explicit user step.
         private bool autoStep;
 
         public override object? Step
@@ -60,7 +58,6 @@ namespace Radzen.Blazor
 
         public override IEnumerable<double> TickValues(int distance)
         {
-            // An explicit user-provided Step keeps the uniform behavior.
             if (Step is TimeSpan && !autoStep)
             {
                 return base.TickValues(distance);
@@ -79,8 +76,6 @@ namespace Radzen.Blazor
             return CalendarTicks(FromTicks(start), FromTicks(end), rawStep);
         }
 
-        // Ticks aligned to calendar boundaries (whole seconds/minutes/hours/days/months/years), picking the
-        // smallest nice unit that fits the desired tick density
         private static IEnumerable<double> CalendarTicks(DateTime start, DateTime end, double rawStepTicks)
         {
             var sixMonths = TimeSpan.FromDays(183).Ticks;
@@ -101,7 +96,6 @@ namespace Radzen.Blazor
                     span = TimeSpan.FromDays(14);
                 }
 
-                // Round the first tick up to a span boundary.
                 var first = new DateTime((start.Ticks + span.Ticks - 1) / span.Ticks * span.Ticks);
 
                 for (var tick = first; tick <= end; tick = tick.Add(span))
@@ -134,7 +128,6 @@ namespace Radzen.Blazor
             {
                 var averageYear = TimeSpan.FromDays(365.25).Ticks;
                 var years = (int)Math.Ceiling(rawStepTicks / averageYear);
-                // Snap to a nice year step (1, 2, 5, 10, 20, 50, ...).
                 var magnitude = (int)Math.Pow(10, Math.Floor(Math.Log10(years)));
                 foreach (var factor in new[] { 1, 2, 5, 10 })
                 {

@@ -100,8 +100,6 @@ $chart-color-schemes: (
   }
 }
 
-// Initial render animation (scoped to Animate=true via .rz-chart-animate) - series
-// are revealed with a left-to-right wipe. Runs once per series element lifetime.
 @keyframes rz-series-reveal {
   from {
     clip-path: inset(0 100% 0 0);
@@ -120,9 +118,6 @@ $chart-color-schemes: (
   }
 }
 
-// Columns grow vertically from the zero axis - positives up, negatives down. The series
-// emits the zero line's pixel position as --rz-zero-y, and the keyframes conjugate the
-// scale around it in the series' own coordinate space.
 @keyframes rz-series-grow-y {
   from {
     transform: translateY(var(--rz-zero-y, 0px)) scaleY(0) translateY(calc(-1 * var(--rz-zero-y, 0px)));
@@ -132,7 +127,6 @@ $chart-color-schemes: (
   }
 }
 
-// Bars grow horizontally from the zero axis - positives right, negatives left.
 @keyframes rz-series-grow-x {
   from {
     transform: translateX(var(--rz-zero-x, 0px)) scaleX(0) translateX(calc(-1 * var(--rz-zero-x, 0px)));
@@ -142,7 +136,6 @@ $chart-color-schemes: (
   }
 }
 
-// Top-down reveal - funnels appear to pour.
 @keyframes rz-series-reveal-down {
   from {
     clip-path: inset(0 0 100% 0);
@@ -152,7 +145,17 @@ $chart-color-schemes: (
   }
 }
 
-// Per-marker pop for point series (scatter/bubble).
+@keyframes rz-segment-expand {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
 @keyframes rz-marker-pop {
   from {
     transform: scale(0);
@@ -164,19 +167,17 @@ $chart-color-schemes: (
   }
 }
 
-// Scale + fade from the center for polar series (pie/donut/spider).
-@keyframes rz-series-scale-in {
+@keyframes rz-slice-expand {
   from {
-    transform: scale(0.6);
+    transform: translate(var(--rz-pie-cx, 0px), var(--rz-pie-cy, 0px)) scale(0) translate(calc(-1 * var(--rz-pie-cx, 0px)), calc(-1 * var(--rz-pie-cy, 0px)));
     opacity: 0;
   }
   to {
-    transform: scale(1);
+    transform: translate(var(--rz-pie-cx, 0px), var(--rz-pie-cy, 0px)) scale(1) translate(calc(-1 * var(--rz-pie-cx, 0px)), calc(-1 * var(--rz-pie-cy, 0px)));
     opacity: 1;
   }
 }
 
-// Plain fade for matrix series (heatmap/contour).
 @keyframes rz-series-fade-in {
   from {
     opacity: 0;
@@ -187,28 +188,26 @@ $chart-color-schemes: (
 }
 
 .rz-chart-animate {
-  // Time-series shapes reveal with a left-to-right wipe. Waterfall joins them - its columns
-  // read as a left-to-right sequence of steps.
   .rz-line-series,
   .rz-stacked-line-series,
   .rz-full-stacked-line-series,
   .rz-area-series,
   .rz-full-stacked-area-series,
   .rz-range-area-series,
-  .rz-waterfall-series {
+  .rz-waterfall-series,
+  .rz-candlestick-series,
+  .rz-ohlc-series,
+  .rz-highlow-series,
+  .rz-box-plot-series {
     animation: rz-series-reveal var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  // Columns expand vertically from the zero axis (positives up, negatives down).
-  // The stacked variants share rz-column-series.
   .rz-column-series,
   .rz-full-stacked-column-series,
   .rz-range-column-series {
     animation: rz-series-grow-y var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  // Bars expand horizontally from the zero axis (positives right, negatives left) -
-  // direction-agnostic, so no RTL variant is needed.
   .rz-bar-series,
   .rz-full-stacked-bar-series,
   .rz-range-bar-series,
@@ -216,13 +215,18 @@ $chart-color-schemes: (
     animation: rz-series-grow-x var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  // The horizontal waterfall reads as a top-to-bottom sequence of steps.
   .rz-horizontal-waterfall-series {
     animation: rz-series-reveal-down var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  // Point series markers pop in, scaling up from their own center. Scatter markers already
-  // carry transform-box/origin from the hover-grow rule; bubbles are bare circles.
+  .rz-funnel-series > g,
+  .rz-pyramid-series > g {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rz-segment-expand 500ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    animation-delay: calc(var(--rz-segment-order, 0) * 90ms);
+  }
+
   .rz-scatter-series .rz-marker > * {
     animation: rz-marker-pop var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -233,10 +237,15 @@ $chart-color-schemes: (
     animation: rz-marker-pop var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  // Matrix series have no natural direction - fade in.
   .rz-heatmap-series,
   .rz-contour-series {
     animation: rz-series-fade-in var(--rz-chart-animation-duration, 700ms) ease-out;
+  }
+
+  .rz-pie-series > g,
+  .rz-donut-series > g {
+    animation: rz-slice-expand 500ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    animation-delay: calc(var(--rz-segment-order, 0) * 90ms);
   }
 }
 
@@ -247,15 +256,15 @@ $chart-color-schemes: (
   .rz-area-series,
   .rz-full-stacked-area-series,
   .rz-range-area-series,
-  .rz-waterfall-series {
+  .rz-waterfall-series,
+  .rz-candlestick-series,
+  .rz-ohlc-series,
+  .rz-highlow-series,
+  .rz-box-plot-series {
     animation-name: rz-series-reveal-rtl;
   }
 }
 
-// Data-update morphing (scoped to AnimateDataUpdates=true) - the path geometry is emitted as a
-// CSS d property so changes between same-structure paths transition smoothly. Browsers without
-// CSS d support fall back to the d attribute and update instantly. Disabled on zoomable charts
-// where path changes come from zoom/pan rather than data.
 .rz-path-transition {
   transition: d 350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -264,7 +273,6 @@ $chart-color-schemes: (
   transition: none;
 }
 
-// Series hover styles (scoped to AllowSeriesHover=true via .rz-chart-series-hover)
 .rz-chart-series-hover {
   .rz-line-series,
   .rz-area-series,
@@ -283,7 +291,6 @@ $chart-color-schemes: (
     }
   }
 
-  // When any series is hovered, dim the others
   svg:has(> g > .rz-state-hover),
   svg:has(> g > :hover) {
     .rz-line-series,
@@ -303,7 +310,6 @@ $chart-color-schemes: (
     }
   }
 
-  // Pie, donut, funnel, pyramid - item-level hover
   .rz-pie-series,
   .rz-donut-series,
   .rz-funnel-series,
@@ -347,7 +353,6 @@ $chart-color-schemes: (
     }
   }
 
-  // Legend item hover highlight
   .rz-legend-item {
     transition: background-color 0.2s;
     border-radius: var(--rz-border-radius);
@@ -391,7 +396,6 @@ $chart-color-schemes: (
   stroke: var(--rz-chart-marker-stroke);
 }
 
-// Last-value label - a pill anchored at the right edge of the plot showing the latest value.
 .rz-series-value-label {
   rect {
     fill: var(--rz-series-color);
@@ -399,10 +403,6 @@ $chart-color-schemes: (
   }
 
   text {
-    // Black or white, whichever contrasts with the pill color (the lightness flip resolves to
-    // white below 0.72 OKLCH lightness and black above). The threshold follows perceptual (APCA)
-    // contrast across all theme palettes - saturated mid-tones read better with white text than
-    // the WCAG 2.x formula suggests. Older browsers keep the fallback.
     fill: var(--rz-chart-marker-stroke);
     fill: oklch(from var(--rz-series-color) calc((0.72 - l) * infinity) 0 h);
     stroke: none;
@@ -412,9 +412,6 @@ $chart-color-schemes: (
   }
 }
 
-// Active data point highlight - dot + halo at the data point the tooltip refers to.
-// The shapes render centered at (0, 0) and the group is positioned via an inline CSS transform,
-// so the highlight glides between data points in every browser regardless of the dot's shape.
 .rz-active-point {
   transition: transform 0.15s ease-out;
 
@@ -432,7 +429,6 @@ $chart-color-schemes: (
   }
 }
 
-// Marker hover grow (transform-box keeps the scale centered on the marker itself)
 .rz-line-series .rz-marker,
 .rz-area-series .rz-marker,
 .rz-scatter-series .rz-marker {
@@ -489,7 +485,6 @@ $chart-color-schemes: (
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   stroke: none;
-  // True vertical centering inside the chip (alignment-baseline is inconsistent across browsers).
   dominant-baseline: central;
 }
 
@@ -497,7 +492,6 @@ $chart-color-schemes: (
   fill: var(--rz-chart-axis-label-color);
 }
 
-// Background chip behind data labels for readability over series fills.
 .rz-series-data-label-chip {
   fill: var(--rz-chart-tooltip-background);
   fill-opacity: 0.9;
@@ -505,8 +499,6 @@ $chart-color-schemes: (
   stroke-width: 1;
 }
 
-// Outlined text appearance - a halo in the chart background color keeps labels readable
-// over series fills without the weight of a chip.
 .rz-series-data-label-outline {
   stroke: var(--rz-base-background-color);
   stroke-width: 3;
@@ -514,7 +506,6 @@ $chart-color-schemes: (
   paint-order: stroke;
 }
 
-// Data labels fade in with the initial render animation.
 .rz-chart-animate .rz-series-data-label-group {
   animation: rz-chart-tooltip-enter var(--rz-chart-animation-duration, 700ms) ease-out;
 }
@@ -648,8 +639,6 @@ $chart-color-schemes: (
   animation: rz-chart-tooltip-enter 0.12s ease-out;
 }
 
-// Category tooltip box (axis-trigger tooltips and sync receivers): the entrance animation plays
-// once when the box appears; afterwards it glides between categories via position transitions.
 .rz-chart-category-tooltip {
   transition: top 0.15s ease-out, left 0.15s ease-out, right 0.15s ease-out;
 }
@@ -712,8 +701,6 @@ $chart-color-schemes: (
   text-align: end;
   font-variant-numeric: tabular-nums;
 }
-
-// Shared Tooltip Styles
 
 .rz-chart-shared-tooltip:has(.rz-chart-tooltip-item-content) {
   .rz-chart-tooltip-title {

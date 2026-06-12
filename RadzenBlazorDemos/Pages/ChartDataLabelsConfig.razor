@@ -302,19 +302,15 @@
         public double Deals { get; set; }
     }
 
-    // Dense data with converging values and a peak at the top edge - exercises overlap hiding and edge flipping.
     DataItem[] revenue2023 = Array.Empty<DataItem>();
     DataItem[] revenue2024 = Array.Empty<DataItem>();
 
-    // Mixed-sign data - exercises sign-aware Auto placement on columns.
     DataItem[] profit2023 = Array.Empty<DataItem>();
     DataItem[] profit2024 = Array.Empty<DataItem>();
 
-    // Quarterly data - keeps horizontal bar charts compact.
     DataItem[] quarterRevenue2023 = Array.Empty<DataItem>();
     DataItem[] quarterRevenue2024 = Array.Empty<DataItem>();
 
-    // Numeric X/Y points with a size dimension - exercises radius-aware bubble label placement.
     PerformanceItem[] performance2023 = Array.Empty<PerformanceItem>();
     PerformanceItem[] performance2024 = Array.Empty<PerformanceItem>();
 
@@ -330,7 +326,6 @@
         public double Count { get; set; }
     }
 
-    // Conversion pipeline - funnel/pyramid segments with a thin tail.
     StageItem[] pipeline = new[]
     {
         new StageItem { Stage = "Visits", Count = 1840 },
@@ -340,7 +335,6 @@
         new StageItem { Stage = "Orders", Count = 95 },
     };
 
-    // Several adjacent small slices - exercises cross-label overlap hiding on polar placement.
     ShareItem[] marketShare = new[]
     {
         new ShareItem { Company = "Acme", Share = 34 },
@@ -361,7 +355,6 @@
 
         revenue2023 = months.Select((m, i) => new DataItem { Quarter = m, Revenue = 60 + i * 2 + random.Next(-8, 8) }).ToArray();
         revenue2024 = months.Select((m, i) => new DataItem { Quarter = m, Revenue = 64 + i * 2 + random.Next(-8, 8) }).ToArray();
-        // Force a value at the very top of the range so Auto edge flipping is visible.
         revenue2024[7].Revenue = 100;
 
         var quarters = new[] { "Q1", "Q2", "Q3", "Q4" };

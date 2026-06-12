@@ -13,7 +13,7 @@
     </RadzenCard>
 
     <RadzenStack Style="width: 100%; max-width: 600px;">
-        <RadzenChart>
+        <RadzenChart Animate="true">
             <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180" ShowTooltipOnLegend="@showTooltipOnLegend">
                 <ChildContent>
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />

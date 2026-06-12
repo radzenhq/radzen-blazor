@@ -7,9 +7,6 @@
     [Parameter]
     public RadzenChart? Chart { get; set; }
 
-    // Whether the category tooltip box was visible after the previous render. The chart uses it to
-    // play the entrance animation only when the box first appears - afterwards it glides between
-    // categories via CSS position transitions.
     internal bool BoxWasVisible { get; private set; }
 
     protected override void OnInitialized()
@@ -25,8 +22,6 @@
         BoxWasVisible = Chart?.CategoryTooltipRendered ?? false;
     }
 
-    // Invoked by the chart when split, axis or synced tooltips change. Re-renders only this
-    // overlay so tooltip tracking never triggers a full chart re-render.
     internal void Refresh()
     {
         StateHasChanged();

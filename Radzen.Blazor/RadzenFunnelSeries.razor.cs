@@ -249,9 +249,6 @@ namespace Radzen.Blazor
                 var edge2 = edge1 + segHeight;
                 var center = edge1 + segHeight / 2;
 
-                // Top/Bottom hug the segment edges from the inside - a label outside its segment
-                // would read as the neighboring segment's value. Inside is an alias of Center:
-                // segment values map to width, so there is no value end to inset from.
                 var y = position switch
                 {
                     DataLabelPosition.Top => Math.Min(edge1, edge2) + inset,

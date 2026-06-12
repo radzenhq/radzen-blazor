@@ -325,7 +325,6 @@ namespace Radzen.Blazor
                         DataLabelPosition.Bottom => (end, anchorY + verticalGap, "middle"),
                         DataLabelPosition.Inside => (end - gap * sign, anchorY, sign < 0 ? "start" : sign > 0 ? "end" : "middle"),
                         DataLabelPosition.Center => (end + (x0 - end) / 2, anchorY, "middle"),
-                        // Auto: outside the value end of the bar, sign-aware.
                         _ => (end + gap * sign, anchorY, sign < 0 ? "end" : sign > 0 ? "start" : "middle"),
                     };
 

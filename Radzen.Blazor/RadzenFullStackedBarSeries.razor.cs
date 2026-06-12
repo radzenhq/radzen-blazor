@@ -406,7 +406,6 @@ namespace Radzen.Blazor
                 var left = GetBarLeft(data, barIndex, category, stackedBarSeries);
                 var right = GetBarRight(data, barIndex, category, stackedBarSeries);
                 var value = Value(data);
-                // The value end of the segment is the side away from zero.
                 var end = value < 0 ? left : right;
                 var center = left + (right - left) / 2;
                 var anchorY = TooltipY(data);
@@ -417,7 +416,6 @@ namespace Radzen.Blazor
                     DataLabelPosition.Top => (center, anchorY - gap, "middle"),
                     DataLabelPosition.Bottom => (center, anchorY + gap, "middle"),
                     DataLabelPosition.Inside => (end - inset * sign, anchorY, sign < 0 ? "start" : sign > 0 ? "end" : "middle"),
-                    // Auto, Center: the middle of the segment.
                     _ => (center, anchorY, "middle"),
                 };
 

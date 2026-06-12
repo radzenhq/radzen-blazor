@@ -322,19 +322,15 @@ namespace Radzen.Blazor
 
             foreach (var data in Items)
             {
-                // GetColumnTop returns the value end of the segment (sign-aware), GetColumnBottom the base end.
                 var end = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
                 var baseY = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
                 var center = end + (baseY - end) / 2;
 
-                // Top/Bottom hug the segment edges from the inside - a label outside its segment along the
-                // stacking axis would read as a value of the neighboring series.
                 var y = position switch
                 {
                     DataLabelPosition.Top => Math.Min(end, baseY) + inset,
                     DataLabelPosition.Bottom => Math.Max(end, baseY) - inset,
                     DataLabelPosition.Inside => end + inset * Math.Sign(baseY - end),
-                    // Auto, Center: the middle of the segment.
                     _ => center,
                 };
 

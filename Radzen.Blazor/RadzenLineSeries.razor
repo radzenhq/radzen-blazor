@@ -37,7 +37,6 @@
       {
         var path = $"M {pathGenerator.Path(data)}";
         var animate = chart.AnimateDataUpdates;
-        // With update animation the element must survive data changes so the CSS d transition can morph it.
         var key = animate ? $"animated-{LineType}" : $"{path}-{LineType}";
         <Path @key=@key Style="@style" D="@path" StrokeWidth="@StrokeWidth" Stroke="@Stroke" LineType="@LineType" Fill="none" Transition="@animate" />
       }

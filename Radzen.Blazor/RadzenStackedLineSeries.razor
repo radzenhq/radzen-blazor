@@ -29,7 +29,6 @@
         var topPath = pathGenerator.Path(topPoints);
         var line = $"M {topPath}";
         var animate = Chart?.AnimateDataUpdates == true;
-        // With update animation the element must survive data changes so the CSS d transition can morph it.
         var key = animate ? $"animated-{LineType}" : $"{line}-{LineType}";
 
         <Path @key="@key" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" Transition="@animate" />

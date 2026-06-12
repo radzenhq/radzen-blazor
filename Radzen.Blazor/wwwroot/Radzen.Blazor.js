@@ -3025,8 +3025,6 @@ window.Radzen = {
       return Math.round(value).toString();
     }
 
-    // Mutates the existing text node rather than assigning textContent - replacing the text
-    // node breaks Blazor's reference to it and subsequent server-rendered updates stop applying.
     function setLabelText(el, text) {
       if (el.firstChild && el.firstChild.nodeType === 3) {
         el.firstChild.nodeValue = text;
@@ -3244,13 +3242,10 @@ window.Radzen = {
     return { width: rect.width, height: rect.height };
   },
   chartToSvg: function (ref) {
-    // The legend contains small swatch SVGs - the plot is the chart element's direct svg child.
     var svg = ref && ref.querySelector(':scope > svg');
     if (!svg) return '';
 
     var clone = svg.cloneNode(true);
-    // Series colors and most chart styling come from CSS classes which are not available in a
-    // standalone SVG document - bake the computed values into inline styles on the clone.
     var props = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap',
       'stroke-linejoin', 'opacity', 'font-size', 'font-family', 'font-weight', 'font-variant-numeric',
       'text-anchor', 'dominant-baseline', 'stop-color', 'stop-opacity'];
@@ -3281,7 +3276,6 @@ window.Radzen = {
   downloadSvgAsPng: async function (svg, fileName) {
     if (!svg) return;
 
-    // Use data: URLs rather than blob: URLs - Content-Security-Policy headers commonly disallow blob: images.
     var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     var img = new Image();
     await new Promise(function (resolve, reject) {
@@ -3314,8 +3308,6 @@ window.Radzen = {
   },
   createChart: function (ref, instance, mouseMoveInterval) {
     var inside = false;
-    // Coalesce mouse moves to animation frames so the crosshair/tooltip track the cursor
-    // smoothly; mouseMoveInterval imposes a minimum delay between dispatches (Blazor Server).
     var interval = mouseMoveInterval || 0;
     var lastDispatch = 0;
     var pendingMove = null;
@@ -5398,8 +5390,6 @@ window.Radzen = {
         }
         var tooltipContent = popup.children[0];
 
-        // Play the entrance animation only when the tooltip was not already open,
-        // so it doesn't re-trigger while the cursor sweeps across data points.
         var inner = tooltipContent.querySelector('.rz-chart-tooltip-content');
         if (inner) {
             inner.classList.remove('rz-chart-tooltip-enter');

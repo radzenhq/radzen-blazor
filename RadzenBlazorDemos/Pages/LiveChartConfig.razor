@@ -46,7 +46,6 @@
     {
         var now = DateTime.Now;
 
-        // Seed the rolling window with initial data.
         for (var index = WindowSize - 1; index >= 0; index--)
         {
             AddPoint(now.AddMilliseconds(-500 * index));
@@ -72,7 +71,6 @@
         cpuValue = Math.Clamp(cpuValue + (random.NextDouble() - 0.5) * 20, 5, 95);
         memoryValue = Math.Clamp(memoryValue + (random.NextDouble() - 0.5) * 10, 5, 95);
 
-        // Assign new list instances so the chart detects the data change.
         cpu = Append(cpu, new DataItem { Time = time, Value = Math.Round(cpuValue, 1) });
         memory = Append(memory, new DataItem { Time = time, Value = Math.Round(memoryValue, 1) });
     }
@@ -81,7 +79,6 @@
     {
         var result = new List<DataItem>(items) { item };
 
-        // Keep a rolling window - drop the oldest point.
         if (result.Count > WindowSize)
         {
             result.RemoveAt(0);
