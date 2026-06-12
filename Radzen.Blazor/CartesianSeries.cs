@@ -520,6 +520,12 @@ namespace Radzen.Blazor
             return TextMeasurer.TextWidth(GetTitle());
         }
 
+        /// <inheritdoc />
+        public virtual IEnumerable<double> MeasureLegendItems()
+        {
+            return new[] { TextMeasurer.TextWidth(GetTitle()) };
+        }
+
         /// <summary>
         /// Determines if the provided point is inside the provided polygon.
         /// </summary>

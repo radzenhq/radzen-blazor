@@ -41,6 +41,43 @@ namespace Radzen.Blazor
                     size = length + 8 + 2 * chart.Series.Select(series => series.MarkerSize).Max();
                 }
             }
+            else
+            {
+                // Top/Bottom: items flow horizontally and wrap onto multiple rows. Reserve height for
+                // every wrapped row so the legend never overlaps the plot when there are many series.
+                var available = chart.MeasuredWidth ?? 0;
+
+                if (available > 0)
+                {
+                    var rows = 1;
+                    double x = 0;
+
+                    foreach (var series in chart.Series)
+                    {
+                        if (!series.ShowInLegend)
+                        {
+                            continue;
+                        }
+
+                        var marker = 2 * series.MarkerSize;
+
+                        foreach (var text in series.MeasureLegendItems())
+                        {
+                            var itemWidth = text + 8 + marker;
+
+                            if (x > 0 && x + itemWidth > available)
+                            {
+                                rows++;
+                                x = 0;
+                            }
+
+                            x += itemWidth;
+                        }
+                    }
+
+                    size += (rows - 1) * (size + 8);
+                }
+            }
 
             return size;
         }

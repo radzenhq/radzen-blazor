@@ -162,6 +162,13 @@ namespace Radzen.Blazor
         /// <returns>System.Double.</returns>
         double MeasureLegend();
         /// <summary>
+        /// Measures the text width of each individual legend item the series contributes. Series that
+        /// render a single legend item return one value; pie-like series return one value per data item.
+        /// Used to estimate how many rows a top or bottom legend wraps into.
+        /// </summary>
+        /// <returns>The text width of each legend item.</returns>
+        System.Collections.Generic.IEnumerable<double> MeasureLegendItems();
+        /// <summary>
         /// Invokes the click handler with the provided data item.
         /// </summary>
         /// <param name="handler">The handler.</param>

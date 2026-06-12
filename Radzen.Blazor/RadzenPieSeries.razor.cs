@@ -233,6 +233,12 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
+        public override IEnumerable<double> MeasureLegendItems()
+        {
+            return Items.Select(item => TextMeasurer.TextWidth(TooltipTitle(item)));
+        }
+
+        /// <inheritdoc />
         protected override RenderFragment RenderLegendItem(bool clickable)
         {
             return builder =>

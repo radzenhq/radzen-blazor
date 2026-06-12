@@ -270,6 +270,11 @@ namespace Radzen.Blazor
         protected double? Width { get; set; }
 
         /// <summary>
+        /// Gets the runtime width of the chart, exposed for legend row-wrap measurement.
+        /// </summary>
+        internal double? MeasuredWidth => Width;
+
+        /// <summary>
         /// Gets the runtime height of the chart.
         /// </summary>
         protected double? Height { get; set; }
