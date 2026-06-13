@@ -25,7 +25,7 @@
                     </RadzenStack>
                     <RadzenButton Text="Subscribe" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" IsBusy="@loading" />
                 </RadzenStack>
-                <altcha-widget challengeurl="https://app.radzen.com/api/newsletter/challenge" auto="onfocus" hidefooter hidelogo style="display:none"></altcha-widget>
+                <altcha-widget challengeurl="https://app.radzen.com/api/newsletter/challenge" auto="onload" hidefooter hidelogo style="display:none"></altcha-widget>
             </RadzenTemplateForm>
             @if (!string.IsNullOrEmpty(error))
             {
