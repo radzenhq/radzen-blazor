@@ -59,6 +59,12 @@ namespace Radzen.Blazor
 
             if (IsLogarithmic)
             {
+                if (step <= 1 || start <= 0)
+                {
+                    yield return start;
+                    yield break;
+                }
+
                 for (var value = start; value <= end; value *= step)
                 {
                     yield return value;

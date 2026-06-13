@@ -84,6 +84,12 @@ namespace Radzen.Blazor
             var start = Input.Start;
             var end = Input.End;
 
+            if (!double.IsFinite(start) || !double.IsFinite(end))
+            {
+                start = 1;
+                end = Base;
+            }
+
             if (start <= 0)
             {
                 start = 1;

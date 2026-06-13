@@ -1522,6 +1522,11 @@ namespace Radzen.Blazor
 
         internal async Task Refresh(bool force = true)
         {
+            if (disposed)
+            {
+                return;
+            }
+
             if (widthAndHeightAreSet)
             {
 
