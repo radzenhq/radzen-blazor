@@ -55,7 +55,7 @@ For the full setup guide including render modes and dialog/notification configur
 
 **Forms** — TextBox, TextArea, Password, Numeric, Mask, DatePicker, TimePicker, ColorPicker, Dropdown, AutoComplete, ListBox, CheckBox, RadioButtonList, Switch, Slider, Rating, FileInput, SecurityCode, SignaturePad, HtmlEditor
 
-**Layout** — Card, Panel, Tabs, Accordion, Splitter, Steps, Dialog, Fieldset, Stack, Row/Column, Sidebar
+**Layout** — Card, Panel, Tabs, Accordion, Splitter, Tile Layout, Steps, Dialog, Fieldset, Stack, Row/Column, Sidebar
 
 **Navigation** — Menu, ContextMenu, PanelMenu, Breadcrumb, Link, TreeView, FabMenu, ProfileMenu
 
