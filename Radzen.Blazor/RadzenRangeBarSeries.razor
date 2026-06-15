@@ -34,6 +34,8 @@
         var max = Max;
 
         var groupStyle = $"--rz-zero-x: {chart.CategoryScale.Scale(Math.Max(0, chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance).Start)).ToInvariantString()}px";
+        var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));
+        var gradient = FillMode == FillMode.Gradient;
         return
         @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
@@ -54,8 +56,13 @@
 
                 var fill = PickColor(Items.IndexOf(data), Fills, Fill);
                 var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+                var fillRef = gradient ? grad.Url(fill ?? "var(--rz-series-color)", 1) : (FillMode == FillMode.None ? "none" : fill);
 
-                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fillRef" LineType="@LineType" Style="@style" />
+            }
+            @if (gradient)
+            {
+                <GradientDefs Plan="@grad" Vertical="false" StartOpacity="@GradientStartOpacity" EndOpacity="@GradientEndOpacity" />
             }
         </g>;
     }

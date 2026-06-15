@@ -1,0 +1,39 @@
+@using Radzen.Blazor.Rendering
+@if (Plan != null && Plan.Entries.Count > 0)
+{
+    <defs>
+        @foreach (var entry in Plan.Entries)
+        {
+            var stops = GradientFill.Stops(Vertical, entry.Sign, StartOpacity, EndOpacity);
+            <linearGradient id="@Plan.Id(entry.Color, entry.Sign)" x1="0" y1="0" x2="@(Vertical ? "0" : "1")" y2="@(Vertical ? "1" : "0")">
+                <stop offset="0" style="@($"stop-color: {entry.Color}; stop-opacity: {stops.Offset0.ToInvariantString()}")"></stop>
+                <stop offset="1" style="@($"stop-color: {entry.Color}; stop-opacity: {stops.Offset1.ToInvariantString()}")"></stop>
+            </linearGradient>
+        }
+    </defs>
+}
+@code {
+    /// <summary>
+    /// The registry of distinct gradients collected while the series rendered its shapes.
+    /// </summary>
+    [Parameter]
+    public GradientFill? Plan { get; set; }
+
+    /// <summary>
+    /// <c>true</c> for a vertical gradient (column series), <c>false</c> for horizontal (bar series).
+    /// </summary>
+    [Parameter]
+    public bool Vertical { get; set; }
+
+    /// <summary>
+    /// The opacity at the value tip.
+    /// </summary>
+    [Parameter]
+    public double StartOpacity { get; set; }
+
+    /// <summary>
+    /// The opacity at the axis baseline.
+    /// </summary>
+    [Parameter]
+    public double EndOpacity { get; set; }
+}

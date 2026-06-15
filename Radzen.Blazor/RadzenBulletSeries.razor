@@ -37,6 +37,8 @@
         var rangeThresholds = GetRangeThresholds();
 
         var groupStyle = $"--rz-zero-x: {x0.ToInvariantString()}px";
+        var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));
+        var gradient = FillMode == FillMode.Gradient;
         return
         @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
@@ -74,7 +76,9 @@
                 var mw = Math.Abs(valueX - x0);
                 var measurePath = $"M {mx1.ToInvariantString()} {measureY.ToInvariantString()} L {(mx1 + mw).ToInvariantString()} {measureY.ToInvariantString()} L {(mx1 + mw).ToInvariantString()} {(measureY + measureHeight).ToInvariantString()} L {mx1.ToInvariantString()} {(measureY + measureHeight).ToInvariantString()} Z";
 
-                <Path @key="@($"measure-{index}")" D="@measurePath" Fill="@fill" Stroke="@stroke" StrokeWidth="@StrokeWidth" Style="@style" />
+                var fillRef = gradient ? grad.Url(fill, valueVal < 0 ? -1 : 1) : (FillMode == FillMode.None ? "none" : fill);
+
+                <Path @key="@($"measure-{index}")" D="@measurePath" Fill="@fillRef" Stroke="@stroke" StrokeWidth="@StrokeWidth" Style="@style" />
 
                 // Target marker line
                 var targetX = chart.CategoryScale.Scale(targetVal, true);
@@ -83,6 +87,10 @@
                 var targetPath = $"M {targetX.ToInvariantString()} {markerY.ToInvariantString()} L {targetX.ToInvariantString()} {(markerY + markerHeight).ToInvariantString()}";
 
                 <Path @key="@($"target-{index}")" D="@targetPath" Fill="none" Stroke="@targetStroke" StrokeWidth="@TargetWidth" Style="@style" />
+            }
+            @if (gradient)
+            {
+                <GradientDefs Plan="@grad" Vertical="false" StartOpacity="@GradientStartOpacity" EndOpacity="@GradientEndOpacity" />
             }
         </g>;
     }

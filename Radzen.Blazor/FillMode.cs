@@ -1,20 +1,21 @@
 ﻿namespace Radzen.Blazor
 {
     /// <summary>
-    /// Specifies how the area of a series is filled. Used by <see cref="RadzenAreaSeries{TItem}"/>.
+    /// Specifies how a series shape is filled. Used by the area, column and bar series families
+    /// (including their stacked, full-stacked, range and bullet variants).
     /// </summary>
     public enum FillMode
     {
         /// <summary>
-        /// The area is filled with a vertical gradient of the series color which fades towards the baseline.
+        /// The shape is filled with a gradient of the series color which fades towards the axis baseline.
         /// </summary>
         Gradient,
         /// <summary>
-        /// The area is filled with a solid color.
+        /// The shape is filled with a solid color.
         /// </summary>
         Solid,
         /// <summary>
-        /// The area is not filled - only the line is rendered.
+        /// The shape is not filled - only the outline (or line) is rendered.
         /// </summary>
         None
     }

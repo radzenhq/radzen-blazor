@@ -68,6 +68,28 @@ namespace Radzen.Blazor
         [Parameter]
         public IList<SeriesColorRange> StrokeRange { get; set; } = new List<SeriesColorRange>();
 
+        /// <summary>
+        /// Specifies how the series is filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a fill that fades toward the axis baseline, or <see cref="FillMode.None"/> to render only the outline.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Solid;
+
+        /// <summary>
+        /// Specifies the opacity at the value end of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient start opacity. Default is <c>0.85</c>.</value>
+        [Parameter]
+        public double GradientStartOpacity { get; set; } = 0.85;
+
+        /// <summary>
+        /// Specifies the opacity at the baseline of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient end opacity. Default is <c>0.4</c>.</value>
+        [Parameter]
+        public double GradientEndOpacity { get; set; } = 0.4;
+
         /// <inheritdoc />
         public override string Color
         {
