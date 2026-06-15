@@ -4,9 +4,12 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true">
+                <RadzenChartTooltipOptions Shared="true" />
                 <RadzenStackedLineSeries Data="@revenue2025" CategoryProperty="Quarter" Title="2025" ValueProperty="Revenue" />
                 <RadzenStackedLineSeries Data="@revenue2026" CategoryProperty="Quarter" Title="2026" ValueProperty="Revenue" LineType="LineType.Dashed" />
-                <RadzenCategoryAxis Padding="20" />
+                <RadzenCategoryAxis Padding="20">
+                    <RadzenAxisCrosshair Visible="true" />
+                </RadzenCategoryAxis>
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />

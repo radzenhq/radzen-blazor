@@ -2,10 +2,13 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true">
+                <RadzenChartTooltipOptions Shared="true" />
                 <RadzenFullStackedLineSeries Data="@desktopShare" CategoryProperty="Month" Title="Desktop" ValueProperty="Share" />
                 <RadzenFullStackedLineSeries Data="@mobileShare" CategoryProperty="Month" Title="Mobile" ValueProperty="Share" />
                 <RadzenFullStackedLineSeries Data="@tabletShare" CategoryProperty="Month" Title="Tablet" ValueProperty="Share" LineType="LineType.Dashed" />
-                <RadzenCategoryAxis Padding="20" />
+                <RadzenCategoryAxis Padding="20">
+                    <RadzenAxisCrosshair Visible="true" />
+                </RadzenCategoryAxis>
                 <RadzenValueAxis FormatString="{0}%" Min="0" Max="100" Step="25">
                     <RadzenGridLines Visible="true" />
                 </RadzenValueAxis>

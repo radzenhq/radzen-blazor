@@ -1,12 +1,15 @@
 <RadzenChart Animate="true" Style="width: 100%; height: 400px;">
+    <RadzenChartTooltipOptions Shared="true" />
     <RadzenLineSeries Data="@data" CategoryProperty="Month" ValueProperty="Temperature" Title="2024" Smooth="true">
         <RadzenMarkers MarkerType="MarkerType.Circle" />
     </RadzenLineSeries>
     <RadzenLineSeries Data="@data2" CategoryProperty="Month" ValueProperty="Temperature" Title="2023" Smooth="true" LineType="LineType.Dashed">
         <RadzenMarkers MarkerType="MarkerType.Square" />
     </RadzenLineSeries>
-    <RadzenAreaSeries Data="@data" CategoryProperty="Month" ValueProperty="Rainfall" Title="Rainfall 2024" Smooth="true" />
-    <RadzenCategoryAxis />
+    <RadzenAreaSeries FillMode="FillMode.Gradient" Data="@data" CategoryProperty="Month" ValueProperty="Rainfall" Title="Rainfall 2024" Smooth="true" />
+    <RadzenCategoryAxis>
+        <RadzenAxisCrosshair Visible="true" />
+    </RadzenCategoryAxis>
     <RadzenValueAxis>
         <RadzenGridLines Visible="true" />
     </RadzenValueAxis>

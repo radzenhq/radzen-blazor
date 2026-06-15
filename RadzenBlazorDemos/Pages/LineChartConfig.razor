@@ -39,7 +39,9 @@
             <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
             <RadzenSeriesDataLabels Visible="@showDataLabels" Step="@labelStep" />
         </RadzenLineSeries>
-        <RadzenCategoryAxis Padding="20" />
+        <RadzenCategoryAxis Padding="20">
+            <RadzenAxisCrosshair Visible="true" />
+        </RadzenCategoryAxis>
         <RadzenValueAxis Formatter="@FormatAsUSD">
             <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
             <RadzenAxisTitle Text="Revenue in USD" />
