@@ -298,9 +298,16 @@ else
 
             if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
             {
-                var distinctQuery = query.SelectMany(property).Select(Column.FilterProperty).Distinct();
+                var childQuery = query.SelectMany(property);
+
+                if (!string.IsNullOrEmpty(loadDataArgs.Filter))
+                {
+                    childQuery = childQuery.Where(Column.FilterProperty, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive);
+                }
+
+                var distinctQuery = childQuery.Select(Column.FilterProperty).Distinct();
                 materializedValues = QueryableExtension.ToList(distinctQuery).Cast<object>().ToList();
-                propertyType = materializedValues.FirstOrDefault()?.GetType() ?? propertyType;
+                propertyType = materializedValues.FirstOrDefault(v => v != null)?.GetType() ?? propertyType;
             }
             else
             {
