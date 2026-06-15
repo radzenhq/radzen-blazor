@@ -2,7 +2,7 @@
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<div id="@containerId" class="rz-background-color-base-200 rz-text-align-center" style="padding: 2.5rem 1rem; border-radius: var(--rz-border-radius);">
+<div id="@containerId" class="rz-text-align-center @(Plain ? "" : "rz-background-color-base-200")" style="@(Plain ? "" : "padding: 2.5rem 1rem; border-radius: var(--rz-border-radius);")">
     <div class="rz-mx-auto" style="max-width: 480px;">
         @if (subscribed)
         {
@@ -12,10 +12,13 @@
         }
         else
         {
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-2">Radzen Blazor Newsletter</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
-                Get an email when new components and releases ship.
-            </RadzenText>
+            @if (ShowHeader)
+            {
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-2">Radzen Blazor Newsletter</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
+                    Get an email when new components and releases ship.
+                </RadzenText>
+            }
             <RadzenTemplateForm TItem="SubscriptionModel" Data="@model" Submit="@OnSubmit">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center" Gap="0.5rem">
                     <RadzenStack Gap="0.25rem" Style="flex: 1; max-width: 320px;">
@@ -42,6 +45,10 @@
     bool subscribed;
     bool loading;
     string error;
+
+    [Parameter] public bool ShowHeader { get; set; } = true;
+
+    [Parameter] public bool Plain { get; set; }
 
     SubscriptionModel model = new();
 

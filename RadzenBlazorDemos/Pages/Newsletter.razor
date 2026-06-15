@@ -1,0 +1,16 @@
+@layout NewsletterLayout
+@page "/newsletter"
+
+<PageTitle>Radzen Blazor Newsletter</PageTitle>
+
+<RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="2rem" class="rz-px-4" Style="min-height: calc(100vh - 7rem); text-align: center;">
+    <RadzenStack Gap="0.75rem" class="rz-mx-auto" Style="max-width: 620px;">
+        <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H1" class="rz-mb-0">Radzen Blazor Newsletter</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-mb-0">
+            Be the first to know when new components, features, and releases ship. Occasional emails, no spam, unsubscribe anytime.
+        </RadzenText>
+    </RadzenStack>
+    <div class="rz-mx-auto" Style="width: 100%; max-width: 520px;">
+        <NewsletterSignup ShowHeader="false" Plain="true" />
+    </div>
+</RadzenStack>

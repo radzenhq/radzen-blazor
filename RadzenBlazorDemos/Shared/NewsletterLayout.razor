@@ -1,0 +1,39 @@
+@inherits LayoutComponentBase
+
+<Canonical />
+
+<RadzenComponents />
+
+<RadzenLayout>
+    <RadzenHeader class="rz-p-0">
+        <ChildContent>
+            <MainTopNav />
+            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav">
+                <RadzenColumn Size="6">
+                    <RadzenLink Path="/" Text="Radzen Blazor Components" Style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" />
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+                        <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
+                            <RadzenLink Path="/docs/api" Text="API Reference" title="Radzen Blazor Components API Reference" class="rz-mx-2 rz-mx-lg-4" target="_blank" />
+                            <GitHubStarLink />
+                        </div>
+                        <RadzenAppearanceToggle class="rz-mx-2" />
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </ChildContent>
+    </RadzenHeader>
+    <RadzenBody class="rz-p-0 radzen-blazor">
+        <ChildContent>
+            @Body
+        </ChildContent>
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+    protected override void OnInitialized()
+    {
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+}
