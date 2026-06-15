@@ -2,8 +2,8 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true" Style="height: 500px">
-                <RadzenStackedBarSeries Data="@expenses" CategoryProperty="Department" ValueProperty="Amount" Title="Expenses" />
-                <RadzenStackedBarSeries Data="@revenue" CategoryProperty="Department" ValueProperty="Amount" Title="Revenue" />
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@expenses" CategoryProperty="Department" ValueProperty="Amount" Title="Expenses" />
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue" CategoryProperty="Department" ValueProperty="Amount" Title="Revenue" />
                 <RadzenBarOptions Radius="0" />
                 <RadzenValueAxis Formatter="@FormatValue" Min="-600" Max="600" Step="200">
                     <RadzenGridLines Visible="true" />

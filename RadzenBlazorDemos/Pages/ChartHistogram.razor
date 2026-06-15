@@ -1,6 +1,6 @@
 <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-4" style="text-align: center;">Examination Result</RadzenText>
 <RadzenChart Animate="true" Style="width: 100%; height: 400px;">
-    <RadzenColumnSeries Data="@bins" CategoryProperty="Range" ValueProperty="Count" Title="Frequency" />
+    <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@bins" CategoryProperty="Range" ValueProperty="Count" Title="Frequency" />
     <RadzenLineSeries Data="@curve" CategoryProperty="Range" ValueProperty="Value" Title="Distribution" Smooth="true" />
     <RadzenCategoryAxis>
         <RadzenAxisTitle Text="Score of Final Examination" />

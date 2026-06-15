@@ -12,7 +12,7 @@
 
     <RadzenChart>
         <RadzenLineSeries Interpolation="@interpolation" Data="@revenue2024" CategoryProperty="Date" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
-        <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" />
+        <RadzenAreaSeries FillMode="FillMode.Gradient" Interpolation="@interpolation" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" />
         <RadzenLineSeries Interpolation="@interpolation" Data="@revenueWithGaps" CategoryProperty="Date" Title="2022 (with gaps)" ValueProperty="Revenue" />
         <RadzenCategoryAxis Padding="20" />
         <RadzenValueAxis Formatter="@FormatAsUSD">

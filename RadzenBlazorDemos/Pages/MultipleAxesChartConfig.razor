@@ -2,7 +2,7 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Style="height: 400px">
-                <RadzenColumnSeries Data="@data" CategoryProperty="Month" ValueProperty="Revenue" Title="Revenue ($)"
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@data" CategoryProperty="Month" ValueProperty="Revenue" Title="Revenue ($)"
                     Fill="var(--rz-series-0)" Stroke="var(--rz-series-0)" />
                 <RadzenLineSeries Data="@data" CategoryProperty="Month" ValueProperty="Orders" Title="Orders" ValueAxisName="orders"
                     Stroke="var(--rz-series-4)">

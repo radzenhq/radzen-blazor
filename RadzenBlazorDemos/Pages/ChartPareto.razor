@@ -1,5 +1,5 @@
 <RadzenChart Style="width: 100%; height: 400px;">
-    <RadzenColumnSeries Data="@defects" CategoryProperty="Category" ValueProperty="Count" Title="Defect Count" />
+    <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@defects" CategoryProperty="Category" ValueProperty="Count" Title="Defect Count" />
     <RadzenLineSeries Data="@defects" CategoryProperty="Category" ValueProperty="CumulativePercent" Title="Cumulative %" Smooth="true">
         <RadzenMarkers MarkerType="MarkerType.Circle" />
         <RadzenSeriesDataLabels Visible="true" />

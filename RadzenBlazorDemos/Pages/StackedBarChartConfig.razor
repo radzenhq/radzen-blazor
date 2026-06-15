@@ -14,10 +14,10 @@
         <RadzenColumn Size="12">
             <h4>Auto-size stacked bar series</h4>
             <RadzenChart Animate="true" SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenStackedBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenStackedBarSeries>
-                <RadzenStackedBarSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenStackedBarSeries>
                 <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
@@ -31,8 +31,8 @@
         <RadzenColumn Size="12">
             <h4>Custom size stacked bar series</h4>
             <RadzenChart Animate="true" SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenStackedBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                <RadzenStackedBarSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue" />
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue" />
                 <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />

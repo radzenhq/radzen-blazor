@@ -2,7 +2,7 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true">
-                <RadzenRangeBarSeries Data="@projectData" CategoryProperty="Task"
+                <RadzenRangeBarSeries FillMode="FillMode.Gradient" Data="@projectData" CategoryProperty="Task"
                     MinProperty="Start" MaxProperty="End" Title="Project Timeline" />
                 <RadzenCategoryAxis />
                 <RadzenValueAxis>

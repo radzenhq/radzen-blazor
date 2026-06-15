@@ -7,7 +7,7 @@
                     Click="@GoBack" class="rz-mb-4" />
             }
             <RadzenChart SeriesClick="@OnSeriesClick">
-                <RadzenColumnSeries Data="@currentData" CategoryProperty="Label" ValueProperty="Value"
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@currentData" CategoryProperty="Label" ValueProperty="Value"
                     Title="@currentTitle" Fill="@currentFill" />
                 <RadzenColumnOptions Radius="3" />
                 <RadzenCategoryAxis />

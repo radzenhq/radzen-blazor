@@ -8,7 +8,7 @@
     </RadzenCard>
 
     <RadzenChart SyncGroup="dashboard" Style="height: 240px;">
-        <RadzenAreaSeries Smooth="true" Data="@revenue" CategoryProperty="Date" ValueProperty="Value" Title="Revenue" />
+        <RadzenAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@revenue" CategoryProperty="Date" ValueProperty="Value" Title="Revenue" />
         <RadzenCategoryAxis FormatString="{0:MMM}">
             <RadzenAxisCrosshair Visible="true" />
         </RadzenCategoryAxis>

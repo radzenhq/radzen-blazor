@@ -2,9 +2,9 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true">
-                <RadzenFullStackedAreaSeries Smooth="true" Data="@desktopShare" CategoryProperty="Month" Title="Desktop" ValueProperty="Share" />
-                <RadzenFullStackedAreaSeries Smooth="true" Data="@mobileShare" CategoryProperty="Month" Title="Mobile" ValueProperty="Share" />
-                <RadzenFullStackedAreaSeries Smooth="true" Data="@tabletShare" CategoryProperty="Month" Title="Tablet" ValueProperty="Share" />
+                <RadzenFullStackedAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@desktopShare" CategoryProperty="Month" Title="Desktop" ValueProperty="Share" />
+                <RadzenFullStackedAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@mobileShare" CategoryProperty="Month" Title="Mobile" ValueProperty="Share" />
+                <RadzenFullStackedAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@tabletShare" CategoryProperty="Month" Title="Tablet" ValueProperty="Share" />
                 <RadzenCategoryAxis Padding="20" />
                 <RadzenValueAxis FormatString="{0}%" Min="0" Max="100" Step="25">
                     <RadzenGridLines Visible="true" />

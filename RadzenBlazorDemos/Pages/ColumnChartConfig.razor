@@ -21,16 +21,26 @@
                     </RadzenSelectBar>
                 </RadzenStack>
             }
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Fill" Component="fillMode" />
+                <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                    <Items>
+                        <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                        <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                        <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
     <RadzenRow>
         <RadzenColumn Size="12">
             <h4>Auto-size column series</h4>
             <RadzenChart Animate="true">
-                <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenColumnSeries FillMode="@fillMode" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                <RadzenColumnSeries FillMode="@fillMode" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" />
@@ -44,10 +54,10 @@
         <RadzenColumn Size="12">
             <h4>Custom size column series</h4>
             <RadzenChart Animate="true">
-                <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" Width="20" />
@@ -62,10 +72,10 @@
         <RadzenColumn Size="12">
             <h4>Range fills column series</h4>
             <RadzenChart Animate="true">
-                <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" FillRange="@fillRange" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" FillRange="@fillRange" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" />
@@ -82,6 +92,7 @@
 @code {
     bool showDataLabels = false;
     DataLabelPosition labelPosition = DataLabelPosition.Auto;
+    FillMode fillMode = FillMode.Gradient;
 
     class DataItem
     {

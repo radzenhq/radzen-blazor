@@ -14,7 +14,7 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Style="height: 400px">
-                <RadzenColumnSeries Data="@data" CategoryProperty="Year" ValueProperty="Rate" Title="Exchange Rate"
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@data" CategoryProperty="Year" ValueProperty="Rate" Title="Exchange Rate"
                     Fills="@fills" Strokes="@fills" />
                 <RadzenCategoryAxis Inverted="@invertCategory" />
                 <RadzenValueAxis Inverted="@invertValue">

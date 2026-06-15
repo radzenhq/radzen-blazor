@@ -2,9 +2,9 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true" style="height: 400px">
-                <RadzenFullStackedBarSeries Data="@desktopShare" CategoryProperty="Quarter" Title="Desktop" ValueProperty="Share" />
-                <RadzenFullStackedBarSeries Data="@mobileShare" CategoryProperty="Quarter" Title="Mobile" ValueProperty="Share" />
-                <RadzenFullStackedBarSeries Data="@tabletShare" CategoryProperty="Quarter" Title="Tablet" ValueProperty="Share" />
+                <RadzenFullStackedBarSeries FillMode="FillMode.Gradient" Data="@desktopShare" CategoryProperty="Quarter" Title="Desktop" ValueProperty="Share" />
+                <RadzenFullStackedBarSeries FillMode="FillMode.Gradient" Data="@mobileShare" CategoryProperty="Quarter" Title="Mobile" ValueProperty="Share" />
+                <RadzenFullStackedBarSeries FillMode="FillMode.Gradient" Data="@tabletShare" CategoryProperty="Quarter" Title="Tablet" ValueProperty="Share" />
                 <RadzenBarOptions Radius="5" />
                 <RadzenValueAxis FormatString="{0}%" Min="0" Max="100" Step="25">
                     <RadzenGridLines Visible="true" />

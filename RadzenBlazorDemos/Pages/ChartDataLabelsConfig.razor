@@ -76,10 +76,10 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Area series</RadzenText>
             <RadzenChart>
-                <RadzenAreaSeries Smooth="true" Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023" RenderingOrder="1">
+                <RadzenAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023" RenderingOrder="1">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenAreaSeries>
-                <RadzenAreaSeries Smooth="true" Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
+                <RadzenAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenAreaSeries>
                 <RadzenLegend Visible="false" />
@@ -92,10 +92,10 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Stacked area series</RadzenText>
             <RadzenChart>
-                <RadzenStackedAreaSeries Smooth="true" Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
+                <RadzenStackedAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenStackedAreaSeries>
-                <RadzenStackedAreaSeries Smooth="true" Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
+                <RadzenStackedAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenStackedAreaSeries>
                 <RadzenLegend Visible="false" />
@@ -108,10 +108,10 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Column series (with negative values)</RadzenText>
             <RadzenChart>
-                <RadzenColumnSeries Data="@profit2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@profit2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@profit2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@profit2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="4" />
@@ -125,10 +125,10 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Stacked column series</RadzenText>
             <RadzenChart>
-                <RadzenStackedColumnSeries Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
+                <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenStackedColumnSeries>
-                <RadzenStackedColumnSeries Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
+                <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenStackedColumnSeries>
                 <RadzenColumnOptions Radius="4" />
@@ -142,10 +142,10 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Full stacked column series</RadzenText>
             <RadzenChart>
-                <RadzenFullStackedColumnSeries Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
+                <RadzenFullStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenFullStackedColumnSeries>
-                <RadzenFullStackedColumnSeries Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
+                <RadzenFullStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenFullStackedColumnSeries>
                 <RadzenColumnOptions Radius="4" />
@@ -159,10 +159,10 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Bar series (with negative values)</RadzenText>
             <RadzenChart>
-                <RadzenBarSeries Data="@profit2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
+                <RadzenBarSeries FillMode="FillMode.Gradient" Data="@profit2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenBarSeries>
-                <RadzenBarSeries Data="@profit2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
+                <RadzenBarSeries FillMode="FillMode.Gradient" Data="@profit2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenBarSeries>
                 <RadzenBarOptions Radius="4" />
@@ -176,10 +176,10 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Stacked bar series</RadzenText>
             <RadzenChart>
-                <RadzenStackedBarSeries Data="@quarterRevenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@quarterRevenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenStackedBarSeries>
-                <RadzenStackedBarSeries Data="@quarterRevenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@quarterRevenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenStackedBarSeries>
                 <RadzenBarOptions Radius="4" />
@@ -193,10 +193,10 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Full stacked bar series</RadzenText>
             <RadzenChart>
-                <RadzenFullStackedBarSeries Data="@quarterRevenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
+                <RadzenFullStackedBarSeries FillMode="FillMode.Gradient" Data="@quarterRevenue2023" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2023">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenFullStackedBarSeries>
-                <RadzenFullStackedBarSeries Data="@quarterRevenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
+                <RadzenFullStackedBarSeries FillMode="FillMode.Gradient" Data="@quarterRevenue2024" CategoryProperty="Quarter" ValueProperty="Revenue" Title="2024">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenFullStackedBarSeries>
                 <RadzenBarOptions Radius="4" />

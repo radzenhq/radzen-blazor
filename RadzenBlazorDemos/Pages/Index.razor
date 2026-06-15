@@ -152,13 +152,13 @@
                           </RadzenStack>
                         </RadzenStack>
                         <RadzenChart>
-                          <RadzenStackedColumnSeries Data="@completedTasksData" CategoryProperty="Month" Title="Completed" ValueProperty="Count">
+                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@completedTasksData" CategoryProperty="Month" Title="Completed" ValueProperty="Count">
                             <RadzenSeriesDataLabels Visible="@showDataLabels" />
                           </RadzenStackedColumnSeries>
-                          <RadzenStackedColumnSeries Data="@inProgressTasksData" CategoryProperty="Month" Title="In Progress" ValueProperty="Count">
+                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@inProgressTasksData" CategoryProperty="Month" Title="In Progress" ValueProperty="Count">
                             <RadzenSeriesDataLabels Visible="@showDataLabels" />
                           </RadzenStackedColumnSeries>
-                          <RadzenStackedColumnSeries Data="@overdueTasksData" CategoryProperty="Month" Title="Overdue" ValueProperty="Count">
+                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@overdueTasksData" CategoryProperty="Month" Title="Overdue" ValueProperty="Count">
                             <RadzenSeriesDataLabels Visible="@showDataLabels" />
                           </RadzenStackedColumnSeries>
                           <RadzenColumnOptions Radius="4" Margin="5" />

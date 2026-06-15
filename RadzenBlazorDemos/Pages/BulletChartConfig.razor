@@ -2,7 +2,7 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true" Style="height: 400px">
-                <RadzenBulletSeries Data="@data" CategoryProperty="Label"
+                <RadzenBulletSeries FillMode="FillMode.Gradient" Data="@data" CategoryProperty="Label"
                     ValueProperty="Value" TargetProperty="Target" MaxProperty="Max"
                     Title="Performance" TargetWidth="3"
                     RangeThresholds="@(new[] { 0.5, 0.8, 1.0 })" />

@@ -2,10 +2,10 @@
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Style="height: 520px">
-                <RadzenColumnSeries Data="@gdp2021" CategoryProperty="Index" ValueProperty="GdpGrowth" Title="2021">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@gdp2021" CategoryProperty="Index" ValueProperty="GdpGrowth" Title="2021">
                     <RadzenSeriesDataLabels Visible="true" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@gdp2022" CategoryProperty="Index" ValueProperty="GdpGrowth" Title="2022">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@gdp2022" CategoryProperty="Index" ValueProperty="GdpGrowth" Title="2022">
                     <RadzenSeriesDataLabels Visible="true" />
                 </RadzenColumnSeries>
                 <RadzenCategoryAxis Formatter="@FormatCategory" Min="0" Max="4" Step="1" LabelAutoRotation="45" />

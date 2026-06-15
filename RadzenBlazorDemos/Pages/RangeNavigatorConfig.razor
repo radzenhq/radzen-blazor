@@ -24,7 +24,7 @@
         </RadzenValueAxis>
         <RadzenLegend Position="LegendPosition.Bottom" />
         <RadzenChartRangeNavigator Height="80" ShowHandleLabels="true" HandleLabelFormatString="{0:MMM dd, yyyy}">
-            <RadzenRangeNavigatorLineSeries Data="@stockData" CategoryProperty="Date" ValueProperty="Close" Stroke="#1E88E5" />
+            <RadzenRangeNavigatorLineSeries FillMode="FillMode.Gradient" Data="@stockData" CategoryProperty="Date" ValueProperty="Close" Stroke="#1E88E5" />
         </RadzenChartRangeNavigator>
     </RadzenChart>
 </RadzenStack>
