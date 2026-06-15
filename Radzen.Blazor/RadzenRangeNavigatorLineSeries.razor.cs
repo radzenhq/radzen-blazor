@@ -70,11 +70,11 @@ namespace Radzen.Blazor
         public double FillOpacity { get; set; } = 0.3;
 
         /// <summary>
-        /// Specifies how the area below the line is filled. Set to <see cref="FillMode.Gradient"/> by default - the area fades from the fill color towards the baseline.
+        /// Specifies how the area below the line is filled. Set to <see cref="FillMode.Solid"/> by default.
         /// </summary>
-        /// <value>The fill mode. Default is <see cref="FillMode.Gradient"/>.</value>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
         [Parameter]
-        public FillMode FillMode { get; set; } = FillMode.Gradient;
+        public FillMode FillMode { get; set; } = FillMode.Solid;
 
         private readonly string gradientId = $"rzNavGradient{Guid.NewGuid():N}";
 

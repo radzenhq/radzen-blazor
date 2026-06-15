@@ -27,12 +27,12 @@ namespace Radzen.Blazor
         public string? Fill { get; set; }
 
         /// <summary>
-        /// Specifies how the area is filled. Set to <see cref="FillMode.Gradient"/> by default - the area fades from the series color towards the baseline.
-        /// Use <see cref="FillMode.Solid"/> for a solid fill or <see cref="FillMode.None"/> to render only the line.
+        /// Specifies how the area is filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a fill that fades toward the baseline, or <see cref="FillMode.None"/> to render only the line.
         /// </summary>
-        /// <value>The fill mode. Default is <see cref="FillMode.Gradient"/>.</value>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
         [Parameter]
-        public FillMode FillMode { get; set; } = FillMode.Gradient;
+        public FillMode FillMode { get; set; } = FillMode.Solid;
 
         /// <summary>
         /// Specifies the opacity at the top of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
