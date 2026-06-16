@@ -280,5 +280,32 @@ namespace Radzen.Blazor.Tests
         {
             public IEnumerable CurrentView => View;
         }
+
+        [Fact]
+        public void AutoComplete_SyncsDomValue_WhenParentRejectsInput()
+        {
+            using var ctx = new TestContext();
+
+            var wrapper = ctx.RenderComponent<RadzenAutoCompleteRejectWrapper>();
+
+            wrapper.Find("input").Change("user-typed");
+
+            Assert.Equal("original", wrapper.FindComponent<RadzenAutoComplete>().Instance.Value);
+            Assert.Equal("original", wrapper.Find("input").GetAttribute("value"));
+        }
+
+        private sealed class RadzenAutoCompleteRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            public string HeldValue { get; private set; } = "original";
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenAutoComplete>(0);
+                builder.AddAttribute(1, nameof(RadzenAutoComplete.Value), HeldValue);
+                builder.AddAttribute(2, nameof(RadzenAutoComplete.ValueChanged),
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                builder.CloseComponent();
+            }
+        }
     }
 }

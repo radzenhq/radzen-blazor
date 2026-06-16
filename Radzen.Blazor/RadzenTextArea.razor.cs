@@ -84,16 +84,24 @@ namespace Radzen.Blazor
         /// <returns>A task representing the asynchronous operation.</returns>
         protected virtual async Task SetValue(string? value)
         {
-            Value = $"{value}";
+            // Do NOT assign to the local Value field here. The @bind:get/:set machinery
+            // relies on the bound .NET value remaining at the parent's value when the
+            // parent rejects (or does not update) the input; in that case, the framework's
+            // post-handler sync writes the bound value back to the DOM. If we mutated
+            // _value to match the user input, _value and the user-typed DOM would agree
+            // and the renderer would have nothing to sync. Let ValueChanged propagate;
+            // the parent's two-way binding (or lack of it) determines what Value becomes
+            // on the next parameter assignment.
+            var newValue = $"{value}";
 
-            await ValueChanged.InvokeAsync(Value);
+            await ValueChanged.InvokeAsync(newValue);
 
             if (FieldIdentifier.FieldName != null)
             {
                 EditContext?.NotifyFieldChanged(FieldIdentifier);
             }
 
-            await Change.InvokeAsync(Value);
+            await Change.InvokeAsync(newValue);
         }
 
         /// <summary>

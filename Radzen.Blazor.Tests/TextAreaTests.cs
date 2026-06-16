@@ -203,5 +203,32 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
         }
+
+        [Fact]
+        public void TextArea_SyncsDomValue_WhenParentRejectsInput()
+        {
+            using var ctx = new TestContext();
+
+            var wrapper = ctx.RenderComponent<RadzenTextAreaRejectWrapper>();
+
+            wrapper.Find("textarea").Change("user-typed");
+
+            Assert.Equal("original", wrapper.FindComponent<RadzenTextArea>().Instance.Value);
+            Assert.Equal("original", wrapper.Find("textarea").GetAttribute("value"));
+        }
+
+        private sealed class RadzenTextAreaRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            public string HeldValue { get; private set; } = "original";
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenTextArea>(0);
+                builder.AddAttribute(1, nameof(RadzenTextArea.Value), HeldValue);
+                builder.AddAttribute(2, nameof(RadzenTextArea.ValueChanged),
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                builder.CloseComponent();
+            }
+        }
     }
 }

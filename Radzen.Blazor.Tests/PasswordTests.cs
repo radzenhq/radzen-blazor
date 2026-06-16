@@ -234,5 +234,32 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
         }
+
+        [Fact]
+        public void Password_SyncsDomValue_WhenParentRejectsInput()
+        {
+            using var ctx = new TestContext();
+
+            var wrapper = ctx.RenderComponent<RadzenPasswordRejectWrapper>();
+
+            wrapper.Find("input").Change("user-typed");
+
+            Assert.Equal("original", wrapper.FindComponent<RadzenPassword>().Instance.Value);
+            Assert.Equal("original", wrapper.Find("input").GetAttribute("value"));
+        }
+
+        private sealed class RadzenPasswordRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            public string HeldValue { get; private set; } = "original";
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenPassword>(0);
+                builder.AddAttribute(1, nameof(RadzenPassword.Value), HeldValue);
+                builder.AddAttribute(2, nameof(RadzenPassword.ValueChanged),
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                builder.CloseComponent();
+            }
+        }
     }
 }

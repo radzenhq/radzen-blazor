@@ -11,16 +11,16 @@
     <div @ref="@Element" style="@($"{Style};display:inline-block;")" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         @if (Multiline)
         {
-            <textarea @ref="@search" @attributes="InputAttributes" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
-                tabindex="@(Disabled ? "-1" : $"{TabIndex}")"  @onchange="@OnChange"
+            <textarea @ref="@search" @attributes="InputAttributes" @onkeydown="@OnFilterKeyPress" @bind:get="@Value" @bind:set="@SetValue" @bind:event="onchange" disabled="@Disabled"
+                tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                 aria-autocomplete="list" aria-haspopup="listbox" aria-controls="@ListId" aria-expanded="@(IsPopupOpen ? "true" : "false")" autocomplete="off" role="combobox"
                 class=@InputClass
                 id="@Name" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
         }
         else
         {
-            <input @ref="@search" @attributes="InputAttributes" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
-                tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange"
+            <input @ref="@search" @attributes="InputAttributes" @onkeydown="@OnFilterKeyPress" @bind:get="@Value" @bind:set="@SetValue" @bind:event="onchange" disabled="@Disabled"
+                tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                 aria-autocomplete="list" aria-haspopup="listbox" aria-controls="@ListId" aria-expanded="@(IsPopupOpen ? "true" : "false")" autocomplete="off" role="combobox"
                 class=@InputClass
                 type="@InputType" id="@Name" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
