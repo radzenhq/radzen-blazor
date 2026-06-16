@@ -260,15 +260,15 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>(parameters => parameters.Add(p => p.Trim, true));
+            var wrapper = ctx.RenderComponent<RadzenTextBoxBindWrapper>(parameters =>
+            {
+                parameters.Add(p => p.Trim, true);
+            });
 
-            string newValue = null;
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => newValue = args));
+            wrapper.Find("input").Change("  hello  ");
 
-            component.Find("input").Change("  hello  ");
-
-            Assert.Equal("hello", newValue);
-            Assert.Equal("hello", component.Instance.Value);
+            Assert.Equal("hello", wrapper.Instance.BoundValue);
+            Assert.Equal("hello", wrapper.FindComponent<RadzenTextBox>().Instance.Value);
         }
 
         [Fact]
@@ -276,24 +276,18 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            int changeCount = 0;
+            var wrapper = ctx.RenderComponent<RadzenTextBoxBindWrapper>(parameters =>
             {
                 parameters.Add(p => p.Immediate, true);
                 parameters.Add(p => p.Trim, true);
+                parameters.Add(p => p.OnChange, args => changeCount++);
             });
 
-            string newValue = null;
-            int changeCount = 0;
-            component.SetParametersAndRender(parameters =>
-            {
-                parameters.Add(p => p.ValueChanged, args => newValue = args);
-                parameters.Add(p => p.Change, args => changeCount++);
-            });
+            wrapper.Find("input").Input("hello ");
 
-            component.Find("input").Input("hello ");
-
-            Assert.Equal("hello ", newValue);
-            Assert.Equal("hello ", component.Instance.Value);
+            Assert.Equal("hello ", wrapper.Instance.BoundValue);
+            Assert.Equal("hello ", wrapper.FindComponent<RadzenTextBox>().Instance.Value);
             Assert.Equal(1, changeCount);
         }
 
@@ -302,20 +296,17 @@ namespace Radzen.Blazor.Tests
         {
             using var ctx = new TestContext();
 
-            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            var wrapper = ctx.RenderComponent<RadzenTextBoxBindWrapper>(parameters =>
             {
                 parameters.Add(p => p.Immediate, true);
                 parameters.Add(p => p.Trim, true);
             });
 
-            string newValue = null;
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => newValue = args));
+            wrapper.Find("input").Input("hello world ");
+            wrapper.Find("input").Change("hello world ");
 
-            component.Find("input").Input("hello world ");
-            component.Find("input").Change("hello world ");
-
-            Assert.Equal("hello world", newValue);
-            Assert.Equal("hello world", component.Instance.Value);
+            Assert.Equal("hello world", wrapper.Instance.BoundValue);
+            Assert.Equal("hello world", wrapper.FindComponent<RadzenTextBox>().Instance.Value);
         }
 
         [Fact]
@@ -336,6 +327,61 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("hello", component.Instance.Value);
             Assert.Equal(0, changeCount);
+        }
+
+        [Fact]
+        public void TextBox_SyncsDomValue_WhenParentRejectsInput()
+        {
+            using var ctx = new TestContext();
+
+            // Wrapper holds Value at "original" and ignores ValueChanged (parent rejects).
+            // After the user types, the DOM input should be synced back to "original".
+            var wrapper = ctx.RenderComponent<RadzenTextBoxRejectWrapper>();
+
+            wrapper.Find("input").Change("user-typed");
+
+            Assert.Equal("original", wrapper.FindComponent<RadzenTextBox>().Instance.Value);
+            Assert.Equal("original", wrapper.Find("input").GetAttribute("value"));
+        }
+
+        private sealed class RadzenTextBoxBindWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            public string BoundValue { get; private set; }
+
+            [Microsoft.AspNetCore.Components.Parameter]
+            public bool Immediate { get; set; }
+
+            [Microsoft.AspNetCore.Components.Parameter]
+            public bool Trim { get; set; }
+
+            [Microsoft.AspNetCore.Components.Parameter]
+            public Microsoft.AspNetCore.Components.EventCallback<string> OnChange { get; set; }
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenTextBox>(0);
+                builder.AddAttribute(1, nameof(RadzenTextBox.Value), BoundValue);
+                builder.AddAttribute(2, nameof(RadzenTextBox.ValueChanged),
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, v => { BoundValue = v; StateHasChanged(); }));
+                builder.AddAttribute(3, nameof(RadzenTextBox.Immediate), Immediate);
+                builder.AddAttribute(4, nameof(RadzenTextBox.Trim), Trim);
+                builder.AddAttribute(5, nameof(RadzenTextBox.Change), OnChange);
+                builder.CloseComponent();
+            }
+        }
+
+        private sealed class RadzenTextBoxRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            public string HeldValue { get; private set; } = "original";
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenTextBox>(0);
+                builder.AddAttribute(1, nameof(RadzenTextBox.Value), HeldValue);
+                builder.AddAttribute(2, nameof(RadzenTextBox.ValueChanged),
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                builder.CloseComponent();
+            }
         }
     }
 }
