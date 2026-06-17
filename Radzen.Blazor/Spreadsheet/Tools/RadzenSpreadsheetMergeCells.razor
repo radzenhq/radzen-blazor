@@ -2,7 +2,7 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
-@implements IDisposable
+@inherits RadzenSpreadsheetToolBase
 
 <RadzenSplitButton Click=@OnClick Icon="merge_type" Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
@@ -13,41 +13,7 @@
 </RadzenSplitButton>
 
 @code {
-#nullable enable
-
-    [CascadingParameter]
-    public Worksheet? Worksheet { get; set; }
-
-    [CascadingParameter]
-    public ISpreadsheet? Spreadsheet { get; set; }
-
-    private bool IsDisabled
-        => Worksheet?.Selection.Cell == CellRef.Invalid
-        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.Merging) == false;
-
-    private readonly EventBinding<Selection> selectionBinding;
-
-    public RadzenSpreadsheetMergeCells()
-    {
-        selectionBinding = new EventBinding<Selection>(
-            s => s.Changed += OnSelectionChanged,
-            s => s.Changed -= OnSelectionChanged);
-    }
-
-    protected override void OnParametersSet()
-    {
-        selectionBinding.Bind(Worksheet?.Selection);
-    }
-
-    private void OnSelectionChanged()
-    {
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        selectionBinding.Dispose();
-    }
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Merging;
 
     private async Task OnClick(RadzenSplitButtonItem? item)
     {

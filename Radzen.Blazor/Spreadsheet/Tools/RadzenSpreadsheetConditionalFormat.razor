@@ -4,7 +4,7 @@
 @using Radzen.Blazor.Spreadsheet.Tools
 @using Radzen.Documents.Spreadsheet
 @inject DialogService DialogService
-@implements IDisposable
+@inherits RadzenSpreadsheetToolBase
 
 <RadzenSplitButton Click=@OnClickAsync Icon="format_color_fill" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Conditional)) ?? "Conditional") Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
@@ -17,41 +17,7 @@
 </RadzenSplitButton>
 
 @code {
-#nullable enable
-
-    [CascadingParameter]
-    public Worksheet? Worksheet { get; set; }
-
-    [CascadingParameter]
-    public ISpreadsheet? Spreadsheet { get; set; }
-
-    private bool IsDisabled
-        => Worksheet?.Selection.Cell == CellRef.Invalid
-        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.ConditionalFormatting) == false;
-
-    private readonly EventBinding<Selection> selectionBinding;
-
-    public RadzenSpreadsheetConditionalFormat()
-    {
-        selectionBinding = new EventBinding<Selection>(
-            s => s.Changed += OnSelectionChanged,
-            s => s.Changed -= OnSelectionChanged);
-    }
-
-    protected override void OnParametersSet()
-    {
-        selectionBinding.Bind(Worksheet?.Selection);
-    }
-
-    private void OnSelectionChanged()
-    {
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        selectionBinding.Dispose();
-    }
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.ConditionalFormatting;
 
     private async Task OnClickAsync(RadzenSplitButtonItem? item)
     {
