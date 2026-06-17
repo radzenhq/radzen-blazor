@@ -263,6 +263,22 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Mask_KeepsTypedValue_WhenUsedWithoutTwoWayBinding()
+        {
+            // Demo-style usage: no @bind-Value or ValueChanged. The user-typed value
+            // must survive the post-handler @bind:get/:set sync, otherwise the input
+            // clears itself on every blur.
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenMask>();
+
+            component.Find("input").Change("user-typed");
+
+            Assert.Equal("user-typed", component.Instance.Value);
+            Assert.Equal("user-typed", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
         public void Mask_SyncsDomValue_WhenParentRejectsInput()
         {
             using var ctx = new TestContext();

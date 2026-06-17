@@ -205,6 +205,21 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void TextArea_KeepsTypedValue_WhenUsedWithoutTwoWayBinding()
+        {
+            // Demo-style usage: no @bind-Value or ValueChanged. The user-typed value
+            // must survive the post-handler @bind:get/:set sync, otherwise the textarea
+            // clears itself on every blur.
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            component.Find("textarea").Change("user-typed");
+
+            Assert.Equal("user-typed", component.Instance.Value);
+        }
+
+        [Fact]
         public void TextArea_SyncsDomValue_WhenParentRejectsInput()
         {
             using var ctx = new TestContext();

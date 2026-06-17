@@ -282,6 +282,22 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void AutoComplete_KeepsTypedValue_WhenUsedWithoutTwoWayBinding()
+        {
+            // Demo-style usage: no @bind-Value or ValueChanged. The user-typed value
+            // must survive the post-handler @bind:get/:set sync, otherwise the input
+            // clears itself on every blur.
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>();
+
+            component.Find("input").Change("user-typed");
+
+            Assert.Equal("user-typed", component.Instance.Value);
+            Assert.Equal("user-typed", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
         public void AutoComplete_SyncsDomValue_WhenParentRejectsInput()
         {
             using var ctx = new TestContext();
