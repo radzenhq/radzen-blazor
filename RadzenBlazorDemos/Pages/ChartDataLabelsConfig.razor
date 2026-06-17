@@ -242,7 +242,7 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Pie series (with small slices)</RadzenText>
             <RadzenChart>
-                <RadzenPieSeries Data="@marketShare" CategoryProperty="Company" ValueProperty="Share" Title="Market share">
+                <RadzenPieSeries FillMode="FillMode.Gradient" Data="@marketShare" CategoryProperty="Company" ValueProperty="Share" Title="Market share">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenPieSeries>
                 <RadzenLegend Visible="false" />
@@ -252,7 +252,7 @@
         <RadzenColumn Size="12" SizeMD="6" SizeXL="4">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Donut series (with small slices)</RadzenText>
             <RadzenChart>
-                <RadzenDonutSeries Data="@marketShare" CategoryProperty="Company" ValueProperty="Share" Title="Market share">
+                <RadzenDonutSeries FillMode="FillMode.Gradient" Data="@marketShare" CategoryProperty="Company" ValueProperty="Share" Title="Market share">
                     <RadzenSeriesDataLabels Position="@position" Appearance="@appearance" AllowOverlap="@allowOverlap" Step="@step" Display="@display" FormatString="@format" />
                 </RadzenDonutSeries>
                 <RadzenLegend Visible="false" />

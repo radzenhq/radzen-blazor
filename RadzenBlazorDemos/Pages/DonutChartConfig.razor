@@ -9,12 +9,22 @@
                 <RadzenCheckBox @bind-Value="@showTooltipOnLegend" Name="legendTooltip"></RadzenCheckBox>
                 <RadzenLabel Text="Show Tooltip On Legend" Component="legendTooltip" />
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Fill" Component="fillMode" />
+                <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                    <Items>
+                        <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                        <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                        <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
 
     <RadzenStack Style="width: 100%; max-width: 600px;">
         <RadzenChart Animate="true">
-            <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180" ShowTooltipOnLegend="@showTooltipOnLegend">
+            <RadzenDonutSeries FillMode="@fillMode" Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180" ShowTooltipOnLegend="@showTooltipOnLegend">
                 <ChildContent>
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </ChildContent>
@@ -32,6 +42,7 @@
 @code {
     bool showDataLabels = false;
     bool showTooltipOnLegend = true;
+    FillMode fillMode = FillMode.Gradient;
 
     class DataItem
     {

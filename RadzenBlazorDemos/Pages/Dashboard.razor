@@ -98,12 +98,12 @@
                     <Tabs>
                         <RadzenTabsItem Text="Top Contributors">
                             <RadzenChart Style="width: 100%; height: 100%;">
-                                <RadzenDonutSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" />
+                                <RadzenDonutSeries FillMode="FillMode.Gradient" Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" />
                             </RadzenChart>
                         </RadzenTabsItem>
                         <RadzenTabsItem Text="Top Labels">
                             <RadzenChart Style="width: 100%; height: 100%;">
-                                <RadzenDonutSeries Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Fills=@labelColors />
+                                <RadzenDonutSeries FillMode="FillMode.Gradient" Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Fills=@labelColors />
                             </RadzenChart>
                         </RadzenTabsItem>
                         <RadzenTabsItem Text="Most Active Member">

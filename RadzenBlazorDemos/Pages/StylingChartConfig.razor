@@ -28,7 +28,7 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeLG="4">
             <RadzenChart ColorScheme="@colorScheme">
-                <RadzenPieSeries Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
+                <RadzenPieSeries FillMode="FillMode.Gradient" Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
             </RadzenChart>
         </RadzenColumn>
     </RadzenRow>

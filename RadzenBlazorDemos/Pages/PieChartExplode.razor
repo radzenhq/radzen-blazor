@@ -1,7 +1,7 @@
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
     <RadzenStack Style="width: 100%; max-width: 600px;">
         <RadzenChart>
-            <RadzenPieSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" ExplodeOffset="15">
+            <RadzenPieSeries FillMode="FillMode.Gradient" Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" ExplodeOffset="15">
                 <RadzenSeriesDataLabels Visible="true" />
             </RadzenPieSeries>
             <RadzenLegend Position="LegendPosition.Bottom" />
