@@ -65,5 +65,8 @@ public class MultiKeySortCommand : RangeSnapshotCommandBase
         }
 
         RestoreSnapshot();
+
+        // RestoreSnapshot only restores cell content, not row visibility - re-apply filters by value.
+        sheet.ReapplyFilters();
     }
 }

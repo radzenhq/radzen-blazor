@@ -339,7 +339,8 @@ public class Table
     /// </summary>
     public void Sort(SortOrder order, int column)
     {
-        Worksheet.Sort(range, new SortKey { ColumnIndex = column, Order = order });
+        // Sort only the data body - never the header or totals row.
+        Worksheet.Sort(DataBodyRange, new SortKey { ColumnIndex = column, Order = order });
     }
 
     /// <summary>
@@ -348,7 +349,8 @@ public class Table
     /// </summary>
     public void Sort(params SortKey[] keys)
     {
-        Worksheet.Sort(range, keys);
+        // Sort only the data body - never the header or totals row.
+        Worksheet.Sort(DataBodyRange, keys);
     }
 
     /// <summary>Resizes the table to a new range. Columns are added or trimmed accordingly.</summary>

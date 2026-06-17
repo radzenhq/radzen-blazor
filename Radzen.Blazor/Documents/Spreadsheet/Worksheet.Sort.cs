@@ -98,6 +98,9 @@ public partial class Worksheet
         // CopyFrom re-triggers formula evaluation, which on a sheet with aggregate
         // formulas (e.g. SUM over the sorted range) is O(N^2) per sort.
         Batch(() => WriteSortedRows(range, sortedRows));
+
+        // Excel re-applies active filters by value after a sort, so filtered-out rows stay hidden.
+        ReapplyFilters();
     }
 
     private void WriteSortedRows(RangeRef range, List<(int originalIndex, List<Cell> cells)> sortedRows)

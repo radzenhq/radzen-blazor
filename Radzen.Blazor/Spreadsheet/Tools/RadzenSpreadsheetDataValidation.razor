@@ -4,6 +4,7 @@
 @using Radzen.Blazor.Spreadsheet.Tools
 @using Radzen.Documents.Spreadsheet
 @inject DialogService DialogService
+@implements IDisposable
 
 <RadzenSplitButton Click=@OnClickAsync Icon="rule" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Validation)) ?? "Validation") Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
@@ -24,6 +25,30 @@
     private bool IsDisabled
         => Worksheet?.Selection.Cell == CellRef.Invalid
         || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.DataValidation) == false;
+
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public RadzenSpreadsheetDataValidation()
+    {
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
+
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        selectionBinding.Dispose();
+    }
 
     private async Task OnClickAsync(RadzenSplitButtonItem? item)
     {

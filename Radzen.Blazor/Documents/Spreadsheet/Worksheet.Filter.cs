@@ -840,6 +840,19 @@ public partial class Worksheet
         Rows.EndUpdate();
     }
 
+    /// <summary>
+    /// Re-evaluates all active filters against current cell values, so rows are hidden by value
+    /// at their current positions. Call after a sort (Excel re-applies filters by value). No-op
+    /// when no filters are active, so it never disturbs manually hidden rows.
+    /// </summary>
+    internal void ReapplyFilters()
+    {
+        if (filters.Count > 0)
+        {
+            ApplyFilters();
+        }
+    }
+
     private void Filter(RangeRef range, FilterCriterion criterion)
     {
         if (range == RangeRef.Invalid)

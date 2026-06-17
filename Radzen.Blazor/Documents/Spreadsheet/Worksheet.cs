@@ -383,7 +383,14 @@ public partial class Worksheet
 
     internal void OnCellValueChanged(Cell cell)
     {
-        if (!IsUpdating && !isEvaluating)
+        if (isEvaluating)
+        {
+            return;
+        }
+
+        // During a batch, EndUpdate recalculates dependent formulas once. The changed cell
+        // itself is not a formula node, so it would never be notified - fire its event here.
+        if (!IsUpdating)
         {
             var dependents = graph.GetTopologicallySortedDependencies(cell);
 
@@ -391,9 +398,9 @@ public partial class Worksheet
             {
                 EvaluateFormula(dependentCell);
             }
-
-            cell.OnChanged();
         }
+
+        cell.OnChanged();
     }
 
     internal void OnCellFormulaChanged(Cell cell)

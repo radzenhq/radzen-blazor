@@ -38,7 +38,9 @@ public partial class SheetEditorHighlight : ComponentBase
             {
                 var highlightToken = new HighlightToken
                 {
-                    Text = token.Type == FormulaTokenType.CellIdentifier ? token.Address.ToString() : token.Value,
+                    // Use the raw lexed text so the highlight overlay aligns with the input and
+                    // keeps a cross-sheet reference's worksheet prefix (Address.ToString() drops it).
+                    Text = token.Value,
                     Class = GetTokenClassName(token.Type),
                     Style = GetTokenStyle(token.Type, refCount)
                 };

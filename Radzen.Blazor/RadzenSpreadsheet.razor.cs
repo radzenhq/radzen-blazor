@@ -671,29 +671,33 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (Worksheet != null)
         {
-            // Check if we're in a data table
-            foreach (var table in Worksheet.Tables)
-            {
-                if (table.Range.Contains(cellMenuRow, cellMenuColumn))
-                {
-                    var command = new SortCommand(Worksheet, table.Range, order, cellMenuColumn);
-                    await ExecuteAsync(command);
-                    break;
-                }
-            }
-
-            // Check if we're in an auto filter
-            if (Worksheet.AutoFilter.Range is not null && Worksheet.AutoFilter.Range.Value.Contains(cellMenuRow, cellMenuColumn))
-            {
-                var command = new SortCommand(Worksheet, Worksheet.AutoFilter.Range.Value, order, cellMenuColumn, skipHeaderRow: true);
-                await ExecuteAsync(command);
-            }
+            await ExecuteAsync(BuildSortCommand(cellMenuRow, cellMenuColumn, order));
         }
 
         if (cellMenuPopup != null)
         {
             await cellMenuPopup.CloseAsync();
         }
+    }
+
+    // Builds a sort command scoped to the data the clicked cell belongs to, never including a
+    // table/auto-filter header (or table totals) row in the sorted range.
+    private SortCommand BuildSortCommand(int row, int column, SortOrder order)
+    {
+        foreach (var table in Worksheet!.Tables)
+        {
+            if (table.Range.Contains(row, column))
+            {
+                return new SortCommand(Worksheet, table.DataBodyRange, order, column);
+            }
+        }
+
+        if (Worksheet.AutoFilter.Range is { } afRange && afRange.Contains(row, column))
+        {
+            return new SortCommand(Worksheet, afRange, order, column, skipHeaderRow: true);
+        }
+
+        return new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), order, column);
     }
 
     private async Task OnCellMenuClearAsync()
@@ -1324,10 +1328,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     await ExecuteAsync(new ClearContentsCommand(Worksheet, Worksheet.Selection.Range));
                     break;
                 case "sort-ascending":
-                    await ExecuteAsync(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Ascending, column));
+                    await ExecuteAsync(BuildSortCommand(row, column, SortOrder.Ascending));
                     break;
                 case "sort-descending":
-                    await ExecuteAsync(new SortCommand(Worksheet, new RangeRef(new CellRef(0, 0), new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1)), SortOrder.Descending, column));
+                    await ExecuteAsync(BuildSortCommand(row, column, SortOrder.Descending));
                     break;
                 case "convert-table-to-range":
                 case "delete-table":
