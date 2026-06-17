@@ -11,6 +11,8 @@
     public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
         var chart = RequireChart();
+        var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));
+        var gradient = FillMode == FillMode.Gradient;
         var category = ComposeCategory(categoryScale);
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
@@ -44,10 +46,16 @@
                 if (r > width / 2 || r > height) { r = 0; }
 
                 var fill = wf.IsSummary ? SummaryFill : (wf.End >= wf.Start ? PositiveFill : NegativeFill);
+                var sign = (wf.IsSummary || wf.End >= wf.Start) ? 1 : -1;
+                var fillRef = gradient ? grad.Url(fill ?? "var(--rz-series-color)", sign) : (FillMode == FillMode.None ? "none" : fill);
 
                 var path = $"M {x.ToInvariantString()} {(top + r).ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + r).ToInvariantString()} {top.ToInvariantString()} L {(x + width - r).ToInvariantString()} {top.ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(top + r).ToInvariantString()} L {(x + width).ToInvariantString()} {(bottom - r).ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + width - r).ToInvariantString()} {bottom.ToInvariantString()} L {(x + r).ToInvariantString()} {bottom.ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(bottom - r).ToInvariantString()} Z";
 
-                <Path @key="@($"wf-{i}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                <Path @key="@($"wf-{i}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Fill="@fillRef" LineType="@LineType" Style="@style" />
+            }
+            @if (gradient)
+            {
+                <GradientDefs Plan="@grad" Vertical="true" StartOpacity="@GradientStartOpacity" EndOpacity="@GradientEndOpacity" />
             }
         </g>;
     }
