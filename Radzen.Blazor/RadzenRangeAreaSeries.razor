@@ -32,6 +32,8 @@
 
         var index = chart.Series.IndexOf(this);
         var className = $"rz-range-area-series rz-series-{index}";
+        var gradientId = $"rzRangeAreaGradient{chart.UniqueID}{index}";
+        var gradientColor = Fill ?? "var(--rz-series-color)";
 
         return
         @<g class="@className">
@@ -95,7 +97,20 @@
                     lowerLine = $"M {lowerPathForward}";
                 }
 
-                <path @key="@area" style="@style" d="@area" fill="@Fill" stroke="none"></path>
+                @if (FillMode == FillMode.Gradient)
+                {
+                    <defs>
+                        <linearGradient id="@gradientId" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" style="@($"stop-color: {gradientColor}; stop-opacity: {GradientStartOpacity.ToInvariantString()}")"></stop>
+                            <stop offset="1" style="@($"stop-color: {gradientColor}; stop-opacity: {GradientEndOpacity.ToInvariantString()}")"></stop>
+                        </linearGradient>
+                    </defs>
+                }
+                @if (FillMode != FillMode.None)
+                {
+                    var fill = FillMode == FillMode.Gradient ? $"url(#{gradientId})" : Fill;
+                    <path @key="@area" style="@style" d="@area" fill="@fill" stroke="none"></path>
+                }
                 <Path @key="@upperLine" D="@upperLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
                 <Path @key="@lowerLine" D="@lowerLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
             }

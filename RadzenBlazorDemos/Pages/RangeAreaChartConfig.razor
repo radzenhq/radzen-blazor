@@ -1,10 +1,23 @@
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenLabel Text="Fill" Component="fillMode" />
+            <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                <Items>
+                    <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                    <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                    <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                </Items>
+            </RadzenSelectBar>
+        </RadzenStack>
+    </RadzenCard>
+
     <RadzenRow>
         <RadzenColumn Size="12">
             <RadzenChart Animate="true">
                 <RadzenRangeAreaSeries Data="@temperatureData" CategoryProperty="Month"
                     MinProperty="Low" MaxProperty="High" Title="Temperature Range"
-                    StrokeWidth="2" Smooth="true" />
+                    StrokeWidth="2" Smooth="true" FillMode="@fillMode" />
                 <RadzenCategoryAxis />
                 <RadzenValueAxis>
                     <RadzenGridLines Visible="true" />
@@ -16,6 +29,8 @@
 </RadzenStack>
 
 @code {
+    FillMode fillMode = FillMode.Gradient;
+
     class DataItem
     {
         public string Month { get; set; }

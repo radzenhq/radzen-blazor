@@ -45,9 +45,32 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the fill color of the area between min and max lines.
+        /// When <see cref="FillMode"/> is <see cref="FillMode.Gradient"/> this color is used as the gradient base color.
         /// </summary>
         [Parameter]
         public string? Fill { get; set; }
+
+        /// <summary>
+        /// Specifies how the band between the min and max lines is filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a fill that fades from the upper boundary toward the lower one, or <see cref="FillMode.None"/> to render only the boundary lines.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Solid;
+
+        /// <summary>
+        /// Specifies the opacity at the upper boundary of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient start opacity. Default is <c>0.55</c>.</value>
+        [Parameter]
+        public double GradientStartOpacity { get; set; } = 0.55;
+
+        /// <summary>
+        /// Specifies the opacity at the lower boundary of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient end opacity. Default is <c>0.05</c>.</value>
+        [Parameter]
+        public double GradientEndOpacity { get; set; } = 0.05;
 
         /// <summary>
         /// Gets or sets the pixel width of the boundary lines.
