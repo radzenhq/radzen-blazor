@@ -1,0 +1,74 @@
+@using Radzen.Blazor.Rendering
+<defs>
+    <radialGradient id="@Id" gradientUnits="userSpaceOnUse" cx="@Cx.ToInvariantString()" cy="@Cy.ToInvariantString()" r="@R.ToInvariantString()">
+        <stop offset="@InnerOffset.ToInvariantString()" style="@($"stop-color: {Color}; stop-opacity: {InnerOpacity.ToInvariantString()}")"></stop>
+        @if (MidOffset.HasValue)
+        {
+            <stop offset="@MidOffset.Value.ToInvariantString()" style="@($"stop-color: {Color}; stop-opacity: {MidOpacity.ToInvariantString()}")"></stop>
+        }
+        <stop offset="1" style="@($"stop-color: {Color}; stop-opacity: {EndOpacity.ToInvariantString()}")"></stop>
+    </radialGradient>
+</defs>
+@code {
+    /// <summary>
+    /// The id of the gradient, referenced by the shape via <c>fill: url(#id)</c>.
+    /// </summary>
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The gradient color, used by both stops (only the opacity varies). May be a literal color or a
+    /// CSS variable such as <c>var(--rz-series-color)</c>, resolved against the element this renders inside.
+    /// </summary>
+    [Parameter]
+    public string Color { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The x coordinate of the gradient center, in user space (the chart SVG coordinate system).
+    /// </summary>
+    [Parameter]
+    public double Cx { get; set; }
+
+    /// <summary>
+    /// The y coordinate of the gradient center, in user space.
+    /// </summary>
+    [Parameter]
+    public double Cy { get; set; }
+
+    /// <summary>
+    /// The radius of the gradient, in user space.
+    /// </summary>
+    [Parameter]
+    public double R { get; set; }
+
+    /// <summary>
+    /// The offset (0-1) of the inner (center-facing) stop. Non-zero for a donut so the gradient spans
+    /// the visible ring rather than the whole radius.
+    /// </summary>
+    [Parameter]
+    public double InnerOffset { get; set; }
+
+    /// <summary>
+    /// The opacity at the inner stop.
+    /// </summary>
+    [Parameter]
+    public double InnerOpacity { get; set; } = 1.0;
+
+    /// <summary>
+    /// The offset (0-1) of the optional middle stop. When <c>null</c> only two stops are rendered.
+    /// </summary>
+    [Parameter]
+    public double? MidOffset { get; set; }
+
+    /// <summary>
+    /// The opacity at the middle stop. Used only when <see cref="MidOffset"/> is set.
+    /// </summary>
+    [Parameter]
+    public double MidOpacity { get; set; } = 1.0;
+
+    /// <summary>
+    /// The opacity at the rim stop.
+    /// </summary>
+    [Parameter]
+    public double EndOpacity { get; set; } = 1.0;
+}

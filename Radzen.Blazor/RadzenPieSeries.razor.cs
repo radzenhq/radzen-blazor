@@ -106,6 +106,51 @@ namespace Radzen.Blazor
         public double StrokeWidth { get; set; }
 
         /// <summary>
+        /// Specifies how the segments are filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a radial fill that holds the full segment color through the inner part of the radius and eases to a faded outer area.
+        /// The faded part lets the chart background show through, so it is lighter on light themes and darker on dark themes. Use <see cref="FillMode.None"/> to render only the outline.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Solid;
+
+        /// <summary>
+        /// Specifies the opacity of the faded middle stop of the gradient.
+        /// Below <c>1</c> it lets the chart background show through, so it eases lighter on light themes and darker on dark themes. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient start opacity. Default is <c>0.62</c>.</value>
+        [Parameter]
+        public double GradientStartOpacity { get; set; } = 0.62;
+
+        /// <summary>
+        /// Specifies the opacity of the full-color part of the gradient - the center of a pie, or the outer rim of a donut ring. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient end opacity. Default is <c>1</c>.</value>
+        [Parameter]
+        public double GradientEndOpacity { get; set; } = 1.0;
+
+        /// <summary>
+        /// Specifies the radius fraction (0-1) at which the gradient holds the full color before it starts to fade. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient inner offset. Default is <c>0.4</c>.</value>
+        [Parameter]
+        public double GradientInnerOffset { get; set; } = 0.4;
+
+        /// <summary>
+        /// Specifies the radius fraction (0-1) of the gradient's faded middle stop. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient middle offset. Default is <c>0.9</c>.</value>
+        [Parameter]
+        public double GradientMidOffset { get; set; } = 0.9;
+
+        /// <summary>
+        /// Specifies the opacity at the very rim of the gradient. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient rim opacity. Default is <c>0.7</c>.</value>
+        [Parameter]
+        public double GradientRimOpacity { get; set; } = 0.7;
+
+        /// <summary>
         /// Gets or sets a value indicating whether hovering or clicking a legend item displays the tooltip for the corresponding pie/donut segment.
         /// This is useful when small slices are difficult to hover over directly on the chart.
         /// </summary>
