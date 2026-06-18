@@ -2240,8 +2240,8 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Chart Gallery",
                     Path = "charts",
-                    Title = "Blazor Chart Gallery | Free UI Components by Radzen",
-                    Description = "Visual gallery of all chart types and data visualization components available in Radzen Blazor.",
+                    Title = "Blazor Charts - 30+ Chart Types | Free UI Components by Radzen",
+                    Description = "Browse 40+ free Blazor data-visualization components, including 30+ chart types plus gauges, sparklines, treemap and Sankey. Drawn in C# as SVG, with no JavaScript charting library.",
                     Icon = "\ue3b6",
                     Tags = new [] { "chart", "gallery", "overview", "visualization" },
                     New = true
@@ -2389,55 +2389,97 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Area Chart",
                             Path = "area-chart",
-                            Description = "Radzen Blazor Chart with area series.",
-                            Tags = new [] { "chart", "graph", "area" }
+                            Description = "Show how a value's volume changes over time with a Blazor area chart - a filled line chart. Free and open source, from Radzen.",
+                            Tags = new [] { "chart", "graph", "area" },
+                            Related = new [] { "line-chart", "stacked-area-chart", "range-area-chart", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use an area chart instead of a line chart?", Answer = "Use an area chart when the size of the value matters as much as its trend - the filled region draws attention to volume, totals, or how much accumulated. A line chart is better when you only care about direction or are comparing many series." },
+                                new FaqItem { Question = "What data does an area chart need?", Answer = "A series of points with a category or date on one axis and a numeric value on the other, mapped through the CategoryProperty and ValueProperty of the area series." },
+                                new FaqItem { Question = "Can I stack multiple area series?", Answer = "Yes. Use stacked area to show how parts add up to a total, or full stacked area to show each part's share of 100%." }
+                            }
                         },
                         new Example
                         {
                             Name = "Range Area Chart",
                             Path = "range-area-chart",
-                            Description = "Radzen Blazor Chart with range area series for displaying value bands.",
+                            Description = "Display a band between a low and a high value with a Blazor range area chart - ideal for ranges and confidence intervals.",
                             Tags = new [] { "chart", "graph", "area", "range", "band", "min", "max" },
-                            New = true
+                            New = true,
+                            Related = new [] { "area-chart", "range-step-area-chart", "range-bar-chart", "highlow-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When is a range area chart the right choice?", Answer = "When each point has two bounds rather than one value - forecast ranges, min/max bands, or uncertainty around an estimate - and you want the spread shown as a filled band." },
+                                new FaqItem { Question = "What data do I bind to it?", Answer = "Each point needs a category or date plus a low and a high value, mapped to the low and high properties of the range area series." }
+                            }
                         },
                         new Example
                         {
                             Name = "Area Negative Points",
                             Path = "negative-area-chart",
-                            Description = "Radzen Blazor Chart with area series displaying both positive and negative values.",
+                            Description = "Plot values that cross zero with a Blazor area chart that fills above and below the baseline.",
                             Tags = new [] { "chart", "graph", "area", "negative", "gdp", "growth" },
-                            New = true
+                            New = true,
+                            Related = new [] { "area-chart", "column-chart", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How are negative values shown?", Answer = "The fill follows the series across the zero line, so the area below the baseline is negative and the area above it is positive." },
+                                new FaqItem { Question = "When should I use it?", Answer = "Whenever your data swings between positive and negative - profit and loss, temperature anomalies, growth rates - and you want the direction obvious from the shape." }
+                            }
                         },
                         new Example
                         {
                             Name = "Step Area Chart",
                             Path = "step-area-chart",
-                            Description = "Radzen Blazor Chart with step area interpolation for discrete filled areas.",
+                            Description = "Show values that change in discrete steps with a Blazor step area chart.",
                             Tags = new [] { "chart", "graph", "area", "step", "interpolation" },
-                            New = true
+                            New = true,
+                            Related = new [] { "area-chart", "step-line-chart", "range-step-area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use step interpolation?", Answer = "When a value stays constant between readings and then changes suddenly - inventory levels, pricing tiers, a setting that holds until updated. A smooth line would imply gradual change that did not happen." },
+                                new FaqItem { Question = "How is it different from a regular area chart?", Answer = "A regular area chart connects points with sloped lines, suggesting continuous change. A step area keeps each value level until the next point, so the change reads as a clean jump." }
+                            }
                         },
                         new Example
                         {
                             Name = "Range Step Area Chart",
                             Path = "range-step-area-chart",
-                            Description = "Radzen Blazor Chart with range area series using step interpolation.",
+                            Description = "Fill a low-to-high band that holds flat between points with a Blazor range step area chart.",
                             Tags = new [] { "chart", "graph", "area", "range", "step", "interpolation", "band" },
-                            New = true
+                            New = true,
+                            Related = new [] { "range-area-chart", "step-area-chart", "area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When would I use this over a plain range area?", Answer = "When the band is constant across an interval and then changes at a known moment - a rate that applies for a month, or a quota that holds until reset - rather than drifting between points." }
+                            }
                         },
                         new Example
                         {
                             Name = "Stacked Area Chart",
                             Path = "stacked-area-chart",
-                            Description = "Radzen Blazor Chart with stacked area series.",
-                            Tags = new [] { "chart", "stack", "graph", "area" }
+                            Description = "Show a total and its composition over time with a Blazor stacked area chart.",
+                            Tags = new [] { "chart", "stack", "graph", "area" },
+                            Related = new [] { "area-chart", "100-percent-stacked-area-chart", "stacked-column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a stacked area chart?", Answer = "When you care about a running total and its composition at once - revenue by product line, traffic by channel - and the parts add up to something meaningful." },
+                                new FaqItem { Question = "What is the difference between stacked and full stacked area?", Answer = "Stacked area shows actual totals, so the top edge is the sum. Full stacked area normalizes every point to 100%, showing each part's share rather than its absolute size." }
+                            }
                         },
                         new Example
                         {
                             Name = "Full Stacked Area Chart",
                             Path = "100-percent-stacked-area-chart",
-                            Description = "Radzen Blazor Chart with full (100%) stacked area series showing proportional filled areas.",
+                            Description = "Show each part's share of 100% over time with a Blazor full stacked area chart.",
                             Tags = new [] { "chart", "graph", "area", "stack", "percent", "100", "proportional", "full" },
-                            New = true
+                            New = true,
+                            Related = new [] { "stacked-area-chart", "area-chart", "100-percent-stacked-column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use full stacked area instead of stacked area?", Answer = "When relative share matters more than absolute totals - for example how market share between products moves over time, even as the overall market grows or shrinks." },
+                                new FaqItem { Question = "What data does it need?", Answer = "Several series sharing the same categories or dates; each point is converted to its percentage of the total automatically." }
+                            }
                         },
                     }
                 },
@@ -2450,39 +2492,69 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Bar Chart",
                             Path = "bar-chart",
-                            Description = "Radzen Blazor Chart with bar series.",
-                            Tags = new [] { "chart", "graph", "column", "bar" }
+                            Description = "Rank categories with a Blazor bar chart - horizontal bars sized by value, with room for long labels. Free and open source, from Radzen.",
+                            Tags = new [] { "chart", "graph", "column", "bar" },
+                            Related = new [] { "column-chart", "stacked-bar-chart", "range-bar-chart", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a bar chart instead of a column chart?", Answer = "Bars run horizontally, columns run vertically. Reach for a bar chart when category names are long, or when ranking many categories - the eye scans a vertical list more comfortably than a crowded horizontal axis." },
+                                new FaqItem { Question = "What data does a bar chart need?", Answer = "A category for each bar and a numeric value for its length, mapped through the CategoryProperty and ValueProperty of the bar series." },
+                                new FaqItem { Question = "Can I show several values per category?", Answer = "Yes. Add more bar series to place bars side by side, or use a stacked bar chart to combine them into one bar per category." }
+                            }
                         },
                         new Example
                         {
                             Name = "Range Bar Chart",
                             Path = "range-bar-chart",
-                            Description = "Radzen Blazor Chart with range bar series for displaying horizontal value ranges.",
+                            Description = "Show spans from a start to an end value with a Blazor range bar chart - schedules, date ranges, and low-to-high bands.",
                             Tags = new [] { "chart", "graph", "bar", "range", "gantt", "timeline", "min", "max" },
-                            New = true
+                            New = true,
+                            Related = new [] { "bar-chart", "range-column-chart", "range-area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "What is a range bar chart good for?", Answer = "Anything with a start and an end on the same row: simple Gantt-style schedules, opening hours, or the min-to-max range of a measurement." },
+                                new FaqItem { Question = "What data do I bind to it?", Answer = "Each bar needs a category plus two values, a start and an end, mapped to the corresponding properties of the range bar series." }
+                            }
                         },
                         new Example
                         {
                             Name = "Stacked Bar Chart",
                             Path = "stacked-bar-chart",
-                            Description = "Radzen Blazor Chart with stacked bar series.",
-                            Tags = new [] { "chart", "stack", "graph", "column", "bar" }
+                            Description = "Show a total and its parts per category with a Blazor stacked bar chart.",
+                            Tags = new [] { "chart", "stack", "graph", "column", "bar" },
+                            Related = new [] { "bar-chart", "100-percent-stacked-bar-chart", "stacked-column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a stacked bar chart?", Answer = "When each category breaks into parts that add up to a meaningful total - survey responses per group, budget by department - and you want totals and composition in one view." },
+                                new FaqItem { Question = "Stacked bar or grouped bars?", Answer = "Stack the segments when the total matters and the parts sum to it. Place bars side by side instead when you mainly want to compare the parts against each other." }
+                            }
                         },
                         new Example
                         {
                             Name = "Full Stacked Bar Chart",
                             Path = "100-percent-stacked-bar-chart",
-                            Description = "Radzen Blazor Chart with full (100%) stacked bar series showing horizontal proportional contributions.",
+                            Description = "Compare composition across categories with a Blazor full stacked bar chart, each bar scaled to 100%.",
                             Tags = new [] { "chart", "graph", "bar", "stack", "percent", "100", "proportional", "horizontal", "full" },
-                            New = true
+                            New = true,
+                            Related = new [] { "stacked-bar-chart", "bar-chart", "100-percent-stacked-column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use full stacked bar instead of stacked bar?", Answer = "When you care about proportions rather than absolute size - the share of responses by category, or how a budget splits - and the categories have different totals you want to set aside." }
+                            }
                         },
                         new Example
                         {
                             Name = "Negative Stacked Bar Chart",
                             Path = "negative-stacked-bar-chart",
-                            Description = "Radzen Blazor Chart with stacked bar series displaying revenue and expenses with negative values.",
+                            Description = "Show opposing quantities around a zero baseline with a Blazor negative stacked bar chart - like revenue against expenses.",
                             Tags = new [] { "chart", "graph", "bar", "stack", "negative", "revenue", "expenses" },
-                            New = true
+                            New = true,
+                            Related = new [] { "stacked-bar-chart", "bar-chart", "negative-area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When is a negative stacked bar chart useful?", Answer = "When each category has values that pull in opposite directions - income versus spending, inflows versus outflows - and you want them mirrored around a shared center line." },
+                                new FaqItem { Question = "How do I show values on both sides?", Answer = "Provide positive values for one direction and negative values for the other; the bars extend left and right from the zero baseline." }
+                            }
                         },
                     }
                 },
@@ -2495,55 +2567,97 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Column Chart",
                             Path = "column-chart",
-                            Description = "Radzen Blazor Chart with column series.",
-                            Tags = new [] { "chart", "graph", "column", "bar" }
+                            Description = "Compare values across categories with a Blazor column chart - vertical bars, ideal for time series. Free and open source, from Radzen.",
+                            Tags = new [] { "chart", "graph", "column", "bar" },
+                            Related = new [] { "bar-chart", "grouped-column-chart", "stacked-column-chart", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a column chart instead of a bar chart?", Answer = "Columns are vertical, bars are horizontal. Columns work best for time on the x-axis (months, quarters) and for a small number of categories; switch to a bar chart when labels are long or you are ranking many categories." },
+                                new FaqItem { Question = "What data does a column chart need?", Answer = "A category for each column and a numeric value for its height, mapped through the CategoryProperty and ValueProperty of the column series." },
+                                new FaqItem { Question = "Can I compare several series?", Answer = "Yes. Add more column series to group them side by side, or stack them to show how parts make up a total." }
+                            }
                         },
                         new Example
                         {
                             Name = "Grouped Column Chart",
                             Path = "grouped-column-chart",
-                            Description = "Radzen Blazor Chart with grouped column series comparing multiple data series side by side.",
+                            Description = "Compare several series side by side with a Blazor grouped column chart.",
                             Tags = new [] { "chart", "graph", "column", "grouped", "bar", "comparison" },
-                            New = true
+                            New = true,
+                            Related = new [] { "column-chart", "stacked-column-chart", "bar-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I group columns instead of stacking them?", Answer = "Group when you want to compare the individual values against each other - this quarter versus last - rather than show how they sum to a total. Stack them when the total is the point." },
+                                new FaqItem { Question = "How many series can I group before it gets crowded?", Answer = "A few per category stays readable; beyond that the columns get thin and hard to compare. With many series, consider a line chart or small multiples instead." }
+                            }
                         },
                         new Example
                         {
                             Name = "Column Negative Points",
                             Path = "negative-column-chart",
-                            Description = "Radzen Blazor Chart with column series displaying positive and negative values with color-coded fill ranges.",
+                            Description = "Plot positive and negative values around a zero baseline with a Blazor column chart.",
                             Tags = new [] { "chart", "graph", "column", "negative", "positive", "loss", "profit" },
-                            New = true
+                            New = true,
+                            Related = new [] { "column-chart", "negative-area-chart", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How are negative values displayed?", Answer = "Columns grow upward from the zero line for positive values and downward for negative ones, often in different colors so the two directions stand apart." },
+                                new FaqItem { Question = "When should I use it?", Answer = "Whenever values can go either way - net profit, budget variance, temperature anomalies - and the sign matters as much as the size." }
+                            }
                         },
                         new Example
                         {
                             Name = "Range Column Chart",
                             Path = "range-column-chart",
-                            Description = "Radzen Blazor Chart with range column series for displaying vertical value ranges.",
+                            Description = "Show a low-to-high band as upright columns with a Blazor range column chart.",
                             Tags = new [] { "chart", "graph", "column", "range", "min", "max" },
-                            New = true
+                            New = true,
+                            Related = new [] { "column-chart", "range-bar-chart", "range-area-chart", "highlow-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "What is a range column chart good for?", Answer = "Showing the spread between two values per category - daily highs and lows, or an estimate's min and max - as an upright band." },
+                                new FaqItem { Question = "What data do I bind to it?", Answer = "Each column needs a category plus a low and a high value, mapped to the corresponding properties of the range column series." }
+                            }
                         },
                         new Example
                         {
                             Name = "Stacked Column Chart",
                             Path = "stacked-column-chart",
-                            Description = "Radzen Blazor Chart with stacked column series.",
-                            Tags = new [] { "chart", "stack", "graph", "column", "bar" }
+                            Description = "Show a total and its parts per category with a Blazor stacked column chart.",
+                            Tags = new [] { "chart", "stack", "graph", "column", "bar" },
+                            Related = new [] { "column-chart", "100-percent-stacked-column-chart", "stacked-bar-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a stacked column chart?", Answer = "When categories break into parts that sum to a meaningful total - sales by region within each quarter - and you want totals and composition together." },
+                                new FaqItem { Question = "Stacked or grouped columns?", Answer = "Stack when the total matters and the parts add up to it; group them side by side when you mainly want to compare the parts." }
+                            }
                         },
                         new Example
                         {
                             Name = "Full Stacked Column Chart",
                             Path = "100-percent-stacked-column-chart",
-                            Description = "Radzen Blazor Chart with full (100%) stacked column series showing proportional contributions.",
+                            Description = "Compare composition across categories with a Blazor full stacked column chart, each column scaled to 100%.",
                             Tags = new [] { "chart", "graph", "column", "stack", "percent", "100", "proportional", "full" },
-                            New = true
+                            New = true,
+                            Related = new [] { "stacked-column-chart", "column-chart", "100-percent-stacked-bar-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use full stacked column instead of stacked column?", Answer = "When share matters more than totals - how the mix of categories shifts over time even as the overall amount changes." }
+                            }
                         },
                         new Example
                         {
                             Name = "Histogram",
-                            Path = "chart-histogram",
-                            Description = "Radzen Blazor Chart displaying frequency distributions as a histogram using column series.",
+                            Path = "histogram-chart",
+                            Description = "Show the shape of a distribution with a Blazor histogram - values grouped into bins and counted.",
                             Tags = new [] { "chart", "graph", "histogram", "frequency", "distribution", "bin" },
-                            New = true
+                            New = true,
+                            Related = new [] { "column-chart", "box-plot-chart", "scatter-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How is a histogram different from a column chart?", Answer = "A column chart compares values across named categories. A histogram groups a single set of numbers into ranges and counts how many land in each, so the x-axis is a continuous scale rather than labels." },
+                                new FaqItem { Question = "How do I choose the number of bins?", Answer = "Fewer, wider bins smooth the shape; more, narrower bins show detail but can look noisy. Pick a bin width that makes the overall pattern clear without over-fragmenting the data." }
+                            }
                         },
                     }
                 },
@@ -2556,40 +2670,69 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Line Chart",
                             Path = "line-chart",
-                            Description = "Radzen Blazor Chart with line series.",
-                            Tags = new [] { "chart", "graph", "line" }
+                            Description = "Show a trend over time with a Blazor line chart - the clearest way to follow how a value changes. Free and open source, from Radzen.",
+                            Tags = new [] { "chart", "graph", "line" },
+                            Related = new [] { "area-chart", "spline-chart", "step-line-chart", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a line chart?", Answer = "When the trend matters most - how a value moves over time, or across an ordered scale - especially when comparing several series at once. If magnitude or volume is the point, an area chart fills the space beneath the line to emphasize it." },
+                                new FaqItem { Question = "What data does a line chart need?", Answer = "A category or date on one axis and a numeric value on the other, mapped through the CategoryProperty and ValueProperty of the line series." },
+                                new FaqItem { Question = "Can I smooth the line or make it step?", Answer = "Yes. Set interpolation to spline for a smooth curve, or to step to hold each value until the next point. Straight-line interpolation is the default." }
+                            }
                         },
                         new Example
                         {
                             Name = "Spline Chart",
-                            Path = "chart-spline",
-                            Description = "Radzen Blazor Chart with smooth spline interpolation for line and area series.",
+                            Path = "spline-chart",
+                            Description = "Connect points with a smooth curve using a Blazor spline chart - a softer line for gradually changing data.",
                             Tags = new [] { "chart", "graph", "spline", "smooth", "interpolation" },
-                            New = true
+                            New = true,
+                            Related = new [] { "line-chart", "step-line-chart", "area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a spline instead of a straight line?", Answer = "When the underlying value changes smoothly and the curve aids readability. Avoid it when exact values matter, since the curve can overshoot between points and imply readings that are not in the data." },
+                                new FaqItem { Question = "How do I enable spline interpolation?", Answer = "Set the line or area series interpolation to spline; the same data renders with a smooth curve instead of straight segments." }
+                            }
                         },
                         new Example
                         {
                             Name = "Step Line Chart",
                             Path = "step-line-chart",
-                            Description = "Radzen Blazor Chart with step line interpolation for discrete value changes.",
+                            Description = "Draw a staircase line for values that change in discrete steps with a Blazor step line chart.",
                             Tags = new [] { "chart", "graph", "line", "step", "interpolation" },
-                            New = true
+                            New = true,
+                            Related = new [] { "line-chart", "spline-chart", "step-area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a step line?", Answer = "When a value stays constant between readings and changes suddenly - interest rates, inventory counts, a setting that holds until updated. A straight line would imply gradual change that did not happen." },
+                                new FaqItem { Question = "How is it different from a spline?", Answer = "A spline smooths between points, suggesting continuous change. A step line does the opposite: it keeps each value level and shows the change as a clean jump." }
+                            }
                         },
                         new Example
                         {
                             Name = "Stacked Line Chart",
                             Path = "stacked-line-chart",
-                            Description = "Radzen Blazor Chart with stacked line series showing cumulative values.",
+                            Description = "Stack series to show a cumulative total over time with a Blazor stacked line chart.",
                             Tags = new [] { "chart", "graph", "line", "stack", "cumulative" },
-                            New = true
+                            New = true,
+                            Related = new [] { "line-chart", "stacked-area-chart", "100-percent-stacked-line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a stacked line chart?", Answer = "When several series add up to a meaningful total over time and you want both the total and the parts - though a stacked area chart often reads more clearly for the same data." }
+                            }
                         },
                         new Example
                         {
                             Name = "Full Stacked Line Chart",
                             Path = "100-percent-stacked-line-chart",
-                            Description = "Radzen Blazor Chart with full (100%) stacked line series showing proportional trends.",
+                            Description = "Trace each series' share of 100% over time with a Blazor full stacked line chart.",
                             Tags = new [] { "chart", "graph", "line", "stack", "percent", "100", "proportional", "full" },
-                            New = true
+                            New = true,
+                            Related = new [] { "stacked-line-chart", "line-chart", "100-percent-stacked-area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use full stacked line instead of stacked line?", Answer = "When relative share is the story - how the mix between series changes over time - rather than the absolute totals." }
+                            }
                         },
                     }
                 },
@@ -2602,17 +2745,28 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Waterfall Chart",
                             Path = "waterfall-chart",
-                            Description = "Radzen Blazor Chart with waterfall series showing cumulative impact of sequential values.",
+                            Description = "Explain how a starting value reaches a final total with a Blazor waterfall chart - each step shown as a rise or fall. Free and open source, from Radzen.",
                             Tags = new [] { "chart", "graph", "waterfall", "column", "cumulative", "running total", "summary" },
-                            New = true
+                            New = true,
+                            Related = new [] { "horizontal-waterfall-chart", "column-chart", "negative-column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a waterfall chart?", Answer = "When you want to explain how you got from one total to another - opening to closing balance, or budget to actuals - by showing each contributing increase and decrease in order." },
+                                new FaqItem { Question = "What data does it need?", Answer = "An ordered list of labeled changes, each a positive or negative value. The chart accumulates them from the starting point and can mark running totals along the way." }
+                            }
                         },
                         new Example
                         {
                             Name = "Horizontal Waterfall Chart",
                             Path = "horizontal-waterfall-chart",
-                            Description = "Radzen Blazor Chart with horizontal waterfall series showing cumulative impact of sequential values.",
+                            Description = "Show a step-by-step waterfall laid out along horizontal bars with a Blazor horizontal waterfall chart.",
                             Tags = new [] { "chart", "graph", "waterfall", "bar", "horizontal", "cumulative", "running total", "summary" },
-                            New = true
+                            New = true,
+                            Related = new [] { "waterfall-chart", "bar-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use the horizontal layout?", Answer = "When your step labels are long or there are many steps; horizontal bars give the labels room and keep a tall sequence readable." }
+                            }
                         },
                     }
                 },
@@ -2625,33 +2779,58 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Pie Chart",
                             Path = "pie-chart",
-                            Description = "Radzen Blazor Chart with pie series.",
+                            Description = "Show parts of a whole at a glance with a Blazor pie chart. Free and open source, from Radzen.",
                             Tags = new [] { "chart", "graph", "pie" },
-                            Updated = true
+                            Updated = true,
+                            Related = new [] { "donut-chart", "column-chart", "funnel-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a pie chart?", Answer = "When you are showing parts of a single whole and there are only a few of them. With many slices, or when precise comparison matters, a bar or column chart is easier to read." },
+                                new FaqItem { Question = "What data does a pie chart need?", Answer = "One value per category; the chart converts each to its share of the total automatically. Bind your collection and set the value and category properties of the pie series." },
+                                new FaqItem { Question = "Pie or donut?", Answer = "They show the same thing. A donut leaves a hole in the middle, which gives you space for a total or label and can look cleaner with more slices." }
+                            }
                         },
                         new Example
                         {
                             Name = "Donut Chart",
                             Path = "donut-chart",
-                            Description = "Radzen Blazor Chart with donut series.",
+                            Description = "Show proportions with a Blazor donut chart - a pie with an open center for a total or label.",
                             Tags = new [] { "chart", "graph", "donut" },
-                            Updated = true
+                            Updated = true,
+                            Related = new [] { "pie-chart", "column-chart", "funnel-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a donut instead of a pie?", Answer = "When you want to place a total or label in the center, or when a slightly cleaner look helps with a handful of slices. Both convey the same part-to-whole comparison." },
+                                new FaqItem { Question = "Can I show the total in the middle?", Answer = "Yes. The open center is a natural place for a summary number or short label." }
+                            }
                         },
                         new Example
                         {
                             Name = "Funnel Chart",
                             Path = "funnel-chart",
-                            Description = "Radzen Blazor Chart with funnel series for visualizing stages in a process.",
+                            Description = "Visualize conversion and pipeline stages with a Blazor funnel chart as each stage narrows.",
                             Tags = new [] { "chart", "graph", "funnel", "conversion", "pipeline", "sales" },
-                            New = true
+                            New = true,
+                            Related = new [] { "pyramid-chart", "pie-chart", "bar-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a funnel chart?", Answer = "When you are tracking how many items make it through each stage of a sequence - visitors to signups to purchases, or leads to closed deals - and want the drop-off between stages to stand out." },
+                                new FaqItem { Question = "What data does it need?", Answer = "One value per stage, listed in order. Each stage is drawn as a band sized by its value, so the funnel narrows as the values fall." }
+                            }
                         },
                         new Example
                         {
                             Name = "Pyramid Chart",
                             Path = "pyramid-chart",
-                            Description = "Radzen Blazor Chart with pyramid series for hierarchical data visualization.",
+                            Description = "Show ranked levels or a hierarchy with a Blazor pyramid chart, widest at the base.",
                             Tags = new [] { "chart", "graph", "pyramid", "hierarchy", "triangle" },
-                            New = true
+                            New = true,
+                            Related = new [] { "funnel-chart", "pie-chart", "bar-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a pyramid chart?", Answer = "When your categories form levels or a hierarchy you want to show by size - population age bands, or tiers of a market - with the largest at the bottom." },
+                                new FaqItem { Question = "How is it different from a funnel chart?", Answer = "They are mirror images in spirit. A funnel emphasizes drop-off through a process from top to bottom, while a pyramid emphasizes the size of ranked levels built up from a base." }
+                            }
                         },
                     }
                 },
@@ -2664,39 +2843,70 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Scatter Chart",
                             Path = "scatter-chart",
-                            Description = "Radzen Blazor Chart with scatter series for plotting numeric X/Y data points.",
-                            Tags = new [] { "chart", "graph", "scatter", "point", "xy" }
+                            Description = "Plot X/Y points to reveal correlation, clusters, and outliers with a Blazor scatter chart. Free and open source, from Radzen.",
+                            Tags = new [] { "chart", "graph", "scatter", "point", "xy" },
+                            Related = new [] { "bubble-chart", "scatter-line-chart", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a scatter chart?", Answer = "When both axes are numeric and you want to see how two measures relate - height against weight, price against demand - or to spot clusters and outliers in raw points." },
+                                new FaqItem { Question = "What data does it need?", Answer = "Each point needs an X and a Y value, mapped to the scatter series. Unlike a line or column chart, the category axis is numeric rather than labeled." },
+                                new FaqItem { Question = "How is a bubble chart different?", Answer = "A bubble chart adds a third dimension: the size of each point encodes another value, so you can show three measures at once." }
+                            }
                         },
                         new Example
                         {
                             Name = "Scatter Line Chart",
                             Path = "scatter-line-chart",
-                            Description = "Radzen Blazor Chart with line series and markers for scatter line visualization.",
+                            Description = "Plot X/Y points joined by a line with a Blazor scatter line chart - markers plus trend on a numeric axis.",
                             Tags = new [] { "chart", "graph", "scatter", "line", "marker", "point" },
-                            New = true
+                            New = true,
+                            Related = new [] { "scatter-chart", "line-chart", "bubble-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use scatter points with a line?", Answer = "When the points sit on a numeric X axis and connecting them helps show a path or trend - a measured curve, or a sequence of readings - while still marking each actual point." },
+                                new FaqItem { Question = "How is it different from a line chart?", Answer = "A line chart spaces points evenly along a labeled category axis. A scatter line places them by their true X value, so uneven spacing is preserved." }
+                            }
                         },
                         new Example
                         {
                             Name = "Bubble Chart",
                             Path = "bubble-chart",
-                            Description = "Radzen Blazor Chart with bubble series for visualizing three dimensions of data.",
-                            Tags = new [] { "chart", "graph", "bubble", "scatter", "size" }
+                            Description = "Show three numeric dimensions at once with a Blazor bubble chart - X, Y, and point size.",
+                            Tags = new [] { "chart", "graph", "bubble", "scatter", "size" },
+                            Related = new [] { "scatter-chart", "scatter-line-chart", "heatmap-series-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a bubble chart?", Answer = "When you have a third measure worth showing alongside an X/Y relationship - market size on top of price and share, say - and want it encoded as the size of each point." },
+                                new FaqItem { Question = "What data does it need?", Answer = "Each bubble needs X, Y, and a size value. Keep the number of bubbles modest, since overlapping circles get hard to read." }
+                            }
                         },
                         new Example
                         {
                             Name = "Heatmap Series Chart",
                             Path = "heatmap-series-chart",
-                            Description = "Radzen Blazor Chart with heatmap series rendering a coloured grid on numeric X/Y axes.",
+                            Description = "Color a grid of X/Y cells by value with a Blazor heatmap series to spot hotspots and density.",
                             Tags = new [] { "chart", "graph", "heatmap", "grid", "intensity", "density" },
-                            New = true
+                            New = true,
+                            Related = new [] { "contour-chart", "heatmap-chart", "scatter-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a heatmap?", Answer = "When you want to see how a value varies across two axes at once - activity by hour and day, or density across a grid - and color reads faster than numbers." },
+                                new FaqItem { Question = "How is the heatmap series different from the standalone heatmap?", Answer = "The heatmap series plots on numeric X/Y axes inside a chart, alongside other series if needed. The standalone heatmap component is built for a labeled category grid, like a calendar or matrix." }
+                            }
                         },
                         new Example
                         {
                             Name = "Contour Chart",
                             Path = "contour-chart",
-                            Description = "Radzen Blazor Chart with contour series for isoilluminance, temperature and scalar-field plots.",
+                            Description = "Map a scalar field as filled bands and iso-lines with a Blazor contour chart - temperature, illuminance, and more.",
                             Tags = new [] { "chart", "graph", "contour", "isoilluminance", "isoline", "isoband", "heatmap", "scalar field" },
-                            New = true
+                            New = true,
+                            Related = new [] { "heatmap-series-chart", "heatmap-chart", "scatter-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a contour chart?", Answer = "When your data is a value sampled across a 2D grid and you want to see its shape - peaks, valleys, and gradients - as bands of color with optional iso-lines between them." },
+                                new FaqItem { Question = "What data does it need?", Answer = "Values on a regular X/Y grid. The chart interpolates between samples to draw smooth bands, and you can turn on iso-lines to outline each level." }
+                            }
                         },
                     }
                 },
@@ -2709,33 +2919,61 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Candlestick Chart",
                             Path = "candlestick-chart",
-                            Description = "Radzen Blazor Chart with candlestick series for financial OHLC data.",
+                            Description = "Show how a price opened, closed, and swung with a Blazor candlestick chart - one candle per trading period. Free and open source, from Radzen.",
                             Tags = new [] { "chart", "graph", "candlestick", "ohlc", "financial", "stock" },
-                            New = true
+                            New = true,
+                            Related = new [] { "ohlc-chart", "highlow-chart", "line-chart", "area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I read a candlestick?", Answer = "The body spans the opening and closing prices, and the thin wicks above and below reach the period's high and low. By convention the candle is colored one way when the price closed higher than it opened, and another way when it closed lower." },
+                                new FaqItem { Question = "What data does the candlestick series need?", Answer = "Each point needs a date and four numbers: open, high, low, and close. Bind your collection and point the Date, Open, High, Low, and Close properties at the matching fields." },
+                                new FaqItem { Question = "Should I use a candlestick or an OHLC chart?", Answer = "They show the same four values. Candlesticks make the open-to-close range easy to spot, while OHLC bars stay readable when you are plotting a lot of periods at once." }
+                            }
                         },
                         new Example
                         {
                             Name = "OHLC Chart",
                             Path = "ohlc-chart",
-                            Description = "Radzen Blazor Chart with OHLC bar series for financial data.",
+                            Description = "Follow price action with a Blazor OHLC bar chart - open, high, low, and close in one compact tick per period. Free and open source, from Radzen.",
                             Tags = new [] { "chart", "graph", "ohlc", "financial", "stock", "open", "high", "low", "close" },
-                            New = true
+                            New = true,
+                            Related = new [] { "candlestick-chart", "highlow-chart", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How is an OHLC bar drawn?", Answer = "Each bar is a vertical line from the low to the high, with a tick on the left for the opening price and a tick on the right for the closing price." },
+                                new FaqItem { Question = "When would I pick OHLC over candlesticks?", Answer = "Reach for OHLC bars when you are showing many periods at once. They take up less room and stay legible where candle bodies would start to overlap." },
+                                new FaqItem { Question = "What fields does the OHLC series expect?", Answer = "A date plus open, high, low, and close values for each point, mapped through the Date, Open, High, Low, and Close properties." }
+                            }
                         },
                         new Example
                         {
                             Name = "High-Low Chart",
                             Path = "highlow-chart",
-                            Description = "Radzen Blazor Chart with high-low series showing value ranges as vertical lines.",
+                            Description = "Show the range between a low and a high value for each point with a Blazor high-low chart. Free and open source, from Radzen.",
                             Tags = new [] { "chart", "graph", "highlow", "high", "low", "range", "temperature" },
-                            New = true
+                            New = true,
+                            Related = new [] { "candlestick-chart", "ohlc-chart", "range-column-chart", "range-bar-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "What is a high-low chart good for?", Answer = "Anywhere you care about a range rather than a single number: daily temperature lows and highs, the day's trading range for a stock, or the spread of estimates around a value." },
+                                new FaqItem { Question = "What data do I bind to it?", Answer = "Each point needs a category or date and two values, a low and a high, which you map to the Low and High properties of the series." },
+                                new FaqItem { Question = "How is it different from a range bar chart?", Answer = "A high-low series draws a thin line between the two values, while a range bar fills the space between them. High-low keeps things light when you have many points to show." }
+                            }
                         },
                         new Example
                         {
                             Name = "Box Plot Chart",
                             Path = "box-plot-chart",
-                            Description = "Radzen Blazor Chart with box-and-whisker series for statistical distributions.",
+                            Description = "Compare distributions with a Blazor box plot - quartiles, median, and outliers at a glance. Free and open source, from Radzen.",
                             Tags = new [] { "chart", "graph", "box", "plot", "whisker", "quartile", "statistics", "distribution" },
-                            New = true
+                            New = true,
+                            Related = new [] { "highlow-chart", "scatter-chart", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "What do the parts of a box plot mean?", Answer = "The box runs from the first quartile to the third, so it holds the middle half of the values. The line inside is the median, and the whiskers reach out to the minimum and maximum." },
+                                new FaqItem { Question = "When should I use a box plot?", Answer = "When you want to compare the shape of several distributions side by side - test scores across classes, or response times across servers - and you care about spread and outliers, not just the average." },
+                                new FaqItem { Question = "What data does the box plot need?", Answer = "Each box is built from a five-number summary - minimum, first quartile, median, third quartile, and maximum - that you provide for every category." }
+                            }
                         },
                     }
                 },
@@ -2748,57 +2986,101 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Trendlines & Statistical Overlays",
                             Path = "chart-trends",
-                            Description = "Radzen Blazor Chart with trendline overlays (linear regression, polynomial fit, moving average) and statistical descriptors (mean, median, mode).",
+                            Description = "Add regression, moving-average, and mean/median/mode overlays to any Blazor chart with trendlines and statistical overlays.",
                             Tags = new [] { "chart", "graph", "trendline", "trend", "trends", "regression", "polynomial", "moving average", "forecast", "mean", "median", "mode", "statistics" },
-                            New = true
+                            New = true,
+                            Related = new [] { "line-chart", "scatter-chart", "chart-reference-line" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "What overlays can I add to a chart?", Answer = "Linear and polynomial trendlines, a moving average, and statistical markers for mean, median, and mode. Each is added alongside the series it describes." },
+                                new FaqItem { Question = "When should I use a trendline?", Answer = "When the raw points are noisy and you want to show the underlying direction - a sales trend through seasonal swings, for example - without changing the data itself." }
+                            }
                         },
                         new Example
                         {
                             Name = "Reference Lines & Bands",
                             Path = "chart-reference-line",
-                            Description = "Radzen Blazor Chart with reference line and reference band overlays that highlight targets, thresholds and acceptable ranges.",
+                            Description = "Mark targets, thresholds, and acceptable ranges on a Blazor chart with reference lines and bands.",
                             Tags = new [] { "chart", "graph", "reference", "line", "band", "target", "threshold", "limit", "range", "overlay" },
-                            New = true
+                            New = true,
+                            Related = new [] { "chart-trends", "line-chart", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a reference line or band?", Answer = "When the data only means something relative to a benchmark - a sales target, a safety limit, or a normal range - and you want that benchmark drawn right on the chart." },
+                                new FaqItem { Question = "What is the difference between a line and a band?", Answer = "A reference line marks a single value, like a target. A band shades the space between two values, like an acceptable range." }
+                            }
                         },
                         new Example
                         {
                             Name = "Synchronized Charts",
                             Path = "chart-sync",
-                            Description = "Radzen Blazor Charts with a shared SyncGroup display a synchronized crosshair, active data points and tooltips across multiple charts.",
+                            Description = "Link multiple Blazor charts with a shared crosshair, active point, and tooltip using synchronized charts.",
                             Tags = new [] { "chart", "graph", "sync", "synchronized", "crosshair", "tooltip", "dashboard", "linked", "export" },
-                            New = true
+                            New = true,
+                            Related = new [] { "line-chart", "chart-trends", "chart-reference-line" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I synchronize charts?", Answer = "When several charts share an axis - usually time - and you want to read them together; moving the cursor on one lines up the same point on all of them." },
+                                new FaqItem { Question = "How do I link charts together?", Answer = "Put the charts in the same sync group; they then coordinate their crosshair, active point, and tooltips." }
+                            }
                         },
                         new Example
                         {
                             Name = "Pareto Chart",
-                            Path = "chart-pareto",
-                            Description = "Radzen Blazor Chart combining column and line series to create a Pareto chart with cumulative percentages.",
+                            Path = "pareto-chart",
+                            Description = "Find the vital few with a Blazor pareto chart - sorted bars plus a cumulative line. Free and open source, from Radzen.",
                             Tags = new [] { "chart", "graph", "pareto", "cumulative", "quality" },
-                            New = true
+                            New = true,
+                            Related = new [] { "column-chart", "line-chart", "funnel-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a pareto chart?", Answer = "When you want to find the vital few - the handful of causes, defects, or customers that drive most of the result - and show how quickly the cumulative total adds up." },
+                                new FaqItem { Question = "What data does it need?", Answer = "A value per category. The chart sorts the bars from largest to smallest and overlays a line of the running cumulative percentage." },
+                                new FaqItem { Question = "Why combine bars and a line?", Answer = "The bars rank the categories by size, while the cumulative line shows how few of them it takes to reach most of the total." }
+                            }
                         },
                         new Example
                         {
                             Name = "DrillDown Chart",
                             Path = "drilldown-chart",
-                            Description = "Radzen Blazor Chart with drill-down interaction to navigate from summary to detailed data on click.",
+                            Description = "Let readers click from summary to detail with an interactive Blazor drill-down chart.",
                             Tags = new [] { "chart", "graph", "drilldown", "drill", "click", "interactive", "navigation", "hierarchy" },
-                            New = true
+                            New = true,
+                            Related = new [] { "column-chart", "pie-chart", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use drill-down?", Answer = "When your data is hierarchical and a single view would be too dense; start with the summary and let readers click into the level they care about." },
+                                new FaqItem { Question = "How does the interaction work?", Answer = "Handle the click on a data point and swap in the detailed data for that point; a back step returns to the previous level." }
+                            }
                         },
                         new Example
                         {
                             Name = "Bullet Chart",
                             Path = "bullet-chart",
-                            Description = "Radzen Blazor Chart with bullet series for comparing a measure against a target.",
+                            Description = "Show a KPI against its target in compact space with a Blazor bullet chart.",
                             Tags = new [] { "chart", "graph", "bullet", "gauge", "target", "kpi", "performance" },
-                            New = true
+                            New = true,
+                            Related = new [] { "arc-gauge", "linear-gauge", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a bullet chart?", Answer = "When you need to show performance against a target in little space - a KPI on a dashboard, where a full gauge would be too big - with bands for poor, okay, and good." },
+                                new FaqItem { Question = "What data does it need?", Answer = "A measured value, a target to compare against, and optional range thresholds that shade the background." },
+                                new FaqItem { Question = "How is it different from a gauge?", Answer = "A bullet chart carries the same information as a gauge in a fraction of the space, which makes it better when you have many KPIs to line up." }
+                            }
                         },
                         new Example
                         {
                             Name = "Live Chart",
                             Path = "live-chart",
-                            Description = "Radzen Blazor live updating line chart streaming real-time data over a rolling window - like a CPU or telemetry monitor.",
+                            Description = "Stream real-time data over a rolling window with a live updating Blazor chart.",
                             Tags = new [] { "chart", "graph", "live", "real-time", "streaming", "update", "timer", "monitor", "telemetry" },
-                            New = true
+                            New = true,
+                            Related = new [] { "line-chart", "area-chart", "scatter-line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I build a live updating chart?", Answer = "Append new points on a timer or from a data feed and drop old ones past your window; the chart redraws as the bound data changes." },
+                                new FaqItem { Question = "When should I use a live chart?", Answer = "For real-time monitoring where the latest values matter most - system metrics, sensor readings, market ticks - rather than a fixed historical range." }
+                            }
                         },
                     }
                 },
@@ -2811,15 +3093,27 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Arc Gauge",
                             Path = "arc-gauge",
-                            Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",
-                            Tags = new [] { "gauge", "graph", "arc", "progress" }
+                            Description = "Show a value on a curved arc with a Blazor arc gauge - a compact dial for cards and tiles.",
+                            Tags = new [] { "gauge", "graph", "arc", "progress" },
+                            Related = new [] { "radial-gauge", "linear-gauge", "bullet-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use an arc gauge?", Answer = "When you want a dial but have limited height; the shallow arc shows the same value-against-range without the footprint of a full circle." },
+                                new FaqItem { Question = "Can I show colored ranges and a value label?", Answer = "Yes. Add scale ranges to shade sections and place the current value in the center of the arc." }
+                            }
                         },
                         new Example
                         {
                             Name = "Linear Gauge",
                             Path = "linear-gauge",
-                            Description = "Display values on a linear scale with configurable ticks, ranges, and pointer orientation.",
+                            Description = "Show a value on a straight scale with a Blazor linear gauge - horizontal or vertical, with ranges and pointers.",
                             Tags = new [] { "gauge", "graph", "linear", "scale", "bar" },
+                            Related = new [] { "radial-gauge", "arc-gauge", "bullet-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a linear gauge?", Answer = "When a straight scale fits your layout better than a dial - a vertical level beside a stat, or a horizontal meter in a row - or when you want several scales side by side." },
+                                new FaqItem { Question = "What can I configure?", Answer = "The orientation, scale ranges and ticks, one or more pointers (including a draggable one), and a reversed scale." }
+                            },
                             Toc =
                             [
                                 new () { Text = "Basic Usage", Anchor = "#basic-usage" },
@@ -2835,16 +3129,28 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Radial Gauge",
                             Path = "radial-gauge",
-                            Description = "Demonstration and configuration of Radzen Blazor Radial Gauge component.",
-                            Tags = new [] { "gauge", "graph", "radial", "circle" }
+                            Description = "Show a value on a circular dial with a Blazor radial gauge - speedometer-style, with ranges and pointers. Free and open source, from Radzen.",
+                            Tags = new [] { "gauge", "graph", "radial", "circle" },
+                            Related = new [] { "arc-gauge", "linear-gauge", "bullet-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a radial gauge?", Answer = "When you want to show one value against a known range at a glance - a score, a utilization percentage, a speed - and a dial reads more naturally than a number alone." },
+                                new FaqItem { Question = "What can I configure on it?", Answer = "The scale range and ticks, one or more pointers, and colored ranges that shade sections of the dial to mark good, warning, and critical zones." },
+                                new FaqItem { Question = "Radial, arc, or linear gauge?", Answer = "Radial is a full or near-full circle, arc is a shallower curved segment that fits tighter layouts, and linear is a straight bar. They show the same kind of value; pick the shape that fits your space." }
+                            }
                         },
                         new Example
                         {
                             Name = "Styling Gauge",
                             Path = "styling-gauge",
                             Title = "Blazor Gauge - Styling | Free UI Components by Radzen",
-                            Description = "This example demonstrates multiple pointers with RadzenRadialGauge and multiple scales with RadzenArcGauge component.",
-                            Tags = new [] { "gauge", "graph", "styling" }
+                            Description = "Style Blazor gauges with multiple pointers, multiple scales, and custom colors.",
+                            Tags = new [] { "gauge", "graph", "styling" },
+                            Related = new [] { "radial-gauge", "arc-gauge", "linear-gauge" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How much can I customize a gauge's appearance?", Answer = "Quite a lot: multiple pointers and scales on one gauge, custom colors and ranges, tick formatting, and center content - enough to match most dashboard designs." }
+                            }
                         },
                     }
                 },
@@ -2857,18 +3163,30 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Zoom and Pan",
                             Path = "zoom-pan-chart",
-                            Description = "Radzen Blazor Chart with mouse wheel zoom and scrollbar pan for exploring large datasets.",
+                            Description = "Let readers scroll to zoom and drag to pan through a large dataset with an interactive Blazor chart.",
                             Tags = new [] { "chart", "zoom", "pan", "scroll", "interactive", "mouse", "wheel" },
-                            New = true
+                            New = true,
+                            Related = new [] { "range-navigator", "line-chart", "live-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I enable zoom and pan?", Answer = "When a series has more points than fit comfortably at once - a year of daily readings, say - and you want readers to focus on a slice and move through it rather than see it all at once." },
+                                new FaqItem { Question = "How do readers control it?", Answer = "The mouse wheel zooms in and out, and a scrollbar or drag pans along the axis." }
+                            }
                         },
                         new Example
                         {
                             Toc = [ new () { Text = "With Series", Anchor = "#with-series" }, new () { Text = "Compact", Anchor = "#compact" } ],
                             Name = "Range Navigator",
                             Path = "range-navigator",
-                            Description = "Radzen Blazor Range Navigator with mini-chart and draggable selection for controlling chart visible range.",
+                            Description = "Frame the visible window of a chart with a draggable Blazor range navigator overview strip.",
                             Tags = new [] { "chart", "range", "navigator", "selector", "zoom", "pan", "interactive" },
-                            New = true
+                            New = true,
+                            Related = new [] { "zoom-pan-chart", "line-chart", "area-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a range navigator?", Answer = "When readers need to move through a long series and keep their bearings; the mini-chart shows the whole picture while the selection frames the part on display." },
+                                new FaqItem { Question = "How is it different from zoom and pan?", Answer = "Zoom and pan act on the chart itself. A range navigator adds a separate overview strip, so readers always see the full extent while choosing the window." }
+                            }
                         },
                     }
                 },
@@ -2876,17 +3194,30 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Heatmap",
                     Path = "heatmap-chart",
-                    Description = "Radzen Blazor Heatmap component for displaying data intensity as a color-coded grid.",
+                    Description = "Show values on a labeled color-coded grid with a Blazor heatmap - calendars, matrices, and density. Free and open source, from Radzen.",
                     Tags = new [] { "chart", "heatmap", "grid", "matrix", "color", "intensity" },
                     Icon = "\ue8f0",
-                    New = true
+                    New = true,
+                    Related = new [] { "heatmap-series-chart", "treemap-chart", "contour-chart" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "When should I use a heatmap?", Answer = "When you want to compare a value across two categorical dimensions at once - day against hour, product against region - and color makes the pattern faster to read than numbers." },
+                        new FaqItem { Question = "What data does it need?", Answer = "A value for each row-and-column pair. The component lays them out on the grid and maps each value to a color from your scheme." },
+                        new FaqItem { Question = "How is it different from the heatmap chart series?", Answer = "This standalone heatmap is built for labeled category grids like calendars and matrices. The heatmap series plots on numeric X/Y axes inside a chart, alongside other series." }
+                    }
                 },
                 new Example
                 {
                     Name = "Treemap",
                     Path = "treemap-chart",
-                    Description = "Radzen Blazor Treemap component for displaying hierarchical data as proportionally-sized rectangles.",
+                    Description = "Show hierarchy and proportion as nested rectangles with a Blazor treemap.",
                     Tags = new [] { "chart", "treemap", "hierarchy", "rectangle", "proportion", "area" },
+                    Related = new [] { "sankey-diagram", "pie-chart", "column-chart" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "When should I use a treemap?", Answer = "When you have hierarchical or part-to-whole data with many items and limited space; the rectangle sizes show proportion without the gaps a pie or bar chart would leave." },
+                        new FaqItem { Question = "What data does it need?", Answer = "Items with a value, optionally nested into parent groups. Each rectangle is sized by its share, and groups are drawn as blocks of their children." }
+                    },
                     Icon= "\ue8f1",
                     New = true
                 },
@@ -2894,9 +3225,15 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Sparkline",
                     Path = "sparkline",
-                    Description = "Demonstration and configuration of RadzenSparkline component.",
+                    Description = "Show a trend inline in word-sized space with a Blazor sparkline - no axes or labels.",
                     Icon = "\uf64f",
-                    Tags = new [] { "chart", "sparkline" }
+                    Tags = new [] { "chart", "sparkline" },
+                    Related = new [] { "line-chart", "area-chart", "bullet-chart" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "When should I use a sparkline?", Answer = "When you want to show the shape of a trend in very little space - a row in a table, a KPI card - where a full chart would be too much and a single number too little." },
+                        new FaqItem { Question = "What data does it need?", Answer = "Just a series of values. The sparkline draws their shape without axes, gridlines, or a legend." }
+                    }
                 },
                 new Example
                 {
@@ -2904,8 +3241,15 @@ namespace RadzenBlazorDemos
                     Name = "Spider Chart",
                     Path = "spider-chart",
                     Title = "Blazor Spider Chart Component | Free UI Components by Radzen",
-                    Description = "Radzen Blazor Spider Chart for displaying multivariate data in a radial format.",
+                    Description = "Compare a profile across many dimensions with a Blazor spider (radar) chart.",
                     Tags = new [] { "spider", "radar", "chart", "multivariate", "radial", "web" },
+                    Related = new [] { "radar-column-chart", "line-chart", "column-chart" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "When should I use a spider chart?", Answer = "When you want to compare items across several measures at once and see their overall shape - player stats, product attributes, or assessment scores across categories." },
+                        new FaqItem { Question = "What data does it need?", Answer = "A value per axis for each series. Every series is drawn as a closed shape across the same set of axes, so you can overlay and compare them." },
+                        new FaqItem { Question = "Spider or radar column?", Answer = "They share the radial layout. A spider chart connects points into a shape, while a radar column draws bars out from the center - use columns when you want to compare each category's magnitude rather than an overall profile." }
+                    },
                     Icon = "\ueb39",
                     Updated = true
                 },
@@ -2913,8 +3257,14 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Radar Column Chart",
                     Path = "radar-column-chart",
-                    Description = "Radzen Blazor Spider Chart with radial column bars for displaying categorical data.",
+                    Description = "Arrange columns around a circle for cyclical categories with a Blazor radar column chart.",
                     Tags = new [] { "spider", "radar", "column", "chart", "radial", "bar" },
+                    Related = new [] { "spider-chart", "column-chart", "pie-chart" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "When should I use a radar column chart?", Answer = "When your categories are cyclical or you want a compact circular comparison - seasonal patterns by month, or activity by hour of day - rather than a long horizontal axis." },
+                        new FaqItem { Question = "How is it different from a spider chart?", Answer = "A spider chart connects values into a shape to compare profiles. A radar column draws each value as a bar from the center, which reads better when you care about each category's size." }
+                    },
                     Icon = "\uf04e",
                     New = true
                 },
@@ -2923,9 +3273,16 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Color Scheme", Anchor = "#color-scheme" }, new () { Text = "Node Properties", Anchor = "#node-properties" }, new () { Text = "Custom Colors", Anchor = "#custom-colors" }, new () { Text = "Custom Tooltips", Anchor = "#custom-tooltips" }, new () { Text = "Animation", Anchor = "#animation" } ],
                     Name = "Sankey Diagram",
                     Path = "sankey-diagram",
-                    Description = "Radzen Blazor Sankey Diagram for visualizing flow and relationships between nodes.",
+                    Description = "Trace flow between stages as proportional bands with a Blazor Sankey diagram.",
                     Icon = "\uf38d",
-                    Tags = new [] { "sankey", "flow", "diagram", "visualization", "relationships" }
+                    Tags = new [] { "sankey", "flow", "diagram", "visualization", "relationships" },
+                    Related = new [] { "treemap-chart", "funnel-chart", "bar-chart" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "When should I use a Sankey diagram?", Answer = "When you want to show how a quantity flows and divides between stages - traffic from sources to pages, money from income to spending - with the band widths carrying the magnitude." },
+                        new FaqItem { Question = "What data does it need?", Answer = "A list of links, each with a source node, a target node, and a value. The diagram lays out the nodes and sizes the connecting bands by value." },
+                        new FaqItem { Question = "Is it good for many nodes?", Answer = "It handles a fair number, but very dense flows get hard to read; group small flows or split the diagram when it gets crowded." }
+                    }
                 },
                 new Example
                 {
@@ -3179,6 +3536,48 @@ namespace RadzenBlazorDemos
 
             return Flatten(Examples)
                         .FirstOrDefault(example => example.Path == uri.AbsolutePath || $"/{example.Path}" == uri.AbsolutePath);
+        }
+
+        public string NameFor(string path)
+        {
+            IEnumerable<Example> Flatten(IEnumerable<Example> e) =>
+                e.SelectMany(c => c.Children != null ? Flatten(c.Children) : new[] { c });
+
+            var p = path?.TrimStart('/');
+            return Flatten(Examples).FirstOrDefault(e => e.Path?.TrimStart('/') == p)?.Name ?? p;
+        }
+
+        // The chart/data-visualization pages listed in the /charts gallery: every leaf under the
+        // "Data Visualization" category except the gallery itself, the "Configuration" feature demos,
+        // and the non-chart components bundled in that category (timeline, qrcode, barcode, googlemap, ssrsviewer).
+        public IEnumerable<Example> GetChartPages()
+        {
+            var nonChart = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "charts", "timeline", "qrcode", "barcode", "googlemap", "ssrsviewer"
+            };
+
+            IEnumerable<Example> Collect(IEnumerable<Example> nodes)
+            {
+                foreach (var node in nodes)
+                {
+                    if (node.Name == "Configuration")
+                        continue;
+
+                    if (node.Children != null)
+                    {
+                        foreach (var child in Collect(node.Children))
+                            yield return child;
+                    }
+                    else if (!string.IsNullOrEmpty(node.Path) && !nonChart.Contains(node.Path.TrimStart('/')))
+                    {
+                        yield return node;
+                    }
+                }
+            }
+
+            var dataViz = Examples.FirstOrDefault(c => c.Name == "Data Visualization");
+            return dataViz?.Children != null ? Collect(dataViz.Children).ToList() : Enumerable.Empty<Example>();
         }
 
         public string TitleFor(Example example)

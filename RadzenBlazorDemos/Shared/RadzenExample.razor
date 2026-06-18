@@ -13,7 +13,11 @@
     <meta property="og:description" content="@ExampleService.DescriptionFor(example)" />
     <meta property="og:site_name" content="Radzen Blazor Components">
     <meta property="og:image" content="https://blazor.radzen.com/images/radzen-og.png" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="@CanonicalUrl" />
     <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="@ExampleService.TitleFor(example)" />
+    <meta property="twitter:description" content="@ExampleService.DescriptionFor(example)" />
 </HeadContent>
 @if (Heading)
 {
@@ -103,6 +107,8 @@
     private string ExampleUrl => string.IsNullOrEmpty(Example) ? $"{Name}Page.razor" : $"{Example}.razor";
 
     Example example;
+
+    string CanonicalUrl => new Uri(NavigationManager.Uri).GetLeftPart(UriPartial.Path);
 
     DateTime start;
 
