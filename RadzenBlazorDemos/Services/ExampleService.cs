@@ -2257,7 +2257,13 @@ namespace RadzenBlazorDemos
                             Name = "Series",
                             Path = "chart-series",
                             Title = "Blazor Chart - Series Config | Free UI Components by Radzen",
-                            Description = "Use the Radzen Blazor Chart component to display data in a graphical format.",
+                            Description = "Bind data to a line, bar, pie, or other series - the building block of every Blazor chart.",
+                            Related = new [] { "line-chart", "column-chart", "chart-axis" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add a series to a chart?", Answer = "Place a series component such as RadzenLineSeries or RadzenColumnSeries inside the chart and bind its Data, then point CategoryProperty and ValueProperty at the fields you want." },
+                                new FaqItem { Question = "Can I combine different series types?", Answer = "Yes. Put more than one series inside the same chart - a column series with a line overlay, for example - as long as they share compatible axes." }
+                            },
                             Tags = new [] { "chart", "graph", "series" }
                         },
                         new Example
@@ -2266,14 +2272,26 @@ namespace RadzenBlazorDemos
                             Name = "Axis",
                             Path = "chart-axis",
                             Title = "Blazor Chart - Axis Config | Free UI Components by Radzen",
-                            Description = "By default the Radzen Blazor Chart determines the Y axis minimum and maximum based on the range of values.",
+                            Description = "Control the scale, gridlines, labels, and title of a Blazor chart's axes, or let them fit the data automatically.",
+                            Related = new [] { "chart-series", "multiple-axes-chart", "logarithmic-axis-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I set the axis minimum, maximum, and step?", Answer = "Set Min, Max, and Step on the value axis to control the range and tick spacing instead of letting the chart pick them from the data." },
+                                new FaqItem { Question = "How do I format axis labels?", Answer = "Use the axis FormatString to display values as currency, percentages, dates, or any format you need." }
+                            },
                             Tags = new [] { "chart", "graph", "series" }
                         },
                         new Example
                         {
                             Name = "Multiple Axes",
                             Path = "multiple-axes-chart",
-                            Description = "Radzen Blazor Chart with multiple value axes for combining series with different scales.",
+                            Description = "Plot series with very different scales on one Blazor chart, each reading against its own value axis.",
+                            Related = new [] { "chart-axis", "line-chart", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use multiple axes?", Answer = "When two series share a category axis but live on different scales - units sold versus conversion rate - so one would flatten the other on a single axis." },
+                                new FaqItem { Question = "How do I assign a series to a second axis?", Answer = "Add a second value axis and point the series at it, so each series reads against the axis that fits its scale." }
+                            },
                             Tags = new [] { "chart", "graph", "multiple", "axes", "axis", "dual", "secondary" },
                             New = true
                         },
@@ -2281,7 +2299,12 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Inverted Axis",
                             Path = "inverted-axis-chart",
-                            Description = "Radzen Blazor Chart with inverted axes to reverse the direction of values or categories.",
+                            Description = "Reverse the direction of a Blazor chart axis, so values count down or categories run the opposite way.",
+                            Related = new [] { "chart-axis", "bar-chart", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When would I invert an axis?", Answer = "When the natural reading runs backwards - a leaderboard where rank 1 belongs at the top, or a depth scale that increases downward." }
+                            },
                             Tags = new [] { "chart", "graph", "inverted", "reversed", "axis", "flip" },
                             New = true
                         },
@@ -2289,7 +2312,12 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Axis Crossing",
                             Path = "axis-crossing-chart",
-                            Description = "Radzen Blazor Chart with axis crossing to position axes at specific values instead of chart edges.",
+                            Description = "Position a Blazor chart axis to cross at a specific value instead of the chart edge.",
+                            Related = new [] { "chart-axis", "negative-column-chart", "chart-reference-line" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I move the axis crossing?", Answer = "When zero is not at the edge of your data - for example values centered on a target, where you want the axis to cross at that target rather than at the bottom." }
+                            },
                             Tags = new [] { "chart", "graph", "axis", "crossing", "origin", "intersect" },
                             New = true
                         },
@@ -2297,7 +2325,12 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Logarithmic Axis",
                             Path = "logarithmic-axis-chart",
-                            Description = "Radzen Blazor Chart with logarithmic value axis for data spanning several orders of magnitude.",
+                            Description = "Use a logarithmic axis on a Blazor chart to keep values spanning several orders of magnitude readable.",
+                            Related = new [] { "chart-axis", "line-chart", "scatter-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use a logarithmic axis?", Answer = "When your values span orders of magnitude and a linear axis would squash the small ones into the baseline - population, revenue across very different sizes, or scientific data." }
+                            },
                             Tags = new [] { "chart", "graph", "logarithmic", "log", "axis", "scale" },
                             New = true
                         },
@@ -2305,7 +2338,12 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Indexed Category Axis",
                             Path = "indexed-category-axis-chart",
-                            Description = "Radzen Blazor Chart with indexed category axis where series are aligned by index rather than category value.",
+                            Description = "Align Blazor chart series by position rather than matching category values with an indexed category axis.",
+                            Related = new [] { "chart-axis", "line-chart", "chart-series" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When do I need an indexed category axis?", Answer = "When your series do not share the same category values but you still want them aligned by order - comparing sequences of different lengths or with gaps." }
+                            },
                             Tags = new [] { "chart", "graph", "indexed", "category", "axis" },
                             New = true
                         },
@@ -2315,7 +2353,13 @@ namespace RadzenBlazorDemos
                             Name = "Legend",
                             Path = "chart-legend",
                             Title = "Blazor Chart - Legend Config | Free UI Components by Radzen",
-                            Description = "The Radzen Blazor Chart displays a legend by default. It uses the Title property of the series (or category values for pie series) as items in the legend.",
+                            Description = "Show, move, restyle, or hide the legend that tells readers which series is which on a Blazor chart.",
+                            Related = new [] { "chart-series", "chart-tooltip", "pie-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I hide the chart legend?", Answer = "Add a legend component with Visible set to false - the chart then renders without the legend." },
+                                new FaqItem { Question = "Can I move the legend?", Answer = "Yes. Set the legend Position to place it on any side of the chart." }
+                            },
                             Tags = new [] { "chart", "graph", "legend" }
                         },
                         new Example
@@ -2324,7 +2368,13 @@ namespace RadzenBlazorDemos
                             Name = "ToolTip",
                             Path = "chart-tooltip",
                             Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
-                            Description = "Blazor Chart tooltip shown on hover. Customize content, enable shared or split tooltip, or disable tooltips per series.",
+                            Description = "Show values on hover with Blazor chart tooltips - customize content, share, split, or turn them off.",
+                            Related = new [] { "chart-crosshair", "chart-sync", "chart-legend" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I customize tooltip content?", Answer = "Provide a tooltip template for the series to render any markup you want in place of the default value." },
+                                new FaqItem { Question = "How do I show one shared tooltip for all series?", Answer = "Enable the shared tooltip so a single tooltip lists every series value at the hovered category." }
+                            },
                             Tags = new [] { "chart", "graph", "legend", "shared", "split", "tooltip" },
                             Updated = true
                         },
@@ -2334,7 +2384,12 @@ namespace RadzenBlazorDemos
                             Name = "Label Rotation",
                             Path = "chart-label-rotation",
                             Title = "Blazor Chart - Label Rotation | Free UI Components by Radzen",
-                            Description = "The Radzen Blazor Chart can rotate the labels of the horizontal axis.",
+                            Description = "Rotate crowded category labels on a Blazor chart, automatically or to an angle you set, to keep them readable.",
+                            Related = new [] { "chart-axis", "column-chart", "bar-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I stop axis labels from overlapping?", Answer = "Let the chart auto-rotate the labels, or set a fixed rotation angle so long labels tilt instead of colliding." }
+                            },
                             Tags = new [] { "chart", "label", "rotate", "rotation" }
                         },
                         new Example
@@ -2342,7 +2397,13 @@ namespace RadzenBlazorDemos
                             Name = "Interpolation",
                             Path = "chart-interpolation",
                             Title = "Blazor Chart - Interpolation | Free UI Components by Radzen",
-                            Description = "This example demonstrates Radzen Blazor Chart interpolation mode.",
+                            Description = "Choose how a Blazor line or area chart connects its points - straight, smooth spline, or flat steps.",
+                            Related = new [] { "line-chart", "spline-chart", "step-line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "What interpolation modes are available?", Answer = "Straight line (the default), spline for a smooth curve, and step to hold each value until the next point." },
+                                new FaqItem { Question = "Which one should I use?", Answer = "Use straight lines for general trends, spline when the data changes smoothly, and step when values stay constant between changes." }
+                            },
                             Tags = new [] { "chart", "interpolation", "spline", "step" }
                         },
                         new Example
@@ -2350,14 +2411,25 @@ namespace RadzenBlazorDemos
                             Name = "Annotations",
                             Path = "chart-annotations",
                             Title = "Blazor Chart - Annotations | Free UI Components by Radzen",
-                            Description = "This example demonstrates RadzenSeriesAnnotation.",
+                            Description = "Add text callouts to specific points on a Blazor chart to flag an event, a peak, or a note.",
+                            Related = new [] { "chart-reference-line", "chart-data-labels", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use chart annotations?", Answer = "To call out a specific point in context - a launch date on a sales line, or an anomaly worth explaining - without a separate caption." }
+                            },
                             Tags = new [] { "chart", "annotation", "label" }
                         },
                         new Example
                         {
                             Name = "Data Labels",
                             Path = "chart-data-labels",
-                            Description = "Radzen Blazor Chart data labels with configurable position, background chip, overlap hiding, display strategy and formatting.",
+                            Description = "Print the value next to each point or bar on a Blazor chart, with position, formatting, and overlap handling.",
+                            Related = new [] { "chart-series", "chart-tooltip", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I show values on a chart?", Answer = "Add data labels to the series; each point then displays its value, with options for position, formatting, and a background chip." },
+                                new FaqItem { Question = "How do I stop data labels from overlapping?", Answer = "Turn on overlap hiding so the chart drops labels that would collide, keeping the readable ones." }
+                            },
                             Tags = new [] { "chart", "graph", "label", "data labels", "values", "format", "overlap" },
                             New = true
                         },
@@ -2366,7 +2438,12 @@ namespace RadzenBlazorDemos
                             Name = "Crosshair",
                             Path = "chart-crosshair",
                             Title = "Blazor Chart - Crosshair | Free UI Components by Radzen",
-                            Description = "Per-axis opt-in crosshair that snaps to the nearest data point (or follows the cursor) and optionally shows a label with the formatted axis value.",
+                            Description = "Add guide lines that track the cursor on a Blazor chart, snapping to the nearest point with an optional value label.",
+                            Related = new [] { "chart-tooltip", "chart-sync", "line-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add a crosshair to a chart?", Answer = "Enable the crosshair per axis; it then follows the cursor or snaps to the nearest data point, with an optional label showing the formatted value." }
+                            },
                             Tags = new [] { "chart", "crosshair", "hover" },
                             New = true
                         },
@@ -2375,7 +2452,12 @@ namespace RadzenBlazorDemos
                             Name = "Styling Chart",
                             Path = "styling-chart",
                             Title = "Blazor Chart - Styling | Free UI Components by Radzen",
-                            Description = "This example demonstrates different color schemes, custom colors and styling of Radzen Blazor Chart component.",
+                            Description = "Restyle a Blazor chart with color schemes, custom series colors, fills, and fonts to match your theme.",
+                            Related = new [] { "chart-series", "styling-gauge", "column-chart" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I change a chart's colors?", Answer = "Pick a built-in color scheme or supply your own palette; you can also set a custom color per series." }
+                            },
                             Tags = new [] { "chart", "graph", "styling" }
                         },
                     }
@@ -3578,6 +3660,15 @@ namespace RadzenBlazorDemos
 
             var dataViz = Examples.FirstOrDefault(c => c.Name == "Data Visualization");
             return dataViz?.Children != null ? Collect(dataViz.Children).ToList() : Enumerable.Empty<Example>();
+        }
+
+        // The chart configuration/feature demos (axis, legend, tooltip, ...). Article-eligible for
+        // schema, but intentionally NOT part of the /charts gallery ItemList.
+        public IEnumerable<Example> GetChartConfigPages()
+        {
+            var dataViz = Examples.FirstOrDefault(c => c.Name == "Data Visualization");
+            var config = dataViz?.Children?.FirstOrDefault(c => c.Name == "Configuration");
+            return config?.Children?.Where(e => !string.IsNullOrEmpty(e.Path)) ?? Enumerable.Empty<Example>();
         }
 
         public string TitleFor(Example example)

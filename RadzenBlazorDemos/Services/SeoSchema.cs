@@ -33,7 +33,8 @@ namespace RadzenBlazorDemos
             }
 
             var chartPaths = new HashSet<string>(
-                exampleService.GetChartPages().Select(p => p.Path?.TrimStart('/')),
+                exampleService.GetChartPages().Concat(exampleService.GetChartConfigPages())
+                    .Select(p => p.Path?.TrimStart('/')),
                 StringComparer.OrdinalIgnoreCase);
 
             if (!chartPaths.Contains(path))
