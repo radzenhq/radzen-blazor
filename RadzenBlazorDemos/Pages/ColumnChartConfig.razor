@@ -31,6 +31,15 @@
                     </Items>
                 </RadzenSelectBar>
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Tick Placement" Component="tickPlacement" />
+                <RadzenSelectBar @bind-Value="@tickPlacement" TValue="TickPlacement" Size="ButtonSize.Small" Name="tickPlacement">
+                    <Items>
+                        <RadzenSelectBarItem Value="TickPlacement.Between" Text="Between" />
+                        <RadzenSelectBarItem Value="TickPlacement.On" Text="On" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
     <RadzenRow>
@@ -44,13 +53,14 @@
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" />
+                <RadzenCategoryAxis TickPlacement="@tickPlacement" />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
                 </RadzenValueAxis>
             </RadzenChart>
         </RadzenColumn>
-        
+
         <RadzenColumn Size="12">
             <h4>Custom size column series</h4>
             <RadzenChart Animate="true">
@@ -93,6 +103,7 @@
     bool showDataLabels = false;
     DataLabelPosition labelPosition = DataLabelPosition.Auto;
     FillMode fillMode = FillMode.Gradient;
+    TickPlacement tickPlacement = TickPlacement.Between;
 
     class DataItem
     {

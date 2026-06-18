@@ -646,6 +646,15 @@ namespace Radzen.Blazor
                 CategoryScale.Padding = CategoryAxis.Padding;
             }
 
+            // The ordinal (category) scale is the CategoryScale normally, but bar-family series and
+            // bullet swap the axes so it becomes the ValueScale. Apply the placement to whichever it is,
+            // for both orientations.
+            var ordinalScale = (CategoryScale as OrdinalScale) ?? (ValueScale as OrdinalScale);
+            if (ordinalScale != null)
+            {
+                ordinalScale.Placement = CategoryAxis.TickPlacement;
+            }
+
             CategoryScale.Resize(xAxis.Min!, xAxis.Max!);
 
             if (xAxis.Step != null)
