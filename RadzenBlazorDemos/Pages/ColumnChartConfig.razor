@@ -40,6 +40,14 @@
                     </Items>
                 </RadzenSelectBar>
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Max Width" Component="maxWidth" />
+                <RadzenNumeric @bind-Value="@maxWidth" Min="0" Max="200" Step="10" Style="width: 90px" Name="maxWidth" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Category Gap" Component="categoryGap" />
+                <RadzenNumeric @bind-Value="@categoryGap" Min="0" Max="0.9m" Step="0.1" Style="width: 90px" Name="categoryGap" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
     <RadzenRow>
@@ -52,7 +60,7 @@
                 <RadzenColumnSeries FillMode="@fillMode" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
-                <RadzenColumnOptions Radius="5" />
+                <RadzenColumnOptions Radius="5" MaxWidth="@(maxWidth > 0 ? maxWidth : null)" CategoryGap="@(categoryGap > 0 ? categoryGap : null)" />
                 <RadzenCategoryAxis TickPlacement="@tickPlacement" />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
@@ -104,6 +112,8 @@
     DataLabelPosition labelPosition = DataLabelPosition.Auto;
     FillMode fillMode = FillMode.Gradient;
     TickPlacement tickPlacement = TickPlacement.Between;
+    double maxWidth = 0;
+    double categoryGap = 0;
 
     class DataItem
     {

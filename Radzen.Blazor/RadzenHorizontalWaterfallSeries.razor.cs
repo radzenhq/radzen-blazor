@@ -216,6 +216,12 @@ namespace Radzen.Blazor
                     return barOptions.Height.Value * barSeries.Count;
                 }
 
+                if (barOptions?.CategoryGap is double gap)
+                {
+                    var step = System.Math.Abs(chart.ValueScale.Scale(1, true) - chart.ValueScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
+
                 var availableHeight = chart.ValueScale.OutputSize;
                 var bands = barSeries.Cast<IChartBarSeries>().Max(s => s.Count) + 2;
                 return availableHeight / bands;
@@ -288,8 +294,8 @@ namespace Radzen.Blazor
 
             var padding = chart.BarOptions?.Margin ?? 0;
             var bandHeight = BandHeight;
-            var height = bandHeight / barSeries.Count - padding + padding / barSeries.Count;
-            var y = category(item) - bandHeight / 2 + seriesIndex * height + seriesIndex * padding;
+            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
+            var y = category(item) - groupHeight / 2 + seriesIndex * (height + padding);
 
             return y + height / 2;
         }
@@ -319,7 +325,7 @@ namespace Radzen.Blazor
 
             var padding = chart.BarOptions?.Margin ?? 0;
             var bandHeight = BandHeight;
-            var height = bandHeight / barSeries.Count - padding + padding / barSeries.Count;
+            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
 
             var wfItems = ComputeWaterfallItems();
 
@@ -328,7 +334,7 @@ namespace Radzen.Blazor
                 var data = Items[i];
                 var wf = wfItems[i];
 
-                var startY = category(data) - bandHeight / 2 + seriesIndex * height + seriesIndex * padding;
+                var startY = category(data) - groupHeight / 2 + seriesIndex * (height + padding);
                 var endY = startY + height;
                 var x1 = chart.CategoryScale.Scale(wf.Start, true);
                 var x2 = chart.CategoryScale.Scale(wf.End, true);

@@ -24,7 +24,7 @@
         var padding = chart.ColumnOptions.Margin;
 
         var bandWidth = BandWidth;
-        var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();;
+        var (width, groupWidth) = BandLayout.Resolve(bandWidth, columnSeries.Count(), padding, chart.ColumnOptions.EffectiveMaxWidth);
         var className = $"rz-column-series rz-series-{chart.Series.IndexOf(this)}";
 
         var groupStyle = $"--rz-zero-y: {y0.ToInvariantString()}px";
@@ -34,7 +34,7 @@
         @<g class="@className" style="@groupStyle">
             @foreach(var data in Items)
             {
-                var x = category(data) - bandWidth / 2 + index * width + index * padding;
+                var x = category(data) - groupWidth / 2 + index * (width + padding);
                 var y = value(data);
                 var itemValue = Value(data);
                 var radius = chart.ColumnOptions.Radius;

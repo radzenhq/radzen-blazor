@@ -181,6 +181,11 @@ namespace Radzen.Blazor
                 {
                     return barOptions.Height.Value * barSeries.Count;
                 }
+                else if (barOptions?.CategoryGap is double gap)
+                {
+                    var step = Math.Abs(chart.ValueScale.Scale(1, true) - chart.ValueScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
                 else
                 {
                     var availableHeight = chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
@@ -267,11 +272,11 @@ namespace Radzen.Blazor
 
             var padding = chart.BarOptions?.Margin ?? 0;
             var bandHeight = BandHeight;
-            var height = barSeries.Count > 0 ? bandHeight / barSeries.Count - padding + padding / barSeries.Count : 0;
+            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
 
             foreach (var data in Items)
             {
-                var startY = category(data) - bandHeight / 2 + index * height + index * padding;
+                var startY = category(data) - groupHeight / 2 + index * (height + padding);
                 var endY = startY + height;
                 var dataX = value(data);
                 var startX = Math.Min(dataX, x0);
@@ -305,8 +310,8 @@ namespace Radzen.Blazor
 
             var padding = chart.BarOptions?.Margin ?? 0;
             var bandHeight = BandHeight;
-            var height = barSeries.Count > 0 ? bandHeight / barSeries.Count - padding + padding / barSeries.Count : 0;
-            var y = category(item) - bandHeight / 2 + index * height + index * padding;
+            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
+            var y = category(item) - groupHeight / 2 + index * (height + padding);
 
             return y + height / 2;
         }

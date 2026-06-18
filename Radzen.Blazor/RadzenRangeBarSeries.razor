@@ -26,7 +26,7 @@
         var barOptions = chart.BarOptions;
         var padding = barOptions?.Margin ?? 0;
         var bandHeight = BandHeight;
-        var height = bandHeight / barSeries.Count - padding + padding / barSeries.Count;
+        var (height, groupHeight) = BandLayout.Resolve(bandHeight, barSeries.Count, padding, barOptions?.EffectiveMaxHeight);
         var className = $"rz-range-bar-series rz-series-{chart.Series.IndexOf(this)}";
         var radius = barOptions?.Radius ?? 0;
 
@@ -40,7 +40,7 @@
         @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
             {
-                var cy = category(data) - bandHeight / 2 + index * height + index * padding;
+                var cy = category(data) - groupHeight / 2 + index * (height + padding);
                 var minX = categoryScale.Scale(min(data), true);
                 var maxX = categoryScale.Scale(max(data), true);
 

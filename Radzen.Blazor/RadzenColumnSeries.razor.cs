@@ -191,6 +191,11 @@ namespace Radzen.Blazor
                 {
                     return chart.ColumnOptions.Width.Value * columnSeries.Count + chart.ColumnOptions.Margin * (columnSeries.Count - 1);
                 }
+                else if (chart.ColumnOptions.CategoryGap is double gap)
+                {
+                    var step = System.Math.Abs(chart.CategoryScale.Scale(1, true) - chart.CategoryScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
                 else
                 {
                     var availableWidth = chart.CategoryScale.OutputSize - (chart.CategoryAxis.Padding * 2);
@@ -214,9 +219,9 @@ namespace Radzen.Blazor
             var index = columnSeries.IndexOf(this);
             var padding = chart.ColumnOptions.Margin;
             var bandWidth = BandWidth;
-            var width = bandWidth / columnSeries.Count - padding + padding / columnSeries.Count;
+            var (width, groupWidth) = Rendering.BandLayout.Resolve(bandWidth, columnSeries.Count, padding, chart.ColumnOptions.EffectiveMaxWidth);
             var category = ComposeCategory(chart.CategoryScale);
-            var x = category(item) - bandWidth / 2 + index * width + index * padding;
+            var x = category(item) - groupWidth / 2 + index * (width + padding);
 
             return x + width / 2;
         }
@@ -242,11 +247,11 @@ namespace Radzen.Blazor
             var index = columnSeries.IndexOf(this);
             var padding = chart.ColumnOptions.Margin;
             var bandWidth = BandWidth;
-            var width = chart.ColumnOptions.Width ?? bandWidth / columnSeries.Count - padding + padding / columnSeries.Count;
+            var (width, groupWidth) = Rendering.BandLayout.Resolve(bandWidth, columnSeries.Count, padding, chart.ColumnOptions.EffectiveMaxWidth);
 
             foreach (var data in Items)
             {
-                var startX = category(data) - bandWidth / 2 + index * width + index * padding;
+                var startX = category(data) - groupWidth / 2 + index * (width + padding);
                 var endX = startX + width;
                 var dataY = value(data);
                 var startY = Math.Min(dataY, y0);

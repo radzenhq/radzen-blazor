@@ -20,7 +20,7 @@
         var seriesIndex = columnSeries.IndexOf(this);
         var padding = chart.ColumnOptions.Margin;
         var bandWidth = BandWidth;
-        var width = bandWidth / columnSeries.Count - padding + padding / columnSeries.Count;
+        var (width, groupWidth) = BandLayout.Resolve(bandWidth, columnSeries.Count, padding, chart.ColumnOptions.EffectiveMaxWidth);
         var className = $"rz-waterfall-series rz-series-{chart.Series.IndexOf(this)}";
         var radius = chart.ColumnOptions.Radius;
 
@@ -33,7 +33,7 @@
                 var data = Items[i];
                 var wf = wfItems[i];
 
-                var x = category(data) - bandWidth / 2 + seriesIndex * width + seriesIndex * padding;
+                var x = category(data) - groupWidth / 2 + seriesIndex * (width + padding);
                 var y1 = valueScale.Scale(wf.Start, true);
                 var y2 = valueScale.Scale(wf.End, true);
 

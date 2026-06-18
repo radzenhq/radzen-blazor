@@ -172,6 +172,11 @@ namespace Radzen.Blazor
                 {
                     return Chart.BarOptions.Height.Value * barSeries.Count;
                 }
+                else if (Chart?.BarOptions?.CategoryGap is double gap)
+                {
+                    var step = System.Math.Abs(Chart.ValueScale.Scale(1, true) - Chart.ValueScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
                 else if (Chart != null)
                 {
                     var availableHeight = Chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
@@ -183,7 +188,20 @@ namespace Radzen.Blazor
             }
         }
 
-        double BarHeight => Chart?.BarOptions?.Height ?? (Chart != null ? BandHeight - Chart.BarOptions.Margin : 0);
+        double BarHeight
+        {
+            get
+            {
+                if (Chart == null)
+                {
+                    return 0;
+                }
+
+                var h = Chart.BarOptions.Height ?? (BandHeight - Chart.BarOptions.Margin);
+                var max = Chart.BarOptions.EffectiveMaxHeight;
+                return max is double m && h > m ? m : h;
+            }
+        }
 
         int BarIndex => VisibleBarSeries.IndexOf(this);
 

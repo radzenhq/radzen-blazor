@@ -187,6 +187,11 @@ namespace Radzen.Blazor
                 {
                     return Chart.ColumnOptions.Width.Value * columnSeries.Count + Chart.ColumnOptions.Margin * (columnSeries.Count - 1);
                 }
+                else if (Chart?.ColumnOptions?.CategoryGap is double gap)
+                {
+                    var step = System.Math.Abs(Chart.CategoryScale.Scale(1, true) - Chart.CategoryScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
                 else if (Chart != null)
                 {
                     var availableWidth = Chart.CategoryScale.OutputSize - (Chart.CategoryAxis.Padding * 2);
@@ -204,7 +209,20 @@ namespace Radzen.Blazor
             return DataAt(x, y).Item1 != null;
         }
 
-        double ColumnWidth => Chart?.ColumnOptions?.Width ?? (Chart != null ? BandWidth - Chart.ColumnOptions.Margin : 0);
+        double ColumnWidth
+        {
+            get
+            {
+                if (Chart == null)
+                {
+                    return 0;
+                }
+
+                var w = Chart.ColumnOptions.Width ?? (BandWidth - Chart.ColumnOptions.Margin);
+                var max = Chart.ColumnOptions.EffectiveMaxWidth;
+                return max is double m && w > m ? m : w;
+            }
+        }
 
         private double GetColumnLeft(TItem item, Func<TItem, double>? category = null)
         {

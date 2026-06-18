@@ -28,7 +28,7 @@
         var barOptions = chart.BarOptions;
         var padding = barOptions?.Margin ?? 0;
         var bandHeight = BandHeight;
-        var height = bandHeight / barSeries.Count - padding + padding / barSeries.Count;
+        var (height, groupHeight) = BandLayout.Resolve(bandHeight, barSeries.Count, padding, barOptions?.EffectiveMaxHeight);
         var className = $"rz-horizontal-waterfall-series rz-series-{chart.Series.IndexOf(this)}";
         var radius = barOptions?.Radius ?? 0;
 
@@ -41,7 +41,7 @@
                 var data = Items[i];
                 var wf = wfItems[i];
 
-                var cy = category(data) - bandHeight / 2 + seriesIndex * height + seriesIndex * padding;
+                var cy = category(data) - groupHeight / 2 + seriesIndex * (height + padding);
                 var x1 = categoryScale.Scale(wf.Start, true);
                 var x2 = categoryScale.Scale(wf.End, true);
 
