@@ -1,3 +1,4 @@
+@use 'sass:list';
 $chart-axis-color: var(--rz-base-300) !default;
 $chart-grid-line-color: color-mix(in srgb, var(--rz-chart-axis-color) 50%, transparent) !default;
 $chart-area-opacity: 0.6 !default;
@@ -393,7 +394,7 @@ $chart-color-schemes: (
 
 @each $scheme, $colors in $chart-color-schemes {
   @each $color in $colors {
-    $index: index($colors, $color);
+    $index: list.index($colors, $color);
     .rz-scheme-#{$scheme} {
       .rz-series-#{$index - 1} {
         --rz-series-color: #{$color};

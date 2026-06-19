@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'variables';
 @import 'mixins';
 $base: true;
@@ -56,35 +57,35 @@ $rz-base-lighter: #ffffff !default;
 $rz-base-dark: #466791 !default;
 $rz-base-darker: #2b3a50 !default;
 
-$rz-primary-light: mix($rz-white, $rz-primary, 12%)!default;
+$rz-primary-light: color.mix($rz-white, $rz-primary, 12%)!default;
 $rz-primary-lighter: rgba($rz-primary, .16) !default;
-$rz-primary-dark: mix($rz-black, $rz-primary, 8%) !default;
-$rz-primary-darker: mix($rz-black, $rz-primary, 25%) !default;
+$rz-primary-dark: color.mix($rz-black, $rz-primary, 8%) !default;
+$rz-primary-darker: color.mix($rz-black, $rz-primary, 25%) !default;
 
-$rz-secondary-light: mix($rz-white, $rz-secondary, 12%) !default;
+$rz-secondary-light: color.mix($rz-white, $rz-secondary, 12%) !default;
 $rz-secondary-lighter: rgba($rz-secondary, .20) !default;
-$rz-secondary-dark: mix($rz-black, $rz-secondary, 8%) !default;
-$rz-secondary-darker: mix($rz-black, $rz-secondary, 25%) !default;
+$rz-secondary-dark: color.mix($rz-black, $rz-secondary, 8%) !default;
+$rz-secondary-darker: color.mix($rz-black, $rz-secondary, 25%) !default;
 
-$rz-info-light: mix($rz-white, $rz-info, 16%) !default;
+$rz-info-light: color.mix($rz-white, $rz-info, 16%) !default;
 $rz-info-lighter: rgba($rz-info, .20) !default;
-$rz-info-dark: mix($rz-black, $rz-info, 16%) !default;
-$rz-info-darker: mix($rz-black, $rz-info, 25%) !default;
+$rz-info-dark: color.mix($rz-black, $rz-info, 16%) !default;
+$rz-info-darker: color.mix($rz-black, $rz-info, 25%) !default;
 
-$rz-success-light: mix($rz-white, $rz-success, 16%) !default;
+$rz-success-light: color.mix($rz-white, $rz-success, 16%) !default;
 $rz-success-lighter: rgba($rz-success, .16) !default;
-$rz-success-dark: mix($rz-black, $rz-success, 16%) !default;
-$rz-success-darker: mix($rz-black, $rz-success, 25%) !default;
+$rz-success-dark: color.mix($rz-black, $rz-success, 16%) !default;
+$rz-success-darker: color.mix($rz-black, $rz-success, 25%) !default;
 
-$rz-warning-light: mix($rz-white, $rz-warning, 16%) !default;
+$rz-warning-light: color.mix($rz-white, $rz-warning, 16%) !default;
 $rz-warning-lighter: rgba($rz-warning, .20) !default;
-$rz-warning-dark: mix($rz-black, $rz-warning, 16%) !default;
-$rz-warning-darker: mix($rz-black, $rz-warning, 25%) !default;
+$rz-warning-dark: color.mix($rz-black, $rz-warning, 16%) !default;
+$rz-warning-darker: color.mix($rz-black, $rz-warning, 25%) !default;
 
-$rz-danger-light: mix($rz-white, $rz-danger, 16%) !default;
+$rz-danger-light: color.mix($rz-white, $rz-danger, 16%) !default;
 $rz-danger-lighter: rgba($rz-danger, .20) !default;
-$rz-danger-dark: mix($rz-black, $rz-danger, 16%) !default;
-$rz-danger-darker: mix($rz-black, $rz-danger, 25%) !default;
+$rz-danger-dark: color.mix($rz-black, $rz-danger, 16%) !default;
+$rz-danger-darker: color.mix($rz-black, $rz-danger, 25%) !default;
 
 // Theme Constants
 

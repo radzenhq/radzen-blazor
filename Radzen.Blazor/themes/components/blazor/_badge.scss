@@ -1,3 +1,4 @@
+@use 'sass:map';
 $badge-border-radius: var(--rz-border-radius) !default;
 $badge-pill-border-radius: calc(4 * var(--rz-border-radius)) !default;
 $badge-padding: 0.125rem 0.25rem !default;
@@ -27,7 +28,7 @@ $badge-letter-spacing: 0.02rem !default;
     }
 }
 
-@each $style, $badge in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $badge in map.merge($severity-styles-map, $base-styles-map) {
   .rz-badge-#{$style} {
     @each $name, $value in $badge {
       @if $style == 'dark' {
@@ -44,7 +45,7 @@ $badge-letter-spacing: 0.02rem !default;
   }
 }
 
-@each $style, $badge in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $badge in map.merge($severity-styles-map, $base-styles-map) {
   .rz-variant-outlined.rz-badge-#{$style} {
     @each $name, $value in $badge {
       @if $name == 'background-color' {
@@ -86,7 +87,7 @@ $badge-letter-spacing: 0.02rem !default;
   }
 }
 
-@each $style, $badge in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $badge in map.merge($severity-styles-map, $base-styles-map) {
   .rz-variant-text.rz-badge-#{$style} {
     @each $name, $value in $badge {
       @if $name == 'background-color' {

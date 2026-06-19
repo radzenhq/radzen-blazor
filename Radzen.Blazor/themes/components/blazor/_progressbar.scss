@@ -1,3 +1,4 @@
+@use 'sass:map';
 $progressbar-value: 100% !default;
 $progressbar-background-color: var(--rz-base-200) !default;
 $progressbar-color: var(--rz-text-color) !default;
@@ -11,7 +12,7 @@ $progressbar-circular-value-stroke-width: 3px !default;
 $progressbar-circular-value-endpoint: round !default;
 
 $progressbar-base-styles: () !default;
-$progressbar-base-styles: map-merge(
+$progressbar-base-styles: map.merge(
   (
     base: (
       background-color: var(--rz-base-600),
@@ -30,7 +31,7 @@ $progressbar-base-styles: map-merge(
 );
 
 $progressbar-circular-sizes: () !default;
-$progressbar-circular-sizes: map-merge(
+$progressbar-circular-sizes: map.merge(
   (
     lg: (
       size: 6rem,
@@ -252,18 +253,18 @@ $progressbar-circular-sizes: map-merge(
   }
 }
 
-@each $style, $progressbar in map-merge($severity-styles-map, $progressbar-base-styles) {
+@each $style, $progressbar in map.merge($severity-styles-map, $progressbar-base-styles) {
   .rz-progressbar.rz-progressbar-#{$style} {
-    color: map-get($progressbar, color);
+    color: map.get($progressbar, color);
   }
   
   .rz-progressbar-determinate.rz-progressbar-#{$style} {
     .rz-progressbar-value {
-      background-color: map-get($progressbar, background-color);
+      background-color: map.get($progressbar, background-color);
     }
 
     .rz-progressbar-circular-value {
-      stroke: map-get($progressbar, background-color);
+      stroke: map.get($progressbar, background-color);
     }
   }
 
@@ -271,24 +272,24 @@ $progressbar-circular-sizes: map-merge(
     .rz-progressbar-value {
 
       &:before {
-        background-color: map-get($progressbar, background-color);
+        background-color: map.get($progressbar, background-color);
       }
 
       &:after {
-        background-color: map-get($progressbar, background-color);
+        background-color: map.get($progressbar, background-color);
       }
     }
 
     .rz-progressbar-circular-value {
-      stroke: map-get($progressbar, background-color);
+      stroke: map.get($progressbar, background-color);
     }
   }
 }
 
 @each $size, $progressbar-circular in $progressbar-circular-sizes {
   .rz-progressbar-circular-#{$size} {
-    width: map-get($progressbar-circular, size);
-    height: map-get($progressbar-circular, size);
-    font-size: map-get($progressbar-circular, font-size);
+    width: map.get($progressbar-circular, size);
+    height: map.get($progressbar-circular, size);
+    font-size: map.get($progressbar-circular, font-size);
   }
 }

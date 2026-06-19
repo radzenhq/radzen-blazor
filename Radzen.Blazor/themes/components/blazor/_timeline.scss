@@ -1,3 +1,4 @@
+@use 'sass:map';
 $rz-timeline-item-padding: 0.5rem !default;
 $rz-timeline-axis-size: 4rem !default;
 $rz-timeline-point-size: 1rem !default;
@@ -13,7 +14,7 @@ $rz-timeline-line-start-offset: calc(var(--rz-timeline-item-padding) + (var(--rz
 $rz-timeline-line-end-offset: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
 
 $timeline-point-sizes: () !default;
-$timeline-point-sizes: map-merge(
+$timeline-point-sizes: map.merge(
   (
     lg: (
       size: 3rem,
@@ -409,29 +410,29 @@ $timeline-point-sizes: map-merge(
   border: 0;
 }
 
-@each $style, $rule in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $rule in map.merge($severity-styles-map, $base-styles-map) {
   .rz-timeline-point-#{$style} {
-    background-color: map-get($rule, background-color);
-    color: map-get($rule, color);
+    background-color: map.get($rule, background-color);
+    color: map.get($rule, color);
   }
 
   .rz-timeline-point-outlined.rz-timeline-point-#{$style} {
     background-color: var(--rz-base-background-color);
-    color: map-get($rule, background-color);
-    border-color: map-get($rule, background-color);
+    color: map.get($rule, background-color);
+    border-color: map.get($rule, background-color);
   }
   .rz-timeline-point-text.rz-timeline-point-#{$style} {
     background-color: var(--rz-base-background-color);
-    color: map-get($rule, background-color);
+    color: map.get($rule, background-color);
   }
 }
 
 @each $size, $timeline-point in $timeline-point-sizes {
   .rz-timeline-axis-#{$size} {
-    --rz-timeline-point-size: #{map-get($timeline-point, size)};
+    --rz-timeline-point-size: #{map.get($timeline-point, size)};
 
     .rz-timeline-point .rzi {
-      font-size: map-get($timeline-point, font-size);
+      font-size: map.get($timeline-point, font-size);
     }
   }
 }
