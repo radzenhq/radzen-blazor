@@ -1994,77 +1994,73 @@ window.Radzen = {
         if (disableSmartPosition !== true) {
             top = parentRect.top - rect.height;
         }
-
-      if (position) {
-        top = top - 40;
-        var tooltipContent = popup.children[0];
-        var tooltipContentClassName = 'rz-' + position + '-tooltip-content';
-        if (tooltipContent.classList.contains(tooltipContentClassName)) {
-          tooltipContent.classList.remove(tooltipContentClassName);
-          tooltipContent.classList.add('rz-top-tooltip-content');
-            position = 'top';
-            if (instance && callback) {
-                try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
-            }
-        }
-      }
     }
 
     if (smartPosition && left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
-      left = !position ? window.innerWidth - rect.width : rect.left;
-
-      if (position) {
-        top = y || parentRect.top;
-        var tooltipContent = popup.children[0];
-        var tooltipContentClassName = 'rz-' + position + '-tooltip-content';
-        if (tooltipContent.classList.contains(tooltipContentClassName)) {
-          tooltipContent.classList.remove(tooltipContentClassName);
-          tooltipContent.classList.add('rz-left-tooltip-content');
-          position = 'left';
-          if (instance && callback) {
-              try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
-          }
-        }
-      }
+      left = window.innerWidth - rect.width;
     }
 
     if (smartPosition && isRTL && left < 0 && window.innerWidth > rect.width) {
-      left = !position ? 0 : rect.left;
+      left = 0;
+    }
 
-      if (position) {
-        top = y || parentRect.top;
-        var tooltipContent = popup.children[0];
-        var tooltipContentClassName = 'rz-' + position + '-tooltip-content';
-        if (tooltipContent.classList.contains(tooltipContentClassName)) {
-          tooltipContent.classList.remove(tooltipContentClassName);
-          tooltipContent.classList.add('rz-right-tooltip-content');
-          position = 'right';
-          if (instance && callback) {
-              try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
-          }
+    if (position && !(disableSmartPosition === true && x != null && y != null)) {
+      var tooltipPlacement = function (side) {
+        switch (side) {
+          case 'left':  return { left: parentRect.left - rect.width - 5, top: parentRect.top };
+          case 'right': return { left: parentRect.right + 10, top: parentRect.top };
+          case 'top':   return { left: isRTL ? parentRect.right - rect.width : parentRect.left, top: parentRect.top - rect.height + 5 };
+          default:      return { left: isRTL ? parentRect.right - rect.width : parentRect.left, top: parentRect.bottom + 20 };
+        }
+      };
+
+      var tooltipFits = function (p) {
+        return p.left >= 0 && p.top >= 0 &&
+               p.left + rect.width <= window.innerWidth &&
+               p.top + rect.height <= window.innerHeight;
+      };
+
+      var fallbackOrder = {
+        left: ['left', 'right', 'top', 'bottom'],
+        right: ['right', 'left', 'top', 'bottom'],
+        top: ['top', 'bottom', 'right', 'left'],
+        bottom: ['bottom', 'top', 'right', 'left']
+      }[position] || [position];
+
+      var resolvedPosition = null;
+      var placement = null;
+
+      for (var pi = 0; pi < fallbackOrder.length; pi++) {
+        var candidate = tooltipPlacement(fallbackOrder[pi]);
+        if (tooltipFits(candidate)) {
+          resolvedPosition = fallbackOrder[pi];
+          placement = candidate;
+          break;
         }
       }
-    }
 
-    if (smartPosition) {
-      if (position) {
-        top = top + 20;
+      if (!placement) {
+        resolvedPosition = position;
+        placement = tooltipPlacement(position);
+        placement.left = Math.max(0, Math.min(placement.left, window.innerWidth - rect.width));
+        placement.top = Math.max(0, Math.min(placement.top, window.innerHeight - rect.height));
       }
-    }
 
-    if (position == 'left') {
-      left = parentRect.left - rect.width - 5;
-      top =  parentRect.top;
-    }
+      left = placement.left;
+      top = placement.top;
 
-    if (position == 'right') {
-      left = parentRect.right + 10;
-      top = parentRect.top;
-    }
-
-    if (position == 'top') {
-      top = parentRect.top - rect.height + 5;
-      left = isRTL ? parentRect.right - rect.width : parentRect.left;
+      if (resolvedPosition != position) {
+        var tooltipContent = popup.children[0];
+        var previousClassName = 'rz-' + position + '-tooltip-content';
+        if (tooltipContent && tooltipContent.classList.contains(previousClassName)) {
+          tooltipContent.classList.remove(previousClassName);
+          tooltipContent.classList.add('rz-' + resolvedPosition + '-tooltip-content');
+        }
+        position = resolvedPosition;
+        if (instance && callback) {
+          try { suppressDisposed(instance.invokeMethodAsync(callback, position)); } catch { }
+        }
+      }
     }
 
     if (disableSmartPosition && x != null && y != null) {
