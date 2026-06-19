@@ -90,12 +90,16 @@ $chart-color-schemes: (
 }
 
 .rz-chart-axis-crosshair-label {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
   rect {
-    fill: var(--rz-chart-tooltip-background);
+    fill: var(--rz-on-base);
+    rx: var(--rz-border-radius);
+    ry: var(--rz-border-radius);
   }
   text {
-    fill: var(--rz-chart-tooltip-color);
-    font-size: var(--rz-chart-tooltip-font-size);
+    fill: var(--rz-base);
+    font-size: 12px;
+    font-weight: bold;
     dominant-baseline: central;
   }
 }

@@ -2008,10 +2008,9 @@ namespace Radzen.Blazor
             string text, double anchorX, double anchorY, AxisCrosshairLabelPlacement placement)
         {
             var paddingX = 6.0;
-            var charWidth = 6.5;
-            var textWidth = (text?.Length ?? 0) * charWidth;
+            var textWidth = Rendering.TextMeasurer.TextWidth(text ?? string.Empty, 12.5);
             var boxWidth = textWidth + paddingX * 2;
-            var boxHeight = 16.0;
+            var boxHeight = 20.0;
 
             double rectX, rectY, textX, textY;
             switch (placement)
@@ -2026,7 +2025,7 @@ namespace Radzen.Blazor
                 default:
                     rectX = -boxWidth - 4;
                     rectY = anchorY - boxHeight / 2;
-                    textX = rectX + boxWidth - paddingX;
+                    textX = rectX + boxWidth / 2;
                     textY = rectY + boxHeight / 2;
                     break;
             }
@@ -2048,8 +2047,9 @@ namespace Radzen.Blazor
             builder.OpenElement(10, "text");
             builder.AddAttribute(11, "x", textX.ToInvariantString());
             builder.AddAttribute(12, "y", textY.ToInvariantString());
-            builder.AddAttribute(13, "text-anchor", placement == AxisCrosshairLabelPlacement.Bottom ? "middle" : "end");
-            builder.AddContent(14, text);
+            builder.AddAttribute(13, "text-anchor", "middle");
+            builder.AddAttribute(14, "dy", "-0.0125em");
+            builder.AddContent(15, text);
             builder.CloseElement();
 
             builder.CloseElement();
