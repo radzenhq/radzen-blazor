@@ -33,6 +33,31 @@ namespace Radzen.Blazor
         public double StrokeWidth { get; set; }
 
         /// <summary>
+        /// Specifies how the segments are filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a horizontal fade across each segment, or
+        /// <see cref="FillMode.None"/> to render only the outline.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Solid;
+
+        /// <summary>
+        /// Specifies the opacity at the start (left) edge of the gradient fill. Used when
+        /// <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient start opacity. Default is <c>0.55</c>.</value>
+        [Parameter]
+        public double GradientStartOpacity { get; set; } = 0.55;
+
+        /// <summary>
+        /// Specifies the opacity at the end (right) edge of the gradient fill. Used when
+        /// <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient end opacity. Default is <c>1</c>.</value>
+        [Parameter]
+        public double GradientEndOpacity { get; set; } = 1;
+
+        /// <summary>
         /// Gets or sets a value indicating whether to show labels on each segment.
         /// </summary>
         [Parameter]

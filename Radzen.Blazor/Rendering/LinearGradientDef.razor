@@ -1,0 +1,33 @@
+@using Radzen.Blazor.Rendering
+<defs>
+    <linearGradient id="@Id" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" style="@($"stop-color: {Color}; stop-opacity: {StartOpacity.ToInvariantString()}")"></stop>
+        <stop offset="1" style="@($"stop-color: {Color}; stop-opacity: {EndOpacity.ToInvariantString()}")"></stop>
+    </linearGradient>
+</defs>
+@code {
+    /// <summary>
+    /// The id of the gradient, referenced by the shape via <c>fill: url(#id)</c>.
+    /// </summary>
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The gradient color, used by both stops (only the opacity varies). May be a literal color or a
+    /// CSS variable such as <c>var(--rz-series-color)</c>, resolved against the element this renders inside.
+    /// </summary>
+    [Parameter]
+    public string Color { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The opacity at the start (left) edge of the gradient.
+    /// </summary>
+    [Parameter]
+    public double StartOpacity { get; set; } = 1.0;
+
+    /// <summary>
+    /// The opacity at the end (right) edge of the gradient.
+    /// </summary>
+    [Parameter]
+    public double EndOpacity { get; set; } = 1.0;
+}
