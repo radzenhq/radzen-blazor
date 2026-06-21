@@ -125,6 +125,14 @@ namespace Radzen.Blazor
         private bool currentUserIsTyping;
         private CancellationTokenSource? typingCts;
 
+        // Mention-related fields
+        private List<MentionUserContext> mentionSearchResults = new();
+        private bool isMentionPopupOpen;
+        private string mentionSearchText = string.Empty;
+        private int selectedMentionIndex = -1;
+        private int mentionStartPosition = -1;
+        private CancellationTokenSource? mentionSearchCts;
+
         /// <summary>
         /// Gets or sets the message template.
         /// </summary>
@@ -354,6 +362,65 @@ namespace Radzen.Blazor
         public EventCallback<ChatUser> UserRemoved { get; set; }
 
         /// <summary>
+        /// Gets or sets the character that triggers the mention search popup (e.g., '@'). When null, mention feature is disabled.
+        /// </summary>
+        [Parameter]
+        public char? MentionCharacter { get; set; }
+
+        /// <summary>
+        /// Event callback that is invoked when a mention search is triggered.
+        /// The callback receives a <see cref="MentionSearchArgs"/> with the search filter and pagination info.
+        /// The app should populate the search results which will be displayed in the mention popup.
+        /// </summary>
+        [Parameter]
+        public EventCallback<MentionSearchArgs> MentionSearch { get; set; }
+
+        /// <summary>
+        /// Gets or sets the template for rendering individual items in the mention search popup.
+        /// Receives a <see cref="MentionUserContext"/> containing the user ID, name, and chat status.
+        /// </summary>
+        [Parameter]
+        public RenderFragment<MentionUserContext>? MentionItemTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the template for rendering a stored mention in the chat message.
+        /// Receives the user ID string (from @[userid] format) and should render how the mention is displayed (e.g., as a badge).
+        /// </summary>
+        [Parameter]
+        public RenderFragment<string>? MentionDisplayTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of mention search results to display in the popup. Defaults to 10.
+        /// </summary>
+        [Parameter]
+        public int MentionMaxResults { get; set; } = 10;
+
+        /// <summary>
+        /// Gets or sets the event callback that stores mention search results from the MentionSearch callback.
+        /// </summary>
+        [Parameter]
+        public EventCallback<IEnumerable<MentionUserContext>> MentionSearchResultsChanged { get; set; }
+
+        /// <summary>
+        /// Updates the mention search results and refreshes the popup.
+        /// Call this from within your MentionSearch event callback handler.
+        /// </summary>
+        /// <param name="results">The search results to display.</param>
+        public async Task SetMentionSearchResults(IEnumerable<MentionUserContext>? results)
+        {
+            mentionSearchResults = results?.ToList() ?? new();
+            selectedMentionIndex = mentionSearchResults.Count > 0 ? 0 : -1;
+            isMentionPopupOpen = mentionSearchResults.Count > 0;
+
+            if (MentionSearchResultsChanged.HasDelegate)
+            {
+                await MentionSearchResultsChanged.InvokeAsync(mentionSearchResults);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
         /// Gets the current list of messages.
         /// </summary>
         public IReadOnlyList<ChatMessage> GetMessages() => Messages.ToList().AsReadOnly();
@@ -559,6 +626,7 @@ namespace Radzen.Blazor
         {
             CurrentInput = e.Value?.ToString() ?? "";
             await NotifyCurrentUserTyping();
+            await DetectMentionTrigger(CurrentInput);
             await InvokeAsync(StateHasChanged);
         }
 
@@ -627,6 +695,41 @@ namespace Radzen.Blazor
 
         private async Task OnKeyDown(KeyboardEventArgs e)
         {
+            // Handle mention popup navigation
+            if (isMentionPopupOpen && MentionCharacter.HasValue)
+            {
+                if (e.Key == "ArrowDown")
+                {
+                    selectedMentionIndex = Math.Min(selectedMentionIndex + 1, mentionSearchResults.Count - 1);
+                    preventDefault = true;
+                    await InvokeAsync(StateHasChanged);
+                    return;
+                }
+                else if (e.Key == "ArrowUp")
+                {
+                    selectedMentionIndex = Math.Max(selectedMentionIndex - 1, 0);
+                    preventDefault = true;
+                    await InvokeAsync(StateHasChanged);
+                    return;
+                }
+                else if (e.Key == "Enter")
+                {
+                    if (selectedMentionIndex >= 0 && selectedMentionIndex < mentionSearchResults.Count)
+                    {
+                        await InsertMention(mentionSearchResults[selectedMentionIndex]);
+                        preventDefault = true;
+                        return;
+                    }
+                }
+                else if (e.Key == "Escape")
+                {
+                    await CloseMentionPopup();
+                    preventDefault = true;
+                    return;
+                }
+            }
+
+            // Handle normal message sending
             if (e.Key == "Enter" && !e.ShiftKey && JSRuntime != null)
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", inputElement, "");
@@ -643,6 +746,204 @@ namespace Radzen.Blazor
             {
                 await SendMessage(CurrentInput);
             }
+        }
+
+        private async Task DetectMentionTrigger(string input)
+        {
+            if (!MentionCharacter.HasValue || MentionSearch.HasDelegate == false)
+            {
+                return;
+            }
+
+            var char_code = MentionCharacter.Value;
+            var trimmedInput = input.TrimEnd();
+
+            // Check if mention character appears at the start or after whitespace
+            int mentionPos = -1;
+            
+            for (int i = trimmedInput.Length - 1; i >= 0; i--)
+            {
+                if (trimmedInput[i] == char_code)
+                {
+                    // Check if it's at the start or after whitespace
+                    if (i == 0 || char.IsWhiteSpace(trimmedInput[i - 1]))
+                    {
+                        mentionPos = i;
+                    }
+                    break;
+                }
+                else if (char.IsWhiteSpace(trimmedInput[i]))
+                {
+                    break;
+                }
+            }
+
+            if (mentionPos >= 0)
+            {
+                // Extract search text after the mention character
+                var searchText = trimmedInput.Substring(mentionPos + 1);
+                
+                // Check if this is a continuous mention (no spaces in search text)
+                if (!searchText.Contains(' ', StringComparison.Ordinal))
+                {
+                    mentionSearchText = searchText;
+                    mentionStartPosition = mentionPos;
+                    await PerformMentionSearch(searchText);
+                    return;
+                }
+            }
+
+            await CloseMentionPopup();
+        }
+
+        private async Task PerformMentionSearch(string filter)
+        {
+            if (!MentionSearch.HasDelegate)
+            {
+                return;
+            }
+
+            mentionSearchCts?.Cancel();
+            mentionSearchCts?.Dispose();
+            mentionSearchCts = new CancellationTokenSource();
+
+            try
+            {
+                var searchArgs = new MentionSearchArgs 
+                { 
+                    Filter = filter,
+                    Skip = 0,
+                    Top = MentionMaxResults
+                };
+
+                await MentionSearch.InvokeAsync(searchArgs);
+                isMentionPopupOpen = true;
+                selectedMentionIndex = 0;
+                
+                if (MentionSearchResultsChanged.HasDelegate)
+                {
+                    await MentionSearchResultsChanged.InvokeAsync(mentionSearchResults);
+                }
+
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (OperationCanceledException)
+            {
+                // Search was cancelled
+            }
+        }
+
+        private async Task InsertMention(MentionUserContext user)
+        {
+            if (user?.UserId == null)
+            {
+                return;
+            }
+
+            // Replace the search text with the mention
+            var beforeMention = CurrentInput.Substring(0, mentionStartPosition);
+            var afterMention = CurrentInput.Substring(mentionStartPosition + 1 + mentionSearchText.Length);
+            
+            var mention = $"{MentionCharacter}[{user.UserId}]";
+            CurrentInput = beforeMention + mention + afterMention;
+
+            await CloseMentionPopup();
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task CloseMentionPopup()
+        {
+            isMentionPopupOpen = false;
+            mentionSearchResults.Clear();
+            mentionSearchText = string.Empty;
+            selectedMentionIndex = -1;
+            mentionStartPosition = -1;
+            
+            mentionSearchCts?.Cancel();
+            mentionSearchCts?.Dispose();
+            mentionSearchCts = null;
+
+            if (MentionSearchResultsChanged.HasDelegate)
+            {
+                await MentionSearchResultsChanged.InvokeAsync(mentionSearchResults);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task OnMentionItemClick(MentionUserContext user)
+        {
+            await InsertMention(user);
+        }
+
+        internal List<(int start, int end, string userId)> ParseMentions(string text)
+        {
+            var mentions = new List<(int, int, string)>();
+            
+            if (string.IsNullOrEmpty(text) || !MentionCharacter.HasValue)
+            {
+                return mentions;
+            }
+
+            var pattern = $@"\{MentionCharacter}\[([^\]]+)\]";
+            var regex = new System.Text.RegularExpressions.Regex(pattern);
+            
+            foreach (System.Text.RegularExpressions.Match match in regex.Matches(text))
+            {
+                var userId = match.Groups[1].Value;
+                mentions.Add((match.Index, match.Length, userId));
+            }
+
+            return mentions;
+        }
+
+        private RenderFragment RenderMessageWithMentions(string text)
+        {
+            return builder =>
+            {
+                if (string.IsNullOrEmpty(text) || !MentionCharacter.HasValue || MentionDisplayTemplate == null)
+                {
+                    builder.AddContent(0, new MarkupString($"<p>{System.Net.WebUtility.HtmlEncode(text)}</p>"));
+                    return;
+                }
+
+                var mentions = ParseMentions(text);
+                if (mentions.Count == 0)
+                {
+                    builder.AddContent(0, new MarkupString($"<p>{System.Net.WebUtility.HtmlEncode(text)}</p>"));
+                    return;
+                }
+
+                int lastIndex = 0;
+                int contentIndex = 0;
+
+                builder.OpenElement(contentIndex++, "p");
+
+                foreach (var mention in mentions)
+                {
+                    // Add text before mention
+                    if (mention.start > lastIndex)
+                    {
+                        var textBefore = text.Substring(lastIndex, mention.start - lastIndex);
+                        builder.AddContent(contentIndex++, textBefore);
+                    }
+
+                    // Add the mention using the template
+                    var userId = mention.userId;
+                    builder.AddContent(contentIndex++, MentionDisplayTemplate(userId));
+
+                    lastIndex = mention.start + mention.end;
+                }
+
+                // Add remaining text after last mention
+                if (lastIndex < text.Length)
+                {
+                    var textAfter = text.Substring(lastIndex);
+                    builder.AddContent(contentIndex++, textAfter);
+                }
+
+                builder.CloseElement();
+            };
         }
 
         private async Task OnClearChat()
@@ -730,6 +1031,10 @@ namespace Radzen.Blazor
                 typingCts?.Cancel();
                 typingCts?.Dispose();
                 typingCts = null;
+
+                mentionSearchCts?.Cancel();
+                mentionSearchCts?.Dispose();
+                mentionSearchCts = null;
             }
             catch
             {
