@@ -64,6 +64,15 @@ namespace Radzen.Blazor
         public double? Radius { get; set; }
 
         /// <summary>
+        /// Gets or sets the corner radius in pixels used to round the corners of each segment.
+        /// A pie segment has its two outer corners and its center apex rounded; a donut segment has all four corners rounded.
+        /// The value is clamped per segment so that adjacent corners never overlap.
+        /// </summary>
+        /// <value>The corner radius in pixels. Default is <c>0</c> (sharp corners).</value>
+        [Parameter]
+        public double CornerRadius { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the property that provides a per-item radius value.
         /// When set, each pie/donut segment can have a different outer radius, allowing visual differentiation by size.
         /// The property should return a numeric value that is used to scale the radius relative to the maximum value.
@@ -74,11 +83,22 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the distance in pixels that a segment moves outward from the center when hovered.
-        /// Set to a value greater than 0 to enable the explode-on-hover effect.
+        /// Set to a value greater than 0 to enable the explode-on-hover effect. Also sets the distance for
+        /// segments pulled out permanently via <see cref="ExplodedProperty"/>.
         /// </summary>
         /// <value>The explode offset in pixels. Default is 0 (disabled).</value>
         [Parameter]
         public double ExplodeOffset { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of a boolean property that marks segments as exploded (pulled out from the
+        /// center) in their normal state, not just on hover. Requires <see cref="ExplodeOffset"/> greater than 0,
+        /// which sets the distance. Exploded segments stay pulled out and move a little further on hover; other
+        /// segments still explode on hover.
+        /// </summary>
+        /// <value>The boolean property name on <typeparamref name="TItem"/>, or null to disable static explode.</value>
+        [Parameter]
+        public string? ExplodedProperty { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of fill colors applied to individual pie segments in sequence.
@@ -220,6 +240,20 @@ namespace Radzen.Blazor
             var minRadius = maxRadius * 0.65;
 
             return minRadius + (value - minValue) / (maxValue - minValue) * (maxRadius - minRadius);
+        }
+
+        /// <summary>
+        /// Returns whether a specific data item is exploded in its normal state, as determined by
+        /// <see cref="ExplodedProperty"/>. Always <c>false</c> when <see cref="ExplodedProperty"/> is not set.
+        /// </summary>
+        internal bool IsExploded(TItem item)
+        {
+            if (string.IsNullOrEmpty(ExplodedProperty))
+            {
+                return false;
+            }
+
+            return PropertyAccess.Getter<TItem, bool>(ExplodedProperty)(item);
         }
 
         /// <summary>
@@ -511,7 +545,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Creates SVG path that renders the specified segment.
+        /// Creates SVG path that renders the specified segment, rounding its corners by <see cref="CornerRadius"/>.
         /// </summary>
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
@@ -520,6 +554,14 @@ namespace Radzen.Blazor
         /// <param name="startAngle">The start angle.</param>
         /// <param name="endAngle">The end angle.</param>
         protected string Segment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle)
+        {
+            return Segment(x, y, radius, innerRadius, startAngle, endAngle, CornerRadius);
+        }
+
+        /// <summary>
+        /// Creates SVG path that renders the specified segment with sharp corners.
+        /// </summary>
+        private string SharpSegment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle)
         {
             var largeArcFlag = 0;
 
@@ -547,6 +589,135 @@ namespace Radzen.Blazor
             var innerR = innerRadius.ToInvariantString();
 
             return $"M {startX} {startY} A {r} {r} 0 {largeArcFlag} 1 {endX} {endY} L {innerEndX} {innerEndY} A {innerR} {innerR} 0 {largeArcFlag} 0 {innerStartX} {innerStartY} Z";
+        }
+
+        /// <summary>
+        /// Creates SVG path that renders the specified segment with corners rounded by <paramref name="cornerRadius"/>.
+        /// A pie segment (<paramref name="innerRadius"/> of <c>0</c>) rounds its two outer corners and its center apex;
+        /// a donut segment rounds all four corners. The corner radius is clamped per segment so corners never overlap.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        /// <param name="radius">The radius.</param>
+        /// <param name="innerRadius">The inner radius.</param>
+        /// <param name="startAngle">The start angle.</param>
+        /// <param name="endAngle">The end angle.</param>
+        /// <param name="cornerRadius">The corner radius in pixels.</param>
+        protected string Segment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle, double cornerRadius)
+        {
+            var sweep = Math.Abs(startAngle - endAngle);
+
+            // No rounding requested, a full ring (no corners to round), or a degenerate radius: use the sharp path.
+            if (cornerRadius <= 0.01 || sweep >= 359.99 || radius <= 0)
+            {
+                return SharpSegment(x, y, radius, innerRadius, startAngle, endAngle);
+            }
+
+            var isDonut = innerRadius > 0;
+
+            // Clamp the corner radius so adjacent fillets never overlap.
+            var s = Math.Sin(DegToRad(sweep / 2));
+            var rc = Math.Min(cornerRadius, (radius - innerRadius) / 2);
+            rc = Math.Min(rc, radius * s / (1 + s));                                 // outer arc angular limit
+            if (isDonut && s < 1)
+            {
+                rc = Math.Min(rc, innerRadius * s / (1 - s));                        // inner arc angular limit
+            }
+
+            // Too thin to round visibly - fall back to sharp corners.
+            if (rc < 0.01)
+            {
+                return SharpSegment(x, y, radius, innerRadius, startAngle, endAngle);
+            }
+
+            // The slice spans from startAngle (a0) down to endAngle (a1), drawn clockwise.
+            var a0 = startAngle;
+            var a1 = endAngle;
+
+            // Outer fillets are tangent to the outer circle from inside (center at radius - rc).
+            var eOut = Math.Asin(rc / (radius - rc));
+            var eOutDeg = eOut * 180 / Math.PI;
+            var outerEdgeRadius = (radius - rc) * Math.Cos(eOut);
+
+            var outerArcStart = ToCartesian(x, y, radius, a0 - eOutDeg);
+            var outerArcEnd = ToCartesian(x, y, radius, a1 + eOutDeg);
+            var outerEdgeStart = ToCartesian(x, y, outerEdgeRadius, a0);
+            var outerEdgeEnd = ToCartesian(x, y, outerEdgeRadius, a1);
+            var outerCenterStart = ToCartesian(x, y, radius - rc, a0 - eOutDeg);
+            var outerCenterEnd = ToCartesian(x, y, radius - rc, a1 + eOutDeg);
+
+            var largeOuter = (sweep - 2 * eOutDeg) >= 180 ? 1 : 0;
+
+            var path = $"M {Format(outerArcStart)}" +
+                       $" {Arc(radius, largeOuter, 1, outerArcEnd)}" +
+                       $" {Arc(rc, 0, Sweep(outerArcEnd, outerEdgeEnd, outerCenterEnd), outerEdgeEnd)}";
+
+            if (isDonut)
+            {
+                // Inner fillets are tangent to the inner circle from outside (center at innerRadius + rc).
+                var eIn = Math.Asin(rc / (innerRadius + rc));
+                var eInDeg = eIn * 180 / Math.PI;
+                var innerEdgeRadius = (innerRadius + rc) * Math.Cos(eIn);
+
+                var innerArcStart = ToCartesian(x, y, innerRadius, a0 - eInDeg);
+                var innerArcEnd = ToCartesian(x, y, innerRadius, a1 + eInDeg);
+                var innerEdgeStart = ToCartesian(x, y, innerEdgeRadius, a0);
+                var innerEdgeEnd = ToCartesian(x, y, innerEdgeRadius, a1);
+                var innerCenterStart = ToCartesian(x, y, innerRadius + rc, a0 - eInDeg);
+                var innerCenterEnd = ToCartesian(x, y, innerRadius + rc, a1 + eInDeg);
+
+                var largeInner = (sweep - 2 * eInDeg) >= 180 ? 1 : 0;
+
+                path += $" L {Format(innerEdgeEnd)}" +
+                        $" {Arc(rc, 0, Sweep(innerEdgeEnd, innerArcEnd, innerCenterEnd), innerArcEnd)}" +
+                        $" {Arc(innerRadius, largeInner, 0, innerArcStart)}" +
+                        $" {Arc(rc, 0, Sweep(innerArcStart, innerEdgeStart, innerCenterStart), innerEdgeStart)}" +
+                        $" L {Format(outerEdgeStart)}" +
+                        $" {Arc(rc, 0, Sweep(outerEdgeStart, outerArcStart, outerCenterStart), outerArcStart)} Z";
+            }
+            else
+            {
+                // Pie: round the center apex where the two radial edges meet.
+                var half = DegToRad(sweep / 2);
+                var apexEdgeRadius = rc / Math.Tan(half);
+                var apexStart = ToCartesian(x, y, apexEdgeRadius, a0);
+                var apexEnd = ToCartesian(x, y, apexEdgeRadius, a1);
+                var apexCenter = ToCartesian(x, y, rc / Math.Sin(half), (a0 + a1) / 2);
+
+                path += $" L {Format(apexEnd)}" +
+                        $" {Arc(rc, 0, Sweep(apexEnd, apexStart, apexCenter), apexStart)}" +
+                        $" L {Format(outerEdgeStart)}" +
+                        $" {Arc(rc, 0, Sweep(outerEdgeStart, outerArcStart, outerCenterStart), outerArcStart)} Z";
+            }
+
+            return path;
+        }
+
+        /// <summary>
+        /// Formats a point as "x y" using the invariant culture.
+        /// </summary>
+        private static string Format((double X, double Y) point)
+        {
+            return $"{point.X.ToInvariantString()} {point.Y.ToInvariantString()}";
+        }
+
+        /// <summary>
+        /// Builds an SVG elliptical-arc command to the given end point.
+        /// </summary>
+        private static string Arc(double radius, int largeArcFlag, int sweepFlag, (double X, double Y) end)
+        {
+            var r = radius.ToInvariantString();
+            return $"A {r} {r} 0 {largeArcFlag} {sweepFlag} {Format(end)}";
+        }
+
+        /// <summary>
+        /// Returns the SVG sweep flag for the minor arc from <paramref name="start"/> to <paramref name="end"/>
+        /// about <paramref name="center"/>. In SVG (y-down) coordinates a positive cross product is drawn clockwise.
+        /// </summary>
+        private static int Sweep((double X, double Y) start, (double X, double Y) end, (double X, double Y) center)
+        {
+            var cross = (start.X - center.X) * (end.Y - center.Y) - (start.Y - center.Y) * (end.X - center.X);
+            return cross > 0 ? 1 : 0;
         }
 
         /// <summary>

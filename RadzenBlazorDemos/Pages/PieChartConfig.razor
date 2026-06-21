@@ -19,12 +19,17 @@
                     </Items>
                 </RadzenSelectBar>
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Corner Radius" Component="cornerRadius" />
+                <RadzenSlider @bind-Value="@cornerRadius" TValue="double" Min="0" Max="30" Step="1" Name="cornerRadius" Style="width: 120px;" />
+                <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-0">@cornerRadius px</RadzenText>
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
 
     <RadzenStack Style="width: 100%; max-width: 600px;">
         <RadzenChart Animate="true" SeriesClick=@OnSeriesClick>
-                <RadzenPieSeries FillMode="@fillMode" Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" ShowTooltipOnLegend="@showTooltipOnLegend">
+                <RadzenPieSeries FillMode="@fillMode" CornerRadius="@cornerRadius" Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" ShowTooltipOnLegend="@showTooltipOnLegend">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenPieSeries>
             </RadzenChart>
@@ -38,6 +43,7 @@
     bool showDataLabels = false;
     bool showTooltipOnLegend = true;
     FillMode fillMode = FillMode.Gradient;
+    double cornerRadius = 0;
 
     void OnSeriesClick(SeriesClickEventArgs args)
     {

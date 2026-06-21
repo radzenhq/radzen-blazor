@@ -337,6 +337,17 @@ $chart-color-schemes: (
         }
       }
     }
+
+    // Segments exploded in their normal state move a little further on hover.
+    > g.rz-state-exploded {
+      &:hover,
+      &.rz-state-hover {
+        > path:not(.rz-hit-area),
+        > .rz-path {
+          transform: translate(calc(var(--rz-explode-x, 0) * 1.2), calc(var(--rz-explode-y, 0) * 1.2));
+        }
+      }
+    }
   }
 
   .rz-pie-series:has(> .rz-state-hover),
@@ -363,6 +374,19 @@ $chart-color-schemes: (
 
     &:hover {
       background-color: var(--rz-base-200);
+    }
+  }
+}
+
+// Segments pulled out permanently via ExplodedProperty. Applied outside the hover wrapper so static
+// explode works even when AllowSeriesHover is false. The hit-area moves too so it tracks the slice.
+.rz-pie-series,
+.rz-donut-series {
+  > g.rz-state-exploded {
+    > path,
+    > .rz-path {
+      transform: translate(var(--rz-explode-x, 0), var(--rz-explode-y, 0));
+      transition: transform var(--rz-transition);
     }
   }
 }

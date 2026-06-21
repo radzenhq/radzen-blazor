@@ -63,7 +63,8 @@
                         startAngle = endAngle;
 
                         var index = Items.IndexOf(data);
-                        var arcClassName = $"rz-series-item-{index}";
+                        var exploded = ExplodeOffset > 0 && IsExploded(data);
+                        var arcClassName = $"rz-series-item-{index}" + (exploded ? " rz-state-exploded" : "");
                         var fill = PickColor(index, Fills);
                         var stroke = PickColor(index, Strokes);
                         var gradId = $"rzPieGradient{chart.UniqueID}-{seriesIndex}-{index}";
