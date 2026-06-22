@@ -1122,6 +1122,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Single Column Sorting",
                             Path = "datagrid-sort",
+                            Related = new [] { "datagrid-multi-sort", "datagrid-sort-api", "datagrid-sort-comparer" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable sorting in the DataGrid?", Answer = "Set AllowSorting to true on the grid (or Sortable on a column); users sort by clicking the column header." }
+                            },
                             Title = "Blazor DataGrid - Sorting | Free UI Components by Radzen",
                             Description = "This example demonstrates sorting in Blazor RadzenDataGrid component.",
                             Tags = new [] { "single", "sort", "datagrid", "table", "dataview" }
@@ -1130,6 +1135,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Multiple Column Sorting",
                             Path = "datagrid-multi-sort",
+                            Related = new [] { "datagrid-sort", "datagrid-sort-api", "datagrid-sort-comparer" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable multi-column sorting?", Answer = "Set AllowMultiColumnSorting to true; users add columns to the sort by clicking more headers, and you can show the order with sort indexes." }
+                            },
                             Title = "Blazor DataGrid - Multi-Column Sorting | Free UI Components by Radzen",
                             Description = "This example demonstrates multiple column sorting in Blazor RadzenDataGrid component.",
                             Tags = new [] { "multi", "sort", "datagrid", "table", "dataview" }
@@ -1138,6 +1148,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Sort API",
                             Path = "datagrid-sort-api",
+                            Related = new [] { "datagrid-sort", "datagrid-multi-sort", "datagrid-sort-comparer" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I set the initial sort order in code?", Answer = "Set each column's SortOrder to Ascending or Descending; the grid applies it on load." }
+                            },
                             Title = "Blazor DataGrid - Sort API | Free UI Components by Radzen",
                             Description = "Set the initial sort order of your RadzenDataGrid via the SortOrder column property.",
                             Tags = new [] { "api", "sort", "datagrid", "table", "dataview" }
@@ -1146,6 +1161,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Custom Sort Comparer",
                             Path = "datagrid-sort-comparer",
+                            Related = new [] { "datagrid-sort", "datagrid-multi-sort", "datagrid-sort-api" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I customize how a column sorts?", Answer = "Set the column's SortComparer to an IComparer implementation; the grid uses it instead of the default comparison." }
+                            },
                             Title = "Blazor DataGrid - Custom Sort Comparer | Free UI Components by Radzen",
                             Description = "Sort a column with a custom IComparer, for example ordering id values by their mapped display name.",
                             Tags = new [] { "comparer", "custom", "sort", "datagrid", "table", "dataview" }
@@ -1162,6 +1182,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Pager Position",
                             Path = "datagrid-pager-position",
+                            Related = new [] { "datagrid-pager-horizontal-align", "datagrid-pager-api", "datagrid-virtualization" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I move the DataGrid pager to the top?", Answer = "Set PagerPosition to Top, Bottom, or TopAndBottom on the grid." }
+                            },
                             Title = "Blazor DataGrid - Pager Position | Free UI Components by Radzen",
                             Description = "Set the pager position to Top, Bottom, or TopAndBottom.",
                             Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
@@ -1170,6 +1195,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Pager Horizontal Align",
                             Path = "datagrid-pager-horizontal-align",
+                            Related = new [] { "datagrid-pager-position", "datagrid-pager-api", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I align the DataGrid pager?", Answer = "Set PagerHorizontalAlign to Left, Center, Right, or Justify." }
+                            },
                             Title = "Blazor DataGrid - Pager Alignment | Free UI Components by Radzen",
                             Description = "See how to change the horizontal alignment of the pager in a RadzenDataGrid.",
                             Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
@@ -1178,6 +1208,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Pager API",
                             Path = "datagrid-pager-api",
+                            Related = new [] { "datagrid-pager-position", "datagrid-pager-horizontal-align", "datagrid-loaddata" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I set the DataGrid page size and current page in code?", Answer = "Set PageSize and PageSizeOptions, use GoToPage or the Page property to change pages, and handle the PageChanged event." }
+                            },
                             Title = "Blazor DataGrid - Pager API | Free UI Components by Radzen",
                             Description = "Blazor RadzenDataGrid Pager API.",
                             Tags = new [] { "pager", "paging", "api", "datagrid", "table", "dataview" }
@@ -1194,6 +1229,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Grouping API",
                             Path = "datagrid-grouping-api",
+                            Related = new [] { "datagrid-group-header-template", "datagrid-group-footer-template", "datagrid-footer-totals" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable grouping in the DataGrid?", Answer = "Set AllowGrouping to true; users drag column headers into the group panel, and you can group from code via the Groups collection." }
+                            },
                             Title = "Blazor DataGrid - Grouping API | Free UI Components by Radzen",
                             Description = "Enable DataGrid grouping with AllowGrouping. Localize group panel text and disable grouping per column.",
                             Tags = new [] { "group", "grouping", "datagrid", "table", "dataview", "api" }
@@ -1202,6 +1242,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Group Header Template",
                             Path = "datagrid-group-header-template",
+                            Related = new [] { "datagrid-grouping-api", "datagrid-group-footer-template", "datagrid-footer-totals" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I customize the group header row?", Answer = "Add a GroupHeaderTemplate to the grid and render the group key, counts, or aggregates with your own markup." }
+                            },
                             Title = "Blazor DataGrid - Group Header | Free UI Components by Radzen",
                             Description = "Use GroupHeaderTemplate to customize DataGrid group header rows.",
                             Tags = new [] { "group", "grouping", "template", "datagrid", "table", "dataview" }
@@ -1210,6 +1255,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Group Footer Template",
                             Path = "datagrid-group-footer-template",
+                            Related = new [] { "datagrid-grouping-api", "datagrid-group-header-template", "datagrid-footer-totals" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I show totals for each group?", Answer = "Add a GroupFooterTemplate to the column and compute the aggregate over the group's data; it renders in each group's footer." }
+                            },
                             Title = "Blazor DataGrid - Group Footer | Free UI Components by Radzen",
                             Description = "The GroupFooterTemplate column property allows you to display aggregated data (totals) in the column footer for each group.",
                             Tags = new [] { "group", "grouping", "footer", "template", "datagrid", "table", "dataview" }
