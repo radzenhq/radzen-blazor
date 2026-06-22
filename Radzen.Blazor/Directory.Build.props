@@ -47,7 +47,8 @@
     <!-- Enable deterministic builds in CI/CD -->
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     
-    <!-- Embed source files for better debugging -->
+    <!-- Packable library only: embeds source into the .snupkg portable PDB for consumer step-into-source.
+         App projects override this to false in the root Directory.Build.props - do not re-sync that here. -->
     <EmbedAllSources>true</EmbedAllSources>
     <!--
       IMPORTANT:
