@@ -1050,6 +1050,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Hierarchy",
                             Path = "master-detail-hierarchy",
+                            Related = new [] { "master-detail-hierarchy-demand", "datagrid-selfref-hierarchy", "master-detail" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I show a nested grid for each row?", Answer = "Add a Template to the grid that renders a child RadzenDataGrid bound to the row's children; users expand a row to see it." }
+                            },
                             Title = "Blazor DataGrid - Hierarchy | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use templates to create a hierarchy in a Blazor RadzenDataGrid.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
@@ -1058,6 +1063,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Hierarchy on demand",
                             Path = "master-detail-hierarchy-demand",
+                            Related = new [] { "master-detail-hierarchy", "datagrid-selfref-hierarchy", "datagrid-loaddata" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I load child rows only when a row is expanded?", Answer = "Handle the RowExpand event to fetch that row's children on demand and bind them to the nested grid." }
+                            },
                             Title = "Blazor DataGrid - Hierarchy on Demand | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use templates to create a Radzen Blazor DataGrid hierarchy and load data on demand.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "on-demand" }
@@ -1066,6 +1076,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Self-reference hierarchy",
                             Path = "datagrid-selfref-hierarchy",
+                            Related = new [] { "master-detail-hierarchy", "master-detail-hierarchy-demand", "master-detail" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I show a self-referencing (parent/child) hierarchy?", Answer = "Bind the grid to the parent rows and render each row's children, matched by the parent id, in a nested grid." }
+                            },
                             Title = "Blazor DataGrid - Self-Reference Hierarchy | Free UI Components by Radzen",
                             Description = "This example demonstrates how to develop and show a self-referencing hierarchy.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "hierarchy", "self-reference" }
@@ -1074,6 +1089,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Master/Detail",
                             Path = "master-detail",
+                            Related = new [] { "master-detail-hierarchy", "datagrid-single-selection", "datagrid-selfref-hierarchy" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I create a master-detail view with two grids?", Answer = "Handle the master grid's RowSelect event and load the related rows into a second DataGrid bound to the selected item." }
+                            },
                             Title = "Blazor DataGrid - Master and Detail | Free UI Components by Radzen",
                             Description = "This example demonstrates how to create a master/detail relationship between two Blazor RadzenDataGrid components.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview" }
@@ -1090,6 +1110,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Single selection",
                             Path = "datagrid-single-selection",
+                            Related = new [] { "datagrid-multiple-selection", "datagrid-cell-selection", "master-detail" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable single row selection?", Answer = "Set SelectionMode to Single and bind Value to a single item; the grid raises RowSelect when the selection changes." }
+                            },
                             Title = "Blazor DataGrid - Single Selection | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable single selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "single", "selection", "datagrid", "table", "dataview" }
@@ -1098,6 +1123,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Multiple selection",
                             Path = "datagrid-multiple-selection",
+                            Related = new [] { "datagrid-single-selection", "datagrid-cell-selection", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable multiple row selection with checkboxes?", Answer = "Set SelectionMode to Multiple and bind Value to a collection; add a header checkbox to select or clear all rows." }
+                            },
                             Title = "Blazor DataGrid - Multi Selection | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable multiple selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
@@ -1106,6 +1136,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Cell selection",
                             Path = "datagrid-cell-selection",
+                            Related = new [] { "datagrid-single-selection", "datagrid-multiple-selection", "datagrid-cell-contextmenu" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable cell selection in the DataGrid?", Answer = "Turn on cell selection and handle the CellClick event to track the selected cells." }
+                            },
                             Title = "Blazor DataGrid - Cell Selection | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable cell selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "cell", "selection", "datagrid", "table", "dataview" }
@@ -1380,6 +1415,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "InLine Editing",
                     Path = "datagrid-inline-edit",
+                    Related = new [] { "datagrid-incell-edit", "datagrid-column-template", "datagrid-iqueryable" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I enable inline row editing in the DataGrid?", Answer = "Add an EditTemplate to each editable column and call EditRow to switch a row into edit mode; UpdateRow saves the changes." }
+                    },
                     Title = "Blazor DataGrid - InLine Editing | Free UI Components by Radzen",
                     Description = "This example demonstrates how to configure the Razden Blazor DataGrid for inline editing.",
                     Icon = "\ue22b",
@@ -1390,6 +1430,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "InCell Editing",
                     Path = "datagrid-incell-edit",
+                    Related = new [] { "datagrid-inline-edit", "datagrid-column-template", "datagrid-cell-selection" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I enable in-cell editing?", Answer = "Use cell edit mode with an EditTemplate per column; edits commit as the user moves between cells." }
+                    },
                     Title = "Blazor DataGrid - InCell Editing | Free UI Components by Radzen",
                     Description = "This example demonstrates how to configure the Razden Blazor DataGrid for in-cell editing.",
                     Icon = "\ue745",
