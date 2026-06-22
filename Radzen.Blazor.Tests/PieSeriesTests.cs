@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Text.RegularExpressions;
 using Bunit;
 using Xunit;
 using static Radzen.Blazor.Tests.ChartTestHelper;
@@ -128,7 +130,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task PieSeries_CornerRadius_RoundsThreeCornersPerSlice()
+        public async System.Threading.Tasks.Task PieSeries_CornerRadius_RoundsTwoOuterCornersPerSlice()
         {
             using var ctx = CreateChartContext();
 
@@ -141,10 +143,10 @@ namespace Radzen.Blazor.Tests
 
             await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
 
-            // No sharp apex (no zero-radius inner arc) once corners are rounded.
+            // The center apex stays sharp (no zero-radius inner arc, and not rounded either).
             Assert.DoesNotContain("A 0 0", chart.Markup);
-            // Three fillet arcs of radius 10 per slice (two outer corners + apex) across three slices.
-            Assert.Equal(9, Count(chart.Markup, "A 10 10"));
+            // Only the two outer corners are rounded per slice across three slices; the center is left sharp.
+            Assert.Equal(6, Count(chart.Markup, "A 10 10"));
             Assert.DoesNotContain("NaN", chart.Markup);
         }
 
@@ -207,6 +209,186 @@ namespace Radzen.Blazor.Tests
             // A full-circle slice has no corners; it renders as the sharp ring (zero-radius inner arc).
             Assert.Contains("A 0 0", chart.Markup);
             Assert.DoesNotContain("A 10 10", chart.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PieSeries_DefaultSegmentGap_UsesSharpPath()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            // No gap by default: slices still close through the center.
+            Assert.Contains("A 0 0", chart.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PieSeries_SegmentGap_InsetsEdgesAndDropsCenterArc()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.SegmentGap, 8.0)
+                    .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            // Outer arcs survive; the inset edges meet at an apex rather than the center, so no zero-radius arc.
+            Assert.Contains("A 118 118", chart.Markup);
+            Assert.DoesNotContain("A 0 0", chart.Markup);
+            Assert.DoesNotContain("NaN", chart.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PieSeries_SegmentGap_WithCornerRadius_RoundsWithoutNaN()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.SegmentGap, 6.0)
+                    .Add(x => x.CornerRadius, 8.0)
+                    .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            Assert.DoesNotContain("A 0 0", chart.Markup);
+            // Only the two outer corners are rounded per slice across three slices (sharp center apex).
+            Assert.Equal(6, Count(chart.Markup, "A 8 8"));
+            Assert.DoesNotContain("NaN", chart.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DonutSeries_SegmentGap_WithCornerRadius_RoundsWithoutNaN()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenDonutSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.InnerRadius, 50)
+                    .Add(x => x.SegmentGap, 6.0)
+                    .Add(x => x.CornerRadius, 8.0)
+                    .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            Assert.Contains("A 118 118", chart.Markup);
+            Assert.Contains("A 50 50", chart.Markup);
+            // Four fillet arcs per slice across three slices.
+            Assert.Equal(12, Count(chart.Markup, "A 8 8"));
+            Assert.DoesNotContain("NaN", chart.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PieSeries_SegmentGap_TinySliceSkippedWithoutThrow()
+        {
+            using var ctx = CreateChartContext();
+
+            var data = new[]
+            {
+                new DataItem { Category = "Tiny", Value = 0.2 },
+                new DataItem { Category = "B", Value = 50 },
+                new DataItem { Category = "C", Value = 50 },
+            };
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.SegmentGap, 40.0)
+                    .Add(x => x.Data, data)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            // The slice too narrow for the gap is skipped; the rest still render.
+            Assert.Contains("A 118 118", chart.Markup);
+            Assert.DoesNotContain("NaN", chart.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PieSeries_LargeSegmentGap_ClampedWithoutNaN()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.SegmentGap, 1000.0)
+                    .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            Assert.DoesNotContain("NaN", chart.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DonutSeries_SegmentGap_SmallerThanHole_KeepsInnerArc()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenDonutSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.InnerRadius, 50)
+                    .Add(x => x.SegmentGap, 4.0)
+                    .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            Assert.Contains("A 118 118", chart.Markup);
+            Assert.Contains("A 50 50", chart.Markup);
+            Assert.DoesNotContain("NaN", chart.Markup);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task PieSeries_CornerRadius_CenterApexNotRounded_UnequalSlices()
+        {
+            using var ctx = CreateChartContext();
+
+            var unequal = new[]
+            {
+                new DataItem { Category = "A", Value = 20 },
+                new DataItem { Category = "B", Value = 50 },
+                new DataItem { Category = "C", Value = 200 },
+            };
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.CornerRadius, 10.0)
+                    .Add(x => x.Data, unequal)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            // Apex stays sharp: two outer fillets per slice, no rounded or zero-radius center.
+            Assert.Equal(6, Count(chart.Markup, "A 10 10"));
+            Assert.DoesNotContain("A 0 0", chart.Markup);
+            Assert.DoesNotContain("NaN", chart.Markup);
+
+            // Every slice's inner edges run to the exact same center point, so the tips converge evenly
+            // regardless of slice size. That shared "L cx cy" target appears once per slice (three times).
+            var sharedTarget = Regex.Matches(chart.Markup, @"L (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)")
+                .Select(m => m.Value)
+                .GroupBy(v => v)
+                .Max(g => g.Count());
+
+            Assert.Equal(3, sharedTarget);
         }
 
         class ExplodeItem

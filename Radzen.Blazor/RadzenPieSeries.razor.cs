@@ -73,6 +73,16 @@ namespace Radzen.Blazor
         public double CornerRadius { get; set; }
 
         /// <summary>
+        /// Gets or sets the width in pixels of a uniform gap drawn between adjacent segments. Each segment's
+        /// two radial edges are inset by half this value, so neighboring segments are separated by a
+        /// constant-width space from the rim to the center (or inner hole), independent of segment size.
+        /// Composes with <see cref="CornerRadius"/>. A segment too narrow for the gap is skipped.
+        /// </summary>
+        /// <value>The gap width in pixels. Default is <c>0</c> (no gap).</value>
+        [Parameter]
+        public double SegmentGap { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the property that provides a per-item radius value.
         /// When set, each pie/donut segment can have a different outer radius, allowing visual differentiation by size.
         /// The property should return a numeric value that is used to scale the radius relative to the maximum value.
@@ -555,6 +565,11 @@ namespace Radzen.Blazor
         /// <param name="endAngle">The end angle.</param>
         protected string Segment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle)
         {
+            if (SegmentGap > 0.01)
+            {
+                return GappedSegment(x, y, radius, innerRadius, startAngle, endAngle, CornerRadius, SegmentGap);
+            }
+
             return Segment(x, y, radius, innerRadius, startAngle, endAngle, CornerRadius);
         }
 
@@ -677,20 +692,153 @@ namespace Radzen.Blazor
             }
             else
             {
-                // Pie: round the center apex where the two radial edges meet.
-                var half = DegToRad(sweep / 2);
-                var apexEdgeRadius = rc / Math.Tan(half);
-                var apexStart = ToCartesian(x, y, apexEdgeRadius, a0);
-                var apexEnd = ToCartesian(x, y, apexEdgeRadius, a1);
-                var apexCenter = ToCartesian(x, y, rc / Math.Sin(half), (a0 + a1) / 2);
-
-                path += $" L {Format(apexEnd)}" +
-                        $" {Arc(rc, 0, Sweep(apexEnd, apexStart, apexCenter), apexStart)}" +
+                // Pie: round only the outer corners and keep the center apex sharp, so every slice meets the
+                // exact center regardless of size (rounding the apex would push thin slices away from it).
+                path += $" L {Format((x, y))}" +
                         $" L {Format(outerEdgeStart)}" +
                         $" {Arc(rc, 0, Sweep(outerEdgeStart, outerArcStart, outerCenterStart), outerArcStart)} Z";
             }
 
             return path;
+        }
+
+        /// <summary>
+        /// Creates an SVG path for a segment separated from its neighbors by a uniform <paramref name="gap"/>.
+        /// Each radial edge is inset by <c>gap / 2</c> perpendicular to the radius, so the space between
+        /// adjacent segments has a constant width. Composes with <paramref name="cornerRadius"/>; segments too
+        /// narrow for the gap return an empty path and are not rendered.
+        /// </summary>
+        private string GappedSegment(double x, double y, double radius, double innerRadius, double startAngle, double endAngle, double cornerRadius, double gap)
+        {
+            var sweep = Math.Abs(startAngle - endAngle);
+
+            // A full ring has no radial edges to inset.
+            if (sweep >= 359.99 || radius <= 0)
+            {
+                return SharpSegment(x, y, radius, innerRadius, startAngle, endAngle);
+            }
+
+            var isDonut = innerRadius > 0;
+            var h = gap / 2;
+            var halfRad = DegToRad(sweep / 2);
+            var s = Math.Sin(halfRad);
+
+            // The segment is narrower than the gap: its inset edges cross before reaching the rim.
+            if (h >= radius * s - 1e-6)
+            {
+                return "";
+            }
+
+            // The hole is smaller than the gap, or the inner edges would cross.
+            if (isDonut && (h >= innerRadius - 1e-6 || Math.Asin(Math.Min(1, h / innerRadius)) >= halfRad - 1e-9))
+            {
+                return "";
+            }
+
+            var a0 = startAngle;
+            var a1 = endAngle;
+            var am = (a0 + a1) / 2;
+
+            var nStart = InteriorNormal(a0, am);
+            var nEnd = InteriorNormal(a1, am);
+
+            var rc = cornerRadius <= 0.01 ? 0 : Math.Min(cornerRadius, (radius - innerRadius) / 2);
+            if (rc > 0)
+            {
+                rc = Math.Min(rc, (radius * s - h) / (1 + s));
+                if (isDonut && s < 1)
+                {
+                    rc = Math.Min(rc, (innerRadius * s - h) / (1 - s));
+                }
+            }
+
+            if (rc < 0.01)
+            {
+                // Gap only, sharp corners.
+                var dOut = Math.Asin(Math.Min(1, h / radius)) * 180 / Math.PI;
+                var oStart = ToCartesian(x, y, radius, a0 - dOut);
+                var oEnd = ToCartesian(x, y, radius, a1 + dOut);
+                var largeO = (sweep - 2 * dOut) >= 180 ? 1 : 0;
+
+                if (isDonut)
+                {
+                    var dIn = Math.Asin(Math.Min(1, h / innerRadius)) * 180 / Math.PI;
+                    var iEnd = ToCartesian(x, y, innerRadius, a1 + dIn);
+                    var iStart = ToCartesian(x, y, innerRadius, a0 - dIn);
+                    var largeI = (sweep - 2 * dIn) >= 180 ? 1 : 0;
+
+                    return $"M {Format(oStart)} {Arc(radius, largeO, 1, oEnd)} L {Format(iEnd)} {Arc(innerRadius, largeI, 0, iStart)} Z";
+                }
+
+                var apex = ToCartesian(x, y, h / s, am);
+                return $"M {Format(oStart)} {Arc(radius, largeO, 1, oEnd)} L {Format(apex)} Z";
+            }
+
+            // Gap with rounded corners. The fillets stay tangent to the arcs and to the inset edges; the only
+            // change from the un-gapped case is that the fillet-center angular offset gains the inset h.
+            var eOut = Math.Asin((h + rc) / (radius - rc));
+            var eOutDeg = eOut * 180 / Math.PI;
+
+            var outerArcStart = ToCartesian(x, y, radius, a0 - eOutDeg);
+            var outerArcEnd = ToCartesian(x, y, radius, a1 + eOutDeg);
+            var outerCenterStart = ToCartesian(x, y, radius - rc, a0 - eOutDeg);
+            var outerCenterEnd = ToCartesian(x, y, radius - rc, a1 + eOutDeg);
+            var outerEdgeStart = (outerCenterStart.X - rc * nStart.X, outerCenterStart.Y - rc * nStart.Y);
+            var outerEdgeEnd = (outerCenterEnd.X - rc * nEnd.X, outerCenterEnd.Y - rc * nEnd.Y);
+
+            var largeOuter = (sweep - 2 * eOutDeg) >= 180 ? 1 : 0;
+
+            var path = $"M {Format(outerArcStart)}" +
+                       $" {Arc(radius, largeOuter, 1, outerArcEnd)}" +
+                       $" {Arc(rc, 0, Sweep(outerArcEnd, outerEdgeEnd, outerCenterEnd), outerEdgeEnd)}";
+
+            if (isDonut)
+            {
+                var eIn = Math.Asin((h + rc) / (innerRadius + rc));
+                var eInDeg = eIn * 180 / Math.PI;
+
+                var innerArcStart = ToCartesian(x, y, innerRadius, a0 - eInDeg);
+                var innerArcEnd = ToCartesian(x, y, innerRadius, a1 + eInDeg);
+                var innerCenterStart = ToCartesian(x, y, innerRadius + rc, a0 - eInDeg);
+                var innerCenterEnd = ToCartesian(x, y, innerRadius + rc, a1 + eInDeg);
+                var innerEdgeStart = (innerCenterStart.X - rc * nStart.X, innerCenterStart.Y - rc * nStart.Y);
+                var innerEdgeEnd = (innerCenterEnd.X - rc * nEnd.X, innerCenterEnd.Y - rc * nEnd.Y);
+
+                var largeInner = (sweep - 2 * eInDeg) >= 180 ? 1 : 0;
+
+                path += $" L {Format(innerEdgeEnd)}" +
+                        $" {Arc(rc, 0, Sweep(innerEdgeEnd, innerArcEnd, innerCenterEnd), innerArcEnd)}" +
+                        $" {Arc(innerRadius, largeInner, 0, innerArcStart)}" +
+                        $" {Arc(rc, 0, Sweep(innerArcStart, innerEdgeStart, innerCenterStart), innerEdgeStart)}" +
+                        $" L {Format(outerEdgeStart)}" +
+                        $" {Arc(rc, 0, Sweep(outerEdgeStart, outerArcStart, outerCenterStart), outerArcStart)} Z";
+            }
+            else
+            {
+                // Pie: round only the outer corners; the inset edges meet at a sharp apex so the center stays
+                // even across unequal slices (only the small gap recession remains, not the corner radius).
+                var apex = ToCartesian(x, y, h / s, am);
+
+                path += $" L {Format(apex)}" +
+                        $" L {Format(outerEdgeStart)}" +
+                        $" {Arc(rc, 0, Sweep(outerEdgeStart, outerArcStart, outerCenterStart), outerArcStart)} Z";
+            }
+
+            return path;
+        }
+
+        /// <summary>
+        /// Returns the unit normal of the radial edge at <paramref name="edgeDegrees"/> pointing toward the
+        /// segment interior (the bisector at <paramref name="midDegrees"/>).
+        /// </summary>
+        private (double X, double Y) InteriorNormal(double edgeDegrees, double midDegrees)
+        {
+            var edge = ToCartesian(0, 0, 1, edgeDegrees);
+            var mid = ToCartesian(0, 0, 1, midDegrees);
+            var normal = (X: -edge.Y, Y: edge.X);
+            var dot = normal.X * mid.X + normal.Y * mid.Y;
+
+            return dot >= 0 ? normal : (X: edge.Y, Y: -edge.X);
         }
 
         /// <summary>

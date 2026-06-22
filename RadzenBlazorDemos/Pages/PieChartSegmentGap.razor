@@ -1,0 +1,29 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenStack Style="width: 100%; max-width: 600px;">
+        <RadzenChart>
+            <RadzenPieSeries FillMode="FillMode.Gradient" Data="@budget" CategoryProperty="Department" ValueProperty="Amount"
+                             CornerRadius="8" SegmentGap="4">
+                <RadzenSeriesDataLabels Visible="true" />
+            </RadzenPieSeries>
+            <RadzenLegend Position="LegendPosition.Bottom" />
+        </RadzenChart>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Department { get; set; }
+        public double Amount { get; set; }
+    }
+
+    DataItem[] budget = new DataItem[]
+    {
+        new DataItem { Department = "Engineering", Amount = 320 },
+        new DataItem { Department = "Sales", Amount = 245 },
+        new DataItem { Department = "Marketing", Amount = 178 },
+        new DataItem { Department = "Support", Amount = 132 },
+        new DataItem { Department = "Design", Amount = 96 },
+        new DataItem { Department = "Finance", Amount = 154 },
+    };
+}
