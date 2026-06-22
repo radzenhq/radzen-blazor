@@ -369,11 +369,11 @@ $chart-color-schemes: (
   }
 
   .rz-legend-item {
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
     border-radius: var(--rz-border-radius);
 
     &:hover {
-      background-color: var(--rz-base-200);
+      @include variant-hover-bg('base');
     }
   }
 }
@@ -608,7 +608,14 @@ $chart-color-schemes: (
   align-items: center;
   gap: 0.25rem;
   margin: 0.25rem;
+  padding: 0.25rem 0.375rem;
   cursor: pointer;
+  line-height: 1;
+
+  svg {
+    border-radius: calc(var(--rz-border-radius) / 2);
+    overflow: hidden;
+  }
 
   &:focus {
     outline: var(--rz-outline-normal);
