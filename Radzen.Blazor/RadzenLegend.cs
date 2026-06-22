@@ -11,9 +11,10 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the position.
         /// </summary>
-        /// <value>The position.</value>
+        /// <value>The position. Default is <see cref="LegendPosition.End"/>, which renders on the right
+        /// in left-to-right mode and automatically flips to the left in right-to-left mode.</value>
         [Parameter]
-        public LegendPosition Position { get; set; }
+        public LegendPosition Position { get; set; } = LegendPosition.End;
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenLegend"/> is visible.
@@ -33,7 +34,8 @@ namespace Radzen.Blazor
 
             var size = 16 * 0.875;
 
-            if (Position == LegendPosition.Right || Position == LegendPosition.Left)
+            if (Position == LegendPosition.Right || Position == LegendPosition.Left
+                || Position == LegendPosition.Start || Position == LegendPosition.End)
             {
                 if (chart.Series.Any())
                 {

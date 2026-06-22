@@ -243,6 +243,18 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Resolves the legend position to a concrete side, mapping the direction-aware
+        /// <see cref="LegendPosition.Start"/> / <see cref="LegendPosition.End"/> values to
+        /// <see cref="LegendPosition.Left"/> / <see cref="LegendPosition.Right"/> based on <see cref="IsRTL"/>.
+        /// </summary>
+        internal LegendPosition EffectiveLegendPosition => (Legend?.Position ?? LegendPosition.Right) switch
+        {
+            LegendPosition.Start => IsRTL ? LegendPosition.Right : LegendPosition.Left,
+            LegendPosition.End => IsRTL ? LegendPosition.Left : LegendPosition.Right,
+            var position => position
+        };
+
+        /// <summary>
         /// Gets or sets the callback invoked when a user clicks on a data point or segment in a chart series.
         /// Provides information about the clicked series, data item, and value in the event arguments.
         /// </summary>
@@ -717,9 +729,11 @@ namespace Radzen.Blazor
 
             if (Legend.Visible)
             {
-                if (Legend.Position == LegendPosition.Right || Legend.Position == LegendPosition.Left)
+                var legendPosition = EffectiveLegendPosition;
+
+                if (legendPosition == LegendPosition.Right || legendPosition == LegendPosition.Left)
                 {
-                    if (Legend.Position == LegendPosition.Right)
+                    if (legendPosition == LegendPosition.Right)
                     {
                         MarginRight = legendSize + 16 + (IsRTL ? valueAxisSize : additionalAxesWidth);
                     }
@@ -728,9 +742,9 @@ namespace Radzen.Blazor
                         MarginLeft = legendSize + 16 + (IsRTL ? additionalAxesWidth : valueAxisSize);
                     }
                 }
-                else if (Legend.Position == LegendPosition.Top || Legend.Position == LegendPosition.Bottom)
+                else if (legendPosition == LegendPosition.Top || legendPosition == LegendPosition.Bottom)
                 {
-                    if (Legend.Position == LegendPosition.Top)
+                    if (legendPosition == LegendPosition.Top)
                     {
                         MarginTop = legendSize + 16;
                     }
