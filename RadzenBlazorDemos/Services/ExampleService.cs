@@ -605,6 +605,22 @@ namespace RadzenBlazorDemos
             Children = new [] {
                 new Example
                 {
+                    Name = "Overview",
+                    Path = "datagrid",
+                    Title = "Blazor DataGrid Component | Free UI Components by Radzen",
+                    Description = "A free, open-source Blazor DataGrid with sorting, filtering, paging, grouping, virtualization, inline editing, and Excel/CSV export. Bind to IQueryable, Entity Framework, OData, or any data source.",
+                    Tags = new [] { "datagrid", "datatable", "datagridview", "grid", "table", "overview" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind data to the Blazor DataGrid?", Answer = "Set the Data property to an IQueryable or IEnumerable and define columns; for remote data use the LoadData event or bind to an OData service. With IQueryable and Entity Framework, paging, sorting, and filtering run as part of the query." },
+                        new FaqItem { Question = "Does the DataGrid page, sort, and filter on the server?", Answer = "Yes. Bound to an IQueryable (such as Entity Framework) or via LoadData, it translates paging, sorting, and filtering into the query so only the current page is fetched." },
+                        new FaqItem { Question = "Can the DataGrid handle large datasets?", Answer = "Yes. Turn on virtualization or use server-side paging so only the visible rows are rendered and fetched, which keeps it fast on very large sets." },
+                        new FaqItem { Question = "Can I export the DataGrid to Excel?", Answer = "Yes. The grid exports to Excel and CSV." },
+                        new FaqItem { Question = "Is the Radzen Blazor DataGrid free?", Answer = "Yes. It is part of the open-source, MIT-licensed Radzen Blazor Components and is free for commercial use, with no license key." }
+                    }
+                },
+                new Example
+                {
                     Name = "Data-binding",
                     Icon = "\ue3ec",
                     Children = new [] {
@@ -613,7 +629,7 @@ namespace RadzenBlazorDemos
                             Name = "IQueryable",
                             Title = "Blazor DataGrid - IQueryable Data Source | Free UI Components by Radzen",
                             Description = "Use RadzenDataGrid to display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.",
-                            Path = "datagrid",
+                            Path = "datagrid-iqueryable",
                             Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
                         },
                         new Example
@@ -3644,12 +3660,16 @@ namespace RadzenBlazorDemos
                 foreach (var node in nodes)
                 {
                     if (node.Name == "Configuration")
+                    {
                         continue;
+                    }
 
                     if (node.Children != null)
                     {
                         foreach (var child in Collect(node.Children))
+                        {
                             yield return child;
+                        }
                     }
                     else if (!string.IsNullOrEmpty(node.Path) && !nonChart.Contains(node.Path.TrimStart('/')))
                     {
@@ -3671,9 +3691,34 @@ namespace RadzenBlazorDemos
             return config?.Children?.Where(e => !string.IsNullOrEmpty(e.Path)) ?? Enumerable.Empty<Example>();
         }
 
+        // Every leaf page under the "DataGrid" category (across its sub-groups). Article-eligible for schema.
+        public IEnumerable<Example> GetDataGridPages()
+        {
+            IEnumerable<Example> Collect(IEnumerable<Example> nodes)
+            {
+                foreach (var node in nodes)
+                {
+                    if (node.Children != null)
+                    {
+                        foreach (var child in Collect(node.Children))
+                        {
+                            yield return child;
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(node.Path))
+                    {
+                        yield return node;
+                    }
+                }
+            }
+
+            var dataGrid = Examples.FirstOrDefault(c => c.Name == "DataGrid");
+            return dataGrid?.Children != null ? Collect(dataGrid.Children).ToList() : Enumerable.Empty<Example>();
+        }
+
         public string TitleFor(Example example)
         {
-            if (example != null && example.Name != "Overview")
+            if (example != null && (example.Name != "Overview" || example.Title != null))
             {
                 return example.Title ?? $"Blazor {example.Name} | Free UI Components by Radzen";
             }

@@ -5,23 +5,26 @@ using System.Text.Json;
 
 namespace RadzenBlazorDemos
 {
-    // Builds schema.org JSON-LD for the chart pages. Mirrors the approved pattern in
-    // www.radzen.com/Client/Shared/BreadcrumbSchema.razor: plain Dictionary<string,object>
-    // graphs serialized with default System.Text.Json options (escapes < > & to \uXXXX, which
-    // also prevents </script> breakout). Production URLs are hardcoded, like that component.
+    // Builds schema.org JSON-LD for the chart and DataGrid pages. Mirrors the approved pattern in
+    // www.radzen.com/Client/Shared/BreadcrumbSchema.razor: plain Dictionary<string,object> graphs
+    // serialized with default System.Text.Json options (escapes < > & to \uXXXX, which also prevents
+    // </script> breakout). Production URLs are hardcoded, like that component.
     public static class SeoSchema
     {
         const string BaseUrl = "https://blazor.radzen.com";
 
-        // Returns the JSON-LD document for the page, or null when the page is not a chart page.
+        // Returns the JSON-LD document for the page, or null when the page is not in a covered cluster.
         public static string BuildFor(Example example, ExampleService exampleService)
         {
             if (example == null)
+            {
                 return null;
+            }
 
             var path = example.Path?.TrimStart('/');
             var url = AbsoluteUrl(path);
 
+            // Charts gallery hub: CollectionPage + ItemList of every chart page.
             if (path == "charts")
             {
                 return Serialize(new List<object>
@@ -32,95 +35,140 @@ namespace RadzenBlazorDemos
                 });
             }
 
-            var chartPaths = new HashSet<string>(
-                exampleService.GetChartPages().Concat(exampleService.GetChartConfigPages())
-                    .Select(p => p.Path?.TrimStart('/')),
-                StringComparer.OrdinalIgnoreCase);
-
-            if (!chartPaths.Contains(path))
-                return null;
-
-            var graph = new List<object>
+            if (InCluster(exampleService.GetChartPages().Concat(exampleService.GetChartConfigPages()), path))
             {
-                TechArticle(example, exampleService, url),
-                Breadcrumb(new[] { ("Home", BaseUrl + "/"), ("Charts", BaseUrl + "/charts"), (example.Name, url) })
-            };
+                return ArticleGraph(example, url, exampleService, "Charts", "charts");
+            }
+
+            if (InCluster(exampleService.GetDataGridPages(), path))
+            {
+                return ArticleGraph(example, url, exampleService, "DataGrid", "datagrid");
+            }
+
+            return null;
+        }
+
+        static bool InCluster(IEnumerable<Example> pages, string path)
+        {
+            var paths = new HashSet<string>(pages.Select(p => p.Path?.TrimStart('/')), StringComparer.OrdinalIgnoreCase);
+
+            return paths.Contains(path);
+        }
+
+        // TechArticle + BreadcrumbList (+ FAQPage) under a cluster hub (Home > {hub} > Page).
+        // The hub page itself gets only Home > {hub}.
+        static string ArticleGraph(Example example, string url, ExampleService exampleService, string hubLabel, string hubPath)
+        {
+            var crumbs = new List<(string, string)> { ("Home", BaseUrl + "/"), (hubLabel, AbsoluteUrl(hubPath)) };
+
+            if (!string.Equals(example.Path?.TrimStart('/'), hubPath, StringComparison.OrdinalIgnoreCase))
+            {
+                crumbs.Add((example.Name, url));
+            }
+
+            var graph = new List<object> { TechArticle(example, exampleService, url), Breadcrumb(crumbs) };
 
             if (example.Faq != null && example.Faq.Any())
+            {
                 graph.Add(FaqPage(example));
+            }
 
             return Serialize(graph);
         }
 
-        static string Serialize(List<object> graph) => JsonSerializer.Serialize(new Dictionary<string, object>
+        static string Serialize(List<object> graph)
         {
-            ["@context"] = "https://schema.org",
-            ["@graph"] = graph
-        });
-
-        static string AbsoluteUrl(string path) => $"{BaseUrl}/{path}";
-
-        static Dictionary<string, object> CollectionPage(Example e, string url) => new()
-        {
-            ["@type"] = "CollectionPage",
-            ["name"] = e.Title ?? e.Name,
-            ["description"] = e.Description,
-            ["url"] = url
-        };
-
-        static Dictionary<string, object> ItemList(IEnumerable<Example> pages) => new()
-        {
-            ["@type"] = "ItemList",
-            ["itemListElement"] = pages.Select((p, i) => (object)new Dictionary<string, object>
+            return JsonSerializer.Serialize(new Dictionary<string, object>
             {
-                ["@type"] = "ListItem",
-                ["position"] = i + 1,
-                ["name"] = p.Name,
-                ["item"] = AbsoluteUrl(p.Path?.TrimStart('/'))
-            }).ToList()
-        };
+                ["@context"] = "https://schema.org",
+                ["@graph"] = graph
+            });
+        }
 
-        static Dictionary<string, object> Breadcrumb(IEnumerable<(string Name, string Url)> crumbs) => new()
+        static string AbsoluteUrl(string path)
         {
-            ["@type"] = "BreadcrumbList",
-            ["itemListElement"] = crumbs.Select((c, i) => (object)new Dictionary<string, object>
+            return $"{BaseUrl}/{path}";
+        }
+
+        static Dictionary<string, object> CollectionPage(Example example, string url)
+        {
+            return new Dictionary<string, object>
             {
-                ["@type"] = "ListItem",
-                ["position"] = i + 1,
-                ["name"] = c.Name,
-                ["item"] = c.Url
-            }).ToList()
-        };
+                ["@type"] = "CollectionPage",
+                ["name"] = example.Title ?? example.Name,
+                ["description"] = example.Description,
+                ["url"] = url
+            };
+        }
 
-        static Dictionary<string, object> TechArticle(Example e, ExampleService svc, string url) => new()
+        static Dictionary<string, object> ItemList(IEnumerable<Example> pages)
         {
-            ["@type"] = "TechArticle",
-            ["headline"] = e.Title ?? svc.TitleFor(e),
-            ["description"] = e.Description ?? svc.DescriptionFor(e),
-            ["url"] = url,
-            ["author"] = Organization(),
-            ["publisher"] = Organization()
-        };
-
-        static Dictionary<string, object> Organization() => new()
-        {
-            ["@type"] = "Organization",
-            ["name"] = "Radzen"
-        };
-
-        static Dictionary<string, object> FaqPage(Example e) => new()
-        {
-            ["@type"] = "FAQPage",
-            ["mainEntity"] = e.Faq.Select(f => (object)new Dictionary<string, object>
+            return new Dictionary<string, object>
             {
-                ["@type"] = "Question",
-                ["name"] = f.Question,
-                ["acceptedAnswer"] = new Dictionary<string, object>
+                ["@type"] = "ItemList",
+                ["itemListElement"] = pages.Select((p, i) => (object)new Dictionary<string, object>
                 {
-                    ["@type"] = "Answer",
-                    ["text"] = f.Answer
-                }
-            }).ToList()
-        };
+                    ["@type"] = "ListItem",
+                    ["position"] = i + 1,
+                    ["name"] = p.Name,
+                    ["item"] = AbsoluteUrl(p.Path?.TrimStart('/'))
+                }).ToList()
+            };
+        }
+
+        static Dictionary<string, object> Breadcrumb(IEnumerable<(string Name, string Url)> crumbs)
+        {
+            return new Dictionary<string, object>
+            {
+                ["@type"] = "BreadcrumbList",
+                ["itemListElement"] = crumbs.Select((c, i) => (object)new Dictionary<string, object>
+                {
+                    ["@type"] = "ListItem",
+                    ["position"] = i + 1,
+                    ["name"] = c.Name,
+                    ["item"] = c.Url
+                }).ToList()
+            };
+        }
+
+        static Dictionary<string, object> TechArticle(Example example, ExampleService exampleService, string url)
+        {
+            return new Dictionary<string, object>
+            {
+                ["@type"] = "TechArticle",
+                ["headline"] = example.Title ?? exampleService.TitleFor(example),
+                ["description"] = example.Description ?? exampleService.DescriptionFor(example),
+                ["url"] = url,
+                ["author"] = Organization(),
+                ["publisher"] = Organization()
+            };
+        }
+
+        static Dictionary<string, object> Organization()
+        {
+            return new Dictionary<string, object>
+            {
+                ["@type"] = "Organization",
+                ["name"] = "Radzen"
+            };
+        }
+
+        static Dictionary<string, object> FaqPage(Example example)
+        {
+            return new Dictionary<string, object>
+            {
+                ["@type"] = "FAQPage",
+                ["mainEntity"] = example.Faq.Select(f => (object)new Dictionary<string, object>
+                {
+                    ["@type"] = "Question",
+                    ["name"] = f.Question,
+                    ["acceptedAnswer"] = new Dictionary<string, object>
+                    {
+                        ["@type"] = "Answer",
+                        ["text"] = f.Answer
+                    }
+                }).ToList()
+            };
+        }
     }
 }
