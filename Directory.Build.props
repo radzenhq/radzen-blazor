@@ -47,21 +47,11 @@
     <!-- Enable deterministic builds in CI/CD -->
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     
-    <!-- Embed source files for better debugging -->
-    <EmbedAllSources>true</EmbedAllSources>
-    <!--
-      IMPORTANT:
-      - NuGet symbol packages (.snupkg) require portable PDB files.
-      - If DebugType=embedded, there are no standalone PDBs, so the .snupkg ends up effectively empty.
-      Use portable PDBs when symbols are enabled; otherwise use embedded for local debugging convenience.
-    -->
-    <!--
-      NOTE: Directory.Build.props is imported before project files, so properties like IncludeSymbols
-      set in a .csproj may not be available yet for Conditions here.
-      IsPacking *is* set by `dotnet pack`, so use that to switch DebugType for symbol packages.
-    -->
-    <DebugType Condition="'$(IsPacking)' == 'true'">portable</DebugType>
-    <DebugType Condition="'$(IsPacking)' != 'true'">embedded</DebugType>
+    <!-- Apps/tests/tools ship the DLL itself; embedded source can't be Brotli-recompressed and bloats the
+         shipped .wasm (~3.5 MB on RadzenBlazorDemos). Portable PDBs aid local debugging but are not published
+         in a Release Blazor WASM build. snupkg source-embedding lives in Radzen.Blazor/Directory.Build.props. -->
+    <EmbedAllSources>false</EmbedAllSources>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Label="Demos and Tests Project Configuration" Condition="$(MSBuildProjectName.Contains('Demos')) OR $(MSBuildProjectName.Contains('Tests'))">
