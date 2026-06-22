@@ -1305,6 +1305,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Density",
                     Path = "datagrid-density",
+                    Related = new [] { "datagrid-grid-lines", "datagrid-virtualization", "datagrid-iqueryable" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I make the DataGrid more compact?", Answer = "Set Density to Compact to reduce row padding and fit more rows; the default is comfortable." }
+                    },
                     Title = "Blazor DataGrid - Density | Free UI Components by Radzen",
                     Description = "See how to set a compact density mode of Blazor RadzenDataGrid.",
                     Icon = "\ueb9e",
@@ -1319,6 +1324,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Header with button",
                             Path="datagrid-custom-header",
+                            Related = new [] { "datagrid-custom-header-columnpicker", "datagrid-column-picker", "export-excel-csv" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add a toolbar to the DataGrid?", Answer = "Use the HeaderTemplate to render your own toolbar - buttons, search, or any components - above the grid's columns." }
+                            },
                             Title = "Blazor DataGrid - Custom Header | Free UI Components by Radzen",
                             Description = "Gives the grid a custom header, allowing the adding of components to create custom tool bars in addtion to column grouping and column picker.",
                             Tags = new [] { "grid header","header" }
@@ -1327,6 +1337,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Header with column picker",
                             Path="datagrid-custom-header-columnpicker",
+                            Related = new [] { "datagrid-custom-header", "datagrid-column-picker", "datagrid-column-reorder" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I put a column picker in a custom header?", Answer = "Render a RadzenDataGridColumnPicker inside the grid's HeaderTemplate so users toggle column visibility from your toolbar." }
+                            },
                             Title = "Blazor DataGrid - Header Column Picker | Free UI Components by Radzen",
                             Description = "See how to add a column picker to your Blazor RadzenDataGrid.",
                             Tags = new [] { "grid header","header" }
@@ -1337,6 +1352,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "GridLines",
                     Path = "datagrid-grid-lines",
+                    Related = new [] { "datagrid-density", "datagrid-conditional-template", "datagrid-iqueryable" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I change the DataGrid grid lines?", Answer = "Set GridLines to Both, Horizontal, Vertical, or None to control which cell borders are shown." }
+                    },
                     Title = "Blazor DataGrid - Grid Lines | Free UI Components by Radzen",
                     Description = "Deside where to display grid lines in your Blazor RadzenDataGrid.",
                     Icon = "\uf016",
@@ -1346,6 +1366,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Cell Context Menu",
                     Path = "datagrid-cell-contextmenu",
+                    Related = new [] { "datagrid-cell-selection", "datagrid-inline-edit", "datagrid-column-template" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add a context menu to DataGrid cells?", Answer = "Handle the CellContextMenu event and open a RadzenContextMenu with your actions for the clicked cell and row." }
+                    },
                     Title = "Blazor DataGrid - Cell Menu | Free UI Components by Radzen",
                     Description = "Right click on a table cell to open the context menu.",
                     Icon = "\ue22b",
@@ -1362,6 +1387,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "IQueryable",
                             Path = "datagrid-save-settings",
+                            Related = new [] { "datagrid-save-settings-loaddata", "datagrid-column-picker", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I save and restore DataGrid state?", Answer = "Bind the Settings property (or handle its change) to capture page, sort, filter, and column layout, then reapply it on load." }
+                            },
                             Title = "Blazor DataGrid - Save/Load Settings | Free UI Components by Radzen",
                             Description = "Save and load DataGrid state including page index, page size, column filters, sort order, width, and visibility.",
                             Tags = new [] { "save", "load", "settings" }
@@ -1371,6 +1401,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "LoadData binding",
                             Path = "datagrid-save-settings-loaddata",
+                            Related = new [] { "datagrid-save-settings", "datagrid-loaddata", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Does saving DataGrid state work with LoadData binding?", Answer = "Yes. Capture the Settings and reapply them; the grid raises LoadData with the restored sort, filter, and page so your query returns the right rows." }
+                            },
                             Title = "Blazor DataGrid - Save/Load Settings | Free UI Components by Radzen",
                             Description = "This example shows how to save/load DataGrid state using Settings property when binding using LoadData event.",
                             Tags = new [] { "save", "load", "settings", "async", "loaddata" }
@@ -1388,6 +1423,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Rows reorder",
                             Path = "/datagrid-rowreorder",
+                            Related = new [] { "datagrid-rowdragbetween", "datagrid-column-reorder", "datagrid-inline-edit" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I let users drag to reorder rows?", Answer = "Enable row reordering and handle the RowReorder event to update your data when a row is dropped in a new position." }
+                            },
                             Title = "Blazor DataGrid - Reorder rows | Free UI Components by Radzen",
                             Description = "This example demonstrates custom DataGrid rows reoder.",
                             Tags = new [] { "datagrid", "reorder", "row" }
@@ -1396,6 +1436,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Drag row between two DataGrids",
                             Path = "/datagrid-rowdragbetween",
+                            Related = new [] { "datagrid-rowreorder", "datagrid-rowdrag-scheduler", "datagrid-multiple-selection" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I drag rows from one DataGrid to another?", Answer = "Handle the row drag events on both grids to remove the item from the source and add it to the target collection." }
+                            },
                             Title = "Blazor DataGrid - Drag Rows Between Grids | Free UI Components by Radzen",
                             Description = "This example demonstrates drag and drop rows between two DataGrid components.",
                             Tags = new [] { "datagrid", "drag", "row", "between" }
@@ -1404,6 +1449,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Drag row between DataGrid and Scheduler",
                             Path = "/datagrid-rowdrag-scheduler",
+                            Related = new [] { "datagrid-rowdragbetween", "datagrid-rowreorder", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I drag DataGrid rows into the Scheduler?", Answer = "Make the rows draggable and handle the Scheduler's drop to create an appointment from the dropped row." }
+                            },
                             Title = "Blazor DataGrid - Drag Rows to Scheduler | Free UI Components by Radzen",
                             Description = "This example demonstrates drag and drop rows between DataGrid and Scheduler.",
                             Tags = new [] { "datagrid", "drag", "row", "scheduler" }
@@ -1445,6 +1495,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Conditional formatting",
                     Path = "datagrid-conditional-template",
+                    Related = new [] { "datagrid-column-template", "datagrid-conditional-columns-render", "datagrid-grid-lines" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I style DataGrid rows or cells by value?", Answer = "Use CellRender and RowRender to add CSS classes or inline styles based on the data, or a column Template to render conditional content." }
+                    },
                     Title = "Blazor DataGrid - Conditional Format | Free UI Components by Radzen",
                     Description = "This example demonstrates RadzenDataGrid with conditional rows and cells template and styles.",
                     Icon = "\ue41d",
@@ -1454,6 +1509,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Export to Excel and CSV",
                     Path = "export-excel-csv",
+                    Related = new [] { "datagrid-footer-totals", "datagrid-grouping-api", "datagrid-iqueryable" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I export the DataGrid to Excel or CSV?", Answer = "Call the grid's export and choose Excel or CSV; the export uses the current sort, filter, and columns." }
+                    },
                     Title = "Blazor DataGrid - Excel & CSV Export | Free UI Components by Radzen",
                     Description = "This example demonstrates how to export a Radzen Blazor DataGrid to Excel and CSV.",
                     Icon = "\ue0c3",
@@ -1463,6 +1523,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Cascading DropDowns",
                     Path = "cascading-dropdowns",
+                    Related = new [] { "datagrid-inline-edit", "datagrid-incell-edit", "datagrid-column-template" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I create cascading dropdowns in the DataGrid?", Answer = "Bind each dropdown's data to the value of the previous one and reload the dependent options when the parent selection changes." }
+                    },
                     Title = "Blazor DataGrid - Cascading DropDown | Free UI Components by Radzen",
                     Description = "This example demonstrates cascading Radzen Blazor DropDown components.",
                     Icon = "\ue915",
@@ -1472,6 +1537,11 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Empty Data Grid",
                     Path = "/datagrid-empty",
+                    Related = new [] { "datagrid-iqueryable", "datagrid-loaddata", "datagrid-column-template" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I customize the DataGrid's empty state?", Answer = "Use the EmptyTemplate to render your own message or content when the grid has no rows." }
+                    },
                     Title = "Blazor DataGrid - Empty Data Grid | Free UI Components by Radzen",
                     Description = "This example demonstrates Blazor DataGrid without data.",
                     Icon = "\ue661",
