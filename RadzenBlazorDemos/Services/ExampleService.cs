@@ -875,7 +875,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-simple-filter",
                             Title = "Blazor DataGrid - Simple Filter Mode | Free UI Components by Radzen",
                             Description = "RadzenDataGrid simple mode filtering.",
-                            Tags = new [] { "filter", "simple", "grid", "datagrid", "table"}
+                            Tags = new [] { "filter", "simple", "grid", "datagrid", "table"},
+                            Related = new [] { "datagrid-simple-filter-menu", "datagrid-advanced-filter", "datagrid-checkboxlist-filter" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add a filter box to each DataGrid column?", Answer = "Set AllowFiltering to true and FilterMode to Simple; each column shows an inline filter input in its header that filters as the user types." }
+                            }
                         },
                         new Example
                         {
@@ -883,7 +888,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-simple-filter-menu",
                             Title = "Blazor DataGrid - Simple Filter with Menu | Free UI Components by Radzen",
                             Description = "RadzenDataGrid simple mode filtering with Menu.",
-                            Tags = new [] { "filter", "simple", "grid", "datagrid", "table", "menu" }
+                            Tags = new [] { "filter", "simple", "grid", "datagrid", "table", "menu" },
+                            Related = new [] { "datagrid-simple-filter", "datagrid-advanced-filter", "datagrid-mixed-filter" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I let users pick the filter operator?", Answer = "Set FilterMode to SimpleWithMenu; each column shows a filter input and a menu where users choose the operator (contains, equals, greater than, and more)." }
+                            }
                         },
                         new Example
                         {
@@ -891,7 +901,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-advanced-filter",
                             Title = "Blazor DataGrid - Advanced Filter Mode | Free UI Components by Radzen",
                             Description = "RadzenDataGrid advanced mode filtering.",
-                            Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"}
+                            Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"},
+                            Related = new [] { "datagrid-simple-filter", "datagrid-mixed-filter", "datagrid-filter-api" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I let users build multi-condition filters?", Answer = "Set FilterMode to Advanced; each column opens a menu where users add multiple conditions combined with AND/OR." }
+                            }
                         },
                         new Example
                         {
@@ -899,7 +914,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-checkboxlist-filter",
                             Title = "Blazor DataGrid - Excel like filtering | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like filtering.",
-                            Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list" }
+                            Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list" },
+                            Related = new [] { "datagrid-checkboxlist-filter-odata", "datagrid-checkboxlist-lookup-filter", "datagrid-checkboxlist-auto-apply-filter" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add Excel-style checkbox filtering?", Answer = "Set the column's FilterMode to CheckBoxList; the filter shows distinct values as checkboxes for multi-value selection." }
+                            }
                         },
                         new Example
                         {
@@ -907,7 +927,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-checkboxlist-lookup-filter",
                             Title = "Blazor DataGrid - CheckBoxList Filter with Lookup Data | Free UI Components by Radzen",
                             Description = "Drive the CheckBoxList filter from a lookup data source: filter by id while showing and searching by name.",
-                            Tags = new [] { "checkboxlist", "lookup", "filter", "filtering", "datagrid", "table", "dataview" }
+                            Tags = new [] { "checkboxlist", "lookup", "filter", "filtering", "datagrid", "table", "dataview" },
+                            Related = new [] { "datagrid-checkboxlist-filter", "datagrid-checkboxlist-auto-apply-filter", "datagrid-checkboxlist-filter-odata" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I show lookup values in a checkbox filter?", Answer = "Set FilterLookupData with FilterLookupTextProperty and FilterLookupValueProperty on the column; the filter shows the text values and filters by the underlying keys." }
+                            }
                         },
                         new Example
                         {
@@ -915,7 +940,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-checkboxlist-auto-apply-filter",
                             Title = "Blazor DataGrid - CheckBoxList Filter Auto-Apply | Free UI Components by Radzen",
                             Description = "Apply CheckBoxList column filters immediately as options are selected, without the Apply button.",
-                            Tags = new [] { "checkboxlist", "auto", "apply", "filter", "filtering", "datagrid", "table", "dataview" }
+                            Tags = new [] { "checkboxlist", "auto", "apply", "filter", "filtering", "datagrid", "table", "dataview" },
+                            Related = new [] { "datagrid-checkboxlist-filter", "datagrid-checkboxlist-lookup-filter", "datagrid-checkboxlist-filter-odata" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I apply checkbox filters as soon as they're selected?", Answer = "Set AutoApplyCheckBoxListFilter on the grid; CheckBoxList selections filter the data immediately instead of waiting for an Apply button." }
+                            }
                         },
                         new Example
                         {
@@ -923,7 +953,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-checkboxlist-filter-odata",
                             Title = "Blazor DataGrid - Excel Filter with OData | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like filtering with OData.",
-                            Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list", "odata" }
+                            Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list", "odata" },
+                            Related = new [] { "datagrid-checkboxlist-filter", "datagrid-odata", "datagrid-checkboxlist-lookup-filter" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Does checkbox filtering work with OData?", Answer = "Yes. With CheckBoxList filtering over OData, the grid requests distinct values and applies the selected ones as a server-side $filter." }
+                            }
                         },
                         new Example
                         {
@@ -931,7 +966,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-mixed-filter",
                             Title = "Blazor DataGrid - Mixed Filter Mode | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like and advanced mixed mode filtering.",
-                            Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"}
+                            Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"},
+                            Related = new [] { "datagrid-advanced-filter", "datagrid-simple-filter", "datagrid-filter-api" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Can different DataGrid columns use different filter modes?", Answer = "Yes. Set each column's FilterMode so some use the Advanced filter menu and others use the inline Simple filter, in the same grid." }
+                            }
                         },
                         new Example
                         {
@@ -939,7 +979,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-enum-filter",
                             Title = "Blazor DataGrid - Enum Filtering | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use enums in the RadzenDataGrid column filter.",
-                            Tags = new [] { "filter", "enum", "grid", "datagrid", "table"}
+                            Tags = new [] { "filter", "enum", "grid", "datagrid", "table"},
+                            Related = new [] { "datagrid-checkboxlist-filter", "datagrid-simple-filter", "datagrid-advanced-filter" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I filter a DataGrid column that holds an enum?", Answer = "Bind the column to the enum property; the filter offers the enum values, and you can use Description attributes for friendly labels." }
+                            }
                         },
                         new Example
                         {
@@ -947,7 +992,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-sub-properties-filter",
                             Title = "Blazor DataGrid - Sub Property Filter | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use sub properties in the RadzenDataGrid column filter.",
-                            Tags = new [] { "filter", "sub properties", "grid", "datagrid", "table"}
+                            Tags = new [] { "filter", "sub properties", "grid", "datagrid", "table"},
+                            Related = new [] { "datagrid-advanced-filter", "datagrid-column-template", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Can I filter a column bound to a nested property?", Answer = "Yes. Set the column Property to the nested path (for example Order.Customer.Country); filtering, sorting, and grouping follow the same path." }
+                            }
                         },
                         new Example
                         {
@@ -955,7 +1005,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-filter-api",
                             Title = "Blazor DataGrid - Filter API | Free UI Components by Radzen",
                             Description = "Set the initial filter of your RadzenDataGrid via the FilterValue and FilterOperator column properties.",
-                            Tags = new [] { "filter", "api", "grid", "datagrid", "table"}
+                            Tags = new [] { "filter", "api", "grid", "datagrid", "table"},
+                            Related = new [] { "datagrid-advanced-filter", "datagrid-simple-filter", "datagrid-mixed-filter" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I set the DataGrid's initial filter in code?", Answer = "Set each column's FilterValue and FilterOperator (and SecondFilterValue for ranges); the grid applies them on load and whenever you change them." }
+                            }
                         },
                         new Example
                         {
@@ -963,7 +1018,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-filter-template",
                             Title = "Blazor DataGrid - Custom Filtering | Free UI Components by Radzen",
                             Description = "This example demonstrates how to define custom RadzenDataGrid column filter template.",
-                            Tags = new [] { "datagrid", "column", "filter", "template" }
+                            Tags = new [] { "datagrid", "column", "filter", "template" },
+                            Related = new [] { "datagrid-filtervalue-template", "datagrid-advanced-filter", "datagrid-column-template" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I create a custom column filter UI?", Answer = "Add a FilterTemplate to the column and place your own controls inside; update the column's filter value to drive filtering." }
+                            }
                         },
                         new Example
                         {
@@ -971,7 +1031,12 @@ namespace RadzenBlazorDemos
                             Path = "datagrid-filtervalue-template",
                             Title = "Blazor DataGrid - Filter Value Template | Free UI Components by Radzen",
                             Description = "This example demonstrates how to define custom RadzenDataGrid column filter value template.",
-                            Tags = new [] { "datagrid", "column", "filter", "template", "value" }
+                            Tags = new [] { "datagrid", "column", "filter", "template", "value" },
+                            Related = new [] { "datagrid-filter-template", "datagrid-advanced-filter", "datagrid-column-template" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "What is the difference between FilterTemplate and FilterValueTemplate?", Answer = "FilterTemplate replaces the whole filter UI; FilterValueTemplate only customizes how the selected filter value is displayed." }
+                            }
                         },
                     }
                 },
