@@ -636,6 +636,12 @@ namespace RadzenBlazorDemos
                         {
                             Name = "LoadData event",
                             Path = "datagrid-loaddata",
+                            Related = new [] { "datagrid-odata", "datagrid-virtualization-loaddata", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "When should I use the LoadData event?", Answer = "Use LoadData when the data comes from a web API or any source you query yourself - the grid passes you the current page, sort, and filter, and you return that page plus the total count." },
+                                new FaqItem { Question = "How is IQueryable binding different from LoadData?", Answer = "With IQueryable, such as Entity Framework, the grid builds and runs the query for you. With LoadData you run the query yourself and return the page, which suits REST APIs and custom back ends." }
+                            },
                             Title = "Blazor DataGrid - LoadData Event | Free UI Components by Radzen",
                             Description = "Blazor Data Grid custom data-binding via the LoadData event.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "custom" }
@@ -644,6 +650,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "OData service",
                             Path = "datagrid-odata",
+                            Related = new [] { "datagrid-loaddata", "datagrid-checkboxlist-filter-odata", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I bind a DataGrid to OData?", Answer = "Point the grid at the OData endpoint; it turns paging, sorting, and filtering into $skip, $top, $orderby, and $filter so the server returns only the rows in view." }
+                            },
                             Title = "Blazor DataGrid - OData Service | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports data-binding to OData.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata", "service", "rest" }
@@ -652,6 +663,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Dynamic data",
                             Path = "datagrid-dynamic",
+                            Related = new [] { "datagrid-datatable", "datagrid-iqueryable", "datagrid-column-template" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Can the DataGrid display data without a C# model?", Answer = "Yes. Bind to dynamic rows such as dictionaries or ExpandoObject and declare columns at runtime by property name." }
+                            },
                             Title = "Blazor DataGrid - Dynamic Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports dynamic data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
@@ -660,6 +676,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "DataTable data",
                             Path = "datagrid-datatable",
+                            Related = new [] { "datagrid-dynamic", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I bind a DataGrid to a DataTable?", Answer = "Bind the grid to the DataTable and map each column by field name; sorting, filtering, and paging work as usual." }
+                            },
                             Title = "Blazor DataGrid - DataTable Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports DataTable sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "datatable" }
@@ -668,6 +689,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Real-time data",
                             Path = "datagrid-realtime",
+                            Related = new [] { "datagrid-iqueryable", "datagrid-loaddata" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I refresh the DataGrid with real-time data?", Answer = "Update the bound collection as data arrives and call the grid's Reload to re-render the current page." }
+                            },
                             Title = "Blazor DataGrid - Real-time Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid with real-time data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "real-time" }
@@ -676,6 +702,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Crosstab data",
                             Path = "datagrid-crosstab",
+                            Related = new [] { "datagrid-grouping-api", "datagrid-footer-totals", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Can the DataGrid show a crosstab or pivot layout?", Answer = "Yes - project each cross dimension into its own column and define those columns; for a full pivot UI with row and column groups, use the PivotDataGrid." }
+                            },
                             Title = "Blazor DataGrid - Crosstab Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports crosstab data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "crosstab", "rows", "columns" }
@@ -684,6 +715,12 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Performance",
                             Path = "datagrid-performance",
+                            Related = new [] { "datagrid-virtualization", "datagrid-loaddata", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I make the DataGrid fast with large datasets?", Answer = "Enable virtualization or server-side paging via IQueryable or LoadData so only the visible rows render, and keep cell templates simple." },
+                                new FaqItem { Question = "How many rows can the DataGrid handle?", Answer = "With virtualization or server-side paging it stays responsive on very large sets, since it only renders and fetches the rows currently in view." }
+                            },
                             Title = "Blazor DataGrid - Performance | Free UI Components by Radzen",
                             Description = "Blazor Data Grid bound to a large collection of data",
                             Tags = new [] { "datagrid", "bind", "performance", "data", "large" }
@@ -724,6 +761,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Template",
                             Path = "datagrid-column-template",
+                            Related = new [] { "datagrid-composite-columns", "datagrid-conditional-columns-render", "datagrid-inline-edit" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I customize a DataGrid column's cell content?", Answer = "Add a Template to the column and put any Razor markup inside; you get the row item as context to bind to." }
+                            },
                             Title = "Blazor DataGrid - Column Template | Free UI Components by Radzen",
                             Description = "Blazor Data Grid custom appearance via column templates. The Template allows you to customize the way data is displayed.",
                             Tags = new [] { "column", "template", "grid", "datagrid", "table"}
@@ -732,6 +774,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Resizing",
                             Path = "datagrid-column-resizing",
+                            Related = new [] { "datagrid-column-reorder", "datagrid-frozen-columns", "datagrid-column-picker" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable column resizing in the DataGrid?", Answer = "Set AllowColumnResize to true on the grid; users can then drag column borders to resize, and you can set each column's Width for the initial layout." }
+                            },
                             Title = "Blazor DataGrid - Column Resizing | Free UI Components by Radzen",
                             Description = "Enable column resizing in RadzenDataGrid by setting the AllowColumnResizing property to true.",
                             Tags = new [] { "column", "resizing", "grid", "datagrid", "table"}
@@ -740,6 +787,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Column Picker",
                             Path = "datagrid-column-picker",
+                            Related = new [] { "datagrid-column-reorder", "datagrid-column-resizing", "datagrid-frozen-columns" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I let users show and hide DataGrid columns?", Answer = "Enable column picking (AllowColumnPicking) and the grid renders a menu where users toggle column visibility." }
+                            },
                             Title = "Blazor DataGrid - Column Picker | Free UI Components by Radzen",
                             Description = "Enable column picker in RadzenDataGrid by setting the AllowColumnPicking property to true.",
                             Tags = new [] { "datagrid", "column", "picker", "chooser" }
@@ -748,6 +800,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Reorder",
                             Path = "datagrid-column-reorder",
+                            Related = new [] { "datagrid-column-resizing", "datagrid-column-picker", "datagrid-frozen-columns" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable column reordering?", Answer = "Set AllowColumnReorder to true; users can then drag column headers to change the column order." }
+                            },
                             Title = "Blazor DataGrid - Column Reorder | Free UI Components by Radzen",
                             Description = "Enable column reorder in RadzenDataGrid by setting the AllowColumnReorder property to true. Define column initial order using column OrderIndex property.",
                             Tags = new [] { "column", "reorder", "grid", "datagrid", "table"}
@@ -756,6 +813,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Footer Totals",
                             Path = "datagrid-footer-totals",
+                            Related = new [] { "datagrid-grouping-api", "datagrid-crosstab", "datagrid-iqueryable" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I show column totals in the DataGrid?", Answer = "Add a FooterTemplate to the column and compute the aggregate - sum, average, count, min, or max - over the grid's view; it updates as the data is filtered and paged." }
+                            },
                             Title = "Blazor DataGrid - Footer Totals | Free UI Components by Radzen",
                             Description = "The FooterTemplate column property allows you to display aggregated data in the column footer.",
                             Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
@@ -764,6 +826,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Frozen Columns",
                             Path = "datagrid-frozen-columns",
+                            Related = new [] { "datagrid-column-resizing", "datagrid-column-reorder", "datagrid-virtualization" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I freeze a column in the DataGrid?", Answer = "Set Frozen on the column, and FrozenPosition for left or right; it stays in place while the other columns scroll horizontally." }
+                            },
                             Title = "Blazor DataGrid - Frozen Columns | Free UI Components by Radzen",
                             Description = "Lock columns in RadzenDataGrid to prevent them from scrolling out of view via the Frozen property.",
                             Tags = new [] { "datagrid", "column", "frozen", "locked" }
@@ -772,6 +839,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Composite Columns",
                             Path = "datagrid-composite-columns",
+                            Related = new [] { "datagrid-column-template", "datagrid-frozen-columns", "datagrid-grouping-api" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I create grouped or multi-level column headers?", Answer = "Nest child columns inside a parent RadzenDataGridColumn; the parent renders as a spanning header above its children." }
+                            },
                             Title = "Blazor DataGrid - Composite Columns | Free UI Components by Radzen",
                             Description = "Use RadzenDataGridColumn Columns property to define child columns.",
                             Tags = new [] { "datagrid", "column", "composite", "merged", "complex" }
@@ -780,6 +852,11 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Conditional Columns",
                             Path = "datagrid-conditional-columns-render",
+                            Related = new [] { "datagrid-column-template", "datagrid-column-picker", "datagrid-conditional-template" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I show a DataGrid column conditionally?", Answer = "Bind the column's Visible property to your condition, or render columns with normal Razor control flow so they appear only when needed." }
+                            },
                             Title = "Blazor DataGrid - Conditional Columns | Free UI Components by Radzen",
                             Description = "Use RadzenDataGridColumn Columns property to define child columns conditionally.",
                             Tags = new [] { "datagrid", "column", "conditional", "render", "complex" }
