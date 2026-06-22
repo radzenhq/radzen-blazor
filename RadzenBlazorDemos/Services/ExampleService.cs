@@ -3182,6 +3182,7 @@ namespace RadzenBlazorDemos
                     Children = new [] {
                         new Example
                         {
+                            Toc = [ new () { Text = "Customization", Anchor = "#customization" }, new () { Text = "Various radius", Anchor = "#various-radius" }, new () { Text = "Explode on hover", Anchor = "#explode-on-hover" }, new () { Text = "Segment gap", Anchor = "#segment-gap" } ],
                             Name = "Pie Chart",
                             Path = "pie-chart",
                             Description = "Show parts of a whole at a glance with a Blazor pie chart. Free and open source, from Radzen.",
@@ -3197,6 +3198,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Toc = [ new () { Text = "Customization", Anchor = "#customization" }, new () { Text = "Various radius", Anchor = "#various-radius" }, new () { Text = "Explode on hover", Anchor = "#explode-on-hover" }, new () { Text = "Segment gap", Anchor = "#segment-gap" } ],
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Show proportions with a Blazor donut chart - a pie with an open center for a total or label.",
