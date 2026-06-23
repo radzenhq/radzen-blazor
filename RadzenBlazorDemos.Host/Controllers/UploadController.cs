@@ -17,7 +17,7 @@ namespace RadzenBlazorDemos
             this.environment = environment;
         }
 
-        [HttpPut("upload/stream")]
+        [HttpPut("api/upload/stream")]
         public async Task<IActionResult> Stream()
         {
             try
@@ -38,7 +38,7 @@ namespace RadzenBlazorDemos
             }
         }
         
-        [HttpPost("upload/single")]
+        [HttpPost("api/upload/single")]
         public IActionResult Single(IFormFile file)
         {
             try
@@ -52,7 +52,7 @@ namespace RadzenBlazorDemos
             }
         }
 
-        [HttpPost("upload/image")]
+        [HttpPost("api/upload/image")]
         public IActionResult Image(IFormFile file)
         {
             try
@@ -99,7 +99,7 @@ namespace RadzenBlazorDemos
             }
         }
 
-        [HttpPost("upload/multiple")]
+        [HttpPost("api/upload/multiple")]
         public IActionResult Multiple(IFormFile[] files)
         {
             try
@@ -113,7 +113,7 @@ namespace RadzenBlazorDemos
             }
         }
 
-        [HttpPost("upload/custom-header")]
+        [HttpPost("api/upload/custom-header")]
         public IActionResult CustomHeader(IFormFile file)
         {
             try
@@ -129,7 +129,7 @@ namespace RadzenBlazorDemos
             }
         }
 
-        [HttpPost("upload/{id}")]
+        [HttpPost("api/upload/{id}")]
         public IActionResult Post(IFormFile[] files, int id, [FromQuery] string query)
         {
             try
@@ -142,7 +142,7 @@ namespace RadzenBlazorDemos
             }
         }
 
-        [HttpPost("upload/specific")]
+        [HttpPost("api/upload/specific")]
         public IActionResult Specific(IFormFile myName)
         {
             try

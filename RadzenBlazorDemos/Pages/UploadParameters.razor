@@ -15,7 +15,7 @@
     private int id = 42;
     private string query = "query";
 
-    private string Url => $"upload/{id}?query={query}";
+    private string Url => $"api/upload/{id}?query={query}";
 
     void OnComplete(UploadCompleteEventArgs args)
     {

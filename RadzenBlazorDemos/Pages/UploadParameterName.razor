@@ -1,5 +1,5 @@
 ﻿<RadzenCard Variant="Variant.Outlined">
-    <RadzenUpload Url="upload/specific" Style="width: 100%" Progress=@OnProgress 
+    <RadzenUpload Url="api/upload/specific" Style="width: 100%" Progress=@OnProgress 
         ParameterName="myName" InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})" />
 </RadzenCard>
 <EventConsole @ref=@console />

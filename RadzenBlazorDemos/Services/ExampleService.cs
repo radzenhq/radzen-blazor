@@ -2547,7 +2547,7 @@ namespace RadzenBlazorDemos
                     ],
                     Name = "Upload",
                     Description = "Demonstration and configuration of the Radzen Blazor Upload component.",
-                    Path = "example-upload",
+                    Path = "upload",
                     Icon = "\uf09b",
                     Tags = new [] { "upload", "file"}
                 },

@@ -89,7 +89,8 @@ public static class CanonicalRedirectMiddleware
         ["/docs/guides/components/timespanpicker.html"] = "/timespanpicker",
         ["/docs/guides/components/tooltip.html"] = "/tooltip",
         ["/docs/guides/components/tree.html"] = "/tree",
-        ["/docs/guides/components/upload.html"] = "/example-upload"
+        ["/docs/guides/components/upload.html"] = "/upload",
+        ["/example-upload"] = "/upload"
     }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
     public static IApplicationBuilder UseCanonicalRedirects(this IApplicationBuilder app)
