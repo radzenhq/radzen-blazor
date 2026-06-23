@@ -144,26 +144,36 @@
                   <RadzenColumn Size="12">
                     <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                       <RadzenStack Gap="1rem">
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween"> 
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
                           <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2">Monthly Performance Overview</RadzenText>
-                          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-                            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                            <RadzenLabel Text="Show labels" Component="dataLabels" />
+                          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                              <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                              <RadzenLabel Text="Show labels" Component="dataLabels" />
+                            </RadzenStack>
+                            <RadzenSelectBar @bind-Value="@selectedRange" TValue="int" Size="ButtonSize.Small" Change="@(_ => UpdateViews())">
+                              <Items>
+                                <RadzenSelectBarItem Text="3M" Value="3" />
+                                <RadzenSelectBarItem Text="6M" Value="6" />
+                                <RadzenSelectBarItem Text="12M" Value="12" />
+                                <RadzenSelectBarItem Text="24M" Value="24" />
+                              </Items>
+                            </RadzenSelectBar>
                           </RadzenStack>
                         </RadzenStack>
                         <RadzenChart>
-                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@completedTasksData" CategoryProperty="Month" Title="Completed" ValueProperty="Count">
+                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@completedView" CategoryProperty="Month" Title="Completed" ValueProperty="Count">
                             <RadzenSeriesDataLabels Visible="@showDataLabels" />
                           </RadzenStackedColumnSeries>
-                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@inProgressTasksData" CategoryProperty="Month" Title="In Progress" ValueProperty="Count">
+                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@inProgressView" CategoryProperty="Month" Title="In Progress" ValueProperty="Count">
                             <RadzenSeriesDataLabels Visible="@showDataLabels" />
                           </RadzenStackedColumnSeries>
-                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@overdueTasksData" CategoryProperty="Month" Title="Overdue" ValueProperty="Count">
+                          <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@overdueView" CategoryProperty="Month" Title="Overdue" ValueProperty="Count">
                             <RadzenSeriesDataLabels Visible="@showDataLabels" />
                           </RadzenStackedColumnSeries>
-                          <RadzenColumnOptions Radius="4" Margin="5" />
+                          <RadzenColumnOptions Radius="4" Margin="5" MaxWidth="40" />
                           <RadzenCategoryAxis Padding="0" LabelAutoRotation="-60" />
-                          <RadzenValueAxis Min="0" Step="10">
+                          <RadzenValueAxis Min="0">
                             <RadzenGridLines Visible="true" />
                             <RadzenAxisTitle Text="Number of Tasks" />
                           </RadzenValueAxis>
@@ -598,7 +608,13 @@
   private List<TaskCountData> overdueTasksData = new();
   private List<string> priorityOptions = new() { "High", "Medium", "Low" };
   private List<string> categoryOptions = new() { "Work", "Personal", "Learning", "Health" };
+
+  // Monthly Performance Overview chart state
   private bool showDataLabels = false;
+  private int selectedRange = 12;
+  private List<TaskCountData> completedView = new();
+  private List<TaskCountData> inProgressView = new();
+  private List<TaskCountData> overdueView = new();
 
   protected override void OnInitialized()
   {
@@ -642,54 +658,100 @@
       new TaskItem { Id = 1018, Name = "Security audit", Description = "Conduct security audit of all systems and applications", DueDate = DateTime.Now.AddDays(17), Priority = "High", Status = "Pending" }
     };
 
-    // Initialize monthly performance data (Jan-Dec) - separate arrays for each series
+    // Initialize monthly performance data (two years, Jan '24 - Dec '25) - separate arrays for each series
     completedTasksData = new List<TaskCountData>
     {
-      new TaskCountData { Month = "Jan", Count = 25 },
-      new TaskCountData { Month = "Feb", Count = 32 },
-      new TaskCountData { Month = "Mar", Count = 28 },
-      new TaskCountData { Month = "Apr", Count = 35 },
-      new TaskCountData { Month = "May", Count = 30 },
-      new TaskCountData { Month = "Jun", Count = 38 },
-      new TaskCountData { Month = "Jul", Count = 33 },
-      new TaskCountData { Month = "Aug", Count = 36 },
-      new TaskCountData { Month = "Sep", Count = 31 },
-      new TaskCountData { Month = "Oct", Count = 42 },
-      new TaskCountData { Month = "Nov", Count = 37 },
-      new TaskCountData { Month = "Dec", Count = 29 }
+      new TaskCountData { Month = "Jan '24", Count = 54 },
+      new TaskCountData { Month = "Feb '24", Count = 47 },
+      new TaskCountData { Month = "Mar '24", Count = 63 },
+      new TaskCountData { Month = "Apr '24", Count = 49 },
+      new TaskCountData { Month = "May '24", Count = 71 },
+      new TaskCountData { Month = "Jun '24", Count = 58 },
+      new TaskCountData { Month = "Jul '24", Count = 66 },
+      new TaskCountData { Month = "Aug '24", Count = 52 },
+      new TaskCountData { Month = "Sep '24", Count = 78 },
+      new TaskCountData { Month = "Oct '24", Count = 69 },
+      new TaskCountData { Month = "Nov '24", Count = 84 },
+      new TaskCountData { Month = "Dec '24", Count = 73 },
+      new TaskCountData { Month = "Jan '25", Count = 91 },
+      new TaskCountData { Month = "Feb '25", Count = 67 },
+      new TaskCountData { Month = "Mar '25", Count = 82 },
+      new TaskCountData { Month = "Apr '25", Count = 99 },
+      new TaskCountData { Month = "May '25", Count = 76 },
+      new TaskCountData { Month = "Jun '25", Count = 104 },
+      new TaskCountData { Month = "Jul '25", Count = 88 },
+      new TaskCountData { Month = "Aug '25", Count = 95 },
+      new TaskCountData { Month = "Sep '25", Count = 79 },
+      new TaskCountData { Month = "Oct '25", Count = 110 },
+      new TaskCountData { Month = "Nov '25", Count = 93 },
+      new TaskCountData { Month = "Dec '25", Count = 106 }
     };
 
     inProgressTasksData = new List<TaskCountData>
     {
-      new TaskCountData { Month = "Jan", Count = 12 },
-      new TaskCountData { Month = "Feb", Count = 15 },
-      new TaskCountData { Month = "Mar", Count = 18 },
-      new TaskCountData { Month = "Apr", Count = 14 },
-      new TaskCountData { Month = "May", Count = 16 },
-      new TaskCountData { Month = "Jun", Count = 13 },
-      new TaskCountData { Month = "Jul", Count = 17 },
-      new TaskCountData { Month = "Aug", Count = 11 },
-      new TaskCountData { Month = "Sep", Count = 19 },
-      new TaskCountData { Month = "Oct", Count = 12 },
-      new TaskCountData { Month = "Nov", Count = 15 },
-      new TaskCountData { Month = "Dec", Count = 20 }
+      new TaskCountData { Month = "Jan '24", Count = 27 },
+      new TaskCountData { Month = "Feb '24", Count = 34 },
+      new TaskCountData { Month = "Mar '24", Count = 22 },
+      new TaskCountData { Month = "Apr '24", Count = 41 },
+      new TaskCountData { Month = "May '24", Count = 30 },
+      new TaskCountData { Month = "Jun '24", Count = 38 },
+      new TaskCountData { Month = "Jul '24", Count = 25 },
+      new TaskCountData { Month = "Aug '24", Count = 44 },
+      new TaskCountData { Month = "Sep '24", Count = 33 },
+      new TaskCountData { Month = "Oct '24", Count = 49 },
+      new TaskCountData { Month = "Nov '24", Count = 36 },
+      new TaskCountData { Month = "Dec '24", Count = 28 },
+      new TaskCountData { Month = "Jan '25", Count = 45 },
+      new TaskCountData { Month = "Feb '25", Count = 39 },
+      new TaskCountData { Month = "Mar '25", Count = 52 },
+      new TaskCountData { Month = "Apr '25", Count = 31 },
+      new TaskCountData { Month = "May '25", Count = 47 },
+      new TaskCountData { Month = "Jun '25", Count = 35 },
+      new TaskCountData { Month = "Jul '25", Count = 54 },
+      new TaskCountData { Month = "Aug '25", Count = 42 },
+      new TaskCountData { Month = "Sep '25", Count = 29 },
+      new TaskCountData { Month = "Oct '25", Count = 50 },
+      new TaskCountData { Month = "Nov '25", Count = 38 },
+      new TaskCountData { Month = "Dec '25", Count = 46 }
     };
 
     overdueTasksData = new List<TaskCountData>
     {
-      new TaskCountData { Month = "Jan", Count = 6 },
-      new TaskCountData { Month = "Feb", Count = 7 },
-      new TaskCountData { Month = "Mar", Count = 8 },
-      new TaskCountData { Month = "Apr", Count = 6 },
-      new TaskCountData { Month = "May", Count = 9 },
-      new TaskCountData { Month = "Jun", Count = 7 },
-      new TaskCountData { Month = "Jul", Count = 10 },
-      new TaskCountData { Month = "Aug", Count = 6 },
-      new TaskCountData { Month = "Sep", Count = 11 },
-      new TaskCountData { Month = "Oct", Count = 8 },
-      new TaskCountData { Month = "Nov", Count = 9 },
-      new TaskCountData { Month = "Dec", Count = 12 }
+      new TaskCountData { Month = "Jan '24", Count = 22 },
+      new TaskCountData { Month = "Feb '24", Count = 31 },
+      new TaskCountData { Month = "Mar '24", Count = 18 },
+      new TaskCountData { Month = "Apr '24", Count = 27 },
+      new TaskCountData { Month = "May '24", Count = 35 },
+      new TaskCountData { Month = "Jun '24", Count = 24 },
+      new TaskCountData { Month = "Jul '24", Count = 19 },
+      new TaskCountData { Month = "Aug '24", Count = 33 },
+      new TaskCountData { Month = "Sep '24", Count = 28 },
+      new TaskCountData { Month = "Oct '24", Count = 21 },
+      new TaskCountData { Month = "Nov '24", Count = 38 },
+      new TaskCountData { Month = "Dec '24", Count = 26 },
+      new TaskCountData { Month = "Jan '25", Count = 17 },
+      new TaskCountData { Month = "Feb '25", Count = 29 },
+      new TaskCountData { Month = "Mar '25", Count = 23 },
+      new TaskCountData { Month = "Apr '25", Count = 36 },
+      new TaskCountData { Month = "May '25", Count = 20 },
+      new TaskCountData { Month = "Jun '25", Count = 32 },
+      new TaskCountData { Month = "Jul '25", Count = 25 },
+      new TaskCountData { Month = "Aug '25", Count = 39 },
+      new TaskCountData { Month = "Sep '25", Count = 22 },
+      new TaskCountData { Month = "Oct '25", Count = 30 },
+      new TaskCountData { Month = "Nov '25", Count = 27 },
+      new TaskCountData { Month = "Dec '25", Count = 34 }
     };
+
+    UpdateViews();
+  }
+
+  // Show only the most recent months selected in the range picker
+  private void UpdateViews()
+  {
+    completedView = completedTasksData.TakeLast(selectedRange).ToList();
+    inProgressView = inProgressTasksData.TakeLast(selectedRange).ToList();
+    overdueView = overdueTasksData.TakeLast(selectedRange).ToList();
   }
 
   private void ShowNotifications()
