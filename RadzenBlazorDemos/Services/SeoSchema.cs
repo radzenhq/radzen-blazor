@@ -20,6 +20,7 @@ namespace RadzenBlazorDemos
             "scheduler",
             "icon",
             "dashboard",
+            "themes",
         };
 
         // Returns the JSON-LD document for the page, or null when the page is not in a covered cluster.

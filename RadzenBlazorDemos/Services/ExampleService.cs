@@ -79,7 +79,14 @@ namespace RadzenBlazorDemos
                     Name = "Themes",
                     Path = "themes",
                     Title = "Blazor Themes | Free UI Components by Radzen",
-                    Description = "Free and premium Blazor themes for Radzen components. Choose the style that best suits your project.",
+                    Description = "Choose from free and premium Blazor themes for Radzen Blazor components - including Material and dark themes - or build your own with the theme customization tools.",
+                    Related = new [] { "theme-service", "colors", "appearance-toggle" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I change the theme in Blazor?", Answer = "Reference the theme's CSS and set it through ThemeService (or the Theme parameter); themes can switch at runtime, including a dark-mode toggle." },
+                        new FaqItem { Question = "Does Radzen Blazor offer dark mode themes?", Answer = "Yes. Several themes ship with dark variants, and users can toggle between light and dark at runtime." },
+                        new FaqItem { Question = "Can I create a custom Blazor theme?", Answer = "Yes. Start from a built-in theme and customize its colors and variables, or use the theme customization tools to build your own." }
+                    },
                     Icon = "\ue40a",
                     Tags = new[] { "theme", "color", "background", "border", "utility", "css", "var"}
                 },
@@ -571,7 +578,7 @@ namespace RadzenBlazorDemos
                     Related = new [] { "tile-layout", "datagrid", "charts" },
                     Faq = new []
                     {
-                        new FaqItem { Question = "How do I build a dashboard in Blazor?", Answer = "Combine Radzen components such as charts, DataGrids, cards, and the TileLayout on a single page and bind them to your data; this sample visualizes live GitHub issues." }
+                        new FaqItem { Question = "How do I build a dashboard in Blazor?", Answer = "Combine Radzen Blazor components such as charts, DataGrids, cards, and the TileLayout on a single page and bind them to your data; this sample visualizes live GitHub issues." }
                     },
                     Icon = "\ue868"
                 },
@@ -3088,7 +3095,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Area Chart",
                             Path = "area-chart",
-                            Description = "Show how a value's volume changes over time with a Blazor area chart - a filled line chart. Free and open source, from Radzen.",
+                            Description = "Show how a value's volume changes over time with a Blazor area chart - a filled line chart. Free and open source.",
                             Tags = new [] { "chart", "graph", "area" },
                             Related = new [] { "line-chart", "stacked-area-chart", "range-area-chart", "column-chart" },
                             Faq = new []
@@ -3191,7 +3198,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Bar Chart",
                             Path = "bar-chart",
-                            Description = "Rank categories with a Blazor bar chart - horizontal bars sized by value, with room for long labels. Free and open source, from Radzen.",
+                            Description = "Rank categories with a Blazor bar chart - horizontal bars sized by value, with room for long labels. Free and open source.",
                             Tags = new [] { "chart", "graph", "column", "bar" },
                             Related = new [] { "column-chart", "stacked-bar-chart", "range-bar-chart", "line-chart" },
                             Faq = new []
@@ -3266,7 +3273,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Column Chart",
                             Path = "column-chart",
-                            Description = "Compare values across categories with a Blazor column chart - vertical bars, ideal for time series. Free and open source, from Radzen.",
+                            Description = "Compare values across categories with a Blazor column chart - vertical bars, ideal for time series. Free and open source.",
                             Tags = new [] { "chart", "graph", "column", "bar" },
                             Related = new [] { "bar-chart", "grouped-column-chart", "stacked-column-chart", "line-chart" },
                             Faq = new []
@@ -3369,7 +3376,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Line Chart",
                             Path = "line-chart",
-                            Description = "Show a trend over time with a Blazor line chart - the clearest way to follow how a value changes. Free and open source, from Radzen.",
+                            Description = "Show a trend over time with a Blazor line chart - the clearest way to follow how a value changes. Free and open source.",
                             Tags = new [] { "chart", "graph", "line" },
                             Related = new [] { "area-chart", "spline-chart", "step-line-chart", "column-chart" },
                             Faq = new []
@@ -3444,7 +3451,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Waterfall Chart",
                             Path = "waterfall-chart",
-                            Description = "Explain how a starting value reaches a final total with a Blazor waterfall chart - each step shown as a rise or fall. Free and open source, from Radzen.",
+                            Description = "Explain how a starting value reaches a final total with a Blazor waterfall chart - each step shown as a rise or fall. Free and open source.",
                             Tags = new [] { "chart", "graph", "waterfall", "column", "cumulative", "running total", "summary" },
                             New = true,
                             Related = new [] { "horizontal-waterfall-chart", "column-chart", "negative-column-chart" },
@@ -3479,7 +3486,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Customization", Anchor = "#customization" }, new () { Text = "Various radius", Anchor = "#various-radius" }, new () { Text = "Explode on hover", Anchor = "#explode-on-hover" }, new () { Text = "Segment gap", Anchor = "#segment-gap" } ],
                             Name = "Pie Chart",
                             Path = "pie-chart",
-                            Description = "Show parts of a whole at a glance with a Blazor pie chart. Free and open source, from Radzen.",
+                            Description = "Show parts of a whole at a glance with a Blazor pie chart. Free and open source.",
                             Tags = new [] { "chart", "graph", "pie" },
                             Updated = true,
                             Related = new [] { "donut-chart", "column-chart", "funnel-chart" },
@@ -3544,7 +3551,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Scatter Chart",
                             Path = "scatter-chart",
-                            Description = "Plot X/Y points to reveal correlation, clusters, and outliers with a Blazor scatter chart. Free and open source, from Radzen.",
+                            Description = "Plot X/Y points to reveal correlation, clusters, and outliers with a Blazor scatter chart. Free and open source.",
                             Tags = new [] { "chart", "graph", "scatter", "point", "xy" },
                             Related = new [] { "bubble-chart", "scatter-line-chart", "line-chart" },
                             Faq = new []
@@ -3620,7 +3627,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Candlestick Chart",
                             Path = "candlestick-chart",
-                            Description = "Show how a price opened, closed, and swung with a Blazor candlestick chart - one candle per trading period. Free and open source, from Radzen.",
+                            Description = "Show how a price opened, closed, and swung with a Blazor candlestick chart - one candle per trading period. Free and open source.",
                             Tags = new [] { "chart", "graph", "candlestick", "ohlc", "financial", "stock" },
                             New = true,
                             Related = new [] { "ohlc-chart", "highlow-chart", "line-chart", "area-chart" },
@@ -3635,7 +3642,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "OHLC Chart",
                             Path = "ohlc-chart",
-                            Description = "Follow price action with a Blazor OHLC bar chart - open, high, low, and close in one compact tick per period. Free and open source, from Radzen.",
+                            Description = "Follow price action with a Blazor OHLC bar chart - open, high, low, and close in one compact tick per period. Free and open source.",
                             Tags = new [] { "chart", "graph", "ohlc", "financial", "stock", "open", "high", "low", "close" },
                             New = true,
                             Related = new [] { "candlestick-chart", "highlow-chart", "line-chart" },
@@ -3650,7 +3657,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "High-Low Chart",
                             Path = "highlow-chart",
-                            Description = "Show the range between a low and a high value for each point with a Blazor high-low chart. Free and open source, from Radzen.",
+                            Description = "Show the range between a low and a high value for each point with a Blazor high-low chart. Free and open source.",
                             Tags = new [] { "chart", "graph", "highlow", "high", "low", "range", "temperature" },
                             New = true,
                             Related = new [] { "candlestick-chart", "ohlc-chart", "range-column-chart", "range-bar-chart" },
@@ -3665,7 +3672,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Box Plot Chart",
                             Path = "box-plot-chart",
-                            Description = "Compare distributions with a Blazor box plot - quartiles, median, and outliers at a glance. Free and open source, from Radzen.",
+                            Description = "Compare distributions with a Blazor box plot - quartiles, median, and outliers at a glance. Free and open source.",
                             Tags = new [] { "chart", "graph", "box", "plot", "whisker", "quartile", "statistics", "distribution" },
                             New = true,
                             Related = new [] { "highlow-chart", "scatter-chart", "column-chart" },
@@ -3729,7 +3736,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Pareto Chart",
                             Path = "pareto-chart",
-                            Description = "Find the vital few with a Blazor pareto chart - sorted bars plus a cumulative line. Free and open source, from Radzen.",
+                            Description = "Find the vital few with a Blazor pareto chart - sorted bars plus a cumulative line. Free and open source.",
                             Tags = new [] { "chart", "graph", "pareto", "cumulative", "quality" },
                             New = true,
                             Related = new [] { "column-chart", "line-chart", "funnel-chart" },
@@ -3830,7 +3837,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Radial Gauge",
                             Path = "radial-gauge",
-                            Description = "Show a value on a circular dial with a Blazor radial gauge - speedometer-style, with ranges and pointers. Free and open source, from Radzen.",
+                            Description = "Show a value on a circular dial with a Blazor radial gauge - speedometer-style, with ranges and pointers. Free and open source.",
                             Tags = new [] { "gauge", "graph", "radial", "circle" },
                             Related = new [] { "arc-gauge", "linear-gauge", "bullet-chart" },
                             Faq = new []
@@ -3895,7 +3902,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Heatmap",
                     Path = "heatmap-chart",
-                    Description = "Show values on a labeled color-coded grid with a Blazor heatmap - calendars, matrices, and density. Free and open source, from Radzen.",
+                    Description = "Show values on a labeled color-coded grid with a Blazor heatmap - calendars, matrices, and density. Free and open source.",
                     Tags = new [] { "chart", "heatmap", "grid", "matrix", "color", "intensity" },
                     Icon = "\ue8f0",
                     New = true,
