@@ -21,6 +21,18 @@ namespace RadzenBlazorDemos
             "icon",
             "dashboard",
             "themes",
+            "menu",
+            "tabs",
+            "accordion",
+            "contextmenu",
+            "breadcrumb",
+            "panelmenu",
+            "login",
+            "profile-menu",
+            "carousel",
+            "steps",
+            "link",
+            "toc",
         };
 
         // Returns the JSON-LD document for the page, or null when the page is not in a covered cluster.

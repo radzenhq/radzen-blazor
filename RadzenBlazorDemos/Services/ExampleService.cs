@@ -2045,8 +2045,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Accordion with single expand", Anchor = "#single-expand" }, new () { Text = "Accordion with multiple expand", Anchor = "#multiple-expand" }, new () { Text = "Dynamically create Accordion items", Anchor = "#dynamic-items" }, new () { Text = "Expand/Collapse events", Anchor = "#expand-collapse-events" }, new () { Text = "Client-side rendering", Anchor = "#client-render-mode" }, new () { Text = "Disable expand/collapse", Anchor = "#disable-expand-collapse" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Accordion",
+                    Title = "Blazor Accordion Component | Free UI Components by Radzen",
                     Path = "accordion",
-                    Description = "Demonstration and configuration of the Blazor RadzenAccordion component.",
+                    Description = "The Blazor Accordion shows collapsible panels with single or multiple expand modes, dynamic items, and expand/collapse events.",
+                    Related = new [] { "tabs", "panelmenu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I allow multiple panels open in the Blazor Accordion?", Answer = "Set Multiple to true so more than one panel can be expanded at once; otherwise opening one collapses the others." }
+                    },
                     Icon = "\ue8fe",
                     Tags = new [] { "panel", "container" }
                 },
@@ -2054,8 +2060,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Default Radzen BreadCrumb", Anchor = "#default-breadcrumb" }, new () { Text = "BreadCrumb width template", Anchor = "#breadcrumb-template" }, new () { Text = "BreadCrumb with child content", Anchor = "#breadcrumb-child-template" } ],
                     Name = "BreadCrumb",
-                    Description = "The Blazor RadzenBreadCrumb component provides a navigation trail to help users keep track of their location.",
+                    Title = "Blazor BreadCrumb Component | Free UI Components by Radzen",
+                    Description = "The Blazor BreadCrumb shows a navigation trail so users can see and jump back to their location in the app.",
                     Path = "breadcrumb",
+                    Related = new [] { "menu", "steps" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add breadcrumbs in Blazor?", Answer = "Add RadzenBreadCrumb with RadzenBreadCrumbItem children, each with Text and Path, to show the navigation trail." }
+                    },
                     Icon = "\uea50",
                     Tags = new [] { "breadcrumb", "navigation", "menu" }
                 },
@@ -2063,8 +2075,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Navigation button styles", Anchor = "#navigation-style" }, new () { Text = "Navigation button content", Anchor = "#navigation-content" }, new () { Text = "Paging", Anchor = "#paging" }, new () { Text = "Data-binding", Anchor = "#data-binding" }, new () { Text = "Carousel with RadzenPager", Anchor = "#pager" } ],
                     Name = "Carousel",
-                    Description = "Demonstration and configuration of the Radzen Blazor Carousel component.",
+                    Title = "Blazor Carousel Component | Free UI Components by Radzen",
+                    Description = "The Blazor Carousel cycles through content - images or any markup - with navigation arrows and paging.",
                     Path = "carousel",
+                    Related = new [] { "tabs", "steps" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build an image carousel in Blazor?", Answer = "Add RadzenCarousel with item content; it cycles through items with navigation arrows and optional auto-cycle and paging." }
+                    },
                     Icon = "\ue8eb",
                     Tags = new [] { "carousel", "gallery", "slide", "deck", "container" }
                 },
@@ -2072,8 +2090,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Show ContextMenu with items", Anchor = "#contextmenu-with-items" }, new () { Text = "Show ContextMenu with custom content and separator", Anchor = "#contextmenu-with-custom-content" }, new () { Text = "Show ContextMenu for HTML element", Anchor = "#contextmenu-for-html-element" } ],
                     Name = "ContextMenu",
-                    Description = "Demonstration and configuration of the Radzen Blazor Context Menu component.",
+                    Title = "Blazor ContextMenu - Right-Click Menu | Free UI Components by Radzen",
+                    Description = "The Blazor ContextMenu opens a right-click menu of actions anywhere in your app via ContextMenuService.",
                     Path = "contextmenu",
+                    Related = new [] { "menu", "profile-menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add a right-click menu in Blazor?", Answer = "Handle an element's @oncontextmenu and call ContextMenuService.Open with your menu items to show a context menu." }
+                    },
                     Icon = "\ue8de",
                     Tags = new [] { "popup", "dropdown", "menu" }
                 },
@@ -2081,24 +2105,42 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Link to path in application", Anchor = "#link-to-path" }, new () { Text = "Link to path in application with icon", Anchor = "#link-with-icon" }, new () { Text = "Link to url", Anchor = "#link-to-url" }, new () { Text = "Link with child content", Anchor = "#link-child-content" }, new () { Text = "Link disabled", Anchor = "#link-disabled" } ],
                     Name = "Link",
-                    Description = "Demonstration and configuration of the Blazor RadzenLink component. Use Path and Target properties to specify Link component navigation.",
+                    Title = "Blazor Link Component | Free UI Components by Radzen",
+                    Description = "The Blazor Link renders a navigation link with Path and Target, integrated with Blazor routing.",
                     Path = "link",
+                    Related = new [] { "menu", "breadcrumb" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How is RadzenLink different from a plain anchor?", Answer = "It renders a styled navigation link with Path and Target that integrates with Blazor routing and the component theme." }
+                    },
                     Icon = "\ue157"
                 },
                 new Example
                 {
                     Toc = [ new () { Text = "Login Events", Anchor = "#login-events" }, new () { Text = "Simple Login", Anchor = "#simple-login" }, new () { Text = "Login with Register (hide password reset)", Anchor = "#login-with-register" }, new () { Text = "Remember me", Anchor = "#remember-me" }, new () { Text = "Form fields", Anchor = "#form-fields" }, new () { Text = "Localization", Anchor = "#localization" }, new () { Text = "Horizontal login layout example", Anchor = "#horizontal-login-example" }, new () { Text = "Vertical login layout example", Anchor = "#vertical-login-example" } ],
                     Name = "Login",
-                    Description = "Demonstration and configuration of the Blazor RadzenLogin component.",
+                    Title = "Blazor Login Component | Free UI Components by Radzen",
+                    Description = "The Blazor Login component is a ready-made sign-in form with configurable fields, events, and layout.",
                     Path = "login",
+                    Related = new [] { "profile-menu", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Does the Blazor Login component handle authentication?", Answer = "It provides the sign-in form and raises a Login event with the credentials; you wire that to your own authentication logic." }
+                    },
                     Icon = "\uea77"
                 },
                 new Example
                 {
                     Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Menu",
-                    Description = "Demonstration and configuration of the Blazor RadzenMenu component.",
+                    Title = "Blazor Menu - Navigation Menu | Free UI Components by Radzen",
+                    Description = "The Blazor Menu builds horizontal or vertical navigation menus with nested submenus, icons, and templates.",
                     Path = "menu",
+                    Related = new [] { "panelmenu", "contextmenu", "profile-menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I create a navigation menu in Blazor?", Answer = "Add RadzenMenu with RadzenMenuItem children; nest items for submenus and set Icon and Path on each item." }
+                    },
                     Icon = "\ue5d2",
                     Tags = new [] { "navigation", "dropdown" }
                 },
@@ -2106,8 +2148,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Statically declared items", Anchor = "#panelmenu-static" }, new () { Text = "Programmatically created items with Expanded binding", Anchor = "#panelmenu-programmatic" }, new () { Text = "Set the display style of menu items", Anchor = "#panelmenu-display-style" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "PanelMenu",
+                    Title = "Blazor PanelMenu - Sidebar Menu | Free UI Components by Radzen",
                     Path = "panelmenu",
-                    Description = "Demonstration and configuration of the Blazor RadzenPanelMenu component.",
+                    Description = "The Blazor PanelMenu is a vertical, expandable sidebar menu with nested items - ideal for app navigation.",
+                    Related = new [] { "menu", "accordion", "profile-menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor PanelMenu used for?", Answer = "It is a vertical, collapsible sidebar menu with nested items, commonly used for application navigation." }
+                    },
                     Icon = "\ue875",
                     Tags = new [] { "navigation", "menu" }
                 },
@@ -2115,8 +2163,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "ProfileMenu",
-                    Description = "Demonstration and configuration of the Blazor RadzenProfileMenu component.",
+                    Title = "Blazor ProfileMenu Component | Free UI Components by Radzen",
+                    Description = "The Blazor ProfileMenu shows a user avatar with a dropdown of account and navigation actions.",
                     Path = "profile-menu",
+                    Related = new [] { "menu", "panelmenu", "login" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add a user profile menu in Blazor?", Answer = "Use RadzenProfileMenu with an avatar and RadzenProfileMenuItem children for account and navigation actions." }
+                    },
                     Icon = "\ue851",
                     Tags = new [] { "navigation", "dropdown", "menu" }
                 },
@@ -2124,8 +2178,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Transition", Anchor = "#transition" }, new () { Text = "CanChange event", Anchor = "#canchange-event" } ],
                     Name = "Steps",
-                    Description = "Blazor Steps component to guide users through a process with numbered steps representing each stage.",
+                    Title = "Blazor Steps - Wizard / Stepper | Free UI Components by Radzen",
+                    Description = "The Blazor Steps component guides users through a multi-step process (wizard) with numbered stages.",
                     Path = "steps",
+                    Related = new [] { "tabs", "breadcrumb" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a wizard in Blazor?", Answer = "Use RadzenSteps with RadzenStepsItem children; each step shows its content and you can validate before advancing." }
+                    },
                     Icon = "\ue8be",
                     Tags = new [] { "step", "steps", "wizard", "transition", "animation" }
                 },
@@ -2133,8 +2193,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Tabs position", Anchor = "#tabs-position" }, new () { Text = "Server render mode", Anchor = "#server-render-mode" }, new () { Text = "Client render mode", Anchor = "#client-render-mode" }, new () { Text = "TabItems modify", Anchor = "#tabs-modify" }, new () { Text = "Tab items wrap", Anchor = "#tabs-wrap" }, new () { Text = "Prevent Tab change", Anchor = "#prevent-tab-change" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Tabs",
-                    Description = "Demonstration and configuration of the Radzen Blazor Tabs component.",
+                    Title = "Blazor Tabs Component | Free UI Components by Radzen",
+                    Description = "The Blazor Tabs component organizes content into tabbed panels, with positioning, dynamic tabs, and lazy or client/server rendering.",
                     Path = "tabs",
+                    Related = new [] { "accordion", "steps" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I render tabs lazily in Blazor?", Answer = "Set RenderMode so tab content loads on demand (client) or is kept server-side, and bind SelectedIndex to control the active tab." }
+                    },
                     Icon = "\ue8d8",
                     Tags = new [] { "tabstrip", "tabview", "container" }
                 },
@@ -2142,8 +2208,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Sticky TOC", Anchor = "#sticky" }, new () { Text = "Orientation", Anchor = "#orientation" } ],
                     Name = "Toc",
-                    Description = "Table of contents component",
+                    Title = "Blazor Table of Contents (ToC) | Free UI Components by Radzen",
+                    Description = "The Blazor ToC auto-generates a table of contents from the headings on the current page.",
                     Path = "toc",
+                    Related = new [] { "breadcrumb", "link" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Blazor ToC build its list?", Answer = "It scans the page's heading elements and generates a linked table of contents automatically." }
+                    },
                     Icon = "\ue241",
                     Tags = [ "toc", "content", "navigation" ]
                 }
