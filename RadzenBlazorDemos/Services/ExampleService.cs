@@ -2200,8 +2200,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Get and Set the value of CheckBox", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBox using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "TriState CheckBox", Anchor = "#tristate-checkbox" }, new () { Text = "Disabled CheckBox", Anchor = "#disabled-checkbox" }, new () { Text = "ReadOnly CheckBox", Anchor = "#readonly-checkbox" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "CheckBox",
+                    Title = "Blazor CheckBox Component | Free UI Components by Radzen",
                     Path = "checkbox",
-                    Description = "Demonstration and configuration of the Radzen Blazor CheckBox component with optional tri-state support.",
+                    Description = "The Blazor CheckBox binds a bool value with optional tri-state (true/false/null) support, plus disabled and read-only modes.",
+                    Related = new [] { "checkboxlist", "switch", "radiobuttonlist" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I enable tri-state in the Blazor CheckBox?", Answer = "Set TriState to true and bind Value to a nullable bool; the checkbox then cycles through checked, unchecked, and null (indeterminate)." }
+                    },
                     Icon = "\ue834",
                     Tags = new [] { "form", "edit" }
                 },
@@ -2209,8 +2215,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Get and Set the value of CheckBoxList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBoxList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set CheckBoxList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate CheckBoxList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated CheckBoxList items from data", Anchor = "#statically-declared" }, new () { Text = "Select all CheckBoxList items", Anchor = "#select-all-items" }, new () { Text = "Disabled CheckBoxList item", Anchor = "#disabled-item" }, new () { Text = "ReadOnly CheckBoxList item", Anchor = "#readonly-item" }, new () { Text = "Templated CheckBoxList item", Anchor = "#templated-item" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "CheckBoxList",
+                    Title = "Blazor CheckBoxList - Multiple Checkboxes | Free UI Components by Radzen",
                     Path = "checkboxlist",
-                    Description = "Demonstration and configuration of the Radzen Blazor CheckBoxList component.",
+                    Description = "The Blazor CheckBoxList lets users select multiple items from a data-bound list, with orientation, select-all, and item templates.",
+                    Related = new [] { "checkbox", "radiobuttonlist", "listbox" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I select multiple items with the Blazor CheckBoxList?", Answer = "Bind Value to a collection; each checked item is added to it. Populate the list with Data plus TextProperty and ValueProperty." }
+                    },
                     Icon = "\ue6b1",
                     Tags = new [] { "form", "edit" }
                 },
@@ -2500,8 +2512,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Get and Set the value of RadioButtonList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of RadioButtonList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set RadioButtonList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate RadioButtonList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated RadioButtonList items from data", Anchor = "#populate-items-statically" }, new () { Text = "RadioButtonList with null value", Anchor = "#null-value" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "RadioButtonList",
+                    Title = "Blazor RadioButtonList - Radio Buttons | Free UI Components by Radzen",
                     Path = "radiobuttonlist",
-                    Description = "Demonstration and configuration of the Radzen Blazor radio button list component.",
+                    Description = "The Blazor RadioButtonList shows a set of radio buttons bound to data, with horizontal or vertical orientation and null value support.",
+                    Related = new [] { "checkboxlist", "selectbar", "dropdown" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Blazor RadioButtonList to data?", Answer = "Set Data to your collection with TextProperty and ValueProperty (or declare RadzenRadioButtonListItem items), then bind the selected value with @bind-Value." }
+                    },
                     Icon = "\ue837",
                     Tags = new [] { "toggle", "form", "edit" }
                 },
@@ -2509,8 +2527,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Get and Set the value of Rating", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Rating using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set number of stars", Anchor = "#number-of-stars" }, new () { Text = "Disabled Rating", Anchor = "#disabled-rating" }, new () { Text = "Read-only Rating", Anchor = "#readonly-rating" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Rating",
+                    Title = "Blazor Rating - Star Rating | Free UI Components by Radzen",
                     Path = "rating",
-                    Description = "Demonstration and configuration of the Radzen Blazor Rating component.",
+                    Description = "The Blazor Rating captures a star rating, with a configurable number of stars and disabled or read-only modes.",
+                    Related = new [] { "slider", "numeric" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I set the number of stars in the Blazor Rating?", Answer = "Set Stars to the maximum number of stars, bind Value to the selected rating, and use ReadOnly to display a fixed rating." }
+                    },
                     Icon = "\ue839",
                     Tags = new [] { "star", "form", "edit" }
                 },
@@ -2553,8 +2577,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Get and Set the value of SelectBar", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of SelectBar using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Populate SelectBar items from data", Anchor = "#populate-from-data" }, new () { Text = "Statically declared and populated SelectBar items from data", Anchor = "#populate-items-statically" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "SelectBar with icons", Anchor = "#icons" }, new () { Text = "SelectBar with images", Anchor = "#images" }, new () { Text = "SelectBar with template", Anchor = "#template" }, new () { Text = "SelectBar Size", Anchor = "#size" }, new () { Text = "SelectBar Orientation", Anchor = "#orientation" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "SelectBar",
+                    Title = "Blazor SelectBar - Button Group Selector | Free UI Components by Radzen",
                     Path = "selectbar",
-                    Description = "Demonstration and configuration of the Radzen Blazor SelectBar component.",
+                    Description = "The Blazor SelectBar is a button-group selector for single or multiple choices, with icons and templates.",
+                    Related = new [] { "radiobuttonlist", "toggle-button", "dropdown" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Can the Blazor SelectBar select multiple values?", Answer = "Yes. Set Multiple to true and bind Value to a collection to allow more than one selected button." }
+                    },
                     Icon = "\uf8e8",
                     Tags = new [] { "form", "edit" }
                 },
@@ -2608,8 +2638,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" }, new () { Text = "Disabled Switch", Anchor = "#disabled-switch" } ],
                     Name = "Switch",
+                    Title = "Blazor Switch - Toggle Switch | Free UI Components by Radzen",
                     Path = "switch",
-                    Description = "Demonstration and configuration of the Radzen Blazor Switch component.",
+                    Description = "The Blazor Switch is a toggle switch that binds a bool value for on and off settings.",
+                    Related = new [] { "checkbox", "toggle-button" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Blazor Switch?", Answer = "Bind Value to a bool with @bind-Value; it is true when the switch is on and false when off." }
+                    },
                     Icon = "\ue9f6",
                     Tags = new [] { "form", "edit", "switch" }
                 },
