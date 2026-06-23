@@ -2227,60 +2227,94 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Get and Set the value of DropDown", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDown using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-and-value-properties" }, new () { Text = "DropDown with template", Anchor = "#template" }, new () { Text = "Disable specific item", Anchor = "#disable-item" }, new () { Text = "Clear selected item", Anchor = "#clear-selected-item" }, new () { Text = "Editable DropDown", Anchor = "#editable-dropdown" }, new () { Text = "Open and close events", Anchor = "#open-and-close-event" }, new () { Text = "DropDown Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                             Name = "Single selection",
                             Path = "dropdown",
-                            Title = "Blazor DropDown Component | Free UI Components by Radzen",
-                            Description = "Demonstration and configuration of the Radzen Blazor DropDown component.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown" },
+                            Title = "Blazor DropDown / Select Component | Free UI Components by Radzen",
+                            Description = "Free Blazor DropDown (select) component with data binding, filtering, multiple selection, grouping, templates, and virtualization for large lists. Bind to any IEnumerable or IQueryable.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "combobox", "multiselect" },
+                            Related = new [] { "dropdown-multiple", "dropdown-filtering", "dropdown-grouping", "dropdown-virtualization", "dropdown-tree", "dropdown-datagrid" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I bind data to the Blazor DropDown?", Answer = "Set the Data property to any IEnumerable or IQueryable and use TextProperty and ValueProperty to choose the display text and the bound value. Bind the selection with @bind-Value." },
+                                new FaqItem { Question = "How do I enable multiple selection (multiselect)?", Answer = "Set Multiple to true and bind Value to a collection. The DropDown then shows checkboxes and a summary of the selected items." },
+                                new FaqItem { Question = "How do I add search or filtering to the DropDown?", Answer = "Set AllowFiltering to true so users can type to filter the list. You can choose the filter operator and case sensitivity, or load filtered data on demand." },
+                                new FaqItem { Question = "Can the DropDown handle large lists?", Answer = "Yes. Turn on virtualization and bind to an IQueryable so only the visible options are rendered and fetched, which keeps it fast on very large lists." },
+                                new FaqItem { Question = "Is the Radzen Blazor DropDown free?", Answer = "Yes. It is part of the open-source, MIT-licensed Radzen Blazor Components and is free for commercial use, with no license key." }
+                            },
                         },
                         new Example
                         {
                             Toc = [ new () { Text = "Define max labels and selected items text", Anchor = "#define-max-labels-and-selected-items-text" }, new () { Text = "Specify an Equality Comparer for item selection. Useful when binding directly to an object collection.", Anchor = "#item-comparer" } ],
                             Name = "Multiple selection",
                             Path = "dropdown-multiple",
-                            Title = "Blazor DropDown - Multi Selection | Free UI Components by Radzen",
-                            Description = "This example demonstrates multiple selection support in Radzen Blazor DropDown component.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown" },
+                            Title = "Blazor MultiSelect DropDown | Free UI Components by Radzen",
+                            Description = "Select multiple items from the Blazor DropDown (multiselect). Bind to a collection, show a summary label, and set an equality comparer when binding to objects.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "multiselect" },
+                            Related = new [] { "dropdown", "dropdown-filtering", "dropdown-grouping", "dropdown-tree" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable multiple selection in the Blazor DropDown?", Answer = "Set Multiple to true and bind Value to a collection (such as a List). The DropDown shows checkboxes and a summary of the selected items." },
+                                new FaqItem { Question = "How do I bind multiselect to a list of objects?", Answer = "Bind Value to a collection of the value type and set an equality comparer so the DropDown can match selected objects back to the list items." }
+                            },
                         },
                         new Example
                         {
                             Name = "Virtualization",
                             Path = "dropdown-virtualization",
-                            Title = "Blazor DropDown - Virtualization | Free UI Components by Radzen",
-                            Description = "This example demonstrates virtualization using IQueryable.",
+                            Title = "Blazor DropDown - Virtualization for Large Lists | Free UI Components by Radzen",
+                            Description = "Render large Blazor DropDown lists efficiently with UI virtualization. Load items on demand from an IQueryable so only the visible options are fetched.",
                             Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "virtualization", "paging" },
+                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "datagrid-virtualization" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How does the Blazor DropDown handle very large lists?", Answer = "Turn on virtualization and bind to an IQueryable. Only the visible options are rendered and fetched, so the dropdown stays fast even with tens of thousands of items." }
+                            },
                         },
                         new Example
                         {
                             Name = "Filtering",
                             Path = "dropdown-filtering",
-                            Title = "Blazor DropDown - Filtering | Free UI Components by Radzen",
-                            Description = "This example demonstrates Blazor DropDown component filtering case sensitivity and filter operator.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "filter" },
+                            Title = "Blazor DropDown - Filtering & Search | Free UI Components by Radzen",
+                            Description = "Add search to the Blazor DropDown with built-in filtering. Choose the filter operator (contains, starts with), toggle case sensitivity, or filter data on demand.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "filter", "search" },
+                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-virtualization", "dropdown-grouping" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add a search box to the Blazor DropDown?", Answer = "Set AllowFiltering to true. Users can then type to filter the items, and you can control the filter operator (contains, starts with) and case sensitivity." },
+                                new FaqItem { Question = "How do I make DropDown filtering case-insensitive?", Answer = "Set FilterCaseSensitivity to CaseInsensitive so the search matches items regardless of letter case." }
+                            },
                         },
                         new Example
                         {
                             Name = "Grouping",
                             Path = "dropdown-grouping",
                             Title = "Blazor DropDown - Grouping | Free UI Components by Radzen",
-                            Description = "This example demonstrates Blazor DropDown component with grouping.",
+                            Description = "Group Blazor DropDown items into categories with group headers bound from a property in your data.",
                             Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "grouping" },
+                            Related = new [] { "dropdown", "dropdown-filtering", "dropdown-multiple", "dropdown-tree" },
                         },
                         new Example
                         {
                             Toc = [ new () { Text = "DropDown data binding to enum", Anchor = "#data-binding-to-enum" } ],
                             Name = "Custom objects binding",
                             Path = "dropdown-custom-objects",
-                            Title = "Blazor DropDown - Custom Objects | Free UI Components by Radzen",
-                            Description = "This example demonstrates Blazor DropDown component binding to custom objects.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "custom" },
+                            Title = "Blazor DropDown - Bind to Objects & Enums | Free UI Components by Radzen",
+                            Description = "Bind the Blazor DropDown to custom objects or enums, using TextProperty and ValueProperty to control the display text and the bound value.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "custom", "enum" },
+                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-grouping", "dropdown-tree" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I bind a Blazor DropDown to a list of objects?", Answer = "Set Data to your object collection and set TextProperty to the property shown in the list and ValueProperty to the property bound to Value." },
+                                new FaqItem { Question = "How do I bind a Blazor DropDown to an enum?", Answer = "Bind Data to the enum values (for example Enum.GetValues) and bind Value to the enum field; the DropDown displays each name and stores the selected enum value." }
+                            },
                         },
                         new Example
                         {
                             Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection with checkboxes", Anchor = "#multiple-selection" }, new () { Text = "Filtering", Anchor = "#filtering" } ],
                             Name = "DropDown with Tree",
                             Path = "dropdown-tree",
-                            Title = "Blazor DropDown Tree | Free UI Components by Radzen",
-                            Description = "Combine Popup and Tree to create a DropDownTree for hierarchical selection.",
+                            Title = "Blazor DropDown Tree - Hierarchical Select | Free UI Components by Radzen",
+                            Description = "Combine a popup and a tree to build a Blazor DropDownTree for hierarchical single or multiple selection with filtering.",
                             Tags = new [] { "select", "picker", "form", "edit", "dropdown", "tree", "hierarchical" },
+                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "tree" },
                         },
                     }
                 },
@@ -2289,9 +2323,16 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Get and Set the value of DropDownDataGrid", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDownDataGrid using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-value-properties" }, new () { Text = "DropDownDataGrid with custom header, footer, value and item templates", Anchor = "#template" }, new () { Text = "Define multiple columns", Anchor = "#multiple-columns" }, new () { Text = "Filtering case sensitivity and filter operator", Anchor = "#filtering-case-sensitivity-and-filter-operator" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "DropDownDataGrid binding to dynamic data", Anchor = "#dynamic" }, new () { Text = "DropDownDataGrid Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "DropDownDataGrid",
                     Path = "dropdown-datagrid",
-                    Description = "Blazor DropDown component with columns and multiple selection support.",
+                    Title = "Blazor DropDownDataGrid - Grid in a DropDown | Free UI Components by Radzen",
+                    Description = "Show tabular data inside a dropdown with the Blazor DropDownDataGrid - multiple columns, filtering, paging, and single or multiple selection.",
                     Icon = "\ue99c",
-                    Tags = new [] { "select", "picker", "form", "edit" }
+                    Tags = new [] { "select", "picker", "form", "edit", "dropdown", "grid", "multiselect" },
+                    Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "datagrid" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor DropDownDataGrid?", Answer = "It is a dropdown that shows a DataGrid in its popup, so users pick a value from a multi-column, filterable, paged grid instead of a plain list." },
+                        new FaqItem { Question = "Can the DropDownDataGrid select multiple rows?", Answer = "Yes. Set Multiple to true and bind Value to a collection to let users select several rows, with filtering and paging in the popup grid." }
+                    }
                 },
                 new Example
                 {
