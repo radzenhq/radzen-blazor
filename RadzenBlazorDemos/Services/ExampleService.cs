@@ -2168,18 +2168,33 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Filled Buttons", Anchor = "#filled-buttons" }, new () { Text = "Flat Buttons", Anchor = "#flat-buttons" }, new () { Text = "Outlined Buttons", Anchor = "#outlined-buttons" }, new () { Text = "Text Buttons", Anchor = "#text-buttons" }, new () { Text = "Content in Buttons", Anchor = "#content-in-buttons" }, new () { Text = "Button Sizes", Anchor = "#button-sizes" }, new () { Text = "FAB", Anchor = "#fab" }, new () { Text = "Disabled Button", Anchor = "#disabled-button" }, new () { Text = "Busy button", Anchor = "#busy-button" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Button",
-                    Description = "Demonstration and configuration of the RadzenButton Blazor component.",
+                    Title = "Blazor Button Component | Free UI Components by Radzen",
+                    Description = "The Radzen Blazor Button comes in filled, flat, outlined, and text variants, with sizes, icons, shades, busy and disabled states, and click handling.",
                     Path = "button",
+                    Tags = new [] { "button", "form", "click" },
+                    Related = new [] { "splitbutton", "toggle-button", "fab" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What button styles does the Radzen Blazor Button support?", Answer = "It supports filled, flat, outlined, and text variants, each with shades, sizes, and icon support, so you can match primary, secondary, and subtle actions." },
+                        new FaqItem { Question = "How do I add an icon to a Blazor Button?", Answer = "Set the Icon property to a Material icon name; you can combine it with Text or use an icon-only button." },
+                        new FaqItem { Question = "How do I show a busy or disabled Button?", Answer = "Set IsBusy to true to show a spinner and block clicks during an operation, and set Disabled to true to disable the button." }
+                    },
                     Icon = "\ue72f"
                 },
                 new Example
                 {
                     Toc = [ new () { Text = "Bound ToggleButton", Anchor = "#bound-toggle-button" }, new () { Text = "ToggleButton Shade", Anchor = "#shade" }, new () { Text = "ToggleButton Style", Anchor = "#style" }, new () { Text = "ToggleButton Variants", Anchor = "#variants" }, new () { Text = "Content in ToggleButtons", Anchor = "#content" }, new () { Text = "ToggleButton Sizes", Anchor = "#sizes" }, new () { Text = "Disabled ToggleButton", Anchor = "#disabled" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "ToggleButton",
-                    Description = "Radzen Blazor ToggleButton is a button that changes its appearance or color when activated and returns to its original state when deactivated.",
+                    Title = "Blazor ToggleButton - Toggle / On-Off Button | Free UI Components by Radzen",
+                    Description = "The Blazor ToggleButton switches between on and off states, changing its appearance when activated - ideal for toolbars and settings.",
                     Path = "toggle-button",
                     Icon = "\ue8e0",
-                    Tags = new [] { "button", "switch", "toggle" }
+                    Tags = new [] { "button", "switch", "toggle" },
+                    Related = new [] { "button", "switch", "selectbar" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Blazor ToggleButton state?", Answer = "Bind Value to a bool with @bind-Value; it is true when the button is toggled on and false when off." }
+                    }
                 },
                 new Example
                 {
@@ -2354,18 +2369,30 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB position", Anchor = "#position" }, new () { Text = "Multiple FABs", Anchor = "#multiple-fabs" }, new () { Text = "Busy FAB", Anchor = "#busy-fab" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Fab",
                     Path = "fab",
-                    Description = "Demonstration and configuration of the Radzen Blazor Fab component.",
+                    Title = "Blazor FAB - Floating Action Button | Free UI Components by Radzen",
+                    Description = "The Blazor FAB (floating action button) highlights your app's primary action with a circular, elevated button.",
                     Icon = "\ue147",
-                    Tags = new [] { "fab", "button", "floating", "action" }
+                    Tags = new [] { "fab", "button", "floating", "action" },
+                    Related = new [] { "fab-menu", "button" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is a FAB (floating action button) in Blazor?", Answer = "A FAB is a circular, elevated button that floats above the UI to highlight the primary action on a screen, such as add or compose." }
+                    }
                 },
                 new Example
                 {
                     Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB menu with icon only buttons", Anchor = "#icons" }, new () { Text = "Expand direction", Anchor = "#direction" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "FabMenu",
                     Path = "fab-menu",
-                    Description = "Demonstration and configuration of the Radzen Blazor FabMenu component.",
+                    Title = "Blazor FAB Menu - Floating Action Menu | Free UI Components by Radzen",
+                    Description = "The Blazor FAB Menu expands a floating action button into a menu of quick actions.",
                     Icon = "\ue091",
-                    Tags = new [] { "fab", "menu", "button", "floating", "action" }
+                    Tags = new [] { "fab", "menu", "button", "floating", "action" },
+                    Related = new [] { "fab", "button", "menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Blazor FAB Menu work?", Answer = "The FAB Menu shows a floating action button that expands into a set of smaller action buttons when pressed, giving quick access to related actions." }
+                    }
                 },
                 new Example
                 {
@@ -2551,16 +2578,30 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "SpeechToTextButton",
-                    Description = "Demonstration and configuration of the Radzen Blazor speech to text button component.",
+                    Title = "Blazor Speech to Text Button | Free UI Components by Radzen",
+                    Description = "The Blazor Speech to Text Button captures voice input using the browser's speech recognition and writes the transcript to your field.",
                     Path = "speechtotextbutton",
+                    Tags = new [] { "button", "speech", "voice", "dictation", "form" },
+                    Related = new [] { "button", "textbox", "aichat" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Blazor Speech to Text Button work?", Answer = "It uses the browser's built-in speech recognition to capture the user's voice and writes the recognized text to the bound value." }
+                    },
                     Icon = "\ue029"
                 },
                 new Example
                 {
                     Toc = [ new () { Text = "Filled SplitButton", Anchor = "#filled" }, new () { Text = "Flat SplitButton", Anchor = "#flat" }, new () { Text = "Outlined SplitButton", Anchor = "#outlined" }, new () { Text = "Text SplitButton", Anchor = "#text" }, new () { Text = "Content in SplitButton", Anchor = "#content" }, new () { Text = "SplitButton Sizes", Anchor = "#sizes" }, new () { Text = "Disabled SplitButton", Anchor = "#disabled" }, new () { Text = "Busy SplitButton", Anchor = "#busy" }, new () { Text = "AlwaysOpenPopup SplitButton", Anchor = "#always-open-popup" }, new () { Text = "DropDown icon of SplitButton", Anchor = "#customize-dropdown-icon" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "SplitButton",
-                    Description = "Demonstration and configuration of the Radzen Blazor split button component",
+                    Title = "Blazor SplitButton - Button with Dropdown Menu | Free UI Components by Radzen",
+                    Description = "The Blazor SplitButton pairs a primary action with a dropdown menu of additional options.",
                     Path = "splitbutton",
+                    Tags = new [] { "button", "menu", "dropdown", "split", "form" },
+                    Related = new [] { "button", "fab-menu", "menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How is a SplitButton different from a regular button?", Answer = "A SplitButton runs a primary action when its main area is clicked and opens a dropdown menu of secondary actions from its arrow, combining a button and a menu." }
+                    },
                     Icon = "\uf756"
                 },
                 new Example
