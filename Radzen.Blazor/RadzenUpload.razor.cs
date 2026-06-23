@@ -203,6 +203,15 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
+        /// Gets or sets the tab order index for keyboard navigation.
+        /// Controls the order in which the Choose button receives focus when the user presses the Tab key.
+        /// Lower values receive focus first. Use -1 to exclude from tab navigation.
+        /// </summary>
+        /// <value>The tab index. Default is 0 (natural tab order).</value>
+        [Parameter]
+        public int TabIndex { get; set; } = 0;
+
+        /// <summary>
         /// Gets the choose class list.
         /// </summary>
         /// <value>The choose class list.</value>

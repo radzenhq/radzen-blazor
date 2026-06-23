@@ -8,7 +8,7 @@
 {
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-fileupload-buttonbar">
-        <span class="@ChooseClassList" tabindex="@(Disabled ? -1 : 0)" role="button" aria-label="@ChooseText"
+        <span class="@ChooseClassList" tabindex="@(Disabled ? -1 : TabIndex)" role="button" aria-label="@ChooseText"
               aria-disabled="@(Disabled ? "true" : "false")" aria-controls="@(Name ?? GetId())"
               >
             @RenderInput()
