@@ -255,8 +255,15 @@ namespace RadzenBlazorDemos
             Name = "Markdown",
             Icon = "\uf552",
             Path = "markdown",
-            Description = "Use Radzen Blazor Markdown component to render markdown content.",
-            Tags = new[] { "markdown", "text", "content" }
+            Title = "Blazor Markdown - Render Markdown Content | Free UI Components by Radzen",
+            Description = "Render Markdown content as HTML in Blazor with RadzenMarkdown - auto-linked headings and support for embedded Blazor components.",
+            Tags = new[] { "markdown", "text", "content", "render" },
+            Related = new [] { "html-editor", "textarea" },
+            Faq = new []
+            {
+                new FaqItem { Question = "How do I render Markdown in Blazor?", Answer = "Add RadzenMarkdown and set its Text property (or place markdown as its child content); it renders the Markdown as HTML." },
+                new FaqItem { Question = "Can I embed Blazor components inside Markdown?", Answer = "Yes. RadzenMarkdown renders Blazor components placed inside the markdown content, alongside standard Markdown syntax." }
+            }
         },
         new Example
         {

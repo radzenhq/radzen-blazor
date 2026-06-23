@@ -45,6 +45,7 @@ namespace RadzenBlazorDemos
             "stack",
             "column",
             "tile-layout",
+            "markdown",
         };
 
         // Returns the JSON-LD document for the page, or null when the page is not in a covered cluster.
