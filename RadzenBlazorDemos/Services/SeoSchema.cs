@@ -45,6 +45,12 @@ namespace RadzenBlazorDemos
                 return ArticleGraph(example, url, exampleService, "DataGrid", "datagrid");
             }
 
+            // Forms has no single hub; each component is its own breadcrumb root.
+            if (path != null && exampleService.GetFormsComponentHubs().TryGetValue(path, out var formsHub))
+            {
+                return ArticleGraph(example, url, exampleService, formsHub.Label, formsHub.Path);
+            }
+
             return null;
         }
 

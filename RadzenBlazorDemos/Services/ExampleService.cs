@@ -4000,29 +4000,61 @@ namespace RadzenBlazorDemos
             return config?.Children?.Where(e => !string.IsNullOrEmpty(e.Path)) ?? Enumerable.Empty<Example>();
         }
 
+        static IEnumerable<Example> CollectLeaves(IEnumerable<Example> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.Children != null)
+                {
+                    foreach (var child in CollectLeaves(node.Children))
+                    {
+                        yield return child;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(node.Path))
+                {
+                    yield return node;
+                }
+            }
+        }
+
         // Every leaf page under the "DataGrid" category (across its sub-groups). Article-eligible for schema.
         public IEnumerable<Example> GetDataGridPages()
         {
-            IEnumerable<Example> Collect(IEnumerable<Example> nodes)
+            var dataGrid = Examples.FirstOrDefault(c => c.Name == "DataGrid");
+            return dataGrid?.Children != null ? CollectLeaves(dataGrid.Children).ToList() : Enumerable.Empty<Example>();
+        }
+
+        // Maps each Forms page path to its component hub (display label + primary page path). Unlike
+        // charts or DataGrid, Forms has no single landing page; every component (DropDown, Button, ...)
+        // is its own hub. Single-page components hub on themselves; grouped ones (DropDown, HtmlEditor)
+        // hub on their first child. Drives per-component breadcrumbs (Home > Component > variant).
+        public Dictionary<string, (string Label, string Path)> GetFormsComponentHubs()
+        {
+            var hubs = new Dictionary<string, (string, string)>(StringComparer.OrdinalIgnoreCase);
+            var forms = Examples.FirstOrDefault(c => c.Name == "Forms");
+            if (forms?.Children == null)
             {
-                foreach (var node in nodes)
+                return hubs;
+            }
+
+            foreach (var component in forms.Children)
+            {
+                var leaves = (component.Children != null ? CollectLeaves(component.Children) : new[] { component })
+                    .Where(e => !string.IsNullOrEmpty(e.Path)).ToList();
+                if (!leaves.Any())
                 {
-                    if (node.Children != null)
-                    {
-                        foreach (var child in Collect(node.Children))
-                        {
-                            yield return child;
-                        }
-                    }
-                    else if (!string.IsNullOrEmpty(node.Path))
-                    {
-                        yield return node;
-                    }
+                    continue;
+                }
+
+                var primaryPath = leaves[0].Path.TrimStart('/');
+                foreach (var leaf in leaves)
+                {
+                    hubs[leaf.Path.TrimStart('/')] = (component.Name, primaryPath);
                 }
             }
 
-            var dataGrid = Examples.FirstOrDefault(c => c.Name == "DataGrid");
-            return dataGrid?.Children != null ? Collect(dataGrid.Children).ToList() : Enumerable.Empty<Example>();
+            return hubs;
         }
 
         public string TitleFor(Example example)
