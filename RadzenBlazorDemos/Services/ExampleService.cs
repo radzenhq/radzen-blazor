@@ -622,8 +622,7 @@ namespace RadzenBlazorDemos
                         new FaqItem { Question = "How do I bind data to the Blazor DataGrid?", Answer = "Set the Data property to an IQueryable or IEnumerable and define columns; for remote data use the LoadData event or bind to an OData service. With IQueryable and Entity Framework, paging, sorting, and filtering run as part of the query." },
                         new FaqItem { Question = "Does the DataGrid page, sort, and filter on the server?", Answer = "Yes. Bound to an IQueryable (such as Entity Framework) or via LoadData, it translates paging, sorting, and filtering into the query so only the current page is fetched." },
                         new FaqItem { Question = "Can the DataGrid handle large datasets?", Answer = "Yes. Turn on virtualization or use server-side paging so only the visible rows are rendered and fetched, which keeps it fast on very large sets." },
-                        new FaqItem { Question = "Can I export the DataGrid to Excel?", Answer = "Yes. The grid exports to Excel and CSV." },
-                        new FaqItem { Question = "Is the Radzen Blazor DataGrid free?", Answer = "Yes. It is part of the open-source, MIT-licensed Radzen Blazor Components and is free for commercial use, with no license key." }
+                        new FaqItem { Question = "Can I export the DataGrid to Excel?", Answer = "Yes. The grid exports to Excel and CSV." }
                     }
                 },
                 new Example
@@ -1699,8 +1698,7 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "Can I use the Blazor Scheduler as a calendar?", Answer = "Yes. The Scheduler is a calendar with day, week, month, year planner, and timeline views; bind your appointments to its Data and it renders them on the calendar." },
                         new FaqItem { Question = "What views does the Blazor Scheduler support?", Answer = "Day, week, month, year planner, and timeline views, and you can show any number of days side by side." },
-                        new FaqItem { Question = "How do I add and edit appointments in the Scheduler?", Answer = "Handle the slot and appointment events (such as SlotSelect and AppointmentSelect) to open a dialog where users create or edit events bound to your data." },
-                        new FaqItem { Question = "Is the Radzen Blazor Scheduler free?", Answer = "Yes. It is part of the open-source, MIT-licensed Radzen Blazor Components and is free for commercial use, with no license key." }
+                        new FaqItem { Question = "How do I add and edit appointments in the Scheduler?", Answer = "Handle the slot and appointment events (such as SlotSelect and AppointmentSelect) to open a dialog where users create or edit events bound to your data." }
                     },
                     Icon = "\ue616",
                     Tags = new[] { "scheduler", "calendar", "event", "appointment" }
@@ -2318,8 +2316,7 @@ namespace RadzenBlazorDemos
                                 new FaqItem { Question = "How do I bind data to the Blazor DropDown?", Answer = "Set the Data property to any IEnumerable or IQueryable and use TextProperty and ValueProperty to choose the display text and the bound value. Bind the selection with @bind-Value." },
                                 new FaqItem { Question = "How do I enable multiple selection (multiselect)?", Answer = "Set Multiple to true and bind Value to a collection. The DropDown then shows checkboxes and a summary of the selected items." },
                                 new FaqItem { Question = "How do I add search or filtering to the DropDown?", Answer = "Set AllowFiltering to true so users can type to filter the list. You can choose the filter operator and case sensitivity, or load filtered data on demand." },
-                                new FaqItem { Question = "Can the DropDown handle large lists?", Answer = "Yes. Turn on virtualization and bind to an IQueryable so only the visible options are rendered and fetched, which keeps it fast on very large lists." },
-                                new FaqItem { Question = "Is the Radzen Blazor DropDown free?", Answer = "Yes. It is part of the open-source, MIT-licensed Radzen Blazor Components and is free for commercial use, with no license key." }
+                                new FaqItem { Question = "Can the DropDown handle large lists?", Answer = "Yes. Turn on virtualization and bind to an IQueryable so only the visible options are rendered and fetched, which keeps it fast on very large lists." }
                             },
                         },
                         new Example
