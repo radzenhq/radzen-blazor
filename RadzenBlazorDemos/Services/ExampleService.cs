@@ -1686,11 +1686,11 @@ namespace RadzenBlazorDemos
                     Name = "Scheduler",
                     Title = "Blazor Scheduler & Calendar Component | Free UI Components by Radzen",
                     Path = "scheduler",
-                    Description = "The Blazor Scheduler is a full calendar that shows appointments in day, week, month, year planner, and timeline views, with event editing, tooltips, and multi-day layouts.",
+                    Description = "The Blazor Scheduler is a calendar that shows appointments in day, week, month, year planner, and timeline views, with event editing, tooltips, and multi-day layouts.",
                     Related = new [] { "datepicker", "timespanpicker" },
                     Faq = new []
                     {
-                        new FaqItem { Question = "Can I use the Blazor Scheduler as a calendar?", Answer = "Yes. The Scheduler is a full calendar with day, week, month, year planner, and timeline views; bind your appointments to its Data and it renders them on the calendar." },
+                        new FaqItem { Question = "Can I use the Blazor Scheduler as a calendar?", Answer = "Yes. The Scheduler is a calendar with day, week, month, year planner, and timeline views; bind your appointments to its Data and it renders them on the calendar." },
                         new FaqItem { Question = "What views does the Blazor Scheduler support?", Answer = "Day, week, month, year planner, and timeline views, and you can show any number of days side by side." },
                         new FaqItem { Question = "How do I add and edit appointments in the Scheduler?", Answer = "Handle the slot and appointment events (such as SlotSelect and AppointmentSelect) to open a dialog where users create or edit events bound to your data." },
                         new FaqItem { Question = "Is the Radzen Blazor Scheduler free?", Answer = "Yes. It is part of the open-source, MIT-licensed Radzen Blazor Components and is free for commercial use, with no license key." }
