@@ -2131,16 +2131,28 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "AIChat",
+                    Title = "Blazor AI Chat Component | Free UI Components by Radzen",
                     Path = "aichat",
-                    Description = "A modern chat component with AI integration that provides a conversational interface similar to popular chat applications.",
+                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants.",
+                    Related = new [] { "chat", "ai", "speechtotextbutton" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." }
+                    },
                     Icon = "\ue0b7",
                     Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
                 },
                 new Example
                 {
                     Name = "Chat",
+                    Title = "Blazor Chat Component | Free UI Components by Radzen",
                     Path = "chat",
-                    Description = "A modern chat component for multi-participant conversations with support for distinct user identities and real-time messaging.",
+                    Description = "The Blazor Chat component supports multi-participant conversations with distinct user identities and real-time messaging.",
+                    Related = new [] { "aichat", "ai" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Does the Blazor Chat support multiple participants?", Answer = "Yes. It renders messages from distinct users with their own identity and supports real-time, multi-participant conversations." }
+                    },
                     Icon = "\uefd1",
                     Tags = new [] { "chat", "conversation", "message", "users", "team", "group" }
                 },
@@ -2153,7 +2165,12 @@ namespace RadzenBlazorDemos
                     Description = "Associate descriptive text labels with form inputs for better accessibility and usability. Clicking a label focuses its associated input.",
                     Path = "label",
                     Icon = "\ue893",
-                    Tags = new [] { "label", "form", "input", "accessibility", "required", "validation", "formfield", "association", "aria" }
+                    Tags = new [] { "label", "form", "input", "accessibility", "required", "validation", "formfield", "association", "aria" },
+                    Related = new [] { "form-field", "fieldset", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Why use the Blazor Label component?", Answer = "It links descriptive text to a form input so clicking the label focuses the input and screen readers announce it, which improves accessibility." }
+                    }
                 },
                 new Example
                 {
@@ -2417,8 +2434,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Fieldset",
+                    Title = "Blazor Fieldset Component | Free UI Components by Radzen",
                     Path = "fieldset",
-                    Description = "Demonstration and configuration of the Radzen Blazor Fieldset component.",
+                    Description = "The Blazor Fieldset groups related form fields under a titled, collapsible container.",
+                    Related = new [] { "form-field", "templateform", "label" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I group form fields in Blazor?", Answer = "Wrap related inputs in a RadzenFieldset with a title; it can be made collapsible to show or hide the group." }
+                    },
                     Icon = "\ue728",
                     Tags = new [] { "form", "container" }
                 },
@@ -2426,8 +2449,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Byte Array Support", Anchor = "#byte-array" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "FileInput",
+                    Title = "Blazor FileInput - File Upload Input | Free UI Components by Radzen",
                     Path = "fileinput",
-                    Description = "Blazor File input component with preview support.",
+                    Description = "The Blazor FileInput uploads a file as base64 with preview support, bound directly to your model.",
+                    Related = new [] { "upload", "signature-pad" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Blazor FileInput return the selected file?", Answer = "It reads the chosen file and binds it to your model as a base64 data string, with an optional preview." }
+                    },
                     Icon = "\ue226",
                     Tags = new [] { "upload", "form", "edit" }
                 },
@@ -2435,8 +2464,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Variants", Anchor = "#variants" }, new () { Text = "Input types", Anchor = "#input-types" }, new () { Text = "Start, End, and ChildContent", Anchor = "#start-end-child-content" }, new () { Text = "Floating Label", Anchor = "#floating-label" }, new () { Text = "Helper text", Anchor = "#helper-text" }, new () { Text = "Validation", Anchor = "#form-field-validation" }, new () { Text = "Disabled FormField", Anchor = "#disabled-form-field" } ],
                     Name = "FormField",
+                    Title = "Blazor FormField - Floating Label Input | Free UI Components by Radzen",
                     Path = "form-field",
-                    Description = "Blazor FormField with floating labels, helper text, validation, and multiple input variants.",
+                    Description = "The Blazor FormField wraps an input with a floating label, helper text, and validation styling.",
+                    Related = new [] { "label", "fieldset", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What does the Blazor FormField do?", Answer = "It wraps an input with a floating label, helper text, and validation styling, similar to Material outlined fields." }
+                    },
                     Icon = "\ue578",
                     Tags = new [] { "form", "label", "floating", "float", "edit", "outline", "input", "helper", "valid" }
                 },
@@ -2451,8 +2486,14 @@ namespace RadzenBlazorDemos
                             Name = "Default Tools",
                             Path = "html-editor",
                             Title = "Blazor HTML Editor Component | Free UI Components by Radzen",
-                            Description = "Blazor HTML editor component with lots of built-in tools.",
-                            Tags = new [] { "html", "editor", "rich", "text" }
+                            Description = "The Blazor HTML Editor is a rich text (WYSIWYG) editor with a full toolbar of formatting tools, image and link support, and HTML output.",
+                            Related = new [] { "html-editor-custom-tools", "textarea" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Is the Blazor HTML Editor a WYSIWYG editor?", Answer = "Yes. It is a rich text editor where users format content visually using a toolbar, and it produces HTML you can bind to your model." },
+                                new FaqItem { Question = "How do I add custom buttons to the HTML Editor?", Answer = "Use RadzenHtmlEditorCustomTool to add your own toolbar buttons that run custom commands on the selected content." }
+                            },
+                            Tags = new [] { "html", "editor", "rich", "text", "wysiwyg" }
                         },
                         new Example
                         {
@@ -2460,7 +2501,12 @@ namespace RadzenBlazorDemos
                             Name = "Custom Tools",
                             Path = "html-editor-custom-tools",
                             Title = "Blazor HTML Editor - Custom Tools | Free UI Components by Radzen",
-                            Description = "Blazor HTML editor with custom tools. Create custom tools via the RadzenHtmlEditorCustomTool tag.",
+                            Description = "Add your own buttons to the Blazor HTML Editor toolbar with RadzenHtmlEditorCustomTool.",
+                            Related = new [] { "html-editor", "textarea" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I create a custom tool in the Blazor HTML Editor?", Answer = "Declare a RadzenHtmlEditorCustomTool inside the editor and handle its Execute callback to run your command on the selected content." }
+                            },
                             Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
                         },
                     }
@@ -2577,8 +2623,14 @@ namespace RadzenBlazorDemos
                 {
                     New = true,
                     Name = "SignaturePad",
+                    Title = "Blazor Signature Pad Component | Free UI Components by Radzen",
                     Path = "signature-pad",
-                    Description = "Demonstration and configuration of the Radzen Blazor SignaturePad component.",
+                    Description = "The Blazor Signature Pad captures a handwritten signature by mouse or touch and exports it as an image.",
+                    Related = new [] { "fileinput", "upload" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I capture a signature in Blazor?", Answer = "Use the SignaturePad component; users draw with mouse or touch and the signature is exported as an image you can save." }
+                    },
                     Icon = "\ue22b",
                     Tags = new [] { "signature", "sign", "draw", "pen", "touch", "form", "input" }
                 },
@@ -2586,8 +2638,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Chip Style", Anchor = "#chip-style" }, new () { Text = "Variant", Anchor = "#variant" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Icons", Anchor = "#icons" }, new () { Text = "Selected", Anchor = "#selected" }, new () { Text = "Disabled", Anchor = "#disabled" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Add / Remove", Anchor = "#add-remove" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Chip",
+                    Title = "Blazor Chip Component | Free UI Components by Radzen",
                     Path = "chip",
-                    Description = "Demonstration and configuration of the Radzen Blazor Chip component.",
+                    Description = "The Blazor Chip is a compact element for tags, statuses, and filters, with optional remove and selection.",
+                    Related = new [] { "chiplist", "label" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor Chip used for?", Answer = "Chips are compact elements for tags, statuses, categories, or filters, and can be made removable or selectable." }
+                    },
                     Icon = "\uf852",
                     Tags = new [] { "chip", "tag", "label", "status" }
                 },
@@ -2595,8 +2653,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Templates", Anchor = "#templates" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "ChipList",
+                    Title = "Blazor ChipList Component | Free UI Components by Radzen",
                     Path = "chiplist",
-                    Description = "Demonstration and configuration of the Radzen Blazor ChipList component.",
+                    Description = "The Blazor ChipList shows a set of selectable, removable chips bound to data.",
+                    Related = new [] { "chip", "listbox", "checkboxlist" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I make a selectable list of chips in Blazor?", Answer = "Use ChipList with data and bind the selection; each chip can be selected or removed." }
+                    },
                     Icon = "\uf852",
                     Tags = new [] { "chip", "chiplist", "tag", "form", "edit", "selection" }
                 },
@@ -2680,8 +2744,15 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Custom EditContext", Anchor = "#custom-edit-context" }, new () { Text = "Form Action", Anchor = "#form-action" } ],
                     Name = "TemplateForm",
+                    Title = "Blazor Form - Template Form with Validation | Free UI Components by Radzen",
                     Path = "templateform",
-                    Description = "Demonstration and configuration of the Radzen Blazor template form component with validation support.",
+                    Description = "The Blazor Form (TemplateForm) builds data-bound forms with built-in validation and submit handling.",
+                    Related = new [] { "form-field", "label", "fieldset" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a form with validation in Blazor?", Answer = "Use RadzenTemplateForm with data-bound inputs and add validators such as RadzenRequiredValidator to validate fields on submit." },
+                        new FaqItem { Question = "Does the Blazor form support EditContext?", Answer = "Yes. RadzenTemplateForm integrates with EditContext and standard data annotations validation." }
+                    },
                     Icon = "\uebed",
                     Tags = new [] { "form", "edit", "validation", "submit", "editcontext" }
                 },
@@ -2745,8 +2816,14 @@ namespace RadzenBlazorDemos
                         new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } 
                     ],
                     Name = "Upload",
-                    Description = "Demonstration and configuration of the Radzen Blazor Upload component.",
+                    Title = "Blazor Upload - File Upload Component | Free UI Components by Radzen",
+                    Description = "The Blazor Upload component uploads single or multiple files to a server endpoint, with progress, validation, and custom headers.",
                     Path = "upload",
+                    Related = new [] { "fileinput", "signature-pad" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I upload files in Blazor?", Answer = "Use the RadzenUpload component: point its Url at a server endpoint, allow single or multiple files, and handle progress and completion events." }
+                    },
                     Icon = "\uf09b",
                     Tags = new [] { "upload", "file"}
                 },
