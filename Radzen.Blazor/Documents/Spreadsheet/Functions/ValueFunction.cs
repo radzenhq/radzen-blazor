@@ -28,13 +28,11 @@ class ValueFunction : FormulaFunction
             return arg;
         }
 
-        // If already number, return as-is
         if (arg.Type == CellDataType.Number)
         {
             return arg;
         }
 
-        // If date, convert to serial
         if (arg.Type == CellDataType.Date)
         {
             var dt = arg.GetValueOrDefault<DateTime>();
@@ -50,7 +48,6 @@ class ValueFunction : FormulaFunction
             return CellData.FromNumber(num);
         }
 
-        // Try time
         if (TimeSpan.TryParse(s, CultureInfo.InvariantCulture, out var ts))
         {
             // Excel stores times as fraction of a day. Round to 15 decimals to stabilize binary representation.
@@ -58,7 +55,6 @@ class ValueFunction : FormulaFunction
             return CellData.FromNumber(fraction);
         }
 
-        // Try date/datetime
         if (DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt2))
         {
             return CellData.FromNumber(dt2.ToNumber());

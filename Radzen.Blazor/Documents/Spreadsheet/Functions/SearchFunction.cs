@@ -36,7 +36,7 @@ class SearchFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        var startIndex = startNum - 1; // zero-based
+        var startIndex = startNum - 1;
 
         // Empty findText returns start_num per Excel behavior
         if (findText.Length == 0)

@@ -31,7 +31,6 @@ class CsvWriter(Worksheet sheet, CsvExportOptions options)
 
     private string BuildContent()
     {
-        // Single pass: collect non-empty cells into a flat dict + track bounds.
         var cells = new Dictionary<(int Row, int Column), Cell>();
         var maxRow = -1;
         var maxCol = -1;

@@ -28,7 +28,6 @@ class ConcatFunction : FormulaFunction
         {
             if (v.IsError)
             {
-                // Propagate first error encountered
                 StringBuilderCache.Release(sb);
                 return v;
             }

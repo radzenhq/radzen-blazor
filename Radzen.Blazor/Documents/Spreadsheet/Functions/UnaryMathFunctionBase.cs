@@ -2,9 +2,6 @@
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Base for single-argument math functions (ABS, SQRT) that coerce one number and compute a result.
-/// </summary>
 abstract class UnaryMathFunctionBase : FormulaFunction
 {
     protected abstract CellData Compute(double number);

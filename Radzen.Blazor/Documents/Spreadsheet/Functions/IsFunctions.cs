@@ -2,9 +2,6 @@
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Base for the IS information functions, which receive their argument even when it is an error.
-/// </summary>
 abstract class IsFunctionBase : FormulaFunction
 {
     public override bool CanHandleErrors => true;

@@ -39,7 +39,6 @@ class IndexFunction : FormulaFunction
             return areaArg;
         }
 
-        // Determine array dimensions
         int rows;
         int cols;
         if (array is RangeList rl)
@@ -67,7 +66,6 @@ class IndexFunction : FormulaFunction
             }
         }
 
-        // Parse row/col indices. If both omitted -> error
         int? row = null;
         int? col = null;
 
@@ -129,7 +127,6 @@ class IndexFunction : FormulaFunction
                 }
                 return result.Count > 0 ? result[0] : CellData.FromError(CellError.Ref);
             }
-            // Fallback: build linear column from list
             if (cols == 1 && cIndex == 1)
             {
                 return array.Count > 0 ? array[0] : CellData.FromError(CellError.Ref);

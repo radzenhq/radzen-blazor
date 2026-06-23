@@ -30,10 +30,9 @@ class TimeFunction : FormulaFunction
             return error3!;
         }
 
-        // Total seconds, then convert to fraction of day
         var totalSeconds = hour * 3600 + minute * 60 + second;
 
-        // Wrap to 24 hours (86400 seconds per day)
+        // Excel TIME wraps past 24 hours (86400 seconds per day); double modulo keeps negatives positive.
         totalSeconds = ((totalSeconds % 86400) + 86400) % 86400;
 
         return CellData.FromNumber(totalSeconds / 86400.0);

@@ -4,17 +4,12 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Shared matcher for functions with repeating (range, criteria) pairs (COUNTIFS, SUMIFS, AVERAGEIFS,
-/// MAXIFS, MINIFS).
-/// </summary>
+// Shared matcher for functions with repeating (range, criteria) pairs (COUNTIFS, SUMIFS, AVERAGEIFS,
+// MAXIFS, MINIFS).
 static class CriteriaPairs
 {
-    /// <summary>
-    /// Parses alternating (range, criteria) groups and returns the indices where ALL criteria match.
-    /// Returns false with <paramref name="error"/> set on a structural problem (odd/empty groups or
-    /// mismatched range sizes).
-    /// </summary>
+    // Returns the indices where ALL criteria match; false with error set on a structural problem
+    // (odd/empty groups or mismatched range sizes).
     public static bool TryMatch(List<List<CellData>>? groups, out List<int> matched, out CellData? error)
     {
         matched = new List<int>();

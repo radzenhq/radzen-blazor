@@ -524,7 +524,6 @@ public class InListCriterion : FilterCriterionLeaf
     /// <inheritdoc/>
     public override bool Matches(object? value)
     {
-        // Check for exact matches first (including null)
         foreach (var listValue in Values)
         {
             if (Equals(value, listValue))
@@ -533,7 +532,6 @@ public class InListCriterion : FilterCriterionLeaf
             }
         }
 
-        // Check for numeric coercion matches (only if value is not null)
         if (value is not null && TryCoerce(value, out var numericValue))
         {
             foreach (var listValue in Values)
@@ -840,11 +838,8 @@ public partial class Worksheet
         Rows.EndUpdate();
     }
 
-    /// <summary>
-    /// Re-evaluates all active filters against current cell values, so rows are hidden by value
-    /// at their current positions. Call after a sort (Excel re-applies filters by value). No-op
-    /// when no filters are active, so it never disturbs manually hidden rows.
-    /// </summary>
+    // Re-evaluate active filters by value after a sort (Excel parity). No-op when no filters
+    // are active, so manually hidden rows are never disturbed.
     internal void ReapplyFilters()
     {
         if (filters.Count > 0)

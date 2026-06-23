@@ -106,7 +106,6 @@ public class FunctionStore
         Add<DatedifFunction>();
         Add<TimeFunction>();
 
-        // Tier 2
         Add<PowerFunction>();
         Add<SqrtFunction>();
         Add<ProductFunction>();

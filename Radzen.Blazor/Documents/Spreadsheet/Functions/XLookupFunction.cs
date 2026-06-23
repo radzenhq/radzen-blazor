@@ -71,7 +71,6 @@ class XLookupFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        // Parse modes
         var matchMode = matchModeArg?.GetValueOrDefault<int?>() ?? 0; // 0 default
         var searchMode = searchModeArg?.GetValueOrDefault<int?>() ?? 1; // 1 default
 

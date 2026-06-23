@@ -5,12 +5,9 @@ namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
 
-/// <summary>
-/// Pastes clipboard content (an internal range or external delimited text) into the worksheet and
-/// makes it undoable: the overwritten destination cells - and, for a same-sheet cut, the cleared
-/// source cells - are snapshotted before the write, and the pasted result is captured so redo can
-/// replay it without depending on the live clipboard. Batching comes from the UndoRedoStack.
-/// </summary>
+// Snapshots overwritten destination cells (and, for a same-sheet cut, the cleared source cells)
+// before the write, and captures the pasted result so redo can replay it without depending on
+// the live clipboard. Batching comes from the UndoRedoStack.
 class PasteCommand : RangeSnapshotCommandBase
 {
     private readonly SpreadsheetClipboard clipboard;
@@ -19,7 +16,6 @@ class PasteCommand : RangeSnapshotCommandBase
     private readonly Dictionary<CellRef, (object? value, string? formula, Format? format)> result = [];
     private bool pasted;
 
-    /// <inheritdoc/>
     public override SheetAction RequiredAction => SheetAction.EditCell;
 
     public PasteCommand(SpreadsheetClipboard clipboard, Worksheet sheet, CellRef destination, string? text)
@@ -30,7 +26,6 @@ class PasteCommand : RangeSnapshotCommandBase
         this.text = text;
     }
 
-    /// <inheritdoc/>
     protected override bool DoExecute()
     {
         if (pasted)
@@ -68,7 +63,6 @@ class PasteCommand : RangeSnapshotCommandBase
         return true;
     }
 
-    /// <inheritdoc/>
     public override void Unexecute() => RestoreSnapshot();
 
     private void CaptureResult()

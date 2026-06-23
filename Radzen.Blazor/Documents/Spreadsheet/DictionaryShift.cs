@@ -3,28 +3,15 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Helpers for rekeying dictionaries during row/column shift operations.
-/// </summary>
 internal static class DictionaryShift
 {
-    /// <summary>
-    /// Rekeys a dictionary in place by applying <paramref name="remap"/> to every key.
-    /// Entries for which <paramref name="remap"/> returns <c>null</c> are dropped.
-    /// A two-phase approach (stage, clear, reinsert) prevents corruption when shifted keys overlap existing ones.
-    /// </summary>
     public static void Remap<TKey, TValue>(IDictionary<TKey, TValue> dict, Func<TKey, TKey?> remap)
         where TKey : struct
     {
         Remap(dict, remap, onRemap: null);
     }
 
-    /// <summary>
-    /// Rekeys a dictionary in place by applying <paramref name="remap"/> to every key.
-    /// Entries for which <paramref name="remap"/> returns <c>null</c> are dropped.
-    /// <paramref name="onRemap"/> is invoked for every retained entry with its old key, new key, and value,
-    /// allowing callers to apply side effects (e.g. updating a stored back-reference).
-    /// </summary>
+    // Two-phase (stage, clear, reinsert) prevents corruption when shifted keys overlap existing ones.
     public static void Remap<TKey, TValue>(
         IDictionary<TKey, TValue> dict,
         Func<TKey, TKey?> remap,
@@ -51,10 +38,6 @@ internal static class DictionaryShift
         }
     }
 
-    /// <summary>
-    /// Rekeys a set in place by applying <paramref name="remap"/> to every element.
-    /// Elements for which <paramref name="remap"/> returns <c>null</c> are dropped.
-    /// </summary>
     public static void Remap<T>(ISet<T> set, Func<T, T?> remap) where T : struct
     {
         var staging = new List<T>(set.Count);

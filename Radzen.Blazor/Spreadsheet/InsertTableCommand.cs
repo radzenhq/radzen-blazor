@@ -63,11 +63,6 @@ public class RemoveTableCommand(Worksheet sheet, Table table) : ICommand
     {
         if (removed)
         {
-            // Re-create the table at the same range. Most metadata is reattached because
-            // the original Table instance still holds it; we restore by adding the same
-            // instance (sheet just stores it in the list).
-            // The simplest and safe thing is to add a fresh table with the same
-            // identity; downstream callers can re-apply style/totals if needed.
             var restored = sheet.AddTable(table.Name, table.Range, table.ShowHeaderRow);
             restored.DisplayName = table.DisplayName;
             restored.ShowTotals = table.ShowTotals;

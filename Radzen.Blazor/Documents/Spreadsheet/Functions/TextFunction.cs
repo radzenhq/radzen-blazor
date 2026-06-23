@@ -50,7 +50,6 @@ class TextFunction : FormulaFunction
             return CellData.FromString(dt.ToString(net, CultureInfo.InvariantCulture));
         }
 
-        // Numeric formatting
         if (!TryCoerceToDouble(valueArg, out var number))
         {
             return CellData.FromError(CellError.Value);
@@ -113,12 +112,10 @@ class TextFunction : FormulaFunction
             var serial = valueArg.GetValueOrDefault<double>();
             return serial.ToDate();
         }
-        // As a fallback try coercing to number
         if (valueArg.TryCoerceToNumber(out var n, allowBooleans: false, nonNumericTextAsZero: false))
         {
             return n.ToDate();
         }
-        // Default epoch
         return new DateTime(1900, 1, 1);
     }
 

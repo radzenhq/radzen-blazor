@@ -129,7 +129,6 @@ internal class FormulaLexer(string expression, bool strict = true)
     {
         while (position < expression.Length)
         {
-            // Capture leading trivia (whitespace before the token)
             var tokenStart = position;
             var leadingTrivia = ScanTrivia();
 
@@ -137,7 +136,6 @@ internal class FormulaLexer(string expression, bool strict = true)
 
             if (token.Type == FormulaTokenType.None)
             {
-                // If we have leading trivia but no token, create a whitespace token
                 if (leadingTrivia.Count > 0)
                 {
                     var whitespaceText = string.Join("", leadingTrivia.Select(t => t.Text));
@@ -150,21 +148,17 @@ internal class FormulaLexer(string expression, bool strict = true)
                 yield break;
             }
 
-            // Add leading trivia to the token
             token.LeadingTrivia.AddRange(leadingTrivia);
 
-            // Capture trailing trivia (whitespace after the token)
             var trailingTrivia = ScanTrivia();
             token.TrailingTrivia.AddRange(trailingTrivia);
 
-            // Set token span including leading and trailing trivia
             token.Start = tokenStart;
             token.End = position;
 
             yield return token;
         }
 
-        // End token to mark completion
         var endToken = new FormulaToken(FormulaTokenType.None, string.Empty)
         {
             Start = position,
@@ -206,13 +200,11 @@ internal class FormulaLexer(string expression, bool strict = true)
             }
             else
             {
-                // Regular whitespace - accumulate
                 whitespaceBuffer.Append(ch);
                 Advance(1);
             }
         }
 
-        // Flush any remaining whitespace
         if (whitespaceBuffer.Length > 0)
         {
             trivia.Add(new FormulaTokenTrivia(FormulaTokenTriviaKind.Whitespace, whitespaceBuffer.ToString()));
@@ -464,7 +456,6 @@ internal class FormulaLexer(string expression, bool strict = true)
             };
         }
 
-        // Unknown error literal
         return new FormulaToken(FormulaTokenType.None, string.Empty);
     }
 
@@ -565,7 +556,6 @@ internal class FormulaLexer(string expression, bool strict = true)
                 buffer.Append(ch);
                 Advance(1);
 
-                // Check for optional + or - after e/E
                 ch = Peek();
                 if (ch == '+' || ch == '-')
                 {
@@ -831,10 +821,8 @@ internal class FormulaLexer(string expression, bool strict = true)
     {
         var startOffset = position;
 
-        // Skip opening quote
         Advance(1);
 
-        // Read until closing quote
         var sheetNameStart = position;
         while (position < expression.Length && Peek() != '\'')
         {
@@ -843,18 +831,15 @@ internal class FormulaLexer(string expression, bool strict = true)
 
         var sheetName = expression[sheetNameStart..position];
 
-        // Skip closing quote
         if (position < expression.Length && Peek() == '\'')
         {
             Advance(1);
         }
 
-        // Expect '!' after closing quote
         if (position < expression.Length && Peek() == '!')
         {
             Advance(1);
 
-            // Now scan the cell reference part (e.g. A1, $B$2)
             var cellRefStart = position;
             while (position < expression.Length)
             {
@@ -883,7 +868,6 @@ internal class FormulaLexer(string expression, bool strict = true)
             }
         }
 
-        // Fallback: return as unknown token
         return new FormulaToken(FormulaTokenType.Unknown, expression[startOffset..position]);
     }
 

@@ -37,7 +37,6 @@ class FindFunction : FormulaFunction
 
         var startIndex = startNum - 1;
 
-        // Empty findText returns start_num
         if (findText.Length == 0)
         {
             return CellData.FromNumber(startNum);

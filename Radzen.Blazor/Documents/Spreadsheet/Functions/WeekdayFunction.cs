@@ -31,7 +31,6 @@ class WeekdayFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        // Determine return_type (default 1)
         var returnType = 1;
         var returnTypeArg = arguments.GetSingle("return_type");
         if (returnTypeArg is not null)

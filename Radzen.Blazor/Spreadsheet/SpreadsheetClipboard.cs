@@ -71,11 +71,6 @@ class SpreadsheetClipboard
         }
     }
 
-    /// <summary>
-    /// Returns the destination range a paste at <paramref name="destinationStart"/> would overwrite
-    /// (internal-clipboard size when <paramref name="pastedText"/> still matches what was copied,
-    /// otherwise the size of the delimited text), or <see cref="RangeRef.Invalid"/> if nothing pastes.
-    /// </summary>
     public RangeRef GetPasteRange(Worksheet targetSheet, CellRef destinationStart, string? pastedText)
     {
         if (range.HasValue && sheet is not null && !string.IsNullOrEmpty(csv) && (pastedText is null || pastedText == csv))
@@ -107,11 +102,7 @@ class SpreadsheetClipboard
         return new RangeRef(destinationStart, new CellRef(destinationStart.Row + rowCount - 1, destinationStart.Column + columnCount - 1));
     }
 
-    /// <summary>
-    /// Returns true when the pending operation is a cut whose source lives on
-    /// <paramref name="targetSheet"/>, so the source range can be snapshotted and restored as part
-    /// of the same undoable paste. Cross-sheet moves are not covered (per-sheet undo stacks).
-    /// </summary>
+    // Cross-sheet moves are not covered: per-sheet undo stacks can't snapshot a source on another sheet.
     public bool TryGetMoveSource(Worksheet targetSheet, out RangeRef source)
     {
         if (operation == ClipboardOperation.Move && range.HasValue && ReferenceEquals(sheet, targetSheet))

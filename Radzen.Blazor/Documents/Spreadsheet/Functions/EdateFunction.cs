@@ -37,8 +37,7 @@ class EdateFunction : FormulaFunction
         {
             var result = startDate.AddMonths(months);
 
-            // If the original day was beyond the end of the target month, clamp to end of month
-            // AddMonths already handles this in .NET (e.g. Jan 31 + 1 month = Feb 29 in leap year)
+            // .NET AddMonths clamps a day past the target month's end (e.g. Jan 31 + 1 month = Feb 28/29).
             return CellData.FromDate(result);
         }
         catch (ArgumentOutOfRangeException)

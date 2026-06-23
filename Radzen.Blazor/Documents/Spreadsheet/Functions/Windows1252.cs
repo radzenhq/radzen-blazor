@@ -2,10 +2,8 @@
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Windows-1252 (ANSI) code mapping used by Excel's CHAR and CODE. Identical to Latin-1 except for the
-/// 128-159 range, which holds typographic characters rather than C1 control codes.
-/// </summary>
+// Windows-1252 (ANSI) mapping used by Excel CHAR and CODE. Identical to Latin-1 except for the
+// 128-159 range, which holds typographic characters rather than C1 control codes.
 static class Windows1252
 {
     // Unicode code points for Windows-1252 bytes 128-159 (undefined slots map to themselves).

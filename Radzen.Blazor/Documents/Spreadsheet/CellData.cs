@@ -532,13 +532,12 @@ public class CellData : IComparable, IComparable<CellData>
     internal bool MatchesCriteria(CellData criteria)
     {
         ArgumentNullException.ThrowIfNull(criteria);
-        // Handle error criteria
         if (criteria.IsError)
         {
             return false;
         }
 
-        // Handle empty criteria - only matches empty cells
+        // Empty criteria only matches empty cells.
         if (criteria.IsEmpty)
         {
             return IsEmpty;

@@ -259,9 +259,9 @@ public partial class CellMenu : ComponentBase
 
         return selectedCount switch
         {
-            0 => false, // No items selected
-            var count when count == totalItems => true, // All items selected
-            _ => null // Indeterminate state
+            0 => false,
+            var count when count == totalItems => true,
+            _ => null
         };
     }
 

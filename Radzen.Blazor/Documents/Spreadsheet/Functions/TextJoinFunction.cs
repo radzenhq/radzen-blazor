@@ -51,7 +51,6 @@ class TextJoinFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        // Single delimiter string
         var delimiter = delimiterArg.GetValueOrDefault<string?>() ?? string.Empty;
 
         var sb = StringBuilderCache.Acquire(texts.Count * 2);

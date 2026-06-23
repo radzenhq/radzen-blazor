@@ -45,8 +45,6 @@ public readonly struct PixelRange(double start, double end)
 /// <summary>
 /// Represents a rectangle in pixel coordinates, defined by two pixel ranges: one for the x-axis and one for the y-axis.
 /// </summary>
-/// <param name="x"></param>
-/// <param name="y"></param>
 public readonly struct PixelRectangle(PixelRange x, PixelRange y)
 {
     /// <summary>
@@ -85,7 +83,6 @@ public readonly struct PixelRectangle(PixelRange x, PixelRange y)
     /// <summary>
     /// Returns the intersection of this rectangle with another rectangle.
     /// </summary>
-    /// <param name="other"></param>
     public PixelRectangle Intersection(PixelRectangle other)
     {
         var left = Math.Max(Left, other.Left);

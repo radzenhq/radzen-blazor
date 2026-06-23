@@ -22,7 +22,6 @@
         var range = ResolveSortRange();
         if (range == RangeRef.Invalid) return;
 
-        // Try to harvest header names from the first row of the range.
         var columnNames = new System.Collections.Generic.List<string>();
         for (var c = range.Start.Column; c <= range.End.Column; c++)
         {
@@ -51,11 +50,9 @@
     private RangeRef ResolveSortRange()
     {
         var sel = Worksheet!.Selection.Range;
-        // Single-cell selection: expand to the contiguous data region around it.
         if (sel.Start == sel.End)
         {
-            // Match Excel's "Sort..." behavior — sort the active sheet's used range or the
-            // selection's single column extended down. For v1 we use the full sheet bounds.
+            // A single-cell selection sorts the whole sheet, matching Excel's "Sort..." behavior.
             return new RangeRef(
                 new CellRef(0, 0),
                 new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1));

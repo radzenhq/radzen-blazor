@@ -177,7 +177,6 @@ public class Table
         range = new RangeRef(newStart, range.End);
         Filter = new AutoFilter(Worksheet, range);
 
-        // Write default header values into the new top row.
         var headerRow = range.Start.Row;
         for (var i = 0; i < columns.Count; i++)
         {
@@ -638,7 +637,6 @@ public class AutoFilter
 
             var range = Range.Value;
 
-            // Find the first visible row in the data table range
             for (int row = range.Start.Row; row <= range.End.Row; row++)
             {
                 if (!Worksheet.Rows.IsHidden(row))
@@ -647,7 +645,6 @@ public class AutoFilter
                 }
             }
 
-            // If all rows are hidden, return the original start
             return range.Start;
         }
     }
@@ -663,7 +660,6 @@ public class AutoFilter
         }
     }
 
-    // ── Per-column filter API ───────────────────────────────────────────────
     // Column indices are RELATIVE to the AutoFilter's range left edge.
 
     /// <summary>
@@ -690,7 +686,6 @@ public class AutoFilter
     {
         ArgumentNullException.ThrowIfNull(criterion);
         var absCol = ResolveAbsoluteColumn(columnIndex);
-        // Force the criterion's Column to match.
         if (criterion is FilterCriterionLeaf leaf)
         {
             // FilterCriterionLeaf.Column is init-only; clone if necessary. For simplicity,
@@ -772,7 +767,6 @@ public class AutoFilter
 
     private void ApplyColumnFilter(int absoluteColumn, FilterCriterion criterion)
     {
-        // Replace any existing per-column filter for this column.
         var existing = FindColumnFilter(absoluteColumn);
         if (existing is not null)
         {

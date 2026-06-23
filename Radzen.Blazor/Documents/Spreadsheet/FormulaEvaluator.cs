@@ -278,7 +278,6 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
     public void VisitCell(CellSyntaxNode cellSyntaxNode)
     {
         var address = cellSyntaxNode.Token.Address;
-        // Resolve sheet (default to current sheet)
         var targetSheet = sheet;
         if (!string.IsNullOrEmpty(address.Worksheet))
         {
@@ -298,7 +297,6 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             return;
         }
 
-        // If out of bounds, return #REF!
         if ((address.Row < 0 || address.Row >= targetSheet.RowCount) || (address.Column < 0 || address.Column >= targetSheet.ColumnCount))
         {
             value = CellData.FromError(CellError.Ref);
@@ -307,7 +305,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
 
         if (!targetSheet.Cells.TryGet(address.Row, address.Column, out var cell))
         {
-            // Cell is in bounds but not populated — treat as empty
+            // Cell is in bounds but not populated - treat as empty
             value = new CellData(null);
             return;
         }
@@ -325,10 +323,8 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
 
     public void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
     {
-        // Get the function to check if it can handle errors
         var function = sheet.FunctionRegistry.Get(functionSyntaxNode.Name);
 
-        // Process arguments according to parameter definitions
         var functionArguments = ProcessArguments(function, functionSyntaxNode.Arguments);
         
         if (functionArguments is null)
@@ -360,10 +356,8 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
                 return null;
             }
 
-            // Handle repeating single parameters
             if (paramDef.Type == ParameterType.Sequence)
             {
-                // Collect all remaining arguments for repeating single parameters
                 var allArguments = new List<CellData>();
                 while (argumentIndex < argumentNodes.Count)
                 {
@@ -413,7 +407,6 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             }
             else
             {
-                // Handle single parameter
                 if (argumentIndex < argumentNodes.Count)
                 {
                     var argument = ProcessArgument(argumentNodes[argumentIndex], function);
@@ -428,12 +421,10 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
                         {
                             argument = new RangeList(1, 1, cellNode.Token.Address.Row, cellNode.Token.Address.Column, sheet) { argument[0] };
                         }
-                        // For collections, pass the list directly
                         functionArguments.Set(paramDef.Name, argument);
                     }
                     else
                     {
-                        // For single values, pass the first item
                         functionArguments.Set(paramDef.Name, argument[0]);
                     }
                     argumentIndex++;
@@ -468,7 +459,6 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
             return null;
         }
 
-        // Convert the evaluated value to a list of CellData
         if (value is List<CellData> list)
         {
             return list;
@@ -484,7 +474,6 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
         var start = rangeSyntaxNode.Start.Token.Address;
         var end = rangeSyntaxNode.End.Token.Address;
 
-        // Resolve target sheet for the range
         var startSheet = sheet;
         if (!string.IsNullOrEmpty(start.Worksheet))
         {
@@ -539,7 +528,7 @@ class FormulaEvaluator(Worksheet sheet, Cell currentCell) : IFormulaSyntaxNodeVi
 
                 if (!startSheet.Cells.TryGet(row, column, out var cell))
                 {
-                    // Cell is in bounds but not populated — treat as empty
+                    // Cell is in bounds but not populated - treat as empty
                     cellValue = new CellData(null);
                 }
                 else

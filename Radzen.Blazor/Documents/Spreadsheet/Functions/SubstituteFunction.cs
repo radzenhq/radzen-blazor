@@ -56,7 +56,6 @@ class SubstituteFunction : FormulaFunction
         }
         else
         {
-            // Replace nth occurrence only
             var index = -1;
             var count = 0;
             var start = 0;
@@ -77,7 +76,6 @@ class SubstituteFunction : FormulaFunction
                 start = index + oldText.Length;
             }
 
-            // If the nth occurrence isn't found, return original text
             return CellData.FromString(text);
         }
     }

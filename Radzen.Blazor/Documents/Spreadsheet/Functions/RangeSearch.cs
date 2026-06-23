@@ -5,21 +5,9 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Shared lookup-position search for MATCH and XMATCH.
-/// </summary>
 static class RangeSearch
 {
-    /// <summary>
-    /// Finds the position of <paramref name="lookup"/> within <paramref name="values"/>.
-    /// </summary>
-    /// <param name="values">The vector to search.</param>
-    /// <param name="lookup">The value to find.</param>
-    /// <param name="matchMode">0 = exact; -1 = exact or next-smaller (largest value &lt;= lookup);
-    /// 1 = exact or next-larger (smallest value &gt;= lookup).</param>
-    /// <param name="wildcards">When true, a string lookup containing <c>*</c> or <c>?</c> is matched as a pattern.</param>
-    /// <param name="error">Set to the first error cell encountered, if any.</param>
-    /// <returns>The 0-based index, or -1 if not found.</returns>
+    // matchMode: 0 = exact; -1 = exact or next-smaller (largest value <= lookup); 1 = exact or next-larger (smallest value >= lookup).
     public static int Find(IReadOnlyList<CellData> values, CellData lookup, int matchMode, bool wildcards, out CellData? error)
     {
         error = null;

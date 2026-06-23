@@ -19,7 +19,6 @@ public class MergedCellStore
     /// <summary>
     /// Adds a merged cell range to the store.
     /// </summary>
-    /// <param name="range"></param>
     public void Add(RangeRef range)
     {
         if (range != RangeRef.Invalid)
@@ -32,7 +31,6 @@ public class MergedCellStore
     /// <summary>
     /// Removes a merged cell range from the store.
     /// </summary>
-    /// <param name="range"></param>
     public bool Remove(RangeRef range)
     {
         if (data.Remove(range))
@@ -80,7 +78,6 @@ public class MergedCellStore
     /// Gets the merged range that contains the specified cell address.
     /// O(1) lookup via spatial index.
     /// </summary>
-    /// <param name="address"></param>
     /// <returns>The merged range if found; otherwise, returns <see cref="RangeRef.Invalid"/>.</returns>
     public RangeRef GetMergedRange(CellRef address)
     {

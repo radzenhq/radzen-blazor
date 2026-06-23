@@ -289,7 +289,6 @@ static class XlsxReader
 
     private static List<WorksheetInfo> ParseSheetDefinitions(ZipArchive archive)
     {
-        // Parse sheet definitions (sheet names + target file paths)
         var workbookEntry = archive.GetEntry("xl/workbook.xml") ?? throw new InvalidDataException("workbook.xml not found");
 
         using var wbStream = workbookEntry.Open();
@@ -325,7 +324,7 @@ static class XlsxReader
 
     private static Worksheet LoadSheet(ZipArchive archive, WorksheetInfo sheetInfo, StyleInfo styleInfo, List<string> sharedStrings)
     {
-        var sheet = new Worksheet(100, 100); // adjust size as needed
+        var sheet = new Worksheet(100, 100);
 
         var sheetEntry = archive.GetEntry(sheetInfo.FullPath);
         if (sheetEntry is null)
@@ -366,7 +365,7 @@ static class XlsxReader
 
     private static double ParseDefaultRowHeight(XDocument sheetDoc, XNamespace sNs)
     {
-        var defaultRowHeight = 20.0; // Default fallback
+        var defaultRowHeight = 20.0;
         var sheetFormatPr = sheetDoc.Descendants(sNs + "sheetFormatPr").FirstOrDefault();
         if (sheetFormatPr is not null)
         {
@@ -766,7 +765,6 @@ static class XlsxReader
 
     private static void ParseDrawings(ZipArchive archive, WorksheetInfo sheetInfo, XDocument sheetDoc, XNamespace sNs, Worksheet sheet)
     {
-        // Find <drawing r:id="..."/> element in sheet XML
         XNamespace rNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
         var drawingElement = sheetDoc.Descendants(sNs + "drawing").FirstOrDefault();
         if (drawingElement is null)
@@ -780,7 +778,6 @@ static class XlsxReader
             return;
         }
 
-        // Load sheet relationships to resolve drawing rId
         var sheetFileName = sheetInfo.FullPath.Split('/').Last();
         var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
         var relsEntry = archive.GetEntry(relsPath);
@@ -895,7 +892,6 @@ static class XlsxReader
                 }
             }
 
-            // Check for chart (graphicFrame)
             var graphicFrame = anchor.Element(xdr + "graphicFrame");
             if (graphicFrame is not null)
             {
@@ -903,7 +899,6 @@ static class XlsxReader
                 continue;
             }
 
-            // Check for image (pic)
             var pic = anchor.Element(xdr + "pic");
             if (pic is null)
             {
@@ -926,7 +921,6 @@ static class XlsxReader
                 image.Height = anchorHeight;
             }
 
-            // Get image rId from blip
             var blipFill = pic.Element(xdr + "blipFill");
             var blip = blipFill?.Element(a + "blip");
             var embedId = blip?.Attribute(rNs + "embed")?.Value;
@@ -1015,7 +1009,6 @@ static class XlsxReader
         chart.Width = width;
         chart.Height = height;
 
-        // Parse name from graphicFrame
         XNamespace xdr = "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing";
         var nvGraphicFramePr = graphicFrame.Element(xdr + "nvGraphicFramePr");
         var cNvPr = nvGraphicFramePr?.Element(xdr + "cNvPr");
@@ -1072,7 +1065,6 @@ static class XlsxReader
             return chart;
         }
 
-        // Find chart type group element
         foreach (var groupElement in plotArea.Elements())
         {
             var localName = groupElement.Name.LocalName;
@@ -1320,7 +1312,6 @@ static class XlsxReader
             return;
         }
 
-        // Resolve sheet rels into a map
         var sheetFileName = sheetInfo.FullPath.Split('/').Last();
         var relsPath = $"xl/worksheets/_rels/{sheetFileName}.rels";
         var relsEntry = archive.GetEntry(relsPath);
@@ -1391,7 +1382,6 @@ static class XlsxReader
             var hasAutoFilter = root.Element(tNs + "autoFilter") is not null;
             table.ShowFilterButton = hasAutoFilter;
 
-            // Style + striping
             var styleInfo = root.Element(tNs + "tableStyleInfo");
             if (styleInfo is not null)
             {
@@ -1402,7 +1392,6 @@ static class XlsxReader
                 table.ShowBandedColumns = styleInfo.Attribute("showColumnStripes")?.Value == "1";
             }
 
-            // Columns: rename + totals function + calculated formula
             var tableColumns = root.Element(tNs + "tableColumns");
             if (tableColumns is not null)
             {

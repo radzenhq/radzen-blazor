@@ -4,11 +4,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Base for statistical aggregations (MEDIAN, MODE, STDEV*, VAR*, PRODUCT) that collect numbers from a
-/// variadic sequence using Excel's AVERAGE rule: errors propagate, only true Number cells count (numeric
-/// text from cell references is ignored), and literal boolean constants coerce to 0/1.
-/// </summary>
+// Collects numbers using Excel's AVERAGE rule: errors propagate, only true Number cells count
+// (numeric text from cell references is ignored), and literal boolean constants coerce to 0/1.
 abstract class StatisticalAggregateFunctionBase : FormulaFunction
 {
     public override bool CoerceLiteralBooleans => true;

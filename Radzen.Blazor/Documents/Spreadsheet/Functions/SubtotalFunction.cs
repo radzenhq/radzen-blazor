@@ -35,15 +35,13 @@ class SubtotalFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        // Normalize 101-111 to 1-11 (hidden rows handling not supported in this context)
+        // Function codes 101-111 mean "ignore hidden rows"; normalize them to the 1-11 base codes.
         var code = funcCode.Value > 100 ? funcCode.Value - 100 : funcCode.Value;
         var excludeHidden = funcCode.Value >= 100;
 
-        // Flatten numeric values; also collect non-empty for COUNTA
         var numeric = new List<double>();
         var nonEmptyCount = 0;
 
-        // If we have coordinates and row-hidden info, use it
         RangeList? rangeList = values as RangeList;
 
         for (int i = 0; i < values.Count; i++)
@@ -60,7 +58,6 @@ class SubtotalFunction : FormulaFunction
                 nonEmptyCount++;
             }
 
-            // Hidden rows handling if available
             if (excludeHidden && rangeList is not null)
             {
                 if (rangeList.IsRowHiddenAt(i))

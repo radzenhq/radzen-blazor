@@ -32,7 +32,6 @@ class WeeknumFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        // Determine return_type (default 1)
         var returnType = 1;
         var returnTypeArg = arguments.GetSingle("return_type");
         if (returnTypeArg is not null)
@@ -47,7 +46,6 @@ class WeeknumFunction : FormulaFunction
             }
         }
 
-        // Validate return type
         if (!(returnType == 1 || returnType == 2 || (returnType >= 11 && returnType <= 17) || returnType == 21))
         {
             return CellData.FromError(CellError.Num);

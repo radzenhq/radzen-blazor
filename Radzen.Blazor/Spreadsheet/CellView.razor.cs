@@ -227,7 +227,6 @@ public partial class CellView : CellBase, IDisposable
 
         if (mergedRange == RangeRef.Invalid)
         {
-            // Not a merged cell, show the menu
             return true;
         }
 
@@ -239,7 +238,6 @@ public partial class CellView : CellBase, IDisposable
             return Column >= Worksheet.Columns.Frozen;
         }
 
-        // If the merged range doesn't overlap with frozen columns, show the menu
         return true;
     }
 

@@ -75,7 +75,6 @@ public static class NumberFormat
             formatCode = "0";
         }
 
-        // Find the decimal point and percent/suffix
         var hasPercent = formatCode.Contains('%', StringComparison.Ordinal);
         var core = hasPercent ? formatCode.Replace("%", "", StringComparison.Ordinal) : formatCode;
 

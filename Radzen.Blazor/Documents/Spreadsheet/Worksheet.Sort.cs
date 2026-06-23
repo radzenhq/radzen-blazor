@@ -6,7 +6,7 @@ namespace Radzen.Documents.Spreadsheet;
 #nullable enable
 
 /// <summary>
-/// Specifies the value the sort comparison runs against — the cell's stored
+/// Specifies the value the sort comparison runs against - the cell's stored
 /// value, its background color, or its font color.
 /// </summary>
 public enum SortOn
@@ -180,7 +180,7 @@ public partial class Worksheet
             {
                 return 1;
             }
-            // Both outside the list — natural string compare
+            // Both outside the list - natural string compare
             return string.Compare(xs, ys, key.CaseSensitive
                 ? StringComparison.Ordinal
                 : StringComparison.OrdinalIgnoreCase);

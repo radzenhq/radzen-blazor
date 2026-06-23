@@ -49,7 +49,6 @@ class AggregateFunction : FormulaFunction
         var ignoreHidden = opts.Value is 1 or 3 or 5 or 7;
         var ignoreErrors = opts.Value is 2 or 3 or 6 or 7;
 
-        // Collect numeric values according to options
         var numbers = new List<double>();
         var nonEmptyCount = 0;
 
@@ -59,7 +58,6 @@ class AggregateFunction : FormulaFunction
         {
             var cell = range[i];
 
-            // hidden rows
             if (ignoreHidden && rl is not null && rl.IsRowHiddenAt(i))
             {
                 continue;

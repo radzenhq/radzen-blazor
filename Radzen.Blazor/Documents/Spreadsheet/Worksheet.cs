@@ -589,23 +589,21 @@ public partial class Worksheet
 
     private void DeleteColumnCore(int columnIndex)
     {
-        // Shift cells left using sparse operation - O(populated cells) instead of O(rows × columns)
+        // Sparse shift - O(populated cells) instead of O(rows x columns)
         Cells.ShiftColumnsLeft(columnIndex);
 
-        // Shift column metadata (custom widths, hidden state)
         Columns.ShiftUp(columnIndex);
 
         MergedCells.ShiftColumnsLeft(columnIndex);
 
         invalidReferenceColumns.Add(columnIndex);
 
-        // Any formulas that reference this column should be turned into =#REF!
         InvalidateFormulasReferencing(cellRef => cellRef.Column == columnIndex);
 
         ColumnCount--;
 
         // A different cell now occupies the selection if it sat at or after the deleted
-        // column — notify so the formula bar re-reads. Skip when the delete left the
+        // column - notify so the formula bar re-reads. Skip when the delete left the
         // selection past the new bounds (re-reading there would be out of range).
         if (Selection.Cell != CellRef.Invalid && Selection.Cell.Column >= columnIndex && Selection.Cell.Column < ColumnCount)
         {
@@ -629,23 +627,21 @@ public partial class Worksheet
 
     private void DeleteRowCore(int rowIndex)
     {
-        // Shift cells up using sparse operation - O(populated cells) instead of O(rows × columns)
+        // Sparse shift - O(populated cells) instead of O(rows x columns)
         Cells.ShiftRowsUp(rowIndex);
 
-        // Shift row metadata (custom heights, hidden state)
         Rows.ShiftUp(rowIndex);
 
         MergedCells.ShiftRowsUp(rowIndex);
 
         invalidReferenceRows.Add(rowIndex);
 
-        // Any formulas that reference this row should be turned into =#REF!
         InvalidateFormulasReferencing(cellRef => cellRef.Row == rowIndex);
 
         RowCount--;
 
         // A different cell now occupies the selection if it sat at or after the deleted
-        // row — notify so the formula bar re-reads. Skip when the delete left the
+        // row - notify so the formula bar re-reads. Skip when the delete left the
         // selection past the new bounds (re-reading there would be out of range).
         if (Selection.Cell != CellRef.Invalid && Selection.Cell.Row >= rowIndex && Selection.Cell.Row < RowCount)
         {
@@ -857,15 +853,13 @@ public partial class Worksheet
 
     private void InsertRowCore(int rowIndex, int count)
     {
-        // Shift cells down using sparse operation - O(populated cells) instead of O(rows × columns)
+        // Sparse shift - O(populated cells) instead of O(rows x columns)
         Cells.ShiftRowsDown(rowIndex, count);
 
-        // Shift row metadata (custom heights, hidden state)
         Rows.ShiftDown(rowIndex, count);
 
         MergedCells.ShiftRowsDown(rowIndex, count);
 
-        // Adjust formulas: shift row indices at or after the insert point
         AdjustFormulas((cellToken) =>
         {
             var a = cellToken.Address;
@@ -879,7 +873,7 @@ public partial class Worksheet
         RowCount += count;
 
         // The selection stays at the same address, but if it sits at or below the insert
-        // point a different cell now occupies it — notify so the formula bar re-reads.
+        // point a different cell now occupies it - notify so the formula bar re-reads.
         if (Selection.Cell != CellRef.Invalid && Selection.Cell.Row >= rowIndex)
         {
             Selection.NotifyContentChanged();
@@ -911,15 +905,13 @@ public partial class Worksheet
 
     private void InsertColumnCore(int columnIndex, int count)
     {
-        // Shift cells right using sparse operation - O(populated cells) instead of O(rows × columns)
+        // Sparse shift - O(populated cells) instead of O(rows x columns)
         Cells.ShiftColumnsRight(columnIndex, count);
 
-        // Shift column metadata (custom widths, hidden state)
         Columns.ShiftDown(columnIndex, count);
 
         MergedCells.ShiftColumnsRight(columnIndex, count);
 
-        // Adjust formulas: shift column indices at or after the insert point
         AdjustFormulas((cellToken) =>
         {
             var a = cellToken.Address;
@@ -933,7 +925,7 @@ public partial class Worksheet
         ColumnCount += count;
 
         // The selection stays at the same address, but if it sits at or after the insert
-        // point a different cell now occupies it — notify so the formula bar re-reads.
+        // point a different cell now occupies it - notify so the formula bar re-reads.
         if (Selection.Cell != CellRef.Invalid && Selection.Cell.Column >= columnIndex)
         {
             Selection.NotifyContentChanged();

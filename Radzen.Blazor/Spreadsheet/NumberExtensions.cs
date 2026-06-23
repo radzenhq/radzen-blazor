@@ -10,8 +10,6 @@ public static class NumberExtensions
     /// <summary>
     /// Converts a double value to a string representation in pixels (px).
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
     public static string ToPx(this double value)
     {
         return $"{value.ToString(CultureInfo.InvariantCulture)}px";

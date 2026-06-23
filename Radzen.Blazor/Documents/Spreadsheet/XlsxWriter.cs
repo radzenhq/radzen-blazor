@@ -446,7 +446,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             plotArea.Add(groupElement);
         }
 
-        // Add axes for non-pie/donut charts
         if (chart.ChartType != SpreadsheetChartType.Pie && chart.ChartType != SpreadsheetChartType.Donut)
         {
             plotArea.Add(new XElement(c + "catAx",
@@ -611,7 +610,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             group.Add(ser);
         }
 
-        // Add axis IDs for non-pie/donut
         if (chart.ChartType != SpreadsheetChartType.Pie && chart.ChartType != SpreadsheetChartType.Donut)
         {
             group.Add(new XElement(c + "axId", new XAttribute("val", "1")));
@@ -669,7 +667,6 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml")));
         }
 
-        // Add image extension defaults for any sheets with images
         var imageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var sheet in sheets)
         {
@@ -687,7 +684,6 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute("ContentType", ExtensionToContentType(ext))));
         }
 
-        // Add drawing and chart overrides
         for (var i = 0; i < sheets.Count; i++)
         {
             if (sheets[i].Images.Count > 0 || sheets[i].Charts.Count > 0)
@@ -904,7 +900,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, sharedStringsDoc, mediaMap, ref globalMediaIndex, ref globalTableIndex);
         }
 
-        // Theme relationship (shared by every workbook)
         workbookRelsElement.Add(new XElement(XName.Get("Relationship", pkgNs),
             new XAttribute("Id", $"rId{sheets.Count + 3}"),
             new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme"),
@@ -952,7 +947,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             sheetRelEntries.Add((id, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", url, true));
         }
 
-        // Add drawing reference if sheet has images or charts
         if (sheet.Images.Count > 0 || sheet.Charts.Count > 0)
         {
             var drawingRelId = $"rId{hyperlinkRels.Count + 1}";
@@ -971,8 +965,6 @@ class XlsxWriter(Workbook sourceWorkbook)
         // but Excel and downstream readers tolerate trailing position too.
         sheetDoc.Root!.Add(CreatePageMargins());
 
-        // Tables: write each table's XML part, register a relationship per table,
-        // and emit a <tableParts> block on the sheet.
         if (sheet.Tables.Count > 0)
         {
             var ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
@@ -1002,13 +994,11 @@ class XlsxWriter(Workbook sourceWorkbook)
             sheetDoc.Root!.Add(tablePartsElement);
         }
 
-        // Save sheet in xl/worksheets/ subdirectory
         using (var entry = archive.CreateEntry($"xl/worksheets/{sheetName}").Open())
         {
             sheetDoc.Save(entry);
         }
 
-        // Save sheet relationships
         if (sheetRelEntries.Count > 0)
         {
             SaveSheetRelationships(archive, sheetName, sheetRelEntries);
@@ -1300,7 +1290,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             rowElement.Add(new XAttribute("customHeight", "1"));
         }
 
-        // Add hidden attribute if row is hidden
         if (sheet.Rows.IsHidden(row))
         {
             rowElement.Add(new XAttribute("hidden", "1"));
@@ -1462,7 +1451,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             return builtInId;
         }
 
-        // Custom format - check if already tracked
         if (styleTracker.NumberFormats.TryGetValue(formatCode, out var existingId))
         {
             return existingId;
@@ -1552,7 +1540,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute("applyNumberFormat", numFmtId > 0 ? "1" : "0"),
             new XAttribute("applyBorder", borderId > 0 ? "1" : "0"));
 
-        // Add alignment if not default
         if (cell.Format.TextAlign is not null || cell.Format.VerticalAlign is not null || cell.Format.WrapText)
         {
             var alignmentElement = CreateAlignmentElement(cell);
@@ -1560,7 +1547,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             xfElement.Add(new XAttribute("applyAlignment", "1"));
         }
 
-        // Add protection if not default
         if (cell.Format.Locked is not null || cell.Format.FormulaHidden is not null)
         {
             var protectionElement = new XElement(XName.Get("protection", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"));
@@ -2164,7 +2150,6 @@ class XlsxWriter(Workbook sourceWorkbook)
                 new XAttribute(XName.Get("id", "http://schemas.openxmlformats.org/officeDocument/2006/relationships"), relId)));
         }
 
-        // Add workbook protection
         var wp = sourceWorkbook.Protection;
         if (wp.LockStructure || wp.PasswordHash is not null || wp.HashValue is not null)
         {
@@ -2285,7 +2270,6 @@ class XlsxWriter(Workbook sourceWorkbook)
             element.Add(new XAttribute("selectUnlockedCells", "1"));
         }
 
-        // Password hashes
         if (p.PasswordHash is not null)
         {
             element.Add(new XAttribute("password", p.PasswordHash));

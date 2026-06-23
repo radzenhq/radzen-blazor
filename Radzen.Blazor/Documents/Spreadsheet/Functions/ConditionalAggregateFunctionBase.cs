@@ -4,10 +4,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Spreadsheet;
 
-/// <summary>
-/// Base for multi-criteria aggregations with a leading value range (SUMIFS, AVERAGEIFS, MAXIFS, MINIFS):
-/// <c>FUNC(value_range, criteria_range1, criteria1, ...)</c>.
-/// </summary>
+// Base for multi-criteria aggregations with a leading value range (SUMIFS, AVERAGEIFS, MAXIFS, MINIFS):
+// FUNC(value_range, criteria_range1, criteria1, ...).
 abstract class ConditionalAggregateFunctionBase : FormulaFunction
 {
     protected abstract CellData Aggregate(List<double> values);
