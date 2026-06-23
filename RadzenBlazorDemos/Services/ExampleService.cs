@@ -2203,19 +2203,34 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "ColorPicker configuration", Anchor = "#configuration" }, new () { Text = "ColorPicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "ColorPicker",
-                    Description = "Demonstration and configuration of the Radzen Blazor ColorPicker component. HSV Picker. RGBA Picker.",
+                    Title = "Blazor ColorPicker Component | Free UI Components by Radzen",
+                    Description = "The Blazor ColorPicker lets users choose a color with HSV and RGBA modes, opacity, and predefined palettes.",
                     Path = "colorpicker",
                     Icon = "\ue40a",
-                    Tags = new [] { "form", "edit" }
+                    Tags = new [] { "form", "edit", "color", "picker" },
+                    Related = new [] { "slider", "numeric" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I get the selected color from the Blazor ColorPicker?", Answer = "Bind Value to a string; the ColorPicker sets it to the chosen color (for example an rgba() or hex value) and raises Change when the user picks a new color." }
+                    }
                 },
                 new Example
                 {
                     Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "DatePicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "DatePicker",
                     Path = "datepicker",
-                    Description = "Demonstration and configuration of the Radzen Blazor Datepicker component with calendar mode. Time Picker.",
+                    Title = "Blazor DatePicker & Calendar Component | Free UI Components by Radzen",
+                    Description = "The Radzen Blazor DatePicker is a date and time picker with an inline calendar mode, time selection, date ranges, min/max and disabled dates, and DateOnly/TimeOnly binding.",
                     Icon = "\ue916",
-                    Tags = new [] { "calendar", "time", "form", "edit" }
+                    Tags = new [] { "calendar", "time", "form", "edit", "datepicker" },
+                    Related = new [] { "timespanpicker", "numeric", "scheduler", "mask" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Can I use the Blazor DatePicker as a calendar?", Answer = "Yes. Set Inline to true to render an always-visible calendar instead of a popup, and bind Value to the selected date." },
+                        new FaqItem { Question = "How do I let users pick a date and time together?", Answer = "Set ShowTime to true so the picker includes a time selector alongside the calendar; use HourFormat to switch between 12- and 24-hour input." },
+                        new FaqItem { Question = "How do I disable specific or past dates?", Answer = "Use the DateRender callback to mark dates as disabled, and set Min and Max to bound the selectable range." },
+                        new FaqItem { Question = "Does the DatePicker support DateOnly and TimeOnly?", Answer = "Yes. It binds to DateTime, DateTimeOffset, DateOnly, and TimeOnly values." }
+                    }
                 },
                 new Example
                 {
@@ -2418,18 +2433,32 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Mask Sizes", Anchor = "#sizes" } ],
                     Name = "Mask",
                     Path = "mask",
-                    Description = "Demonstration and configuration of the Radzen Blazor masked textbox component.",
+                    Title = "Blazor Masked TextBox - Input Mask | Free UI Components by Radzen",
+                    Description = "The Blazor Masked TextBox formats input as the user types using a pattern - phone numbers, dates, IP addresses, and more.",
                     Icon = "\ue262",
-                    Tags = new [] { "input", "form", "edit", "mask" }
+                    Tags = new [] { "input", "form", "edit", "mask" },
+                    Related = new [] { "textbox", "numeric", "datepicker" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I mask a phone number or date in Blazor?", Answer = "Set the Mask property to a pattern (for example (***) ***-**** ) and the masked textbox enforces it as the user types." },
+                        new FaqItem { Question = "Which characters can I use in a mask pattern?", Answer = "Use the placeholder characters (such as * for any character and 9 for digits) together with literal characters that appear as-is in the input." }
+                    }
                 },
                 new Example
                 {
                     Toc = [ new () { Text = "Get and Set the value of Numeric", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Numeric using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Min set to 1 and Max set to 10", Anchor = "#min-max" }, new () { Text = "Placeholder and 0.5 step", Anchor = "#placeholder-and-step" }, new () { Text = "Without Up/Down", Anchor = "#without-up-down" }, new () { Text = "Formatted value", Anchor = "#formatted-value" }, new () { Text = "Align value", Anchor = "#align-value" }, new () { Text = "Custom Value convert", Anchor = "#custom-value-convert" }, new () { Text = "Custom Numeric Type Support", Anchor = "#custom-numeric-type" }, new () { Text = "Numeric Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Numeric",
                     Path = "numeric",
-                    Description = "Demonstration and configuration of the Radzen Blazor numeric textbox component.",
+                    Title = "Blazor Numeric TextBox - Number Input | Free UI Components by Radzen",
+                    Description = "The Blazor Numeric TextBox edits numbers with min/max limits, step buttons, formatted display, and culture-aware parsing.",
                     Icon = "\uf04a",
-                    Tags = new [] { "input", "number", "form", "edit" }
+                    Tags = new [] { "input", "number", "form", "edit", "numeric" },
+                    Related = new [] { "slider", "mask", "textbox" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I set minimum and maximum values on the Numeric TextBox?", Answer = "Set the Min and Max properties; the component clamps input to that range and the step buttons stay within it." },
+                        new FaqItem { Question = "How do I format the number shown in the Numeric TextBox?", Answer = "Set the Format property to a standard or custom .NET numeric format string (for example C for currency or N2 for two decimals)." }
+                    }
                 },
                 new Example
                 {
@@ -2507,9 +2536,16 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Get and Set the value of Slider", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Slider using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Slider from -100 to 100", Anchor = "#min-max-value" }, new () { Text = "Slider with Step=10", Anchor = "#step" }, new () { Text = "Range Slider", Anchor = "#range-slider" }, new () { Text = "Disabled Slider", Anchor = "#disabled-slider" }, new () { Text = "Vertical Slider", Anchor = "#vertical-slider" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Slider",
                     Path = "slider",
-                    Description = "Demonstration and configuration of the Radzen Blazor Slider component.",
+                    Title = "Blazor Slider & Range Slider | Free UI Components by Radzen",
+                    Description = "The Blazor Slider selects a single value or a range by dragging, with step increments and horizontal or vertical orientation.",
                     Icon = "\ue429",
-                    Tags = new [] { "form", "slider" }
+                    Tags = new [] { "form", "slider", "range" },
+                    Related = new [] { "numeric", "rating", "colorpicker" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I create a range slider in Blazor?", Answer = "Set Range to true and bind Value to a collection of two numbers; the slider then shows two handles for the lower and upper bounds." },
+                        new FaqItem { Question = "How do I make the Blazor Slider vertical?", Answer = "Set Orientation to Orientation.Vertical to render the slider top-to-bottom instead of left-to-right." }
+                    }
                 },
                 new Example
                 {
@@ -2567,9 +2603,15 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Bind the value of TimeSpanPicker", Anchor = "#bind-value" }, new () { Text = "Get and Set the value of TimeSpanPicker using Value and Change event.", Anchor = "#value-and-change-event" }, new () { Text = "Min and Max values", Anchor = "#min-max-values" }, new () { Text = "Inline picker", Anchor = "#inline" }, new () { Text = "Various configurations", Anchor = "#various-config" }, new () { Text = "Time span format", Anchor = "#format" }, new () { Text = "Custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "TimeSpanPicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "TimeSpanPicker",
                     Path = "timespanpicker",
-                    Description = "Demonstration and configuration of the Radzen Blazor TimeSpanPicker component.",
+                    Title = "Blazor TimeSpanPicker - Duration Input | Free UI Components by Radzen",
+                    Description = "Pick a duration or time span in the Blazor TimeSpanPicker, with inline mode, custom formatting, and min/max values.",
                     Icon = "\ue425",
-                    Tags = new [] { "duration", "form", "edit" }
+                    Tags = new [] { "duration", "form", "edit", "timespan" },
+                    Related = new [] { "datepicker", "numeric", "slider" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind a TimeSpan value in Blazor?", Answer = "Bind Value to a TimeSpan (or nullable TimeSpan); the TimeSpanPicker reads and writes that value and raises Change when the user edits it." }
+                    }
                 },
                 new Example
                 {
