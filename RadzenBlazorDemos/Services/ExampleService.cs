@@ -1936,24 +1936,42 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Sidebar, Header and Footer", Anchor = "#sidebar-header-footer" }, new () { Text = "Full height Sidebar", Anchor = "#full-height-sidebar" }, new () { Text = "Overlay Sidebar", Anchor = "#overlay" }, new () { Text = "Full height overlay Sidebar", Anchor = "#overlay-full" }, new () { Text = "Right Sidebar", Anchor = "#right-sidebar" }, new () { Text = "Right full height Sidebar", Anchor = "#right-full-height-sidebar" }, new () { Text = "Right and Left Sidebar", Anchor = "#right-left-sidebar" }, new () { Text = "Start and End Sidebar", Anchor = "#start-end-sidebar" }, new () { Text = "Icon Sidebar", Anchor = "#icon-sidebar" } ],
                     Name = "Layout",
-                    Description = "Blazor RadzenLayout allows you to define the global layout of your application.",
+                    Title = "Blazor Layout - Header, Sidebar, Footer | Free UI Components by Radzen",
+                    Description = "The Blazor Layout arranges a page into header, sidebar, body, and footer regions, with a collapsible sidebar.",
                     Path = "layout",
+                    Related = new [] { "panel", "stack", "splitter" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add a collapsible sidebar in Blazor?", Answer = "Use RadzenLayout with RadzenSidebar and a RadzenSidebarToggle in the header to expand and collapse the sidebar." }
+                    },
                     Icon = "\ue8f1",
                     Tags = new [] { "layout", "sidebar", "drawer", "header", "body", "footer" }
                 },
                 new Example
                 {
                     Name = "Stack",
-                    Description = "Use RadzenStack component to create a stack layout - a way of arranging elements in a vertical or horizontal stack.",
+                    Title = "Blazor Stack - Flex Layout | Free UI Components by Radzen",
+                    Description = "The Blazor Stack arranges children horizontally or vertically with consistent spacing.",
                     Path = "stack",
+                    Related = new [] { "row", "column" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I space elements evenly in Blazor?", Answer = "Use RadzenStack with Orientation and Gap to arrange children in a row or column with consistent spacing." }
+                    },
                     Icon = "\ue8e9",
                     Tags = new [] { "stack", "layout" }
                 },
                 new Example
                 {
                     Name = "Row",
-                    Description = "Blazor RadzenRow component is used to create a row in a responsive grid layout.",
+                    Title = "Blazor Row - Grid Row Layout | Free UI Components by Radzen",
+                    Description = "The Blazor Row arranges columns in a responsive 12-column grid row, with gap and alignment control.",
                     Path = "row",
+                    Related = new [] { "column", "stack" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a responsive grid in Blazor?", Answer = "Use RadzenRow with RadzenColumn children sized per breakpoint to lay out a responsive 12-column grid." }
+                    },
                     Icon = "\uf676",
                     Tags = new [] { "row", "layout", "responsive", "grid" }
                 },
@@ -1961,8 +1979,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Auto-layout columns", Anchor = "#auto-layout-columns" }, new () { Text = "Column sizes", Anchor = "#column-sizes" }, new () { Text = "Responsive column sizes", Anchor = "#responsive-column-sizes" }, new () { Text = "Column wrapping", Anchor = "#column-wrapping" }, new () { Text = "Column offset", Anchor = "#column-offset" }, new () { Text = "Responsive offsetting", Anchor = "#column-responsive-offset" }, new () { Text = "Column order", Anchor = "#column-order" }, new () { Text = "Responsive column ordering", Anchor = "#column-responsive-order" }, new () { Text = "Nested Layouts", Anchor = "#nested-layouts" }, new () { Text = "Gutters", Anchor = "#gutters" } ],
                     Name = "Column",
-                    Description = "Blazor RadzenColumn component is used within a RadzenRow to create a structured grid layout. Columns are positioned on a 12-column based responsive grid.",
+                    Title = "Blazor Column - Grid Column | Free UI Components by Radzen",
+                    Description = "The Blazor Column defines a responsive column within a Row's 12-column grid, sized per breakpoint.",
                     Path = "column",
+                    Related = new [] { "row", "stack" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I size columns responsively in Blazor?", Answer = "Set the Size properties (and per-breakpoint sizes) on RadzenColumn within a RadzenRow to control its width across screen sizes." }
+                    },
                     Icon = "\uf674",
                     Tags = new [] { "column", "col", "layout", "responsive", "grid" }
                 },
@@ -1970,16 +1994,28 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Card Variant", Anchor = "#card-variant" } ],
                     Name = "Card",
-                    Description = "Use the Blazor RadzenCard component to display a piece of content, like an image and text.",
+                    Title = "Blazor Card Component | Free UI Components by Radzen",
+                    Description = "The Blazor Card is a surface for grouping content, with variants, shadow, and customizable padding.",
                     Path = "card",
+                    Related = new [] { "card-group", "panel" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor Card used for?", Answer = "It is a surface that groups related content - text, images, and actions - with elevation and padding." }
+                    },
                     Icon = "\uefad",
                     Tags = new [] { "card", "container" }
                 },
                 new Example
                 {
                     Name = "CardGroup",
-                    Description = "Use the Blazor RadzenCardGroup component to visually stick RadzenCards next to each other.",
+                    Title = "Blazor CardGroup Component | Free UI Components by Radzen",
+                    Description = "The Blazor CardGroup lays out a set of cards as a connected, responsive group.",
                     Path = "card-group",
+                    Related = new [] { "card", "stack" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor CardGroup?", Answer = "It arranges multiple RadzenCard elements as a single connected group that wraps responsively." }
+                    },
                     Icon = "\ue8f3",
                     Tags = new [] { "card", "group", "deck", "container" }
                 },
@@ -1987,8 +2023,14 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Open page as a dialog", Anchor = "#open-page-as-dialog" }, new () { Text = "Inline Dialog", Anchor = "#inline-dialog" }, new () { Text = "Busy Dialog", Anchor = "#busy-dialog" }, new () { Text = "Confirm Dialog", Anchor = "#confirm-dialog" }, new () { Text = "Alert Dialog", Anchor = "#alert-dialog" }, new () { Text = "Prevent dialog from closing", Anchor = "#prevent-close" }, new () { Text = "Close Dialog by clicking outside", Anchor = "#close-dialog-by-clicking-outside" }, new () { Text = "Side Dialog", Anchor = "#side-dialog" }, new () { Text = "Dialog with custom CSS classes", Anchor = "#custom-css-classes" }, new () { Text = "Update dialog properties", Anchor = "#cascading-value" } ],
                     Name = "Dialog",
-                    Description = "Demonstration and configuration of the Blazor RadzenDialog component.",
+                    Title = "Blazor Dialog - Modal Dialog | Free UI Components by Radzen",
+                    Description = "The Blazor Dialog opens modal dialogs and side panels from code via DialogService, with Alert and Confirm helpers, custom content, sizing, and async results.",
                     Path = "dialog",
+                    Related = new [] { "popup", "card" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I open a dialog in Blazor?", Answer = "Inject DialogService and call Open or OpenAsync with a component or content; OpenAsync returns the dialog's result when it closes." }
+                    },
                     Icon = "\ue069",
                     Tags = new [] { "popup", "window" },
                 },
@@ -1996,32 +2038,56 @@ namespace RadzenBlazorDemos
                 {
                     Toc = [ new () { Text = "Define can-drop and no-drop styles", Anchor = "#can-drop-no-drop-styles" }, new () { Text = "Define a Footer Template per Drop Zone", Anchor = "#footer-template" } ],
                     Name = "DropZone",
-                    Description = "Demonstration and configuration of the Radzen Blazor DropZone component.",
+                    Title = "Blazor DropZone - Drag & Drop | Free UI Components by Radzen",
+                    Description = "The Blazor DropZone lets users drag and drop items between zones - for kanban boards and reordering.",
                     Path = "dropzone",
+                    Related = new [] { "tile-layout", "splitter" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a drag-and-drop list in Blazor?", Answer = "Use RadzenDropZoneContainer with RadzenDropZone areas and handle the drop events to move items between zones." }
+                    },
                     Icon = "\ue945",
                     Tags = new [] { "dropzone", "drag", "drop" }
                 },
                 new Example
                 {
                     Name = "Panel",
-                    Description = "Demonstration and configuration of the Blazor RadzenPanel component.",
+                    Title = "Blazor Panel - Collapsible Panel | Free UI Components by Radzen",
+                    Description = "The Blazor Panel is a titled, collapsible container for grouping content.",
                     Path = "panel",
+                    Related = new [] { "card", "fieldset" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I make a collapsible panel in Blazor?", Answer = "Set AllowCollapse on RadzenPanel so users can expand and collapse its content under the title." }
+                    },
                     Icon = "\uf732",
                     Tags = new [] { "container" }
                 },
                 new Example
                 {
                     Name = "Popup",
-                    Description = "Demonstration and configuration of the Radzen Blazor Popup component.",
+                    Title = "Blazor Popup Component | Free UI Components by Radzen",
+                    Description = "The Blazor Popup shows floating content anchored to an element via PopupService, for custom dropdowns and overlays.",
                     Path = "popup",
+                    Related = new [] { "dialog", "contextmenu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I show a popup anchored to an element in Blazor?", Answer = "Use PopupService (or the RadzenPopup component) to open floating content positioned relative to a target element." }
+                    },
                     Icon = "\ue0ca",
                     Tags = new [] { "popup", "dropdown"}
                 },
                 new Example
                 {
                     Name = "Splitter",
-                    Description = "Demonstration and configuration of the Blazor RadzenSplitter component.",
+                    Title = "Blazor Splitter - Resizable Panes | Free UI Components by Radzen",
+                    Description = "The Blazor Splitter divides an area into resizable, collapsible panes, horizontally or vertically.",
                     Path = "splitter",
+                    Related = new [] { "layout", "stack" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I create resizable panes in Blazor?", Answer = "Use RadzenSplitter with RadzenSplitterPane children; users drag the bars to resize, and panes can be collapsible." }
+                    },
                     Icon = "\ue42a",
                     Tags = new [] { "splitter", "layout"}
                 },
@@ -2029,8 +2095,14 @@ namespace RadzenBlazorDemos
                 {
                     Name = "TileLayout",
                     New = true,
-                    Description = "Demonstration and configuration of the Blazor RadzenTileLayout component for building dashboards with draggable and resizable tiles.",
+                    Title = "Blazor TileLayout - Dashboard Tiles | Free UI Components by Radzen",
+                    Description = "The Blazor TileLayout builds dashboards from draggable, resizable tiles.",
                     Path = "tile-layout",
+                    Related = new [] { "dashboard", "dropzone" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a tile dashboard in Blazor?", Answer = "Use RadzenTileLayout with RadzenTile children; users can drag and resize tiles to arrange the dashboard." }
+                    },
                     Icon = "\ue871",
                     Tags = new [] { "tile", "layout", "grid", "dashboard", "drag", "resize" }
                 }

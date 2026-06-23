@@ -33,6 +33,18 @@ namespace RadzenBlazorDemos
             "steps",
             "link",
             "toc",
+            "dialog",
+            "layout",
+            "card",
+            "dropzone",
+            "popup",
+            "splitter",
+            "card-group",
+            "panel",
+            "row",
+            "stack",
+            "column",
+            "tile-layout",
         };
 
         // Returns the JSON-LD document for the page, or null when the page is not in a covered cluster.
