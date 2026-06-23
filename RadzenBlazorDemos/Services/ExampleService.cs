@@ -3648,7 +3648,7 @@ namespace RadzenBlazorDemos
                     Children = new [] {
                         new Example
                         {
-                            Toc = [ new () { Text = "Customization", Anchor = "#customization" }, new () { Text = "Various radius", Anchor = "#various-radius" }, new () { Text = "Explode on hover", Anchor = "#explode-on-hover" }, new () { Text = "Segment gap", Anchor = "#segment-gap" } ],
+                            Toc = [ new () { Text = "Showcase", Anchor = "#showcase" }, new () { Text = "Basic pie", Anchor = "#basic" }, new () { Text = "Various radius", Anchor = "#various-radius" }, new () { Text = "Segment gap", Anchor = "#segment-gap" }, new () { Text = "Rounded corners", Anchor = "#rounded-corners" }, new () { Text = "Semi-circle", Anchor = "#semi-circle" }, new () { Text = "Explode on hover", Anchor = "#explode-on-hover" }, new () { Text = "Custom colors", Anchor = "#custom-colors" }, new () { Text = "Labels and legend", Anchor = "#labels-legend" }, new () { Text = "Playground", Anchor = "#playground" } ],
                             Name = "Pie Chart",
                             Path = "pie-chart",
                             Description = "Show parts of a whole at a glance with a Blazor pie chart. Free and open source.",
@@ -3664,7 +3664,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Toc = [ new () { Text = "Customization", Anchor = "#customization" }, new () { Text = "Various radius", Anchor = "#various-radius" }, new () { Text = "Explode on hover", Anchor = "#explode-on-hover" }, new () { Text = "Segment gap", Anchor = "#segment-gap" } ],
+                            Toc = [ new () { Text = "Showcase", Anchor = "#showcase" }, new () { Text = "Basic donut", Anchor = "#basic" }, new () { Text = "Inner radius", Anchor = "#inner-radius" }, new () { Text = "Center label", Anchor = "#center-label" }, new () { Text = "Various radius", Anchor = "#various-radius" }, new () { Text = "Segment gap", Anchor = "#segment-gap" }, new () { Text = "Rounded corners", Anchor = "#rounded-corners" }, new () { Text = "Semi-circle", Anchor = "#semi-circle" }, new () { Text = "Explode on hover", Anchor = "#explode-on-hover" }, new () { Text = "Custom colors", Anchor = "#custom-colors" }, new () { Text = "Labels and legend", Anchor = "#labels-legend" }, new () { Text = "Playground", Anchor = "#playground" } ],
                             Name = "Donut Chart",
                             Path = "donut-chart",
                             Description = "Show proportions with a Blazor donut chart - a pie with an open center for a total or label.",
