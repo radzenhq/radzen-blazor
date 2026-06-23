@@ -129,7 +129,14 @@ namespace RadzenBlazorDemos
                     Name = "Icons",
                     Path = "icon",
                     Title = "Blazor Icon Component | Free UI Components by Radzen",
-                    Description = "Demonstration and configuration of the Radzen Blazor Icon component.",
+                    Description = "Display Material icons in Blazor with the RadzenIcon component - control size and color, and use custom icon fonts.",
+                    Related = new [] { "button", "fab" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add an icon in Blazor?", Answer = "Use the RadzenIcon component and set its Icon property to a Material icon name; the icon renders inline wherever you place it." },
+                        new FaqItem { Question = "How do I change an icon's size or color?", Answer = "Control the color with IconStyle or a Style/class, and set the font size (for example via Style) to change the icon size." },
+                        new FaqItem { Question = "Can I use custom icons?", Answer = "Yes. In addition to the built-in Material icons, you can use a custom icon font or image-based icons." }
+                    },
                     Icon = "\ue148",
                     Tags = new [] { "icon", "content" }
                 },

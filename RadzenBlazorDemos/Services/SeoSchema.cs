@@ -18,6 +18,7 @@ namespace RadzenBlazorDemos
         static readonly HashSet<string> StandalonePages = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "scheduler",
+            "icon",
         };
 
         // Returns the JSON-LD document for the page, or null when the page is not in a covered cluster.
