@@ -119,7 +119,7 @@
                 var value = Chart.CategoryScale.Value(tick);
                 var text = XAxis != null ? XAxis.Format(Chart.CategoryScale, value) : "";
 
-                var textWidth = TextMeasurer.TextWidth(text) - 8;
+                var textWidth = TextMeasurer.TextWidth(text) + 4;
 
                 if (textWidth > tickWidth)
                 {
