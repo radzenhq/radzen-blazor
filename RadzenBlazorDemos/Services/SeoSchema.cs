@@ -79,6 +79,11 @@ namespace RadzenBlazorDemos
                 return ArticleGraph(example, url, exampleService, "DataGrid", "datagrid");
             }
 
+            if (InCluster(exampleService.GetPivotDataGridPages(), path))
+            {
+                return ArticleGraph(example, url, exampleService, "Pivot DataGrid", "pivot-data-grid");
+            }
+
             // Forms has no single hub; each component is its own breadcrumb root.
             if (path != null && exampleService.GetFormsComponentHubs().TryGetValue(path, out var formsHub))
             {

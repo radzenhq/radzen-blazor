@@ -1578,33 +1578,54 @@ namespace RadzenBlazorDemos
                 {
                     Name = "IQueryable",
                     Path = "/pivot-data-grid",
-                    Title = "Blazor Pivot DataGrid - IQueryable | Free UI Components by Radzen",
-                    Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
-                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
+                    Title = "Blazor Pivot Table - Pivot DataGrid (IQueryable) | Free UI Components by Radzen",
+                    Description = "The Blazor Pivot DataGrid (RadzenPivotDataGrid) creates cross-tabulation reports - rows, columns, and aggregated values - from an IQueryable data source.",
+                    Tags = new [] { "pivot", "pivot table", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" },
+                    Related = new [] { "pivot-data-grid-load-data", "pivot-data-grid-dynamic", "pivot-data-grid-odata", "datagrid" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor Pivot DataGrid?", Answer = "It is a pivot table (cross-tab) component that groups data into rows and columns and shows aggregated values, with drill-down." },
+                        new FaqItem { Question = "How do I bind the Pivot DataGrid to data?", Answer = "Set Data to an IQueryable (or use the LoadData event for remote data) and define the row, column, and value fields to aggregate." }
+                    }
                 },
                 new Example
                 {
                     Name = "LoadData",
                     Path = "/pivot-data-grid-load-data",
                     Title = "Blazor Pivot DataGrid - LoadData Binding | Free UI Components by Radzen",
-                    Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
-                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
+                    Description = "Bind the Blazor Pivot DataGrid to remote data with the LoadData event, fetching aggregated cross-tab results on demand.",
+                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "loaddata", "remote" },
+                    Related = new [] { "pivot-data-grid", "pivot-data-grid-odata", "datagrid-loaddata" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I load Pivot DataGrid data on demand?", Answer = "Handle the LoadData event to fetch and aggregate data from the server as the grid needs it." }
+                    }
                 },
                 new Example
                 {
                     Name = "Dynamic data",
                     Path = "/pivot-data-grid-dynamic",
                     Title = "Blazor Pivot DataGrid - Dynamic Data | Free UI Components by Radzen",
-                    Description = "Bind RadzenPivotDataGrid to schema-less IDictionary<string, object> records and configure fields dynamically.",
-                    Tags = new [] { "pivot", "dynamic", "dictionary", "analysis", "aggregation", "drill-down", "datagrid", "table" }
+                    Description = "Bind the Blazor Pivot DataGrid to schema-less IDictionary<string, object> records and configure pivot fields dynamically.",
+                    Tags = new [] { "pivot", "dynamic", "dictionary", "analysis", "aggregation", "drill-down", "datagrid", "table" },
+                    Related = new [] { "pivot-data-grid", "pivot-data-grid-load-data", "datagrid-dynamic" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Pivot DataGrid to dynamic data?", Answer = "Bind Data to records of IDictionary<string, object> and configure the row, column, and value fields at runtime, without a fixed model." }
+                    }
                 },
                 new Example
                 {
                     Name = "OData",
                     Path = "/pivot-data-grid-odata",
                     Title = "Blazor Pivot DataGrid - OData Binding | Free UI Components by Radzen",
-                    Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
-                    Tags = new [] { "odata", "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
+                    Description = "Bind the Blazor Pivot DataGrid to an OData service and build cross-tabulation reports from the remote query.",
+                    Tags = new [] { "odata", "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "remote" },
+                    Related = new [] { "pivot-data-grid", "pivot-data-grid-load-data", "datagrid-odata" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Pivot DataGrid to OData?", Answer = "Point the grid at an OData endpoint via the LoadData event; it builds the cross-tabulation from the remote query results." }
+                    }
                 }
             }
         },
@@ -4468,6 +4489,13 @@ namespace RadzenBlazorDemos
         {
             var dataGrid = Examples.FirstOrDefault(c => c.Name == "DataGrid");
             return dataGrid?.Children != null ? CollectLeaves(dataGrid.Children).ToList() : Enumerable.Empty<Example>();
+        }
+
+        // Every leaf page under the "PivotDataGrid" category. Article-eligible for schema.
+        public IEnumerable<Example> GetPivotDataGridPages()
+        {
+            var pivot = Examples.FirstOrDefault(c => c.Name == "PivotDataGrid");
+            return pivot?.Children != null ? CollectLeaves(pivot.Children).ToList() : Enumerable.Empty<Example>();
         }
 
         // Maps each Forms page path to its component hub (display label + primary page path). Unlike
