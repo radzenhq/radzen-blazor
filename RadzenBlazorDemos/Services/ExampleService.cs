@@ -566,8 +566,13 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Issues Dashboard",
                     Path = "/dashboard",
-                    Title = "Sample Dashboard | Free UI Components by Radzen",
-                    Description = "Rich dashboard created with the Radzen Blazor Components library.",
+                    Title = "Sample Blazor Dashboard | Free UI Components by Radzen",
+                    Description = "A sample Blazor dashboard built with Radzen Blazor Components - charts, grids, and cards on one page, visualizing live GitHub issues.",
+                    Related = new [] { "tile-layout", "datagrid", "charts" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a dashboard in Blazor?", Answer = "Combine Radzen components such as charts, DataGrids, cards, and the TileLayout on a single page and bind them to your data; this sample visualizes live GitHub issues." }
+                    },
                     Icon = "\ue868"
                 },
                 new Example
