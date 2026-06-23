@@ -13,6 +13,13 @@ namespace RadzenBlazorDemos
     {
         const string BaseUrl = "https://blazor.radzen.com";
 
+        // Standalone pages (not part of a cluster) that have been individually SEO-optimized.
+        // Each gets TechArticle + BreadcrumbList (Home > Page) keyed on the example's own name.
+        static readonly HashSet<string> StandalonePages = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "scheduler",
+        };
+
         // Returns the JSON-LD document for the page, or null when the page is not in a covered cluster.
         public static string BuildFor(Example example, ExampleService exampleService)
         {
@@ -49,6 +56,12 @@ namespace RadzenBlazorDemos
             if (path != null && exampleService.GetFormsComponentHubs().TryGetValue(path, out var formsHub))
             {
                 return ArticleGraph(example, url, exampleService, formsHub.Label, formsHub.Path);
+            }
+
+            // Standalone single-page components (scheduler, etc.): Home > Page.
+            if (path != null && StandalonePages.Contains(path))
+            {
+                return ArticleGraph(example, url, exampleService, example.Name, path);
             }
 
             return null;
