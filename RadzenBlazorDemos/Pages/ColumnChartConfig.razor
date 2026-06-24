@@ -32,15 +32,6 @@
                 </RadzenSelectBar>
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenLabel Text="Tick Placement" Component="tickPlacement" />
-                <RadzenSelectBar @bind-Value="@tickPlacement" TValue="TickPlacement" Size="ButtonSize.Small" Name="tickPlacement">
-                    <Items>
-                        <RadzenSelectBarItem Value="TickPlacement.Between" Text="Between" />
-                        <RadzenSelectBarItem Value="TickPlacement.On" Text="On" />
-                    </Items>
-                </RadzenSelectBar>
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenLabel Text="Max Width" Component="maxWidth" />
                 <RadzenNumeric @bind-Value="@maxWidth" Min="0" Max="200" Step="10" Style="width: 90px" Name="maxWidth" />
             </RadzenStack>
@@ -61,7 +52,7 @@
                     <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" MaxWidth="@(maxWidth > 0 ? maxWidth : null)" CategoryGap="@(categoryGap > 0 ? categoryGap : null)" />
-                <RadzenCategoryAxis TickPlacement="@tickPlacement" />
+                <RadzenCategoryAxis />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
@@ -111,7 +102,6 @@
     bool showDataLabels = false;
     DataLabelPosition labelPosition = DataLabelPosition.Auto;
     FillMode fillMode = FillMode.Gradient;
-    TickPlacement tickPlacement = TickPlacement.Between;
     double maxWidth = 0;
     double categoryGap = 0;
 
