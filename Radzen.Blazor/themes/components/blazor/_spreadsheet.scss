@@ -80,6 +80,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 
     .rz-spreadsheet-editor-input,
     .rz-spreadsheet-editor-highlight {
+        min-height: 1.425rem;
         padding: 0.125rem;
         padding-inline-start: 1.5rem;
     }

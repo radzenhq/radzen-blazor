@@ -22,9 +22,11 @@
     }
     <RadzenTileLayoutItem @bind-Col=@custom.Col @bind-Row=@custom.Row @bind-ColSpan=@custom.ColSpan @bind-RowSpan=@custom.RowSpan>
         <HeaderTemplate>
-            <RadzenIcon Icon="insights" Style="color: var(--rz-primary);" />
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Span" class="rz-flex-grow-1 rz-m-0">Custom header</RadzenText>
-            <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Live" />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="4px">
+                <RadzenIcon Icon="insights" Style="color: var(--rz-primary);" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Span" class="rz-flex-grow-1 rz-m-0">Custom header</RadzenText>
+                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Live" />
+            </RadzenStack>
         </HeaderTemplate>
         <ChildContent>
             <RadzenText>This tile uses a custom <code>HeaderTemplate</code> and spans multiple cells.</RadzenText>
