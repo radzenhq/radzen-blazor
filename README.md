@@ -53,9 +53,9 @@ For the full setup guide including render modes and dialog/notification configur
 
 **Data** — DataGrid, DataList, PivotDataGrid, DataFilter, PickList, Pager, Tree, Scheduler, Gantt, Timeline, Spreadsheet, Charts (Line, Bar, Column, Area, Pie, Donut, Scatter, Bubble, Spider/Radar, BoxPlot, Bullet, Candlestick, OHLC, Pyramid, Funnel, Waterfall, HighLow, Range Area/Bar/Column, Step Line/Area, Stacked & Full-Stacked variants, Contour), Heatmap, Treemap, RangeNavigator, SankeyDiagram, GaugeCharts (Radial, Linear, Arc)
 
-**Forms** — TextBox, TextArea, Password, Numeric, Mask, DatePicker, TimePicker, ColorPicker, Dropdown, AutoComplete, ListBox, CheckBox, RadioButtonList, Switch, Slider, Rating, FileInput, SecurityCode, SignaturePad, HtmlEditor
+**Forms** — TextBox, TextArea, Password, Numeric, Mask, DatePicker, TimePicker, ColorPicker, Dropdown, AutoComplete, ListBox, CheckBox, RadioButtonList, Switch, Slider, Rating, FileInput, Upload, SecurityCode, SignaturePad, HtmlEditor, Button, SplitButton, Login
 
-**Layout** — Card, Panel, Tabs, Accordion, Splitter, Tile Layout, Steps, Dialog, Fieldset, Stack, Row/Column, Sidebar
+**Layout** — Card, Panel, Tabs, Accordion, Splitter, Tile Layout, Steps, Dialog, Fieldset, Stack, Row/Column, Sidebar, Carousel
 
 **Navigation** — Menu, ContextMenu, PanelMenu, Breadcrumb, Link, TreeView, FabMenu, ProfileMenu
 
