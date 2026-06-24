@@ -196,7 +196,7 @@ namespace RadzenBlazorDemos
                 .Replace("#nullable enable", "#nullable disable")
                 .Replace("where TItem : , notnull", "where TItem : notnull");
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(generatedCode, CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp10));
+            var syntaxTree = CSharpSyntaxTree.ParseText(generatedCode, CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest));
 
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(syntaxTree);
 
