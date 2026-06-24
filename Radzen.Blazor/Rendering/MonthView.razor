@@ -326,7 +326,12 @@
         if (Scheduler != null)
         {
             await Scheduler.SelectAppointment(data);
-            await contentView.FocusAsync();
+
+            try
+            {
+                await contentView.FocusAsync();
+            }
+            catch (JSException) {}
         }
     }
 
