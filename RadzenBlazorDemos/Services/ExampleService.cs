@@ -34,8 +34,7 @@ namespace RadzenBlazorDemos
             Title = "AI and Radzen Blazor | Free UI Components by Radzen",
             Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",
             Icon = "\uefac",
-            Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "mcp", "nuget" },
-            New = true
+            Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "mcp", "nuget" }
         },
         new Example
         {
@@ -45,637 +44,6 @@ namespace RadzenBlazorDemos
             Description = "How to get support for the Radzen Blazor Components library.",
             Icon = "\ue0c6"
         },
-        new Example
-        {
-            Toc = [ new () { Text = "Applying guidelines", Anchor = "#applying-guidelines" }, new () { Text = "WCAG 2.2", Anchor = "#wcag" }, new () { Text = "WCAG compliant theme colors (AA level of conformance)", Anchor = "#wcag-colors" }, new () { Text = "ARIA attributes", Anchor = "#wai-aria" }, new () { Text = "Semantic HTML", Anchor = "#semantic-html" }, new () { Text = "Screen reader compatibility", Anchor = "#screen-readers" }, new () { Text = "Responsive design", Anchor = "#responsive-design" }, new () { Text = "Keyboard compatibility", Anchor = "#keyboard-compatibility" }, new () { Text = "Accessibility Conformance Report", Anchor = "#acr" } ],
-            Name = "Accessibility",
-            Path = "/accessibility",
-            Title = "Blazor Accessibility | Free UI Components by Radzen",
-            Description = "Accessible Blazor components compliant with WAI-ARIA, WCAG 2.2, Section 508, and keyboard navigation standards.",
-            Icon = "\ue92c",
-            Tags = new[] { "keyboard", "accessibility", "standard", "508", "wai-aria", "wcag", "shortcut"}
-        },
-        new Example
-        {
-            Toc = [ new () { Text = "Live demo", Anchor = "#live-demo" }, new () { Text = "How it works", Anchor = "#how-it-works" }, new () { Text = "ILocalizer", Anchor = "#ilocalizer" }, new () { Text = "Satellite assemblies", Anchor = "#satellite-assemblies" }, new () { Text = "Parameter override", Anchor = "#parameter-override" }, new () { Text = "Resource keys", Anchor = "#resource-keys" }, new () { Text = "Culture resolution", Anchor = "#culture" }, new () { Text = "Priority order", Anchor = "#priority" } ],
-            Name = "Localization",
-            New = true,
-            Path = "/localization",
-            Title = "Blazor Localization | Free UI Components by Radzen",
-            Description = "How to localize Radzen Blazor Components using resource files, satellite assemblies, or the ILocalizer interface.",
-            Icon = "\ue8e2",
-            Tags = new[] { "localization", "globalization", "culture", "translation", "language", "i18n", "l10n", "resource", "resx", "satellite" }
-        },
-
-        new Example
-        {
-
-            Toc = [ new () { Text = "Customize themes in Radzen Blazor Studio", Anchor = "#text-tag-name" } ],
-            Name = "UI Fundamentals",
-            Icon = "\ue749",
-            Children = new [] {
-                new Example
-                {
-                    Name = "Themes",
-                    Path = "themes",
-                    Title = "Blazor Themes | Free UI Components by Radzen",
-                    Description = "Choose from free and premium Blazor themes for Radzen Blazor components - including Material and dark themes - or build your own with the theme customization tools.",
-                    Related = new [] { "theme-service", "colors", "appearance-toggle" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I change the theme in Blazor?", Answer = "Reference the theme's CSS and set it through ThemeService (or the Theme parameter); themes can switch at runtime, including a dark-mode toggle." },
-                        new FaqItem { Question = "Does Radzen Blazor offer dark mode themes?", Answer = "Yes. Several themes ship with dark variants, and users can toggle between light and dark at runtime." },
-                        new FaqItem { Question = "Can I create a custom Blazor theme?", Answer = "Yes. Start from a built-in theme and customize its colors and variables, or use the theme customization tools to build your own." }
-                    },
-                    Icon = "\ue40a",
-                    Tags = new[] { "theme", "color", "background", "border", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Persist the Theme", Anchor = "#persist" }, new () { Text = "Video: Changing themes at runtime in Radzen Blazor Studio", Anchor = "#video-changing-themes-at-runtime" } ],
-                    Name = "ThemeService",
-                    Path = "theme-service",
-                    Title = "Blazor ThemeService | Free UI Components by Radzen",
-                    Description = "The ThemeService allows to change the theme of the application at runtime.",
-                    Icon = "\ue3ae",
-                    Tags = ["theme", "service", "change", "runtime", "rtl", "right to left", "direction", "wcag", "accessibility"]
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Switch between light and dark mode", Anchor = "#light-dark-mode" }, new () { Text = "Video: AppearanceToggle in Radzen Blazor Studio", Anchor = "#video-radzen-blazor-studio-config" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "AppearanceToggle",
-                    Path = "appearance-toggle",
-                    Title = "Blazor Appearance Toggle | Free UI Components by Radzen",
-                    Description = "The AppearanceToggle button allows you to switch between two predefined themes, most commonly light and dark.",
-                    Icon = "\ueb37",
-                    Tags = new[] { "theme", "light", "dark", "mode", "appearance", "toggle", "switch"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Theme Colors", Anchor = "#theme-colors" }, new () { Text = "Utility CSS Classes", Anchor = "#utility-css-classes" }, new () { Text = "Video: Theme Colors in Radzen Blazor Studio", Anchor = "#video-theme-colors" } ],
-                    Name = "Colors",
-                    Path = "colors",
-                    Title = "Blazor Color Utilities | Free UI Components by Radzen",
-                    Description = "List of colors and utility CSS classes available in Radzen Blazor Components library.",
-                    Icon = "\ue997",
-                    Tags = new[] { "color", "background", "border", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Text Style", Anchor = "#text-style" }, new () { Text = "Text Style and Tag Name", Anchor = "#text-tag-name" }, new () { Text = "Display headings", Anchor = "#text-display-headings" }, new () { Text = "Text Align", Anchor = "#text-align" }, new () { Text = "Text Functional Colors", Anchor = "#text-color" }, new () { Text = "Text Transform", Anchor = "#text-transform" }, new () { Text = "Text Wrap", Anchor = "#text-wrap" }, new () { Text = "Video: How Typography Works in Radzen Blazor Studio", Anchor = "#video-radzen-text" } ],
-                    Name = "Typography",
-                    Path = "typography",
-                    Title = "Blazor Text Component | Free UI Components by Radzen",
-                    Description = "Use the RadzenText component to format text in your applications. The TextStyle property applies a predefined text style such as H1, H2, etc.",
-                    Icon = "\ue264",
-                    Tags = new [] { "typo", "typography", "text", "paragraph", "header", "heading", "caption", "overline", "content" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Material Icons", Anchor = "#material-icons" }, new () { Text = "Icon color", Anchor = "#icon-color" }, new () { Text = "Filled icons", Anchor = "#filled-icons" }, new () { Text = "Styled icons", Anchor = "#styled-icons" }, new () { Text = "Using RadzenIcon with other icon fonts", Anchor = "#icons-width-other-fonts" }, new () { Text = "Video: RadzenIcon in Radzen Blazor Studio", Anchor = "#video-icons" } ],
-                    Name = "Icons",
-                    Path = "icon",
-                    Title = "Blazor Icon Component | Free UI Components by Radzen",
-                    Description = "Display Material icons in Blazor with the RadzenIcon component - control size and color, and use custom icon fonts.",
-                    Related = new [] { "button", "fab" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I add an icon in Blazor?", Answer = "Use the RadzenIcon component and set its Icon property to a Material icon name; the icon renders inline wherever you place it." },
-                        new FaqItem { Question = "How do I change an icon's size or color?", Answer = "Control the color with IconStyle or a Style/class, and set the font size (for example via Style) to change the icon size." },
-                        new FaqItem { Question = "Can I use custom icons?", Answer = "Yes. In addition to the built-in Material icons, you can use a custom icon font or image-based icons." }
-                    },
-                    Icon = "\ue148",
-                    Tags = new [] { "icon", "content" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Video: Styling Borders in Radzen Blazor Studio", Anchor = "#video-borders" }, new () { Text = "Border radius", Anchor = "#border-radius" }, new () { Text = "Add or remove borders arbitrarily", Anchor = "#add-remove-css-classes" }, new () { Text = "Border color utility CSS classes", Anchor = "#color-css-classes" }, new () { Text = "Border with color utility CSS classes", Anchor = "#utility-css-classes" }, new () { Text = "Set border width via CSS variable", Anchor = "#border-width" }, new () { Text = "Borders with CSS variables", Anchor = "#css-variables" } ],
-                    Name = "Borders",
-                    Path = "borders",
-                    Title = "Blazor Border Utilities | Free UI Components by Radzen",
-                    Description = "Border styles and utility CSS classes for borders available in Radzen Blazor Components library.",
-                    Icon = "\ue3c6",
-                    Tags = new [] { "border", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Breakpoints", Anchor = "#breakpoints" }, new () { Text = "Usage of Breakpoints", Anchor = "#usage" } ],
-                    Name = "Breakpoints",
-                    Title = "Blazor Responsive Breakpoints | Free UI Components by Radzen",
-                    Description = "Responsive breakpoints are used to adjust the layout based on the screen size of the device in use.",
-                    Path = "breakpoints",
-                    Icon = "\ue1b1",
-                    Tags = new [] { "breakpoints", "spacing", "margin", "padding", "gutter", "gap", "utility", "css", "responsive", "layout"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Responsive display", Anchor = "#responsive-spacing" } ],
-                    Name = "Display",
-                    Title = "Blazor Display Utilities | Free UI Components by Radzen",
-                    Description = "Display styles and utility CSS classes available in Radzen Blazor Components library.",
-                    Path = "display",
-                    Icon = "\uf023",
-                    Tags = new [] { "display", "hide", "show", "flex", "block", "inline", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Responsive overflow", Anchor = "#responsive-spacing" } ],
-                    Name = "Overflow",
-                    Title = "Blazor Overflow Utilities | Free UI Components by Radzen",
-                    Description = "Overflow styles and utility CSS classes available in Radzen Blazor Components library.",
-                    Path = "overflow",
-                    Icon = "\uf829",
-                    Tags = new [] { "overflow", "content", "width", "height", "size", "wrap", "hide", "hidden", "visible", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Show/Hide Content Based on Screen Size", Anchor = "#responsive-content" }, new () { Text = "Multiple Breakpoints", Anchor = "#multiple-breakpoints" }, new () { Text = "Device Orientation", Anchor = "#orientation" } ],
-                    Name = "MediaQuery",
-                    Title = "Blazor MediaQuery Component | Free UI Components by Radzen",
-                    Description = "Respond to browser viewport size changes using CSS media queries. Perfect for creating responsive Blazor applications.",
-                    Path = "media-query",
-                    Icon = "\ue337",
-                    Tags = new [] { "mediaquery", "media", "query", "responsive", "breakpoint", "viewport", "screen", "mobile", "tablet", "desktop", "orientation", "utility"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Ripple RadzenButton", Anchor = "#ripple-button" }, new () { Text = "Ripple RadzenLink", Anchor = "#ripple-link" }, new () { Text = "Ripple HTML div", Anchor = "#ripple-div" } ],
-                    Name = "Ripple",
-                    Title = "Blazor Ripple Effect | Free UI Components by Radzen",
-                    Description = "See how to apply the ripple effect to various UI elements.",
-                    Path = "ripple",
-                    Icon = "\ue762",
-                    Tags = new [] { "ripple", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Utility CSS classes", Anchor = "#shadow-css-classes" }, new () { Text = "Custom CSS properties (CSS Variables)", Anchor = "#shadow-css-variables" } ],
-                    Name = "Shadows",
-                    Path = "shadows",
-                    Title = "Blazor Shadow Utilities | Free UI Components by Radzen",
-                    Description = "Shadow styles and utility CSS classes for shadows available in Radzen Blazor Components library.",
-                    Icon = "\ue9df",
-                    Tags = new [] { "shadow", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Width percentage CSS classes", Anchor = "#width-percentage-css-classes" }, new () { Text = "Width keyword CSS classes", Anchor = "#width-keyword-css-classes" }, new () { Text = "Width viewport CSS classes", Anchor = "#width-viewport-css-classes" }, new () { Text = "Max-width and min-width CSS classes", Anchor = "#border-radius" }, new () { Text = "Height percentage CSS classes", Anchor = "#height-percentage-css-classes" }, new () { Text = "Height viewport CSS classes", Anchor = "#height-viewport-css-classes" }, new () { Text = "Max-height and min-height CSS classes", Anchor = "#border-radius" }, new () { Text = "Responsive sizing", Anchor = "#responsive-spacing" } ],
-                    Name = "Sizing",
-                    Title = "Blazor Sizing Utilities | Free UI Components by Radzen",
-                    Description = "Sizing styles and utility CSS classes for width and height available in Radzen Blazor Components library.",
-                    Path = "sizing",
-                    Icon = "\uf730",
-                    Tags = new [] { "sizing", "width", "height", "size", "max", "min", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Text Size", Anchor = "#text-size" }, new () { Text = "Animations", Anchor = "#animations" }, new () { Text = "Complex Example", Anchor = "#complex-example" }, new () { Text = "DataGrid Loading", Anchor = "#datagrid-loading" } ],
-                    Name = "Skeleton",
-                    Title = "Blazor Skeleton Component | Free UI Components by Radzen",
-                    Description = "RadzenSkeleton component displays loading placeholders with various shapes and animations.",
-                    Path = "skeleton",
-                    Icon = "\uf486",
-                    Tags = new [] { "skeleton", "load", "loading", "placeholder", "animation", "wave", "pulse", "text", "circular", "rectangular", "rounded" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Margin CSS classes", Anchor = "#margin-css-classes" }, new () { Text = "Padding CSS classes", Anchor = "#padding-css-classes" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Responsive spacing", Anchor = "#responsive-spacing" } ],
-                    Name = "Spacing",
-                    Title = "Blazor Spacing Utilities | Free UI Components by Radzen",
-                    Description = "Spacing styles and utility CSS classes for margin and padding available in Radzen Blazor Components library.",
-                    Path = "spacing",
-                    Icon = "\uf773",
-                    Tags = new [] { "spacing", "margin", "padding", "gutter", "gap", "utility", "css", "var"}
-                }
-            }
-        },
-        new Example
-        {
-            Toc = [ new () { Text = "Get and set the text", Anchor = "#text" }, new () { Text = "Markdown with Blazor components inside", Anchor = "#blazor" } ],
-            Name = "Markdown",
-            Icon = "\uf552",
-            Path = "markdown",
-            Title = "Blazor Markdown - Render Markdown Content | Free UI Components by Radzen",
-            Description = "Render Markdown content as HTML in Blazor with RadzenMarkdown - auto-linked headings and support for embedded Blazor components.",
-            Tags = new[] { "markdown", "text", "content", "render" },
-            Related = new [] { "html-editor", "textarea" },
-            Faq = new []
-            {
-                new FaqItem { Question = "How do I render Markdown in Blazor?", Answer = "Add RadzenMarkdown and set its Text property (or place markdown as its child content); it renders the Markdown as HTML." },
-                new FaqItem { Question = "Can I embed Blazor components inside Markdown?", Answer = "Yes. RadzenMarkdown renders Blazor components placed inside the markdown content, alongside standard Markdown syntax." }
-            }
-        },
-        new Example
-        {
-            Name = "Spreadsheet",
-            Icon = "\ue3ec",
-            New = true,
-            Children = new []
-            {
-                new Example
-                {
-                    Name = "Overview",
-                    Path = "spreadsheet",
-                    Title = "Open-Source Blazor Spreadsheet Component | Free UI Components by Radzen",
-                    Description = "Free open-source Blazor Spreadsheet component with Excel-like editing, formulas, cell formatting, filtering, sorting, data validation, conditional formatting, frozen panes, XLSX import/export, clipboard, autofill, undo/redo, multiple sheets, virtualization, custom cell types, and data binding.",
-                    Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" },
-                    Related = new [] { "spreadsheet-formulas", "spreadsheet-cell-formatting", "spreadsheet-conditional-formatting", "spreadsheet-charts", "spreadsheet-data-validation" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What can the Blazor Spreadsheet do?", Answer = "It offers Excel-like editing with formulas, cell formatting, filtering and sorting, data validation, conditional formatting, frozen panes, multiple sheets, and XLSX import/export." },
-                        new FaqItem { Question = "Does the Blazor Spreadsheet import and export Excel files?", Answer = "Yes. It reads and writes XLSX files, so you can load existing workbooks and let users download edited ones, and it also supports CSV." },
-                        new FaqItem { Question = "Does the Blazor Spreadsheet support formulas?", Answer = "Yes. It includes built-in functions such as SUM, AVERAGE, VLOOKUP, and IF, recalculated automatically as cell values change." },
-                        new FaqItem { Question = "Can the Blazor Spreadsheet handle large data?", Answer = "Yes. It virtualizes rows so it stays responsive with tens of thousands of rows, even with live formula calculations." },
-                        new FaqItem { Question = "Can I customize cells and the toolbar?", Answer = "Yes. You can define custom cell types (renderers and editors) and replace or extend the toolbar with your own tools." }
-                    },
-                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ]
-                },
-                new Example
-                {
-                    Name = "Formulas",
-                    Path = "spreadsheet-formulas",
-                    Title = "Blazor Spreadsheet Formulas | Free UI Components by Radzen",
-                    Description = "Use built-in formula functions including SUM, AVERAGE, VLOOKUP, IF, and more.",
-                    Tags = new [] { "spreadsheet", "formula", "function", "sum", "average", "vlookup", "if", "calculate" },
-                    Related = new [] { "spreadsheet", "spreadsheet-data-validation", "spreadsheet-large-data" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Which formula functions does the Blazor Spreadsheet support?", Answer = "Built-in functions include SUM, AVERAGE, VLOOKUP, IF, and many more, recalculated automatically when cell values change." }
-                    }
-                },
-                new Example
-                {
-                    Name = "Cell Formatting",
-                    Path = "spreadsheet-cell-formatting",
-                    Title = "Blazor Spreadsheet Cell Formatting | Free UI Components by Radzen",
-                    Description = "Apply fonts, colors, alignment, number formats, borders, and text styles to spreadsheet cells.",
-                    Tags = new [] { "spreadsheet", "format", "font", "color", "alignment", "number", "style", "border" },
-                    Related = new [] { "spreadsheet", "spreadsheet-conditional-formatting", "spreadsheet-merge-cells-borders" }
-                },
-                new Example
-                {
-                    Name = "Filtering & Sorting",
-                    Path = "spreadsheet-filtering-sorting",
-                    Title = "Blazor Spreadsheet Filtering & Sorting | Free UI Components by Radzen",
-                    Description = "Filter and sort spreadsheet data using auto-filter and sort operations.",
-                    Tags = new [] { "spreadsheet", "filter", "sort", "autofilter", "data" },
-                    Related = new [] { "spreadsheet", "spreadsheet-tables", "spreadsheet-data-validation" }
-                },
-                new Example
-                {
-                    Name = "Tables",
-                    Path = "spreadsheet-tables",
-                    Title = "Blazor Spreadsheet Tables | Free UI Components by Radzen",
-                    Description = "Wrap a range in an Excel-style table with style, banded rows, calculated columns, and a totals row.",
-                    Tags = new [] { "spreadsheet", "table", "tables", "listobject", "totals", "subtotal", "calculated column", "banded rows", "table style" },
-                    Related = new [] { "spreadsheet", "spreadsheet-filtering-sorting", "spreadsheet-formulas" }
-                },
-                new Example
-                {
-                    Name = "Data Validation",
-                    Path = "spreadsheet-data-validation",
-                    Title = "Blazor Spreadsheet Data Validation | Free UI Components by Radzen",
-                    Description = "Add validation rules to cells including number ranges, lists, dates, and custom formulas.",
-                    Tags = new [] { "spreadsheet", "validation", "rule", "list", "number", "date", "custom" },
-                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-conditional-formatting" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I restrict what users can enter in a cell?", Answer = "Add data validation rules - number ranges, dropdown lists, dates, or custom formulas - to control the accepted input." }
-                    }
-                },
-                new Example
-                {
-                    Name = "Conditional Formatting",
-                    Path = "spreadsheet-conditional-formatting",
-                    Title = "Blazor Spreadsheet Conditional Formatting | Free UI Components by Radzen",
-                    Description = "Apply conditional formatting rules to highlight cells based on their values.",
-                    Tags = new [] { "spreadsheet", "conditional", "formatting", "highlight", "rule", "color" },
-                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-data-validation" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I highlight cells based on their value?", Answer = "Add conditional formatting rules and matching cells are styled automatically when their values meet the condition." }
-                    }
-                },
-                new Example
-                {
-                    Name = "Frozen Panes",
-                    Path = "spreadsheet-frozen-panes",
-                    Title = "Blazor Spreadsheet Frozen Panes | Free UI Components by Radzen",
-                    Description = "Freeze rows and columns to keep headers visible while scrolling.",
-                    Tags = new [] { "spreadsheet", "freeze", "frozen", "panes", "rows", "columns", "scroll" },
-                    Related = new [] { "spreadsheet", "spreadsheet-large-data", "spreadsheet-multiple-sheets" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I keep headers visible while scrolling a spreadsheet?", Answer = "Freeze the top rows and/or left columns so the headers stay in place as users scroll." }
-                    }
-                },
-                new Example
-                {
-                    Name = "Images & Hyperlinks",
-                    Path = "spreadsheet-images-hyperlinks",
-                    Title = "Blazor Spreadsheet Images & Hyperlinks | Free UI Components by Radzen",
-                    Description = "Insert and manage images and hyperlinks in spreadsheet cells.",
-                    Tags = new [] { "spreadsheet", "image", "hyperlink", "link", "picture" },
-                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-charts" }
-                },
-                new Example
-                {
-                    Name = "Merge Cells",
-                    Path = "spreadsheet-merge-cells-borders",
-                    Title = "Blazor Spreadsheet Merge Cells | Free UI Components by Radzen",
-                    Description = "Merge cells to create headers and build form layouts in the spreadsheet.",
-                    Tags = new [] { "spreadsheet", "merge", "cells", "layout" },
-                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-templates" }
-                },
-                new Example
-                {
-                    Name = "Custom Cell Types",
-                    Path = "spreadsheet-custom-cell-types",
-                    Title = "Blazor Spreadsheet Custom Cell Types | Free UI Components by Radzen",
-                    Description = "Create custom cell renderers and editors for the Radzen Blazor Spreadsheet.",
-                    Tags = new [] { "spreadsheet", "custom", "cell", "type", "renderer", "editor" },
-                    Related = new [] { "spreadsheet", "spreadsheet-custom-toolbar", "spreadsheet-cell-formatting" }
-                },
-                new Example
-                {
-                    Name = "Multiple Sheets",
-                    Path = "spreadsheet-multiple-sheets",
-                    Title = "Blazor Spreadsheet Multiple Sheets | Free UI Components by Radzen",
-                    Description = "Work with multiple worksheets and use cross-sheet references to aggregate data across sheets.",
-                    Tags = new [] { "spreadsheet", "sheets", "worksheets", "tabs", "cross-sheet", "reference" },
-                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-frozen-panes" }
-                },
-                new Example
-                {
-                    Name = "Large Data",
-                    Path = "spreadsheet-large-data",
-                    Title = "Blazor Spreadsheet Large Data | Free UI Components by Radzen",
-                    Description = "Virtualized spreadsheet with 10,000 rows and formula calculations for smooth scrolling performance.",
-                    Tags = new [] { "spreadsheet", "performance", "virtualization", "large", "data", "virtual", "scrolling" },
-                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-frozen-panes" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How many rows can the Blazor Spreadsheet handle?", Answer = "Row virtualization keeps it smooth with tens of thousands of rows, even with formula calculations." }
-                    }
-                },
-                new Example
-                {
-                    Name = "Templates",
-                    Path = "spreadsheet-templates",
-                    Title = "Blazor Spreadsheet Templates | Free UI Components by Radzen",
-                    Description = "Real-world spreadsheet templates: annual budget tracker and weekly timesheet with formulas and conditional formatting.",
-                    Tags = new [] { "spreadsheet", "template", "budget", "timesheet", "invoice", "financial", "planning" },
-                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-conditional-formatting" }
-                },
-                new Example
-                {
-                    Name = "Protection",
-                    Path = "spreadsheet-protection",
-                    Title = "Blazor Spreadsheet Protection | Free UI Components by Radzen",
-                    Description = "Protect sheets to prevent editing of locked cells while allowing input in unlocked cells with XLSX round-trip support.",
-                    Tags = new [] { "spreadsheet", "protection", "locked", "unlock", "readonly", "security", "sheet" },
-                    Related = new [] { "spreadsheet", "spreadsheet-permissions", "spreadsheet-data-validation" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I make a spreadsheet read-only or lock specific cells?", Answer = "Protect the sheet to lock chosen cells while allowing input in others, with XLSX round-trip support." }
-                    }
-                },
-                new Example
-                {
-                    Name = "Charts",
-                    Path = "spreadsheet-charts",
-                    Title = "Blazor Spreadsheet Charts - Embed Column, Bar, Line, Pie Charts | Free UI Components by Radzen",
-                    Description = "Embed interactive charts in Blazor spreadsheet cells. Supports column, bar, line, area, pie, donut, and scatter charts with live data binding and XLSX import/export.",
-                    Tags = new [] { "spreadsheet", "chart", "charts", "graph", "visualization", "column chart", "bar chart", "line chart", "pie chart", "donut chart", "scatter chart", "area chart", "excel chart", "embedded chart", "data visualization", "xlsx", "dashboard" },
-                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-cell-formatting" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Can I embed charts in the Blazor Spreadsheet?", Answer = "Yes. Embed column, bar, line, area, pie, donut, and scatter charts in cells, bound to live spreadsheet data." }
-                    }
-                },
-                new Example
-                {
-                    Name = "Custom Toolbar",
-                    Path = "spreadsheet-custom-toolbar",
-                    Title = "Blazor Spreadsheet Custom Toolbar | Free UI Components by Radzen",
-                    Description = "Replace the built-in toolbar with your own selection of tools. Reuse the predefined tool components in any order or layout, and add custom tools that dispatch undoable commands.",
-                    Tags = new [] { "spreadsheet", "toolbar", "custom", "custom tools", "childcontent", "command", "icommand", "undo", "extend" },
-                    Related = new [] { "spreadsheet", "spreadsheet-custom-cell-types", "spreadsheet-permissions" },
-                    Toc = [ new () { Text = "Predefined tools in a custom layout", Anchor = "#predefined-tools" }, new () { Text = "Custom tool with an undoable command", Anchor = "#custom-tool" } ]
-                },
-                new Example
-                {
-                    Name = "Permissions",
-                    Path = "spreadsheet-permissions",
-                    Title = "Blazor Spreadsheet Permissions | Free UI Components by Radzen",
-                    Description = "Lock the spreadsheet for view-only embedding with ReadOnly, disable individual features with Allow* flags, or veto commands dynamically with a CommandExecuting handler.",
-                    Tags = new [] { "spreadsheet", "permissions", "readonly", "read-only", "view-only", "allow", "allowediting", "allowfiltering", "allowsorting", "commandexecuting", "preventdefault", "audit", "role", "restrict" },
-                    Related = new [] { "spreadsheet", "spreadsheet-protection", "spreadsheet-custom-toolbar" },
-                    Toc = [ new () { Text = "Read-only mode", Anchor = "#read-only" }, new () { Text = "Configuration toggles", Anchor = "#toggles" }, new () { Text = "Dynamic veto with CommandExecuting", Anchor = "#dynamic-veto" } ]
-                },
-            }
-        },
-        new Example
-        {
-            Name = "Document Processing",
-            Icon = "",
-            New = true,
-            Title = "Blazor Document Processing | Free UI Components by Radzen",
-            Description = "Read and write Excel (XLSX) and CSV files in Blazor and C#. Generate downloads, parse uploads, and evaluate Excel formulas in code.",
-            Children = new []
-            {
-                new Example
-                {
-                    Name = "Spreadsheet API",
-                    Path = "document-processing-spreadsheet",
-                    Title = "Generate Excel (XLSX) and CSV Files in Blazor | Radzen",
-                    Description = "Create Excel (XLSX) and CSV files from a list of objects and let users download them in Blazor.",
-                    Tags = new [] { "document", "processing", "spreadsheet", "api", "xlsx", "csv", "excel", "generate", "create", "download", "list", "objects", "workbook" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "XLSX", Anchor = "#xlsx" }, new () { Text = "CSV", Anchor = "#csv" } ],
-                    Name = "Import & Export",
-                    Path = "document-processing-import-export",
-                    Title = "Import and Export Excel (XLSX) and CSV in Blazor | Radzen",
-                    Description = "Import and export Excel (XLSX) and CSV files in Blazor. Upload a file, parse the data, and display the rows, or generate a file users can download.",
-                    Tags = new [] { "document", "processing", "import", "export", "xlsx", "csv", "excel", "upload", "download", "read", "write", "parse", "separator", "encoding", "quoting" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Formulas in code", Anchor = "#in-code" }, new () { Text = "Stateless evaluation", Anchor = "#stateless-engine" }, new () { Text = "Stateful evaluation", Anchor = "#stateful-engine" }, new () { Text = "Custom functions", Anchor = "#custom-functions" } ],
-                    Name = "Formulas",
-                    Path = "document-processing-formulas",
-                    Title = "Excel Formula Evaluator for Blazor and C# | Radzen",
-                    Description = "Evaluate Excel formulas in Blazor and C#. Use them as cell formulas in a workbook, calculate them in code, or add your own custom Excel functions.",
-                    Tags = new [] { "document", "processing", "formula", "formulas", "excel", "evaluate", "calculate", "engine", "evaluator", "custom", "function", "compound", "vlookup", "sum", "average", "if", "iferror", "edate", "sumif" }
-                },
-            }
-        },
-        new Example
-        {
-            Toc = [ new () { Text = "Centered CTA", Anchor = "#centered-cta" }, new () { Text = "Left-aligned CTA", Anchor = "#left-aligned-cta" }, new () { Text = "Justified CTA", Anchor = "#left-aligned-cta" }, new () { Text = "Image to the left", Anchor = "#image-to-the-left" }, new () { Text = "Image to the right", Anchor = "#image-to-the-right" } ],
-            Name = "UI Blocks",
-            Pro = true,
-            Title = "Blazor UI Blocks | Free UI Components by Radzen",
-            Description = "Ready to use UI building blocks and templates",
-            Icon = "\uf51d",
-            Children = new[] {
-                new Example
-                {
-                    Name = "Call-to-Action",
-                    Title = "Blazor Call-to-Action | UI Blocks by Radzen",
-                    Icon = "\ue06c",
-                    Description = "Examples of CTA UI Blocks",
-                    Path = "ui-blocks-cta",
-                    Tags = new [] { "cta", "call-to-action", "call", "action", "button" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Simple stats", Anchor = "#simple-stats" }, new () { Text = "Simple stats with icon", Anchor = "#simple-stats-with-icon" }, new () { Text = "Stats with trends", Anchor = "#stats-with-trends" }, new () { Text = "Stats with trends to the right", Anchor = "#stats-with-trends-to-the-right" }, new () { Text = "Stats with square icon", Anchor = "#stats-with-square-icon" } ],
-                    Name = "Cards",
-                    Title = "Blazor Cards | UI Blocks by Radzen",
-                    Icon = "\ue991",
-                    Description = "Examples of Card Blocks",
-                    Path = "ui-blocks-cards",
-                    Tags = new [] { "card", "stats", "products" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "FAQ in 2 columns", Anchor = "#faq-in-2-columns" }, new () { Text = "FAQ to the right", Anchor = "#faq-to-the-right" }, new () { Text = "FAQ Accordion to the right", Anchor = "#faq-accordion-to-the-right" }, new () { Text = "FAQ in centered Accordion", Anchor = "#faq-in-centered-accordion" } ],
-                    Name = "FAQ",
-                    Title = "Blazor FAQ - Frequently Asked Questions | UI Blocks by Radzen",
-                    Icon = "\uf04c",
-                    Description = "Examples of FAQ Blocks",
-                    Path = "ui-blocks-faq",
-                    Tags = new [] { "faq", "question", "answer" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Features with small icons", Anchor = "#features-with-small-icons" }, new () { Text = "Features with large icons on top", Anchor = "#features-with-large-icons-on-top" }, new () { Text = "Centered features", Anchor = "#centered-features" } ],
-                    Name = "Features",
-                    Title = "Blazor Features | UI Blocks by Radzen",
-                    Icon = "\ue031",
-                    Description = "Examples of Features Blocks",
-                    Path = "ui-blocks-features",
-                    Tags = new [] { "feature", "list" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Footer with a sitemap", Anchor = "#footer-with-sitemap" }, new () { Text = "Centered Footer", Anchor = "#centered-footer" }, new () { Text = "Simple Footer", Anchor = "#simple-footer" } ],
-                    Name = "Footers",
-                    Title = "Blazor Footer | UI Blocks by Radzen",
-                    Icon = "\uf7e6",
-                    Description = "Preconfigured Footer UI Blocks",
-                    Path = "ui-blocks-footers",
-                    Tags = new [] { "footer" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Centered Logos", Anchor = "#centered-logos" }, new () { Text = "Logos to the right", Anchor = "#logos-to-the-right" } ],
-                    Name = "Logo Clouds",
-                    Title = "Blazor Logo Clouds | UI Blocks by Radzen",
-                    Icon = "\ue574",
-                    Description = "Examples of Customers Logo Blocks",
-                    Path = "ui-blocks-logos",
-                    Tags = new [] { "logo", "customer", "logos" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Centered layout", Anchor = "#centered-layout" }, new () { Text = "Left-aligned with image", Anchor = "#left-aligned-with-image" } ],
-                    Name = "Newsletter",
-                    Title = "Blazor Newsletter | UI Blocks by Radzen",
-                    Icon = "\uf18c",
-                    Description = "Examples of Newsletter subscription form UI Blocks",
-                    Path = "ui-blocks-newsletter",
-                    Tags = new [] { "newsletter", "subscribe", "subscription" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Title with actions", Anchor = "#title-with-actions" }, new () { Text = "Title with breadcrumbs", Anchor = "#title-with-breadcrumbs" }, new () { Text = "Title with breadcrumbs and actions", Anchor = "#title-with-breadcrumbs-and-actions" } ],
-                    Name = "Page Headings",
-                    Title = "Blazor Page Heading | UI Blocks by Radzen",
-                    Icon = "\ue9ea",
-                    Description = "Preconfigured Page Heading UI Blocks",
-                    Path = "ui-blocks-page-headings",
-                    Tags = new [] { "headings", "heading", "page", "title" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Pricing Cards", Anchor = "#pricing-cards" }, new () { Text = "Basic pricing", Anchor = "#basic-pricing" } ],
-                    Name = "Pricing",
-                    Title = "Blazor Pricing | UI Blocks by Radzen",
-                    Icon = "\uf05b",
-                    Description = "Examples of Pricing UI Blocks",
-                    Path = "ui-blocks-pricing",
-                    Tags = new [] { "pricing", "table" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Quotes in Carousel", Anchor = "#quotes-in-carousel" }, new () { Text = "Quotes on a row", Anchor = "#quotes-on-a-row" }, new () { Text = "Quotes in Cards", Anchor = "#quotes-in-cards" }, new () { Text = "Quotes in a CardGroup", Anchor = "#quotes-in-cardgroup" }, new () { Text = "Centered quotes", Anchor = "#centered-quotes" }, new () { Text = "Single quote", Anchor = "#single-quote" } ],
-                    Name = "Testimonials",
-                    Title = "Blazor Customer Testimonials | UI Blocks by Radzen",
-                    Icon = "\uf054",
-                    Description = "Examples of Customer Testimonials UI Blocks",
-                    Path = "ui-blocks-testimonials",
-                    Tags = new [] { "testimonial", "quote", "customer" }
-                }
-            }
-        },
-
-        new Example
-        {
-            Name = "App Templates",
-            Title = "Blazor App Templates | Free UI Components by Radzen",
-            Description = "Ready to use Blazor application and website templates",
-            Icon = "\ue5c3",
-            Children = new[] {
-                new Example
-                {
-                    Name = "Issues Dashboard",
-                    Path = "/dashboard",
-                    Title = "Sample Blazor Dashboard | Free UI Components by Radzen",
-                    Description = "A sample Blazor dashboard built with Radzen Blazor Components - charts, grids, and cards on one page, visualizing live GitHub issues.",
-                    Related = new [] { "tile-layout", "datagrid", "charts" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I build a dashboard in Blazor?", Answer = "Combine Radzen Blazor components such as charts, DataGrids, cards, and the TileLayout on a single page and bind them to your data; this sample visualizes live GitHub issues." }
-                    },
-                    Icon = "\ue868"
-                },
-                new Example
-                {
-                    Name = "Healthcare",
-                    Pro = true,
-                    Title = "Healthcare Blazor Website | Premium App Templates by Radzen",
-                    Icon = "\ueb4c",
-                    Description = "A modern, responsive healthcare blazor website template.",
-                    Path = "templates-healthcare",
-                    Tags = new [] { "template", "health", "healthcare", "website", "app", "application", "page", "landing" }
-                },
-                new Example
-                {
-                    Name = "Real Estate",
-                    Pro = true,
-                    Title = "Real Estate Blazor Website | Premium App Templates by Radzen",
-                    Icon = "\ue73a",
-                    Description = "A real estate website template designed to showcase listings, build trust, and convert leads. Featuring clean layout and responsive design.",
-                    Path = "templates-realestate",
-                    Tags = new [] { "template", "real estate", "apartment", "home", "website", "app", "application", "page", "landing" }
-                },
-                new Example
-                {
-                    Name = "Repair Workshop",
-                    Pro = true,
-                    Title = "Repair Workshop Blazor Website | Premium App Templates by Radzen",
-                    Icon = "\uf56c",
-                    Description = "A modern, responsive auto repair blazor website template.",
-                    Path = "templates-repairshop",
-                    Tags = new [] { "template", "repair", "workshop", "website", "app", "application", "page", "landing" }
-                }
-            }
-        },
-
         new Example
         {
 
@@ -1627,1458 +995,6 @@ namespace RadzenBlazorDemos
                     Tags = new [] { "datagrid", "databinding" }
                 }
             }
-        },
-        new Example
-        {
-            Name = "PivotDataGrid",
-            Icon = "\ue9ce",
-            Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table" },
-            Children = new[]
-            {
-                new Example
-                {
-                    Name = "IQueryable",
-                    Path = "/pivot-data-grid",
-                    Title = "Blazor Pivot Table - Pivot DataGrid (IQueryable) | Free UI Components by Radzen",
-                    Description = "The Blazor Pivot DataGrid (RadzenPivotDataGrid) creates cross-tabulation reports - rows, columns, and aggregated values - from an IQueryable data source.",
-                    Tags = new [] { "pivot", "pivot table", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" },
-                    Related = new [] { "pivot-data-grid-load-data", "pivot-data-grid-dynamic", "pivot-data-grid-odata", "datagrid" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor Pivot DataGrid?", Answer = "It is a pivot table (cross-tab) component that groups data into rows and columns and shows aggregated values, with drill-down." },
-                        new FaqItem { Question = "How do I bind the Pivot DataGrid to data?", Answer = "Set Data to an IQueryable (or use the LoadData event for remote data) and define the row, column, and value fields to aggregate." }
-                    }
-                },
-                new Example
-                {
-                    Name = "LoadData",
-                    Path = "/pivot-data-grid-load-data",
-                    Title = "Blazor Pivot DataGrid - LoadData Binding | Free UI Components by Radzen",
-                    Description = "Bind the Blazor Pivot DataGrid to remote data with the LoadData event, fetching aggregated cross-tab results on demand.",
-                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "loaddata", "remote" },
-                    Related = new [] { "pivot-data-grid", "pivot-data-grid-odata", "datagrid-loaddata" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I load Pivot DataGrid data on demand?", Answer = "Handle the LoadData event to fetch and aggregate data from the server as the grid needs it." }
-                    }
-                },
-                new Example
-                {
-                    Name = "Dynamic data",
-                    Path = "/pivot-data-grid-dynamic",
-                    Title = "Blazor Pivot DataGrid - Dynamic Data | Free UI Components by Radzen",
-                    Description = "Bind the Blazor Pivot DataGrid to schema-less IDictionary<string, object> records and configure pivot fields dynamically.",
-                    Tags = new [] { "pivot", "dynamic", "dictionary", "analysis", "aggregation", "drill-down", "datagrid", "table" },
-                    Related = new [] { "pivot-data-grid", "pivot-data-grid-load-data", "datagrid-dynamic" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I bind the Pivot DataGrid to dynamic data?", Answer = "Bind Data to records of IDictionary<string, object> and configure the row, column, and value fields at runtime, without a fixed model." }
-                    }
-                },
-                new Example
-                {
-                    Name = "OData",
-                    Path = "/pivot-data-grid-odata",
-                    Title = "Blazor Pivot DataGrid - OData Binding | Free UI Components by Radzen",
-                    Description = "Bind the Blazor Pivot DataGrid to an OData service and build cross-tabulation reports from the remote query.",
-                    Tags = new [] { "odata", "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "remote" },
-                    Related = new [] { "pivot-data-grid", "pivot-data-grid-load-data", "datagrid-odata" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I bind the Pivot DataGrid to OData?", Answer = "Point the grid at an OData endpoint via the LoadData event; it builds the cross-tabulation from the remote query results." }
-                    }
-                }
-            }
-        },
-        new Example
-        {
-            Name = "Data",
-            Icon = "\ue99c",
-            Children = new [] {
-                new Example
-                {
-                    Name = "DataList",
-                    Icon = "\ue896",
-                    Tags = new[] { "dataview", "grid", "table" },
-                    Children = new[] {
-                        new Example
-                        {
-                            Name = "IQueryable",
-                            Title = "Blazor DataList Component | Free UI Components by Radzen",
-                            Description = "Demonstration and configuration of the Radzen Blazor DataList component.",
-                            Path = "datalist",
-                            Tags = new [] { "dataview", "grid", "table", "list"},
-                        },
-                        new Example
-                        {
-                            Name = "OData service",
-                            Title = "Blazor DataList - OData Service | Free UI Components by Radzen",
-                            Description = "Demonstration and configuration of the Radzen Blazor DataList component using LoadData event.",
-                            Path = "datalist-loaddata",
-                            Tags = new [] { "dataview", "grid", "table", "list", "odata" },
-                        }
-                    }
-                },
-                new Example
-                {
-                    Name = "DataFilter",
-                    Icon = "\uef4f",
-                    Tags = new[] { "dataview", "grid", "table", "filter" },
-                    Children = new[] {
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                            Name = "IQueryable",
-                            Title = "Blazor DataFilter Component | Free UI Components by Radzen",
-                            Description = "Filter Entity Framework IQueryable without extra code.",
-                            Path = "datafilter",
-                            Tags = new [] { "dataview", "grid", "table", "filter" },
-                        },
-                        new Example
-                        {
-                            Name = "LoadData",
-                            Title = "Blazor DataFilter - LoadData event | Free UI Components by Radzen",
-                            Description = "This example demonstrates DataFilter with DataGrid LoadData event.",
-                            Path = "datafilter-loaddata",
-                            Tags = new [] { "dataview", "grid", "table", "filter", "loaddata" },
-                        },
-                        new Example
-                        {
-                            Name = "OData service",
-                            Title = "Blazor DataFilter - OData Service | Free UI Components by Radzen",
-                            Description = "This example demonstrates data filter with OData service.",
-                            Path = "datafilter-odata",
-                            Tags = new [] { "dataview", "grid", "table", "filter", "odata" },
-                        }
-                    }
-                },
-
-                new Example
-                {
-
-                    Toc = [ new () { Text = "Allow Reload", Anchor = "#allow-reload" }, new () { Text = "Pager Density", Anchor = "#pager-density" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Pager",
-                    Path = "pager",
-                    Description = "Demonstration and configuration of the Radzen Blazor Pager component.",
-                    Icon = "\ueb8d",
-                    Tags = new[] { "pager", "paging" }
-                },
-                new Example
-                {
-                    Name = "PickList",
-                    Description = "Use Radzen Blazor PickList component to transfer items between two collections.",
-                    Path = "picklist",
-                    Icon = "\ue0b8",
-                    Tags = new[] { "picklist", "list", "listbox" }
-                },
-                new Example
-                {
-                    Name = "Empty PickList",
-                    Path = "/picklist-empty",
-                    Title = "Blazor PickList - Empty PickList | Free UI Components by Radzen",
-                    Description = "This example demonstrates Blazor PickList with empty text and empty template.",
-                    Icon = "\ue0b8",
-                    Tags = new[] { "picklist", "empty", "list", "listbox" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Scheduler",
-                    Title = "Blazor Scheduler & Calendar Component | Free UI Components by Radzen",
-                    Path = "scheduler",
-                    Description = "The Blazor Scheduler is a calendar that shows appointments in day, week, month, year planner, and timeline views, with event editing, tooltips, and multi-day layouts.",
-                    Related = new [] { "datepicker", "timespanpicker" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Can I use the Blazor Scheduler as a calendar?", Answer = "Yes. The Scheduler is a calendar with day, week, month, year planner, and timeline views; bind your appointments to its Data and it renders them on the calendar." },
-                        new FaqItem { Question = "What views does the Blazor Scheduler support?", Answer = "Day, week, month, year planner, and timeline views, and you can show any number of days side by side." },
-                        new FaqItem { Question = "How do I add and edit appointments in the Scheduler?", Answer = "Handle the slot and appointment events (such as SlotSelect and AppointmentSelect) to open a dialog where users create or edit events bound to your data." }
-                    },
-                    Icon = "\ue616",
-                    Tags = new[] { "scheduler", "calendar", "event", "appointment" }
-                },
-                new Example
-                {
-                    Name = "Gantt",
-                    Icon = "\ueb85",
-                    Tags = new[] { "gantt", "timeline", "project", "task", "schedule" },
-                    Children = new[]
-                    {
-                        new Example
-                        {
-                            Name = "Overview",
-                            Path = "gantt",
-                            Title = "Blazor Gantt Component | Free UI Components by Radzen",
-                            Description = "Blazor Gantt component with a hierarchical task list and a timeline view.",
-                            Tags = new[] { "gantt", "timeline", "project", "task", "schedule" }
-                        },
-                        new Example
-                        {
-                            Name = "Tooltips",
-                            Path = "gantt-tooltips",
-                            Title = "Blazor Gantt Tooltips | Free UI Components by Radzen",
-                            Description = "Show tooltips when hovering over Gantt task bars using TaskMouseEnter and TaskMouseLeave events.",
-                            Tags = new[] { "gantt", "tooltip", "hover", "task", "mouse" }
-                        },
-                        new Example
-                        {
-                            Name = "Filtering",
-                            Path = "gantt-filtering",
-                            Title = "Blazor Gantt Filtering | Free UI Components by Radzen",
-                            Description = "Filter Gantt tasks using Simple, SimpleWithMenu, or Advanced filter modes.",
-                            Tags = new[] { "gantt", "filter", "filtermode", "simple", "advanced" }
-                        },
-                        new Example
-                        {
-                            Name = "InLine Editing",
-                            Path = "gantt-inline-edit",
-                            Title = "Blazor Gantt Inline Editing | Free UI Components by Radzen",
-                            Description = "Edit Gantt tasks inline with add, edit, and save actions.",
-                            Tags = new[] { "gantt", "edit", "inline", "row", "tasks" }
-                        },
-                        new Example
-                        {
-                            Name = "In-Cell Editing",
-                            Path = "gantt-incell-edit",
-                            Title = "Blazor Gantt In-Cell Editing | Free UI Components by Radzen",
-                            Description = "Edit Gantt task fields in-cell with inline editors per column.",
-                            Tags = new[] { "gantt", "edit", "incell", "cell", "tasks" }
-                        },
-                        new Example
-                        {
-                            Name = "Drag & Resize",
-                            Path = "gantt-drag-resize",
-                            Title = "Blazor Gantt Drag & Resize | Free UI Components by Radzen",
-                            Description = "Drag task bars to move them and drag their edges to resize. Zero-duration tasks render as milestone diamonds.",
-                            Tags = new[] { "gantt", "drag", "resize", "move", "milestone", "diamond", "interactive" }
-                        },
-                        new Example
-                        {
-                            Name = "Dependency Types",
-                            Path = "gantt-dependency-types",
-                            Title = "Blazor Gantt Dependency Types | Free UI Components by Radzen",
-                            Description = "All four dependency types: Finish-to-Start, Start-to-Start, Finish-to-Finish, and Start-to-Finish.",
-                            Tags = new[] { "gantt", "dependency", "link", "finish-to-start", "start-to-start", "finish-to-finish", "start-to-finish" }
-                        },
-                        new Example
-                        {
-                            Name = "Dependency Data",
-                            Path = "gantt-dependency-data",
-                            Title = "Blazor Gantt Dependency Data Binding | Free UI Components by Radzen",
-                            Description = "Bind dependencies using a separate POCO collection with ID-based references — ideal for relational databases.",
-                            Tags = new[] { "gantt", "dependency", "data", "binding", "database", "id", "predecessor", "successor" }
-                        },
-                        new Example
-                        {
-                            Name = "Critical Path",
-                            Path = "gantt-critical-path",
-                            Title = "Blazor Gantt Critical Path | Free UI Components by Radzen",
-                            Description = "Highlight the longest chain of dependent tasks that determines the project end date.",
-                            Tags = new[] { "gantt", "critical", "path", "highlight", "schedule", "dependency" }
-                        },
-                        new Example
-                        {
-                            Name = "Baselines",
-                            Path = "gantt-baselines",
-                            Title = "Blazor Gantt Baselines | Free UI Components by Radzen",
-                            Description = "Show planned vs. actual schedule side by side using baseline bars.",
-                            Tags = new[] { "gantt", "baseline", "planned", "actual", "schedule", "comparison" }
-                        },
-                        new Example
-                        {
-                            Name = "Customization",
-                            Path = "gantt-customization",
-                            Title = "Blazor Gantt Customization | Free UI Components by Radzen",
-                            Description = "Customize the Gantt with a today line, weekend shading, vertical markers, per-bar styling via TaskRender, and custom bar templates.",
-                            Tags = new[] { "gantt", "today", "marker", "weekend", "taskrender", "template", "customize" }
-                        }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Dynamic Table", Anchor = "#dynamic" }, new () { Text = "Scrollable Table", Anchor = "#scrollable" }, new () { Text = "Table with merged cells", Anchor = "#scrollable" } ],
-                    Name = "Table",
-                    Description = "Blazor RadzenTable component is used to create a HTML table with rows and cells.",
-                    Path = "table",
-                    Icon = "\uf101",
-                    Tags = new [] { "table", "cells", "row", "grid" }
-                },
-                new Example
-                {
-                    Name = "Tree",
-                    Icon = "\ue94b",
-                    Tags = new[] { "tree", "treeview", "nodes", "hierarchy" },
-                    Children = new[] {
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                            Name = "Inline definition",
-                            Title = "Blazor Tree Component | Free UI Components by Radzen",
-                            Description = "Demonstration and configuration of the Blazor RadzenTree component.",
-                            Path = "tree",
-                            Tags = new [] { "tree", "treeview", "nodes", "inline" },
-                        },
-                        new Example
-                        {
-                            Name = "Data-binding",
-                            Title = "Blazor Tree - Data-binding | Free UI Components by Radzen",
-                            Description = "This example demonstrates how to populate RadzenTree from a database via Entity Framework.",
-                            Path = "tree-data-binding",
-                            Tags = new [] { "tree", "treeview", "nodes", "data", "table" },
-                        },
-                        new Example
-                        {
-                            Name = "Files and directories",
-                            Title = "Blazor Tree - File & Directory Binding | Free UI Components by Radzen",
-                            Description = "This example demonstrates how to populate Blazor RadzenTree from the file system.",
-                            Path = "tree-file-system",
-                            Tags = new [] { "tree", "treeview", "nodes", "file", "directory" },
-                        },
-                        new Example
-                        {
-                            Name = "Selection",
-                            Title = "Blazor Tree - Selection | Free UI Components by Radzen",
-                            Description = "This example demonstrates how to get or set the selected items of RadzenTree.",
-                            Path = "tree-selection",
-                            Tags = new [] { "tree", "treeview", "nodes", "selection" },
-                        },
-                        new Example
-                        {
-                            Name = "Checkboxes",
-                            Title = "Blazor Tree - Tri-State Checkboxes | Free UI Components by Radzen",
-                            Description = "This example demonstrates tri-state checkboxes in RadzenTree.",
-                            Path = "tree-checkboxes",
-                            Tags = new [] { "tree", "treeview", "nodes", "check" },
-                        },
-                        new Example
-                        {
-                            Name = "Drag & Drop",
-                            Title = "Blazor Tree - Drag & Drop items | Free UI Components by Radzen",
-                            Description = "This example demonstrates custom drag & drop logic in RadzenTree.",
-                            Path = "tree-dragdrop",
-                            Tags = new [] { "tree", "treeview", "nodes", "drag", "drop" },
-                        },
-                        new Example
-                        {
-                            Name = "Context menu",
-                            Title = "Blazor Tree - Context menu | Free UI Components by Radzen",
-                            Description = "This example demonstrates context menu in RadzenTree.",
-                            Path = "tree-contextmenu",
-                            Tags = new [] { "tree", "treeview", "nodes", "context", "menu" },
-                        },
-                        new Example
-                        {
-                            Name = "Refreshing tree data-binding",
-                            Title = "Blazor Tree - Refresh Data Binding | Free UI Components by Radzen",
-                            Description = "This example demonstrates how to refresh a lazily loaded RadzenTree.",
-                            Path = "tree-data-binding-refresh",
-                            Tags = new [] { "tree", "treeview", "nodes" },
-                        },
-                        new Example
-                        {
-                            Name = "Tree filtering",
-                            Title = "Blazor Tree - Filtering | Free UI Components by Radzen",
-                            Description = "This example demonstrates how to filter RadzenTree.",
-                            Path = "tree-filter",
-                            Tags = new [] { "tree", "treeview", "filter" },
-                        }
-                    }
-                }
-            }
-        },
-        new Example
-        {
-            Toc = [ new () { Text = "Gravatar with email (info@radzen.com)", Anchor = "#gravatar-with-email" } ],
-            Name = "Images",
-            Icon = "\ue3d3",
-            Children = new[] {
-                new Example
-                {
-                    Name = "Gravatar",
-                    Description = "Demonstration and configuration of the Radzen Blazor Gravatar component.",
-                    Path = "gravatar",
-                    Icon = "\ue420"
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Image from application assets", Anchor = "#image-from-application-assets" }, new () { Text = "Image from url", Anchor = "#image-from-url" }, new () { Text = "Image from base64 encoded string", Anchor = "#image-from-base64" }, new () { Text = "Image from binary data", Anchor = "#image-from-binary-data" } ],
-                    Name = "Image",
-                    Description = "Demonstration and configuration of the Radzen Blazor Image component.",
-                    Path = "image",
-                    Icon = "\ue3c4"
-                },
-            }
-        },
-        new Example
-        {
-            Name = "Layout",
-            Icon = "\ue8f1",
-            Children = new[] {
-                new Example
-                {
-                    Toc = [ new () { Text = "Sidebar, Header and Footer", Anchor = "#sidebar-header-footer" }, new () { Text = "Full height Sidebar", Anchor = "#full-height-sidebar" }, new () { Text = "Overlay Sidebar", Anchor = "#overlay" }, new () { Text = "Full height overlay Sidebar", Anchor = "#overlay-full" }, new () { Text = "Right Sidebar", Anchor = "#right-sidebar" }, new () { Text = "Right full height Sidebar", Anchor = "#right-full-height-sidebar" }, new () { Text = "Right and Left Sidebar", Anchor = "#right-left-sidebar" }, new () { Text = "Start and End Sidebar", Anchor = "#start-end-sidebar" }, new () { Text = "Icon Sidebar", Anchor = "#icon-sidebar" } ],
-                    Name = "Layout",
-                    Title = "Blazor Layout - Header, Sidebar, Footer | Free UI Components by Radzen",
-                    Description = "The Blazor Layout arranges a page into header, sidebar, body, and footer regions, with a collapsible sidebar.",
-                    Path = "layout",
-                    Related = new [] { "panel", "stack", "splitter" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I add a collapsible sidebar in Blazor?", Answer = "Use RadzenLayout with RadzenSidebar and a RadzenSidebarToggle in the header to expand and collapse the sidebar." }
-                    },
-                    Icon = "\ue8f1",
-                    Tags = new [] { "layout", "sidebar", "drawer", "header", "body", "footer" }
-                },
-                new Example
-                {
-                    Name = "Stack",
-                    Title = "Blazor Stack - Flex Layout | Free UI Components by Radzen",
-                    Description = "The Blazor Stack arranges children horizontally or vertically with consistent spacing.",
-                    Path = "stack",
-                    Related = new [] { "row", "column" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I space elements evenly in Blazor?", Answer = "Use RadzenStack with Orientation and Gap to arrange children in a row or column with consistent spacing." }
-                    },
-                    Icon = "\ue8e9",
-                    Tags = new [] { "stack", "layout" }
-                },
-                new Example
-                {
-                    Name = "Row",
-                    Title = "Blazor Row - Grid Row Layout | Free UI Components by Radzen",
-                    Description = "The Blazor Row arranges columns in a responsive 12-column grid row, with gap and alignment control.",
-                    Path = "row",
-                    Related = new [] { "column", "stack" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I build a responsive grid in Blazor?", Answer = "Use RadzenRow with RadzenColumn children sized per breakpoint to lay out a responsive 12-column grid." }
-                    },
-                    Icon = "\uf676",
-                    Tags = new [] { "row", "layout", "responsive", "grid" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Auto-layout columns", Anchor = "#auto-layout-columns" }, new () { Text = "Column sizes", Anchor = "#column-sizes" }, new () { Text = "Responsive column sizes", Anchor = "#responsive-column-sizes" }, new () { Text = "Column wrapping", Anchor = "#column-wrapping" }, new () { Text = "Column offset", Anchor = "#column-offset" }, new () { Text = "Responsive offsetting", Anchor = "#column-responsive-offset" }, new () { Text = "Column order", Anchor = "#column-order" }, new () { Text = "Responsive column ordering", Anchor = "#column-responsive-order" }, new () { Text = "Nested Layouts", Anchor = "#nested-layouts" }, new () { Text = "Gutters", Anchor = "#gutters" } ],
-                    Name = "Column",
-                    Title = "Blazor Column - Grid Column | Free UI Components by Radzen",
-                    Description = "The Blazor Column defines a responsive column within a Row's 12-column grid, sized per breakpoint.",
-                    Path = "column",
-                    Related = new [] { "row", "stack" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I size columns responsively in Blazor?", Answer = "Set the Size properties (and per-breakpoint sizes) on RadzenColumn within a RadzenRow to control its width across screen sizes." }
-                    },
-                    Icon = "\uf674",
-                    Tags = new [] { "column", "col", "layout", "responsive", "grid" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Card Variant", Anchor = "#card-variant" } ],
-                    Name = "Card",
-                    Title = "Blazor Card Component | Free UI Components by Radzen",
-                    Description = "The Blazor Card is a surface for grouping content, with variants, shadow, and customizable padding.",
-                    Path = "card",
-                    Related = new [] { "card-group", "panel" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor Card used for?", Answer = "It is a surface that groups related content - text, images, and actions - with elevation and padding." }
-                    },
-                    Icon = "\uefad",
-                    Tags = new [] { "card", "container" }
-                },
-                new Example
-                {
-                    Name = "CardGroup",
-                    Title = "Blazor CardGroup Component | Free UI Components by Radzen",
-                    Description = "The Blazor CardGroup lays out a set of cards as a connected, responsive group.",
-                    Path = "card-group",
-                    Related = new [] { "card", "stack" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor CardGroup?", Answer = "It arranges multiple RadzenCard elements as a single connected group that wraps responsively." }
-                    },
-                    Icon = "\ue8f3",
-                    Tags = new [] { "card", "group", "deck", "container" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Open page as a dialog", Anchor = "#open-page-as-dialog" }, new () { Text = "Inline Dialog", Anchor = "#inline-dialog" }, new () { Text = "Busy Dialog", Anchor = "#busy-dialog" }, new () { Text = "Confirm Dialog", Anchor = "#confirm-dialog" }, new () { Text = "Alert Dialog", Anchor = "#alert-dialog" }, new () { Text = "Prevent dialog from closing", Anchor = "#prevent-close" }, new () { Text = "Close Dialog by clicking outside", Anchor = "#close-dialog-by-clicking-outside" }, new () { Text = "Side Dialog", Anchor = "#side-dialog" }, new () { Text = "Dialog with custom CSS classes", Anchor = "#custom-css-classes" }, new () { Text = "Update dialog properties", Anchor = "#cascading-value" } ],
-                    Name = "Dialog",
-                    Title = "Blazor Dialog - Modal Dialog | Free UI Components by Radzen",
-                    Description = "The Blazor Dialog opens modal dialogs and side panels from code via DialogService, with Alert and Confirm helpers, custom content, sizing, and async results.",
-                    Path = "dialog",
-                    Related = new [] { "popup", "card" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I open a dialog in Blazor?", Answer = "Inject DialogService and call Open or OpenAsync with a component or content; OpenAsync returns the dialog's result when it closes." }
-                    },
-                    Icon = "\ue069",
-                    Tags = new [] { "popup", "window" },
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Define can-drop and no-drop styles", Anchor = "#can-drop-no-drop-styles" }, new () { Text = "Define a Footer Template per Drop Zone", Anchor = "#footer-template" } ],
-                    Name = "DropZone",
-                    Title = "Blazor DropZone - Drag & Drop | Free UI Components by Radzen",
-                    Description = "The Blazor DropZone lets users drag and drop items between zones - for kanban boards and reordering.",
-                    Path = "dropzone",
-                    Related = new [] { "tile-layout", "splitter" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I build a drag-and-drop list in Blazor?", Answer = "Use RadzenDropZoneContainer with RadzenDropZone areas and handle the drop events to move items between zones." }
-                    },
-                    Icon = "\ue945",
-                    Tags = new [] { "dropzone", "drag", "drop" }
-                },
-                new Example
-                {
-                    Name = "Panel",
-                    Title = "Blazor Panel - Collapsible Panel | Free UI Components by Radzen",
-                    Description = "The Blazor Panel is a titled, collapsible container for grouping content.",
-                    Path = "panel",
-                    Related = new [] { "card", "fieldset" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I make a collapsible panel in Blazor?", Answer = "Set AllowCollapse on RadzenPanel so users can expand and collapse its content under the title." }
-                    },
-                    Icon = "\uf732",
-                    Tags = new [] { "container" }
-                },
-                new Example
-                {
-                    Name = "Popup",
-                    Title = "Blazor Popup Component | Free UI Components by Radzen",
-                    Description = "The Blazor Popup shows floating content anchored to an element via PopupService, for custom dropdowns and overlays.",
-                    Path = "popup",
-                    Related = new [] { "dialog", "contextmenu" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I show a popup anchored to an element in Blazor?", Answer = "Use PopupService (or the RadzenPopup component) to open floating content positioned relative to a target element." }
-                    },
-                    Icon = "\ue0ca",
-                    Tags = new [] { "popup", "dropdown"}
-                },
-                new Example
-                {
-                    Name = "Splitter",
-                    Title = "Blazor Splitter - Resizable Panes | Free UI Components by Radzen",
-                    Description = "The Blazor Splitter divides an area into resizable, collapsible panes, horizontally or vertically.",
-                    Path = "splitter",
-                    Related = new [] { "layout", "stack" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I create resizable panes in Blazor?", Answer = "Use RadzenSplitter with RadzenSplitterPane children; users drag the bars to resize, and panes can be collapsible." }
-                    },
-                    Icon = "\ue42a",
-                    Tags = new [] { "splitter", "layout"}
-                },
-                new Example
-                {
-                    Name = "TileLayout",
-                    New = true,
-                    Title = "Blazor TileLayout - Dashboard Tiles | Free UI Components by Radzen",
-                    Description = "The Blazor TileLayout builds dashboards from draggable, resizable tiles.",
-                    Path = "tile-layout",
-                    Related = new [] { "dashboard", "dropzone" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I build a tile dashboard in Blazor?", Answer = "Use RadzenTileLayout with RadzenTile children; users can drag and resize tiles to arrange the dashboard." }
-                    },
-                    Icon = "\ue871",
-                    Tags = new [] { "tile", "layout", "grid", "dashboard", "drag", "resize" }
-                }
-            }
-        },
-        new Example
-        {
-            Name = "Navigation",
-            Icon = "\ue762",
-            Children = new[] {
-                new Example
-                {
-                    Toc = [ new () { Text = "Accordion with single expand", Anchor = "#single-expand" }, new () { Text = "Accordion with multiple expand", Anchor = "#multiple-expand" }, new () { Text = "Dynamically create Accordion items", Anchor = "#dynamic-items" }, new () { Text = "Expand/Collapse events", Anchor = "#expand-collapse-events" }, new () { Text = "Client-side rendering", Anchor = "#client-render-mode" }, new () { Text = "Disable expand/collapse", Anchor = "#disable-expand-collapse" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Accordion",
-                    Title = "Blazor Accordion Component | Free UI Components by Radzen",
-                    Path = "accordion",
-                    Description = "The Blazor Accordion shows collapsible panels with single or multiple expand modes, dynamic items, and expand/collapse events.",
-                    Related = new [] { "tabs", "panelmenu" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I allow multiple panels open in the Blazor Accordion?", Answer = "Set Multiple to true so more than one panel can be expanded at once; otherwise opening one collapses the others." }
-                    },
-                    Icon = "\ue8fe",
-                    Tags = new [] { "panel", "container" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Default Radzen BreadCrumb", Anchor = "#default-breadcrumb" }, new () { Text = "BreadCrumb width template", Anchor = "#breadcrumb-template" }, new () { Text = "BreadCrumb with child content", Anchor = "#breadcrumb-child-template" } ],
-                    Name = "BreadCrumb",
-                    Title = "Blazor BreadCrumb Component | Free UI Components by Radzen",
-                    Description = "The Blazor BreadCrumb shows a navigation trail so users can see and jump back to their location in the app.",
-                    Path = "breadcrumb",
-                    Related = new [] { "menu", "steps" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I add breadcrumbs in Blazor?", Answer = "Add RadzenBreadCrumb with RadzenBreadCrumbItem children, each with Text and Path, to show the navigation trail." }
-                    },
-                    Icon = "\uea50",
-                    Tags = new [] { "breadcrumb", "navigation", "menu" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Navigation button styles", Anchor = "#navigation-style" }, new () { Text = "Navigation button content", Anchor = "#navigation-content" }, new () { Text = "Paging", Anchor = "#paging" }, new () { Text = "Data-binding", Anchor = "#data-binding" }, new () { Text = "Carousel with RadzenPager", Anchor = "#pager" } ],
-                    Name = "Carousel",
-                    Title = "Blazor Carousel Component | Free UI Components by Radzen",
-                    Description = "The Blazor Carousel cycles through content - images or any markup - with navigation arrows and paging.",
-                    Path = "carousel",
-                    Related = new [] { "tabs", "steps" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I build an image carousel in Blazor?", Answer = "Add RadzenCarousel with item content; it cycles through items with navigation arrows and optional auto-cycle and paging." }
-                    },
-                    Icon = "\ue8eb",
-                    Tags = new [] { "carousel", "gallery", "slide", "deck", "container" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Show ContextMenu with items", Anchor = "#contextmenu-with-items" }, new () { Text = "Show ContextMenu with custom content and separator", Anchor = "#contextmenu-with-custom-content" }, new () { Text = "Show ContextMenu for HTML element", Anchor = "#contextmenu-for-html-element" } ],
-                    Name = "ContextMenu",
-                    Title = "Blazor ContextMenu - Right-Click Menu | Free UI Components by Radzen",
-                    Description = "The Blazor ContextMenu opens a right-click menu of actions anywhere in your app via ContextMenuService.",
-                    Path = "contextmenu",
-                    Related = new [] { "menu", "profile-menu" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I add a right-click menu in Blazor?", Answer = "Handle an element's @oncontextmenu and call ContextMenuService.Open with your menu items to show a context menu." }
-                    },
-                    Icon = "\ue8de",
-                    Tags = new [] { "popup", "dropdown", "menu" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Link to path in application", Anchor = "#link-to-path" }, new () { Text = "Link to path in application with icon", Anchor = "#link-with-icon" }, new () { Text = "Link to url", Anchor = "#link-to-url" }, new () { Text = "Link with child content", Anchor = "#link-child-content" }, new () { Text = "Link disabled", Anchor = "#link-disabled" } ],
-                    Name = "Link",
-                    Title = "Blazor Link Component | Free UI Components by Radzen",
-                    Description = "The Blazor Link renders a navigation link with Path and Target, integrated with Blazor routing.",
-                    Path = "link",
-                    Related = new [] { "menu", "breadcrumb" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How is RadzenLink different from a plain anchor?", Answer = "It renders a styled navigation link with Path and Target that integrates with Blazor routing and the component theme." }
-                    },
-                    Icon = "\ue157"
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Login Events", Anchor = "#login-events" }, new () { Text = "Simple Login", Anchor = "#simple-login" }, new () { Text = "Login with Register (hide password reset)", Anchor = "#login-with-register" }, new () { Text = "Remember me", Anchor = "#remember-me" }, new () { Text = "Form fields", Anchor = "#form-fields" }, new () { Text = "Localization", Anchor = "#localization" }, new () { Text = "Horizontal login layout example", Anchor = "#horizontal-login-example" }, new () { Text = "Vertical login layout example", Anchor = "#vertical-login-example" } ],
-                    Name = "Login",
-                    Title = "Blazor Login Component | Free UI Components by Radzen",
-                    Description = "The Blazor Login component is a ready-made sign-in form with configurable fields, events, and layout.",
-                    Path = "login",
-                    Related = new [] { "profile-menu", "templateform" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Does the Blazor Login component handle authentication?", Answer = "It provides the sign-in form and raises a Login event with the credentials; you wire that to your own authentication logic." }
-                    },
-                    Icon = "\uea77"
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Menu",
-                    Title = "Blazor Menu - Navigation Menu | Free UI Components by Radzen",
-                    Description = "The Blazor Menu builds horizontal or vertical navigation menus with nested submenus, icons, and templates.",
-                    Path = "menu",
-                    Related = new [] { "panelmenu", "contextmenu", "profile-menu" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I create a navigation menu in Blazor?", Answer = "Add RadzenMenu with RadzenMenuItem children; nest items for submenus and set Icon and Path on each item." }
-                    },
-                    Icon = "\ue5d2",
-                    Tags = new [] { "navigation", "dropdown" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Statically declared items", Anchor = "#panelmenu-static" }, new () { Text = "Programmatically created items with Expanded binding", Anchor = "#panelmenu-programmatic" }, new () { Text = "Set the display style of menu items", Anchor = "#panelmenu-display-style" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "PanelMenu",
-                    Title = "Blazor PanelMenu - Sidebar Menu | Free UI Components by Radzen",
-                    Path = "panelmenu",
-                    Description = "The Blazor PanelMenu is a vertical, expandable sidebar menu with nested items - ideal for app navigation.",
-                    Related = new [] { "menu", "accordion", "profile-menu" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor PanelMenu used for?", Answer = "It is a vertical, collapsible sidebar menu with nested items, commonly used for application navigation." }
-                    },
-                    Icon = "\ue875",
-                    Tags = new [] { "navigation", "menu" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "ProfileMenu",
-                    Title = "Blazor ProfileMenu Component | Free UI Components by Radzen",
-                    Description = "The Blazor ProfileMenu shows a user avatar with a dropdown of account and navigation actions.",
-                    Path = "profile-menu",
-                    Related = new [] { "menu", "panelmenu", "login" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I add a user profile menu in Blazor?", Answer = "Use RadzenProfileMenu with an avatar and RadzenProfileMenuItem children for account and navigation actions." }
-                    },
-                    Icon = "\ue851",
-                    Tags = new [] { "navigation", "dropdown", "menu" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Transition", Anchor = "#transition" }, new () { Text = "CanChange event", Anchor = "#canchange-event" } ],
-                    Name = "Steps",
-                    Title = "Blazor Steps - Wizard / Stepper | Free UI Components by Radzen",
-                    Description = "The Blazor Steps component guides users through a multi-step process (wizard) with numbered stages.",
-                    Path = "steps",
-                    Related = new [] { "tabs", "breadcrumb" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I build a wizard in Blazor?", Answer = "Use RadzenSteps with RadzenStepsItem children; each step shows its content and you can validate before advancing." }
-                    },
-                    Icon = "\ue8be",
-                    Tags = new [] { "step", "steps", "wizard", "transition", "animation" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Tabs position", Anchor = "#tabs-position" }, new () { Text = "Server render mode", Anchor = "#server-render-mode" }, new () { Text = "Client render mode", Anchor = "#client-render-mode" }, new () { Text = "TabItems modify", Anchor = "#tabs-modify" }, new () { Text = "Tab items wrap", Anchor = "#tabs-wrap" }, new () { Text = "Prevent Tab change", Anchor = "#prevent-tab-change" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Tabs",
-                    Title = "Blazor Tabs Component | Free UI Components by Radzen",
-                    Description = "The Blazor Tabs component organizes content into tabbed panels, with positioning, dynamic tabs, and lazy or client/server rendering.",
-                    Path = "tabs",
-                    Related = new [] { "accordion", "steps" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I render tabs lazily in Blazor?", Answer = "Set RenderMode so tab content loads on demand (client) or is kept server-side, and bind SelectedIndex to control the active tab." }
-                    },
-                    Icon = "\ue8d8",
-                    Tags = new [] { "tabstrip", "tabview", "container" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Sticky TOC", Anchor = "#sticky" }, new () { Text = "Orientation", Anchor = "#orientation" } ],
-                    Name = "Toc",
-                    Title = "Blazor Table of Contents (ToC) | Free UI Components by Radzen",
-                    Description = "The Blazor ToC auto-generates a table of contents from the headings on the current page.",
-                    Path = "toc",
-                    Related = new [] { "breadcrumb", "link" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How does the Blazor ToC build its list?", Answer = "It scans the page's heading elements and generates a linked table of contents automatically." }
-                    },
-                    Icon = "\ue241",
-                    Tags = [ "toc", "content", "navigation" ]
-                }
-            }
-        },
-        new Example
-        {
-            Name = "Forms",
-            Icon = "\uf1c1",
-            Children = new[] {
-                new Example
-                {
-                    Name = "AIChat",
-                    Title = "Blazor AI Chat Component | Free UI Components by Radzen",
-                    Path = "aichat",
-                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants.",
-                    Related = new [] { "chat", "ai", "speechtotextbutton" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." }
-                    },
-                    Icon = "\ue0b7",
-                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
-                },
-                new Example
-                {
-                    Name = "Chat",
-                    Title = "Blazor Chat Component | Free UI Components by Radzen",
-                    Path = "chat",
-                    Description = "The Blazor Chat component supports multi-participant conversations with distinct user identities and real-time messaging.",
-                    Related = new [] { "aichat", "ai" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Does the Blazor Chat support multiple participants?", Answer = "Yes. It renders messages from distinct users with their own identity and supports real-time, multi-participant conversations." }
-                    },
-                    Icon = "\uefd1",
-                    Tags = new [] { "chat", "conversation", "message", "users", "team", "group" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Basic Label with Input", Anchor = "#basic-usage" }, new () { Text = "Labels with Different Input Types", Anchor = "#input-types" }, new () { Text = "Label with Custom Content", Anchor = "#custom-content" }, new () { Text = "Required Field Indicators", Anchor = "#required-fields" }, new () { Text = "Label Typography", Anchor = "#typography" }, new () { Text = "Label Styling", Anchor = "#styling" } ],
-                    Name = "Label",
-                    Updated = true,
-                    Title = "Blazor Label Component | Free UI Components by Radzen",
-                    Description = "Associate descriptive text labels with form inputs for better accessibility and usability. Clicking a label focuses its associated input.",
-                    Path = "label",
-                    Icon = "\ue893",
-                    Tags = new [] { "label", "form", "input", "accessibility", "required", "validation", "formfield", "association", "aria" },
-                    Related = new [] { "form-field", "fieldset", "templateform" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Why use the Blazor Label component?", Answer = "It links descriptive text to a form input so clicking the label focuses the input and screen readers announce it, which improves accessibility." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of AutoComplete", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of AutoComplete using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Get the selected item of AutoComplete", Anchor = "#get-selected" }, new () { Text = "Define AutoComplete placeholder", Anchor = "#placeholder" }, new () { Text = "Define AutoComplete template", Anchor = "#template" }, new () { Text = "Change AutoComplete filter operator, case sensitivity and delay", Anchor = "#filter-operator" }, new () { Text = "Load data on-demand in AutoComplete and apply custom filter and sort", Anchor = "#load-on-demand" }, new () { Text = "Empty and Loading templates", Anchor = "#empty-and-loading-templates" }, new () { Text = "AutoComplete with a List of Strings", Anchor = "#list-of-strings" }, new () { Text = "Multiline AutoComplete", Anchor = "#multiline" }, new () { Text = "Open on Focus", Anchor = "#open-on-focus" }, new () { Text = "Disabled AutoComplete", Anchor = "#disabled-autocomplete" }, new () { Text = "AutoComplete Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "AutoComplete",
-                    Title = "Blazor AutoComplete - Search Suggestions | Free UI Components by Radzen",
-                    Path = "autocomplete",
-                    Description = "The Blazor AutoComplete suggests matching items as the user types, with templates, custom filter operators, and on-demand data loading.",
-                    Related = new [] { "dropdown", "listbox", "textbox" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How is AutoComplete different from a DropDown?", Answer = "AutoComplete is a free-text input that suggests matching items as the user types, while a DropDown restricts selection to the listed options." },
-                        new FaqItem { Question = "How do I load AutoComplete suggestions on demand?", Answer = "Handle the LoadData event to fetch and filter suggestions from the server as the user types." }
-                    },
-                    Icon = "\ue03b",
-                    Tags = new [] { "form", "complete", "suggest", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Filled Buttons", Anchor = "#filled-buttons" }, new () { Text = "Flat Buttons", Anchor = "#flat-buttons" }, new () { Text = "Outlined Buttons", Anchor = "#outlined-buttons" }, new () { Text = "Text Buttons", Anchor = "#text-buttons" }, new () { Text = "Content in Buttons", Anchor = "#content-in-buttons" }, new () { Text = "Button Sizes", Anchor = "#button-sizes" }, new () { Text = "FAB", Anchor = "#fab" }, new () { Text = "Disabled Button", Anchor = "#disabled-button" }, new () { Text = "Busy button", Anchor = "#busy-button" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Button",
-                    Title = "Blazor Button Component | Free UI Components by Radzen",
-                    Description = "The Radzen Blazor Button comes in filled, flat, outlined, and text variants, with sizes, icons, shades, busy and disabled states, and click handling.",
-                    Path = "button",
-                    Tags = new [] { "button", "form", "click" },
-                    Related = new [] { "splitbutton", "toggle-button", "fab" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What button styles does the Radzen Blazor Button support?", Answer = "It supports filled, flat, outlined, and text variants, each with shades, sizes, and icon support, so you can match primary, secondary, and subtle actions." },
-                        new FaqItem { Question = "How do I add an icon to a Blazor Button?", Answer = "Set the Icon property to a Material icon name; you can combine it with Text or use an icon-only button." },
-                        new FaqItem { Question = "How do I show a busy or disabled Button?", Answer = "Set IsBusy to true to show a spinner and block clicks during an operation, and set Disabled to true to disable the button." }
-                    },
-                    Icon = "\ue72f"
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Bound ToggleButton", Anchor = "#bound-toggle-button" }, new () { Text = "ToggleButton Shade", Anchor = "#shade" }, new () { Text = "ToggleButton Style", Anchor = "#style" }, new () { Text = "ToggleButton Variants", Anchor = "#variants" }, new () { Text = "Content in ToggleButtons", Anchor = "#content" }, new () { Text = "ToggleButton Sizes", Anchor = "#sizes" }, new () { Text = "Disabled ToggleButton", Anchor = "#disabled" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "ToggleButton",
-                    Title = "Blazor ToggleButton - Toggle / On-Off Button | Free UI Components by Radzen",
-                    Description = "The Blazor ToggleButton switches between on and off states, changing its appearance when activated - ideal for toolbars and settings.",
-                    Path = "toggle-button",
-                    Icon = "\ue8e0",
-                    Tags = new [] { "button", "switch", "toggle" },
-                    Related = new [] { "button", "switch", "selectbar" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I bind the Blazor ToggleButton state?", Answer = "Bind Value to a bool with @bind-Value; it is true when the button is toggled on and false when off." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of CheckBox", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBox using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "TriState CheckBox", Anchor = "#tristate-checkbox" }, new () { Text = "Disabled CheckBox", Anchor = "#disabled-checkbox" }, new () { Text = "ReadOnly CheckBox", Anchor = "#readonly-checkbox" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "CheckBox",
-                    Title = "Blazor CheckBox Component | Free UI Components by Radzen",
-                    Path = "checkbox",
-                    Description = "The Blazor CheckBox binds a bool value with optional tri-state (true/false/null) support, plus disabled and read-only modes.",
-                    Related = new [] { "checkboxlist", "switch", "radiobuttonlist" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I enable tri-state in the Blazor CheckBox?", Answer = "Set TriState to true and bind Value to a nullable bool; the checkbox then cycles through checked, unchecked, and null (indeterminate)." }
-                    },
-                    Icon = "\ue834",
-                    Tags = new [] { "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of CheckBoxList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBoxList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set CheckBoxList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate CheckBoxList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated CheckBoxList items from data", Anchor = "#statically-declared" }, new () { Text = "Select all CheckBoxList items", Anchor = "#select-all-items" }, new () { Text = "Disabled CheckBoxList item", Anchor = "#disabled-item" }, new () { Text = "ReadOnly CheckBoxList item", Anchor = "#readonly-item" }, new () { Text = "Templated CheckBoxList item", Anchor = "#templated-item" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "CheckBoxList",
-                    Title = "Blazor CheckBoxList - Multiple Checkboxes | Free UI Components by Radzen",
-                    Path = "checkboxlist",
-                    Description = "The Blazor CheckBoxList lets users select multiple items from a data-bound list, with orientation, select-all, and item templates.",
-                    Related = new [] { "checkbox", "radiobuttonlist", "listbox" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I select multiple items with the Blazor CheckBoxList?", Answer = "Bind Value to a collection; each checked item is added to it. Populate the list with Data plus TextProperty and ValueProperty." }
-                    },
-                    Icon = "\ue6b1",
-                    Tags = new [] { "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "ColorPicker configuration", Anchor = "#configuration" }, new () { Text = "ColorPicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "ColorPicker",
-                    Title = "Blazor ColorPicker Component | Free UI Components by Radzen",
-                    Description = "The Blazor ColorPicker lets users choose a color with HSV and RGBA modes, opacity, and predefined palettes.",
-                    Path = "colorpicker",
-                    Icon = "\ue40a",
-                    Tags = new [] { "form", "edit", "color", "picker" },
-                    Related = new [] { "slider", "numeric" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I get the selected color from the Blazor ColorPicker?", Answer = "Bind Value to a string; the ColorPicker sets it to the chosen color (for example an rgba() or hex value) and raises Change when the user picks a new color." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "DatePicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "DatePicker",
-                    Path = "datepicker",
-                    Title = "Blazor DatePicker & Calendar Component | Free UI Components by Radzen",
-                    Description = "The Radzen Blazor DatePicker is a date and time picker with an inline calendar mode, time selection, date ranges, min/max and disabled dates, and DateOnly/TimeOnly binding.",
-                    Icon = "\ue916",
-                    Tags = new [] { "calendar", "time", "form", "edit", "datepicker" },
-                    Related = new [] { "timespanpicker", "numeric", "scheduler", "mask" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Can I use the Blazor DatePicker as a calendar?", Answer = "Yes. Set Inline to true to render an always-visible calendar instead of a popup, and bind Value to the selected date." },
-                        new FaqItem { Question = "How do I let users pick a date and time together?", Answer = "Set ShowTime to true so the picker includes a time selector alongside the calendar; use HourFormat to switch between 12- and 24-hour input." },
-                        new FaqItem { Question = "How do I disable specific or past dates?", Answer = "Use the DateRender callback to mark dates as disabled, and set Min and Max to bound the selectable range." },
-                        new FaqItem { Question = "Does the DatePicker support DateOnly and TimeOnly?", Answer = "Yes. It binds to DateTime, DateTimeOffset, DateOnly, and TimeOnly values." }
-                    }
-                },
-                new Example
-                {
-                    Name = "DropDown",
-                    Icon = "\ue172",
-                    Children = new [] {
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Get and Set the value of DropDown", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDown using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-and-value-properties" }, new () { Text = "DropDown with template", Anchor = "#template" }, new () { Text = "Disable specific item", Anchor = "#disable-item" }, new () { Text = "Clear selected item", Anchor = "#clear-selected-item" }, new () { Text = "Editable DropDown", Anchor = "#editable-dropdown" }, new () { Text = "Open and close events", Anchor = "#open-and-close-event" }, new () { Text = "DropDown Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                            Name = "Single selection",
-                            Path = "dropdown",
-                            Title = "Blazor DropDown / Select Component | Free UI Components by Radzen",
-                            Description = "Free Blazor DropDown (select) component with data binding, filtering, multiple selection, grouping, templates, and virtualization for large lists. Bind to any IEnumerable or IQueryable.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "combobox", "multiselect" },
-                            Related = new [] { "dropdown-multiple", "dropdown-filtering", "dropdown-grouping", "dropdown-virtualization", "dropdown-tree", "dropdown-datagrid" },
-                            Faq = new []
-                            {
-                                new FaqItem { Question = "How do I bind data to the Blazor DropDown?", Answer = "Set the Data property to any IEnumerable or IQueryable and use TextProperty and ValueProperty to choose the display text and the bound value. Bind the selection with @bind-Value." },
-                                new FaqItem { Question = "How do I enable multiple selection (multiselect)?", Answer = "Set Multiple to true and bind Value to a collection. The DropDown then shows checkboxes and a summary of the selected items." },
-                                new FaqItem { Question = "How do I add search or filtering to the DropDown?", Answer = "Set AllowFiltering to true so users can type to filter the list. You can choose the filter operator and case sensitivity, or load filtered data on demand." },
-                                new FaqItem { Question = "Can the DropDown handle large lists?", Answer = "Yes. Turn on virtualization and bind to an IQueryable so only the visible options are rendered and fetched, which keeps it fast on very large lists." }
-                            },
-                        },
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Define max labels and selected items text", Anchor = "#define-max-labels-and-selected-items-text" }, new () { Text = "Specify an Equality Comparer for item selection. Useful when binding directly to an object collection.", Anchor = "#item-comparer" } ],
-                            Name = "Multiple selection",
-                            Path = "dropdown-multiple",
-                            Title = "Blazor MultiSelect DropDown | Free UI Components by Radzen",
-                            Description = "Select multiple items from the Blazor DropDown (multiselect). Bind to a collection, show a summary label, and set an equality comparer when binding to objects.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "multiselect" },
-                            Related = new [] { "dropdown", "dropdown-filtering", "dropdown-grouping", "dropdown-tree" },
-                            Faq = new []
-                            {
-                                new FaqItem { Question = "How do I enable multiple selection in the Blazor DropDown?", Answer = "Set Multiple to true and bind Value to a collection (such as a List). The DropDown shows checkboxes and a summary of the selected items." },
-                                new FaqItem { Question = "How do I bind multiselect to a list of objects?", Answer = "Bind Value to a collection of the value type and set an equality comparer so the DropDown can match selected objects back to the list items." }
-                            },
-                        },
-                        new Example
-                        {
-                            Name = "Virtualization",
-                            Path = "dropdown-virtualization",
-                            Title = "Blazor DropDown - Virtualization for Large Lists | Free UI Components by Radzen",
-                            Description = "Render large Blazor DropDown lists efficiently with UI virtualization. Load items on demand from an IQueryable so only the visible options are fetched.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "virtualization", "paging" },
-                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "datagrid-virtualization" },
-                            Faq = new []
-                            {
-                                new FaqItem { Question = "How does the Blazor DropDown handle very large lists?", Answer = "Turn on virtualization and bind to an IQueryable. Only the visible options are rendered and fetched, so the dropdown stays fast even with tens of thousands of items." }
-                            },
-                        },
-                        new Example
-                        {
-                            Name = "Filtering",
-                            Path = "dropdown-filtering",
-                            Title = "Blazor DropDown - Filtering & Search | Free UI Components by Radzen",
-                            Description = "Add search to the Blazor DropDown with built-in filtering. Choose the filter operator (contains, starts with), toggle case sensitivity, or filter data on demand.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "filter", "search" },
-                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-virtualization", "dropdown-grouping" },
-                            Faq = new []
-                            {
-                                new FaqItem { Question = "How do I add a search box to the Blazor DropDown?", Answer = "Set AllowFiltering to true. Users can then type to filter the items, and you can control the filter operator (contains, starts with) and case sensitivity." },
-                                new FaqItem { Question = "How do I make DropDown filtering case-insensitive?", Answer = "Set FilterCaseSensitivity to CaseInsensitive so the search matches items regardless of letter case." }
-                            },
-                        },
-                        new Example
-                        {
-                            Name = "Grouping",
-                            Path = "dropdown-grouping",
-                            Title = "Blazor DropDown - Grouping | Free UI Components by Radzen",
-                            Description = "Group Blazor DropDown items into categories with group headers bound from a property in your data.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "grouping" },
-                            Related = new [] { "dropdown", "dropdown-filtering", "dropdown-multiple", "dropdown-tree" },
-                        },
-                        new Example
-                        {
-                            Toc = [ new () { Text = "DropDown data binding to enum", Anchor = "#data-binding-to-enum" } ],
-                            Name = "Custom objects binding",
-                            Path = "dropdown-custom-objects",
-                            Title = "Blazor DropDown - Bind to Objects & Enums | Free UI Components by Radzen",
-                            Description = "Bind the Blazor DropDown to custom objects or enums, using TextProperty and ValueProperty to control the display text and the bound value.",
-                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "custom", "enum" },
-                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-grouping", "dropdown-tree" },
-                            Faq = new []
-                            {
-                                new FaqItem { Question = "How do I bind a Blazor DropDown to a list of objects?", Answer = "Set Data to your object collection and set TextProperty to the property shown in the list and ValueProperty to the property bound to Value." },
-                                new FaqItem { Question = "How do I bind a Blazor DropDown to an enum?", Answer = "Bind Data to the enum values (for example Enum.GetValues) and bind Value to the enum field; the DropDown displays each name and stores the selected enum value." }
-                            },
-                        },
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection with checkboxes", Anchor = "#multiple-selection" }, new () { Text = "Filtering", Anchor = "#filtering" } ],
-                            Name = "DropDown with Tree",
-                            Path = "dropdown-tree",
-                            Title = "Blazor DropDown Tree - Hierarchical Select | Free UI Components by Radzen",
-                            Description = "Combine a popup and a tree to build a Blazor DropDownTree for hierarchical single or multiple selection with filtering.",
-                            Tags = new [] { "select", "picker", "form", "edit", "dropdown", "tree", "hierarchical" },
-                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "tree" },
-                        },
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of DropDownDataGrid", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDownDataGrid using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-value-properties" }, new () { Text = "DropDownDataGrid with custom header, footer, value and item templates", Anchor = "#template" }, new () { Text = "Define multiple columns", Anchor = "#multiple-columns" }, new () { Text = "Filtering case sensitivity and filter operator", Anchor = "#filtering-case-sensitivity-and-filter-operator" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "DropDownDataGrid binding to dynamic data", Anchor = "#dynamic" }, new () { Text = "DropDownDataGrid Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "DropDownDataGrid",
-                    Path = "dropdown-datagrid",
-                    Title = "Blazor DropDownDataGrid - Grid in a DropDown | Free UI Components by Radzen",
-                    Description = "Show tabular data inside a dropdown with the Blazor DropDownDataGrid - multiple columns, filtering, paging, and single or multiple selection.",
-                    Icon = "\ue99c",
-                    Tags = new [] { "select", "picker", "form", "edit", "dropdown", "grid", "multiselect" },
-                    Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "datagrid" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor DropDownDataGrid?", Answer = "It is a dropdown that shows a DataGrid in its popup, so users pick a value from a multi-column, filterable, paged grid instead of a plain list." },
-                        new FaqItem { Question = "Can the DropDownDataGrid select multiple rows?", Answer = "Yes. Set Multiple to true and bind Value to a collection to let users select several rows, with filtering and paging in the popup grid." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB position", Anchor = "#position" }, new () { Text = "Multiple FABs", Anchor = "#multiple-fabs" }, new () { Text = "Busy FAB", Anchor = "#busy-fab" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Fab",
-                    Path = "fab",
-                    Title = "Blazor FAB - Floating Action Button | Free UI Components by Radzen",
-                    Description = "The Blazor FAB (floating action button) highlights your app's primary action with a circular, elevated button.",
-                    Icon = "\ue147",
-                    Tags = new [] { "fab", "button", "floating", "action" },
-                    Related = new [] { "fab-menu", "button" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is a FAB (floating action button) in Blazor?", Answer = "A FAB is a circular, elevated button that floats above the UI to highlight the primary action on a screen, such as add or compose." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB menu with icon only buttons", Anchor = "#icons" }, new () { Text = "Expand direction", Anchor = "#direction" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "FabMenu",
-                    Path = "fab-menu",
-                    Title = "Blazor FAB Menu - Floating Action Menu | Free UI Components by Radzen",
-                    Description = "The Blazor FAB Menu expands a floating action button into a menu of quick actions.",
-                    Icon = "\ue091",
-                    Tags = new [] { "fab", "menu", "button", "floating", "action" },
-                    Related = new [] { "fab", "button", "menu" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How does the Blazor FAB Menu work?", Answer = "The FAB Menu shows a floating action button that expands into a set of smaller action buttons when pressed, giving quick access to related actions." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Fieldset",
-                    Title = "Blazor Fieldset Component | Free UI Components by Radzen",
-                    Path = "fieldset",
-                    Description = "The Blazor Fieldset groups related form fields under a titled, collapsible container.",
-                    Related = new [] { "form-field", "templateform", "label" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I group form fields in Blazor?", Answer = "Wrap related inputs in a RadzenFieldset with a title; it can be made collapsible to show or hide the group." }
-                    },
-                    Icon = "\ue728",
-                    Tags = new [] { "form", "container" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Byte Array Support", Anchor = "#byte-array" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "FileInput",
-                    Title = "Blazor FileInput - File Upload Input | Free UI Components by Radzen",
-                    Path = "fileinput",
-                    Description = "The Blazor FileInput uploads a file as base64 with preview support, bound directly to your model.",
-                    Related = new [] { "upload", "signature-pad" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How does the Blazor FileInput return the selected file?", Answer = "It reads the chosen file and binds it to your model as a base64 data string, with an optional preview." }
-                    },
-                    Icon = "\ue226",
-                    Tags = new [] { "upload", "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Variants", Anchor = "#variants" }, new () { Text = "Input types", Anchor = "#input-types" }, new () { Text = "Start, End, and ChildContent", Anchor = "#start-end-child-content" }, new () { Text = "Floating Label", Anchor = "#floating-label" }, new () { Text = "Helper text", Anchor = "#helper-text" }, new () { Text = "Validation", Anchor = "#form-field-validation" }, new () { Text = "Disabled FormField", Anchor = "#disabled-form-field" } ],
-                    Name = "FormField",
-                    Title = "Blazor FormField - Floating Label Input | Free UI Components by Radzen",
-                    Path = "form-field",
-                    Description = "The Blazor FormField wraps an input with a floating label, helper text, and validation styling.",
-                    Related = new [] { "label", "fieldset", "templateform" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What does the Blazor FormField do?", Answer = "It wraps an input with a floating label, helper text, and validation styling, similar to Material outlined fields." }
-                    },
-                    Icon = "\ue578",
-                    Tags = new [] { "form", "label", "floating", "float", "edit", "outline", "input", "helper", "valid" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Custom set of tools (text-editing only)", Anchor = "#custom-set-of-tools" }, new () { Text = "Upload images", Anchor = "#upload" }, new () { Text = "Focus", Anchor = "#focus" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name="HtmlEditor",
-                    Icon = "\ue3c9",
-                    Children = new [] {
-                        new Example
-                        {
-                            Name = "Default Tools",
-                            Path = "html-editor",
-                            Title = "Blazor HTML Editor Component | Free UI Components by Radzen",
-                            Description = "The Blazor HTML Editor is a rich text (WYSIWYG) editor with a full toolbar of formatting tools, image and link support, and HTML output.",
-                            Related = new [] { "html-editor-custom-tools", "textarea" },
-                            Faq = new []
-                            {
-                                new FaqItem { Question = "Is the Blazor HTML Editor a WYSIWYG editor?", Answer = "Yes. It is a rich text editor where users format content visually using a toolbar, and it produces HTML you can bind to your model." },
-                                new FaqItem { Question = "How do I add custom buttons to the HTML Editor?", Answer = "Use RadzenHtmlEditorCustomTool to add your own toolbar buttons that run custom commands on the selected content." }
-                            },
-                            Tags = new [] { "html", "editor", "rich", "text", "wysiwyg" }
-                        },
-                        new Example
-                        {
-                            Toc = [ new () { Text = "Custom command on Execute event", Anchor = "#command-execute-event" }, new () { Text = "Custom tool with template", Anchor = "#command-template" }, new () { Text = "Custom dialog", Anchor = "#command-dialog" } ],
-                            Name = "Custom Tools",
-                            Path = "html-editor-custom-tools",
-                            Title = "Blazor HTML Editor - Custom Tools | Free UI Components by Radzen",
-                            Description = "Add your own buttons to the Blazor HTML Editor toolbar with RadzenHtmlEditorCustomTool.",
-                            Related = new [] { "html-editor", "textarea" },
-                            Faq = new []
-                            {
-                                new FaqItem { Question = "How do I create a custom tool in the Blazor HTML Editor?", Answer = "Declare a RadzenHtmlEditorCustomTool inside the editor and handle its Execute callback to run your command on the selected content." }
-                            },
-                            Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
-                        },
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of ListBox", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of ListBox using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-value-properties" }, new () { Text = "ListBox with template", Anchor = "#template" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Filtering case sensitivity and filter operator", Anchor = "#filtering" }, new () { Text = "Custom filtering with LoadData event", Anchor = "#loaddata-event" }, new () { Text = "Virtualization using IQueryable", Anchor = "#virtualization-using-iqueryable" }, new () { Text = "Virtualization with LoadData event", Anchor = "#virtualization-with-loaddata" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "ListBox",
-                    Title = "Blazor ListBox - Selectable List | Free UI Components by Radzen",
-                    Path = "listbox",
-                    Icon = "\ue0ee",
-                    Description = "The Blazor ListBox shows a selectable list for single or multiple selection, with filtering and virtualization for large data.",
-                    Related = new [] { "dropdown", "checkboxlist", "autocomplete" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I enable multiple selection in the Blazor ListBox?", Answer = "Set Multiple to true and bind Value to a collection so users can select several items." },
-                        new FaqItem { Question = "Can the Blazor ListBox filter and handle large lists?", Answer = "Yes. Enable AllowFiltering for a search box and turn on virtualization to render large lists efficiently." }
-                    },
-                    Tags = new [] { "select", "picker", "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Mask Sizes", Anchor = "#sizes" } ],
-                    Name = "Mask",
-                    Path = "mask",
-                    Title = "Blazor Masked TextBox - Input Mask | Free UI Components by Radzen",
-                    Description = "The Blazor Masked TextBox formats input as the user types using a pattern - phone numbers, dates, IP addresses, and more.",
-                    Icon = "\ue262",
-                    Tags = new [] { "input", "form", "edit", "mask" },
-                    Related = new [] { "textbox", "numeric", "datepicker" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I mask a phone number or date in Blazor?", Answer = "Set the Mask property to a pattern (for example (***) ***-**** ) and the masked textbox enforces it as the user types." },
-                        new FaqItem { Question = "Which characters can I use in a mask pattern?", Answer = "Use the placeholder characters (such as * for any character and 9 for digits) together with literal characters that appear as-is in the input." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of Numeric", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Numeric using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Min set to 1 and Max set to 10", Anchor = "#min-max" }, new () { Text = "Placeholder and 0.5 step", Anchor = "#placeholder-and-step" }, new () { Text = "Without Up/Down", Anchor = "#without-up-down" }, new () { Text = "Formatted value", Anchor = "#formatted-value" }, new () { Text = "Align value", Anchor = "#align-value" }, new () { Text = "Custom Value convert", Anchor = "#custom-value-convert" }, new () { Text = "Custom Numeric Type Support", Anchor = "#custom-numeric-type" }, new () { Text = "Numeric Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Numeric",
-                    Path = "numeric",
-                    Title = "Blazor Numeric TextBox - Number Input | Free UI Components by Radzen",
-                    Description = "The Blazor Numeric TextBox edits numbers with min/max limits, step buttons, formatted display, and culture-aware parsing.",
-                    Icon = "\uf04a",
-                    Tags = new [] { "input", "number", "form", "edit", "numeric" },
-                    Related = new [] { "slider", "mask", "textbox" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I set minimum and maximum values on the Numeric TextBox?", Answer = "Set the Min and Max properties; the component clamps input to that range and the step buttons stay within it." },
-                        new FaqItem { Question = "How do I format the number shown in the Numeric TextBox?", Answer = "Set the Format property to a standard or custom .NET numeric format string (for example C for currency or N2 for two decimals)." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of Password", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Password using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define placeholder", Anchor = "#placeholder" }, new () { Text = "Without auto-complete", Anchor = "#without-auto-complete" }, new () { Text = "Password Sizes", Anchor = "#sizes" } ],
-                    Name = "Password",
-                    Title = "Blazor Password TextBox | Free UI Components by Radzen",
-                    Path = "password",
-                    Description = "The Blazor Password TextBox masks input, with autocomplete control and placeholder support.",
-                    Related = new [] { "textbox", "security-code" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Does the Blazor Password TextBox hide what the user types?", Answer = "Yes. It renders as a password field that masks the characters, and you can control the autocomplete behavior and placeholder." }
-                    },
-                    Icon = "\uf042",
-                    Tags = new [] { "input", "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of RadioButtonList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of RadioButtonList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set RadioButtonList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate RadioButtonList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated RadioButtonList items from data", Anchor = "#populate-items-statically" }, new () { Text = "RadioButtonList with null value", Anchor = "#null-value" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "RadioButtonList",
-                    Title = "Blazor RadioButtonList - Radio Buttons | Free UI Components by Radzen",
-                    Path = "radiobuttonlist",
-                    Description = "The Blazor RadioButtonList shows a set of radio buttons bound to data, with horizontal or vertical orientation and null value support.",
-                    Related = new [] { "checkboxlist", "selectbar", "dropdown" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I bind the Blazor RadioButtonList to data?", Answer = "Set Data to your collection with TextProperty and ValueProperty (or declare RadzenRadioButtonListItem items), then bind the selected value with @bind-Value." }
-                    },
-                    Icon = "\ue837",
-                    Tags = new [] { "toggle", "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of Rating", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Rating using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set number of stars", Anchor = "#number-of-stars" }, new () { Text = "Disabled Rating", Anchor = "#disabled-rating" }, new () { Text = "Read-only Rating", Anchor = "#readonly-rating" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Rating",
-                    Title = "Blazor Rating - Star Rating | Free UI Components by Radzen",
-                    Path = "rating",
-                    Description = "The Blazor Rating captures a star rating, with a configurable number of stars and disabled or read-only modes.",
-                    Related = new [] { "slider", "numeric" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I set the number of stars in the Blazor Rating?", Answer = "Set Stars to the maximum number of stars, bind Value to the selected rating, and use ReadOnly to display a fixed rating." }
-                    },
-                    Icon = "\ue839",
-                    Tags = new [] { "star", "form", "edit" }
-                },
-                new Example
-                {
-                    Name = "SecurityCode",
-                    Title = "Blazor SecurityCode - OTP / PIN Input | Free UI Components by Radzen",
-                    Path = "security-code",
-                    Description = "The Blazor SecurityCode is a multi-box input for one-time passwords (OTP), PINs, and verification codes.",
-                    Related = new [] { "password", "textbox" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor SecurityCode used for?", Answer = "It collects a multi-digit code such as a one-time password (OTP), PIN, or email/SMS verification code, with one box per digit." },
-                        new FaqItem { Question = "How many digits can the SecurityCode have?", Answer = "Set Count to the number of digits; the component renders that many input cells and concatenates them into the bound value." }
-                    },
-                    Icon = "\uf045",
-                    Tags = new [] { "security", "code", "input" }
-                },
-                new Example
-                {
-                    New = true,
-                    Name = "SignaturePad",
-                    Title = "Blazor Signature Pad Component | Free UI Components by Radzen",
-                    Path = "signature-pad",
-                    Description = "The Blazor Signature Pad captures a handwritten signature by mouse or touch and exports it as an image.",
-                    Related = new [] { "fileinput", "upload" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I capture a signature in Blazor?", Answer = "Use the SignaturePad component; users draw with mouse or touch and the signature is exported as an image you can save." }
-                    },
-                    Icon = "\ue22b",
-                    Tags = new [] { "signature", "sign", "draw", "pen", "touch", "form", "input" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Chip Style", Anchor = "#chip-style" }, new () { Text = "Variant", Anchor = "#variant" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Icons", Anchor = "#icons" }, new () { Text = "Selected", Anchor = "#selected" }, new () { Text = "Disabled", Anchor = "#disabled" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Add / Remove", Anchor = "#add-remove" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Chip",
-                    Title = "Blazor Chip Component | Free UI Components by Radzen",
-                    Path = "chip",
-                    Description = "The Blazor Chip is a compact element for tags, statuses, and filters, with optional remove and selection.",
-                    Related = new [] { "chiplist", "label" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "What is the Blazor Chip used for?", Answer = "Chips are compact elements for tags, statuses, categories, or filters, and can be made removable or selectable." }
-                    },
-                    Icon = "\uf852",
-                    Tags = new [] { "chip", "tag", "label", "status" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Templates", Anchor = "#templates" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "ChipList",
-                    Title = "Blazor ChipList Component | Free UI Components by Radzen",
-                    Path = "chiplist",
-                    Description = "The Blazor ChipList shows a set of selectable, removable chips bound to data.",
-                    Related = new [] { "chip", "listbox", "checkboxlist" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I make a selectable list of chips in Blazor?", Answer = "Use ChipList with data and bind the selection; each chip can be selected or removed." }
-                    },
-                    Icon = "\uf852",
-                    Tags = new [] { "chip", "chiplist", "tag", "form", "edit", "selection" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of SelectBar", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of SelectBar using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Populate SelectBar items from data", Anchor = "#populate-from-data" }, new () { Text = "Statically declared and populated SelectBar items from data", Anchor = "#populate-items-statically" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "SelectBar with icons", Anchor = "#icons" }, new () { Text = "SelectBar with images", Anchor = "#images" }, new () { Text = "SelectBar with template", Anchor = "#template" }, new () { Text = "SelectBar Size", Anchor = "#size" }, new () { Text = "SelectBar Orientation", Anchor = "#orientation" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "SelectBar",
-                    Title = "Blazor SelectBar - Button Group Selector | Free UI Components by Radzen",
-                    Path = "selectbar",
-                    Description = "The Blazor SelectBar is a button-group selector for single or multiple choices, with icons and templates.",
-                    Related = new [] { "radiobuttonlist", "toggle-button", "dropdown" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "Can the Blazor SelectBar select multiple values?", Answer = "Yes. Set Multiple to true and bind Value to a collection to allow more than one selected button." }
-                    },
-                    Icon = "\uf8e8",
-                    Tags = new [] { "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of Slider", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Slider using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Slider from -100 to 100", Anchor = "#min-max-value" }, new () { Text = "Slider with Step=10", Anchor = "#step" }, new () { Text = "Range Slider", Anchor = "#range-slider" }, new () { Text = "Disabled Slider", Anchor = "#disabled-slider" }, new () { Text = "Vertical Slider", Anchor = "#vertical-slider" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "Slider",
-                    Path = "slider",
-                    Title = "Blazor Slider & Range Slider | Free UI Components by Radzen",
-                    Description = "The Blazor Slider selects a single value or a range by dragging, with step increments and horizontal or vertical orientation.",
-                    Icon = "\ue429",
-                    Tags = new [] { "form", "slider", "range" },
-                    Related = new [] { "numeric", "rating", "colorpicker" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I create a range slider in Blazor?", Answer = "Set Range to true and bind Value to a collection of two numbers; the slider then shows two handles for the lower and upper bounds." },
-                        new FaqItem { Question = "How do I make the Blazor Slider vertical?", Answer = "Set Orientation to Orientation.Vertical to render the slider top-to-bottom instead of left-to-right." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "SpeechToTextButton",
-                    Title = "Blazor Speech to Text Button | Free UI Components by Radzen",
-                    Description = "The Blazor Speech to Text Button captures voice input using the browser's speech recognition and writes the transcript to your field.",
-                    Path = "speechtotextbutton",
-                    Tags = new [] { "button", "speech", "voice", "dictation", "form" },
-                    Related = new [] { "button", "textbox", "aichat" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How does the Blazor Speech to Text Button work?", Answer = "It uses the browser's built-in speech recognition to capture the user's voice and writes the recognized text to the bound value." }
-                    },
-                    Icon = "\ue029"
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Filled SplitButton", Anchor = "#filled" }, new () { Text = "Flat SplitButton", Anchor = "#flat" }, new () { Text = "Outlined SplitButton", Anchor = "#outlined" }, new () { Text = "Text SplitButton", Anchor = "#text" }, new () { Text = "Content in SplitButton", Anchor = "#content" }, new () { Text = "SplitButton Sizes", Anchor = "#sizes" }, new () { Text = "Disabled SplitButton", Anchor = "#disabled" }, new () { Text = "Busy SplitButton", Anchor = "#busy" }, new () { Text = "AlwaysOpenPopup SplitButton", Anchor = "#always-open-popup" }, new () { Text = "DropDown icon of SplitButton", Anchor = "#customize-dropdown-icon" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "SplitButton",
-                    Title = "Blazor SplitButton - Button with Dropdown Menu | Free UI Components by Radzen",
-                    Description = "The Blazor SplitButton pairs a primary action with a dropdown menu of additional options.",
-                    Path = "splitbutton",
-                    Tags = new [] { "button", "menu", "dropdown", "split", "form" },
-                    Related = new [] { "button", "fab-menu", "menu" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How is a SplitButton different from a regular button?", Answer = "A SplitButton runs a primary action when its main area is clicked and opens a dropdown menu of secondary actions from its arrow, combining a button and a menu." }
-                    },
-                    Icon = "\uf756"
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" }, new () { Text = "Disabled Switch", Anchor = "#disabled-switch" } ],
-                    Name = "Switch",
-                    Title = "Blazor Switch - Toggle Switch | Free UI Components by Radzen",
-                    Path = "switch",
-                    Description = "The Blazor Switch is a toggle switch that binds a bool value for on and off settings.",
-                    Related = new [] { "checkbox", "toggle-button" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I bind the Blazor Switch?", Answer = "Bind Value to a bool with @bind-Value; it is true when the switch is on and false when off." }
-                    },
-                    Icon = "\ue9f6",
-                    Tags = new [] { "form", "edit", "switch" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Custom EditContext", Anchor = "#custom-edit-context" }, new () { Text = "Form Action", Anchor = "#form-action" } ],
-                    Name = "TemplateForm",
-                    Title = "Blazor Form - Template Form with Validation | Free UI Components by Radzen",
-                    Path = "templateform",
-                    Description = "The Blazor Form (TemplateForm) builds data-bound forms with built-in validation and submit handling.",
-                    Related = new [] { "form-field", "label", "fieldset" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I build a form with validation in Blazor?", Answer = "Use RadzenTemplateForm with data-bound inputs and add validators such as RadzenRequiredValidator to validate fields on submit." },
-                        new FaqItem { Question = "Does the Blazor form support EditContext?", Answer = "Yes. RadzenTemplateForm integrates with EditContext and standard data annotations validation." }
-                    },
-                    Icon = "\uebed",
-                    Tags = new [] { "form", "edit", "validation", "submit", "editcontext" }
-                },
-                new Example
-                {
-                    Name = "TextArea",
-                    Title = "Blazor TextArea - Multiline Text Input | Free UI Components by Radzen",
-                    Path = "textarea",
-                    Description = "The Blazor TextArea is a multi-line text input with auto-resize, value binding, and placeholder support.",
-                    Related = new [] { "textbox", "html-editor" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I bind the Blazor TextArea?", Answer = "Bind Value to a string with @bind-Value to capture multi-line input from the user." }
-                    },
-                    Icon = "\ue167",
-                    Tags = new [] { "input", "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Get and Set the value of TextBox", Anchor = "#bind-value" }, new () { Text = "Placeholder", Anchor = "#placeholder" }, new () { Text = "Maximum length", Anchor = "#max-length" }, new () { Text = "Change on every input", Anchor = "#immediate" }, new () { Text = "Disabled TextBox", Anchor = "#disabled" }, new () { Text = "AutoComplete", Anchor = "#autocomplete" }, new () { Text = "TextBox Sizes", Anchor = "#sizes" } ],
-                    Name = "TextBox",
-                    Title = "Blazor TextBox - Text Input | Free UI Components by Radzen",
-                    Path = "textbox",
-                    Description = "The Blazor TextBox is a single-line text input with value binding, placeholder, max length, and read-only support.",
-                    Related = new [] { "textarea", "mask", "password" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I two-way bind a Blazor TextBox?", Answer = "Use @bind-Value to bind the input to a string property; the value updates as the user edits the field." }
-                    },
-                    Icon = "\ue9f1",
-                    Tags = new [] { "input", "form", "edit" }
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Bind the value of TimeSpanPicker", Anchor = "#bind-value" }, new () { Text = "Get and Set the value of TimeSpanPicker using Value and Change event.", Anchor = "#value-and-change-event" }, new () { Text = "Min and Max values", Anchor = "#min-max-values" }, new () { Text = "Inline picker", Anchor = "#inline" }, new () { Text = "Various configurations", Anchor = "#various-config" }, new () { Text = "Time span format", Anchor = "#format" }, new () { Text = "Custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "TimeSpanPicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
-                    Name = "TimeSpanPicker",
-                    Path = "timespanpicker",
-                    Title = "Blazor TimeSpanPicker - Duration Input | Free UI Components by Radzen",
-                    Description = "Pick a duration or time span in the Blazor TimeSpanPicker, with inline mode, custom formatting, and min/max values.",
-                    Icon = "\ue425",
-                    Tags = new [] { "duration", "form", "edit", "timespan" },
-                    Related = new [] { "datepicker", "numeric", "slider" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I bind a TimeSpan value in Blazor?", Answer = "Bind Value to a TimeSpan (or nullable TimeSpan); the TimeSpanPicker reads and writes that value and raises Change when the user edits it." }
-                    }
-                },
-                new Example
-                {
-                    Toc = [  
-                        new () { Text = "Upload files", Anchor = "#change" }, 
-                        new () { Text = "Upload files to server", Anchor = "#url" }, 
-                        new () { Text = "Upload multiple files", Anchor = "#multiple" }, 
-                        new () { Text = "Trigger from code", Anchor = "#from-code" }, 
-                        new () { Text = "File filter", Anchor = "#filter" }, 
-                        new () { Text = "Use parameters", Anchor = "#parameters" }, 
-                        new () { Text = "Show upload progress", Anchor = "#progress" }, 
-                        new () { Text = "Drag and drop to upload", Anchor = "#drag-drop" }, 
-                        new () { Text = "Custom HTTP headers", Anchor = "#custom-headers" }, 
-                        new () { Text = "Specify parameter name", Anchor = "#parameter-name" }, 
-                        new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } 
-                    ],
-                    Name = "Upload",
-                    Title = "Blazor Upload - File Upload Component | Free UI Components by Radzen",
-                    Description = "The Blazor Upload component uploads single or multiple files to a server endpoint, with progress, validation, and custom headers.",
-                    Path = "upload",
-                    Related = new [] { "fileinput", "signature-pad" },
-                    Faq = new []
-                    {
-                        new FaqItem { Question = "How do I upload files in Blazor?", Answer = "Use the RadzenUpload component: point its Url at a server endpoint, allow single or multiple files, and handle progress and completion events." }
-                    },
-                    Icon = "\uf09b",
-                    Tags = new [] { "upload", "file"}
-                },
-            },
         },
         new Example
         {
@@ -4264,6 +2180,2076 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
+            Name = "Forms",
+            Icon = "\uf1c1",
+            Children = new[] {
+                new Example
+                {
+                    Name = "AIChat",
+                    Title = "Blazor AI Chat Component | Free UI Components by Radzen",
+                    Path = "aichat",
+                    Description = "The Blazor AI Chat component provides a conversational, streaming chat interface for AI assistants.",
+                    Related = new [] { "chat", "ai", "speechtotextbutton" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor AI Chat component?", Answer = "It is a chat UI for AI assistants, with a conversational layout and support for streaming responses as they are generated." }
+                    },
+                    Icon = "\ue0b7",
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
+                },
+                new Example
+                {
+                    Name = "Chat",
+                    Title = "Blazor Chat Component | Free UI Components by Radzen",
+                    Path = "chat",
+                    Description = "The Blazor Chat component supports multi-participant conversations with distinct user identities and real-time messaging.",
+                    Related = new [] { "aichat", "ai" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Does the Blazor Chat support multiple participants?", Answer = "Yes. It renders messages from distinct users with their own identity and supports real-time, multi-participant conversations." }
+                    },
+                    Icon = "\uefd1",
+                    Tags = new [] { "chat", "conversation", "message", "users", "team", "group" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Basic Label with Input", Anchor = "#basic-usage" }, new () { Text = "Labels with Different Input Types", Anchor = "#input-types" }, new () { Text = "Label with Custom Content", Anchor = "#custom-content" }, new () { Text = "Required Field Indicators", Anchor = "#required-fields" }, new () { Text = "Label Typography", Anchor = "#typography" }, new () { Text = "Label Styling", Anchor = "#styling" } ],
+                    Name = "Label",
+                    Updated = true,
+                    Title = "Blazor Label Component | Free UI Components by Radzen",
+                    Description = "Associate descriptive text labels with form inputs for better accessibility and usability. Clicking a label focuses its associated input.",
+                    Path = "label",
+                    Icon = "\ue893",
+                    Tags = new [] { "label", "form", "input", "accessibility", "required", "validation", "formfield", "association", "aria" },
+                    Related = new [] { "form-field", "fieldset", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Why use the Blazor Label component?", Answer = "It links descriptive text to a form input so clicking the label focuses the input and screen readers announce it, which improves accessibility." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of AutoComplete", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of AutoComplete using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Get the selected item of AutoComplete", Anchor = "#get-selected" }, new () { Text = "Define AutoComplete placeholder", Anchor = "#placeholder" }, new () { Text = "Define AutoComplete template", Anchor = "#template" }, new () { Text = "Change AutoComplete filter operator, case sensitivity and delay", Anchor = "#filter-operator" }, new () { Text = "Load data on-demand in AutoComplete and apply custom filter and sort", Anchor = "#load-on-demand" }, new () { Text = "Empty and Loading templates", Anchor = "#empty-and-loading-templates" }, new () { Text = "AutoComplete with a List of Strings", Anchor = "#list-of-strings" }, new () { Text = "Multiline AutoComplete", Anchor = "#multiline" }, new () { Text = "Open on Focus", Anchor = "#open-on-focus" }, new () { Text = "Disabled AutoComplete", Anchor = "#disabled-autocomplete" }, new () { Text = "AutoComplete Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "AutoComplete",
+                    Title = "Blazor AutoComplete - Search Suggestions | Free UI Components by Radzen",
+                    Path = "autocomplete",
+                    Description = "The Blazor AutoComplete suggests matching items as the user types, with templates, custom filter operators, and on-demand data loading.",
+                    Related = new [] { "dropdown", "listbox", "textbox" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How is AutoComplete different from a DropDown?", Answer = "AutoComplete is a free-text input that suggests matching items as the user types, while a DropDown restricts selection to the listed options." },
+                        new FaqItem { Question = "How do I load AutoComplete suggestions on demand?", Answer = "Handle the LoadData event to fetch and filter suggestions from the server as the user types." }
+                    },
+                    Icon = "\ue03b",
+                    Tags = new [] { "form", "complete", "suggest", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Filled Buttons", Anchor = "#filled-buttons" }, new () { Text = "Flat Buttons", Anchor = "#flat-buttons" }, new () { Text = "Outlined Buttons", Anchor = "#outlined-buttons" }, new () { Text = "Text Buttons", Anchor = "#text-buttons" }, new () { Text = "Content in Buttons", Anchor = "#content-in-buttons" }, new () { Text = "Button Sizes", Anchor = "#button-sizes" }, new () { Text = "FAB", Anchor = "#fab" }, new () { Text = "Disabled Button", Anchor = "#disabled-button" }, new () { Text = "Busy button", Anchor = "#busy-button" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Button",
+                    Title = "Blazor Button Component | Free UI Components by Radzen",
+                    Description = "The Radzen Blazor Button comes in filled, flat, outlined, and text variants, with sizes, icons, shades, busy and disabled states, and click handling.",
+                    Path = "button",
+                    Tags = new [] { "button", "form", "click" },
+                    Related = new [] { "splitbutton", "toggle-button", "fab" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What button styles does the Radzen Blazor Button support?", Answer = "It supports filled, flat, outlined, and text variants, each with shades, sizes, and icon support, so you can match primary, secondary, and subtle actions." },
+                        new FaqItem { Question = "How do I add an icon to a Blazor Button?", Answer = "Set the Icon property to a Material icon name; you can combine it with Text or use an icon-only button." },
+                        new FaqItem { Question = "How do I show a busy or disabled Button?", Answer = "Set IsBusy to true to show a spinner and block clicks during an operation, and set Disabled to true to disable the button." }
+                    },
+                    Icon = "\ue72f"
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Bound ToggleButton", Anchor = "#bound-toggle-button" }, new () { Text = "ToggleButton Shade", Anchor = "#shade" }, new () { Text = "ToggleButton Style", Anchor = "#style" }, new () { Text = "ToggleButton Variants", Anchor = "#variants" }, new () { Text = "Content in ToggleButtons", Anchor = "#content" }, new () { Text = "ToggleButton Sizes", Anchor = "#sizes" }, new () { Text = "Disabled ToggleButton", Anchor = "#disabled" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "ToggleButton",
+                    Title = "Blazor ToggleButton - Toggle / On-Off Button | Free UI Components by Radzen",
+                    Description = "The Blazor ToggleButton switches between on and off states, changing its appearance when activated - ideal for toolbars and settings.",
+                    Path = "toggle-button",
+                    Icon = "\ue8e0",
+                    Tags = new [] { "button", "switch", "toggle" },
+                    Related = new [] { "button", "switch", "selectbar" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Blazor ToggleButton state?", Answer = "Bind Value to a bool with @bind-Value; it is true when the button is toggled on and false when off." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of CheckBox", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBox using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "TriState CheckBox", Anchor = "#tristate-checkbox" }, new () { Text = "Disabled CheckBox", Anchor = "#disabled-checkbox" }, new () { Text = "ReadOnly CheckBox", Anchor = "#readonly-checkbox" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "CheckBox",
+                    Title = "Blazor CheckBox Component | Free UI Components by Radzen",
+                    Path = "checkbox",
+                    Description = "The Blazor CheckBox binds a bool value with optional tri-state (true/false/null) support, plus disabled and read-only modes.",
+                    Related = new [] { "checkboxlist", "switch", "radiobuttonlist" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I enable tri-state in the Blazor CheckBox?", Answer = "Set TriState to true and bind Value to a nullable bool; the checkbox then cycles through checked, unchecked, and null (indeterminate)." }
+                    },
+                    Icon = "\ue834",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of CheckBoxList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBoxList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set CheckBoxList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate CheckBoxList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated CheckBoxList items from data", Anchor = "#statically-declared" }, new () { Text = "Select all CheckBoxList items", Anchor = "#select-all-items" }, new () { Text = "Disabled CheckBoxList item", Anchor = "#disabled-item" }, new () { Text = "ReadOnly CheckBoxList item", Anchor = "#readonly-item" }, new () { Text = "Templated CheckBoxList item", Anchor = "#templated-item" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "CheckBoxList",
+                    Title = "Blazor CheckBoxList - Multiple Checkboxes | Free UI Components by Radzen",
+                    Path = "checkboxlist",
+                    Description = "The Blazor CheckBoxList lets users select multiple items from a data-bound list, with orientation, select-all, and item templates.",
+                    Related = new [] { "checkbox", "radiobuttonlist", "listbox" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I select multiple items with the Blazor CheckBoxList?", Answer = "Bind Value to a collection; each checked item is added to it. Populate the list with Data plus TextProperty and ValueProperty." }
+                    },
+                    Icon = "\ue6b1",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "ColorPicker configuration", Anchor = "#configuration" }, new () { Text = "ColorPicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "ColorPicker",
+                    Title = "Blazor ColorPicker Component | Free UI Components by Radzen",
+                    Description = "The Blazor ColorPicker lets users choose a color with HSV and RGBA modes, opacity, and predefined palettes.",
+                    Path = "colorpicker",
+                    Icon = "\ue40a",
+                    Tags = new [] { "form", "edit", "color", "picker" },
+                    Related = new [] { "slider", "numeric" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I get the selected color from the Blazor ColorPicker?", Answer = "Bind Value to a string; the ColorPicker sets it to the chosen color (for example an rgba() or hex value) and raises Change when the user picks a new color." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "DatePicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "DatePicker",
+                    Path = "datepicker",
+                    Title = "Blazor DatePicker & Calendar Component | Free UI Components by Radzen",
+                    Description = "The Radzen Blazor DatePicker is a date and time picker with an inline calendar mode, time selection, date ranges, min/max and disabled dates, and DateOnly/TimeOnly binding.",
+                    Icon = "\ue916",
+                    Tags = new [] { "calendar", "time", "form", "edit", "datepicker" },
+                    Related = new [] { "timespanpicker", "numeric", "scheduler", "mask" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Can I use the Blazor DatePicker as a calendar?", Answer = "Yes. Set Inline to true to render an always-visible calendar instead of a popup, and bind Value to the selected date." },
+                        new FaqItem { Question = "How do I let users pick a date and time together?", Answer = "Set ShowTime to true so the picker includes a time selector alongside the calendar; use HourFormat to switch between 12- and 24-hour input." },
+                        new FaqItem { Question = "How do I disable specific or past dates?", Answer = "Use the DateRender callback to mark dates as disabled, and set Min and Max to bound the selectable range." },
+                        new FaqItem { Question = "Does the DatePicker support DateOnly and TimeOnly?", Answer = "Yes. It binds to DateTime, DateTimeOffset, DateOnly, and TimeOnly values." }
+                    }
+                },
+                new Example
+                {
+                    Name = "DropDown",
+                    Icon = "\ue172",
+                    Children = new [] {
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Get and Set the value of DropDown", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDown using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-and-value-properties" }, new () { Text = "DropDown with template", Anchor = "#template" }, new () { Text = "Disable specific item", Anchor = "#disable-item" }, new () { Text = "Clear selected item", Anchor = "#clear-selected-item" }, new () { Text = "Editable DropDown", Anchor = "#editable-dropdown" }, new () { Text = "Open and close events", Anchor = "#open-and-close-event" }, new () { Text = "DropDown Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                            Name = "Single selection",
+                            Path = "dropdown",
+                            Title = "Blazor DropDown / Select Component | Free UI Components by Radzen",
+                            Description = "Free Blazor DropDown (select) component with data binding, filtering, multiple selection, grouping, templates, and virtualization for large lists. Bind to any IEnumerable or IQueryable.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "combobox", "multiselect" },
+                            Related = new [] { "dropdown-multiple", "dropdown-filtering", "dropdown-grouping", "dropdown-virtualization", "dropdown-tree", "dropdown-datagrid" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I bind data to the Blazor DropDown?", Answer = "Set the Data property to any IEnumerable or IQueryable and use TextProperty and ValueProperty to choose the display text and the bound value. Bind the selection with @bind-Value." },
+                                new FaqItem { Question = "How do I enable multiple selection (multiselect)?", Answer = "Set Multiple to true and bind Value to a collection. The DropDown then shows checkboxes and a summary of the selected items." },
+                                new FaqItem { Question = "How do I add search or filtering to the DropDown?", Answer = "Set AllowFiltering to true so users can type to filter the list. You can choose the filter operator and case sensitivity, or load filtered data on demand." },
+                                new FaqItem { Question = "Can the DropDown handle large lists?", Answer = "Yes. Turn on virtualization and bind to an IQueryable so only the visible options are rendered and fetched, which keeps it fast on very large lists." }
+                            },
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Define max labels and selected items text", Anchor = "#define-max-labels-and-selected-items-text" }, new () { Text = "Specify an Equality Comparer for item selection. Useful when binding directly to an object collection.", Anchor = "#item-comparer" } ],
+                            Name = "Multiple selection",
+                            Path = "dropdown-multiple",
+                            Title = "Blazor MultiSelect DropDown | Free UI Components by Radzen",
+                            Description = "Select multiple items from the Blazor DropDown (multiselect). Bind to a collection, show a summary label, and set an equality comparer when binding to objects.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "multiselect" },
+                            Related = new [] { "dropdown", "dropdown-filtering", "dropdown-grouping", "dropdown-tree" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I enable multiple selection in the Blazor DropDown?", Answer = "Set Multiple to true and bind Value to a collection (such as a List). The DropDown shows checkboxes and a summary of the selected items." },
+                                new FaqItem { Question = "How do I bind multiselect to a list of objects?", Answer = "Bind Value to a collection of the value type and set an equality comparer so the DropDown can match selected objects back to the list items." }
+                            },
+                        },
+                        new Example
+                        {
+                            Name = "Virtualization",
+                            Path = "dropdown-virtualization",
+                            Title = "Blazor DropDown - Virtualization for Large Lists | Free UI Components by Radzen",
+                            Description = "Render large Blazor DropDown lists efficiently with UI virtualization. Load items on demand from an IQueryable so only the visible options are fetched.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "virtualization", "paging" },
+                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "datagrid-virtualization" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How does the Blazor DropDown handle very large lists?", Answer = "Turn on virtualization and bind to an IQueryable. Only the visible options are rendered and fetched, so the dropdown stays fast even with tens of thousands of items." }
+                            },
+                        },
+                        new Example
+                        {
+                            Name = "Filtering",
+                            Path = "dropdown-filtering",
+                            Title = "Blazor DropDown - Filtering & Search | Free UI Components by Radzen",
+                            Description = "Add search to the Blazor DropDown with built-in filtering. Choose the filter operator (contains, starts with), toggle case sensitivity, or filter data on demand.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "filter", "search" },
+                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-virtualization", "dropdown-grouping" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I add a search box to the Blazor DropDown?", Answer = "Set AllowFiltering to true. Users can then type to filter the items, and you can control the filter operator (contains, starts with) and case sensitivity." },
+                                new FaqItem { Question = "How do I make DropDown filtering case-insensitive?", Answer = "Set FilterCaseSensitivity to CaseInsensitive so the search matches items regardless of letter case." }
+                            },
+                        },
+                        new Example
+                        {
+                            Name = "Grouping",
+                            Path = "dropdown-grouping",
+                            Title = "Blazor DropDown - Grouping | Free UI Components by Radzen",
+                            Description = "Group Blazor DropDown items into categories with group headers bound from a property in your data.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "multiple", "dropdown", "grouping" },
+                            Related = new [] { "dropdown", "dropdown-filtering", "dropdown-multiple", "dropdown-tree" },
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "DropDown data binding to enum", Anchor = "#data-binding-to-enum" } ],
+                            Name = "Custom objects binding",
+                            Path = "dropdown-custom-objects",
+                            Title = "Blazor DropDown - Bind to Objects & Enums | Free UI Components by Radzen",
+                            Description = "Bind the Blazor DropDown to custom objects or enums, using TextProperty and ValueProperty to control the display text and the bound value.",
+                            Tags = new [] { "select", "picker", "form" , "edit", "dropdown", "custom", "enum" },
+                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-grouping", "dropdown-tree" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I bind a Blazor DropDown to a list of objects?", Answer = "Set Data to your object collection and set TextProperty to the property shown in the list and ValueProperty to the property bound to Value." },
+                                new FaqItem { Question = "How do I bind a Blazor DropDown to an enum?", Answer = "Bind Data to the enum values (for example Enum.GetValues) and bind Value to the enum field; the DropDown displays each name and stores the selected enum value." }
+                            },
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection with checkboxes", Anchor = "#multiple-selection" }, new () { Text = "Filtering", Anchor = "#filtering" } ],
+                            Name = "DropDown with Tree",
+                            Path = "dropdown-tree",
+                            Title = "Blazor DropDown Tree - Hierarchical Select | Free UI Components by Radzen",
+                            Description = "Combine a popup and a tree to build a Blazor DropDownTree for hierarchical single or multiple selection with filtering.",
+                            Tags = new [] { "select", "picker", "form", "edit", "dropdown", "tree", "hierarchical" },
+                            Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "tree" },
+                        },
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of DropDownDataGrid", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of DropDownDataGrid using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-value-properties" }, new () { Text = "DropDownDataGrid with custom header, footer, value and item templates", Anchor = "#template" }, new () { Text = "Define multiple columns", Anchor = "#multiple-columns" }, new () { Text = "Filtering case sensitivity and filter operator", Anchor = "#filtering-case-sensitivity-and-filter-operator" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "DropDownDataGrid binding to dynamic data", Anchor = "#dynamic" }, new () { Text = "DropDownDataGrid Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "DropDownDataGrid",
+                    Path = "dropdown-datagrid",
+                    Title = "Blazor DropDownDataGrid - Grid in a DropDown | Free UI Components by Radzen",
+                    Description = "Show tabular data inside a dropdown with the Blazor DropDownDataGrid - multiple columns, filtering, paging, and single or multiple selection.",
+                    Icon = "\ue99c",
+                    Tags = new [] { "select", "picker", "form", "edit", "dropdown", "grid", "multiselect" },
+                    Related = new [] { "dropdown", "dropdown-multiple", "dropdown-filtering", "datagrid" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor DropDownDataGrid?", Answer = "It is a dropdown that shows a DataGrid in its popup, so users pick a value from a multi-column, filterable, paged grid instead of a plain list." },
+                        new FaqItem { Question = "Can the DropDownDataGrid select multiple rows?", Answer = "Yes. Set Multiple to true and bind Value to a collection to let users select several rows, with filtering and paging in the popup grid." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB position", Anchor = "#position" }, new () { Text = "Multiple FABs", Anchor = "#multiple-fabs" }, new () { Text = "Busy FAB", Anchor = "#busy-fab" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Fab",
+                    Path = "fab",
+                    Title = "Blazor FAB - Floating Action Button | Free UI Components by Radzen",
+                    Description = "The Blazor FAB (floating action button) highlights your app's primary action with a circular, elevated button.",
+                    Icon = "\ue147",
+                    Tags = new [] { "fab", "button", "floating", "action" },
+                    Related = new [] { "fab-menu", "button" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is a FAB (floating action button) in Blazor?", Answer = "A FAB is a circular, elevated button that floats above the UI to highlight the primary action on a screen, such as add or compose." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB menu with icon only buttons", Anchor = "#icons" }, new () { Text = "Expand direction", Anchor = "#direction" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "FabMenu",
+                    Path = "fab-menu",
+                    Title = "Blazor FAB Menu - Floating Action Menu | Free UI Components by Radzen",
+                    Description = "The Blazor FAB Menu expands a floating action button into a menu of quick actions.",
+                    Icon = "\ue091",
+                    Tags = new [] { "fab", "menu", "button", "floating", "action" },
+                    Related = new [] { "fab", "button", "menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Blazor FAB Menu work?", Answer = "The FAB Menu shows a floating action button that expands into a set of smaller action buttons when pressed, giving quick access to related actions." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Fieldset",
+                    Title = "Blazor Fieldset Component | Free UI Components by Radzen",
+                    Path = "fieldset",
+                    Description = "The Blazor Fieldset groups related form fields under a titled, collapsible container.",
+                    Related = new [] { "form-field", "templateform", "label" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I group form fields in Blazor?", Answer = "Wrap related inputs in a RadzenFieldset with a title; it can be made collapsible to show or hide the group." }
+                    },
+                    Icon = "\ue728",
+                    Tags = new [] { "form", "container" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Byte Array Support", Anchor = "#byte-array" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "FileInput",
+                    Title = "Blazor FileInput - File Upload Input | Free UI Components by Radzen",
+                    Path = "fileinput",
+                    Description = "The Blazor FileInput uploads a file as base64 with preview support, bound directly to your model.",
+                    Related = new [] { "upload", "signature-pad" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Blazor FileInput return the selected file?", Answer = "It reads the chosen file and binds it to your model as a base64 data string, with an optional preview." }
+                    },
+                    Icon = "\ue226",
+                    Tags = new [] { "upload", "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Variants", Anchor = "#variants" }, new () { Text = "Input types", Anchor = "#input-types" }, new () { Text = "Start, End, and ChildContent", Anchor = "#start-end-child-content" }, new () { Text = "Floating Label", Anchor = "#floating-label" }, new () { Text = "Helper text", Anchor = "#helper-text" }, new () { Text = "Validation", Anchor = "#form-field-validation" }, new () { Text = "Disabled FormField", Anchor = "#disabled-form-field" } ],
+                    Name = "FormField",
+                    Title = "Blazor FormField - Floating Label Input | Free UI Components by Radzen",
+                    Path = "form-field",
+                    Description = "The Blazor FormField wraps an input with a floating label, helper text, and validation styling.",
+                    Related = new [] { "label", "fieldset", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What does the Blazor FormField do?", Answer = "It wraps an input with a floating label, helper text, and validation styling, similar to Material outlined fields." }
+                    },
+                    Icon = "\ue578",
+                    Tags = new [] { "form", "label", "floating", "float", "edit", "outline", "input", "helper", "valid" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "All tools", Anchor = "#all-tools" }, new () { Text = "Custom set of tools (text-editing only)", Anchor = "#custom-set-of-tools" }, new () { Text = "Upload images", Anchor = "#upload" }, new () { Text = "Focus", Anchor = "#focus" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name="HtmlEditor",
+                    Icon = "\ue3c9",
+                    Children = new [] {
+                        new Example
+                        {
+                            Name = "Default Tools",
+                            Path = "html-editor",
+                            Title = "Blazor HTML Editor Component | Free UI Components by Radzen",
+                            Description = "The Blazor HTML Editor is a rich text (WYSIWYG) editor with a full toolbar of formatting tools, image and link support, and HTML output.",
+                            Related = new [] { "html-editor-custom-tools", "textarea" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "Is the Blazor HTML Editor a WYSIWYG editor?", Answer = "Yes. It is a rich text editor where users format content visually using a toolbar, and it produces HTML you can bind to your model." },
+                                new FaqItem { Question = "How do I add custom buttons to the HTML Editor?", Answer = "Use RadzenHtmlEditorCustomTool to add your own toolbar buttons that run custom commands on the selected content." }
+                            },
+                            Tags = new [] { "html", "editor", "rich", "text", "wysiwyg" }
+                        },
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Custom command on Execute event", Anchor = "#command-execute-event" }, new () { Text = "Custom tool with template", Anchor = "#command-template" }, new () { Text = "Custom dialog", Anchor = "#command-dialog" } ],
+                            Name = "Custom Tools",
+                            Path = "html-editor-custom-tools",
+                            Title = "Blazor HTML Editor - Custom Tools | Free UI Components by Radzen",
+                            Description = "Add your own buttons to the Blazor HTML Editor toolbar with RadzenHtmlEditorCustomTool.",
+                            Related = new [] { "html-editor", "textarea" },
+                            Faq = new []
+                            {
+                                new FaqItem { Question = "How do I create a custom tool in the Blazor HTML Editor?", Answer = "Declare a RadzenHtmlEditorCustomTool inside the editor and handle its Execute callback to run your command on the selected content." }
+                            },
+                            Tags = new [] { "html", "editor", "rich", "text", "tool", "custom" }
+                        },
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of ListBox", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of ListBox using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define Text and Value properties", Anchor = "#text-value-properties" }, new () { Text = "ListBox with template", Anchor = "#template" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Filtering case sensitivity and filter operator", Anchor = "#filtering" }, new () { Text = "Custom filtering with LoadData event", Anchor = "#loaddata-event" }, new () { Text = "Virtualization using IQueryable", Anchor = "#virtualization-using-iqueryable" }, new () { Text = "Virtualization with LoadData event", Anchor = "#virtualization-with-loaddata" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "ListBox",
+                    Title = "Blazor ListBox - Selectable List | Free UI Components by Radzen",
+                    Path = "listbox",
+                    Icon = "\ue0ee",
+                    Description = "The Blazor ListBox shows a selectable list for single or multiple selection, with filtering and virtualization for large data.",
+                    Related = new [] { "dropdown", "checkboxlist", "autocomplete" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I enable multiple selection in the Blazor ListBox?", Answer = "Set Multiple to true and bind Value to a collection so users can select several items." },
+                        new FaqItem { Question = "Can the Blazor ListBox filter and handle large lists?", Answer = "Yes. Enable AllowFiltering for a search box and turn on virtualization to render large lists efficiently." }
+                    },
+                    Tags = new [] { "select", "picker", "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Mask Sizes", Anchor = "#sizes" } ],
+                    Name = "Mask",
+                    Path = "mask",
+                    Title = "Blazor Masked TextBox - Input Mask | Free UI Components by Radzen",
+                    Description = "The Blazor Masked TextBox formats input as the user types using a pattern - phone numbers, dates, IP addresses, and more.",
+                    Icon = "\ue262",
+                    Tags = new [] { "input", "form", "edit", "mask" },
+                    Related = new [] { "textbox", "numeric", "datepicker" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I mask a phone number or date in Blazor?", Answer = "Set the Mask property to a pattern (for example (***) ***-**** ) and the masked textbox enforces it as the user types." },
+                        new FaqItem { Question = "Which characters can I use in a mask pattern?", Answer = "Use the placeholder characters (such as * for any character and 9 for digits) together with literal characters that appear as-is in the input." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of Numeric", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Numeric using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Min set to 1 and Max set to 10", Anchor = "#min-max" }, new () { Text = "Placeholder and 0.5 step", Anchor = "#placeholder-and-step" }, new () { Text = "Without Up/Down", Anchor = "#without-up-down" }, new () { Text = "Formatted value", Anchor = "#formatted-value" }, new () { Text = "Align value", Anchor = "#align-value" }, new () { Text = "Custom Value convert", Anchor = "#custom-value-convert" }, new () { Text = "Custom Numeric Type Support", Anchor = "#custom-numeric-type" }, new () { Text = "Numeric Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Numeric",
+                    Path = "numeric",
+                    Title = "Blazor Numeric TextBox - Number Input | Free UI Components by Radzen",
+                    Description = "The Blazor Numeric TextBox edits numbers with min/max limits, step buttons, formatted display, and culture-aware parsing.",
+                    Icon = "\uf04a",
+                    Tags = new [] { "input", "number", "form", "edit", "numeric" },
+                    Related = new [] { "slider", "mask", "textbox" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I set minimum and maximum values on the Numeric TextBox?", Answer = "Set the Min and Max properties; the component clamps input to that range and the step buttons stay within it." },
+                        new FaqItem { Question = "How do I format the number shown in the Numeric TextBox?", Answer = "Set the Format property to a standard or custom .NET numeric format string (for example C for currency or N2 for two decimals)." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of Password", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Password using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Define placeholder", Anchor = "#placeholder" }, new () { Text = "Without auto-complete", Anchor = "#without-auto-complete" }, new () { Text = "Password Sizes", Anchor = "#sizes" } ],
+                    Name = "Password",
+                    Title = "Blazor Password TextBox | Free UI Components by Radzen",
+                    Path = "password",
+                    Description = "The Blazor Password TextBox masks input, with autocomplete control and placeholder support.",
+                    Related = new [] { "textbox", "security-code" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Does the Blazor Password TextBox hide what the user types?", Answer = "Yes. It renders as a password field that masks the characters, and you can control the autocomplete behavior and placeholder." }
+                    },
+                    Icon = "\uf042",
+                    Tags = new [] { "input", "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of RadioButtonList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of RadioButtonList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set RadioButtonList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate RadioButtonList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated RadioButtonList items from data", Anchor = "#populate-items-statically" }, new () { Text = "RadioButtonList with null value", Anchor = "#null-value" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "RadioButtonList",
+                    Title = "Blazor RadioButtonList - Radio Buttons | Free UI Components by Radzen",
+                    Path = "radiobuttonlist",
+                    Description = "The Blazor RadioButtonList shows a set of radio buttons bound to data, with horizontal or vertical orientation and null value support.",
+                    Related = new [] { "checkboxlist", "selectbar", "dropdown" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Blazor RadioButtonList to data?", Answer = "Set Data to your collection with TextProperty and ValueProperty (or declare RadzenRadioButtonListItem items), then bind the selected value with @bind-Value." }
+                    },
+                    Icon = "\ue837",
+                    Tags = new [] { "toggle", "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of Rating", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Rating using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set number of stars", Anchor = "#number-of-stars" }, new () { Text = "Disabled Rating", Anchor = "#disabled-rating" }, new () { Text = "Read-only Rating", Anchor = "#readonly-rating" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Rating",
+                    Title = "Blazor Rating - Star Rating | Free UI Components by Radzen",
+                    Path = "rating",
+                    Description = "The Blazor Rating captures a star rating, with a configurable number of stars and disabled or read-only modes.",
+                    Related = new [] { "slider", "numeric" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I set the number of stars in the Blazor Rating?", Answer = "Set Stars to the maximum number of stars, bind Value to the selected rating, and use ReadOnly to display a fixed rating." }
+                    },
+                    Icon = "\ue839",
+                    Tags = new [] { "star", "form", "edit" }
+                },
+                new Example
+                {
+                    Name = "SecurityCode",
+                    Title = "Blazor SecurityCode - OTP / PIN Input | Free UI Components by Radzen",
+                    Path = "security-code",
+                    Description = "The Blazor SecurityCode is a multi-box input for one-time passwords (OTP), PINs, and verification codes.",
+                    Related = new [] { "password", "textbox" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor SecurityCode used for?", Answer = "It collects a multi-digit code such as a one-time password (OTP), PIN, or email/SMS verification code, with one box per digit." },
+                        new FaqItem { Question = "How many digits can the SecurityCode have?", Answer = "Set Count to the number of digits; the component renders that many input cells and concatenates them into the bound value." }
+                    },
+                    Icon = "\uf045",
+                    Tags = new [] { "security", "code", "input" }
+                },
+                new Example
+                {
+                    New = true,
+                    Name = "SignaturePad",
+                    Title = "Blazor Signature Pad Component | Free UI Components by Radzen",
+                    Path = "signature-pad",
+                    Description = "The Blazor Signature Pad captures a handwritten signature by mouse or touch and exports it as an image.",
+                    Related = new [] { "fileinput", "upload" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I capture a signature in Blazor?", Answer = "Use the SignaturePad component; users draw with mouse or touch and the signature is exported as an image you can save." }
+                    },
+                    Icon = "\ue22b",
+                    Tags = new [] { "signature", "sign", "draw", "pen", "touch", "form", "input" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Chip Style", Anchor = "#chip-style" }, new () { Text = "Variant", Anchor = "#variant" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Icons", Anchor = "#icons" }, new () { Text = "Selected", Anchor = "#selected" }, new () { Text = "Disabled", Anchor = "#disabled" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Add / Remove", Anchor = "#add-remove" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Chip",
+                    Title = "Blazor Chip Component | Free UI Components by Radzen",
+                    Path = "chip",
+                    Description = "The Blazor Chip is a compact element for tags, statuses, and filters, with optional remove and selection.",
+                    Related = new [] { "chiplist", "label" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor Chip used for?", Answer = "Chips are compact elements for tags, statuses, categories, or filters, and can be made removable or selectable." }
+                    },
+                    Icon = "\uf852",
+                    Tags = new [] { "chip", "tag", "label", "status" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Single selection", Anchor = "#single-selection" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Events", Anchor = "#events" }, new () { Text = "Templates", Anchor = "#templates" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "ChipList",
+                    Title = "Blazor ChipList Component | Free UI Components by Radzen",
+                    Path = "chiplist",
+                    Description = "The Blazor ChipList shows a set of selectable, removable chips bound to data.",
+                    Related = new [] { "chip", "listbox", "checkboxlist" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I make a selectable list of chips in Blazor?", Answer = "Use ChipList with data and bind the selection; each chip can be selected or removed." }
+                    },
+                    Icon = "\uf852",
+                    Tags = new [] { "chip", "chiplist", "tag", "form", "edit", "selection" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of SelectBar", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of SelectBar using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Multiple selection", Anchor = "#multiple-selection" }, new () { Text = "Populate SelectBar items from data", Anchor = "#populate-from-data" }, new () { Text = "Statically declared and populated SelectBar items from data", Anchor = "#populate-items-statically" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "SelectBar with icons", Anchor = "#icons" }, new () { Text = "SelectBar with images", Anchor = "#images" }, new () { Text = "SelectBar with template", Anchor = "#template" }, new () { Text = "SelectBar Size", Anchor = "#size" }, new () { Text = "SelectBar Orientation", Anchor = "#orientation" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "SelectBar",
+                    Title = "Blazor SelectBar - Button Group Selector | Free UI Components by Radzen",
+                    Path = "selectbar",
+                    Description = "The Blazor SelectBar is a button-group selector for single or multiple choices, with icons and templates.",
+                    Related = new [] { "radiobuttonlist", "toggle-button", "dropdown" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Can the Blazor SelectBar select multiple values?", Answer = "Yes. Set Multiple to true and bind Value to a collection to allow more than one selected button." }
+                    },
+                    Icon = "\uf8e8",
+                    Tags = new [] { "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of Slider", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Slider using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Slider from -100 to 100", Anchor = "#min-max-value" }, new () { Text = "Slider with Step=10", Anchor = "#step" }, new () { Text = "Range Slider", Anchor = "#range-slider" }, new () { Text = "Disabled Slider", Anchor = "#disabled-slider" }, new () { Text = "Vertical Slider", Anchor = "#vertical-slider" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Slider",
+                    Path = "slider",
+                    Title = "Blazor Slider & Range Slider | Free UI Components by Radzen",
+                    Description = "The Blazor Slider selects a single value or a range by dragging, with step increments and horizontal or vertical orientation.",
+                    Icon = "\ue429",
+                    Tags = new [] { "form", "slider", "range" },
+                    Related = new [] { "numeric", "rating", "colorpicker" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I create a range slider in Blazor?", Answer = "Set Range to true and bind Value to a collection of two numbers; the slider then shows two handles for the lower and upper bounds." },
+                        new FaqItem { Question = "How do I make the Blazor Slider vertical?", Answer = "Set Orientation to Orientation.Vertical to render the slider top-to-bottom instead of left-to-right." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "SpeechToTextButton",
+                    Title = "Blazor Speech to Text Button | Free UI Components by Radzen",
+                    Description = "The Blazor Speech to Text Button captures voice input using the browser's speech recognition and writes the transcript to your field.",
+                    Path = "speechtotextbutton",
+                    Tags = new [] { "button", "speech", "voice", "dictation", "form" },
+                    Related = new [] { "button", "textbox", "aichat" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Blazor Speech to Text Button work?", Answer = "It uses the browser's built-in speech recognition to capture the user's voice and writes the recognized text to the bound value." }
+                    },
+                    Icon = "\ue029"
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Filled SplitButton", Anchor = "#filled" }, new () { Text = "Flat SplitButton", Anchor = "#flat" }, new () { Text = "Outlined SplitButton", Anchor = "#outlined" }, new () { Text = "Text SplitButton", Anchor = "#text" }, new () { Text = "Content in SplitButton", Anchor = "#content" }, new () { Text = "SplitButton Sizes", Anchor = "#sizes" }, new () { Text = "Disabled SplitButton", Anchor = "#disabled" }, new () { Text = "Busy SplitButton", Anchor = "#busy" }, new () { Text = "AlwaysOpenPopup SplitButton", Anchor = "#always-open-popup" }, new () { Text = "DropDown icon of SplitButton", Anchor = "#customize-dropdown-icon" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "SplitButton",
+                    Title = "Blazor SplitButton - Button with Dropdown Menu | Free UI Components by Radzen",
+                    Description = "The Blazor SplitButton pairs a primary action with a dropdown menu of additional options.",
+                    Path = "splitbutton",
+                    Tags = new [] { "button", "menu", "dropdown", "split", "form" },
+                    Related = new [] { "button", "fab-menu", "menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How is a SplitButton different from a regular button?", Answer = "A SplitButton runs a primary action when its main area is clicked and opens a dropdown menu of secondary actions from its arrow, combining a button and a menu." }
+                    },
+                    Icon = "\uf756"
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and set the value", Anchor = "#get-set-value" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" }, new () { Text = "Disabled Switch", Anchor = "#disabled-switch" } ],
+                    Name = "Switch",
+                    Title = "Blazor Switch - Toggle Switch | Free UI Components by Radzen",
+                    Path = "switch",
+                    Description = "The Blazor Switch is a toggle switch that binds a bool value for on and off settings.",
+                    Related = new [] { "checkbox", "toggle-button" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Blazor Switch?", Answer = "Bind Value to a bool with @bind-Value; it is true when the switch is on and false when off." }
+                    },
+                    Icon = "\ue9f6",
+                    Tags = new [] { "form", "edit", "switch" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Custom EditContext", Anchor = "#custom-edit-context" }, new () { Text = "Form Action", Anchor = "#form-action" } ],
+                    Name = "TemplateForm",
+                    Title = "Blazor Form - Template Form with Validation | Free UI Components by Radzen",
+                    Path = "templateform",
+                    Description = "The Blazor Form (TemplateForm) builds data-bound forms with built-in validation and submit handling.",
+                    Related = new [] { "form-field", "label", "fieldset" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a form with validation in Blazor?", Answer = "Use RadzenTemplateForm with data-bound inputs and add validators such as RadzenRequiredValidator to validate fields on submit." },
+                        new FaqItem { Question = "Does the Blazor form support EditContext?", Answer = "Yes. RadzenTemplateForm integrates with EditContext and standard data annotations validation." }
+                    },
+                    Icon = "\uebed",
+                    Tags = new [] { "form", "edit", "validation", "submit", "editcontext" }
+                },
+                new Example
+                {
+                    Name = "TextArea",
+                    Title = "Blazor TextArea - Multiline Text Input | Free UI Components by Radzen",
+                    Path = "textarea",
+                    Description = "The Blazor TextArea is a multi-line text input with auto-resize, value binding, and placeholder support.",
+                    Related = new [] { "textbox", "html-editor" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Blazor TextArea?", Answer = "Bind Value to a string with @bind-Value to capture multi-line input from the user." }
+                    },
+                    Icon = "\ue167",
+                    Tags = new [] { "input", "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of TextBox", Anchor = "#bind-value" }, new () { Text = "Placeholder", Anchor = "#placeholder" }, new () { Text = "Maximum length", Anchor = "#max-length" }, new () { Text = "Change on every input", Anchor = "#immediate" }, new () { Text = "Disabled TextBox", Anchor = "#disabled" }, new () { Text = "AutoComplete", Anchor = "#autocomplete" }, new () { Text = "TextBox Sizes", Anchor = "#sizes" } ],
+                    Name = "TextBox",
+                    Title = "Blazor TextBox - Text Input | Free UI Components by Radzen",
+                    Path = "textbox",
+                    Description = "The Blazor TextBox is a single-line text input with value binding, placeholder, max length, and read-only support.",
+                    Related = new [] { "textarea", "mask", "password" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I two-way bind a Blazor TextBox?", Answer = "Use @bind-Value to bind the input to a string property; the value updates as the user edits the field." }
+                    },
+                    Icon = "\ue9f1",
+                    Tags = new [] { "input", "form", "edit" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Bind the value of TimeSpanPicker", Anchor = "#bind-value" }, new () { Text = "Get and Set the value of TimeSpanPicker using Value and Change event.", Anchor = "#value-and-change-event" }, new () { Text = "Min and Max values", Anchor = "#min-max-values" }, new () { Text = "Inline picker", Anchor = "#inline" }, new () { Text = "Various configurations", Anchor = "#various-config" }, new () { Text = "Time span format", Anchor = "#format" }, new () { Text = "Custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "TimeSpanPicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "TimeSpanPicker",
+                    Path = "timespanpicker",
+                    Title = "Blazor TimeSpanPicker - Duration Input | Free UI Components by Radzen",
+                    Description = "Pick a duration or time span in the Blazor TimeSpanPicker, with inline mode, custom formatting, and min/max values.",
+                    Icon = "\ue425",
+                    Tags = new [] { "duration", "form", "edit", "timespan" },
+                    Related = new [] { "datepicker", "numeric", "slider" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind a TimeSpan value in Blazor?", Answer = "Bind Value to a TimeSpan (or nullable TimeSpan); the TimeSpanPicker reads and writes that value and raises Change when the user edits it." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [  
+                        new () { Text = "Upload files", Anchor = "#change" }, 
+                        new () { Text = "Upload files to server", Anchor = "#url" }, 
+                        new () { Text = "Upload multiple files", Anchor = "#multiple" }, 
+                        new () { Text = "Trigger from code", Anchor = "#from-code" }, 
+                        new () { Text = "File filter", Anchor = "#filter" }, 
+                        new () { Text = "Use parameters", Anchor = "#parameters" }, 
+                        new () { Text = "Show upload progress", Anchor = "#progress" }, 
+                        new () { Text = "Drag and drop to upload", Anchor = "#drag-drop" }, 
+                        new () { Text = "Custom HTTP headers", Anchor = "#custom-headers" }, 
+                        new () { Text = "Specify parameter name", Anchor = "#parameter-name" }, 
+                        new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } 
+                    ],
+                    Name = "Upload",
+                    Title = "Blazor Upload - File Upload Component | Free UI Components by Radzen",
+                    Description = "The Blazor Upload component uploads single or multiple files to a server endpoint, with progress, validation, and custom headers.",
+                    Path = "upload",
+                    Related = new [] { "fileinput", "signature-pad" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I upload files in Blazor?", Answer = "Use the RadzenUpload component: point its Url at a server endpoint, allow single or multiple files, and handle progress and completion events." }
+                    },
+                    Icon = "\uf09b",
+                    Tags = new [] { "upload", "file"}
+                },
+            },
+        },
+        new Example
+        {
+            Name = "Spreadsheet",
+            Icon = "\ue3ec",
+            New = true,
+            Children = new []
+            {
+                new Example
+                {
+                    Name = "Overview",
+                    Path = "spreadsheet",
+                    Title = "Open-Source Blazor Spreadsheet Component | Free UI Components by Radzen",
+                    Description = "Free open-source Blazor Spreadsheet component with Excel-like editing, formulas, cell formatting, filtering, sorting, data validation, conditional formatting, frozen panes, XLSX import/export, clipboard, autofill, undo/redo, multiple sheets, virtualization, custom cell types, and data binding.",
+                    Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" },
+                    Related = new [] { "spreadsheet-formulas", "spreadsheet-cell-formatting", "spreadsheet-conditional-formatting", "spreadsheet-charts", "spreadsheet-data-validation" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What can the Blazor Spreadsheet do?", Answer = "It offers Excel-like editing with formulas, cell formatting, filtering and sorting, data validation, conditional formatting, frozen panes, multiple sheets, and XLSX import/export." },
+                        new FaqItem { Question = "Does the Blazor Spreadsheet import and export Excel files?", Answer = "Yes. It reads and writes XLSX files, so you can load existing workbooks and let users download edited ones, and it also supports CSV." },
+                        new FaqItem { Question = "Does the Blazor Spreadsheet support formulas?", Answer = "Yes. It includes built-in functions such as SUM, AVERAGE, VLOOKUP, and IF, recalculated automatically as cell values change." },
+                        new FaqItem { Question = "Can the Blazor Spreadsheet handle large data?", Answer = "Yes. It virtualizes rows so it stays responsive with tens of thousands of rows, even with live formula calculations." },
+                        new FaqItem { Question = "Can I customize cells and the toolbar?", Answer = "Yes. You can define custom cell types (renderers and editors) and replace or extend the toolbar with your own tools." }
+                    },
+                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ]
+                },
+                new Example
+                {
+                    Name = "Formulas",
+                    Path = "spreadsheet-formulas",
+                    Title = "Blazor Spreadsheet Formulas | Free UI Components by Radzen",
+                    Description = "Use built-in formula functions including SUM, AVERAGE, VLOOKUP, IF, and more.",
+                    Tags = new [] { "spreadsheet", "formula", "function", "sum", "average", "vlookup", "if", "calculate" },
+                    Related = new [] { "spreadsheet", "spreadsheet-data-validation", "spreadsheet-large-data" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Which formula functions does the Blazor Spreadsheet support?", Answer = "Built-in functions include SUM, AVERAGE, VLOOKUP, IF, and many more, recalculated automatically when cell values change." }
+                    }
+                },
+                new Example
+                {
+                    Name = "Cell Formatting",
+                    Path = "spreadsheet-cell-formatting",
+                    Title = "Blazor Spreadsheet Cell Formatting | Free UI Components by Radzen",
+                    Description = "Apply fonts, colors, alignment, number formats, borders, and text styles to spreadsheet cells.",
+                    Tags = new [] { "spreadsheet", "format", "font", "color", "alignment", "number", "style", "border" },
+                    Related = new [] { "spreadsheet", "spreadsheet-conditional-formatting", "spreadsheet-merge-cells-borders" }
+                },
+                new Example
+                {
+                    Name = "Filtering & Sorting",
+                    Path = "spreadsheet-filtering-sorting",
+                    Title = "Blazor Spreadsheet Filtering & Sorting | Free UI Components by Radzen",
+                    Description = "Filter and sort spreadsheet data using auto-filter and sort operations.",
+                    Tags = new [] { "spreadsheet", "filter", "sort", "autofilter", "data" },
+                    Related = new [] { "spreadsheet", "spreadsheet-tables", "spreadsheet-data-validation" }
+                },
+                new Example
+                {
+                    Name = "Tables",
+                    Path = "spreadsheet-tables",
+                    Title = "Blazor Spreadsheet Tables | Free UI Components by Radzen",
+                    Description = "Wrap a range in an Excel-style table with style, banded rows, calculated columns, and a totals row.",
+                    Tags = new [] { "spreadsheet", "table", "tables", "listobject", "totals", "subtotal", "calculated column", "banded rows", "table style" },
+                    Related = new [] { "spreadsheet", "spreadsheet-filtering-sorting", "spreadsheet-formulas" }
+                },
+                new Example
+                {
+                    Name = "Data Validation",
+                    Path = "spreadsheet-data-validation",
+                    Title = "Blazor Spreadsheet Data Validation | Free UI Components by Radzen",
+                    Description = "Add validation rules to cells including number ranges, lists, dates, and custom formulas.",
+                    Tags = new [] { "spreadsheet", "validation", "rule", "list", "number", "date", "custom" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-conditional-formatting" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I restrict what users can enter in a cell?", Answer = "Add data validation rules - number ranges, dropdown lists, dates, or custom formulas - to control the accepted input." }
+                    }
+                },
+                new Example
+                {
+                    Name = "Conditional Formatting",
+                    Path = "spreadsheet-conditional-formatting",
+                    Title = "Blazor Spreadsheet Conditional Formatting | Free UI Components by Radzen",
+                    Description = "Apply conditional formatting rules to highlight cells based on their values.",
+                    Tags = new [] { "spreadsheet", "conditional", "formatting", "highlight", "rule", "color" },
+                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-data-validation" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I highlight cells based on their value?", Answer = "Add conditional formatting rules and matching cells are styled automatically when their values meet the condition." }
+                    }
+                },
+                new Example
+                {
+                    Name = "Frozen Panes",
+                    Path = "spreadsheet-frozen-panes",
+                    Title = "Blazor Spreadsheet Frozen Panes | Free UI Components by Radzen",
+                    Description = "Freeze rows and columns to keep headers visible while scrolling.",
+                    Tags = new [] { "spreadsheet", "freeze", "frozen", "panes", "rows", "columns", "scroll" },
+                    Related = new [] { "spreadsheet", "spreadsheet-large-data", "spreadsheet-multiple-sheets" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I keep headers visible while scrolling a spreadsheet?", Answer = "Freeze the top rows and/or left columns so the headers stay in place as users scroll." }
+                    }
+                },
+                new Example
+                {
+                    Name = "Images & Hyperlinks",
+                    Path = "spreadsheet-images-hyperlinks",
+                    Title = "Blazor Spreadsheet Images & Hyperlinks | Free UI Components by Radzen",
+                    Description = "Insert and manage images and hyperlinks in spreadsheet cells.",
+                    Tags = new [] { "spreadsheet", "image", "hyperlink", "link", "picture" },
+                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-charts" }
+                },
+                new Example
+                {
+                    Name = "Merge Cells",
+                    Path = "spreadsheet-merge-cells-borders",
+                    Title = "Blazor Spreadsheet Merge Cells | Free UI Components by Radzen",
+                    Description = "Merge cells to create headers and build form layouts in the spreadsheet.",
+                    Tags = new [] { "spreadsheet", "merge", "cells", "layout" },
+                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-templates" }
+                },
+                new Example
+                {
+                    Name = "Custom Cell Types",
+                    Path = "spreadsheet-custom-cell-types",
+                    Title = "Blazor Spreadsheet Custom Cell Types | Free UI Components by Radzen",
+                    Description = "Create custom cell renderers and editors for the Radzen Blazor Spreadsheet.",
+                    Tags = new [] { "spreadsheet", "custom", "cell", "type", "renderer", "editor" },
+                    Related = new [] { "spreadsheet", "spreadsheet-custom-toolbar", "spreadsheet-cell-formatting" }
+                },
+                new Example
+                {
+                    Name = "Multiple Sheets",
+                    Path = "spreadsheet-multiple-sheets",
+                    Title = "Blazor Spreadsheet Multiple Sheets | Free UI Components by Radzen",
+                    Description = "Work with multiple worksheets and use cross-sheet references to aggregate data across sheets.",
+                    Tags = new [] { "spreadsheet", "sheets", "worksheets", "tabs", "cross-sheet", "reference" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-frozen-panes" }
+                },
+                new Example
+                {
+                    Name = "Large Data",
+                    Path = "spreadsheet-large-data",
+                    Title = "Blazor Spreadsheet Large Data | Free UI Components by Radzen",
+                    Description = "Virtualized spreadsheet with 10,000 rows and formula calculations for smooth scrolling performance.",
+                    Tags = new [] { "spreadsheet", "performance", "virtualization", "large", "data", "virtual", "scrolling" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-frozen-panes" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How many rows can the Blazor Spreadsheet handle?", Answer = "Row virtualization keeps it smooth with tens of thousands of rows, even with formula calculations." }
+                    }
+                },
+                new Example
+                {
+                    Name = "Templates",
+                    Path = "spreadsheet-templates",
+                    Title = "Blazor Spreadsheet Templates | Free UI Components by Radzen",
+                    Description = "Real-world spreadsheet templates: annual budget tracker and weekly timesheet with formulas and conditional formatting.",
+                    Tags = new [] { "spreadsheet", "template", "budget", "timesheet", "invoice", "financial", "planning" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-conditional-formatting" }
+                },
+                new Example
+                {
+                    Name = "Protection",
+                    Path = "spreadsheet-protection",
+                    Title = "Blazor Spreadsheet Protection | Free UI Components by Radzen",
+                    Description = "Protect sheets to prevent editing of locked cells while allowing input in unlocked cells with XLSX round-trip support.",
+                    Tags = new [] { "spreadsheet", "protection", "locked", "unlock", "readonly", "security", "sheet" },
+                    Related = new [] { "spreadsheet", "spreadsheet-permissions", "spreadsheet-data-validation" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I make a spreadsheet read-only or lock specific cells?", Answer = "Protect the sheet to lock chosen cells while allowing input in others, with XLSX round-trip support." }
+                    }
+                },
+                new Example
+                {
+                    Name = "Charts",
+                    Path = "spreadsheet-charts",
+                    Title = "Blazor Spreadsheet Charts - Embed Column, Bar, Line, Pie Charts | Free UI Components by Radzen",
+                    Description = "Embed interactive charts in Blazor spreadsheet cells. Supports column, bar, line, area, pie, donut, and scatter charts with live data binding and XLSX import/export.",
+                    Tags = new [] { "spreadsheet", "chart", "charts", "graph", "visualization", "column chart", "bar chart", "line chart", "pie chart", "donut chart", "scatter chart", "area chart", "excel chart", "embedded chart", "data visualization", "xlsx", "dashboard" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-cell-formatting" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Can I embed charts in the Blazor Spreadsheet?", Answer = "Yes. Embed column, bar, line, area, pie, donut, and scatter charts in cells, bound to live spreadsheet data." }
+                    }
+                },
+                new Example
+                {
+                    Name = "Custom Toolbar",
+                    Path = "spreadsheet-custom-toolbar",
+                    Title = "Blazor Spreadsheet Custom Toolbar | Free UI Components by Radzen",
+                    Description = "Replace the built-in toolbar with your own selection of tools. Reuse the predefined tool components in any order or layout, and add custom tools that dispatch undoable commands.",
+                    Tags = new [] { "spreadsheet", "toolbar", "custom", "custom tools", "childcontent", "command", "icommand", "undo", "extend" },
+                    Related = new [] { "spreadsheet", "spreadsheet-custom-cell-types", "spreadsheet-permissions" },
+                    Toc = [ new () { Text = "Predefined tools in a custom layout", Anchor = "#predefined-tools" }, new () { Text = "Custom tool with an undoable command", Anchor = "#custom-tool" } ]
+                },
+                new Example
+                {
+                    Name = "Permissions",
+                    Path = "spreadsheet-permissions",
+                    Title = "Blazor Spreadsheet Permissions | Free UI Components by Radzen",
+                    Description = "Lock the spreadsheet for view-only embedding with ReadOnly, disable individual features with Allow* flags, or veto commands dynamically with a CommandExecuting handler.",
+                    Tags = new [] { "spreadsheet", "permissions", "readonly", "read-only", "view-only", "allow", "allowediting", "allowfiltering", "allowsorting", "commandexecuting", "preventdefault", "audit", "role", "restrict" },
+                    Related = new [] { "spreadsheet", "spreadsheet-protection", "spreadsheet-custom-toolbar" },
+                    Toc = [ new () { Text = "Read-only mode", Anchor = "#read-only" }, new () { Text = "Configuration toggles", Anchor = "#toggles" }, new () { Text = "Dynamic veto with CommandExecuting", Anchor = "#dynamic-veto" } ]
+                },
+            }
+        },
+        new Example
+        {
+            Name = "PivotDataGrid",
+            Icon = "\ue9ce",
+            Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table" },
+            Children = new[]
+            {
+                new Example
+                {
+                    Name = "IQueryable",
+                    Path = "/pivot-data-grid",
+                    Title = "Blazor Pivot Table - Pivot DataGrid (IQueryable) | Free UI Components by Radzen",
+                    Description = "The Blazor Pivot DataGrid (RadzenPivotDataGrid) creates cross-tabulation reports - rows, columns, and aggregated values - from an IQueryable data source.",
+                    Tags = new [] { "pivot", "pivot table", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" },
+                    Related = new [] { "pivot-data-grid-load-data", "pivot-data-grid-dynamic", "pivot-data-grid-odata", "datagrid" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor Pivot DataGrid?", Answer = "It is a pivot table (cross-tab) component that groups data into rows and columns and shows aggregated values, with drill-down." },
+                        new FaqItem { Question = "How do I bind the Pivot DataGrid to data?", Answer = "Set Data to an IQueryable (or use the LoadData event for remote data) and define the row, column, and value fields to aggregate." }
+                    }
+                },
+                new Example
+                {
+                    Name = "LoadData",
+                    Path = "/pivot-data-grid-load-data",
+                    Title = "Blazor Pivot DataGrid - LoadData Binding | Free UI Components by Radzen",
+                    Description = "Bind the Blazor Pivot DataGrid to remote data with the LoadData event, fetching aggregated cross-tab results on demand.",
+                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "loaddata", "remote" },
+                    Related = new [] { "pivot-data-grid", "pivot-data-grid-odata", "datagrid-loaddata" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I load Pivot DataGrid data on demand?", Answer = "Handle the LoadData event to fetch and aggregate data from the server as the grid needs it." }
+                    }
+                },
+                new Example
+                {
+                    Name = "Dynamic data",
+                    Path = "/pivot-data-grid-dynamic",
+                    Title = "Blazor Pivot DataGrid - Dynamic Data | Free UI Components by Radzen",
+                    Description = "Bind the Blazor Pivot DataGrid to schema-less IDictionary<string, object> records and configure pivot fields dynamically.",
+                    Tags = new [] { "pivot", "dynamic", "dictionary", "analysis", "aggregation", "drill-down", "datagrid", "table" },
+                    Related = new [] { "pivot-data-grid", "pivot-data-grid-load-data", "datagrid-dynamic" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Pivot DataGrid to dynamic data?", Answer = "Bind Data to records of IDictionary<string, object> and configure the row, column, and value fields at runtime, without a fixed model." }
+                    }
+                },
+                new Example
+                {
+                    Name = "OData",
+                    Path = "/pivot-data-grid-odata",
+                    Title = "Blazor Pivot DataGrid - OData Binding | Free UI Components by Radzen",
+                    Description = "Bind the Blazor Pivot DataGrid to an OData service and build cross-tabulation reports from the remote query.",
+                    Tags = new [] { "odata", "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "remote" },
+                    Related = new [] { "pivot-data-grid", "pivot-data-grid-load-data", "datagrid-odata" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I bind the Pivot DataGrid to OData?", Answer = "Point the grid at an OData endpoint via the LoadData event; it builds the cross-tabulation from the remote query results." }
+                    }
+                }
+            }
+        },
+        new Example
+        {
+            Name = "Document Processing",
+            Icon = "",
+            New = true,
+            Title = "Blazor Document Processing | Free UI Components by Radzen",
+            Description = "Read and write Excel (XLSX) and CSV files in Blazor and C#. Generate downloads, parse uploads, and evaluate Excel formulas in code.",
+            Children = new []
+            {
+                new Example
+                {
+                    Name = "Spreadsheet API",
+                    Path = "document-processing-spreadsheet",
+                    Title = "Generate Excel (XLSX) and CSV Files in Blazor | Radzen",
+                    Description = "Create Excel (XLSX) and CSV files from a list of objects and let users download them in Blazor.",
+                    Tags = new [] { "document", "processing", "spreadsheet", "api", "xlsx", "csv", "excel", "generate", "create", "download", "list", "objects", "workbook" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "XLSX", Anchor = "#xlsx" }, new () { Text = "CSV", Anchor = "#csv" } ],
+                    Name = "Import & Export",
+                    Path = "document-processing-import-export",
+                    Title = "Import and Export Excel (XLSX) and CSV in Blazor | Radzen",
+                    Description = "Import and export Excel (XLSX) and CSV files in Blazor. Upload a file, parse the data, and display the rows, or generate a file users can download.",
+                    Tags = new [] { "document", "processing", "import", "export", "xlsx", "csv", "excel", "upload", "download", "read", "write", "parse", "separator", "encoding", "quoting" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Formulas in code", Anchor = "#in-code" }, new () { Text = "Stateless evaluation", Anchor = "#stateless-engine" }, new () { Text = "Stateful evaluation", Anchor = "#stateful-engine" }, new () { Text = "Custom functions", Anchor = "#custom-functions" } ],
+                    Name = "Formulas",
+                    Path = "document-processing-formulas",
+                    Title = "Excel Formula Evaluator for Blazor and C# | Radzen",
+                    Description = "Evaluate Excel formulas in Blazor and C#. Use them as cell formulas in a workbook, calculate them in code, or add your own custom Excel functions.",
+                    Tags = new [] { "document", "processing", "formula", "formulas", "excel", "evaluate", "calculate", "engine", "evaluator", "custom", "function", "compound", "vlookup", "sum", "average", "if", "iferror", "edate", "sumif" }
+                },
+            }
+        },
+        new Example
+        {
+            Toc = [ new () { Text = "Live demo", Anchor = "#live-demo" }, new () { Text = "How it works", Anchor = "#how-it-works" }, new () { Text = "ILocalizer", Anchor = "#ilocalizer" }, new () { Text = "Satellite assemblies", Anchor = "#satellite-assemblies" }, new () { Text = "Parameter override", Anchor = "#parameter-override" }, new () { Text = "Resource keys", Anchor = "#resource-keys" }, new () { Text = "Culture resolution", Anchor = "#culture" }, new () { Text = "Priority order", Anchor = "#priority" } ],
+            Name = "Localization",
+            New = true,
+            Path = "/localization",
+            Title = "Blazor Localization | Free UI Components by Radzen",
+            Description = "How to localize Radzen Blazor Components using resource files, satellite assemblies, or the ILocalizer interface.",
+            Icon = "\ue8e2",
+            Tags = new[] { "localization", "globalization", "culture", "translation", "language", "i18n", "l10n", "resource", "resx", "satellite" }
+        },
+        new Example
+        {
+            Toc = [ new () { Text = "Get and set the text", Anchor = "#text" }, new () { Text = "Markdown with Blazor components inside", Anchor = "#blazor" } ],
+            Name = "Markdown",
+            Icon = "\uf552",
+            Path = "markdown",
+            Title = "Blazor Markdown - Render Markdown Content | Free UI Components by Radzen",
+            Description = "Render Markdown content as HTML in Blazor with RadzenMarkdown - auto-linked headings and support for embedded Blazor components.",
+            Tags = new[] { "markdown", "text", "content", "render" },
+            Related = new [] { "html-editor", "textarea" },
+            Faq = new []
+            {
+                new FaqItem { Question = "How do I render Markdown in Blazor?", Answer = "Add RadzenMarkdown and set its Text property (or place markdown as its child content); it renders the Markdown as HTML." },
+                new FaqItem { Question = "Can I embed Blazor components inside Markdown?", Answer = "Yes. RadzenMarkdown renders Blazor components placed inside the markdown content, alongside standard Markdown syntax." }
+            }
+        },
+        new Example
+        {
+            Name = "Data",
+            Icon = "\ue99c",
+            Children = new [] {
+                new Example
+                {
+                    Name = "DataList",
+                    Icon = "\ue896",
+                    Tags = new[] { "dataview", "grid", "table" },
+                    Children = new[] {
+                        new Example
+                        {
+                            Name = "IQueryable",
+                            Title = "Blazor DataList Component | Free UI Components by Radzen",
+                            Description = "Demonstration and configuration of the Radzen Blazor DataList component.",
+                            Path = "datalist",
+                            Tags = new [] { "dataview", "grid", "table", "list"},
+                        },
+                        new Example
+                        {
+                            Name = "OData service",
+                            Title = "Blazor DataList - OData Service | Free UI Components by Radzen",
+                            Description = "Demonstration and configuration of the Radzen Blazor DataList component using LoadData event.",
+                            Path = "datalist-loaddata",
+                            Tags = new [] { "dataview", "grid", "table", "list", "odata" },
+                        }
+                    }
+                },
+                new Example
+                {
+                    Name = "DataFilter",
+                    Icon = "\uef4f",
+                    Tags = new[] { "dataview", "grid", "table", "filter" },
+                    Children = new[] {
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                            Name = "IQueryable",
+                            Title = "Blazor DataFilter Component | Free UI Components by Radzen",
+                            Description = "Filter Entity Framework IQueryable without extra code.",
+                            Path = "datafilter",
+                            Tags = new [] { "dataview", "grid", "table", "filter" },
+                        },
+                        new Example
+                        {
+                            Name = "LoadData",
+                            Title = "Blazor DataFilter - LoadData event | Free UI Components by Radzen",
+                            Description = "This example demonstrates DataFilter with DataGrid LoadData event.",
+                            Path = "datafilter-loaddata",
+                            Tags = new [] { "dataview", "grid", "table", "filter", "loaddata" },
+                        },
+                        new Example
+                        {
+                            Name = "OData service",
+                            Title = "Blazor DataFilter - OData Service | Free UI Components by Radzen",
+                            Description = "This example demonstrates data filter with OData service.",
+                            Path = "datafilter-odata",
+                            Tags = new [] { "dataview", "grid", "table", "filter", "odata" },
+                        }
+                    }
+                },
+
+                new Example
+                {
+
+                    Toc = [ new () { Text = "Allow Reload", Anchor = "#allow-reload" }, new () { Text = "Pager Density", Anchor = "#pager-density" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Pager",
+                    Path = "pager",
+                    Description = "Demonstration and configuration of the Radzen Blazor Pager component.",
+                    Icon = "\ueb8d",
+                    Tags = new[] { "pager", "paging" }
+                },
+                new Example
+                {
+                    Name = "PickList",
+                    Description = "Use Radzen Blazor PickList component to transfer items between two collections.",
+                    Path = "picklist",
+                    Icon = "\ue0b8",
+                    Tags = new[] { "picklist", "list", "listbox" }
+                },
+                new Example
+                {
+                    Name = "Empty PickList",
+                    Path = "/picklist-empty",
+                    Title = "Blazor PickList - Empty PickList | Free UI Components by Radzen",
+                    Description = "This example demonstrates Blazor PickList with empty text and empty template.",
+                    Icon = "\ue0b8",
+                    Tags = new[] { "picklist", "empty", "list", "listbox" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Scheduler",
+                    Title = "Blazor Scheduler & Calendar Component | Free UI Components by Radzen",
+                    Path = "scheduler",
+                    Description = "The Blazor Scheduler is a calendar that shows appointments in day, week, month, year planner, and timeline views, with event editing, tooltips, and multi-day layouts.",
+                    Related = new [] { "datepicker", "timespanpicker" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Can I use the Blazor Scheduler as a calendar?", Answer = "Yes. The Scheduler is a calendar with day, week, month, year planner, and timeline views; bind your appointments to its Data and it renders them on the calendar." },
+                        new FaqItem { Question = "What views does the Blazor Scheduler support?", Answer = "Day, week, month, year planner, and timeline views, and you can show any number of days side by side." },
+                        new FaqItem { Question = "How do I add and edit appointments in the Scheduler?", Answer = "Handle the slot and appointment events (such as SlotSelect and AppointmentSelect) to open a dialog where users create or edit events bound to your data." }
+                    },
+                    Icon = "\ue616",
+                    Tags = new[] { "scheduler", "calendar", "event", "appointment" }
+                },
+                new Example
+                {
+                    Name = "Gantt",
+                    Icon = "\ueb85",
+                    Tags = new[] { "gantt", "timeline", "project", "task", "schedule" },
+                    Children = new[]
+                    {
+                        new Example
+                        {
+                            Name = "Overview",
+                            Path = "gantt",
+                            Title = "Blazor Gantt Component | Free UI Components by Radzen",
+                            Description = "Blazor Gantt component with a hierarchical task list and a timeline view.",
+                            Tags = new[] { "gantt", "timeline", "project", "task", "schedule" }
+                        },
+                        new Example
+                        {
+                            Name = "Tooltips",
+                            Path = "gantt-tooltips",
+                            Title = "Blazor Gantt Tooltips | Free UI Components by Radzen",
+                            Description = "Show tooltips when hovering over Gantt task bars using TaskMouseEnter and TaskMouseLeave events.",
+                            Tags = new[] { "gantt", "tooltip", "hover", "task", "mouse" }
+                        },
+                        new Example
+                        {
+                            Name = "Filtering",
+                            Path = "gantt-filtering",
+                            Title = "Blazor Gantt Filtering | Free UI Components by Radzen",
+                            Description = "Filter Gantt tasks using Simple, SimpleWithMenu, or Advanced filter modes.",
+                            Tags = new[] { "gantt", "filter", "filtermode", "simple", "advanced" }
+                        },
+                        new Example
+                        {
+                            Name = "InLine Editing",
+                            Path = "gantt-inline-edit",
+                            Title = "Blazor Gantt Inline Editing | Free UI Components by Radzen",
+                            Description = "Edit Gantt tasks inline with add, edit, and save actions.",
+                            Tags = new[] { "gantt", "edit", "inline", "row", "tasks" }
+                        },
+                        new Example
+                        {
+                            Name = "In-Cell Editing",
+                            Path = "gantt-incell-edit",
+                            Title = "Blazor Gantt In-Cell Editing | Free UI Components by Radzen",
+                            Description = "Edit Gantt task fields in-cell with inline editors per column.",
+                            Tags = new[] { "gantt", "edit", "incell", "cell", "tasks" }
+                        },
+                        new Example
+                        {
+                            Name = "Drag & Resize",
+                            Path = "gantt-drag-resize",
+                            Title = "Blazor Gantt Drag & Resize | Free UI Components by Radzen",
+                            Description = "Drag task bars to move them and drag their edges to resize. Zero-duration tasks render as milestone diamonds.",
+                            Tags = new[] { "gantt", "drag", "resize", "move", "milestone", "diamond", "interactive" }
+                        },
+                        new Example
+                        {
+                            Name = "Dependency Types",
+                            Path = "gantt-dependency-types",
+                            Title = "Blazor Gantt Dependency Types | Free UI Components by Radzen",
+                            Description = "All four dependency types: Finish-to-Start, Start-to-Start, Finish-to-Finish, and Start-to-Finish.",
+                            Tags = new[] { "gantt", "dependency", "link", "finish-to-start", "start-to-start", "finish-to-finish", "start-to-finish" }
+                        },
+                        new Example
+                        {
+                            Name = "Dependency Data",
+                            Path = "gantt-dependency-data",
+                            Title = "Blazor Gantt Dependency Data Binding | Free UI Components by Radzen",
+                            Description = "Bind dependencies using a separate POCO collection with ID-based references — ideal for relational databases.",
+                            Tags = new[] { "gantt", "dependency", "data", "binding", "database", "id", "predecessor", "successor" }
+                        },
+                        new Example
+                        {
+                            Name = "Critical Path",
+                            Path = "gantt-critical-path",
+                            Title = "Blazor Gantt Critical Path | Free UI Components by Radzen",
+                            Description = "Highlight the longest chain of dependent tasks that determines the project end date.",
+                            Tags = new[] { "gantt", "critical", "path", "highlight", "schedule", "dependency" }
+                        },
+                        new Example
+                        {
+                            Name = "Baselines",
+                            Path = "gantt-baselines",
+                            Title = "Blazor Gantt Baselines | Free UI Components by Radzen",
+                            Description = "Show planned vs. actual schedule side by side using baseline bars.",
+                            Tags = new[] { "gantt", "baseline", "planned", "actual", "schedule", "comparison" }
+                        },
+                        new Example
+                        {
+                            Name = "Customization",
+                            Path = "gantt-customization",
+                            Title = "Blazor Gantt Customization | Free UI Components by Radzen",
+                            Description = "Customize the Gantt with a today line, weekend shading, vertical markers, per-bar styling via TaskRender, and custom bar templates.",
+                            Tags = new[] { "gantt", "today", "marker", "weekend", "taskrender", "template", "customize" }
+                        }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Dynamic Table", Anchor = "#dynamic" }, new () { Text = "Scrollable Table", Anchor = "#scrollable" }, new () { Text = "Table with merged cells", Anchor = "#scrollable" } ],
+                    Name = "Table",
+                    Description = "Blazor RadzenTable component is used to create a HTML table with rows and cells.",
+                    Path = "table",
+                    Icon = "\uf101",
+                    Tags = new [] { "table", "cells", "row", "grid" }
+                },
+                new Example
+                {
+                    Name = "Tree",
+                    Icon = "\ue94b",
+                    Tags = new[] { "tree", "treeview", "nodes", "hierarchy" },
+                    Children = new[] {
+                        new Example
+                        {
+                            Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                            Name = "Inline definition",
+                            Title = "Blazor Tree Component | Free UI Components by Radzen",
+                            Description = "Demonstration and configuration of the Blazor RadzenTree component.",
+                            Path = "tree",
+                            Tags = new [] { "tree", "treeview", "nodes", "inline" },
+                        },
+                        new Example
+                        {
+                            Name = "Data-binding",
+                            Title = "Blazor Tree - Data-binding | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to populate RadzenTree from a database via Entity Framework.",
+                            Path = "tree-data-binding",
+                            Tags = new [] { "tree", "treeview", "nodes", "data", "table" },
+                        },
+                        new Example
+                        {
+                            Name = "Files and directories",
+                            Title = "Blazor Tree - File & Directory Binding | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to populate Blazor RadzenTree from the file system.",
+                            Path = "tree-file-system",
+                            Tags = new [] { "tree", "treeview", "nodes", "file", "directory" },
+                        },
+                        new Example
+                        {
+                            Name = "Selection",
+                            Title = "Blazor Tree - Selection | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to get or set the selected items of RadzenTree.",
+                            Path = "tree-selection",
+                            Tags = new [] { "tree", "treeview", "nodes", "selection" },
+                        },
+                        new Example
+                        {
+                            Name = "Checkboxes",
+                            Title = "Blazor Tree - Tri-State Checkboxes | Free UI Components by Radzen",
+                            Description = "This example demonstrates tri-state checkboxes in RadzenTree.",
+                            Path = "tree-checkboxes",
+                            Tags = new [] { "tree", "treeview", "nodes", "check" },
+                        },
+                        new Example
+                        {
+                            Name = "Drag & Drop",
+                            Title = "Blazor Tree - Drag & Drop items | Free UI Components by Radzen",
+                            Description = "This example demonstrates custom drag & drop logic in RadzenTree.",
+                            Path = "tree-dragdrop",
+                            Tags = new [] { "tree", "treeview", "nodes", "drag", "drop" },
+                        },
+                        new Example
+                        {
+                            Name = "Context menu",
+                            Title = "Blazor Tree - Context menu | Free UI Components by Radzen",
+                            Description = "This example demonstrates context menu in RadzenTree.",
+                            Path = "tree-contextmenu",
+                            Tags = new [] { "tree", "treeview", "nodes", "context", "menu" },
+                        },
+                        new Example
+                        {
+                            Name = "Refreshing tree data-binding",
+                            Title = "Blazor Tree - Refresh Data Binding | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to refresh a lazily loaded RadzenTree.",
+                            Path = "tree-data-binding-refresh",
+                            Tags = new [] { "tree", "treeview", "nodes" },
+                        },
+                        new Example
+                        {
+                            Name = "Tree filtering",
+                            Title = "Blazor Tree - Filtering | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to filter RadzenTree.",
+                            Path = "tree-filter",
+                            Tags = new [] { "tree", "treeview", "filter" },
+                        }
+                    }
+                }
+            }
+        },
+        new Example
+        {
+            Name = "Navigation",
+            Icon = "\ue762",
+            Children = new[] {
+                new Example
+                {
+                    Toc = [ new () { Text = "Accordion with single expand", Anchor = "#single-expand" }, new () { Text = "Accordion with multiple expand", Anchor = "#multiple-expand" }, new () { Text = "Dynamically create Accordion items", Anchor = "#dynamic-items" }, new () { Text = "Expand/Collapse events", Anchor = "#expand-collapse-events" }, new () { Text = "Client-side rendering", Anchor = "#client-render-mode" }, new () { Text = "Disable expand/collapse", Anchor = "#disable-expand-collapse" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Accordion",
+                    Title = "Blazor Accordion Component | Free UI Components by Radzen",
+                    Path = "accordion",
+                    Description = "The Blazor Accordion shows collapsible panels with single or multiple expand modes, dynamic items, and expand/collapse events.",
+                    Related = new [] { "tabs", "panelmenu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I allow multiple panels open in the Blazor Accordion?", Answer = "Set Multiple to true so more than one panel can be expanded at once; otherwise opening one collapses the others." }
+                    },
+                    Icon = "\ue8fe",
+                    Tags = new [] { "panel", "container" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Default Radzen BreadCrumb", Anchor = "#default-breadcrumb" }, new () { Text = "BreadCrumb width template", Anchor = "#breadcrumb-template" }, new () { Text = "BreadCrumb with child content", Anchor = "#breadcrumb-child-template" } ],
+                    Name = "BreadCrumb",
+                    Title = "Blazor BreadCrumb Component | Free UI Components by Radzen",
+                    Description = "The Blazor BreadCrumb shows a navigation trail so users can see and jump back to their location in the app.",
+                    Path = "breadcrumb",
+                    Related = new [] { "menu", "steps" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add breadcrumbs in Blazor?", Answer = "Add RadzenBreadCrumb with RadzenBreadCrumbItem children, each with Text and Path, to show the navigation trail." }
+                    },
+                    Icon = "\uea50",
+                    Tags = new [] { "breadcrumb", "navigation", "menu" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Navigation button styles", Anchor = "#navigation-style" }, new () { Text = "Navigation button content", Anchor = "#navigation-content" }, new () { Text = "Paging", Anchor = "#paging" }, new () { Text = "Data-binding", Anchor = "#data-binding" }, new () { Text = "Carousel with RadzenPager", Anchor = "#pager" } ],
+                    Name = "Carousel",
+                    Title = "Blazor Carousel Component | Free UI Components by Radzen",
+                    Description = "The Blazor Carousel cycles through content - images or any markup - with navigation arrows and paging.",
+                    Path = "carousel",
+                    Related = new [] { "tabs", "steps" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build an image carousel in Blazor?", Answer = "Add RadzenCarousel with item content; it cycles through items with navigation arrows and optional auto-cycle and paging." }
+                    },
+                    Icon = "\ue8eb",
+                    Tags = new [] { "carousel", "gallery", "slide", "deck", "container" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Show ContextMenu with items", Anchor = "#contextmenu-with-items" }, new () { Text = "Show ContextMenu with custom content and separator", Anchor = "#contextmenu-with-custom-content" }, new () { Text = "Show ContextMenu for HTML element", Anchor = "#contextmenu-for-html-element" } ],
+                    Name = "ContextMenu",
+                    Title = "Blazor ContextMenu - Right-Click Menu | Free UI Components by Radzen",
+                    Description = "The Blazor ContextMenu opens a right-click menu of actions anywhere in your app via ContextMenuService.",
+                    Path = "contextmenu",
+                    Related = new [] { "menu", "profile-menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add a right-click menu in Blazor?", Answer = "Handle an element's @oncontextmenu and call ContextMenuService.Open with your menu items to show a context menu." }
+                    },
+                    Icon = "\ue8de",
+                    Tags = new [] { "popup", "dropdown", "menu" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Link to path in application", Anchor = "#link-to-path" }, new () { Text = "Link to path in application with icon", Anchor = "#link-with-icon" }, new () { Text = "Link to url", Anchor = "#link-to-url" }, new () { Text = "Link with child content", Anchor = "#link-child-content" }, new () { Text = "Link disabled", Anchor = "#link-disabled" } ],
+                    Name = "Link",
+                    Title = "Blazor Link Component | Free UI Components by Radzen",
+                    Description = "The Blazor Link renders a navigation link with Path and Target, integrated with Blazor routing.",
+                    Path = "link",
+                    Related = new [] { "menu", "breadcrumb" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How is RadzenLink different from a plain anchor?", Answer = "It renders a styled navigation link with Path and Target that integrates with Blazor routing and the component theme." }
+                    },
+                    Icon = "\ue157"
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Login Events", Anchor = "#login-events" }, new () { Text = "Simple Login", Anchor = "#simple-login" }, new () { Text = "Login with Register (hide password reset)", Anchor = "#login-with-register" }, new () { Text = "Remember me", Anchor = "#remember-me" }, new () { Text = "Form fields", Anchor = "#form-fields" }, new () { Text = "Localization", Anchor = "#localization" }, new () { Text = "Horizontal login layout example", Anchor = "#horizontal-login-example" }, new () { Text = "Vertical login layout example", Anchor = "#vertical-login-example" } ],
+                    Name = "Login",
+                    Title = "Blazor Login Component | Free UI Components by Radzen",
+                    Description = "The Blazor Login component is a ready-made sign-in form with configurable fields, events, and layout.",
+                    Path = "login",
+                    Related = new [] { "profile-menu", "templateform" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Does the Blazor Login component handle authentication?", Answer = "It provides the sign-in form and raises a Login event with the credentials; you wire that to your own authentication logic." }
+                    },
+                    Icon = "\uea77"
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Menu",
+                    Title = "Blazor Menu - Navigation Menu | Free UI Components by Radzen",
+                    Description = "The Blazor Menu builds horizontal or vertical navigation menus with nested submenus, icons, and templates.",
+                    Path = "menu",
+                    Related = new [] { "panelmenu", "contextmenu", "profile-menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I create a navigation menu in Blazor?", Answer = "Add RadzenMenu with RadzenMenuItem children; nest items for submenus and set Icon and Path on each item." }
+                    },
+                    Icon = "\ue5d2",
+                    Tags = new [] { "navigation", "dropdown" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Statically declared items", Anchor = "#panelmenu-static" }, new () { Text = "Programmatically created items with Expanded binding", Anchor = "#panelmenu-programmatic" }, new () { Text = "Set the display style of menu items", Anchor = "#panelmenu-display-style" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "PanelMenu",
+                    Title = "Blazor PanelMenu - Sidebar Menu | Free UI Components by Radzen",
+                    Path = "panelmenu",
+                    Description = "The Blazor PanelMenu is a vertical, expandable sidebar menu with nested items - ideal for app navigation.",
+                    Related = new [] { "menu", "accordion", "profile-menu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor PanelMenu used for?", Answer = "It is a vertical, collapsible sidebar menu with nested items, commonly used for application navigation." }
+                    },
+                    Icon = "\ue875",
+                    Tags = new [] { "navigation", "menu" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "ProfileMenu",
+                    Title = "Blazor ProfileMenu Component | Free UI Components by Radzen",
+                    Description = "The Blazor ProfileMenu shows a user avatar with a dropdown of account and navigation actions.",
+                    Path = "profile-menu",
+                    Related = new [] { "menu", "panelmenu", "login" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add a user profile menu in Blazor?", Answer = "Use RadzenProfileMenu with an avatar and RadzenProfileMenuItem children for account and navigation actions." }
+                    },
+                    Icon = "\ue851",
+                    Tags = new [] { "navigation", "dropdown", "menu" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Transition", Anchor = "#transition" }, new () { Text = "CanChange event", Anchor = "#canchange-event" } ],
+                    Name = "Steps",
+                    Title = "Blazor Steps - Wizard / Stepper | Free UI Components by Radzen",
+                    Description = "The Blazor Steps component guides users through a multi-step process (wizard) with numbered stages.",
+                    Path = "steps",
+                    Related = new [] { "tabs", "breadcrumb" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a wizard in Blazor?", Answer = "Use RadzenSteps with RadzenStepsItem children; each step shows its content and you can validate before advancing." }
+                    },
+                    Icon = "\ue8be",
+                    Tags = new [] { "step", "steps", "wizard", "transition", "animation" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Tabs position", Anchor = "#tabs-position" }, new () { Text = "Server render mode", Anchor = "#server-render-mode" }, new () { Text = "Client render mode", Anchor = "#client-render-mode" }, new () { Text = "TabItems modify", Anchor = "#tabs-modify" }, new () { Text = "Tab items wrap", Anchor = "#tabs-wrap" }, new () { Text = "Prevent Tab change", Anchor = "#prevent-tab-change" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "Tabs",
+                    Title = "Blazor Tabs Component | Free UI Components by Radzen",
+                    Description = "The Blazor Tabs component organizes content into tabbed panels, with positioning, dynamic tabs, and lazy or client/server rendering.",
+                    Path = "tabs",
+                    Related = new [] { "accordion", "steps" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I render tabs lazily in Blazor?", Answer = "Set RenderMode so tab content loads on demand (client) or is kept server-side, and bind SelectedIndex to control the active tab." }
+                    },
+                    Icon = "\ue8d8",
+                    Tags = new [] { "tabstrip", "tabview", "container" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Sticky TOC", Anchor = "#sticky" }, new () { Text = "Orientation", Anchor = "#orientation" } ],
+                    Name = "Toc",
+                    Title = "Blazor Table of Contents (ToC) | Free UI Components by Radzen",
+                    Description = "The Blazor ToC auto-generates a table of contents from the headings on the current page.",
+                    Path = "toc",
+                    Related = new [] { "breadcrumb", "link" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How does the Blazor ToC build its list?", Answer = "It scans the page's heading elements and generates a linked table of contents automatically." }
+                    },
+                    Icon = "\ue241",
+                    Tags = [ "toc", "content", "navigation" ]
+                }
+            }
+        },
+        new Example
+        {
+            Name = "Layout",
+            Icon = "\ue8f1",
+            Children = new[] {
+                new Example
+                {
+                    Toc = [ new () { Text = "Sidebar, Header and Footer", Anchor = "#sidebar-header-footer" }, new () { Text = "Full height Sidebar", Anchor = "#full-height-sidebar" }, new () { Text = "Overlay Sidebar", Anchor = "#overlay" }, new () { Text = "Full height overlay Sidebar", Anchor = "#overlay-full" }, new () { Text = "Right Sidebar", Anchor = "#right-sidebar" }, new () { Text = "Right full height Sidebar", Anchor = "#right-full-height-sidebar" }, new () { Text = "Right and Left Sidebar", Anchor = "#right-left-sidebar" }, new () { Text = "Start and End Sidebar", Anchor = "#start-end-sidebar" }, new () { Text = "Icon Sidebar", Anchor = "#icon-sidebar" } ],
+                    Name = "Layout",
+                    Title = "Blazor Layout - Header, Sidebar, Footer | Free UI Components by Radzen",
+                    Description = "The Blazor Layout arranges a page into header, sidebar, body, and footer regions, with a collapsible sidebar.",
+                    Path = "layout",
+                    Related = new [] { "panel", "stack", "splitter" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add a collapsible sidebar in Blazor?", Answer = "Use RadzenLayout with RadzenSidebar and a RadzenSidebarToggle in the header to expand and collapse the sidebar." }
+                    },
+                    Icon = "\ue8f1",
+                    Tags = new [] { "layout", "sidebar", "drawer", "header", "body", "footer" }
+                },
+                new Example
+                {
+                    Name = "Stack",
+                    Title = "Blazor Stack - Flex Layout | Free UI Components by Radzen",
+                    Description = "The Blazor Stack arranges children horizontally or vertically with consistent spacing.",
+                    Path = "stack",
+                    Related = new [] { "row", "column" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I space elements evenly in Blazor?", Answer = "Use RadzenStack with Orientation and Gap to arrange children in a row or column with consistent spacing." }
+                    },
+                    Icon = "\ue8e9",
+                    Tags = new [] { "stack", "layout" }
+                },
+                new Example
+                {
+                    Name = "Row",
+                    Title = "Blazor Row - Grid Row Layout | Free UI Components by Radzen",
+                    Description = "The Blazor Row arranges columns in a responsive 12-column grid row, with gap and alignment control.",
+                    Path = "row",
+                    Related = new [] { "column", "stack" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a responsive grid in Blazor?", Answer = "Use RadzenRow with RadzenColumn children sized per breakpoint to lay out a responsive 12-column grid." }
+                    },
+                    Icon = "\uf676",
+                    Tags = new [] { "row", "layout", "responsive", "grid" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Auto-layout columns", Anchor = "#auto-layout-columns" }, new () { Text = "Column sizes", Anchor = "#column-sizes" }, new () { Text = "Responsive column sizes", Anchor = "#responsive-column-sizes" }, new () { Text = "Column wrapping", Anchor = "#column-wrapping" }, new () { Text = "Column offset", Anchor = "#column-offset" }, new () { Text = "Responsive offsetting", Anchor = "#column-responsive-offset" }, new () { Text = "Column order", Anchor = "#column-order" }, new () { Text = "Responsive column ordering", Anchor = "#column-responsive-order" }, new () { Text = "Nested Layouts", Anchor = "#nested-layouts" }, new () { Text = "Gutters", Anchor = "#gutters" } ],
+                    Name = "Column",
+                    Title = "Blazor Column - Grid Column | Free UI Components by Radzen",
+                    Description = "The Blazor Column defines a responsive column within a Row's 12-column grid, sized per breakpoint.",
+                    Path = "column",
+                    Related = new [] { "row", "stack" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I size columns responsively in Blazor?", Answer = "Set the Size properties (and per-breakpoint sizes) on RadzenColumn within a RadzenRow to control its width across screen sizes." }
+                    },
+                    Icon = "\uf674",
+                    Tags = new [] { "column", "col", "layout", "responsive", "grid" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Card Variant", Anchor = "#card-variant" } ],
+                    Name = "Card",
+                    Title = "Blazor Card Component | Free UI Components by Radzen",
+                    Description = "The Blazor Card is a surface for grouping content, with variants, shadow, and customizable padding.",
+                    Path = "card",
+                    Related = new [] { "card-group", "panel" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor Card used for?", Answer = "It is a surface that groups related content - text, images, and actions - with elevation and padding." }
+                    },
+                    Icon = "\uefad",
+                    Tags = new [] { "card", "container" }
+                },
+                new Example
+                {
+                    Name = "CardGroup",
+                    Title = "Blazor CardGroup Component | Free UI Components by Radzen",
+                    Description = "The Blazor CardGroup lays out a set of cards as a connected, responsive group.",
+                    Path = "card-group",
+                    Related = new [] { "card", "stack" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What is the Blazor CardGroup?", Answer = "It arranges multiple RadzenCard elements as a single connected group that wraps responsively." }
+                    },
+                    Icon = "\ue8f3",
+                    Tags = new [] { "card", "group", "deck", "container" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Open page as a dialog", Anchor = "#open-page-as-dialog" }, new () { Text = "Inline Dialog", Anchor = "#inline-dialog" }, new () { Text = "Busy Dialog", Anchor = "#busy-dialog" }, new () { Text = "Confirm Dialog", Anchor = "#confirm-dialog" }, new () { Text = "Alert Dialog", Anchor = "#alert-dialog" }, new () { Text = "Prevent dialog from closing", Anchor = "#prevent-close" }, new () { Text = "Close Dialog by clicking outside", Anchor = "#close-dialog-by-clicking-outside" }, new () { Text = "Side Dialog", Anchor = "#side-dialog" }, new () { Text = "Dialog with custom CSS classes", Anchor = "#custom-css-classes" }, new () { Text = "Update dialog properties", Anchor = "#cascading-value" } ],
+                    Name = "Dialog",
+                    Title = "Blazor Dialog - Modal Dialog | Free UI Components by Radzen",
+                    Description = "The Blazor Dialog opens modal dialogs and side panels from code via DialogService, with Alert and Confirm helpers, custom content, sizing, and async results.",
+                    Path = "dialog",
+                    Related = new [] { "popup", "card" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I open a dialog in Blazor?", Answer = "Inject DialogService and call Open or OpenAsync with a component or content; OpenAsync returns the dialog's result when it closes." }
+                    },
+                    Icon = "\ue069",
+                    Tags = new [] { "popup", "window" },
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Define can-drop and no-drop styles", Anchor = "#can-drop-no-drop-styles" }, new () { Text = "Define a Footer Template per Drop Zone", Anchor = "#footer-template" } ],
+                    Name = "DropZone",
+                    Title = "Blazor DropZone - Drag & Drop | Free UI Components by Radzen",
+                    Description = "The Blazor DropZone lets users drag and drop items between zones - for kanban boards and reordering.",
+                    Path = "dropzone",
+                    Related = new [] { "tile-layout", "splitter" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a drag-and-drop list in Blazor?", Answer = "Use RadzenDropZoneContainer with RadzenDropZone areas and handle the drop events to move items between zones." }
+                    },
+                    Icon = "\ue945",
+                    Tags = new [] { "dropzone", "drag", "drop" }
+                },
+                new Example
+                {
+                    Name = "Panel",
+                    Title = "Blazor Panel - Collapsible Panel | Free UI Components by Radzen",
+                    Description = "The Blazor Panel is a titled, collapsible container for grouping content.",
+                    Path = "panel",
+                    Related = new [] { "card", "fieldset" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I make a collapsible panel in Blazor?", Answer = "Set AllowCollapse on RadzenPanel so users can expand and collapse its content under the title." }
+                    },
+                    Icon = "\uf732",
+                    Tags = new [] { "container" }
+                },
+                new Example
+                {
+                    Name = "Popup",
+                    Title = "Blazor Popup Component | Free UI Components by Radzen",
+                    Description = "The Blazor Popup shows floating content anchored to an element via PopupService, for custom dropdowns and overlays.",
+                    Path = "popup",
+                    Related = new [] { "dialog", "contextmenu" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I show a popup anchored to an element in Blazor?", Answer = "Use PopupService (or the RadzenPopup component) to open floating content positioned relative to a target element." }
+                    },
+                    Icon = "\ue0ca",
+                    Tags = new [] { "popup", "dropdown"}
+                },
+                new Example
+                {
+                    Name = "Splitter",
+                    Title = "Blazor Splitter - Resizable Panes | Free UI Components by Radzen",
+                    Description = "The Blazor Splitter divides an area into resizable, collapsible panes, horizontally or vertically.",
+                    Path = "splitter",
+                    Related = new [] { "layout", "stack" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I create resizable panes in Blazor?", Answer = "Use RadzenSplitter with RadzenSplitterPane children; users drag the bars to resize, and panes can be collapsible." }
+                    },
+                    Icon = "\ue42a",
+                    Tags = new [] { "splitter", "layout"}
+                },
+                new Example
+                {
+                    Name = "TileLayout",
+                    New = true,
+                    Title = "Blazor TileLayout - Dashboard Tiles | Free UI Components by Radzen",
+                    Description = "The Blazor TileLayout builds dashboards from draggable, resizable tiles.",
+                    Path = "tile-layout",
+                    Related = new [] { "dashboard", "dropzone" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a tile dashboard in Blazor?", Answer = "Use RadzenTileLayout with RadzenTile children; users can drag and resize tiles to arrange the dashboard." }
+                    },
+                    Icon = "\ue871",
+                    Tags = new [] { "tile", "layout", "grid", "dashboard", "drag", "resize" }
+                }
+            }
+        },
+        new Example
+        {
+
+            Toc = [ new () { Text = "Customize themes in Radzen Blazor Studio", Anchor = "#text-tag-name" } ],
+            Name = "UI Fundamentals",
+            Icon = "\ue749",
+            Children = new [] {
+                new Example
+                {
+                    Name = "Themes",
+                    Path = "themes",
+                    Title = "Blazor Themes | Free UI Components by Radzen",
+                    Description = "Choose from free and premium Blazor themes for Radzen Blazor components - including Material and dark themes - or build your own with the theme customization tools.",
+                    Related = new [] { "theme-service", "colors", "appearance-toggle" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I change the theme in Blazor?", Answer = "Reference the theme's CSS and set it through ThemeService (or the Theme parameter); themes can switch at runtime, including a dark-mode toggle." },
+                        new FaqItem { Question = "Does Radzen Blazor offer dark mode themes?", Answer = "Yes. Several themes ship with dark variants, and users can toggle between light and dark at runtime." },
+                        new FaqItem { Question = "Can I create a custom Blazor theme?", Answer = "Yes. Start from a built-in theme and customize its colors and variables, or use the theme customization tools to build your own." }
+                    },
+                    Icon = "\ue40a",
+                    Tags = new[] { "theme", "color", "background", "border", "utility", "css", "var"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Persist the Theme", Anchor = "#persist" }, new () { Text = "Video: Changing themes at runtime in Radzen Blazor Studio", Anchor = "#video-changing-themes-at-runtime" } ],
+                    Name = "ThemeService",
+                    Path = "theme-service",
+                    Title = "Blazor ThemeService | Free UI Components by Radzen",
+                    Description = "The ThemeService allows to change the theme of the application at runtime.",
+                    Icon = "\ue3ae",
+                    Tags = ["theme", "service", "change", "runtime", "rtl", "right to left", "direction", "wcag", "accessibility"]
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Switch between light and dark mode", Anchor = "#light-dark-mode" }, new () { Text = "Video: AppearanceToggle in Radzen Blazor Studio", Anchor = "#video-radzen-blazor-studio-config" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "AppearanceToggle",
+                    Path = "appearance-toggle",
+                    Title = "Blazor Appearance Toggle | Free UI Components by Radzen",
+                    Description = "The AppearanceToggle button allows you to switch between two predefined themes, most commonly light and dark.",
+                    Icon = "\ueb37",
+                    Tags = new[] { "theme", "light", "dark", "mode", "appearance", "toggle", "switch"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Theme Colors", Anchor = "#theme-colors" }, new () { Text = "Utility CSS Classes", Anchor = "#utility-css-classes" }, new () { Text = "Video: Theme Colors in Radzen Blazor Studio", Anchor = "#video-theme-colors" } ],
+                    Name = "Colors",
+                    Path = "colors",
+                    Title = "Blazor Color Utilities | Free UI Components by Radzen",
+                    Description = "List of colors and utility CSS classes available in Radzen Blazor Components library.",
+                    Icon = "\ue997",
+                    Tags = new[] { "color", "background", "border", "utility", "css", "var"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Text Style", Anchor = "#text-style" }, new () { Text = "Text Style and Tag Name", Anchor = "#text-tag-name" }, new () { Text = "Display headings", Anchor = "#text-display-headings" }, new () { Text = "Text Align", Anchor = "#text-align" }, new () { Text = "Text Functional Colors", Anchor = "#text-color" }, new () { Text = "Text Transform", Anchor = "#text-transform" }, new () { Text = "Text Wrap", Anchor = "#text-wrap" }, new () { Text = "Video: How Typography Works in Radzen Blazor Studio", Anchor = "#video-radzen-text" } ],
+                    Name = "Typography",
+                    Path = "typography",
+                    Title = "Blazor Text Component | Free UI Components by Radzen",
+                    Description = "Use the RadzenText component to format text in your applications. The TextStyle property applies a predefined text style such as H1, H2, etc.",
+                    Icon = "\ue264",
+                    Tags = new [] { "typo", "typography", "text", "paragraph", "header", "heading", "caption", "overline", "content" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Material Icons", Anchor = "#material-icons" }, new () { Text = "Icon color", Anchor = "#icon-color" }, new () { Text = "Filled icons", Anchor = "#filled-icons" }, new () { Text = "Styled icons", Anchor = "#styled-icons" }, new () { Text = "Using RadzenIcon with other icon fonts", Anchor = "#icons-width-other-fonts" }, new () { Text = "Video: RadzenIcon in Radzen Blazor Studio", Anchor = "#video-icons" } ],
+                    Name = "Icons",
+                    Path = "icon",
+                    Title = "Blazor Icon Component | Free UI Components by Radzen",
+                    Description = "Display Material icons in Blazor with the RadzenIcon component - control size and color, and use custom icon fonts.",
+                    Related = new [] { "button", "fab" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I add an icon in Blazor?", Answer = "Use the RadzenIcon component and set its Icon property to a Material icon name; the icon renders inline wherever you place it." },
+                        new FaqItem { Question = "How do I change an icon's size or color?", Answer = "Control the color with IconStyle or a Style/class, and set the font size (for example via Style) to change the icon size." },
+                        new FaqItem { Question = "Can I use custom icons?", Answer = "Yes. In addition to the built-in Material icons, you can use a custom icon font or image-based icons." }
+                    },
+                    Icon = "\ue148",
+                    Tags = new [] { "icon", "content" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Video: Styling Borders in Radzen Blazor Studio", Anchor = "#video-borders" }, new () { Text = "Border radius", Anchor = "#border-radius" }, new () { Text = "Add or remove borders arbitrarily", Anchor = "#add-remove-css-classes" }, new () { Text = "Border color utility CSS classes", Anchor = "#color-css-classes" }, new () { Text = "Border with color utility CSS classes", Anchor = "#utility-css-classes" }, new () { Text = "Set border width via CSS variable", Anchor = "#border-width" }, new () { Text = "Borders with CSS variables", Anchor = "#css-variables" } ],
+                    Name = "Borders",
+                    Path = "borders",
+                    Title = "Blazor Border Utilities | Free UI Components by Radzen",
+                    Description = "Border styles and utility CSS classes for borders available in Radzen Blazor Components library.",
+                    Icon = "\ue3c6",
+                    Tags = new [] { "border", "utility", "css", "var"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Breakpoints", Anchor = "#breakpoints" }, new () { Text = "Usage of Breakpoints", Anchor = "#usage" } ],
+                    Name = "Breakpoints",
+                    Title = "Blazor Responsive Breakpoints | Free UI Components by Radzen",
+                    Description = "Responsive breakpoints are used to adjust the layout based on the screen size of the device in use.",
+                    Path = "breakpoints",
+                    Icon = "\ue1b1",
+                    Tags = new [] { "breakpoints", "spacing", "margin", "padding", "gutter", "gap", "utility", "css", "responsive", "layout"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Responsive display", Anchor = "#responsive-spacing" } ],
+                    Name = "Display",
+                    Title = "Blazor Display Utilities | Free UI Components by Radzen",
+                    Description = "Display styles and utility CSS classes available in Radzen Blazor Components library.",
+                    Path = "display",
+                    Icon = "\uf023",
+                    Tags = new [] { "display", "hide", "show", "flex", "block", "inline", "utility", "css", "var"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Responsive overflow", Anchor = "#responsive-spacing" } ],
+                    Name = "Overflow",
+                    Title = "Blazor Overflow Utilities | Free UI Components by Radzen",
+                    Description = "Overflow styles and utility CSS classes available in Radzen Blazor Components library.",
+                    Path = "overflow",
+                    Icon = "\uf829",
+                    Tags = new [] { "overflow", "content", "width", "height", "size", "wrap", "hide", "hidden", "visible", "utility", "css", "var"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Show/Hide Content Based on Screen Size", Anchor = "#responsive-content" }, new () { Text = "Multiple Breakpoints", Anchor = "#multiple-breakpoints" }, new () { Text = "Device Orientation", Anchor = "#orientation" } ],
+                    Name = "MediaQuery",
+                    Title = "Blazor MediaQuery Component | Free UI Components by Radzen",
+                    Description = "Respond to browser viewport size changes using CSS media queries. Perfect for creating responsive Blazor applications.",
+                    Path = "media-query",
+                    Icon = "\ue337",
+                    Tags = new [] { "mediaquery", "media", "query", "responsive", "breakpoint", "viewport", "screen", "mobile", "tablet", "desktop", "orientation", "utility"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Ripple RadzenButton", Anchor = "#ripple-button" }, new () { Text = "Ripple RadzenLink", Anchor = "#ripple-link" }, new () { Text = "Ripple HTML div", Anchor = "#ripple-div" } ],
+                    Name = "Ripple",
+                    Title = "Blazor Ripple Effect | Free UI Components by Radzen",
+                    Description = "See how to apply the ripple effect to various UI elements.",
+                    Path = "ripple",
+                    Icon = "\ue762",
+                    Tags = new [] { "ripple", "utility", "css", "var"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Utility CSS classes", Anchor = "#shadow-css-classes" }, new () { Text = "Custom CSS properties (CSS Variables)", Anchor = "#shadow-css-variables" } ],
+                    Name = "Shadows",
+                    Path = "shadows",
+                    Title = "Blazor Shadow Utilities | Free UI Components by Radzen",
+                    Description = "Shadow styles and utility CSS classes for shadows available in Radzen Blazor Components library.",
+                    Icon = "\ue9df",
+                    Tags = new [] { "shadow", "utility", "css", "var"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Width percentage CSS classes", Anchor = "#width-percentage-css-classes" }, new () { Text = "Width keyword CSS classes", Anchor = "#width-keyword-css-classes" }, new () { Text = "Width viewport CSS classes", Anchor = "#width-viewport-css-classes" }, new () { Text = "Max-width and min-width CSS classes", Anchor = "#border-radius" }, new () { Text = "Height percentage CSS classes", Anchor = "#height-percentage-css-classes" }, new () { Text = "Height viewport CSS classes", Anchor = "#height-viewport-css-classes" }, new () { Text = "Max-height and min-height CSS classes", Anchor = "#border-radius" }, new () { Text = "Responsive sizing", Anchor = "#responsive-spacing" } ],
+                    Name = "Sizing",
+                    Title = "Blazor Sizing Utilities | Free UI Components by Radzen",
+                    Description = "Sizing styles and utility CSS classes for width and height available in Radzen Blazor Components library.",
+                    Path = "sizing",
+                    Icon = "\uf730",
+                    Tags = new [] { "sizing", "width", "height", "size", "max", "min", "utility", "css", "var"}
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Text Size", Anchor = "#text-size" }, new () { Text = "Animations", Anchor = "#animations" }, new () { Text = "Complex Example", Anchor = "#complex-example" }, new () { Text = "DataGrid Loading", Anchor = "#datagrid-loading" } ],
+                    Name = "Skeleton",
+                    Title = "Blazor Skeleton Component | Free UI Components by Radzen",
+                    Description = "RadzenSkeleton component displays loading placeholders with various shapes and animations.",
+                    Path = "skeleton",
+                    Icon = "\uf486",
+                    Tags = new [] { "skeleton", "load", "loading", "placeholder", "animation", "wave", "pulse", "text", "circular", "rectangular", "rounded" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Margin CSS classes", Anchor = "#margin-css-classes" }, new () { Text = "Padding CSS classes", Anchor = "#padding-css-classes" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Responsive spacing", Anchor = "#responsive-spacing" } ],
+                    Name = "Spacing",
+                    Title = "Blazor Spacing Utilities | Free UI Components by Radzen",
+                    Description = "Spacing styles and utility CSS classes for margin and padding available in Radzen Blazor Components library.",
+                    Path = "spacing",
+                    Icon = "\uf773",
+                    Tags = new [] { "spacing", "margin", "padding", "gutter", "gap", "utility", "css", "var"}
+                }
+            }
+        },
+        new Example
+        {
+            Name = "App Templates",
+            Title = "Blazor App Templates | Free UI Components by Radzen",
+            Description = "Ready to use Blazor application and website templates",
+            Icon = "\ue5c3",
+            Children = new[] {
+                new Example
+                {
+                    Name = "Issues Dashboard",
+                    Path = "/dashboard",
+                    Title = "Sample Blazor Dashboard | Free UI Components by Radzen",
+                    Description = "A sample Blazor dashboard built with Radzen Blazor Components - charts, grids, and cards on one page, visualizing live GitHub issues.",
+                    Related = new [] { "tile-layout", "datagrid", "charts" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I build a dashboard in Blazor?", Answer = "Combine Radzen Blazor components such as charts, DataGrids, cards, and the TileLayout on a single page and bind them to your data; this sample visualizes live GitHub issues." }
+                    },
+                    Icon = "\ue868"
+                },
+                new Example
+                {
+                    Name = "Healthcare",
+                    Pro = true,
+                    Title = "Healthcare Blazor Website | Premium App Templates by Radzen",
+                    Icon = "\ueb4c",
+                    Description = "A modern, responsive healthcare blazor website template.",
+                    Path = "templates-healthcare",
+                    Tags = new [] { "template", "health", "healthcare", "website", "app", "application", "page", "landing" }
+                },
+                new Example
+                {
+                    Name = "Real Estate",
+                    Pro = true,
+                    Title = "Real Estate Blazor Website | Premium App Templates by Radzen",
+                    Icon = "\ue73a",
+                    Description = "A real estate website template designed to showcase listings, build trust, and convert leads. Featuring clean layout and responsive design.",
+                    Path = "templates-realestate",
+                    Tags = new [] { "template", "real estate", "apartment", "home", "website", "app", "application", "page", "landing" }
+                },
+                new Example
+                {
+                    Name = "Repair Workshop",
+                    Pro = true,
+                    Title = "Repair Workshop Blazor Website | Premium App Templates by Radzen",
+                    Icon = "\uf56c",
+                    Description = "A modern, responsive auto repair blazor website template.",
+                    Path = "templates-repairshop",
+                    Tags = new [] { "template", "repair", "workshop", "website", "app", "application", "page", "landing" }
+                }
+            }
+        },
+        new Example
+        {
+            Toc = [ new () { Text = "Centered CTA", Anchor = "#centered-cta" }, new () { Text = "Left-aligned CTA", Anchor = "#left-aligned-cta" }, new () { Text = "Justified CTA", Anchor = "#left-aligned-cta" }, new () { Text = "Image to the left", Anchor = "#image-to-the-left" }, new () { Text = "Image to the right", Anchor = "#image-to-the-right" } ],
+            Name = "UI Blocks",
+            Pro = true,
+            Title = "Blazor UI Blocks | Free UI Components by Radzen",
+            Description = "Ready to use UI building blocks and templates",
+            Icon = "\uf51d",
+            Children = new[] {
+                new Example
+                {
+                    Name = "Call-to-Action",
+                    Title = "Blazor Call-to-Action | UI Blocks by Radzen",
+                    Icon = "\ue06c",
+                    Description = "Examples of CTA UI Blocks",
+                    Path = "ui-blocks-cta",
+                    Tags = new [] { "cta", "call-to-action", "call", "action", "button" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Simple stats", Anchor = "#simple-stats" }, new () { Text = "Simple stats with icon", Anchor = "#simple-stats-with-icon" }, new () { Text = "Stats with trends", Anchor = "#stats-with-trends" }, new () { Text = "Stats with trends to the right", Anchor = "#stats-with-trends-to-the-right" }, new () { Text = "Stats with square icon", Anchor = "#stats-with-square-icon" } ],
+                    Name = "Cards",
+                    Title = "Blazor Cards | UI Blocks by Radzen",
+                    Icon = "\ue991",
+                    Description = "Examples of Card Blocks",
+                    Path = "ui-blocks-cards",
+                    Tags = new [] { "card", "stats", "products" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "FAQ in 2 columns", Anchor = "#faq-in-2-columns" }, new () { Text = "FAQ to the right", Anchor = "#faq-to-the-right" }, new () { Text = "FAQ Accordion to the right", Anchor = "#faq-accordion-to-the-right" }, new () { Text = "FAQ in centered Accordion", Anchor = "#faq-in-centered-accordion" } ],
+                    Name = "FAQ",
+                    Title = "Blazor FAQ - Frequently Asked Questions | UI Blocks by Radzen",
+                    Icon = "\uf04c",
+                    Description = "Examples of FAQ Blocks",
+                    Path = "ui-blocks-faq",
+                    Tags = new [] { "faq", "question", "answer" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Features with small icons", Anchor = "#features-with-small-icons" }, new () { Text = "Features with large icons on top", Anchor = "#features-with-large-icons-on-top" }, new () { Text = "Centered features", Anchor = "#centered-features" } ],
+                    Name = "Features",
+                    Title = "Blazor Features | UI Blocks by Radzen",
+                    Icon = "\ue031",
+                    Description = "Examples of Features Blocks",
+                    Path = "ui-blocks-features",
+                    Tags = new [] { "feature", "list" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Footer with a sitemap", Anchor = "#footer-with-sitemap" }, new () { Text = "Centered Footer", Anchor = "#centered-footer" }, new () { Text = "Simple Footer", Anchor = "#simple-footer" } ],
+                    Name = "Footers",
+                    Title = "Blazor Footer | UI Blocks by Radzen",
+                    Icon = "\uf7e6",
+                    Description = "Preconfigured Footer UI Blocks",
+                    Path = "ui-blocks-footers",
+                    Tags = new [] { "footer" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Centered Logos", Anchor = "#centered-logos" }, new () { Text = "Logos to the right", Anchor = "#logos-to-the-right" } ],
+                    Name = "Logo Clouds",
+                    Title = "Blazor Logo Clouds | UI Blocks by Radzen",
+                    Icon = "\ue574",
+                    Description = "Examples of Customers Logo Blocks",
+                    Path = "ui-blocks-logos",
+                    Tags = new [] { "logo", "customer", "logos" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Centered layout", Anchor = "#centered-layout" }, new () { Text = "Left-aligned with image", Anchor = "#left-aligned-with-image" } ],
+                    Name = "Newsletter",
+                    Title = "Blazor Newsletter | UI Blocks by Radzen",
+                    Icon = "\uf18c",
+                    Description = "Examples of Newsletter subscription form UI Blocks",
+                    Path = "ui-blocks-newsletter",
+                    Tags = new [] { "newsletter", "subscribe", "subscription" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Title with actions", Anchor = "#title-with-actions" }, new () { Text = "Title with breadcrumbs", Anchor = "#title-with-breadcrumbs" }, new () { Text = "Title with breadcrumbs and actions", Anchor = "#title-with-breadcrumbs-and-actions" } ],
+                    Name = "Page Headings",
+                    Title = "Blazor Page Heading | UI Blocks by Radzen",
+                    Icon = "\ue9ea",
+                    Description = "Preconfigured Page Heading UI Blocks",
+                    Path = "ui-blocks-page-headings",
+                    Tags = new [] { "headings", "heading", "page", "title" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Pricing Cards", Anchor = "#pricing-cards" }, new () { Text = "Basic pricing", Anchor = "#basic-pricing" } ],
+                    Name = "Pricing",
+                    Title = "Blazor Pricing | UI Blocks by Radzen",
+                    Icon = "\uf05b",
+                    Description = "Examples of Pricing UI Blocks",
+                    Path = "ui-blocks-pricing",
+                    Tags = new [] { "pricing", "table" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Quotes in Carousel", Anchor = "#quotes-in-carousel" }, new () { Text = "Quotes on a row", Anchor = "#quotes-on-a-row" }, new () { Text = "Quotes in Cards", Anchor = "#quotes-in-cards" }, new () { Text = "Quotes in a CardGroup", Anchor = "#quotes-in-cardgroup" }, new () { Text = "Centered quotes", Anchor = "#centered-quotes" }, new () { Text = "Single quote", Anchor = "#single-quote" } ],
+                    Name = "Testimonials",
+                    Title = "Blazor Customer Testimonials | UI Blocks by Radzen",
+                    Icon = "\uf054",
+                    Description = "Examples of Customer Testimonials UI Blocks",
+                    Path = "ui-blocks-testimonials",
+                    Tags = new [] { "testimonial", "quote", "customer" }
+                }
+            }
+        },
+        new Example
+        {
+            Toc = [ new () { Text = "Gravatar with email (info@radzen.com)", Anchor = "#gravatar-with-email" } ],
+            Name = "Images",
+            Icon = "\ue3d3",
+            Children = new[] {
+                new Example
+                {
+                    Name = "Gravatar",
+                    Description = "Demonstration and configuration of the Radzen Blazor Gravatar component.",
+                    Path = "gravatar",
+                    Icon = "\ue420"
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Image from application assets", Anchor = "#image-from-application-assets" }, new () { Text = "Image from url", Anchor = "#image-from-url" }, new () { Text = "Image from base64 encoded string", Anchor = "#image-from-base64" }, new () { Text = "Image from binary data", Anchor = "#image-from-binary-data" } ],
+                    Name = "Image",
+                    Description = "Demonstration and configuration of the Radzen Blazor Image component.",
+                    Path = "image",
+                    Icon = "\ue3c4"
+                },
+            }
+        },
+        new Example
+        {
             Name = "Feedback",
             Icon = "\ue0cb",
             Children = new[] {
@@ -4414,14 +4400,24 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
+            Toc = [ new () { Text = "Applying guidelines", Anchor = "#applying-guidelines" }, new () { Text = "WCAG 2.2", Anchor = "#wcag" }, new () { Text = "WCAG compliant theme colors (AA level of conformance)", Anchor = "#wcag-colors" }, new () { Text = "ARIA attributes", Anchor = "#wai-aria" }, new () { Text = "Semantic HTML", Anchor = "#semantic-html" }, new () { Text = "Screen reader compatibility", Anchor = "#screen-readers" }, new () { Text = "Responsive design", Anchor = "#responsive-design" }, new () { Text = "Keyboard compatibility", Anchor = "#keyboard-compatibility" }, new () { Text = "Accessibility Conformance Report", Anchor = "#acr" } ],
+            Name = "Accessibility",
+            Path = "/accessibility",
+            Title = "Blazor Accessibility | Free UI Components by Radzen",
+            Description = "Accessible Blazor components compliant with WAI-ARIA, WCAG 2.2, Section 508, and keyboard navigation standards.",
+            Icon = "\ue92c",
+            Tags = new[] { "keyboard", "accessibility", "standard", "508", "wai-aria", "wcag", "shortcut"}
+        },
+        new Example
+        {
             Name = "Changelog",
             Path = "/changelog",
             Updated = true,
             Title = "Blazor Components Changelog | Free UI Components by Radzen",
             Description = "See what's new in Radzen Blazor Components",
             Icon = "\ue8e1"
-        },
-    };
+        }
+        };
 
         public IEnumerable<Example> Examples
         {
