@@ -6239,7 +6239,7 @@ Radzen.scrollElementTo = (scrollable, left, top) => {
   scrollable.scrollTo({ top: top, left: left });
 };
 Radzen.createFormField = function(el) {
-  if (!el) return null;
+  if (!el || typeof el.addEventListener !== 'function') return null;
   function onFocusIn() { el.classList.add('rz-state-focused'); }
   function onFocusOut() { el.classList.remove('rz-state-focused'); }
   el.addEventListener('focusin', onFocusIn);
