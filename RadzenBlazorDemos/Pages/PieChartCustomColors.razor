@@ -1,0 +1,29 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenStack Style="width: 100%; max-width: 600px;">
+        <RadzenChart>
+            <RadzenPieSeries Data="@revenue" CategoryProperty="Category" ValueProperty="Value" Title="Revenue" Fills="@palette" FillMode="FillMode.Solid">
+                <RadzenSeriesDataLabels Visible="false" />
+            </RadzenPieSeries>
+            <RadzenLegend Position="LegendPosition.Bottom" />
+        </RadzenChart>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Category { get; set; }
+        public double Value { get; set; }
+    }
+
+    string[] palette = new[] { "#6366f1", "#0ea5e9", "#14b8a6", "#22c55e", "#f59e0b" };
+
+    DataItem[] revenue = new DataItem[]
+    {
+        new DataItem { Category = "Cloud", Value = 4200 },
+        new DataItem { Category = "Licenses", Value = 3100 },
+        new DataItem { Category = "Services", Value = 2300 },
+        new DataItem { Category = "Support", Value = 1500 },
+        new DataItem { Category = "Training", Value = 900 },
+    };
+}

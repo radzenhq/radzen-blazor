@@ -1,0 +1,32 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenHtmlEditorButtonBase
+
+<EditorButton Title=@Title Click=@OnClick Icon=@Icon Disabled=@IsDisabled />
+
+@code {
+    bool IsDisabled => Editor == null || Editor.Disabled || !CanExecute();
+
+    protected override async Task OnClick()
+    {
+        if (Editor != null && !string.IsNullOrEmpty(TableCommand))
+        {
+            await Editor.ExecuteTableCommandAsync(TableCommand);
+        }
+    }
+
+    bool CanExecute()
+    {
+        if (Editor?.TableSelection == null || !Editor.TableSelection.InTable)
+        {
+            return false;
+        }
+
+        return TableCommand switch
+        {
+            "mergeCellRight" => Editor.TableSelection.CanMergeRight,
+            "mergeCellDown" => Editor.TableSelection.CanMergeDown,
+            "splitCell" => Editor.TableSelection.CanSplit,
+            _ => true
+        };
+    }
+}

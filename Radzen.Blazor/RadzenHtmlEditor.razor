@@ -9,7 +9,7 @@
     <div @ref=Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
         @if (ShowToolbar)
         {
-        <div class="rz-html-editor-toolbar">
+        <div class="rz-toolbar rz-html-editor-toolbar">
             <CascadingValue Value=@this>
             @if (ChildContent != null)
             {
@@ -45,6 +45,7 @@
                 <RadzenHtmlEditorLink />
                 <RadzenHtmlEditorUnlink />
                 <RadzenHtmlEditorImage />
+                <RadzenHtmlEditorTableTools />
                 <RadzenHtmlEditorFontName />
                 <RadzenHtmlEditorFontSize />
                 <RadzenHtmlEditorFormatBlock />

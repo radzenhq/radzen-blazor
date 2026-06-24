@@ -59,17 +59,11 @@ The Radzen.Blazor library provides a built-in service that persists the current 
 </code>
 </pre>
         </RadzenTabsItem>
-        <RadzenTabsItem Text=".NET 7">
-@RegisterService
-@MainLayout
-@Host
-@Persist("_Host.cshtml")
-        </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>
 
 @code {
-    private static readonly string[] versions = ["net8", "net7"];
+    private static readonly string[] versions = ["net8"];
 
     private int selectedIndex = 0;
 
@@ -118,31 +112,6 @@ builder.Services.AddRadzenCookieThemeService(options =&gt;
 Register CookieThemeService in all <code>Program.cs</code> files of your application.
 </RadzenAlert>
         </text>;
-    RenderFragment Host => @<text>
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">3. Open <code>_Host.cshtml</code> and add this code:</RadzenText>
-<pre class="rz-p-4">
-<code>
-@@inject Radzen.ThemeService ThemeService
-@@{
-    var theme = HttpContext.Request.Cookies["MyApplicationTheme"];
-
-    if (!string.IsNullOrEmpty(theme))
-    {
-        ThemeService.SetTheme(theme, true);
-    }
-}
-</code>
-</pre>
-    </text>;
-
-    RenderFragment<string> Persist => fileName => @<text>
-<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">4. Open <code>@fileName</code> and append the following code after the last <code>script</code> tag:</RadzenText>
-<pre class="rz-p-4">
-<code>
-&lt;persist-component-state /&gt;
-</code>
-</pre>
-    </text>;
 }
 
 <RadzenRow>

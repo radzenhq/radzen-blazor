@@ -1,6 +1,6 @@
 ﻿<RadzenCard Variant="Variant.Outlined">
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select a file to upload</RadzenText>
-    <RadzenUpload Url="upload/single" Progress=@OnProgress Complete=@OnComplete Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+    <RadzenUpload Url="api/upload/single" Progress=@OnProgress Complete=@OnComplete Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
     <RadzenProgressBar Value=@progress class="rz-mt-6" Visible=@showProgress />
     <RadzenButton Text="Cancel" Click=@OnCancel class="rz-mt-4" Visible=@showProgress />
     <RadzenLabel Visible=@showComplete class="rz-mt-6" Text=@completionMessage />

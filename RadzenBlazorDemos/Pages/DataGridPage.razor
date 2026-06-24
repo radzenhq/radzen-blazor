@@ -3,13 +3,48 @@
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Blazor DataGrid
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1200px;">
+    The Radzen Blazor DataGrid displays tabular data with sorting, filtering, paging, grouping, and editing built in. Bind it to IQueryable and Entity Framework, an OData service, a DataTable, or dynamic data, and it pages, sorts, and filters on the server.
 </RadzenText>
 
 <RadzenExample ComponentName="DataGrid" Example="DataGridIQueryable">
     <DataGridIQueryable />
 </RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-pt-12 rz-pb-4">
+    DataGrid features
+</RadzenText>
+<RadzenRow Gap="1rem" RowGap="1rem" class="datagrid-features">
+    @foreach (var feature in features)
+    {
+        <RadzenColumn Size="12" SizeSM="6" SizeMD="4">
+            <RadzenLink Path="@feature.Path">
+                <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mb-1">@feature.Title</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-mb-0 rz-color-text-secondary">@feature.Description</RadzenText>
+                </RadzenCard>
+            </RadzenLink>
+        </RadzenColumn>
+    }
+</RadzenRow>
+
+<style>
+    .datagrid-features .rz-link {
+        --rz-link-text-decoration: none;
+        --rz-link-hover-text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.15s;
+    }
+
+    .datagrid-features .rz-link:hover {
+        transform: translateY(-2px);
+    }
+
+    .datagrid-features .rz-link:hover .rz-card {
+        box-shadow: var(--rz-shadow-2);
+    }
+</style>
 
 <RadzenText Anchor="datagrid#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Keyboard Navigation
@@ -21,6 +56,22 @@
 <KeyboardNavigationDataGrid Data="@data" />
 
 @code {
+    (string Title, string Description, string Path)[] features = new[]
+    {
+        ("Data binding", "IQueryable & Entity Framework, OData, DataTable, dynamic data, or custom via LoadData", "/datagrid-iqueryable"),
+        ("Filtering", "Simple and advanced filter modes, plus Excel-style checkbox filtering", "/datagrid-advanced-filter"),
+        ("Sorting", "Single and multi-column sorting, with custom comparers", "/datagrid-sort"),
+        ("Paging", "Built-in pager with configurable position and page sizes", "/datagrid-pager-position"),
+        ("Grouping", "Group by one or more columns, with header and footer aggregates", "/datagrid-grouping-api"),
+        ("Virtualization", "Render thousands of rows smoothly by loading only what's visible", "/datagrid-virtualization"),
+        ("Editing", "Inline and in-cell editing with validation", "/datagrid-inline-edit"),
+        ("Columns", "Templates, resizing, reordering, frozen columns, and a column picker", "/datagrid-column-template"),
+        ("Selection", "Single, multiple, and cell selection", "/datagrid-multiple-selection"),
+        ("Excel & CSV export", "Export grid data to Excel and CSV", "/export-excel-csv"),
+        ("Hierarchy", "Master-detail and self-referencing hierarchies", "/master-detail-hierarchy"),
+        ("State persistence", "Save and restore column, sort, filter, and paging settings", "/datagrid-save-settings"),
+    };
+
     List<KeyboardShortcut> data = new List<KeyboardShortcut>
     {
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DataGrid." },

@@ -1,0 +1,59 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenComponent
+
+<div @ref="@Element" style="@Style" @attributes="@Attributes" class="@GetCssClass()">
+@if (Width.HasValue && Height.HasValue && Data != null)
+{
+    ComputeLayout();
+
+    if (items != null && xCategories != null && yCategories != null)
+    {
+        var leftMargin = 80.0;
+        var bottomMargin = 40.0;
+        var topMargin = 10.0;
+        var rightMargin = 10.0;
+
+        var plotWidth = Width.Value - leftMargin - rightMargin;
+        var plotHeight = Height.Value - topMargin - bottomMargin;
+        var cellWidth = plotWidth / xCategories.Count;
+        var cellHeight = plotHeight / yCategories.Count;
+        var range = maxValue - minValue;
+
+        <svg style="width: 100%; height: 100%;" viewBox="@($"0 0 {Width.Value.ToInvariantString()} {Height.Value.ToInvariantString()}")">
+            @RenderLabels(leftMargin, topMargin, bottomMargin, cellWidth, cellHeight)
+
+            @* Cells *@
+            @foreach (var item in items)
+            {
+                var xCat = GetX(item);
+                var yCat = GetY(item);
+                var value = GetValue(item);
+                var xi = xCategories.IndexOf(xCat);
+                var yi = yCategories.IndexOf(yCat);
+
+                if (xi >= 0 && yi >= 0)
+                {
+                    var t = range > 0 ? (value - minValue) / range : 0.5;
+                    var color = InterpolateColor(t);
+                    var cx = leftMargin + xi * cellWidth + CellPadding;
+                    var cy = topMargin + yi * cellHeight + CellPadding;
+                    var cw = cellWidth - 2 * CellPadding;
+                    var ch = cellHeight - 2 * CellPadding;
+
+                    <rect x="@(cx.ToInvariantString())" y="@(cy.ToInvariantString())"
+                          width="@(cw.ToInvariantString())" height="@(ch.ToInvariantString())"
+                          fill="@color" rx="2" ry="2" class="rz-heatmap-cell" />
+
+                    @if (ShowValues && cw > 20 && ch > 14)
+                    {
+                        var textX = cx + cw / 2;
+                        var textY = cy + ch / 2;
+                        var textColor = t > 0.5 ? "white" : "var(--rz-text-color)";
+                        @RenderSvgText(textX, textY, "middle", "middle", $"fill: {textColor}; font-size: 11px; pointer-events: none;", FormatValue(value))
+                    }
+                }
+            }
+        </svg>
+    }
+}
+</div>

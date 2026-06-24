@@ -1,0 +1,69 @@
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+@implements IChartBarSeries
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = Chart;
+        if (chart == null) { return _ => { }; }
+
+        var category = ComposeCategory(valueScale);
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+        var barSeries = VisibleBarSeries;
+        if (barSeries.Count == 0) { return _ => { }; }
+
+        var index = barSeries.IndexOf(this);
+        if (index < 0) { return _ => { }; }
+
+        var barOptions = chart.BarOptions;
+        var padding = barOptions?.Margin ?? 0;
+        var bandHeight = BandHeight;
+        var (height, groupHeight) = BandLayout.Resolve(bandHeight, barSeries.Count, padding, barOptions?.EffectiveMaxHeight);
+        var className = $"rz-range-bar-series rz-series-{chart.Series.IndexOf(this)}";
+        var radius = barOptions?.Radius ?? 0;
+
+        var min = Min;
+        var max = Max;
+
+        var groupStyle = $"--rz-zero-x: {chart.CategoryScale.Scale(Math.Max(0, chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance).Start)).ToInvariantString()}px";
+        var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));
+        var gradient = FillMode == FillMode.Gradient;
+        return
+        @<g class="@className" style="@groupStyle">
+            @foreach (var data in Items)
+            {
+                var cy = category(data) - groupHeight / 2 + index * (height + padding);
+                var minX = categoryScale.Scale(min(data), true);
+                var maxX = categoryScale.Scale(max(data), true);
+
+                var left = Math.Min(minX, maxX);
+                var barWidth = Math.Abs(maxX - minX);
+                if (barWidth < 1) { barWidth = 1; }
+
+                var r = radius;
+                if (r > height / 2 || r > barWidth) { r = 0; }
+
+                var rs = r.ToInvariantString();
+                var path = $"M {left.ToInvariantString()} {cy.ToInvariantString()} L {(left + barWidth - r).ToInvariantString()} {cy.ToInvariantString()} A {rs} {rs} 0 0 1 {(left + barWidth).ToInvariantString()} {(cy + r).ToInvariantString()} L {(left + barWidth).ToInvariantString()} {(cy + height - r).ToInvariantString()} A {rs} {rs} 0 0 1 {(left + barWidth - r).ToInvariantString()} {(cy + height).ToInvariantString()} L {left.ToInvariantString()} {(cy + height).ToInvariantString()} Z";
+
+                var fill = PickColor(Items.IndexOf(data), Fills, Fill);
+                var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke);
+                var fillRef = gradient ? grad.Url(fill ?? "var(--rz-series-color)", 1) : (FillMode == FillMode.None ? "none" : fill);
+
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fillRef" LineType="@LineType" Style="@style" />
+            }
+            @if (gradient)
+            {
+                <GradientDefs Plan="@grad" Vertical="false" StartOpacity="@GradientStartOpacity" EndOpacity="@GradientEndOpacity" />
+            }
+        </g>;
+    }
+}

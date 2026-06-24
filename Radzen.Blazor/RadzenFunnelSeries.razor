@@ -1,0 +1,50 @@
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+
+@code {
+    public override CoordinateSystem CoordinateSystem => CoordinateSystem.Polar;
+
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var seriesIndex = chart.Series.IndexOf(this);
+        var className = $"rz-funnel-series rz-series-{seriesIndex}";
+        var orderedItems = GetOrderedItems();
+        var count = orderedItems.Count;
+        var gradient = FillMode == FillMode.Gradient;
+
+        return
+        @<g class="@className">
+            @if (orderedItems.Any())
+            {
+                var maxValue = orderedItems.Max(Value);
+
+                @for (var i = 0; i < count; i++)
+                {
+                    var data = orderedItems[i];
+                    var index = Items.IndexOf(data);
+                    var d = GetSegmentPath(i, count, maxValue, orderedItems);
+                    var fill = PickColor(index, Fills);
+                    var stroke = PickColor(index, Strokes);
+                    var arcClassName = $"rz-series-item-{index}";
+                    var gradId = $"rzFunnelGradient{chart.UniqueID}-{seriesIndex}-{index}";
+                    var gradientColor = fill ?? "var(--rz-series-color)";
+                    var fillRef = gradient ? $"url(#{gradId})" : (FillMode == FillMode.None ? "none" : fill);
+
+                    <g class="@arcClassName" style="@($"--rz-segment-order: {index}")">
+                        @if (gradient)
+                        {
+                            <LinearGradientDef Id="@gradId" Color="@gradientColor" StartOpacity="@GradientStartOpacity" EndOpacity="@GradientEndOpacity" />
+                        }
+                        <Path D="@d" Fill="@fillRef" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
+                    </g>
+                }
+            }
+        </g>;
+    }
+}

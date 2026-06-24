@@ -1,0 +1,78 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenSelectBar Value=@CurrentTextAlign ValueChanged=@OnTextAlignChangedAsync TValue="Radzen.TextAlign" Disabled=@IsDisabled Size="ButtonSize.Small">
+    <Items>
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Left Icon="format_align_left" />
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Center Icon="format_align_center" />
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Right Icon="format_align_right" />
+    </Items>
+</RadzenSelectBar>
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private Radzen.TextAlign CurrentTextAlign
+    {
+        get
+        {
+            if (Worksheet?.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.TextAlign ?? Radzen.TextAlign.Left;
+            }
+            return Radzen.TextAlign.Left;
+        }
+    }
+
+    private async Task OnTextAlignChangedAsync(Radzen.TextAlign value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        if (!Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+        {
+            return;
+        }
+
+        var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithTextAlign(value));
+        await Spreadsheet.ExecuteAsync(command);
+    }
+
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
+
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public RadzenSpreadsheetTextAlign()
+    {
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
+
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        selectionBinding.Dispose();
+    }
+}

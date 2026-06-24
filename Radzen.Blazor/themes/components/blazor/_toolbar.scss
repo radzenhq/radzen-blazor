@@ -1,0 +1,74 @@
+.rz-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.125rem;
+
+    --rz-selectbar-border-radius: var(--rz-border-radius);
+    --rz-button-border-radius: var(--rz-border-radius);
+
+    .rz-dropdown {
+        --rz-dropdown-open-border: var(--rz-border-focus);
+    }
+
+    .rz-button {
+        .rzi {
+            font-size: 1rem;
+        }
+
+        .rz-button-text {
+            font-size: 0.75rem;
+        }
+    }
+
+    .rz-selectbar.rz-selectbar-horizontal .rz-button {
+        outline: none;
+        border-radius: var(--rz-border-radius) !important;
+
+        &:not(:first-child) {
+            margin-inline-start: 0.125rem;
+        }
+    }
+
+    .rz-colorpicker {
+        flex-direction: column;
+        gap: 0;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-block-end: 1px solid transparent;
+        box-shadow: none;
+        background-color: transparent;
+        --rz-colorpicker-panel-border: none;
+
+        &.rz-state-disabled {
+            border: 1px solid transparent;
+            border-block-end: 1px solid transparent;
+        }
+
+        .rzi {
+            font-size: 0.875rem;
+        }
+
+        .rz-colorpicker-value {
+            height: 0.25rem;
+            min-height: 0.25rem;
+            max-height: 0.25rem;
+            min-width: 1rem;
+        }
+    }
+}
+
+.rz-toolbar-separator {
+    width: 1px;
+    height: 1.25rem;
+    margin-inline: 0.125rem;
+    background-color: var(--rz-base-200);
+}
+
+.rz-editor-dropdown-panel {
+    --rz-dropdown-panel-padding: 0;
+
+    h1, h2, h3, h4, h5, h6, p {
+        margin: 0;
+    }
+}

@@ -1,0 +1,68 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+  public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+  {
+    var category = ComposeCategory(categoryScale);
+
+    var value = ComposeValue(valueScale);
+
+    var pathGenerator = GetPathGenerator();
+
+    var ticks = Chart?.CategoryScale?.Ticks(Chart.CategoryAxis.TickDistance);
+
+    var index = Chart?.Series.IndexOf(this);
+
+    var topPoints = GetTopPoints(category, value, valueScale);
+    var bottomPoints = GetBottomPoints(category, value, valueScale);
+
+    var className = $"rz-full-stacked-area-series rz-series-{index}";
+    var gradientId = $"rzAreaGradient{Chart?.UniqueID}{index}";
+    var gradientColor = Fill ?? "var(--rz-series-color)";
+
+    return
+    @<g class="@className">
+      @if (Items.Any())
+      {
+        var x1 = category(Items.First()).ToInvariantString();
+        var x2 = category(Items.Last()).ToInvariantString();
+        var valueTicks = Chart?.ValueScale?.Ticks(Chart?.ValueAxis?.TickDistance ?? 0) ?? (Start: 0.0, End: 0.0, Step: 0.0);
+        var start = Math.Max(0, valueTicks.Start);
+        var y = Chart?.ValueScale.Scale(start).ToInvariantString();
+        var style = $"clip-path: url(#{Chart?.ClipPath}); -webkit-clip-path: url(#{Chart?.ClipPath});";
+        var topPath = pathGenerator.Path(topPoints);
+        var bottomPath = pathGenerator.Path(bottomPoints);
+        var area = $"M {x1} {y} {topPath} L {x2} {y} {bottomPath}";
+        var line = $"M {topPath}";
+
+        @if (FillMode == FillMode.Gradient)
+        {
+            <defs>
+                <linearGradient id="@gradientId" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" style="@($"stop-color: {gradientColor}; stop-opacity: {GradientStartOpacity.ToInvariantString()}")"></stop>
+                    <stop offset="1" style="@($"stop-color: {gradientColor}; stop-opacity: {GradientEndOpacity.ToInvariantString()}")"></stop>
+                </linearGradient>
+            </defs>
+        }
+        var animate = Chart?.AnimateDataUpdates == true;
+        var lineKey = animate ? $"animated-line-{LineType}" : line;
+
+        @if (FillMode != FillMode.None)
+        {
+            var fill = FillMode == FillMode.Gradient ? $"url(#{gradientId})" : Fill;
+            var fillClass = FillMode == FillMode.Gradient ? "rz-area-gradient" : null;
+            var fillKey = animate ? "animated-fill" : area;
+            var fillStyle = animate ? $"d: path(\"{area}\");{style}" : style;
+            <path @key="@fillKey" class="@($"{fillClass} {(animate ? "rz-path-transition" : null)}".Trim())" style="@fillStyle" d="@area" fill="@fill" stroke="none"></path>
+        }
+        <Path @key="@lineKey" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" Transition="@animate" />
+      }
+      <Markers Visible="@Markers.Visible" Series="@this" Data="@topPoints" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+    </g>;
+  }
+}

@@ -33,6 +33,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenGoogleMap : RadzenComponent
     {
+        IJSObjectReference? _jsRef;
         /// <summary>
         /// Gets or sets the data - collection of RadzenGoogleMapMarker.
         /// </summary>
@@ -209,13 +210,13 @@ namespace Radzen.Blazor
             {
                 if (firstRender)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, MapId, Zoom, Center,
-                         data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMap", Element, Reference, UniqueID, ApiKey, MapId, Zoom, Center,
+                         data.Select(m => new GoogleMapMarkerData { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
                 }
                 else
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, ApiKey, null, null,
-                                 data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
+                                 data.Select(m => new GoogleMapMarkerData { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
                 }
             }
         }
@@ -225,12 +226,22 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (IsJSRuntimeAvailable && JSRuntime != null && UniqueID != null)
+            if (IsJSRuntimeAvailable && _jsRef != null)
             {
-                JSRuntime.InvokeVoid("Radzen.destroyMap", UniqueID);
+                _jsRef.InvokeVoidAsync("dispose");
+                _jsRef.DisposeAsync();
             }
 
             GC.SuppressFinalize(this);
         }
+    }
+
+    internal class GoogleMapMarkerData
+    {
+        public string? Title { get; set; }
+
+        public string? Label { get; set; }
+
+        public GoogleMapPosition? Position { get; set; }
     }
 }

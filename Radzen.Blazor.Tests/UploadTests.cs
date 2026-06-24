@@ -90,6 +90,44 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("accept=\"image/*\"", component.Markup);
         }
+
+        [Fact]
+        public void Upload_Renders_DefaultTabIndex_OnChooseButton()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>();
+
+            Assert.Equal("0", component.Find(".rz-fileupload-choose").GetAttribute("tabindex"));
+        }
+
+        [Fact]
+        public void Upload_Renders_TabIndex_OnChooseButton_NotWrapper()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            {
+                parameters.Add(p => p.TabIndex, 22);
+            });
+
+            Assert.Equal("22", component.Find(".rz-fileupload-choose").GetAttribute("tabindex"));
+            Assert.False(component.Find(".rz-fileupload").HasAttribute("tabindex"));
+        }
+
+        [Fact]
+        public void Upload_Renders_DisabledTabIndex_OnChooseButton()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            {
+                parameters.Add(p => p.TabIndex, 22);
+                parameters.Add(p => p.Disabled, true);
+            });
+
+            Assert.Equal("-1", component.Find(".rz-fileupload-choose").GetAttribute("tabindex"));
+        }
     }
 }
 

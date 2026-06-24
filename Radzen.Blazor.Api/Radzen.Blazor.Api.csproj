@@ -6,14 +6,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" />
+    <PackageReference Include="Radzen.Blazor" Version="*" GeneratePathProperty="true" Condition="'$(Configuration)' == 'Release'" />
+    <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" Condition="'$(Configuration)' != 'Release'" />
   </ItemGroup>
 
   <PropertyGroup>
-    <RadzenBlazorDll>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net10.0\Radzen.Blazor.dll</RadzenBlazorDll>
-    <RadzenBlazorXml>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net10.0\Radzen.Blazor.xml</RadzenBlazorXml>
     <GeneratorProject>$(MSBuildThisFileDirectory)..\Radzen.Blazor.Api.Generator\Radzen.Blazor.Api.Generator.csproj</GeneratorProject>
     <GeneratedPagesDir>$(MSBuildThisFileDirectory)Generated\Pages</GeneratedPagesDir>
+  </PropertyGroup>
+
+  <!-- Release reflects over the published package (what the site ships); Debug over the source build. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <RadzenBlazorDll>$(PkgRadzen_Blazor)/lib/net10.0/Radzen.Blazor.dll</RadzenBlazorDll>
+    <RadzenBlazorXml>$(PkgRadzen_Blazor)/lib/net10.0/Radzen.Blazor.xml</RadzenBlazorXml>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' != 'Release'">
+    <RadzenBlazorDll>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net10.0\Radzen.Blazor.dll</RadzenBlazorDll>
+    <RadzenBlazorXml>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net10.0\Radzen.Blazor.xml</RadzenBlazorXml>
   </PropertyGroup>
 
   <!-- Usage: dotnet build -p:GenerateApiPages=true -->

@@ -1,18 +1,21 @@
-<RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
-    <RadzenStack Gap="0.25rem">
-        <RadzenText TextStyle="TextStyle.Caption">Color Scheme</RadzenText>
-        <RadzenSelectBar @bind-Value="colorScheme" TValue="ColorScheme" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
-            <Items>
-                <RadzenSelectBarItem Text="Pastel" Value="ColorScheme.Pastel" />
-                <RadzenSelectBarItem Text="Palette" Value="ColorScheme.Palette" />
-                <RadzenSelectBarItem Text="Mono" Value="ColorScheme.Monochrome" />
-                <RadzenSelectBarItem Text="Divergent" Value="ColorScheme.Divergent" />
-            </Items>
-        </RadzenSelectBar>
-    </RadzenStack>
-</RadzenCard>
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Gap="0.25rem">
+                <RadzenText TextStyle="TextStyle.Caption">Color Scheme</RadzenText>
+                <RadzenSelectBar @bind-Value="colorScheme" TValue="ColorScheme" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                    <Items>
+                        <RadzenSelectBarItem Text="Pastel" Value="ColorScheme.Pastel" />
+                        <RadzenSelectBarItem Text="Palette" Value="ColorScheme.Palette" />
+                        <RadzenSelectBarItem Text="Mono" Value="ColorScheme.Monochrome" />
+                        <RadzenSelectBarItem Text="Divergent" Value="ColorScheme.Divergent" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
 
-<RadzenSpiderChart ColorScheme="@colorScheme" Style="width: 100%; height: 500px;">
+    <RadzenSpiderChart ColorScheme="@colorScheme" Style="width: 100%; height: 500px;">
     <RadzenSpiderSeries TItem="SkillData"
                         Data="@aliceData"
                         CategoryProperty="@nameof(SkillData.Skill)"
@@ -23,7 +26,8 @@
                         CategoryProperty="@nameof(SkillData.Skill)"
                         ValueProperty="@nameof(SkillData.Score)"
                         Title="Bob" />
-</RadzenSpiderChart>
+    </RadzenSpiderChart>
+</RadzenStack>
 
 @code {
     ColorScheme colorScheme = ColorScheme.Pastel;

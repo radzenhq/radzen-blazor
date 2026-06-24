@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using System.Linq;
 using Radzen.Blazor.Rendering;
@@ -13,7 +14,9 @@ namespace Radzen.Blazor
     /// Base class of <see cref="RadzenChart" /> series.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data.</typeparam>
-    public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IDisposable
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
+    public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IDisposable
     {
         /// <summary>
         /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on
@@ -57,9 +60,14 @@ namespace Radzen.Blazor
 
             if (scale is OrdinalScale ordinal)
             {
-                Func<TItem, object> category = String.IsNullOrEmpty(CategoryProperty) ? (item) => string.Empty : PropertyAccess.Getter<TItem, object>(CategoryProperty);
+                if (String.IsNullOrEmpty(CategoryProperty))
+                {
+                    return (item) => Items.IndexOf(item);
+                }
 
-                return (item) => ordinal.Data?.IndexOf(category(item)) ?? -1;
+                var ordinalCategory = PropertyAccess.Getter<TItem, object>(CategoryProperty);
+
+                return (item) => ordinal.Data?.IndexOf(ordinalCategory(item)) ?? -1;
             }
 
             return (item) => Items.IndexOf(item);
@@ -157,6 +165,13 @@ namespace Radzen.Blazor
 
             return PropertyAccess.IsNumeric(property);
         }
+
+        /// <summary>
+        /// Gets or sets the name of the value axis this series is bound to.
+        /// When null or empty, the series uses the primary (default) axis.
+        /// </summary>
+        [Parameter]
+        public string? ValueAxisName { get; set; }
 
         /// <inheritdoc />
         [Parameter]
@@ -299,9 +314,12 @@ namespace Radzen.Blazor
         /// </summary>
         protected virtual IList<object> GetCategories()
         {
-            Func<TItem, object> category = String.IsNullOrEmpty(CategoryProperty) ? (item) => string.Empty : PropertyAccess.Getter<TItem, object>(CategoryProperty);
+            if (String.IsNullOrEmpty(CategoryProperty))
+            {
+                return Items.Select((item, index) => (object)index).ToList();
+            }
 
-            return Items.Select(category).ToList();
+            return Items.Select(PropertyAccess.Getter<TItem, object>(CategoryProperty)).ToList();
         }
 
         /// <inheritdoc />
@@ -397,7 +415,24 @@ namespace Radzen.Blazor
                 builder.OpenRegion(0);
                 foreach (var overlay in Overlays)
                 {
-                    if (overlay.Visible)
+                    if (overlay.Visible && !overlay.RenderOnTop)
+                    {
+                        builder.AddContent(1, overlay.Render(categoryScale, valueScale));
+                    }
+                }
+                builder.CloseRegion();
+            });
+        }
+
+        /// <inheritdoc />
+        public RenderFragment RenderTopOverlays(ScaleBase categoryScale, ScaleBase valueScale)
+        {
+            return new RenderFragment(builder =>
+            {
+                builder.OpenRegion(0);
+                foreach (var overlay in Overlays)
+                {
+                    if (overlay.Visible && overlay.RenderOnTop)
                     {
                         builder.AddContent(1, overlay.Render(categoryScale, valueScale));
                     }
@@ -408,6 +443,12 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         public abstract string Color { get; }
+
+        /// <summary>
+        /// Specifies whether the chart highlights the hovered data point of this series with an active point
+        /// dot. Range-style series override this to <c>false</c> - a single dot cannot represent their value range.
+        /// </summary>
+        public virtual bool ShowActivePoint => true;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -483,6 +524,12 @@ namespace Radzen.Blazor
         public virtual double MeasureLegend()
         {
             return TextMeasurer.TextWidth(GetTitle());
+        }
+
+        /// <inheritdoc />
+        public virtual IEnumerable<double> MeasureLegendItems()
+        {
+            return new[] { TextMeasurer.TextWidth(GetTitle()) };
         }
 
         /// <summary>
@@ -661,9 +708,15 @@ namespace Radzen.Blazor
                 builder.AddAttribute(6, nameof(LegendItem.Text), GetTitle());
                 builder.AddAttribute(7, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
                 builder.AddAttribute(8, nameof(LegendItem.Clickable), clickable);
+                builder.AddAttribute(9, nameof(LegendItem.ShowLine), ShowLineInLegend);
                 builder.CloseComponent();
             };
         }
+
+        /// <summary>
+        /// Specifies whether the legend swatch displays a line indicator instead of a filled marker. Overridden by line series.
+        /// </summary>
+        protected internal virtual bool ShowLineInLegend => false;
 
         /// <inheritdoc />
         public double MarkerSize
@@ -732,18 +785,18 @@ namespace Radzen.Blazor
             {
                 Func<TItem, double> X;
                 Func<TItem, double> Y;
+                var vs = chart.GetValueScale(ValueAxisName);
                 if (chart.ShouldInvertAxes())
                 {
-                    var valueScale = chart.ValueScale;
-                    var categoryAccessor = Category(chart.ValueScale);
+                    var categoryAccessor = Category(vs);
                     X = e => chart.CategoryScale.Scale(Value(e));
-                    Y = e => valueScale.Scale(categoryAccessor(e));
+                    Y = e => vs.Scale(categoryAccessor(e));
                 }
                 else
                 {
                     var categoryAccessor = Category(chart.CategoryScale);
                     X = e => chart.CategoryScale.Scale(categoryAccessor(e));
-                    Y = e => chart.ValueScale.Scale(Value(e));
+                    Y = e => vs.Scale(Value(e));
                 }
 
                 var data = Items.ToList();
@@ -765,6 +818,41 @@ namespace Radzen.Blazor
             }
 
             return (a, b);
+        }
+
+        /// <inheritdoc />
+        public IList<Point> GetScaledDataPoints()
+        {
+            var result = new List<Point>();
+            var chart = Chart;
+            if (chart == null || Items == null || !Items.Any())
+            {
+                return result;
+            }
+
+            var vs = chart.GetValueScale(ValueAxisName);
+            if (chart.ShouldInvertAxes())
+            {
+                var categoryAccessor = Category(vs);
+                foreach (var item in Items)
+                {
+                    var px = chart.CategoryScale.Scale(Value(item));
+                    var py = vs.Scale(categoryAccessor(item));
+                    result.Add(new Point { X = px, Y = py });
+                }
+            }
+            else
+            {
+                var categoryAccessor = Category(chart.CategoryScale);
+                foreach (var item in Items)
+                {
+                    var px = chart.CategoryScale.Scale(categoryAccessor(item));
+                    var py = vs.Scale(Value(item));
+                    result.Add(new Point { X = px, Y = py });
+                }
+            }
+
+            return result;
         }
 
         private async Task OnLegendItemClick()
@@ -834,7 +922,9 @@ namespace Radzen.Blazor
         protected virtual string TooltipValue(TItem item)
         {
             var chart = RequireChart();
-            return chart.ValueAxis.Format(chart.ValueScale, chart.ValueScale.Value(Value(item)));
+            var valueAxis = chart.GetValueAxis(ValueAxisName);
+            var valueScale = chart.GetValueScale(ValueAxisName);
+            return valueAxis.Format(valueScale, valueScale.Value(Value(item)));
         }
 
         /// <summary>
@@ -855,7 +945,7 @@ namespace Radzen.Blazor
         internal virtual double TooltipY(TItem item)
         {
             var chart = RequireChart();
-            return chart.ValueScale.Scale(Value(item), true);
+            return chart.GetValueScale(ValueAxisName).Scale(Value(item), true);
         }
 
         /// <inheritdoc />
@@ -884,11 +974,51 @@ namespace Radzen.Blazor
 
             foreach (var d in Items)
             {
+                var value = Value(d);
                 list.Add(new ChartDataLabel
                 {
                     Position = new Point { X = TooltipX(d) + offsetX, Y = TooltipY(d) + offsetY },
+                    Anchor = new Point { X = TooltipX(d), Y = TooltipY(d) },
+                    Value = value,
                     TextAnchor = "middle",
-                    Text = chart.ValueAxis.Format(chart.ValueScale, Value(d))
+                    Text = chart.GetValueAxis(ValueAxisName).Format(chart.GetValueScale(ValueAxisName), value)
+                });
+            }
+
+            return list;
+        }
+
+        /// <inheritdoc />
+        public virtual IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
+            if (position == DataLabelPosition.Auto)
+            {
+                return GetDataLabels(offsetX, offsetY);
+            }
+
+            var chart = RequireChart();
+            var list = new List<ChartDataLabel>();
+            const double gap = 16;
+
+            foreach (var d in Items)
+            {
+                var anchorX = TooltipX(d);
+                var anchorY = TooltipY(d);
+                var y = position switch
+                {
+                    DataLabelPosition.Top => anchorY - gap,
+                    DataLabelPosition.Bottom => anchorY + gap,
+                    _ => anchorY,
+                };
+                var value = Value(d);
+
+                list.Add(new ChartDataLabel
+                {
+                    Position = new Point { X = anchorX + offsetX, Y = y + offsetY },
+                    Anchor = new Point { X = anchorX, Y = anchorY },
+                    Value = value,
+                    TextAnchor = "middle",
+                    Text = chart.GetValueAxis(ValueAxisName).Format(chart.GetValueScale(ValueAxisName), value)
                 });
             }
 

@@ -1,0 +1,177 @@
+@using System.Collections.Generic
+@using System.Linq
+@using Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetDialogBase
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableRange)) class="rz-text-subtitle2" />
+        <RadzenLabel Text=@($"{Range.Start}:{Range.End}") class="rz-text-subtitle2" />
+        <span style="flex:1"></span>
+        <RadzenCheckBox @bind-Value=@hasHeaders Name="hasHeadersCheck" TValue="bool" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_SortHasHeaders)) Component="hasHeadersCheck" class="rz-text-subtitle2" />
+    </RadzenStack>
+
+    <RadzenTable class="rz-density-compact" Style="height: 200px">
+        <RadzenTableHeader>
+            <RadzenTableHeaderRow>
+                <RadzenTableHeaderCell Style="width:32px" />
+                <RadzenTableHeaderCell Style="width:160px"><span class="rz-column-title rz-ps-0">@L(nameof(RadzenStrings.Spreadsheet_SortLevelColumn))</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="width:120px"><span class="rz-column-title rz-ps-0">@L(nameof(RadzenStrings.Spreadsheet_SortLevelSortOn))</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="width:130px"><span class="rz-column-title rz-ps-0">@L(nameof(RadzenStrings.Spreadsheet_SortLevelOrder))</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell><span class="rz-column-title rz-ps-0">@L(nameof(RadzenStrings.Spreadsheet_SortLevelCustomList))</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="width:60px"><span class="rz-column-title rz-ps-0" title=@L(nameof(RadzenStrings.Spreadsheet_SortLevelCase))>Aa</span></RadzenTableHeaderCell>
+                <RadzenTableHeaderCell Style="width:120px" />
+            </RadzenTableHeaderRow>
+        </RadzenTableHeader>
+        <RadzenTableBody>
+            @for (var i = 0; i < levels.Count; i++)
+            {
+                var idx = i;
+                var level = levels[idx];
+                <RadzenTableRow>
+                    <RadzenTableCell>@(idx + 1)</RadzenTableCell>
+                    <RadzenTableCell>
+                        <RadzenDropDown TValue="int" Data=@columnOptions
+                            TextProperty="@nameof(ColumnOption.Text)" ValueProperty="@nameof(ColumnOption.Value)"
+                            Value=@level.ColumnIndex
+                            Change=@(v => level.ColumnIndex = (int)v)
+                            InputSize="InputSize.Small" Style="width:100%" />
+                    </RadzenTableCell>
+                    <RadzenTableCell>
+                        <RadzenDropDown TValue="SortOn" Data=@SortOnOptions
+                            TextProperty="@nameof(SortOnOption.Text)" ValueProperty="@nameof(SortOnOption.Value)"
+                            Value=@level.SortOn
+                            Change=@(v => level.SortOn = (SortOn)v)
+                            InputSize="InputSize.Small" Style="width:100%" />
+                    </RadzenTableCell>
+                    <RadzenTableCell>
+                        <RadzenDropDown TValue="SortOrder" Data=@OrderOptions
+                            TextProperty="@nameof(OrderOption.Text)" ValueProperty="@nameof(OrderOption.Value)"
+                            Value=@level.Order
+                            Change=@(v => level.Order = (SortOrder)v)
+                            InputSize="InputSize.Small" Style="width:100%" />
+                    </RadzenTableCell>
+                    <RadzenTableCell>
+                        <RadzenTextBox @bind-Value=@level.CustomListText
+                            Placeholder=@L(nameof(RadzenStrings.Spreadsheet_SortLevelCustomListPlaceholder))
+                            InputSize="InputSize.Small" Style="width:100%" />
+                    </RadzenTableCell>
+                    <RadzenTableCell>
+                        <RadzenCheckBox @bind-Value=@level.CaseSensitive TValue="bool" />
+                    </RadzenTableCell>
+                    <RadzenTableCell Style="white-space: nowrap">
+                        <RadzenButton Icon="arrow_upward" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text"
+                            Size="ButtonSize.Small" Disabled=@(idx == 0)
+                            Click=@(() => Move(idx, -1)) />
+                        <RadzenButton Icon="arrow_downward" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text"
+                            Size="ButtonSize.Small" Disabled=@(idx == levels.Count - 1)
+                            Click=@(() => Move(idx, 1)) />
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text"
+                            Size="ButtonSize.Small" Disabled=@(levels.Count == 1)
+                            Click=@(() => RemoveLevel(idx)) />
+                    </RadzenTableCell>
+                </RadzenTableRow>
+            }
+        </RadzenTableBody>
+    </RadzenTable>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+        <RadzenButton Icon="add" Text=@L(nameof(RadzenStrings.Spreadsheet_SortLevelAddLevel))
+            ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Small" Click=@AddLevel />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End" class="rz-spreadsheet-dialog-actions">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined"
+            Click=@OnCancel />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat"
+            Click=@OnOk />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    [Parameter] public RangeRef Range { get; set; }
+    [Parameter] public List<string> ColumnNames { get; set; } = [];
+
+    /// <summary>The result returned via DialogService when the user clicks OK.</summary>
+    public sealed record Result(SortKey[] Keys, bool HasHeaders);
+
+    private sealed class Level
+    {
+        public int ColumnIndex { get; set; }
+        public SortOrder Order { get; set; } = SortOrder.Ascending;
+        public SortOn SortOn { get; set; } = SortOn.Values;
+        public string CustomListText { get; set; } = "";
+        public bool CaseSensitive { get; set; }
+    }
+
+    private sealed record ColumnOption(string Text, int Value);
+    private sealed record SortOnOption(string Text, SortOn Value);
+    private sealed record OrderOption(string Text, SortOrder Value);
+
+    private bool hasHeaders = true;
+    private readonly List<Level> levels = [];
+    private List<ColumnOption> columnOptions = [];
+
+    private SortOnOption[] SortOnOptions =>
+    [
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOnValues)), SortOn.Values),
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOnCellColor)), SortOn.CellColor),
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOnFontColor)), SortOn.FontColor),
+    ];
+
+    private OrderOption[] OrderOptions =>
+    [
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOrderAscending)), SortOrder.Ascending),
+        new(L(nameof(RadzenStrings.Spreadsheet_SortOrderDescending)), SortOrder.Descending),
+    ];
+
+    private string FormatColumnName(int number) =>
+        string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_ColumnFormat)), number);
+
+    protected override void OnInitialized()
+    {
+        columnOptions = ColumnNames
+            .Select((n, i) => new ColumnOption(string.IsNullOrEmpty(n) ? FormatColumnName(i + 1) : n, i))
+            .ToList();
+        if (columnOptions.Count == 0)
+        {
+            for (var i = 0; i < Math.Max(1, Range.Columns); i++)
+                columnOptions.Add(new ColumnOption(FormatColumnName(i + 1), i));
+        }
+        levels.Add(new Level { ColumnIndex = 0 });
+    }
+
+    private void AddLevel() => levels.Add(new Level { ColumnIndex = 0 });
+
+    private void RemoveLevel(int idx)
+    {
+        if (levels.Count > 1) levels.RemoveAt(idx);
+    }
+
+    private void Move(int idx, int delta)
+    {
+        var newIdx = idx + delta;
+        if (newIdx < 0 || newIdx >= levels.Count) return;
+        (levels[idx], levels[newIdx]) = (levels[newIdx], levels[idx]);
+    }
+
+    private void OnOk()
+    {
+        var keys = levels.Select(l => new SortKey
+        {
+            ColumnIndex = l.ColumnIndex,
+            Order = l.Order,
+            SortOn = l.SortOn,
+            CaseSensitive = l.CaseSensitive,
+            CustomList = string.IsNullOrWhiteSpace(l.CustomListText)
+                ? null
+                : l.CustomListText.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0).ToArray(),
+        }).ToArray();
+
+        DialogService.Close(new Result(keys, hasHeaders));
+    }
+}

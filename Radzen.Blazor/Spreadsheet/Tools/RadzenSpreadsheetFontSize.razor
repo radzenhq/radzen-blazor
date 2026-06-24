@@ -1,0 +1,79 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenDropDown Value=@CurrentFontSize ValueChanged=@OnFontSizeChangedAsync TValue="double" Data=@FontSizes
+    Disabled=@IsDisabled InputSize="InputSize.Small" Style="width: 65px" />
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private static readonly List<double> FontSizes =
+    [
+        8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 36, 48, 72
+    ];
+
+    private double CurrentFontSize
+    {
+        get
+        {
+            if (Worksheet?.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.FontSize ?? 11;
+            }
+            return 11;
+        }
+    }
+
+    private async Task OnFontSizeChangedAsync(double value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        if (!Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+        {
+            return;
+        }
+
+        double? fontSize = value == 11 ? null : value;
+        var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithFontSize(fontSize));
+        await Spreadsheet.ExecuteAsync(command);
+    }
+
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
+
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public RadzenSpreadsheetFontSize()
+    {
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
+
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        selectionBinding.Dispose();
+    }
+}

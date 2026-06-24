@@ -1,5 +1,6 @@
-<RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
         <RadzenStack Gap="0.25rem">
             <RadzenText TextStyle="TextStyle.Caption">Legend Position</RadzenText>
             <RadzenSelectBar @bind-Value="legendPosition" TValue="LegendPosition" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
@@ -15,10 +16,10 @@
             <RadzenSwitch @bind-Value="legendVisible" Name="legendVisible" Change="@(() => StateHasChanged())" />
             <RadzenLabel Text="Show Legend" Component="legendVisible" />
         </RadzenStack>
-    </RadzenStack>
-</RadzenCard>
+        </RadzenStack>
+    </RadzenCard>
 
-<RadzenSpiderChart Style="width: 100%; height: 500px;">
+    <RadzenSpiderChart Style="width: 100%; height: 500px;">
     <RadzenSpiderLegend Position="@legendPosition" Visible="@legendVisible" />
     <RadzenSpiderSeries TItem="SkillData"
                         Data="@aliceData"
@@ -30,7 +31,8 @@
                         CategoryProperty="@nameof(SkillData.Skill)"
                         ValueProperty="@nameof(SkillData.Score)"
                         Title="Bob" />
-</RadzenSpiderChart>
+    </RadzenSpiderChart>
+</RadzenStack>
 
 @code {
     LegendPosition legendPosition = LegendPosition.Right;

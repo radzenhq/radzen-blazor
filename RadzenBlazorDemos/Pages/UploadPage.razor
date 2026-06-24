@@ -1,13 +1,13 @@
-@page "/example-upload"
+@page "/upload"
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Blazor Upload
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Drag-and-drop, progress tracking, and multiple file support.
+    The Blazor Upload component uploads single or multiple files to a server endpoint, with drag-and-drop, progress tracking, validation, and custom headers.
 </RadzenText>
 
-<RadzenText Anchor="example-upload#change" TextStyle="TextStyle.H5" TagName="TagName.H2">
+<RadzenText Anchor="upload#change" TextStyle="TextStyle.H5" TagName="TagName.H2">
     Upload files
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -16,7 +16,7 @@
 <RadzenExample ComponentName="Upload" Example="UploadChange">
     <UploadChange />
 </RadzenExample>
-<RadzenText Anchor="example-upload#url" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#url" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Upload files to a server
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -27,7 +27,7 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadUrl)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadUrl />
 </RadzenExample>
-<RadzenText Anchor="example-upload#multiple" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#multiple" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Upload multiple files
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -36,7 +36,7 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadMultiple)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadMultiple />
 </RadzenExample>
-<RadzenText Anchor="example-upload#from-code" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#from-code" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Trigger upload from code
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -45,7 +45,7 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadFromCode)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadFromCode />
 </RadzenExample>
-<RadzenText Anchor="example-upload#filter" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#filter" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     File filter
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -54,7 +54,7 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadImage)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadImage />
 </RadzenExample>
-<RadzenText Anchor="example-upload#parameters" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#parameters" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Use parameters
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -63,7 +63,7 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadParameters)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadParameters />
 </RadzenExample>
-<RadzenText Anchor="example-upload#progress" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#progress" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Show upload progress
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -72,7 +72,7 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadProgress)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadProgress />
 </RadzenExample>
-<RadzenText Anchor="example-upload#drag-drop" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#drag-drop" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Drag and drop files to upload
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -81,7 +81,7 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadDragDrop)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadDragDrop />
 </RadzenExample>
-<RadzenText Anchor="example-upload#custom-headers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#custom-headers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Send custom HTTP headers
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -90,7 +90,7 @@
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadCustomHeaders)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadCustomHeaders />
 </RadzenExample>
-<RadzenText Anchor="example-upload#parameter-name" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#parameter-name" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Specify action method parameter name
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
@@ -101,7 +101,7 @@
     <UploadParameterName />
 </RadzenExample>
 
-<RadzenText Anchor="example-upload#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="upload#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Keyboard Navigation
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">

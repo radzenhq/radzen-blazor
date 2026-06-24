@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,6 +41,7 @@ namespace Radzen.Blazor
     ///                      TextProperty="Name" ValueProperty="Id" Orientation="Orientation.Horizontal" /&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>
     {
         string ItemClass(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
@@ -305,7 +307,9 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled || ReadOnly || item.ReadOnly)
+            {
                 return;
+            }
 
             focusedIndex = allItems.IndexOf(item);
 
@@ -359,7 +363,10 @@ namespace Radzen.Blazor
 
             var item = allItems.ElementAtOrDefault(focusedIndex) ?? allItems.FirstOrDefault();
 
-            if (item == null) return;
+            if (item == null)
+            {
+                return;
+            }
 
             if ((Orientation == Orientation.Horizontal && (key == "ArrowLeft" || key == "ArrowRight")) ||
                 (Orientation == Orientation.Vertical && (key == "ArrowUp" || key == "ArrowDown")))

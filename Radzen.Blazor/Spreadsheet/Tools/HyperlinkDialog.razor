@@ -1,0 +1,53 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_URL)) Component="url" class="rz-text-subtitle2" Style="align-self: start" />
+        <RadzenTextBox @bind-Value=@Url Name="url" Style="width: 100%" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_DisplayText)) Component="displayText" class="rz-text-subtitle2" Style="align-self: start" />
+        <RadzenTextBox @bind-Value=@Text Name="displayText" Style="width: 100%" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="rz-spreadsheet-dialog-actions">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public string Url { get; set; } = "";
+
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Inject]
+    public DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
+    private void OnOk()
+    {
+        if (!string.IsNullOrWhiteSpace(Url))
+        {
+            DialogService.Close(new Hyperlink
+            {
+                Url = Url,
+                Text = string.IsNullOrWhiteSpace(Text) ? null : Text
+            });
+        }
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close(null);
+    }
+}

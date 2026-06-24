@@ -1,0 +1,38 @@
+@namespace Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+
+<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button">
+    <InputFile OnChange=@OnUploadAsync accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" />
+    <i class="notranslate rzi">folder_open</i>
+</RadzenButton>
+@code {
+    #nullable enable
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    [Parameter]
+    public CsvImportOptions? CsvImportOptions { get; set; }
+
+    async Task OnUploadAsync(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+
+        if (file is null || Spreadsheet is null) return;
+
+        using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10); // 10 MB max size
+        using var memoryStream = new MemoryStream();
+
+        await stream.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;
+
+        var ext = Path.GetExtension(file.Name);
+        var workbook = string.Equals(ext, ".csv", StringComparison.OrdinalIgnoreCase)
+            ? Workbook.LoadFromCsv(memoryStream, CsvImportOptions)
+            : Workbook.LoadFromStream(memoryStream);
+
+        await Spreadsheet.LoadWorkbookAsync(workbook);
+    }
+}

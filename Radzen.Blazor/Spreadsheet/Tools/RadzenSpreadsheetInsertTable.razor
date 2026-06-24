@@ -1,0 +1,84 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inherits RadzenSpreadsheetToolBase
+@inject DialogService DialogService
+
+<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" ButtonType="ButtonType.Button"
+    Disabled=@IsDisabled
+    Click=@OnClick
+    Icon="table_chart"
+    title=@Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertTable)) />
+
+@code {
+#nullable enable
+
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Tables;
+
+    private async Task OnClick()
+    {
+        if (Worksheet is null || Spreadsheet is null || Worksheet.Selection.Cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        var initialRange = Worksheet.Selection.Range;
+        if (initialRange.Rows == 0 || initialRange.Columns == 0)
+        {
+            return;
+        }
+
+        // Auto-generate a unique table name within the workbook.
+        var nextIndex = 1;
+        var existing = new System.Collections.Generic.HashSet<string>(
+            Worksheet.Workbook.Sheets.SelectMany(s => s.Tables).Select(t => t.Name),
+            StringComparer.OrdinalIgnoreCase);
+        while (existing.Contains($"Table{nextIndex}")) nextIndex++;
+
+        var draft = new InsertTableDraft
+        {
+            Name = $"Table{nextIndex}",
+            HasHeaders = true,
+            RangeFormula = FormulaFormat.ToAbsoluteFormula(Worksheet, initialRange),
+        };
+
+        string? focusFieldId = null;
+        var title = Spreadsheet.Localize(nameof(RadzenStrings.Spreadsheet_InsertTable));
+        object? result;
+
+        // Loop only while the dialog closes for a range-pick request. On OK
+        // (InsertTableDraft) or Cancel (null) the dialog returns and we exit.
+        do
+        {
+            var args = new System.Collections.Generic.Dictionary<string, object?>
+            {
+                ["Draft"]        = draft,
+                ["FocusFieldId"] = focusFieldId,
+            };
+
+            result = await DialogService.OpenAsync<InsertTableDialog>(
+                title,
+                args,
+                new DialogOptions { Width = "420px", ShowClose = true });
+
+            if (result is RangePickRequest pick)
+            {
+                var picked = await ((Radzen.Blazor.RadzenSpreadsheet)Spreadsheet).BeginRangePickAsync(pick.Value);
+                if (picked != null && pick.FieldId == InsertTableDialog.RangeFieldId)
+                {
+                    draft.RangeFormula = picked;
+                }
+                focusFieldId = pick.FieldId;
+            }
+        }
+        while (result is RangePickRequest);
+
+        if (result is InsertTableDraft finalDraft)
+        {
+            var range = FormulaFormat.TryParseFormula(finalDraft.RangeFormula, out var parsed)
+                ? parsed
+                : initialRange;
+            await Spreadsheet.ExecuteAsync(new InsertTableCommand(Worksheet, finalDraft.Name, range, finalDraft.HasHeaders));
+        }
+    }
+}

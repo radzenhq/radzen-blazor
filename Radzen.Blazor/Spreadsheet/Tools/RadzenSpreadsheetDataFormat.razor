@@ -1,0 +1,95 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenDropDown Value=@CurrentFormat ValueChanged=@OnFormatChangedAsync TValue="string" Data=@FormatOptions TextProperty="Name" ValueProperty="FormatCode"
+    Disabled=@IsDisabled InputSize="InputSize.Small" Style="width: 130px" />
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private List<FormatOption>? formatOptions;
+    private List<FormatOption> FormatOptions => formatOptions ??=
+    [
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatGeneral)) ?? "General", "General"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatNumber)) ?? "Number", "#,##0.00"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatCurrency)) ?? "Currency", "$#,##0.00"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatAccounting)) ?? "Accounting", "_($* #,##0.00_);_($* (#,##0.00);_($* \"-\"??_);_(@_)"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatPercentage)) ?? "Percentage", "0%"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatScientific)) ?? "Scientific", "0.00E+00"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatDate)) ?? "Date", "mm/dd/yyyy"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatTime)) ?? "Time", "h:mm AM/PM"),
+        new(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FormatText)) ?? "Text", "@")
+    ];
+
+    private string CurrentFormat
+    {
+        get
+        {
+            if (Worksheet?.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.NumberFormat ?? "General";
+            }
+            return "General";
+        }
+    }
+
+    private async Task OnFormatChangedAsync(string value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        if (!Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+        {
+            return;
+        }
+
+        var format = value == "General" ? null : value;
+        var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithNumberFormat(format));
+        await Spreadsheet.ExecuteAsync(command);
+    }
+
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
+
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public RadzenSpreadsheetDataFormat()
+    {
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
+
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        selectionBinding.Dispose();
+    }
+
+    private sealed class FormatOption(string name, string formatCode)
+    {
+        public string Name { get; } = name;
+        public string FormatCode { get; } = formatCode;
+    }
+}

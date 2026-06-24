@@ -21,5 +21,11 @@ namespace Radzen.Blazor
         /// <value>The title template.</value>
         [Parameter]
         public RenderFragment? TitleTemplate { get; set; }
+
+        /// <inheritdoc />
+        internal override double LabelInnerRadius(double outerRadius)
+        {
+            return InnerRadius ?? outerRadius / 2;
+        }
     }
 }

@@ -7,6 +7,14 @@ $colorpicker-saturation-height: 200px !default;
 $colorpicker-focus-outline: var(--rz-outline-focus) !default;
 $colorpicker-focus-outline-offset: var(--rz-outline-offset) !default;
 $colorpicker-value-border-radius: var(--rz-border-radius) !default;
+$colorpicker-value-size-xs: 0.875rem !default;
+$colorpicker-value-size-sm: 1.125rem !default;
+$colorpicker-value-size-md: 20px !default;
+$colorpicker-value-size-lg: 20px !default;
+$colorpicker-trigger-icon-size-xs: 1rem !default;
+$colorpicker-trigger-icon-size-sm: 1rem !default;
+$colorpicker-trigger-icon-size-md: var(--rz-icon-size) !default;
+$colorpicker-trigger-icon-size-lg: var(--rz-icon-size) !default;
 $colorpicker-items-gap: 0.5rem !default;
 $colorpicker-item-size: 1.25rem !default;
 $colorpicker-item-border-radius: var(--rz-border-radius) !default;
@@ -45,7 +53,7 @@ button.rz-colorpicker-trigger {
   outline: none;
 
   .rzi {
-    font-size: var(--rz-icon-size);
+    font-size: var(--rz-colorpicker-trigger-icon-size);
     &:before {
       content: 'arrow_drop_down';
     }
@@ -73,8 +81,18 @@ button.rz-colorpicker-trigger {
   flex: 1;
   border-radius: var(--rz-colorpicker-value-border-radius);
   border: var(--rz-colorpicker-panel-border);
-  min-width: 20px;
-  min-height: 20px;
+  min-width: var(--rz-colorpicker-value-size);
+  min-height: var(--rz-colorpicker-value-size);
+}
+
+.rz-colorpicker.rz-input-xs {
+  --rz-colorpicker-value-size: var(--rz-colorpicker-value-size-xs);
+  --rz-colorpicker-trigger-icon-size: var(--rz-colorpicker-trigger-icon-size-xs);
+}
+
+.rz-colorpicker.rz-input-sm {
+  --rz-colorpicker-value-size: var(--rz-colorpicker-value-size-sm);
+  --rz-colorpicker-trigger-icon-size: var(--rz-colorpicker-trigger-icon-size-sm);
 }
 
 .rz-saturation-picker {
@@ -265,8 +283,11 @@ button.rz-colorpicker-trigger {
 }
 
 .rz-colorpicker-button {
-  justify-content: flex-end;
   display: flex;
+
+  > .rz-button {
+    flex: 1;
+  }
 }
 
 .rz-colorpicker-section {

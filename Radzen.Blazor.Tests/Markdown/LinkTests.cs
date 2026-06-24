@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Xunit;
 
-namespace Radzen.Blazor.Markdown.Tests;
+namespace Radzen.Documents.Markdown.Tests;
 
 public class LinkTests
 {

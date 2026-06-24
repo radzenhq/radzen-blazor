@@ -25,6 +25,21 @@
       [Parameter]
       public double Padding { get; set; }
 
+      /// <summary>
+      /// Specifies whether categories are placed between ticks (reserving half a band at each end) or
+      /// on the ticks (flush to the plot edges). The default is <see cref="TickPlacement.Between" />.
+      /// </summary>
+      [Parameter]
+      public TickPlacement TickPlacement { get; set; } = TickPlacement.Between;
+
+      /// <inheritdoc />
+      protected override bool ShouldRefreshChart(ParameterView parameters)
+      {
+          return base.ShouldRefreshChart(parameters)
+              || DidParameterChange(parameters, nameof(Padding), Padding)
+              || DidParameterChange(parameters, nameof(TickPlacement), TickPlacement);
+      }
+
       internal override double Size
       {
           get

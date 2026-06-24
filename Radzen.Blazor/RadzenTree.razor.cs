@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
@@ -44,6 +45,7 @@ namespace Radzen.Blazor
     /// }
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenTree : RadzenComponent
     {
         /// <summary>
@@ -287,7 +289,10 @@ namespace Radzen.Blazor
             }
 
             var level = depth < Levels.Count ? Levels.ElementAt(depth) : (Levels.Count > 0 ? Levels.LastOrDefault() : null);
-            if (level == null) return _ => { };
+            if (level == null)
+            {
+                return _ => { };
+            }
 
             return builder =>
             {

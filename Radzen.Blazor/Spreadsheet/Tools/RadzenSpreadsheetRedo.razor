@@ -1,0 +1,51 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnRedoAsync Icon="redo" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public UndoRedoStack? Commands { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private bool IsDisabled
+        => Commands is null
+        || !Commands.CanRedo
+        || Spreadsheet?.CanRedo == false;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Commands is not null)
+        {
+            Commands.Changed -= OnCommandsChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Commands is not null)
+        {
+            Commands.Changed += OnCommandsChanged;
+        }
+    }
+
+    private void OnCommandsChanged()
+    {
+        StateHasChanged();
+    }
+
+    private void OnRedoAsync() => Spreadsheet?.Redo();
+
+    public void Dispose()
+    {
+        if (Commands is not null)
+        {
+            Commands.Changed -= OnCommandsChanged;
+        }
+    }
+}

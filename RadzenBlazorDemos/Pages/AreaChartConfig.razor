@@ -11,19 +11,38 @@
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
                 <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Fill" Component="fillMode" />
+                <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                    <Items>
+                        <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                        <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                        <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Tick Placement" Component="tickPlacement" />
+                <RadzenSelectBar @bind-Value="@tickPlacement" TValue="TickPlacement" Size="ButtonSize.Small" Name="tickPlacement">
+                    <Items>
+                        <RadzenSelectBarItem Value="TickPlacement.Between" Text="Between" />
+                        <RadzenSelectBarItem Value="TickPlacement.On" Text="On" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
 
-    <RadzenChart>
-        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
+    <RadzenChart Animate="true">
+        <RadzenAreaSeries Smooth="@smooth" FillMode="@fillMode" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
             <RadzenSeriesDataLabels Visible="@showDataLabels" />
         </RadzenAreaSeries>
-        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2024" CategoryProperty="Date" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+        <RadzenAreaSeries Smooth="@smooth" FillMode="@fillMode" Data="@revenue2024" CategoryProperty="Date" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
             <RadzenSeriesDataLabels Visible="@showDataLabels" />
         </RadzenAreaSeries>
-        <RadzenCategoryAxis Padding="20" LabelAutoRotation="-45" />
+        <RadzenCategoryAxis LabelAutoRotation="-45" TickPlacement="@tickPlacement" />
         <RadzenValueAxis Formatter="@FormatAsUSD">
-            <RadzenGridLines Visible="true" />
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
             <RadzenAxisTitle Text="Revenue in USD" />
         </RadzenValueAxis>
     </RadzenChart>
@@ -32,6 +51,8 @@
 @code {
     bool smooth = true;
     bool showDataLabels = false;
+    FillMode fillMode = FillMode.Gradient;
+    TickPlacement tickPlacement = TickPlacement.Between;
     class DataItem
     {
         public string Date { get; set; }

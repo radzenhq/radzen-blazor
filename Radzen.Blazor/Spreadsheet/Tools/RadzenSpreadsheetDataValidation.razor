@@ -1,0 +1,42 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Blazor.Spreadsheet.Tools
+@using Radzen.Documents.Spreadsheet
+@inject DialogService DialogService
+@inherits RadzenSpreadsheetToolBase
+
+<RadzenSplitButton Click=@OnClickAsync Icon="rule" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Validation)) ?? "Validation") Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+    <ChildContent>
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationMenu)) ?? "Data Validation...") Value="validate" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ClearValidation)) ?? "Clear Validation") Value="clear" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.DataValidation;
+
+    private async Task OnClickAsync(RadzenSplitButtonItem? item)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        var action = item?.Value ?? "validate";
+
+        if (action == "clear")
+        {
+            await Spreadsheet.ExecuteAsync(new ClearValidationCommand(Worksheet, Worksheet.Selection.Range));
+            return;
+        }
+
+        var result = await DialogService.OpenAsync<DataValidationDialog>(Spreadsheet.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationTitle)),
+            null, new DialogOptions { Width = "520px" });
+
+        if (result is DataValidationRule rule)
+        {
+            await Spreadsheet.ExecuteAsync(new DataValidationCommand(Worksheet, Worksheet.Selection.Range, rule));
+        }
+    }
+}

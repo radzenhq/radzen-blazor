@@ -4,6 +4,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace Radzen.Blazor
     ///                         TextProperty="Name" ValueProperty="Id" DisabledProperty="IsDisabled" /&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
     {
         string ItemClass(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
@@ -236,7 +238,9 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled)
+            {
                 return;
+            }
 
             focusedIndex = allItems.IndexOf(item);
 
@@ -285,7 +289,10 @@ namespace Radzen.Blazor
 
             var item = allItems.ElementAtOrDefault(focusedIndex) ?? allItems.FirstOrDefault();
 
-            if (item == null) return;
+            if (item == null)
+            {
+                return;
+            }
 
             if ((Orientation == Orientation.Horizontal && (key == "ArrowLeft" || key == "ArrowRight")) ||
                 (Orientation == Orientation.Vertical && (key == "ArrowUp" || key == "ArrowDown")))

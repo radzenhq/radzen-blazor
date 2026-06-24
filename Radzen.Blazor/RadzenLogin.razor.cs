@@ -152,65 +152,83 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowLoginButton { get; set; } = true;
 
+        private string? loginText;
+
         /// <summary>
         /// Gets or sets the login text.
         /// </summary>
         /// <value>The login text.</value>
         [Parameter]
-        public string LoginText { get; set; } = "Login";
+        public string LoginText { get => loginText ?? Localize(nameof(RadzenStrings.Login_LoginText)); set => loginText = value; }
+
+        private string? registerText;
 
         /// <summary>
         /// Gets or sets the register text.
         /// </summary>
         /// <value>The register text.</value>
         [Parameter]
-        public string RegisterText { get; set; } = "Sign up";
+        public string RegisterText { get => registerText ?? Localize(nameof(RadzenStrings.Login_RegisterText)); set => registerText = value; }
+
+        private string? rememberMeText;
 
         /// <summary> Gets or sets the remember me text.</summary>
         [Parameter]
-        public string RememberMeText { get; set; } = "Remember me";
+        public string RememberMeText { get => rememberMeText ?? Localize(nameof(RadzenStrings.Login_RememberMeText)); set => rememberMeText = value; }
+
+        private string? registerMessageText;
 
         /// <summary>
         /// Gets or sets the register message text.
         /// </summary>
         /// <value>The register message text.</value>
         [Parameter]
-        public string RegisterMessageText { get; set; } = "Don't have an account yet?";
+        public string RegisterMessageText { get => registerMessageText ?? Localize(nameof(RadzenStrings.Login_RegisterMessageText)); set => registerMessageText = value; }
+
+        private string? resetPasswordText;
 
         /// <summary>
         /// Gets or sets the reset password text.
         /// </summary>
         /// <value>The reset password text.</value>
         [Parameter]
-        public string ResetPasswordText { get; set; } = "Forgot password?";
+        public string ResetPasswordText { get => resetPasswordText ?? Localize(nameof(RadzenStrings.Login_ResetPasswordText)); set => resetPasswordText = value; }
+
+        private string? userText;
 
         /// <summary>
         /// Gets or sets the user text.
         /// </summary>
         /// <value>The user text.</value>
         [Parameter]
-        public string UserText { get; set; } = "Username";
+        public string UserText { get => userText ?? Localize(nameof(RadzenStrings.Login_UserText)); set => userText = value; }
+
+        private string? userRequired;
 
         /// <summary>
         /// Gets or sets the user required text.
         /// </summary>
         /// <value>The user required text.</value>
         [Parameter]
-        public string UserRequired { get; set; } = "Username is required";
+        public string UserRequired { get => userRequired ?? Localize(nameof(RadzenStrings.Login_UserRequired)); set => userRequired = value; }
+
+        private string? passwordText;
 
         /// <summary>
         /// Gets or sets the password text.
         /// </summary>
         /// <value>The password text.</value>
         [Parameter]
-        public string PasswordText { get; set; } = "Password";
+        public string PasswordText { get => passwordText ?? Localize(nameof(RadzenStrings.Login_PasswordText)); set => passwordText = value; }
+
+        private string? passwordRequired;
 
         /// <summary>
         /// Gets or sets the password required.
         /// </summary>
         /// <value>The password required.</value>
         [Parameter]
-        public string PasswordRequired { get; set; } = "Password is required";
+        public string PasswordRequired { get => passwordRequired ?? Localize(nameof(RadzenStrings.Login_PasswordRequired)); set => passwordRequired = value; }
 
         /// <summary>
         /// Called when login.

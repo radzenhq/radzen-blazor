@@ -1,0 +1,88 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Sales Report", 50, 26);
+
+        sheet.BeginUpdate();
+
+        var headerFormat = new Format { Bold = true, FontSize = 14, TextAlign = TextAlign.Center, BackgroundColor = "#1e88e5", Color = "#ffffff" };
+        var columnHeaderFormat = new Format { Bold = true, BackgroundColor = "#e3f2fd", TextAlign = TextAlign.Center, Color = "#005da1" };
+        var currencyFormat = new Format { NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right };
+        var totalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#e8f5e9", Color = "#0f2e10" };
+        var grandTotalFormat = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
+
+        // Title row
+        sheet.MergedCells.Add(RangeRef.Parse("A1:G1"));
+        sheet.Cells["A1"].Value = "Quarterly Sales Report 2025";
+        sheet.Cells["A1"].Format = headerFormat;
+        sheet.Rows[0] = 32;
+
+        // Column headers
+        string[] headers = { "Product", "Q1", "Q2", "Q3", "Q4", "Total", "% of Total" };
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[1, i].Value = headers[i];
+            sheet.Cells[1, i].Format = columnHeaderFormat;
+        }
+        sheet.Columns[0] = 140;
+        for (int i = 1; i <= 5; i++) sheet.Columns[i] = 100;
+        sheet.Columns[6] = 90;
+
+        // Product data
+        string[] products = { "Laptops", "Monitors", "Keyboards", "Headsets", "Webcams", "Mice", "Cables", "Docking Stations", "Speakers", "Software Licenses" };
+        double[,] sales = {
+            { 45200, 52100, 48700, 61300 },
+            { 18500, 21300, 19800, 24600 },
+            { 8200, 7600, 9100, 11400 },
+            { 12300, 14500, 13200, 16800 },
+            { 6700, 8200, 7500, 9100 },
+            { 5400, 6100, 5800, 7200 },
+            { 3200, 2900, 3500, 4100 },
+            { 22100, 25400, 23800, 29600 },
+            { 4800, 5600, 5200, 6500 },
+            { 31000, 35200, 33500, 42000 }
+        };
+
+        for (int row = 0; row < products.Length; row++)
+        {
+            int r = row + 2;
+            sheet.Cells[r, 0].Value = products[row];
+            for (int q = 0; q < 4; q++)
+            {
+                sheet.Cells[r, q + 1].Value = sales[row, q];
+                sheet.Cells[r, q + 1].Format = currencyFormat;
+            }
+            // Total formula
+            var rowNum = r + 1;
+            sheet.Cells[r, 5].Formula = $"=SUM(B{rowNum}:E{rowNum})";
+            sheet.Cells[r, 5].Format = new Format { Bold = true, NumberFormat = "$#,##0.00", TextAlign = TextAlign.Right };
+            // % of Total formula
+            sheet.Cells[r, 6].Formula = $"=F{rowNum}/F13";
+            sheet.Cells[r, 6].Format = new Format { NumberFormat = "0.0%", TextAlign = TextAlign.Right };
+        }
+
+        // Grand total row (row 13, 1-indexed row 14)
+        sheet.Cells["A13"].Value = "Grand Total";
+        sheet.Cells["A13"].Format = new Format { Bold = true, BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
+        for (int col = 1; col <= 5; col++)
+        {
+            var colLetter = (char)('A' + col);
+            sheet.Cells[12, col].Formula = $"=SUM({colLetter}3:{colLetter}12)";
+            sheet.Cells[12, col].Format = grandTotalFormat;
+        }
+        sheet.Cells["G13"].Value = 1.0;
+        sheet.Cells["G13"].Format = new Format { Bold = true, NumberFormat = "0.0%", TextAlign = TextAlign.Right, BackgroundColor = "#c8e6c9", Color = "#0f2e10" };
+
+        // Freeze header rows
+        sheet.Rows.Frozen = 2;
+
+        sheet.EndUpdate();
+    }
+}

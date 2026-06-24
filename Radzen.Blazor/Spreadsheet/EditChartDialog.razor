@@ -1,0 +1,133 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetDialogBase
+
+<RadzenStack Gap="0" Style="max-height: 70vh; display: flex; flex-direction: column">
+<RadzenStack Gap="0.5rem" Style="padding: 0.25rem; overflow-y: auto; flex: 1">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ChartType)) Component="chartType" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenDropDown Value=@Draft.ChartType Change=@(v => Draft.ChartType = (SpreadsheetChartType)v) Data=@chartTypes TextProperty="Text" ValueProperty="Value" Name="chartType" InputSize="InputSize.Small" Style="flex: 1" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ChartTitle)) Component="chartTitle" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenTextBox Value=@Draft.Title Change=@(v => Draft.Title = v) Name="chartTitle" InputSize="InputSize.Small" Style="flex: 1" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Style="padding-inline-start: 8.5rem">
+        <RadzenCheckBox Value=@Draft.ShowLegend Change=@((bool v) => Draft.ShowLegend = v) TValue="bool" Name="showLegend" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ShowLegend)) Component="showLegend" class="rz-text-subtitle2" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_LegendPosition)) Component="legendPosition" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenDropDown Value=@Draft.LegendPosition Change=@(v => Draft.LegendPosition = (ChartLegendPosition)v) Data=@legendPositions TextProperty="Text" ValueProperty="Value"
+            Disabled=@(!Draft.ShowLegend) Name="legendPosition" InputSize="InputSize.Small" Style="flex: 1" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Style="margin-top: 0.5rem">
+        <RadzenText TextStyle="TextStyle.Subtitle1" Text=@L(nameof(RadzenStrings.Spreadsheet_Series)) />
+        <RadzenButton Icon="add" Text=@L(nameof(RadzenStrings.Spreadsheet_AddSeries)) ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.ExtraSmall" Click=@OnAddSeries />
+    </RadzenStack>
+    @foreach (var entry in Draft.Series)
+    {
+        var index = entry.Index;
+        var categoryFieldId = CategoryFieldId(index);
+        var valueFieldId = ValueFieldId(index);
+        var seriesTitleFieldId = $"seriesTitle_{index}";
+        <RadzenFieldset Text=@(entry.Name ?? FormatSeriesName(index + 1))>
+            <RadzenStack Gap="0.5rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_SeriesTitle)) Component=@seriesTitleFieldId class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                    <RadzenTextBox Value=@entry.Name Change=@(v => entry.Name = v) Name=@seriesTitleFieldId InputSize="InputSize.Small" Style="flex: 1" />
+                    <RadzenColorPicker Value=@entry.Color Change=@(v => entry.Color = v) ShowHSV=false ShowRGBA=false ShowButton=false InputSize="InputSize.Small" />
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Size="ButtonSize.Small"
+                        Click=@(() => OnRemoveSeries(entry)) Disabled=@(Draft.Series.Count <= 1) />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_CategoryRange)) class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                    <RangePicker Value=@entry.Categories ValueChanged=@(v => entry.Categories = v)
+                        OnPickRequested=@(() => RequestPick(categoryFieldId, entry.Categories ?? string.Empty))
+                        ShouldFocusOnLoad=@(FocusFieldId == categoryFieldId) InputSize="InputSize.Small" Style="flex: 1" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_ValueRange)) class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+                    <RangePicker Value=@entry.Values ValueChanged=@(v => entry.Values = v)
+                        OnPickRequested=@(() => RequestPick(valueFieldId, entry.Values ?? string.Empty))
+                        ShouldFocusOnLoad=@(FocusFieldId == valueFieldId) InputSize="InputSize.Small" Style="flex: 1" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenFieldset>
+    }
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="rz-spreadsheet-dialog-actions">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    [Parameter] public EditChartDraft Draft { get; set; } = default!;
+    [Parameter] public string? FocusFieldId { get; set; }
+
+    internal static string CategoryFieldId(int seriesIndex) => $"category_{seriesIndex}";
+    internal static string ValueFieldId(int seriesIndex) => $"value_{seriesIndex}";
+
+    private void RequestPick(string fieldId, string value)
+    {
+        DialogService.Close(new RangePickRequest(fieldId, value));
+    }
+
+    private List<object> chartTypes = [];
+    private List<object> legendPositions = [];
+
+    private string FormatSeriesName(int number) =>
+        string.Format(System.Globalization.CultureInfo.CurrentCulture, L(nameof(RadzenStrings.Spreadsheet_SeriesFormat)), number);
+
+    protected override void OnInitialized()
+    {
+        chartTypes =
+        [
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_Column)), Value = SpreadsheetChartType.Column },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_Bar)), Value = SpreadsheetChartType.Bar },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_StackedColumn)), Value = SpreadsheetChartType.StackedColumn },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_StackedBar)), Value = SpreadsheetChartType.StackedBar },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_Line)), Value = SpreadsheetChartType.Line },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_Area)), Value = SpreadsheetChartType.Area },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_StackedArea)), Value = SpreadsheetChartType.StackedArea },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_Pie)), Value = SpreadsheetChartType.Pie },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_Donut)), Value = SpreadsheetChartType.Donut },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_ChartType_Scatter)), Value = SpreadsheetChartType.Scatter },
+        ];
+
+        legendPositions =
+        [
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_LegendPosition_Right)), Value = ChartLegendPosition.Right },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_LegendPosition_Left)), Value = ChartLegendPosition.Left },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_LegendPosition_Top)), Value = ChartLegendPosition.Top },
+            new { Text = L(nameof(RadzenStrings.Spreadsheet_LegendPosition_Bottom)), Value = ChartLegendPosition.Bottom },
+        ];
+    }
+
+    private void OnAddSeries()
+    {
+        Draft.Series.Add(new EditChartSeriesDraft
+        {
+            Index = Draft.Series.Count,
+            Name = FormatSeriesName(Draft.Series.Count + 1)
+        });
+    }
+
+    private void OnRemoveSeries(EditChartSeriesDraft entry)
+    {
+        Draft.Series.Remove(entry);
+        for (int i = 0; i < Draft.Series.Count; i++)
+        {
+            Draft.Series[i].Index = i;
+        }
+    }
+
+    private void OnOk()
+    {
+        DialogService.Close(Draft);
+    }
+}

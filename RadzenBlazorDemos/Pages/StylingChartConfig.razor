@@ -2,13 +2,15 @@
 
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
     <RadzenCard Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Color scheme:" Component="ColorScheme" />
-            <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" Name="ColorScheme">
-                <Template>
-                    @Enum.GetName(typeof(ColorScheme), context)
-                </Template>
-            </RadzenDropDown>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Color scheme:" Component="ColorScheme" />
+                <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" Name="ColorScheme">
+                    <Template>
+                        @Enum.GetName(typeof(ColorScheme), context)
+                    </Template>
+                </RadzenDropDown>
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
 
@@ -18,7 +20,7 @@
                 @for (var year = 2017; year <= 2024; year++)
                 {
                     var currentYearRevenue = revenue.Where(r => r.Year == year).ToList();
-                    <RadzenColumnSeries Data="@currentYearRevenue" CategoryProperty="Quarter" Title="@year.ToString()" ValueProperty="Revenue" />
+                    <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@currentYearRevenue" CategoryProperty="Quarter" Title="@year.ToString()" ValueProperty="Revenue" />
                 }
                 <RadzenColumnOptions Margin="0" />
                 <RadzenValueAxis Formatter="@FormatAsUSD" />
@@ -26,7 +28,7 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeLG="4">
             <RadzenChart ColorScheme="@colorScheme">
-                <RadzenPieSeries Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
+                <RadzenPieSeries FillMode="FillMode.Gradient" Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
             </RadzenChart>
         </RadzenColumn>
     </RadzenRow>
@@ -35,7 +37,7 @@
         <RadzenColumn Size="12">
             <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">Custom colors and styling</RadzenText>
             <RadzenChart>
-                <RadzenAreaSeries Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@revenue.Where(r => r.Year == 2020)" CategoryProperty="Quarter" ValueProperty="Revenue">
+                <RadzenAreaSeries FillMode="FillMode.Gradient" Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@revenue.Where(r => r.Year == 2020)" CategoryProperty="Quarter" ValueProperty="Revenue">
                     <ChildContent>
                         <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#fff" Stroke="rgba(236,72,127)" StrokeWidth="2" Size="8" />
                     </ChildContent>

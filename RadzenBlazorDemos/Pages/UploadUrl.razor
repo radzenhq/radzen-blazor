@@ -1,14 +1,14 @@
 ﻿<RadzenCard Variant="Variant.Outlined">
     <RadzenUpload 
         ChooseText="Upload a single file as form data"
-        Url="upload/single" 
+        Url="api/upload/single" 
         Style="width: 100%"
         Progress=@OnProgress 
         Complete=@OnComplete
         InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})" />
     <RadzenUpload
         ChooseText="Upload a single file as stream"
-        Url="upload/stream" 
+        Url="api/upload/stream" 
         Method="PUT"
         Stream="true"
         Multiple="false"

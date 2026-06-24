@@ -5,6 +5,7 @@ using Radzen;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -19,6 +20,13 @@ namespace Radzen.Blazor
 #if NET6_0_OR_GREATER
     [CascadingTypeParameter(nameof(TItem))]
 #endif
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenGantt<TItem> where TItem : notnull
     {
         private RadzenScheduler<TItem>? scheduler;
@@ -343,29 +351,37 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment<TItem>? TaskTemplate { get; set; }
 
+        private string? todayText;
+
         /// <summary>
         /// Text for the "Today" navigation button. Default is <c>"Today"</c>.
         /// </summary>
         [Parameter]
-        public string TodayText { get; set; } = "Today";
+        public string TodayText { get => todayText ?? Localize(nameof(RadzenStrings.Gantt_TodayText)); set => todayText = value; }
+
+        private string? prevText;
 
         /// <summary>
         /// Tooltip for the "Previous" navigation button. Default is <c>"Previous"</c>.
         /// </summary>
         [Parameter]
-        public string PrevText { get; set; } = "Previous";
+        public string PrevText { get => prevText ?? Localize(nameof(RadzenStrings.Gantt_PrevText)); set => prevText = value; }
+
+        private string? nextText;
 
         /// <summary>
         /// Tooltip for the "Next" navigation button. Default is <c>"Next"</c>.
         /// </summary>
         [Parameter]
-        public string NextText { get; set; } = "Next";
+        public string NextText { get => nextText ?? Localize(nameof(RadzenStrings.Gantt_NextText)); set => nextText = value; }
+
+        private string? zoomToFitText;
 
         /// <summary>
         /// Tooltip for the "Zoom to fit" navigation button. Default is <c>"Zoom to fit"</c>.
         /// </summary>
         [Parameter]
-        public string ZoomToFitText { get; set; } = "Zoom to fit";
+        public string ZoomToFitText { get => zoomToFitText ?? Localize(nameof(RadzenStrings.Gantt_ZoomToFitText)); set => zoomToFitText = value; }
 
         #endregion
 
@@ -485,11 +501,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowEmptyMessage { get; set; } = true;
 
+        private string? emptyText;
+
         /// <summary>
         /// Gets or sets the empty text.
         /// </summary>
         [Parameter]
-        public string EmptyText { get; set; } = "No records to display.";
+        public string EmptyText { get => emptyText ?? Localize(nameof(RadzenStrings.Gantt_EmptyText)); set => emptyText = value; }
 
         /// <summary>
         /// Gets or sets whether loading indicator is shown.
@@ -555,119 +573,157 @@ namespace Radzen.Blazor
 
         #region DataGrid Proxied Filter Text
 
+        private string? filterText;
+
         /// <summary>
         /// Filter text.
         /// </summary>
         [Parameter]
-        public string FilterText { get; set; } = "Filter";
+        public string FilterText { get => filterText ?? Localize(nameof(RadzenStrings.Gantt_FilterText)); set => filterText = value; }
+
+        private string? andOperatorText;
 
         /// <summary>
         /// And operator text.
         /// </summary>
         [Parameter]
-        public string AndOperatorText { get; set; } = "And";
+        public string AndOperatorText { get => andOperatorText ?? Localize(nameof(RadzenStrings.Gantt_AndOperatorText)); set => andOperatorText = value; }
+
+        private string? orOperatorText;
 
         /// <summary>
         /// Or operator text.
         /// </summary>
         [Parameter]
-        public string OrOperatorText { get; set; } = "Or";
+        public string OrOperatorText { get => orOperatorText ?? Localize(nameof(RadzenStrings.Gantt_OrOperatorText)); set => orOperatorText = value; }
+
+        private string? applyFilterText;
 
         /// <summary>
         /// Apply filter text.
         /// </summary>
         [Parameter]
-        public string ApplyFilterText { get; set; } = "Apply";
+        public string ApplyFilterText { get => applyFilterText ?? Localize(nameof(RadzenStrings.Gantt_ApplyFilterText)); set => applyFilterText = value; }
+
+        private string? clearFilterText;
 
         /// <summary>
         /// Clear filter text.
         /// </summary>
         [Parameter]
-        public string ClearFilterText { get; set; } = "Clear";
+        public string ClearFilterText { get => clearFilterText ?? Localize(nameof(RadzenStrings.Gantt_ClearFilterText)); set => clearFilterText = value; }
+
+        private string? equalsText;
 
         /// <summary>
         /// Equals text.
         /// </summary>
         [Parameter]
-        public string EqualsText { get; set; } = "Equals";
+        public string EqualsText { get => equalsText ?? Localize(nameof(RadzenStrings.Gantt_EqualsText)); set => equalsText = value; }
+
+        private string? notEqualsText;
 
         /// <summary>
         /// Not equals text.
         /// </summary>
         [Parameter]
-        public string NotEqualsText { get; set; } = "Not equals";
+        public string NotEqualsText { get => notEqualsText ?? Localize(nameof(RadzenStrings.Gantt_NotEqualsText)); set => notEqualsText = value; }
+
+        private string? lessThanText;
 
         /// <summary>
         /// Less than text.
         /// </summary>
         [Parameter]
-        public string LessThanText { get; set; } = "Less than";
+        public string LessThanText { get => lessThanText ?? Localize(nameof(RadzenStrings.Gantt_LessThanText)); set => lessThanText = value; }
+
+        private string? lessThanOrEqualsText;
 
         /// <summary>
         /// Less than or equals text.
         /// </summary>
         [Parameter]
-        public string LessThanOrEqualsText { get; set; } = "Less than or equals";
+        public string LessThanOrEqualsText { get => lessThanOrEqualsText ?? Localize(nameof(RadzenStrings.Gantt_LessThanOrEqualsText)); set => lessThanOrEqualsText = value; }
+
+        private string? greaterThanText;
 
         /// <summary>
         /// Greater than text.
         /// </summary>
         [Parameter]
-        public string GreaterThanText { get; set; } = "Greater than";
+        public string GreaterThanText { get => greaterThanText ?? Localize(nameof(RadzenStrings.Gantt_GreaterThanText)); set => greaterThanText = value; }
+
+        private string? greaterThanOrEqualsText;
 
         /// <summary>
         /// Greater than or equals text.
         /// </summary>
         [Parameter]
-        public string GreaterThanOrEqualsText { get; set; } = "Greater than or equals";
+        public string GreaterThanOrEqualsText { get => greaterThanOrEqualsText ?? Localize(nameof(RadzenStrings.Gantt_GreaterThanOrEqualsText)); set => greaterThanOrEqualsText = value; }
+
+        private string? containsText;
 
         /// <summary>
         /// Contains text.
         /// </summary>
         [Parameter]
-        public string ContainsText { get; set; } = "Contains";
+        public string ContainsText { get => containsText ?? Localize(nameof(RadzenStrings.Gantt_ContainsText)); set => containsText = value; }
+
+        private string? doesNotContainText;
 
         /// <summary>
         /// Does not contain text.
         /// </summary>
         [Parameter]
-        public string DoesNotContainText { get; set; } = "Does not contain";
+        public string DoesNotContainText { get => doesNotContainText ?? Localize(nameof(RadzenStrings.Gantt_DoesNotContainText)); set => doesNotContainText = value; }
+
+        private string? startsWithText;
 
         /// <summary>
         /// Starts with text.
         /// </summary>
         [Parameter]
-        public string StartsWithText { get; set; } = "Starts with";
+        public string StartsWithText { get => startsWithText ?? Localize(nameof(RadzenStrings.Gantt_StartsWithText)); set => startsWithText = value; }
+
+        private string? endsWithText;
 
         /// <summary>
         /// Ends with text.
         /// </summary>
         [Parameter]
-        public string EndsWithText { get; set; } = "Ends with";
+        public string EndsWithText { get => endsWithText ?? Localize(nameof(RadzenStrings.Gantt_EndsWithText)); set => endsWithText = value; }
+
+        private string? isNullText;
 
         /// <summary>
         /// Is null text.
         /// </summary>
         [Parameter]
-        public string IsNullText { get; set; } = "Is null";
+        public string IsNullText { get => isNullText ?? Localize(nameof(RadzenStrings.Gantt_IsNullText)); set => isNullText = value; }
+
+        private string? isNotNullText;
 
         /// <summary>
         /// Is not null text.
         /// </summary>
         [Parameter]
-        public string IsNotNullText { get; set; } = "Is not null";
+        public string IsNotNullText { get => isNotNullText ?? Localize(nameof(RadzenStrings.Gantt_IsNotNullText)); set => isNotNullText = value; }
+
+        private string? isEmptyText;
 
         /// <summary>
         /// Is empty text.
         /// </summary>
         [Parameter]
-        public string IsEmptyText { get; set; } = "Is empty";
+        public string IsEmptyText { get => isEmptyText ?? Localize(nameof(RadzenStrings.Gantt_IsEmptyText)); set => isEmptyText = value; }
+
+        private string? isNotEmptyText;
 
         /// <summary>
         /// Is not empty text.
         /// </summary>
         [Parameter]
-        public string IsNotEmptyText { get; set; } = "Is not empty";
+        public string IsNotEmptyText { get => isNotEmptyText ?? Localize(nameof(RadzenStrings.Gantt_IsNotEmptyText)); set => isNotEmptyText = value; }
 
         #endregion
 
@@ -1072,7 +1128,10 @@ namespace Radzen.Blazor
 
             var start = min.Value.Date;
             var end = max.Value.Date;
-            if (end < start) (start, end) = (end, start);
+            if (end < start)
+            {
+                (start, end) = (end, start);
+            }
 
             var pad = ZoomLevel switch
             {
@@ -1147,9 +1206,21 @@ namespace Radzen.Blazor
 
         private static DateTime? ToDateTime(object? value)
         {
-            if (value == null) return null;
-            if (value is DateTime dt) return dt;
-            if (value is DateTimeOffset dto) return dto.DateTime;
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is DateTime dt)
+            {
+                return dt;
+            }
+
+            if (value is DateTimeOffset dto)
+            {
+                return dto.DateTime;
+            }
+
             if (value is string s && DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var parsed))
             {
                 return parsed;
@@ -1195,7 +1266,10 @@ namespace Radzen.Blazor
             var links = new List<GanttDependency<TItem>>();
             foreach (var dep in DependencyData)
             {
-                if (dep == null) continue;
+                if (dep == null)
+                {
+                    continue;
+                }
 
                 fromGetter ??= PropertyAccess.Getter<object>(dep, DependencyFromProperty!);
                 toGetter ??= PropertyAccess.Getter<object>(dep, DependencyToProperty!);
@@ -1206,7 +1280,10 @@ namespace Radzen.Blazor
 
                 var fromId = fromGetter(dep);
                 var toId = toGetter(dep);
-                if (fromId == null || toId == null) continue;
+                if (fromId == null || toId == null)
+                {
+                    continue;
+                }
 
                 if (!taskById.TryGetValue(fromId, out var fromTask) || !taskById.TryGetValue(toId, out var toTask))
                 {
@@ -1298,7 +1375,10 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (items.Count == 0) return;
+            if (items.Count == 0)
+            {
+                return;
+            }
 
             var deps = resolvedDeps
                 .Where(d => d != null && itemSet.Contains(d.From) && itemSet.Contains(d.To))
@@ -1327,7 +1407,10 @@ namespace Radzen.Blazor
             foreach (var t in items)
             {
                 var s = ToDateTime(startGet(t));
-                if (s.HasValue && s.Value < refDate) refDate = s.Value;
+                if (s.HasValue && s.Value < refDate)
+                {
+                    refDate = s.Value;
+                }
             }
 
             foreach (var t in items)
@@ -1451,7 +1534,10 @@ namespace Radzen.Blazor
 
             var s = start.Value.Date;
             var e = end.Value.Date;
-            if (e < s) (s, e) = (e, s);
+            if (e < s)
+            {
+                (s, e) = (e, s);
+            }
 
             if (e < rangeStart || s > rangeEnd)
             {
@@ -1499,10 +1585,25 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (dayView != null) yield return dayView;
-                if (weekView != null) yield return weekView;
-                if (monthView != null) yield return monthView;
-                if (yearView != null) yield return yearView;
+                if (dayView != null)
+                {
+                    yield return dayView;
+                }
+
+                if (weekView != null)
+                {
+                    yield return weekView;
+                }
+
+                if (monthView != null)
+                {
+                    yield return monthView;
+                }
+
+                if (yearView != null)
+                {
+                    yield return yearView;
+                }
             }
         }
 
@@ -1576,14 +1677,20 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task ZoomToFit()
         {
-            if (scheduler == null) return;
+            if (scheduler == null)
+            {
+                return;
+            }
 
             var data = (IEnumerable<TItem>?)grid?.View ?? Data ?? Enumerable.Empty<TItem>();
             DateTime? min = null, max = null;
 
             var sg = GetStartGetter();
             var eg = GetEndGetter();
-            if (sg == null || eg == null) return;
+            if (sg == null || eg == null)
+            {
+                return;
+            }
 
             foreach (var item in data)
             {
@@ -1599,18 +1706,29 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (!min.HasValue || !max.HasValue) return;
+            if (!min.HasValue || !max.HasValue)
+            {
+                return;
+            }
 
             var span = max.Value - min.Value;
             GanttZoomLevel bestZoom;
             if (span.TotalDays <= 2)
+            {
                 bestZoom = GanttZoomLevel.Day;
+            }
             else if (span.TotalDays <= 60)
+            {
                 bestZoom = GanttZoomLevel.Week;
+            }
             else if (span.TotalDays <= 180)
+            {
                 bestZoom = GanttZoomLevel.Month;
+            }
             else
+            {
                 bestZoom = GanttZoomLevel.Year;
+            }
 
             var pad = bestZoom switch
             {

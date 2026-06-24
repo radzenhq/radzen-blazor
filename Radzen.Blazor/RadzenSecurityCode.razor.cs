@@ -44,6 +44,8 @@ namespace Radzen.Blazor
         [Parameter]
         public string? Gap { get; set; }
 
+        IJSObjectReference? _jsRef;
+
         bool firstRender;
         bool visibleChanged;
         bool disabledChanged;
@@ -93,7 +95,13 @@ namespace Radzen.Blazor
 
                 if (Visible && !Disabled && JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.createSecurityCode", GetId(), Reference, Element,
+                    if (_jsRef != null)
+                    {
+                        await _jsRef.InvokeVoidAsync("dispose");
+                        await _jsRef.DisposeAsync();
+                    }
+
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSecurityCode", GetId(), Reference, Element,
                         Type == SecurityCodeType.Numeric ? true : false);
 
                     StateHasChanged();
@@ -106,14 +114,8 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (IsJSRuntimeAvailable && JSRuntime != null)
-            {
-                var id = GetId();
-                if (id != null)
-                {
-                    JSRuntime.InvokeVoid("Radzen.destroySecurityCode", id, Element);
-                }
-            }
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
 
             GC.SuppressFinalize(this);
         }

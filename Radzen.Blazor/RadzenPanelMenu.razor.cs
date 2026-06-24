@@ -39,12 +39,14 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
+        private string? ariaLabel;
+
         /// <summary>
         /// Gets or sets the menu aria label text.
         /// </summary>
         /// <value>The menu aria label text.</value>
         [Parameter]
-        public string AriaLabel { get; set; } = "Menu";
+        public string AriaLabel { get => ariaLabel ?? Localize(nameof(RadzenStrings.PanelMenu_AriaLabel)); set => ariaLabel = value; }
 
         /// <summary>
         /// Gets or sets a value representing the URL matching behavior.
@@ -165,7 +167,11 @@ namespace Radzen.Blazor
                     focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
                 }
 
-                if (JSRuntime == null) return;
+                if (JSRuntime == null)
+                {
+                    return;
+                }
+
                 try
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);

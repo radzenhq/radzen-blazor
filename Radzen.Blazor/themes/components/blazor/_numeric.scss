@@ -3,7 +3,27 @@ $numeric-input-padding-block: 0.5rem !default;
 $numeric-input-padding-inline: 0.5rem 1.25rem !default;
 $numeric-button-width: 0.875rem !default;
 $numeric-button-height: $numeric-button-width !default;
+$numeric-input-padding-block-xs: 0rem !default;
+$numeric-input-padding-block-sm: 0.25rem !default;
+$numeric-input-padding-block-md: $numeric-input-padding-block !default;
+$numeric-input-padding-block-lg: 1rem !default;
+$numeric-input-padding-inline-xs: 0.25rem 0.875rem !default;
+$numeric-input-padding-inline-sm: 0.375rem 1rem !default;
+$numeric-input-padding-inline-md: $numeric-input-padding-inline !default;
+$numeric-input-padding-inline-lg: 0.625rem 1.625rem !default;
+$numeric-button-width-xs: 0.5625rem !default;
+$numeric-button-width-sm: 0.75rem !default;
+$numeric-button-width-md: $numeric-button-width !default;
+$numeric-button-width-lg: 1.375rem !default;
+$numeric-button-height-xs: 0.5625rem !default;
+$numeric-button-height-sm: 0.75rem !default;
+$numeric-button-height-md: $numeric-button-height !default;
+$numeric-button-height-lg: 1.375rem !default;
 $numeric-button-offset: 2px !default;
+$numeric-button-offset-xs: 0 !default;
+$numeric-button-offset-sm: 0.0625rem !default;
+$numeric-button-offset-md: $numeric-button-offset !default;
+$numeric-button-offset-lg: $numeric-button-offset !default;
 $numeric-button-border-radius: calc(var(--rz-border-radius) - 2px) !default;
 $numeric-button-background-color: var(--rz-secondary) !default;
 $numeric-button-color: var(--rz-on-secondary) !default;
@@ -100,4 +120,27 @@ $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
 
 .rz-numeric-down {
   inset-block-end: var(--rz-numeric-button-offset);
+}
+
+.rz-numeric.rz-input-xs {
+  --rz-numeric-input-padding-block: var(--rz-numeric-input-padding-block-xs);
+  --rz-numeric-input-padding-inline: var(--rz-numeric-input-padding-inline-xs);
+  --rz-numeric-button-width: var(--rz-numeric-button-width-xs);
+  --rz-numeric-button-height: var(--rz-numeric-button-height-xs);
+  --rz-numeric-button-offset: var(--rz-numeric-button-offset-xs);
+}
+
+.rz-numeric.rz-input-sm {
+  --rz-numeric-input-padding-block: var(--rz-numeric-input-padding-block-sm);
+  --rz-numeric-input-padding-inline: var(--rz-numeric-input-padding-inline-sm);
+  --rz-numeric-button-width: var(--rz-numeric-button-width-sm);
+  --rz-numeric-button-height: var(--rz-numeric-button-height-sm);
+  --rz-numeric-button-offset: var(--rz-numeric-button-offset-sm);
+}
+
+.rz-numeric.rz-input-lg {
+  --rz-numeric-input-padding-block: var(--rz-numeric-input-padding-block-lg);
+  --rz-numeric-input-padding-inline: var(--rz-numeric-input-padding-inline-lg);
+  --rz-numeric-button-width: var(--rz-numeric-button-width-lg);
+  --rz-numeric-button-height: var(--rz-numeric-button-height-lg);
 }

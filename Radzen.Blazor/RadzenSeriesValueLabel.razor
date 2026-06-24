@@ -1,0 +1,108 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenChartComponentBase
+@implements IChartSeriesOverlay
+@implements IDisposable
+
+@code {
+    /// <summary>
+    /// Gets or sets a value indicating whether the label is visible. Set to <c>true</c> by default.
+    /// </summary>
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    /// <summary>
+    /// Value labels render above all series so no series line draws over them.
+    /// </summary>
+    public bool RenderOnTop => true;
+
+    /// <summary>
+    /// Gets or sets the background color of the label. Defaults to the series color.
+    /// </summary>
+    [Parameter]
+    public string? Fill { get; set; }
+
+    IChartSeries? series;
+
+    /// <summary>
+    /// The series this overlay belongs to. Set by the parent series via a cascading parameter.
+    /// </summary>
+    [CascadingParameter]
+    protected IChartSeries? Series
+    {
+        get
+        {
+            return series;
+        }
+        set
+        {
+            if (value == null)
+            {
+                series = null;
+                return;
+            }
+            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            {
+                throw new ArgumentException("Series must use Cartesian coordinate system");
+            }
+            series = value;
+            if (!series.Overlays.Contains(this))
+            {
+                series.Overlays.Add(this);
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        if (Chart == null || series == null || Chart.ShouldInvertAxes())
+        {
+            return null!;
+        }
+
+        var plotWidth = Chart.CategoryScale.OutputSize;
+        var plotHeight = Chart.ValueScale.OutputSize;
+
+        var (data, point) = series.DataAt(plotWidth + 10, 0);
+
+        if (data == null)
+        {
+            return null!;
+        }
+
+        var label = series.GetDataLabels(0, 0).OrderBy(l => Math.Abs(l.Position.X - point.X)).FirstOrDefault();
+
+        if (label == null || string.IsNullOrEmpty(label.Text))
+        {
+            return null!;
+        }
+
+        var text = label.Text;
+        var index = Chart.Series.IndexOf(series);
+
+        var paddingX = 6.0;
+        var boxWidth = text.Length * 7.5 + paddingX * 2;
+        var boxHeight = 18.0;
+        var x = plotWidth - boxWidth - 4;
+        var y = Chart.ReserveValueLabelSlot(point.Y, boxHeight + 4, plotHeight);
+        var style = Fill != null ? $"--rz-series-color: {Fill};" : null;
+
+        return
+    @<g class="@($"rz-series-value-label rz-series-{index}")" style="@style" pointer-events="none">
+        <rect x="@x.ToInvariantString()" y="@((y - boxHeight / 2).ToInvariantString())" width="@boxWidth.ToInvariantString()" height="@boxHeight.ToInvariantString()" rx="4" ry="4"></rect>
+        <text x="@((x + boxWidth / 2).ToInvariantString())" y="@y.ToInvariantString()" text-anchor="middle">@text</text>
+    </g>;
+    }
+
+    /// <inheritdoc />
+    public bool Contains(double mouseX, double mouseY, int tolerance) => false;
+
+    /// <inheritdoc />
+    public RenderFragment RenderTooltip(double mouseX, double mouseY) => null!;
+
+    /// <inheritdoc />
+    public Point GetTooltipPosition(double mouseX, double mouseY) => new Point { X = mouseX, Y = mouseY };
+
+    /// <inheritdoc />
+    public void Dispose() => series?.Overlays.Remove(this);
+}

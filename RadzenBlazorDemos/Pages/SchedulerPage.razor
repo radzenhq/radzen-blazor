@@ -3,7 +3,7 @@
     Blazor Scheduler
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Daily, weekly, and monthly views for event scheduling.
+    The Blazor Scheduler is a calendar component with day, week, month, year planner, and timeline views, appointment editing, and tooltips.
 </RadzenText>
 
 <RadzenText Anchor="scheduler#views" TextStyle="TextStyle.H5" TagName="TagName.H2">
@@ -42,6 +42,16 @@
 </RadzenText>
 <RadzenExample ComponentName="Scheduler" Example="SchedulerMultiDay" AdditionalSourceCodePages=@(new [] { "/demos/Models/Appointment.cs" })>
     <SchedulerMultiDay />
+</RadzenExample>
+
+<RadzenText Anchor="scheduler#agenda" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Display scheduler as an agenda
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Configure the scheduler to display appointments in an agenda view for better overview of upcoming events.
+</RadzenText>
+<RadzenExample ComponentName="Scheduler" Example="SchedulerAgenda" AdditionalSourceCodePages=@(new[] { "/demos/Models/Appointment.cs" })>
+    <SchedulerAgenda />
 </RadzenExample>
 
 <RadzenText Anchor="scheduler#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">

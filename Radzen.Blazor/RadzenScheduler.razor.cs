@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,6 +51,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenScheduler&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenScheduler<TItem> : RadzenComponent, IScheduler
     {
         /// <summary>
@@ -119,26 +121,32 @@ namespace Radzen.Blazor
         [Parameter]
         public int SelectedIndex { get; set; }
 
+        private string? todayText;
+
         /// <summary>
         /// Gets or sets the text of the today button. Set to <c>Today</c> by default.
         /// </summary>
         /// <value>The today text.</value>
         [Parameter]
-        public string TodayText { get; set; } = "Today";
+        public string TodayText { get => todayText ?? Localize(nameof(RadzenStrings.Scheduler_TodayText)); set => todayText = value; }
+
+        private string? nextText;
 
         /// <summary>
         /// Gets or sets the text of the next button. Set to <c>Next</c> by default.
         /// </summary>
         /// <value>The next text.</value>
         [Parameter]
-        public string NextText { get; set; } = "Next";
+        public string NextText { get => nextText ?? Localize(nameof(RadzenStrings.Scheduler_NextText)); set => nextText = value; }
+
+        private string? prevText;
 
         /// <summary>
         /// Gets or sets the text of the previous button. Set to <c>Previous</c> by default.
         /// </summary>
         /// <value>The previous text.</value>
         [Parameter]
-        public string PrevText { get; set; } = "Previous";
+        public string PrevText { get => prevText ?? Localize(nameof(RadzenStrings.Scheduler_PrevText)); set => prevText = value; }
 
         /// <summary>
         /// Gets or sets the initial date displayed by the selected view. Set to <c>DateTime.Today</c> by default.
@@ -502,10 +510,14 @@ namespace Radzen.Blazor
         {
             var viewIndex = Views.IndexOf(view);
             if (viewIndex == -1)
+            {
                 return;
+            }
 
             if (SelectedView == view)
+            {
                 return;
+            }
 
             selectedIndex = viewIndex;
 
@@ -747,7 +759,7 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
-                JSRuntime.InvokeVoid("Radzen.destroyResizable", Element);
+                JSRuntime.InvokeVoid("Radzen.disposeElement", Element);
             }
 
             GC.SuppressFinalize(this);
@@ -771,25 +783,25 @@ namespace Radzen.Blazor
         async Task IScheduler.MouseEnterAppointment(ElementReference reference, AppointmentData data)
         {
             var argsData = data.Data is TItem typed ? typed : default!;
-            await AppointmentMouseEnter.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData });
+            await AppointmentMouseEnter.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData, AppointmentData = data });
         }
 
         async Task IScheduler.MouseEnterAppointment(ElementReference reference, AppointmentData data, double clientX, double clientY)
         {
             var argsData = data.Data is TItem typed ? typed : default!;
-            await AppointmentMouseEnter.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData, ClientX = clientX, ClientY = clientY });
+            await AppointmentMouseEnter.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData, AppointmentData = data, ClientX = clientX, ClientY = clientY });
         }
 
         async Task IScheduler.MouseLeaveAppointment(ElementReference reference, AppointmentData data)
         {
             var argsData = data.Data is TItem typed ? typed : default!;
-            await AppointmentMouseLeave.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData });
+            await AppointmentMouseLeave.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData, AppointmentData = data });
         }
 
         async Task IScheduler.MouseLeaveAppointment(ElementReference reference, AppointmentData data, double clientX, double clientY)
         {
             var argsData = data.Data is TItem typed ? typed : default!;
-            await AppointmentMouseLeave.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData, ClientX = clientX, ClientY = clientY });
+            await AppointmentMouseLeave.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData, AppointmentData = data, ClientX = clientX, ClientY = clientY });
         }
 
         bool IScheduler.HasMouseEnterAppointmentDelegate()

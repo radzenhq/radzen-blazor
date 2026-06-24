@@ -1,4 +1,6 @@
 $chart-axis-color: var(--rz-base-300) !default;
+$chart-grid-line-color: color-mix(in srgb, var(--rz-chart-axis-color) 50%, transparent) !default;
+$chart-area-opacity: 0.6 !default;
 $chart-axis-label-color: var(--rz-text-secondary-color) !default;
 $chart-axis-font-size: 0.875rem !default;
 $chart-legend-font-size: 0.875rem !default;
@@ -79,7 +81,314 @@ $chart-color-schemes: (
 }
 
 .rz-area-series {
-  fill-opacity: 0.8;
+  fill-opacity: var(--rz-chart-area-opacity);
+}
+
+.rz-area-series .rz-area-gradient,
+.rz-full-stacked-area-series .rz-area-gradient {
+  fill-opacity: 1;
+}
+
+.rz-chart-axis-crosshair-label {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  rect {
+    fill: var(--rz-on-base);
+    rx: var(--rz-border-radius);
+    ry: var(--rz-border-radius);
+  }
+  text {
+    fill: var(--rz-base);
+    font-size: 12px;
+    font-weight: bold;
+    dominant-baseline: central;
+  }
+}
+
+@keyframes rz-series-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rz-series-reveal-rtl {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rz-series-grow-y {
+  from {
+    transform: translateY(var(--rz-zero-y, 0px)) scaleY(0) translateY(calc(-1 * var(--rz-zero-y, 0px)));
+  }
+  to {
+    transform: translateY(var(--rz-zero-y, 0px)) scaleY(1) translateY(calc(-1 * var(--rz-zero-y, 0px)));
+  }
+}
+
+@keyframes rz-series-grow-x {
+  from {
+    transform: translateX(var(--rz-zero-x, 0px)) scaleX(0) translateX(calc(-1 * var(--rz-zero-x, 0px)));
+  }
+  to {
+    transform: translateX(var(--rz-zero-x, 0px)) scaleX(1) translateX(calc(-1 * var(--rz-zero-x, 0px)));
+  }
+}
+
+@keyframes rz-series-reveal-down {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rz-segment-expand {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rz-marker-pop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rz-slice-expand {
+  from {
+    transform: translate(var(--rz-pie-cx, 0px), var(--rz-pie-cy, 0px)) scale(0) translate(calc(-1 * var(--rz-pie-cx, 0px)), calc(-1 * var(--rz-pie-cy, 0px)));
+    opacity: 0;
+  }
+  to {
+    transform: translate(var(--rz-pie-cx, 0px), var(--rz-pie-cy, 0px)) scale(1) translate(calc(-1 * var(--rz-pie-cx, 0px)), calc(-1 * var(--rz-pie-cy, 0px)));
+    opacity: 1;
+  }
+}
+
+@keyframes rz-series-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.rz-chart-animate {
+  .rz-line-series,
+  .rz-stacked-line-series,
+  .rz-full-stacked-line-series,
+  .rz-area-series,
+  .rz-full-stacked-area-series,
+  .rz-range-area-series,
+  .rz-waterfall-series,
+  .rz-candlestick-series,
+  .rz-ohlc-series,
+  .rz-highlow-series,
+  .rz-box-plot-series {
+    animation: rz-series-reveal var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rz-column-series,
+  .rz-full-stacked-column-series,
+  .rz-range-column-series {
+    animation: rz-series-grow-y var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rz-bar-series,
+  .rz-full-stacked-bar-series,
+  .rz-range-bar-series,
+  .rz-bullet-series {
+    animation: rz-series-grow-x var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rz-horizontal-waterfall-series {
+    animation: rz-series-reveal-down var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rz-funnel-series > g,
+  .rz-pyramid-series > g {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rz-segment-expand 500ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    animation-delay: calc(var(--rz-segment-order, 0) * 90ms);
+  }
+
+  .rz-scatter-series .rz-marker > * {
+    animation: rz-marker-pop var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rz-bubble-series circle {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rz-marker-pop var(--rz-chart-animation-duration, 700ms) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rz-heatmap-series,
+  .rz-contour-series {
+    animation: rz-series-fade-in var(--rz-chart-animation-duration, 700ms) ease-out;
+  }
+
+  .rz-pie-series > g,
+  .rz-donut-series > g {
+    animation: rz-slice-expand 500ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    animation-delay: calc(var(--rz-segment-order, 0) * 90ms);
+  }
+}
+
+*[dir=rtl] .rz-chart-animate {
+  .rz-line-series,
+  .rz-stacked-line-series,
+  .rz-full-stacked-line-series,
+  .rz-area-series,
+  .rz-full-stacked-area-series,
+  .rz-range-area-series,
+  .rz-waterfall-series,
+  .rz-candlestick-series,
+  .rz-ohlc-series,
+  .rz-highlow-series,
+  .rz-box-plot-series {
+    animation-name: rz-series-reveal-rtl;
+  }
+}
+
+.rz-path-transition {
+  transition: d 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rz-chart-zoomable .rz-path-transition {
+  transition: none;
+}
+
+.rz-chart-series-hover {
+  .rz-line-series,
+  .rz-area-series,
+  .rz-column-series,
+  .rz-bar-series,
+  .rz-scatter-series,
+  .rz-candlestick-series,
+  .rz-waterfall-series,
+  .rz-bullet-series {
+    transition: opacity 0.2s, filter 0.2s;
+    cursor: pointer;
+
+    &:hover,
+    &.rz-state-hover {
+      filter: brightness(1.1) drop-shadow(0 0 3px rgba(0, 0, 0, 0.2));
+    }
+  }
+
+  svg:has(> g > .rz-state-hover),
+  svg:has(> g > :hover) {
+    .rz-line-series,
+    .rz-area-series,
+    .rz-column-series,
+    .rz-bar-series,
+    .rz-scatter-series,
+    .rz-candlestick-series,
+    .rz-waterfall-series,
+    .rz-bullet-series {
+      opacity: 0.4;
+
+      &:hover,
+      &.rz-state-hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .rz-pie-series,
+  .rz-donut-series,
+  .rz-funnel-series,
+  .rz-pyramid-series {
+    > g {
+      transition: opacity var(--rz-transition), filter var(--rz-transition);
+      cursor: pointer;
+
+      > path:not(.rz-hit-area),
+      > .rz-path {
+        transition: transform var(--rz-transition);
+      }
+
+      &:hover,
+      &.rz-state-hover {
+        filter: brightness(1.1) drop-shadow(0 0 3px rgba(0, 0, 0, 0.2));
+
+        > path:not(.rz-hit-area),
+        > .rz-path {
+          transform: translate(var(--rz-explode-x, 0), var(--rz-explode-y, 0));
+        }
+      }
+    }
+
+    // Segments exploded in their normal state move a little further on hover.
+    > g.rz-state-exploded {
+      &:hover,
+      &.rz-state-hover {
+        > path:not(.rz-hit-area),
+        > .rz-path {
+          transform: translate(calc(var(--rz-explode-x, 0) * 1.2), calc(var(--rz-explode-y, 0) * 1.2));
+        }
+      }
+    }
+  }
+
+  .rz-pie-series:has(> .rz-state-hover),
+  .rz-donut-series:has(> .rz-state-hover),
+  .rz-funnel-series:has(> .rz-state-hover),
+  .rz-pyramid-series:has(> .rz-state-hover),
+  .rz-pie-series:has(> :hover),
+  .rz-donut-series:has(> :hover),
+  .rz-funnel-series:has(> :hover),
+  .rz-pyramid-series:has(> :hover) {
+    > g {
+      opacity: 0.4;
+
+      &:hover,
+      &.rz-state-hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .rz-legend-item {
+    transition: background-color 0.2s, color 0.2s;
+    border-radius: var(--rz-border-radius);
+
+    &:hover {
+      @include variant-hover-bg('base');
+    }
+  }
+}
+
+// Segments pulled out permanently via ExplodedProperty. Applied outside the hover wrapper so static
+// explode works even when AllowSeriesHover is false. The hit-area moves too so it tracks the slice.
+.rz-pie-series,
+.rz-donut-series {
+  > g.rz-state-exploded {
+    > path,
+    > .rz-path {
+      transform: translate(var(--rz-explode-x, 0), var(--rz-explode-y, 0));
+      transition: transform var(--rz-transition);
+    }
+  }
 }
 
 @each $scheme, $colors in $chart-color-schemes {
@@ -87,6 +396,7 @@ $chart-color-schemes: (
     $index: index($colors, $color);
     .rz-scheme-#{$scheme} {
       .rz-series-#{$index - 1} {
+        --rz-series-color: #{$color};
         fill: $color;
         stroke: $color;
       }
@@ -98,6 +408,7 @@ $chart-color-schemes: (
       }
 
       .rz-series-item-#{$index - 1} {
+        --rz-series-color: #{$color};
         fill: $color;
         stroke: $color;
 
@@ -111,6 +422,55 @@ $chart-color-schemes: (
 
 .rz-marker {
   stroke: var(--rz-chart-marker-stroke);
+}
+
+.rz-series-value-label {
+  rect {
+    fill: var(--rz-series-color);
+    stroke: none;
+  }
+
+  text {
+    fill: var(--rz-chart-marker-stroke);
+    fill: oklch(from var(--rz-series-color) calc((0.72 - l) * infinity) 0 h);
+    stroke: none;
+    font-size: 0.75rem;
+    dominant-baseline: central;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.rz-active-point {
+  transition: transform 0.15s ease-out;
+
+  .rz-active-point-halo {
+    fill: var(--rz-series-color);
+    fill-opacity: 0.15;
+    stroke: none;
+  }
+
+  .rz-active-point-dot {
+    fill: var(--rz-series-color);
+    fill-opacity: 1;
+    stroke: var(--rz-chart-marker-stroke);
+    stroke-width: 2;
+  }
+}
+
+.rz-line-series .rz-marker,
+.rz-area-series .rz-marker,
+.rz-scatter-series .rz-marker {
+  cursor: pointer;
+
+  > * {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.15s ease-out;
+  }
+
+  &:hover > * {
+    transform: scale(1.35);
+  }
 }
 
 .rz-area-series .rz-marker {
@@ -138,25 +498,48 @@ $chart-color-schemes: (
 }
 
 .rz-axis .rz-grid-line {
-  stroke: var(--rz-chart-axis-color);
+  stroke: var(--rz-chart-grid-line-color);
 }
 
 .rz-tick-text {
   stroke: none;
   fill: var(--rz-chart-axis-label-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.rz-series-data-label,
+.rz-series-data-label-fill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  stroke: none;
+  dominant-baseline: central;
 }
 
 .rz-series-data-label {
   fill: var(--rz-chart-axis-label-color);
 }
 
+.rz-series-data-label-chip {
+  fill: var(--rz-chart-tooltip-background);
+  fill-opacity: 0.9;
+  stroke: var(--rz-chart-grid-line-color);
+  stroke-width: 1;
+}
+
+.rz-series-data-label-outline {
+  stroke: var(--rz-base-background-color);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.rz-chart-animate .rz-series-data-label-group {
+  animation: rz-chart-tooltip-enter var(--rz-chart-animation-duration, 700ms) ease-out;
+}
+
 .rz-value-axis .rz-tick-text {
   text-anchor: end;
-
-  /* Right-to-left anchor */
-  *[dir="rtl"] & {
-    text-anchor: start;
-  }
 }
 
 .rz-axis .rz-axis-title {
@@ -225,7 +608,14 @@ $chart-color-schemes: (
   align-items: center;
   gap: 0.25rem;
   margin: 0.25rem;
+  padding: 0.25rem 0.375rem;
   cursor: pointer;
+  line-height: 1;
+
+  svg {
+    border-radius: calc(var(--rz-border-radius) / 2);
+    overflow: hidden;
+  }
 
   &:focus {
     outline: var(--rz-outline-normal);
@@ -247,6 +637,7 @@ $chart-color-schemes: (
   position: absolute;
   top: 0;
   left: 0;
+  pointer-events: none;
 }
 
 .rz-top-chart-tooltip  {
@@ -260,11 +651,35 @@ $chart-color-schemes: (
 .rz-chart-tooltip-content {
   background: var(--rz-chart-tooltip-background);
   color: var(--rz-chart-tooltip-color);
-  box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.18), 0 2px 6px -2px rgba(0, 0, 0, 0.1);
   padding: 0.5rem;
   border-radius: var(--rz-chart-tooltip-border-radius);
   white-space: nowrap;
   font-size: var(--rz-chart-tooltip-font-size);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes rz-chart-tooltip-enter {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.rz-chart-tooltip-content.rz-chart-tooltip-enter {
+  animation: rz-chart-tooltip-enter 0.12s ease-out;
+}
+
+.rz-chart-category-tooltip {
+  transition: top 0.15s ease-out, left 0.15s ease-out, right 0.15s ease-out;
+}
+
+.rz-chart-tooltip-appear .rz-chart-tooltip-content {
+  animation: rz-chart-tooltip-enter 0.12s ease-out;
 }
 
 .rz-chart-tooltip {
@@ -322,8 +737,6 @@ $chart-color-schemes: (
   font-variant-numeric: tabular-nums;
 }
 
-// Shared Tooltip Styles
-
 .rz-chart-shared-tooltip:has(.rz-chart-tooltip-item-content) {
   .rz-chart-tooltip-title {
     padding: 0 0.5rem;
@@ -351,4 +764,37 @@ $chart-color-schemes: (
     cursor: inherit;
   }
 
+}
+
+.rz-chart-scrollbar {
+  height: 16px;
+  padding: 4px 0;
+  position: absolute;
+}
+
+.rz-chart-scrollbar-track {
+  position: relative;
+  height: 8px;
+  background: var(--rz-base-200, #e5e7eb);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.rz-chart-scrollbar-thumb {
+  position: absolute;
+  height: 100%;
+  background: var(--rz-base-400, #9ca3af);
+  border-radius: 4px;
+  cursor: grab;
+  min-width: 20px;
+  transition: background 0.15s;
+
+  &:hover,
+  &:active {
+    background: var(--rz-base-500, #6b7280);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
 }

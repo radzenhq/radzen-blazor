@@ -54,29 +54,37 @@ namespace Radzen.Blazor
         [Parameter]
         public string? Title { get; set; }
 
+        private string? placeholder;
+
         /// <summary>
         /// Gets or sets the placeholder text for the input field.
         /// </summary>
         [Parameter]
-        public string Placeholder { get; set; } = "Type your message...";
+        public string Placeholder { get => placeholder ?? Localize(nameof(RadzenStrings.AIChat_Placeholder)); set => placeholder = value; }
+
+        private string? emptyMessage;
 
         /// <summary>
         /// Gets or sets the message displayed when there are no messages.
         /// </summary>
         [Parameter]
-        public string EmptyMessage { get; set; } = "No messages yet. Start a conversation!";
+        public string EmptyMessage { get => emptyMessage ?? Localize(nameof(RadzenStrings.AIChat_EmptyMessage)); set => emptyMessage = value; }
+
+        private string? userAvatarText;
 
         /// <summary>
         /// Gets or sets the text displayed in the user avatar.
         /// </summary>
         [Parameter]
-        public string UserAvatarText { get; set; } = "U";
+        public string UserAvatarText { get => userAvatarText ?? Localize(nameof(RadzenStrings.AIChat_UserAvatarText)); set => userAvatarText = value; }
+
+        private string? assistantAvatarText;
 
         /// <summary>
         /// Gets or sets the text displayed in the assistant avatar.
         /// </summary>
         [Parameter]
-        public string AssistantAvatarText { get; set; } = "AI";
+        public string AssistantAvatarText { get => assistantAvatarText ?? Localize(nameof(RadzenStrings.AIChat_AssistantAvatarText)); set => assistantAvatarText = value; }
 
         /// <summary>
         /// Gets or sets the model name.
@@ -295,7 +303,9 @@ namespace Radzen.Blazor
         public async Task SendMessage(string content)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
+            {
                 return;
+            }
 
             // Add user message
             var userMessage = AddMessage(content, true);
@@ -325,7 +335,9 @@ namespace Radzen.Blazor
         public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
+            {
                 return;
+            }
 
             // Add user message
             var userMessage = AddMessage(content, true);
@@ -346,7 +358,9 @@ namespace Radzen.Blazor
         public async Task LoadConversationHistory()
         {
             if (string.IsNullOrEmpty(currentSessionId))
+            {
                 return;
+            }
 
             var session = ChatService.GetOrCreateSession(currentSessionId);
             
@@ -365,7 +379,9 @@ namespace Radzen.Blazor
         private async Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(userInput))
+            {
                 return;
+            }
 
             IsLoading = true;
             var previousCts = cts;
@@ -480,11 +496,7 @@ namespace Radzen.Blazor
             if (!firstRender && messagesContainer.Context != null && JSRuntime != null)
             {
                 // Scroll to bottom when new messages are added
-                await JSRuntime.InvokeVoidAsync("eval", 
-                    "setTimeout(() => { " +
-                    "const container = document.querySelector('.rz-chat-messages'); " +
-                    "if (container) container.scrollTop = container.scrollHeight; " +
-                    "}, 100);");
+                await JSRuntime.InvokeVoidAsync("Radzen.chatScrollAfterRender", ".rz-chat-messages", 100);
             }
         }
 

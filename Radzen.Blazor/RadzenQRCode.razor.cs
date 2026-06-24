@@ -209,6 +209,19 @@ namespace Radzen.Blazor
             }
             return string.Empty;
         }
+
+        /// <summary>
+        /// Renders the QR code as a PNG image and downloads it in the browser.
+        /// </summary>
+        /// <param name="fileName">The download file name. Default is <c>qrcode.png</c>.</param>
+        public async Task ToPng(string fileName = "qrcode.png")
+        {
+            if (JSRuntime != null)
+            {
+                var svg = await ToSvg();
+                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName);
+            }
+        }
     }
 }
 

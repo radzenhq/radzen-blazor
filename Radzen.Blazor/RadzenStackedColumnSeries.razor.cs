@@ -68,6 +68,28 @@ namespace Radzen.Blazor
         [Parameter]
         public IList<SeriesColorRange> StrokeRange { get; set; } = new List<SeriesColorRange>();
 
+        /// <summary>
+        /// Specifies how the series is filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a fill that fades toward the axis baseline, or <see cref="FillMode.None"/> to render only the outline.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Solid;
+
+        /// <summary>
+        /// Specifies the opacity at the value end of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient start opacity. Default is <c>0.85</c>.</value>
+        [Parameter]
+        public double GradientStartOpacity { get; set; } = 0.85;
+
+        /// <summary>
+        /// Specifies the opacity at the baseline of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient end opacity. Default is <c>0.4</c>.</value>
+        [Parameter]
+        public double GradientEndOpacity { get; set; } = 0.4;
+
         /// <inheritdoc />
         public override string Color
         {
@@ -165,6 +187,11 @@ namespace Radzen.Blazor
                 {
                     return Chart.ColumnOptions.Width.Value * columnSeries.Count + Chart.ColumnOptions.Margin * (columnSeries.Count - 1);
                 }
+                else if (Chart?.ColumnOptions?.CategoryGap is double gap)
+                {
+                    var step = System.Math.Abs(Chart.CategoryScale.Scale(1, true) - Chart.CategoryScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
                 else if (Chart != null)
                 {
                     var availableWidth = Chart.CategoryScale.OutputSize - (Chart.CategoryAxis.Padding * 2);
@@ -182,7 +209,20 @@ namespace Radzen.Blazor
             return DataAt(x, y).Item1 != null;
         }
 
-        double ColumnWidth => Chart?.ColumnOptions?.Width ?? (Chart != null ? BandWidth - Chart.ColumnOptions.Margin : 0);
+        double ColumnWidth
+        {
+            get
+            {
+                if (Chart == null)
+                {
+                    return 0;
+                }
+
+                var w = Chart.ColumnOptions.Width ?? (BandWidth - Chart.ColumnOptions.Margin);
+                var max = Chart.ColumnOptions.EffectiveMaxWidth;
+                return max is double m && w > m ? m : w;
+            }
+        }
 
         private double GetColumnLeft(TItem item, Func<TItem, double>? category = null)
         {
@@ -303,6 +343,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
             if (Chart == null)
             {
                 return Enumerable.Empty<ChartDataLabel>();
@@ -312,16 +358,27 @@ namespace Radzen.Blazor
             var stackedColumnSeries = StackedColumnSeries;
             var columnIndex = ColumnIndex;
             var category = ComposeCategory(Chart.CategoryScale);
+            const double inset = 12;
 
             foreach (var data in Items)
             {
-                var top = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
-                var bottom = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
-                var y = top + (bottom - top) / 2;
+                var end = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
+                var baseY = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
+                var center = end + (baseY - end) / 2;
+
+                var y = position switch
+                {
+                    DataLabelPosition.Top => Math.Min(end, baseY) + inset,
+                    DataLabelPosition.Bottom => Math.Max(end, baseY) - inset,
+                    DataLabelPosition.Inside => end + inset * Math.Sign(baseY - end),
+                    _ => center,
+                };
 
                 list.Add(new ChartDataLabel
                 {
                     Position = new Point { X = TooltipX(data) + offsetX, Y = y + offsetY },
+                    Anchor = new Point { X = TooltipX(data), Y = center },
+                    Value = Value(data),
                     TextAnchor = "middle",
                     Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(data))
                 });

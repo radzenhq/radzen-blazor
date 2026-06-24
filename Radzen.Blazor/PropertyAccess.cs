@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -20,6 +21,7 @@ public static class PropertyAccess
     /// <param name="propertyName">Name of the property to return.</param>
     /// <param name="type">Type of the object.</param>
     /// <returns>A function which return the specified property by its name.</returns>
+    [RequiresUnreferencedCode(TrimMessages.ExpressionTreeReflection)]
     public static Func<TItem, TValue> Getter<TItem, TValue>(string propertyName, Type? type = null)
     {
         ArgumentNullException.ThrowIfNull(propertyName);
@@ -37,7 +39,9 @@ public static class PropertyAccess
         Expression body = arg;
 
         if (type != null)
+        {
             body = Expression.Convert(body, type);
+        }
 
         Expression AccessNoInterface(Expression instance, string memberName)
         {
@@ -49,7 +53,9 @@ public static class PropertyAccess
                         .FirstOrDefault(t => t.GetProperty(memberName) != null);
 
                 if (declaringType == null)
+                {
                     throw new InvalidOperationException($"Member '{memberName}' not found on interface '{instance.Type}'.");
+                }
 
                 return Expression.Property(instance, declaringType, memberName);
             }
@@ -62,11 +68,17 @@ public static class PropertyAccess
             {
                 var prop = instance.Type.GetProperty(memberName,
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                if (prop != null) return Expression.Property(instance, prop);
+                if (prop != null)
+                {
+                    return Expression.Property(instance, prop);
+                }
 
                 var field = instance.Type.GetField(memberName,
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-                if (field != null) return Expression.Field(instance, field);
+                if (field != null)
+                {
+                    return Expression.Field(instance, field);
+                }
 
                 throw;
             }
@@ -95,7 +107,9 @@ public static class PropertyAccess
         }
 
         foreach (var member in propertyName.Split('.'))
+        {
             body = AccessWithNullPropagation(body, member);
+        }
 
         body = Expression.Convert(body, typeof(TValue));
         return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
@@ -108,7 +122,11 @@ public static class PropertyAccess
     /// <returns><c>true</c> if the specified type is a DateTime instance or nullable DateTime; otherwise, <c>false</c>.</returns>
     public static bool IsDate(Type? source)
     {
-        if (source == null) return false;
+        if (source == null)
+        {
+            return false;
+        }
+
         var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
         if (type == typeof(DateTime) || type == typeof(DateTimeOffset))
@@ -129,7 +147,11 @@ public static class PropertyAccess
     /// <returns><c>true</c> if the specified type is a DateOnly instance or nullable DateOnly; otherwise, <c>false</c>.</returns>
     public static bool IsDateOnly(Type? source)
     {
-        if (source == null) return false;
+        if (source == null)
+        {
+            return false;
+        }
+
         var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
         if (type == typeof(DateOnly))
@@ -156,7 +178,7 @@ public static class PropertyAccess
     /// </summary>
     /// <param name="type">The type.</param>
     /// <returns>The type of the collection element.</returns>
-    public static Type GetElementType(Type type)
+    public static Type GetElementType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] Type type)
     {
         ArgumentNullException.ThrowIfNull(type);
 
@@ -194,6 +216,7 @@ public static class PropertyAccess
     /// <param name="value">The value.</param>
     /// <param name="path">The path.</param>
     /// <returns>The value of the specified expression or <paramref name="value"/> if not found.</returns>
+    [RequiresUnreferencedCode(TrimMessages.PropertyAccessReflection)]
     public static object? GetValue(object? value, string path)
     {
         ArgumentNullException.ThrowIfNull(path);
@@ -229,6 +252,7 @@ public static class PropertyAccess
     /// <param name="data">The value.</param>
     /// <param name="propertyName">The name of the property to return.</param>
     /// <returns>A function that returns the specified property.</returns>
+    [RequiresUnreferencedCode(TrimMessages.ExpressionTreeReflection)]
     public static Func<object, T> Getter<T>(object data, string propertyName)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -249,6 +273,7 @@ public static class PropertyAccess
     /// <param name="property">The property.</param>
     /// <param name="result">The property value.</param>
     /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
+    [RequiresUnreferencedCode(TrimMessages.PropertyAccessReflection)]
     public static bool TryGetItemOrValueFromProperty<T>(object item, string property, out T result)
     {
         object? r = item != null ? GetItemOrValueFromProperty(item, property) : null;
@@ -271,6 +296,7 @@ public static class PropertyAccess
     /// <param name="item">The item.</param>
     /// <param name="property">The property.</param>
     /// <returns>System.Object.</returns>
+    [RequiresUnreferencedCode(TrimMessages.PropertyAccessReflection)]
     public static object? GetItemOrValueFromProperty(object? item, string? property)
     {
         if (item == null)
@@ -294,7 +320,9 @@ public static class PropertyAccess
     public static bool IsNumeric(Type source)
     {
         if (source == null)
+        {
             return false;
+        }
 
         var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
@@ -325,7 +353,9 @@ public static class PropertyAccess
     public static bool IsEnum(Type? source)
     {
         if (source == null)
+        {
             return false;
+        }
 
         return source.IsEnum;
     }
@@ -337,7 +367,11 @@ public static class PropertyAccess
     /// <returns><c>true</c> if the specified source is an enum; otherwise, <c>false</c>.</returns>
     public static bool IsNullableEnum(Type? source)
     {
-        if (source == null) return false;
+        if (source == null)
+        {
+            return false;
+        }
+
         Type? u = Nullable.GetUnderlyingType(source);
         return (u != null) && u.IsEnum;
     }
@@ -347,6 +381,7 @@ public static class PropertyAccess
     /// </summary>
     /// <param name="type">The type.</param>
     /// <returns><c>true</c> if the specified type is anonymous; otherwise, <c>false</c>.</returns>
+    [RequiresUnreferencedCode(TrimMessages.CustomAttributeReflection)]
     public static bool IsAnonymous(this Type type)
     {
         ArgumentNullException.ThrowIfNull(type);
@@ -392,7 +427,8 @@ public static class PropertyAccess
     /// <param name="type">The type.</param>
     /// <param name="property">The property.</param>
     /// <returns>Type.</returns>
-    public static Type? GetPropertyType(Type type, string property)
+    [RequiresUnreferencedCode(TrimMessages.PropertyAccessReflection)]
+    public static Type? GetPropertyType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type type, string property)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(property);
@@ -402,14 +438,18 @@ public static class PropertyAccess
             var part = property.Split('.').FirstOrDefault();
             var propertyType = GetPropertyTypeIncludeInterface(type, part);
             if (propertyType == null)
+            {
                 return null;
+            }
+
             return GetPropertyType(propertyType, property.ReplaceFirst($"{part}.", ""));
         }
 
         return GetPropertyTypeIncludeInterface(type, property);
     }
 
-    private static Type? GetPropertyTypeIncludeInterface(Type? type, string? property)
+    [RequiresUnreferencedCode(TrimMessages.PropertyAccessReflection)]
+    private static Type? GetPropertyTypeIncludeInterface([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type? type, string? property)
     {
         if (type != null)
         {
@@ -430,7 +470,8 @@ public static class PropertyAccess
     /// <param name="type">The type.</param>
     /// <param name="property">The property.</param>
     /// <returns>PropertyInfo.</returns>
-    public static PropertyInfo? GetProperty(Type type, string property)
+    [RequiresUnreferencedCode(TrimMessages.PropertyAccessReflection)]
+    public static PropertyInfo? GetProperty([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type type, string property)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(property);
@@ -471,4 +512,3 @@ public static class PropertyAccess
         return $@"({typeFunc})it[""{name}""]";
     }
 }
-

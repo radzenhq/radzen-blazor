@@ -10,6 +10,7 @@ namespace Radzen.Blazor.Tests
         public void ColorPicker_ShouldAcceptInvalidValues()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenColorPicker>(ComponentParameter.CreateParameter("Value", "invalid"));
         }

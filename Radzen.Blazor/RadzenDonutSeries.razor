@@ -32,15 +32,19 @@
     public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
         var chart = RequireChart();
-        var className = $"rz-donut-series rz-series-{chart.Series.IndexOf(this)}";
+        var seriesIndex = chart.Series.IndexOf(this);
+        var className = $"rz-donut-series rz-series-{seriesIndex}";
+        var gradient = FillMode == FillMode.Gradient;
         var x = CenterX;
         var y = CenterY;
         var radius = CurrentRadius;
         var innerRadius = InnerRadius ?? radius / 2;
         var items = PositiveItems;
+        var centerStyle = $"--rz-pie-cx: {x.ToInvariantString()}px; --rz-pie-cy: {y.ToInvariantString()}px";
+
         return
         @<g>
-            <g class="@className">
+            <g class="@className" style="@centerStyle">
                 @if (items.Any())
                 {
                     var sum = items.Sum(Value);
@@ -52,17 +56,35 @@
                         var sweepAngle = (value / sum) * TotalAngle;
                         var endAngle = startAngle - sweepAngle;
 
-                        var d = Segment(x, y, radius, innerRadius, startAngle, endAngle);
+                        var itemRadius = GetItemRadius(data, radius);
+                        var d = Segment(x, y, itemRadius, innerRadius, startAngle, endAngle);
 
+                        var midAngle = startAngle - sweepAngle / 2;
                         startAngle = endAngle;
 
                         var index = Items.IndexOf(data);
-                        var arcClassName = $"rz-series-item-{index}";
+                        var exploded = ExplodeOffset > 0 && IsExploded(data);
+                        var arcClassName = $"rz-series-item-{index}" + (exploded ? " rz-state-exploded" : "");
                         var fill = PickColor(index, Fills);
                         var stroke = PickColor(index, Strokes);
+                        var gradId = $"rzPieGradient{chart.UniqueID}-{seriesIndex}-{index}";
+                        var fillRef = gradient ? $"url(#{gradId})" : (FillMode == FillMode.None ? "none" : fill);
+                        var gradientColor = fill ?? "var(--rz-series-color)";
+                        var explodeStyle = ExplodeOffset > 0 ? $"--rz-explode-x: {(ExplodeOffset * Math.Cos(DegToRad(midAngle))).ToInvariantString()}px; --rz-explode-y: {(-ExplodeOffset * Math.Sin(DegToRad(midAngle))).ToInvariantString()}px" : "";
 
-                        <g class="@arcClassName">
-                            <Path D="@d" Fill="@fill" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
+                        <g class="@arcClassName" style="@($"--rz-segment-order: {index};{explodeStyle}")">
+                            @if (!string.IsNullOrEmpty(d))
+                            {
+                                @if (gradient)
+                                {
+                                    <RadialGradientDef Id="@gradId" Color="@gradientColor" Cx="@x" Cy="@y" R="@radius" InnerOffset="@GradientInnerOffset" InnerOpacity="@GradientEndOpacity" MidOffset="@GradientMidOffset" MidOpacity="@GradientStartOpacity" EndOpacity="@GradientRimOpacity" />
+                                }
+                                @if (ExplodeOffset > 0)
+                                {
+                                    <path class="rz-hit-area" d="@d" style="fill: transparent; stroke: none; pointer-events: fill" />
+                                }
+                                <Path D="@d" Fill="@fillRef" StrokeWidth="@StrokeWidth" Stroke="@stroke" />
+                            }
                         </g>
                     }
                 }

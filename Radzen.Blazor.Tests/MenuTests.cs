@@ -10,6 +10,7 @@ namespace Radzen.Blazor.Tests
         public void Menu_Renders_WithClassName()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenMenu>();
 
             Assert.Contains(@"rz-menu", component.Markup);
@@ -19,6 +20,7 @@ namespace Radzen.Blazor.Tests
         public void Menu_Renders_Responsive_True()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Responsive, true);
@@ -32,6 +34,7 @@ namespace Radzen.Blazor.Tests
         public void Menu_Renders_Responsive_False()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Responsive, false);
@@ -46,6 +49,7 @@ namespace Radzen.Blazor.Tests
         public void Menu_Renders_CustomToggleAriaLabel()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Responsive, true);
@@ -59,6 +63,7 @@ namespace Radzen.Blazor.Tests
         public void Menu_Renders_Flyout_Class_When_Enabled()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Flyout, true);
@@ -71,6 +76,7 @@ namespace Radzen.Blazor.Tests
         public void Menu_Does_Not_Render_Flyout_Class_By_Default()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenMenu>();
 
             Assert.DoesNotContain("rz-menu-flyout", component.Markup);
@@ -80,6 +86,7 @@ namespace Radzen.Blazor.Tests
         public void Menu_Flyout_Arrow_Icon_Is_Right_For_Nested_Items()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Flyout, true);
@@ -116,6 +123,7 @@ namespace Radzen.Blazor.Tests
         public void Menu_Flyout_Submenu_Has_Data_Flyout_Attribute()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenMenu>(parameters =>
             {
                 parameters.Add(p => p.Flyout, true);

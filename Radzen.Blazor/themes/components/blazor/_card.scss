@@ -80,7 +80,7 @@ $card-heading-margin-bottom: 0.5rem !default;
   }
 }
 
-@if $theme-name == material3 or $theme-name == material3-dark {
+@if $theme-name == material3 or $theme-name == material3-dark or $theme-name == material3expressive or $theme-name == material3expressive-dark {
   .rz-card-group {
     > .rz-card:first-of-type,
     > .rz-card + .rz-card:not(:last-of-type) {
@@ -117,7 +117,7 @@ $card-heading-margin-bottom: 0.5rem !default;
       border-end-end-radius: var(--rz-card-border-radius);
     }
 
-    @if $theme-name == material3 or $theme-name == material3-dark {
+    @if $theme-name == material3 or $theme-name == material3-dark or $theme-name == material3expressive or $theme-name == material3expressive-dark {
       > .rz-card {
         clip-path: none;
       }

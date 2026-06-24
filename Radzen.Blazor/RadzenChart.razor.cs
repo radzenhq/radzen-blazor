@@ -62,6 +62,199 @@ namespace Radzen.Blazor
         public ColorScheme ColorScheme { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether series highlight on hover is enabled.
+        /// When <c>true</c>, hovering over a series or its legend item highlights the series and dims the others.
+        /// </summary>
+        /// <value><c>true</c> if series hover is allowed; otherwise, <c>false</c>. Default is <c>true</c>.</value>
+        [Parameter]
+        public bool AllowSeriesHover { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the minimum interval in milliseconds between mouse move notifications which drive the tooltip, crosshair and hover tracking.
+        /// Mouse moves are coalesced to animation frames; this value imposes an additional delay between dispatches.
+        /// Defaults to <c>0</c> (every animation frame) on WebAssembly and <c>50</c> on Blazor Server to limit SignalR traffic.
+        /// </summary>
+        /// <value>The mouse move throttle in milliseconds.</value>
+        [Parameter]
+        public int? MouseMoveThrottle { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether series animate when the chart first renders.
+        /// Series are revealed with a left-to-right wipe. The animation respects the user's reduced motion preference.
+        /// </summary>
+        /// <value><c>true</c> if the initial render is animated; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Animate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the duration of the initial render animation in milliseconds.
+        /// </summary>
+        /// <value>The animation duration in milliseconds. Default is <c>700</c>.</value>
+        [Parameter]
+        public double AnimationDuration { get; set; } = 700;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether line and area series morph smoothly when their data changes.
+        /// Best suited for live dashboards where values update in place. Not applied while zooming or panning.
+        /// Supported in Chromium and Firefox; other browsers update instantly.
+        /// </summary>
+        /// <value><c>true</c> to animate data updates; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool AnimateDataUpdates { get; set; }
+
+        /// <summary>
+        /// Gets or sets the synchronization group of the chart. Charts which share the same group display
+        /// a synchronized crosshair and active data points: hovering one chart highlights the same category in the others.
+        /// Charts in a group should plot the same kind of category (e.g. the same dates).
+        /// </summary>
+        /// <value>The synchronization group. Default is <c>null</c> (not synchronized).</value>
+        [Parameter]
+        public string? SyncGroup { get; set; }
+
+        private static readonly object syncGroupsLock = new object();
+        private static readonly Dictionary<string, List<RadzenChart>> syncGroups = new Dictionary<string, List<RadzenChart>>();
+        private string? registeredSyncGroup;
+
+        internal double? SyncedPlotX { get; private set; }
+
+        private void RegisterSyncGroup()
+        {
+            if (registeredSyncGroup == SyncGroup)
+            {
+                return;
+            }
+
+            UnregisterSyncGroup();
+
+            if (SyncGroup != null)
+            {
+                lock (syncGroupsLock)
+                {
+                    if (!syncGroups.TryGetValue(SyncGroup, out var charts))
+                    {
+                        charts = new List<RadzenChart>();
+                        syncGroups[SyncGroup] = charts;
+                    }
+                    charts.Add(this);
+                }
+                registeredSyncGroup = SyncGroup;
+            }
+        }
+
+        private void UnregisterSyncGroup()
+        {
+            if (registeredSyncGroup == null)
+            {
+                return;
+            }
+
+            lock (syncGroupsLock)
+            {
+                if (syncGroups.TryGetValue(registeredSyncGroup, out var charts))
+                {
+                    charts.Remove(this);
+                    if (charts.Count == 0)
+                    {
+                        syncGroups.Remove(registeredSyncGroup);
+                    }
+                }
+            }
+            registeredSyncGroup = null;
+        }
+
+        private void BroadcastSyncedHover(double x, double y)
+        {
+            if (registeredSyncGroup == null)
+            {
+                return;
+            }
+
+            List<RadzenChart> targets;
+            lock (syncGroupsLock)
+            {
+                targets = syncGroups.TryGetValue(registeredSyncGroup, out var charts)
+                    ? charts.Where(chart => !ReferenceEquals(chart, this)).ToList()
+                    : new List<RadzenChart>();
+            }
+
+            double? categoryValue = null;
+            if ((x >= 0 || y >= 0) && Width.HasValue && Height.HasValue)
+            {
+                var plotWidth = Width.Value - MarginLeft - MarginRight;
+                var plotHeight = Height.Value - MarginTop - MarginBottom;
+                var queryX = x - MarginLeft;
+                var queryY = y - MarginTop;
+
+                if (queryX >= 0 && queryX <= plotWidth && queryY >= 0 && queryY <= plotHeight)
+                {
+                    categoryValue = (double)Convert.ChangeType(PixelToValue(CategoryScale, queryX), typeof(double), CultureInfo.InvariantCulture);
+                }
+            }
+
+            foreach (var target in targets)
+            {
+                target.SetSyncedHover(categoryValue);
+            }
+        }
+
+        private void SetSyncedHover(double? categoryValue)
+        {
+            double? plotX = null;
+
+            if (categoryValue != null)
+            {
+                var x = CategoryScale.Scale(categoryValue.Value, true);
+                if (x >= 0 && x <= CategoryScale.OutputSize)
+                {
+                    plotX = x;
+                }
+            }
+
+            if (SyncedPlotX != plotX)
+            {
+                SyncedPlotX = plotX;
+                HoverOverlay?.Refresh();
+                TooltipOverlay?.Refresh();
+            }
+        }
+
+        internal string? GetChartStyle()
+        {
+            return Animate ? $"--rz-chart-animation-duration: {AnimationDuration.ToInvariantString()}ms;{Style}" : Style;
+        }
+
+        /// <summary>
+        /// Gets whether the chart is currently rendered in a right-to-left context.
+        /// When <c>true</c>, the category axis direction is reversed and the value axis renders on the right side.
+        /// </summary>
+        internal bool IsRTL { get; private set; }
+
+        /// <summary>
+        /// Called from JavaScript when the document direction changes.
+        /// </summary>
+        [JSInvokable]
+        public async Task SetRTL(bool isRTL)
+        {
+            if (IsRTL != isRTL)
+            {
+                IsRTL = isRTL;
+                await Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Resolves the legend position to a concrete side, mapping the direction-aware
+        /// <see cref="LegendPosition.Start"/> / <see cref="LegendPosition.End"/> values to
+        /// <see cref="LegendPosition.Left"/> / <see cref="LegendPosition.Right"/> based on <see cref="IsRTL"/>.
+        /// </summary>
+        internal LegendPosition EffectiveLegendPosition => (Legend?.Position ?? LegendPosition.Right) switch
+        {
+            LegendPosition.Start => IsRTL ? LegendPosition.Right : LegendPosition.Left,
+            LegendPosition.End => IsRTL ? LegendPosition.Left : LegendPosition.Right,
+            var position => position
+        };
+
+        /// <summary>
         /// Gets or sets the callback invoked when a user clicks on a data point or segment in a chart series.
         /// Provides information about the clicked series, data item, and value in the event arguments.
         /// </summary>
@@ -84,6 +277,11 @@ namespace Radzen.Blazor
         /// Gets the runtime width of the chart.
         /// </summary>
         protected double? Width { get; set; }
+
+        /// <summary>
+        /// Gets the runtime width of the chart, exposed for legend row-wrap measurement.
+        /// </summary>
+        internal double? MeasuredWidth => Width;
 
         /// <summary>
         /// Gets the runtime height of the chart.
@@ -119,13 +317,164 @@ namespace Radzen.Blazor
 
         internal ScaleBase CategoryScale { get; set; } = new LinearScale();
         internal ScaleBase ValueScale { get; set; } = new LinearScale();
+        internal Dictionary<string, ScaleBase> AdditionalValueScales { get; set; } = new Dictionary<string, ScaleBase>();
         internal IList<IChartSeries> Series { get; set; } = new List<IChartSeries>();
         internal RadzenColumnOptions ColumnOptions { get; set; } = new RadzenColumnOptions();
         internal RadzenBarOptions BarOptions { get; set; } = new RadzenBarOptions();
         internal RadzenLegend Legend { get; set; } = new RadzenLegend();
         internal RadzenCategoryAxis CategoryAxis { get; set; } = new RadzenCategoryAxis();
         internal RadzenValueAxis ValueAxis { get; set; } = new RadzenValueAxis();
+        internal Dictionary<string, RadzenValueAxis> AdditionalValueAxes { get; set; } = new Dictionary<string, RadzenValueAxis>();
         internal RadzenChartTooltipOptions Tooltip { get; set; } = new RadzenChartTooltipOptions();
+
+        /// <summary>
+        /// Gets or sets whether mouse wheel zoom is enabled.
+        /// </summary>
+        [Parameter]
+        public bool AllowZoom { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether pan via scrollbar is enabled.
+        /// </summary>
+        [Parameter]
+        public bool AllowPan { get; set; }
+
+        /// <summary>
+        /// Gets or sets the zoom level as a percentage. A value of 100 means no zoom (full range visible).
+        /// Higher values zoom in (e.g., 200 shows half the range, 400 shows a quarter).
+        /// Set to 100 to reset zoom. Supports two-way binding with <c>@bind-Zoom</c>.
+        /// </summary>
+        [Parameter]
+        public double Zoom { get; set; } = 100;
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the zoom level changes due to user interaction (mouse wheel or pan).
+        /// Used for two-way binding with <c>@bind-Zoom</c>.
+        /// </summary>
+        [Parameter]
+        public EventCallback<double> ZoomChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the visible range changes due to zoom or pan.
+        /// Provides the current zoom level and visible range fractions.
+        /// </summary>
+        [Parameter]
+        public EventCallback<ChartViewChangeEventArgs> ViewChange { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start of the visible range as a fraction (0-1) of the full category range.
+        /// Supports two-way binding with <c>@bind-ViewStart</c>.
+        /// </summary>
+        [Parameter]
+        public double ViewStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the visible range start changes due to user interaction.
+        /// Used for two-way binding with <c>@bind-ViewStart</c>.
+        /// </summary>
+        [Parameter]
+        public EventCallback<double> ViewStartChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end of the visible range as a fraction (0-1) of the full category range.
+        /// Supports two-way binding with <c>@bind-ViewEnd</c>.
+        /// </summary>
+        [Parameter]
+        public double ViewEnd { get; set; } = 1;
+
+        /// <summary>
+        /// Gets or sets the callback invoked when the visible range end changes due to user interaction.
+        /// Used for two-way binding with <c>@bind-ViewEnd</c>.
+        /// </summary>
+        [Parameter]
+        public EventCallback<double> ViewEndChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start of the visible range as a fraction (0-1) of the full category range.
+        /// </summary>
+        internal double ZoomStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end of the visible range as a fraction (0-1) of the full category range.
+        /// </summary>
+        internal double ZoomEnd { get; set; } = 1;
+
+        /// <summary>
+        /// True while the chart itself is processing a zoom/pan operation.
+        /// Prevents SetParametersAsync from overwriting ZoomStart/ZoomEnd
+        /// with stale values from the parent during sequential callbacks.
+        /// </summary>
+        private bool isInternalZoom;
+
+        /// <summary>
+        /// The full category scale input range before zoom is applied.
+        /// </summary>
+        private double fullCategoryStart;
+        private double fullCategoryEnd;
+
+        private void ApplyZoomLevel()
+        {
+            var zoomLevel = Math.Max(100, Zoom) / 100.0;
+            var range = 1.0 / zoomLevel;
+            var center = (ZoomStart + ZoomEnd) / 2;
+            ZoomStart = Math.Max(0, center - range / 2);
+            ZoomEnd = Math.Min(1, ZoomStart + range);
+            if (ZoomStart < 0) { ZoomStart = 0; ZoomEnd = range; }
+        }
+
+        private async Task NotifyZoomChanged()
+        {
+            var range = ZoomEnd - ZoomStart;
+            var newZoom = range > 0 ? Math.Round(100.0 / range) : 100;
+            Zoom = newZoom;
+            ViewStart = ZoomStart;
+            ViewEnd = ZoomEnd;
+            await ZoomChanged.InvokeAsync(newZoom);
+            await ViewStartChanged.InvokeAsync(ZoomStart);
+            await ViewEndChanged.InvokeAsync(ZoomEnd);
+            await ViewChange.InvokeAsync(new ChartViewChangeEventArgs
+            {
+                Zoom = newZoom,
+                ViewStart = ZoomStart,
+                ViewEnd = ZoomEnd
+            });
+        }
+
+        /// <summary>
+        /// The bottom offset for the scrollbar, to position it above the legend.
+        /// </summary>
+        private double scrollbarBottom;
+
+        internal void AddValueAxis(string name, RadzenValueAxis axis)
+        {
+            AdditionalValueAxes[name] = axis;
+        }
+
+        internal void RemoveValueAxis(string name)
+        {
+            AdditionalValueAxes.Remove(name);
+            AdditionalValueScales.Remove(name);
+        }
+
+        internal ScaleBase GetValueScale(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return ValueScale;
+            }
+
+            return AdditionalValueScales.TryGetValue(name, out var scale) ? scale : ValueScale;
+        }
+
+        internal RadzenValueAxis GetValueAxis(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return ValueAxis;
+            }
+
+            return AdditionalValueAxes.TryGetValue(name, out var axis) ? axis : ValueAxis;
+        }
         internal void AddSeries(IChartSeries series)
         {
             if (!Series.Contains(series))
@@ -136,7 +485,10 @@ namespace Radzen.Blazor
 
         internal void RemoveSeries(IChartSeries series)
         {
-            Series.Remove(series);
+            if (Series.Remove(series))
+            {
+                _ = Refresh(false);
+            }
         }
         /// <summary>
         /// Returns the Series used by the Chart.
@@ -150,15 +502,32 @@ namespace Radzen.Blazor
         /// <returns></returns>
         protected bool ShouldRenderAxes()
         {
-            var pieType = typeof(RadzenPieSeries<>);
-            var donutType = typeof(RadzenDonutSeries<>);
+            return !Series.All(IsPolarSeries);
+        }
 
-            return !Series.All(series =>
+        // Pie, donut, funnel and pyramid series are radial - they have no value/category axes.
+        // Walk the base chain so user subclasses (e.g. class MyPie : RadzenPieSeries<MyItem>) are matched too.
+        private static bool IsPolarSeries(IChartSeries series)
+        {
+            for (var type = series.GetType(); type != null; type = type.BaseType)
             {
-                var type = series.GetType().GetGenericTypeDefinition();
+                if (!type.IsGenericType)
+                {
+                    continue;
+                }
 
-                return type == pieType || type == donutType;
-            });
+                var definition = type.GetGenericTypeDefinition();
+
+                if (definition == typeof(RadzenPieSeries<>)
+                    || definition == typeof(RadzenDonutSeries<>)
+                    || definition == typeof(RadzenFunnelSeries<>)
+                    || definition == typeof(RadzenPyramidSeries<>))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal bool ShouldInvertAxes()
@@ -176,7 +545,9 @@ namespace Radzen.Blazor
             var categoryScale = CategoryScale;
 
             CategoryScale = new LinearScale { Output = CategoryScale.Output };
-            ValueScale = new LinearScale { Output = ValueScale.Output };
+            ValueScale = ValueAxis.Logarithmic
+                ? new LogarithmicScale { Base = ValueAxis.LogarithmicBase, Output = ValueScale.Output }
+                : new LinearScale { Output = ValueScale.Output };
 
             var visibleSeries = Series.Where(series => series.Visible).ToList();
             var invisibleSeries = Series.Where(series => series.Visible == false).ToList();
@@ -186,10 +557,92 @@ namespace Radzen.Blazor
                 visibleSeries.Add(invisibleSeries.Last());
             }
 
+            // Partition series: primary axis vs named axes
+            var primarySeries = new List<IChartSeries>();
+            var namedAxisSeries = new Dictionary<string, List<IChartSeries>>();
+
+            foreach (var series in visibleSeries)
+            {
+                var axisName = (series is IChartValueAxisSeries named) ? named.ValueAxisName : null;
+                if (string.IsNullOrEmpty(axisName))
+                {
+                    primarySeries.Add(series);
+                }
+                else
+                {
+                    if (!namedAxisSeries.TryGetValue(axisName, out var list))
+                    {
+                        list = new List<IChartSeries>();
+                        namedAxisSeries[axisName] = list;
+                    }
+                    list.Add(series);
+                }
+            }
+
+            // All series contribute to category scale
             foreach (var series in visibleSeries)
             {
                 CategoryScale = series.TransformCategoryScale(CategoryScale);
+            }
+
+            // Primary series contribute to primary value scale
+            foreach (var series in primarySeries)
+            {
                 ValueScale = series.TransformValueScale(ValueScale);
+            }
+
+            // Named-axis series contribute to their own scales
+            foreach (var entry in namedAxisSeries)
+            {
+                var axisName = entry.Key;
+                var axis = GetValueAxis(axisName);
+
+                ScaleBase CreateAdditionalScale(ScaleRange? output = null)
+                {
+                    if (axis.Logarithmic)
+                    {
+                        var s = new LogarithmicScale { Base = axis.LogarithmicBase };
+                        if (output != null)
+                        {
+                            s.Output = output;
+                        }
+
+                        return s;
+                    }
+                    var ls = new LinearScale();
+                    if (output != null)
+                    {
+                        ls.Output = output;
+                    }
+
+                    return ls;
+                }
+
+                ScaleBase additionalScale;
+                if (!AdditionalValueScales.TryGetValue(axisName, out var existingScale))
+                {
+                    additionalScale = CreateAdditionalScale();
+                }
+                else
+                {
+                    additionalScale = CreateAdditionalScale(existingScale.Output);
+                }
+
+                foreach (var series in entry.Value)
+                {
+                    additionalScale = series.TransformValueScale(additionalScale);
+                }
+
+                AdditionalValueScales[axisName] = additionalScale;
+            }
+
+            // Remove scales for axes that no longer have series
+            foreach (var key in AdditionalValueScales.Keys.ToList())
+            {
+                if (!namedAxisSeries.ContainsKey(key))
+                {
+                    AdditionalValueScales.Remove(key);
+                }
             }
 
             AxisBase xAxis = CategoryAxis;
@@ -203,6 +656,15 @@ namespace Radzen.Blazor
             else
             {
                 CategoryScale.Padding = CategoryAxis.Padding;
+            }
+
+            // The ordinal (category) scale is the CategoryScale normally, but bar-family series and
+            // bullet swap the axes so it becomes the ValueScale. Apply the placement to whichever it is,
+            // for both orientations.
+            var ordinalScale = (CategoryScale as OrdinalScale) ?? (ValueScale as OrdinalScale);
+            if (ordinalScale != null)
+            {
+                ordinalScale.Placement = CategoryAxis.TickPlacement;
             }
 
             CategoryScale.Resize(xAxis.Min!, xAxis.Max!);
@@ -221,35 +683,68 @@ namespace Radzen.Blazor
                 ValueScale.Round = false;
             }
 
+            // Resize additional value scales
+            foreach (var entry in AdditionalValueScales)
+            {
+                var axis = GetValueAxis(entry.Key);
+                entry.Value.Resize(axis.Min!, axis.Max!);
+                if (axis.Step != null)
+                {
+                    entry.Value.Step = axis.Step;
+                    entry.Value.Round = false;
+                }
+            }
+
             var legendSize = Legend.Measure(this);
             var valueAxisSize = ValueAxis.Measure(this);
             var categoryAxisSize = CategoryAxis.Measure(this);
 
+            // Measure additional axes for right margin
+            double additionalAxesWidth = 0;
+            foreach (var entry in AdditionalValueAxes)
+            {
+                additionalAxesWidth += entry.Value.Measure(this, GetValueScale(entry.Key));
+            }
+
             if (!ShouldRenderAxes())
             {
                 valueAxisSize = categoryAxisSize = 0;
+                additionalAxesWidth = 0;
             }
 
-            MarginTop = MarginRight = 32;
-            MarginLeft = valueAxisSize;
+            MarginTop = 32;
+
+            if (IsRTL)
+            {
+                MarginRight = valueAxisSize;
+                MarginLeft = 32 + additionalAxesWidth;
+            }
+            else
+            {
+                MarginRight = 32 + additionalAxesWidth;
+                MarginLeft = valueAxisSize;
+            }
+
             MarginBottom = Math.Max(32, categoryAxisSize);
 
             if (Legend.Visible)
             {
-                if (Legend.Position == LegendPosition.Right || Legend.Position == LegendPosition.Left)
+                var legendPosition = EffectiveLegendPosition;
+
+                if (legendPosition == LegendPosition.Right || legendPosition == LegendPosition.Left)
                 {
-                    if (Legend.Position == LegendPosition.Right)
+                    if (legendPosition == LegendPosition.Right)
                     {
-                        MarginRight = legendSize + 16;
+                        MarginRight = legendSize + 16 + (IsRTL ? valueAxisSize : additionalAxesWidth);
                     }
                     else
                     {
-                        MarginLeft = legendSize + 16 + valueAxisSize;
+                        MarginLeft = legendSize + 16 + (IsRTL ? additionalAxesWidth : valueAxisSize);
                     }
                 }
-                else if (Legend.Position == LegendPosition.Top || Legend.Position == LegendPosition.Bottom)
+                else if (legendPosition == LegendPosition.Top || legendPosition == LegendPosition.Bottom)
                 {
-                    if (Legend.Position == LegendPosition.Top)
+                    if (legendPosition == LegendPosition.Top)
                     {
                         MarginTop = legendSize + 16;
                     }
@@ -260,11 +755,74 @@ namespace Radzen.Blazor
                 }
             }
 
-            CategoryScale.Output = new ScaleRange { Start = MarginLeft, End = Width != null ? Width.Value - MarginRight : 0 };
-            ValueScale.Output = new ScaleRange { Start = Height != null ? Height.Value - MarginBottom : 0, End = MarginTop };
+            if (AllowZoom || AllowPan)
+            {
+                MarginBottom += 20;
+
+                scrollbarBottom = 0;
+                if (Legend.Visible && Legend.Position == LegendPosition.Bottom)
+                {
+                    scrollbarBottom = legendSize + 16;
+                }
+            }
+
+            var categoryStart = MarginLeft;
+            var categoryEnd = Width != null ? Width.Value - MarginRight : 0;
+            var valueStart = Height != null ? Height.Value - MarginBottom : 0;
+            var valueEnd = MarginTop;
+
+            var categoryReversed = CategoryAxis.Inverted != IsRTL;
+            var valueReversed = ValueAxis.Inverted;
+
+            CategoryScale.Output = new ScaleRange
+            {
+                Start = categoryReversed ? categoryEnd : categoryStart,
+                End = categoryReversed ? categoryStart : categoryEnd
+            };
+            ValueScale.Output = new ScaleRange
+            {
+                Start = valueReversed ? valueEnd : valueStart,
+                End = valueReversed ? valueStart : valueEnd
+            };
 
             ValueScale.Fit(ValueAxis.TickDistance);
             CategoryScale.Fit(CategoryAxis.TickDistance);
+
+            // Apply zoom to category scale
+            if ((AllowZoom || AllowPan) && (ZoomStart > 0 || ZoomEnd < 1))
+            {
+                fullCategoryStart = CategoryScale.Input.Start;
+                fullCategoryEnd = CategoryScale.Input.End;
+
+                var fullRange = fullCategoryEnd - fullCategoryStart;
+                CategoryScale.Input = new ScaleRange
+                {
+                    Start = fullCategoryStart + fullRange * ZoomStart,
+                    End = fullCategoryStart + fullRange * ZoomEnd
+                };
+                CategoryScale.Round = false;
+
+                // Recalculate step for zoomed range
+                var zoomedTicks = CategoryScale.Ticks(CategoryAxis.TickDistance);
+                CategoryScale.Step = zoomedTicks.Step;
+            }
+            else
+            {
+                fullCategoryStart = CategoryScale.Input.Start;
+                fullCategoryEnd = CategoryScale.Input.End;
+            }
+
+            // Set output ranges and fit additional scales
+            foreach (var entry in AdditionalValueScales)
+            {
+                var axis = GetValueAxis(entry.Key);
+                entry.Value.Output = new ScaleRange
+                {
+                    Start = axis.Inverted ? valueEnd : valueStart,
+                    End = axis.Inverted ? valueStart : valueEnd
+                };
+                entry.Value.Fit(axis.TickDistance);
+            }
 
             var stateHasChanged = !ValueScale.IsEqualTo(valueScale);
 
@@ -291,7 +849,14 @@ namespace Radzen.Blazor
                 Width = width;
                 stateHasChanged = true;
 
-                CategoryScale.Output = new ScaleRange { Start = MarginLeft, End = Width.Value - MarginRight };
+                var cs = MarginLeft;
+                var ce = Width.Value - MarginRight;
+                var catReversed = CategoryAxis.Inverted != IsRTL;
+                CategoryScale.Output = new ScaleRange
+                {
+                    Start = catReversed ? ce : cs,
+                    End = catReversed ? cs : ce
+                };
             }
 
             if (height != Height)
@@ -299,7 +864,24 @@ namespace Radzen.Blazor
                 Height = height;
                 stateHasChanged = true;
 
-                ValueScale.Output = new ScaleRange { Start = Height.Value - MarginBottom, End = MarginTop };
+                var vs = Height.Value - MarginBottom;
+                var ve = MarginTop;
+                var valReversed = ValueAxis.Inverted;
+                ValueScale.Output = new ScaleRange
+                {
+                    Start = valReversed ? ve : vs,
+                    End = valReversed ? vs : ve
+                };
+
+                foreach (var entry in AdditionalValueScales)
+                {
+                    var axis = GetValueAxis(entry.Key);
+                    entry.Value.Output = new ScaleRange
+                    {
+                        Start = axis.Inverted ? ve : vs,
+                        End = axis.Inverted ? vs : ve
+                    };
+                }
             }
 
             if (stateHasChanged)
@@ -310,8 +892,75 @@ namespace Radzen.Blazor
 
         RenderFragment? tooltip;
         object? tooltipData;
+        IChartSeries? tooltipSeries;
         double mouseX;
         double mouseY;
+
+        // Plot-area-local coordinates of the nearest data point under the cursor. Used by the
+        // crosshair overlay so the vertical line snaps to the category X of the closest series point.
+        internal double SnapPlotX { get; private set; } = -1;
+        internal double SnapPlotY { get; private set; } = -1;
+
+        // True while the cursor is over the chart plot area. Drives crosshair visibility.
+        internal bool MouseInside { get; private set; }
+
+        // The series whose data point is currently nearest to the cursor (within tooltip tolerance).
+        // Used to resolve which value axis owns the horizontal crosshair line in multi-axis charts.
+        internal IChartSeries? HoveredSeries { get; private set; }
+
+        internal List<(IChartSeries Series, object Data, Point Point)>? SharedPointsAtSnap { get; private set; }
+
+        // Nearest data-point X across all visible series, in plot-local pixels. Used by the X crosshair
+        // when Snap=true. CartesianSeries.DataAt iterates all items and picks the closest by X with no
+        // tolerance, so this works even when the cursor is far from any series.
+        private double? NearestDataPointX(double plotLocalCursorX, double plotLocalCursorY)
+        {
+            double bestDistance = double.MaxValue;
+            double? bestX = null;
+            foreach (var series in Series)
+            {
+                if (!series.Visible)
+                {
+                    continue;
+                }
+
+                var (data, point) = series.DataAt(plotLocalCursorX, plotLocalCursorY);
+                if (data == null)
+                {
+                    continue;
+                }
+
+                var distance = Math.Abs(point.X - plotLocalCursorX);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestX = point.X;
+                }
+            }
+            return bestX;
+        }
+
+        private bool AnyAxisCrosshairVisible()
+        {
+            if (CategoryAxis?.Crosshair?.Visible == true)
+            {
+                return true;
+            }
+
+            if (ValueAxis?.Crosshair?.Visible == true)
+            {
+                return true;
+            }
+
+            foreach (var axis in AdditionalValueAxes.Values)
+            {
+                if (axis.Crosshair?.Visible == true)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         /// <summary>
         /// Invoked via interop when the user moves the mouse over the RadzenChart. Displays the tooltip.
@@ -323,6 +972,38 @@ namespace Radzen.Blazor
         {
             mouseX = x;
             mouseY = y;
+
+            // JS sends (-1, -1) on mouseleave. Clear hover state and re-render to hide the crosshair.
+            if (x < 0 && y < 0)
+            {
+                if (MouseInside || SnapPlotX >= 0 || SnapPlotY >= 0)
+                {
+                    MouseInside = false;
+                    SnapPlotX = -1;
+                    SnapPlotY = -1;
+                    HoveredSeries = null;
+                    SharedPointsAtSnap = null;
+                    if (Tooltip != null && (Tooltip.Split || AxisTooltipTrigger))
+                    {
+                        TooltipOverlay?.Refresh();
+                    }
+                    if (AnyAxisCrosshairVisible() || ActivePointEnabled || (Tooltip != null && Tooltip.Split))
+                    {
+                        HoverOverlay?.Refresh();
+                    }
+                }
+            }
+            else
+            {
+                MouseInside = true;
+                // The crosshair follows the cursor even when no data point is in tooltip range,
+                if (AnyAxisCrosshairVisible())
+                {
+                    HoverOverlay?.Refresh();
+                }
+            }
+
+            BroadcastSyncedHover(x, y);
 
             await DisplayTooltip();
         }
@@ -347,32 +1028,10 @@ namespace Radzen.Blazor
         [JSInvokable]
         public async Task Click(double x, double y)
         {
-            IChartSeries? closestSeries = null;
-            object? closestSeriesData = null;
-            double closestSeriesDistanceSquared = ClickTolerance * ClickTolerance;
-
             var queryX = x - MarginLeft;
             var queryY = y - MarginTop;
 
-            foreach (var series in Series)
-            {
-                if (series.Visible)
-                {
-                    var (seriesData, seriesDataPoint) = series.DataAt(queryX, queryY);
-                    if (seriesData != null)
-                    {
-                        double xDelta = queryX - seriesDataPoint.X;
-                        double yDelta = queryY - seriesDataPoint.Y;
-                        double squaredDistance = xDelta * xDelta + yDelta * yDelta;
-                        if (squaredDistance < closestSeriesDistanceSquared)
-                        {
-                            closestSeries = series;
-                            closestSeriesData = seriesData;
-                            closestSeriesDistanceSquared = squaredDistance;
-                        }
-                    }
-                }
-            }
+            var (closestSeries, closestSeriesData) = FindClosestSeries(queryX, queryY, ClickTolerance);
 
             if (closestSeriesData != null && closestSeries != null)
             {
@@ -380,79 +1039,337 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Invoked via interop when the user scrolls the mouse wheel over the chart. Zooms in or out.
+        /// </summary>
+        /// <param name="x">The mouse X position relative to the chart element.</param>
+        /// <param name="delta">Positive to zoom out, negative to zoom in.</param>
+        [JSInvokable]
+        public async Task OnWheel(double x, int delta)
+        {
+            if (!AllowZoom)
+            {
+                return;
+            }
+
+            var plotWidth = (Width ?? 0) - MarginLeft - MarginRight;
+            if (plotWidth <= 0)
+            {
+                return;
+            }
+
+            var fraction = Math.Clamp((x - MarginLeft) / plotWidth, 0, 1);
+            var zoomFactor = delta < 0 ? 0.8 : 1.25;
+            var range = ZoomEnd - ZoomStart;
+            var newRange = Math.Clamp(range * zoomFactor, 0.01, 1.0);
+
+            var center = ZoomStart + fraction * range;
+            var newStart = center - newRange * fraction;
+            var newEnd = newStart + newRange;
+
+            if (newEnd > 1) { newEnd = 1; newStart = 1 - newRange; }
+            if (newStart < 0) { newStart = 0; newEnd = newRange; }
+
+            ZoomStart = Math.Max(0, newStart);
+            ZoomEnd = Math.Min(1, newEnd);
+
+            isInternalZoom = true;
+            try
+            {
+                await NotifyZoomChanged();
+                await Refresh();
+            }
+            finally
+            {
+                isInternalZoom = false;
+            }
+        }
+
+        /// <summary>
+        /// Invoked via interop when the user drags the scrollbar thumb.
+        /// </summary>
+        /// <param name="position">The new start position as a fraction (0-1).</param>
+        [JSInvokable]
+        public async Task OnPan(double position)
+        {
+            if (!AllowPan && !AllowZoom)
+            {
+                return;
+            }
+
+            var range = ZoomEnd - ZoomStart;
+            ZoomStart = Math.Clamp(position, 0, 1 - range);
+            ZoomEnd = ZoomStart + range;
+
+            isInternalZoom = true;
+            try
+            {
+                await NotifyZoomChanged();
+                await Refresh();
+            }
+            finally
+            {
+                isInternalZoom = false;
+            }
+        }
+
+        // A column/bar/pie series reports a hit anywhere inside its filled region by returning the cursor
+        // position itself, so its distance is always 0 and it would always beat a line/scatter/bubble
+        // marker drawn on top of it. Give point series priority: pick the closest point series within
+        // tolerance first, and only fall back to region series when no point series qualifies.
+        internal (IChartSeries?, object?) FindClosestSeries(double queryX, double queryY, double tolerance)
+        {
+            var ordered = Series.OrderBy(s => s.RenderingOrder).Reverse().ToList();
+
+            var pointHit = ClosestSeries(ordered.Where(s => !IsRegionSeries(s)), queryX, queryY, tolerance);
+            if (pointHit.Item1 != null)
+            {
+                return pointHit;
+            }
+
+            return ClosestSeries(ordered.Where(IsRegionSeries), queryX, queryY, tolerance);
+        }
+
+        private static (IChartSeries?, object?) ClosestSeries(IEnumerable<IChartSeries> candidates, double queryX, double queryY, double tolerance)
+        {
+            IChartSeries? closestSeries = null;
+            object? closestData = null;
+            var closestDistanceSquared = tolerance * tolerance;
+
+            foreach (var series in candidates)
+            {
+                if (!series.Visible)
+                {
+                    continue;
+                }
+
+                var (data, point) = series.DataAt(queryX, queryY);
+                if (data != null)
+                {
+                    var xDelta = queryX - point.X;
+                    var yDelta = queryY - point.Y;
+                    var squaredDistance = xDelta * xDelta + yDelta * yDelta;
+                    if (squaredDistance < closestDistanceSquared)
+                    {
+                        closestSeries = series;
+                        closestData = data;
+                        closestDistanceSquared = squaredDistance;
+                    }
+                }
+            }
+
+            return (closestSeries, closestData);
+        }
+
+        internal bool AxisTooltipTrigger
+        {
+            get
+            {
+                return (Tooltip?.Trigger ?? ChartTooltipTrigger.Auto) switch
+                {
+                    ChartTooltipTrigger.Axis => true,
+                    ChartTooltipTrigger.Point => false,
+                    _ => CategoryAxis?.Crosshair?.Visible == true || SyncGroup != null,
+                };
+            }
+        }
+
+        private (IChartSeries?, object?) ClosestSeriesByCategory(double queryX, double queryY)
+        {
+            IChartSeries? closestSeries = null;
+            object? closestData = null;
+            var bestX = double.MaxValue;
+            var bestY = double.MaxValue;
+
+            foreach (var series in Series.OrderBy(s => s.RenderingOrder).Reverse())
+            {
+                if (!series.Visible || IsRegionSeries(series))
+                {
+                    continue;
+                }
+
+                var (data, point) = series.DataAt(queryX, queryY);
+                if (data == null)
+                {
+                    continue;
+                }
+
+                var dx = Math.Abs(point.X - queryX);
+                var dy = Math.Abs(point.Y - queryY);
+
+                if (dx < bestX - 0.5 || (Math.Abs(dx - bestX) <= 0.5 && dy < bestY))
+                {
+                    bestX = dx;
+                    bestY = dy;
+                    closestSeries = series;
+                    closestData = data;
+                }
+            }
+
+            return (closestSeries, closestData);
+        }
+
+        // True for series that fill a region (columns, bars, stacks and the radial pie/donut/funnel/pyramid),
+        // i.e. whose DataAt returns the cursor itself rather than a discrete data point.
+        private static bool IsRegionSeries(IChartSeries series)
+        {
+            return series is IChartColumnSeries
+                || series is IChartBarSeries
+                || series is IChartStackedColumnSeries
+                || series is IChartStackedBarSeries
+                || series is IChartFullStackedColumnSeries
+                || series is IChartFullStackedBarSeries
+                || IsPolarSeries(series);
+        }
+
         internal async Task DisplayTooltip()
         {
             if (Tooltip.Visible)
             {
-                var orderedSeries = Series.OrderBy(s => s.RenderingOrder).Reverse();
-                IChartSeries? closestSeries = null;
-                object? closestSeriesData = null;
-                double closestSeriesDistanceSquared = TooltipTolerance * TooltipTolerance;
-
                 var queryX = mouseX - MarginLeft;
                 var queryY = mouseY - MarginTop;
 
-                foreach (var series in orderedSeries)
+                foreach (var series in Series.OrderBy(s => s.RenderingOrder).Reverse())
                 {
-                    if (series.Visible)
+                    if (!series.Visible)
                     {
-                        foreach (var overlay in series.Overlays.Reverse())
-                        {
-                            if (overlay.Visible && overlay.Contains(queryX, queryY, TooltipTolerance))
-                            {
-                                tooltipData = null;
-                                tooltip = overlay.RenderTooltip(queryX, queryY);
-                                var tooltipPosition = overlay.GetTooltipPosition(queryX, queryY);
-                                TooltipService?.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
-                                {
-                                    ColorScheme = ColorScheme
-                                });
-                                await Task.Yield();
+                        continue;
+                    }
 
-                                return;
-                            }
-                        }
-
-                        var (seriesData, seriesDataPoint) = series.DataAt(queryX, queryY);
-                        if (seriesData != null)
+                    foreach (var overlay in series.Overlays.Reverse())
+                    {
+                        if (overlay.Visible && overlay.Contains(queryX, queryY, TooltipTolerance))
                         {
-                            double xDelta = queryX - seriesDataPoint.X;
-                            double yDelta = queryY - seriesDataPoint.Y;
-                            double squaredDistance = xDelta * xDelta + yDelta * yDelta;
-                            if (squaredDistance < closestSeriesDistanceSquared)
+                            tooltipData = null;
+                            tooltip = overlay.RenderTooltip(queryX, queryY);
+                            var tooltipPosition = overlay.GetTooltipPosition(queryX, queryY);
+                            TooltipService?.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
                             {
-                                closestSeries = series;
-                                closestSeriesData = seriesData;
-                                closestSeriesDistanceSquared = squaredDistance;
-                            }
+                                ColorScheme = ColorScheme
+                            });
+                            await Task.Yield();
+
+                            return;
                         }
+                    }
+                }
+
+                var axisMode = AxisTooltipTrigger;
+                var cursorInPlot = false;
+
+                if (Width.HasValue && Height.HasValue)
+                {
+                    var plotWidth = Width.Value - MarginLeft - MarginRight;
+                    var plotHeight = Height.Value - MarginTop - MarginBottom;
+                    cursorInPlot = queryX >= 0 && queryX <= plotWidth && queryY >= 0 && queryY <= plotHeight;
+                }
+
+                IChartSeries? closestSeries = null;
+                object? closestSeriesData = null;
+
+                if (!axisMode || cursorInPlot)
+                {
+                    (closestSeries, closestSeriesData) = FindClosestSeries(queryX, queryY, TooltipTolerance);
+
+                    if (closestSeriesData == null && axisMode)
+                    {
+                        (closestSeries, closestSeriesData) = ClosestSeriesByCategory(queryX, queryY);
                     }
                 }
 
                 if (closestSeriesData != null && closestSeries != null)
                 {
-                    if (closestSeriesData != tooltipData)
+                    var snap = closestSeries.GetTooltipPosition(closestSeriesData);
+                    var snapChanged = SnapPlotX != snap.X || SnapPlotY != snap.Y || !ReferenceEquals(HoveredSeries, closestSeries);
+                    SnapPlotX = snap.X;
+                    SnapPlotY = snap.Y;
+                    HoveredSeries = closestSeries;
+
+                    if (Tooltip.Split || (Tooltip.Shared && ActivePointEnabled))
+                    {
+                        // Collect all visible series' nearest points at the snapped X so the split
+                        // overlay can render a small tooltip per series anchored to its own Y.
+                        var list = new List<(IChartSeries Series, object Data, Point Point)>();
+                        foreach (var series in Series.OrderBy(s => s.RenderingOrder))
+                        {
+                            if (!series.Visible)
+                            {
+                                continue;
+                            }
+
+                            var (d, p) = series.DataAt(SnapPlotX, SnapPlotY);
+                            if (d != null)
+                            {
+                                list.Add((series, d, series.GetTooltipPosition(d)));
+                            }
+                        }
+                        SharedPointsAtSnap = list;
+                    }
+                    else
+                    {
+                        SharedPointsAtSnap = null;
+                    }
+
+                    if (closestSeriesData != tooltipData || !ReferenceEquals(closestSeries, tooltipSeries))
                     {
                         tooltipData = closestSeriesData;
+                        tooltipSeries = closestSeries;
                         tooltip = closestSeries.RenderTooltip(closestSeriesData);
-                        var tooltipPosition = closestSeries.GetTooltipPosition(closestSeriesData);
-                        TooltipService?.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+
+                        if (!Tooltip.Split && !axisMode)
                         {
-                            ColorScheme = ColorScheme
-                        });
+                            TooltipService?.OpenChartTooltip(Element, snap.X + MarginLeft, snap.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+                            {
+                                ColorScheme = ColorScheme
+                            });
+                        }
                         await Task.Yield();
                     }
+
+                    if (snapChanged)
+                    {
+                        if (Tooltip.Split || axisMode)
+                        {
+                            TooltipOverlay?.Refresh();
+                        }
+                        if (AnyAxisCrosshairVisible() || ActivePointEnabled || Tooltip.Split)
+                        {
+                            HoverOverlay?.Refresh();
+                        }
+                    }
                     return;
+                }
+            }
+
+            var cleared = false;
+
+            if (SnapPlotX >= 0 || SnapPlotY >= 0)
+            {
+                SnapPlotX = -1;
+                SnapPlotY = -1;
+                HoveredSeries = null;
+                SharedPointsAtSnap = null;
+                cleared = true;
+                if (AnyAxisCrosshairVisible() || ActivePointEnabled || Tooltip.Split)
+                {
+                    HoverOverlay?.Refresh();
                 }
             }
 
             if (tooltip != null)
             {
                 tooltipData = null;
+                tooltipSeries = null;
                 tooltip = null;
+                cleared = true;
 
                 TooltipService?.Close();
                 await Task.Yield();
+            }
+
+            if (cleared && (Tooltip.Split || AxisTooltipTrigger))
+            {
+                TooltipOverlay?.Refresh();
             }
         }
 
@@ -482,6 +1399,7 @@ namespace Radzen.Blazor
             if (IsJSRuntimeAvailable)
             {
                 tooltipData = data;
+                tooltipSeries = series;
                 tooltip = series.RenderTooltip(data);
                 var point = series.GetTooltipPosition(data);
                 TooltipService?.OpenChartTooltip(Element, point.X + MarginLeft, point.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
@@ -508,7 +1426,8 @@ namespace Radzen.Blazor
 
                 if (Visible && JSRuntime != null)
                 {
-                    var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createChart", Element, Reference);
+                    var mouseMoveThrottle = MouseMoveThrottle ?? (JSRuntime is IJSInProcessRuntime ? 0 : 50);
+                    var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createChart", Element, Reference, mouseMoveThrottle);
 
                     if (!widthAndHeightAreSet)
                     {
@@ -518,6 +1437,7 @@ namespace Radzen.Blazor
                     }
                 }
             }
+
         }
 
         internal string? ClipPath { get; set; }
@@ -530,6 +1450,16 @@ namespace Radzen.Blazor
             ClipPath = $"clipPath{UniqueID}";
             CategoryAxis.Chart = this;
             ValueAxis.Chart = this;
+
+            if (ViewStart != 0 || ViewEnd != 1)
+            {
+                ZoomStart = ViewStart;
+                ZoomEnd = ViewEnd;
+            }
+            else
+            {
+                ApplyZoomLevel();
+            }
 
             Initialize();
         }
@@ -574,10 +1504,30 @@ namespace Radzen.Blazor
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             bool shouldRefresh = parameters.DidParameterChange(nameof(Style), Style);
+            bool zoomChanged = parameters.DidParameterChange(nameof(Zoom), Zoom);
+            bool viewStartChanged = parameters.DidParameterChange(nameof(ViewStart), ViewStart);
+            bool viewEndChanged = parameters.DidParameterChange(nameof(ViewEnd), ViewEnd);
 
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
             await base.SetParametersAsync(parameters);
+
+            RegisterSyncGroup();
+
+            if ((viewStartChanged || viewEndChanged) && !isInternalZoom)
+            {
+                ZoomStart = ViewStart;
+                ZoomEnd = ViewEnd;
+
+                if (widthAndHeightAreSet)
+                {
+                    UpdateScales();
+                }
+            }
+            else if (zoomChanged)
+            {
+                ApplyZoomLevel();
+            }
 
             if (shouldRefresh)
             {
@@ -586,15 +1536,20 @@ namespace Radzen.Blazor
 
             if (visibleChanged && !firstRender)
             {
-                if (Visible == false && JSRuntime != null)
+                if (Visible == false)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.destroyChart", Element);
+                    await JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
                 }
             }
         }
 
         internal async Task Refresh(bool force = true)
         {
+            if (disposed)
+            {
+                return;
+            }
+
             if (widthAndHeightAreSet)
             {
 
@@ -616,14 +1571,71 @@ namespace Radzen.Blazor
             await Refresh(true);
         }
 
+        /// <summary>
+        /// Resets zoom and pan to show the full data range.
+        /// </summary>
+        public async Task ResetZoom()
+        {
+            ZoomStart = 0;
+            ZoomEnd = 1;
+
+            isInternalZoom = true;
+            try
+            {
+                await NotifyZoomChanged();
+                await Refresh(true);
+            }
+            finally
+            {
+                isInternalZoom = false;
+            }
+        }
+
+        /// <summary>
+        /// Returns the SVG markup of the rendered chart as a string.
+        /// The plot area and axes are included, with theme styles inlined so the SVG renders standalone.
+        /// Legends and tooltips are HTML overlays and are not included.
+        /// To download it, pass the result to the <c>Radzen.downloadFile</c> JavaScript helper.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task{String}"/> representing the asynchronous operation. The task result contains the SVG markup of the chart.
+        /// </returns>
+        public async Task<string> ToSvg()
+        {
+            if (IsJSRuntimeAvailable && JSRuntime != null)
+            {
+                return await JSRuntime.InvokeAsync<string>("Radzen.chartToSvg", Element);
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Renders the chart as a PNG image and downloads it in the browser.
+        /// The plot area and axes are included; legends and tooltips are HTML overlays and are not included.
+        /// </summary>
+        /// <param name="fileName">The download file name. Default is <c>chart.png</c>.</param>
+        public async Task ToPng(string fileName = "chart.png")
+        {
+            ArgumentNullException.ThrowIfNull(fileName);
+
+            if (IsJSRuntimeAvailable && JSRuntime != null)
+            {
+                var svg = await ToSvg();
+                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName);
+            }
+        }
+
         /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
 
-            if (Visible && IsJSRuntimeAvailable && JSRuntime != null)
+            UnregisterSyncGroup();
+
+            if (IsJSRuntimeAvailable && JSRuntime != null)
             {
-                JSRuntime.InvokeVoid("Radzen.destroyChart", Element);
+                JSRuntime.InvokeVoid("Radzen.disposeElement", Element);
             }
 
             GC.SuppressFinalize(this);
@@ -632,7 +1644,668 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-chart rz-scheme-{ColorScheme.ToString().ToLowerInvariant()}";
+            var css = $"rz-chart rz-scheme-{ColorScheme.ToString().ToLowerInvariant()}";
+
+            if (AllowSeriesHover)
+            {
+                css += " rz-chart-series-hover";
+            }
+
+            if (Animate)
+            {
+                css += " rz-chart-animate";
+            }
+
+            if (AllowZoom || AllowPan)
+            {
+                css += " rz-chart-zoomable";
+            }
+
+            return css;
         }
+
+        private bool ActivePointEnabled => Tooltip != null && Tooltip.Visible && Tooltip.HighlightDataPoint;
+
+        internal HoverOverlay? HoverOverlay { get; set; }
+
+        internal TooltipOverlay? TooltipOverlay { get; set; }
+
+        internal RadzenChartRangeNavigator? RangeNavigator { get; set; }
+
+        private readonly List<(double Top, double Bottom)> valueLabelReservations = new List<(double Top, double Bottom)>();
+
+        internal void ResetValueLabelLayout()
+        {
+            valueLabelReservations.Clear();
+            dataLabelReservations.Clear();
+        }
+
+        private readonly List<(double X, double Y, double Width, double Height)> dataLabelReservations = new List<(double X, double Y, double Width, double Height)>();
+
+        internal bool ReserveDataLabelRect(double x, double y, double width, double height)
+        {
+            foreach (var (rx, ry, rw, rh) in dataLabelReservations)
+            {
+                if (x < rx + rw && x + width > rx && y < ry + rh && y + height > ry)
+                {
+                    return false;
+                }
+            }
+
+            dataLabelReservations.Add((x, y, width, height));
+            return true;
+        }
+
+        internal double ReserveValueLabelSlot(double desiredY, double height, double plotHeight)
+        {
+            var half = height / 2;
+            var y = Math.Clamp(desiredY, half, Math.Max(half, plotHeight - half));
+
+            bool Overlaps(double candidate)
+            {
+                foreach (var (top, bottom) in valueLabelReservations)
+                {
+                    if (candidate - half < bottom && candidate + half > top)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            if (Overlaps(y))
+            {
+                for (var offset = 1.0; offset <= plotHeight; offset += 1)
+                {
+                    if (y + offset + half <= plotHeight && !Overlaps(y + offset))
+                    {
+                        y += offset;
+                        break;
+                    }
+                    if (y - offset - half >= 0 && !Overlaps(y - offset))
+                    {
+                        y -= offset;
+                        break;
+                    }
+                }
+            }
+
+            valueLabelReservations.Add((y - half, y + half));
+            return y;
+        }
+
+        internal async Task OnRangeNavigatorViewChanged(double start, double end)
+        {
+            var newStart = Math.Clamp(Math.Min(start, end), 0, 1);
+            var newEnd = Math.Clamp(Math.Max(start, end), 0, 1);
+
+            if (newStart == ZoomStart && newEnd == ZoomEnd)
+            {
+                return;
+            }
+
+            ZoomStart = newStart;
+            ZoomEnd = newEnd;
+
+            isInternalZoom = true;
+            try
+            {
+                await NotifyZoomChanged();
+                await Refresh();
+            }
+            finally
+            {
+                isInternalZoom = false;
+            }
+        }
+
+        internal RenderFragment RenderActivePoint()
+        {
+            return builder =>
+            {
+                var synced = !MouseInside && SyncedPlotX.HasValue;
+
+                if (!ActivePointEnabled || (!MouseInside && !synced) || (MouseInside && SnapPlotX < 0 && SnapPlotY < 0))
+                {
+                    return;
+                }
+
+                var points = new List<(IChartSeries Series, double X, double Y)>();
+
+                if (synced)
+                {
+                    foreach (var series in Series.OrderBy(s => s.RenderingOrder))
+                    {
+                        if (!series.Visible || IsRegionSeries(series) || !series.ShowActivePoint)
+                        {
+                            continue;
+                        }
+
+                        var (data, point) = series.DataAt(SyncedPlotX!.Value, 0);
+                        if (data != null)
+                        {
+                            points.Add((series, point.X, point.Y));
+                        }
+                    }
+                }
+                else if (Tooltip!.Shared && SharedPointsAtSnap != null)
+                {
+                    foreach (var (series, _, point) in SharedPointsAtSnap)
+                    {
+                        if (!IsRegionSeries(series) && series.ShowActivePoint)
+                        {
+                            points.Add((series, point.X, point.Y));
+                        }
+                    }
+                }
+                else if (HoveredSeries != null && !IsRegionSeries(HoveredSeries) && HoveredSeries.ShowActivePoint)
+                {
+                    points.Add((HoveredSeries, SnapPlotX, SnapPlotY));
+                }
+
+                if (points.Count == 0)
+                {
+                    return;
+                }
+
+                builder.OpenElement(0, "g");
+                builder.AddAttribute(1, "class", "rz-chart-active-points");
+                builder.AddAttribute(2, "pointer-events", "none");
+
+                foreach (var (series, x, y) in points)
+                {
+                    var index = Series.IndexOf(series);
+                    var size = Math.Max(3, series.MarkerSize);
+
+                    var style = $"transform: translate({x.ToInvariantString()}px, {y.ToInvariantString()}px)";
+                    if (!string.IsNullOrEmpty(series.Color))
+                    {
+                        style = $"--rz-series-color: {series.Color}; {style}";
+                    }
+
+                    builder.OpenElement(3, "g");
+                    builder.SetKey(index);
+                    builder.AddAttribute(4, "class", $"rz-series-{index} rz-active-point");
+                    builder.AddAttribute(5, "style", style);
+
+                    builder.OpenElement(6, "circle");
+                    builder.AddAttribute(7, "class", "rz-active-point-halo");
+                    builder.AddAttribute(8, "r", (size * 2.4).ToInvariantString());
+                    builder.CloseElement();
+
+                    var markerPath = Rendering.MarkerPath.For(series.MarkerType, 0, 0, size);
+
+                    if (markerPath.Length > 0)
+                    {
+                        builder.OpenElement(9, "path");
+                        builder.AddAttribute(10, "class", "rz-active-point-dot");
+                        builder.AddAttribute(11, "d", markerPath);
+                        builder.CloseElement();
+                    }
+                    else
+                    {
+                        builder.OpenElement(12, "circle");
+                        builder.AddAttribute(13, "class", "rz-active-point-dot");
+                        builder.AddAttribute(14, "r", size.ToInvariantString());
+                        builder.CloseElement();
+                    }
+
+                    builder.CloseElement();
+                }
+
+                builder.CloseElement();
+            };
+        }
+
+        internal RenderFragment RenderCrosshair()
+        {
+            return builder =>
+            {
+                var synced = !MouseInside && SyncedPlotX.HasValue;
+
+                if ((!MouseInside && !synced) || Tooltip == null || !Tooltip.Visible)
+                {
+                    return;
+                }
+
+                if (!Width.HasValue || !Height.HasValue)
+                {
+                    return;
+                }
+
+                var plotWidth = Width.Value - MarginLeft - MarginRight;
+                var plotHeight = Height.Value - MarginTop - MarginBottom;
+                if (plotWidth <= 0 || plotHeight <= 0)
+                {
+                    return;
+                }
+
+                var categoryCrosshair = CategoryAxis?.Crosshair;
+                var hoveredValueAxis = GetValueAxis((HoveredSeries as IChartValueAxisSeries)?.ValueAxisName);
+                var hoveredValueScale = GetValueScale((HoveredSeries as IChartValueAxisSeries)?.ValueAxisName);
+                var valueCrosshair = hoveredValueAxis?.Crosshair;
+
+                var snapX = categoryCrosshair?.Snap ?? true;
+                var queryX = synced ? SyncedPlotX!.Value : mouseX - MarginLeft;
+                var queryY = mouseY - MarginTop;
+
+                if (!synced && (queryX < 0 || queryX > plotWidth || queryY < 0 || queryY > plotHeight))
+                {
+                    return;
+                }
+                double lineX = snapX ? (NearestDataPointX(queryX, queryY) ?? queryX) : queryX;
+                var lineY = queryY;
+
+                var showX = categoryCrosshair?.Visible == true && lineX >= 0 && lineX <= plotWidth;
+                var showY = !synced && valueCrosshair?.Visible == true && lineY >= 0 && lineY <= plotHeight;
+
+                if (!showX && !showY)
+                {
+                    return;
+                }
+
+                builder.OpenElement(0, "g");
+                builder.AddAttribute(1, "class", "rz-chart-crosshair");
+                builder.AddAttribute(2, "pointer-events", "none");
+
+                if (showX && categoryCrosshair != null)
+                {
+                    RenderCrosshairLine(builder, 3, categoryCrosshair,
+                        x1: lineX, x2: lineX, y1: 0, y2: plotHeight);
+
+                    if (categoryCrosshair.Label && CategoryAxis != null)
+                    {
+                        var raw = PixelToValue(CategoryScale, lineX);
+                        var text = CategoryAxis.Format(CategoryScale, raw);
+                        RenderAxisCrosshairLabel(builder, 4, text,
+                            anchorX: lineX, anchorY: plotHeight,
+                            placement: AxisCrosshairLabelPlacement.Bottom);
+                    }
+                }
+
+                if (showY && valueCrosshair != null && hoveredValueAxis != null)
+                {
+                    RenderCrosshairLine(builder, 5, valueCrosshair,
+                        x1: 0, x2: plotWidth, y1: lineY, y2: lineY);
+
+                    if (valueCrosshair.Label)
+                    {
+                        var raw = PixelToValue(hoveredValueScale, lineY);
+                        var text = hoveredValueAxis.Format(hoveredValueScale, raw);
+                        RenderAxisCrosshairLabel(builder, 6, text,
+                            anchorX: 0, anchorY: lineY,
+                            placement: AxisCrosshairLabelPlacement.Left);
+                    }
+                }
+
+                builder.CloseElement();
+            };
+        }
+
+        // Inverse of ScaleBase.Scale(value, padding: true) for plot-local pixel -> input value.
+        // The padded variant is what the chart uses everywhere (ComposeCategory/ComposeValue, TooltipX/Y),
+        // so this matches the actual rendered position of data points and gridlines. Handles linear and
+        // logarithmic scales. Categorical-string axes use a numeric index; the label shows the index.
+        private static object PixelToValue(ScaleBase scale, double plotLocalPixel)
+        {
+            var outputDelta = scale.Output.End - scale.Output.Start;
+            var size = Math.Abs(outputDelta);
+            if (size == 0)
+            {
+                return scale.Input.Start;
+            }
+            var paddedSize = size - scale.Padding * 2;
+            if (paddedSize <= 0)
+            {
+                return scale.Input.Start;
+            }
+            var t = (plotLocalPixel - scale.Padding) / paddedSize;
+            if (t < 0)
+            {
+                t = 0;
+            }
+            else if (t > 1)
+            {
+                t = 1;
+            }
+
+            if (outputDelta < 0)
+            {
+                t = 1 - t;
+            }
+
+            if (scale.IsLogarithmic && scale.Input.Start > 0 && scale.Input.End > 0)
+            {
+                var logMin = Math.Log(scale.Input.Start);
+                var logMax = Math.Log(scale.Input.End);
+                return Math.Exp(logMin + t * (logMax - logMin));
+            }
+            return scale.Input.Start + t * (scale.Input.End - scale.Input.Start);
+        }
+
+        private static void RenderCrosshairLine(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, int seqBase,
+            RadzenAxisCrosshair config, double x1, double x2, double y1, double y2)
+        {
+            var stroke = config.Stroke ?? "var(--rz-chart-crosshair-color, var(--rz-chart-axis-color, rgba(0,0,0,0.5)))";
+            var width = config.StrokeWidth;
+            string? dashArray = config.LineType switch
+            {
+                LineType.Dashed => $"{(width * 3).ToInvariantString()} {(width * 3).ToInvariantString()}",
+                LineType.Dotted => $"0 {(width * 2).ToInvariantString()}",
+                _ => null,
+            };
+            var lineCap = config.LineType == LineType.Dotted ? "round" : null;
+
+            builder.OpenRegion(seqBase);
+            builder.OpenElement(0, "line");
+            builder.AddAttribute(1, "x1", x1.ToInvariantString());
+            builder.AddAttribute(2, "x2", x2.ToInvariantString());
+            builder.AddAttribute(3, "y1", y1.ToInvariantString());
+            builder.AddAttribute(4, "y2", y2.ToInvariantString());
+            builder.AddAttribute(5, "stroke", stroke);
+            builder.AddAttribute(6, "stroke-width", width.ToInvariantString());
+            if (dashArray != null)
+            {
+                builder.AddAttribute(7, "stroke-dasharray", dashArray);
+            }
+            if (lineCap != null)
+            {
+                builder.AddAttribute(8, "stroke-linecap", lineCap);
+            }
+            builder.CloseElement();
+            builder.CloseRegion();
+        }
+
+        private enum AxisCrosshairLabelPlacement { Bottom, Left }
+
+        private static void RenderAxisCrosshairLabel(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, int seqBase,
+            string text, double anchorX, double anchorY, AxisCrosshairLabelPlacement placement)
+        {
+            var paddingX = 6.0;
+            var textWidth = Rendering.TextMeasurer.TextWidth(text ?? string.Empty, 12.5);
+            var boxWidth = textWidth + paddingX * 2;
+            var boxHeight = 20.0;
+
+            double rectX, rectY, textX, textY;
+            switch (placement)
+            {
+                case AxisCrosshairLabelPlacement.Bottom:
+                    rectX = anchorX - boxWidth / 2;
+                    rectY = anchorY + 4;
+                    textX = anchorX;
+                    textY = rectY + boxHeight / 2;
+                    break;
+                case AxisCrosshairLabelPlacement.Left:
+                default:
+                    rectX = -boxWidth - 4;
+                    rectY = anchorY - boxHeight / 2;
+                    textX = rectX + boxWidth / 2;
+                    textY = rectY + boxHeight / 2;
+                    break;
+            }
+
+            builder.OpenRegion(seqBase);
+            builder.OpenElement(0, "g");
+            builder.AddAttribute(1, "class", "rz-chart-axis-crosshair-label");
+            builder.AddAttribute(2, "pointer-events", "none");
+
+            builder.OpenElement(3, "rect");
+            builder.AddAttribute(4, "x", rectX.ToInvariantString());
+            builder.AddAttribute(5, "y", rectY.ToInvariantString());
+            builder.AddAttribute(6, "width", boxWidth.ToInvariantString());
+            builder.AddAttribute(7, "height", boxHeight.ToInvariantString());
+            builder.AddAttribute(8, "rx", "2");
+            builder.AddAttribute(9, "ry", "2");
+            builder.CloseElement();
+
+            builder.OpenElement(10, "text");
+            builder.AddAttribute(11, "x", textX.ToInvariantString());
+            builder.AddAttribute(12, "y", textY.ToInvariantString());
+            builder.AddAttribute(13, "text-anchor", "middle");
+            builder.AddAttribute(14, "dy", "-0.0125em");
+            builder.AddContent(15, text);
+            builder.CloseElement();
+
+            builder.CloseElement();
+            builder.CloseRegion();
+        }
+
+        private List<(IChartSeries Series, object Data, Point Point)> SyncedPoints()
+        {
+            var list = new List<(IChartSeries Series, object Data, Point Point)>();
+
+            foreach (var series in Series.OrderBy(s => s.RenderingOrder))
+            {
+                if (!series.Visible || IsRegionSeries(series))
+                {
+                    continue;
+                }
+
+                var (data, _) = series.DataAt(SyncedPlotX!.Value, 0);
+                if (data != null)
+                {
+                    list.Add((series, data, series.GetTooltipPosition(data)));
+                }
+            }
+
+            return list;
+        }
+
+        internal bool CategoryTooltipRendered { get; private set; }
+
+        internal RenderFragment RenderTooltipOverlay()
+        {
+            return builder =>
+            {
+                CategoryTooltipRendered = false;
+
+                if (Tooltip == null || !Tooltip.Visible || !Width.HasValue || !Height.HasValue)
+                {
+                    return;
+                }
+
+                var plotWidth = Width.Value - MarginLeft - MarginRight;
+                var plotHeight = Height.Value - MarginTop - MarginBottom;
+                if (plotWidth <= 0 || plotHeight <= 0)
+                {
+                    return;
+                }
+
+                if (!MouseInside || !Tooltip.Split)
+                {
+                    IChartSeries? series = null;
+                    object? data = null;
+                    Point? boxAnchor = null;
+
+                    if (MouseInside && AxisTooltipTrigger && SnapPlotX >= 0 && tooltipSeries != null && tooltipData != null)
+                    {
+                        series = tooltipSeries;
+                        data = tooltipData;
+                        boxAnchor = new Point { X = SnapPlotX, Y = SnapPlotY };
+                    }
+                    else if (!MouseInside && SyncedPlotX.HasValue)
+                    {
+                        var synced = SyncedPoints();
+                        if (synced.Count > 0)
+                        {
+                            (series, data, boxAnchor) = synced[0];
+                        }
+                    }
+
+                    if (series == null || data == null || boxAnchor == null)
+                    {
+                        return;
+                    }
+
+                    CategoryTooltipRendered = true;
+                    RenderCategoryTooltipBox(builder, series, data, boxAnchor, plotWidth, plotHeight);
+                    return;
+                }
+
+                var points = SharedPointsAtSnap;
+                if (points == null || points.Count == 0)
+                {
+                    return;
+                }
+
+                const double estTooltipHeight = 64;
+                const double gap = 10;
+                const double minVerticalGap = 6;
+                var topLimit = MarginTop;
+                var bottomLimit = MarginTop + plotHeight - estTooltipHeight;
+
+                // For each series, resolve the preferred anchor (right of the data point by default,
+                // flipped left if the expected content would spill off the plot). Content sizes itself
+                // via CSS; we only control the container's top/left.
+                var placements = new List<(IChartSeries Series, object Data, double AnchorX, double AnchorY, bool RightSide)>();
+                foreach (var entry in points)
+                {
+                    // entry.Point is in plot-local coords. Convert to chart-relative by adding margins.
+                    var anchorX = entry.Point.X + MarginLeft;
+                    var anchorY = entry.Point.Y + MarginTop;
+                    var rightSide = anchorX + gap + 180 <= MarginLeft + plotWidth;
+                    placements.Add((entry.Series, entry.Data, anchorX, anchorY, rightSide));
+                }
+
+                var adjustedAnchorY = new double[placements.Count];
+
+                // Resolve collisions per side independently, sliding the whole stack up if it overflows the bottom.
+                foreach (var side in new[] { true, false })
+                {
+                    var indices = Enumerable.Range(0, placements.Count)
+                        .Where(i => placements[i].RightSide == side)
+                        .OrderBy(i => placements[i].AnchorY)
+                        .ToList();
+                    if (indices.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    // Initial Y positions (cursor anchored to data point).
+                    var ys = indices.Select(i => placements[i].AnchorY).ToArray();
+
+                    // Step 1: push each tooltip down so it doesn't overlap the previous one.
+                    for (var k = 1; k < ys.Length; k++)
+                    {
+                        var minY = ys[k - 1] + estTooltipHeight + minVerticalGap;
+                        if (ys[k] < minY)
+                        {
+                            ys[k] = minY;
+                        }
+                    }
+
+                    // Step 2: if the stack overflows the bottom, slide everything up.
+                    var bottomOverflow = ys[^1] - bottomLimit;
+                    if (bottomOverflow > 0)
+                    {
+                        for (var k = 0; k < ys.Length; k++)
+                        {
+                            ys[k] -= bottomOverflow;
+                        }
+                    }
+
+                    // Step 3: clamp top, then re-cascade in case the slide went above the top limit.
+                    if (ys[0] < topLimit)
+                    {
+                        ys[0] = topLimit;
+                    }
+
+                    for (var k = 1; k < ys.Length; k++)
+                    {
+                        var minY = ys[k - 1] + estTooltipHeight + minVerticalGap;
+                        if (ys[k] < minY)
+                        {
+                            ys[k] = minY;
+                        }
+                    }
+
+                    for (var k = 0; k < indices.Count; k++)
+                    {
+                        adjustedAnchorY[indices[k]] = ys[k];
+                    }
+                }
+
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "rz-chart-split-tooltip");
+                builder.AddAttribute(2, "style", "position: absolute; inset: 0; pointer-events: none; overflow: hidden;");
+
+                var seq = 3;
+                for (var i = 0; i < placements.Count; i++)
+                {
+                    var p = placements[i];
+                    var ty = adjustedAnchorY[i];
+
+                    // Position the container at (AnchorX ± gap, ty). For right-side, content flows left-to-right;
+                    // for left-side, we use right:<distance> instead of left so the content's right edge anchors near the data point.
+                    string positionStyle;
+                    if (p.RightSide)
+                    {
+                        var left = p.AnchorX + gap;
+                        positionStyle = $"left: {left.ToInvariantString()}px;";
+                    }
+                    else
+                    {
+                        // right = distance from chart's right edge to where the tooltip's right edge should sit.
+                        var right = Width!.Value - (p.AnchorX - gap);
+                        positionStyle = $"right: {right.ToInvariantString()}px;";
+                    }
+
+                    var borderSide = p.RightSide ? "border-left" : "border-right";
+
+                    builder.OpenElement(seq++, "div");
+                    builder.AddAttribute(seq++, "class", "rz-chart-split-tooltip-item");
+                    builder.AddAttribute(seq++, "style",
+                        $"position: absolute; top: {ty.ToInvariantString()}px; {positionStyle} " +
+                        $"{borderSide}: 3px solid {p.Series.Color}; pointer-events: none;");
+
+                    builder.AddContent(seq++, p.Series.RenderTooltip(p.Data));
+
+                    builder.CloseElement(); // tooltip item
+                }
+
+                builder.CloseElement(); // container div
+            };
+        }
+
+        private void RenderCategoryTooltipBox(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder,
+            IChartSeries series, object data, Point anchor, double plotWidth, double plotHeight)
+        {
+            const double gap = 10;
+            const double estTooltipHeight = 64;
+
+            var anchorX = anchor.X + MarginLeft;
+            var anchorY = anchor.Y + MarginTop;
+            var rightSide = anchorX + gap + 180 <= MarginLeft + plotWidth;
+            var top = Math.Max(MarginTop, Math.Min(MarginTop + plotHeight - estTooltipHeight, anchorY - estTooltipHeight / 2));
+
+            string positionStyle;
+            if (rightSide)
+            {
+                positionStyle = $"left: {(anchorX + gap).ToInvariantString()}px;";
+            }
+            else
+            {
+                positionStyle = $"right: {(Width!.Value - (anchorX - gap)).ToInvariantString()}px;";
+            }
+
+            var borderSide = rightSide ? "border-left" : "border-right";
+            var entering = !(TooltipOverlay?.BoxWasVisible ?? false);
+
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "rz-chart-split-tooltip");
+            builder.AddAttribute(2, "style", "position: absolute; inset: 0; pointer-events: none; overflow: hidden;");
+
+            builder.OpenElement(3, "div");
+            builder.AddAttribute(4, "class", $"rz-chart-category-tooltip{(entering ? " rz-chart-tooltip-appear" : "")}");
+            builder.AddAttribute(5, "style",
+                $"position: absolute; top: {top.ToInvariantString()}px; {positionStyle} " +
+                $"{borderSide}: 3px solid {series.Color}; pointer-events: none;");
+
+            builder.AddContent(6, series.RenderTooltip(data));
+
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+
     }
 }

@@ -69,7 +69,11 @@ namespace Radzen.Blazor
             if (firstRender)
             {
                 initialized = true;
-                if (JSRuntime == null) return;
+                if (JSRuntime == null)
+                {
+                    return;
+                }
+
                 try
                 {
                     var matches = await JSRuntime.InvokeAsync<bool>("Radzen.mediaQuery", Query, Reference);
@@ -90,7 +94,11 @@ namespace Radzen.Blazor
         {
             if (initialized)
             {
-                if (JSRuntime == null) return;
+                if (JSRuntime == null)
+                {
+                    return;
+                }
+
                 try
                 {
                     _ = JSRuntime.InvokeVoidAsync("Radzen.mediaQuery", Reference);

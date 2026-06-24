@@ -223,7 +223,11 @@ namespace Radzen.Blazor
             }
 
             var vbWidth = x + Math.Max(0, QuietZoneModules);
-            if (vbWidth <= 0) vbWidth = 1;
+            if (vbWidth <= 0)
+            {
+                vbWidth = 1;
+            }
+
             return (rects, vbWidth, checksumText, null);
         }
 
@@ -245,28 +249,40 @@ namespace Radzen.Blazor
                 }
 
                 int j = i + 1;
-                while (j < bits.Length && bits[j] == '1') j++;
+                while (j < bits.Length && bits[j] == '1')
+                {
+                    j++;
+                }
+
                 rects.Add(new BarcodeRect(quiet + i, 0, j - i, BarHeight));
                 i = j;
             }
 
             var vbWidth = quiet + bits.Length + quiet;
-            if (vbWidth <= 0) vbWidth = 1;
+            if (vbWidth <= 0)
+            {
+                vbWidth = 1;
+            }
+
             return (rects, vbWidth, checksumText, null);
         }
 
         (IReadOnlyList<BarcodeRect> bars, double vbWidth, string? checksumText, string? error) CreateFromRects((IReadOnlyList<BarcodeRect> bars, double vbWidth) geometry, string? checksumText)
         {
             var vbWidth = geometry.vbWidth;
-            if (vbWidth <= 0) vbWidth = 1;
+            if (vbWidth <= 0)
+            {
+                vbWidth = 1;
+            }
+
             return (geometry.bars, vbWidth, checksumText, null);
         }
 
         /// <summary>
-        /// Returns the SVG markup of the rendered QR code as a string.
+        /// Returns the SVG markup of the rendered barcode as a string.
         /// </summary>
         /// <returns>
-        /// A <see cref="Task{String}"/> representing the asynchronous operation. The task result contains the SVG markup of the QR code.
+        /// A <see cref="Task{String}"/> representing the asynchronous operation. The task result contains the SVG markup of the barcode.
         /// </returns>
         public async Task<string> ToSvg()
         {
@@ -275,6 +291,19 @@ namespace Radzen.Blazor
                 return await JSRuntime.InvokeAsync<string>("Radzen.outerHTML", Element);
             }
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Renders the barcode as a PNG image and downloads it in the browser.
+        /// </summary>
+        /// <param name="fileName">The download file name. Default is <c>barcode.png</c>.</param>
+        public async Task ToPng(string fileName = "barcode.png")
+        {
+            if (JSRuntime != null)
+            {
+                var svg = await ToSvg();
+                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName);
+            }
         }
     }
 }

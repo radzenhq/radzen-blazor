@@ -1,0 +1,99 @@
+@implements IDisposable
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenButton Click="@TogglePlay" Icon="@(running ? "pause" : "play_arrow")" Text="@(running ? "Pause" : "Play")" ButtonStyle="ButtonStyle.Primary" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart AnimateDataUpdates="true">
+        <RadzenChartTooltipOptions />
+        <RadzenLineSeries Smooth="true" Data="@cpu" CategoryProperty="Time" ValueProperty="Value" Title="CPU">
+            <RadzenSeriesValueLabel />
+        </RadzenLineSeries>
+        <RadzenLineSeries Smooth="true" Data="@memory" CategoryProperty="Time" ValueProperty="Value" Title="Memory">
+            <RadzenSeriesValueLabel />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Step="@TimeSpan.FromSeconds(5)" FormatString="{0:HH:mm:ss}" />
+        <RadzenValueAxis Min="0" Max="100" Step="25" FormatString="{0}%">
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
+            <RadzenAxisTitle Text="Usage" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public DateTime Time { get; set; }
+        public double Value { get; set; }
+    }
+
+    const int WindowSize = 30;
+
+    List<DataItem> cpu = new();
+    List<DataItem> memory = new();
+
+    Random random = new();
+    System.Threading.Timer timer;
+    bool running = true;
+
+    double cpuValue = 50;
+    double memoryValue = 40;
+
+    protected override void OnInitialized()
+    {
+        var now = DateTime.Now;
+
+        for (var index = WindowSize - 1; index >= 0; index--)
+        {
+            AddPoint(now.AddMilliseconds(-500 * index));
+        }
+
+        timer = new System.Threading.Timer(OnTimer, null, dueTime: 500, period: 500);
+    }
+
+    void OnTimer(object state)
+    {
+        if (!running)
+        {
+            return;
+        }
+
+        AddPoint(DateTime.Now);
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    void AddPoint(DateTime time)
+    {
+        cpuValue = Math.Clamp(cpuValue + (random.NextDouble() - 0.5) * 20, 5, 95);
+        memoryValue = Math.Clamp(memoryValue + (random.NextDouble() - 0.5) * 10, 5, 95);
+
+        cpu = Append(cpu, new DataItem { Time = time, Value = Math.Round(cpuValue, 1) });
+        memory = Append(memory, new DataItem { Time = time, Value = Math.Round(memoryValue, 1) });
+    }
+
+    static List<DataItem> Append(List<DataItem> items, DataItem item)
+    {
+        var result = new List<DataItem>(items) { item };
+
+        if (result.Count > WindowSize)
+        {
+            result.RemoveAt(0);
+        }
+
+        return result;
+    }
+
+    void TogglePlay()
+    {
+        running = !running;
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}

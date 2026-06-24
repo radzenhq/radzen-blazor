@@ -1,0 +1,28 @@
+@page "/range-navigator"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Range Navigator
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    A range navigator is a small overview chart with a draggable selection that controls the visible range of a larger chart - the familiar strip you drag to frame a window of time.
+</RadzenText>
+
+<RadzenText Anchor="range-navigator#with-series" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    With Series
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>RadzenRangeNavigatorLineSeries</code> as child content to display a mini-chart preview of the full data range inside the navigator.
+</RadzenText>
+<RadzenExample ComponentName="RangeNavigator" Example="RangeNavigatorConfig">
+    <RangeNavigatorConfig />
+</RadzenExample>
+
+<RadzenText Anchor="range-navigator#compact" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Compact
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>RadzenRangeNavigator</code> without child content for a compact range selector. The component automatically renders as a compact track bar.
+</RadzenText>
+<RadzenExample ComponentName="RangeNavigator" Example="RangeNavigatorCompact">
+    <RangeNavigatorCompact />
+</RadzenExample>

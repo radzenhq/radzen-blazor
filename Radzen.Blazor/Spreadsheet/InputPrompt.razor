@@ -1,0 +1,16 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+@if (visible && (!string.IsNullOrEmpty(title) || !string.IsNullOrEmpty(message)))
+{
+    <div class=@className style=@style>
+        @if (!string.IsNullOrEmpty(title))
+        {
+            <div class="rz-spreadsheet-input-prompt-title">@title</div>
+        }
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="rz-spreadsheet-input-prompt-message">@message</div>
+        }
+    </div>
+}

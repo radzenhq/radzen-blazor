@@ -2,36 +2,71 @@
 
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
     <RadzenCard Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-            <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            </RadzenStack>
+            @if (showDataLabels)
+            {
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Label Position" Component="labelPosition" />
+                    <RadzenSelectBar @bind-Value="@labelPosition" TValue="DataLabelPosition" Size="ButtonSize.Small" Name="labelPosition">
+                        <Items>
+                            <RadzenSelectBarItem Value="DataLabelPosition.Auto" Text="Auto" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Top" Text="Top" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Inside" Text="Inside" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Center" Text="Center" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenStack>
+            }
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Fill" Component="fillMode" />
+                <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                    <Items>
+                        <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                        <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                        <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Max Height" Component="maxHeight" />
+                <RadzenNumeric @bind-Value="@maxHeight" Min="0" Max="200" Step="10" Style="width: 90px" Name="maxHeight" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Category Gap" Component="categoryGap" />
+                <RadzenNumeric @bind-Value="@categoryGap" Min="0" Max="0.9m" Step="0.1" Style="width: 90px" Name="categoryGap" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
     <RadzenRow>
         <RadzenColumn Size="12" SizeLG="6">
             <h4>Auto-size bar series</h4>
-            <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+            <RadzenChart Animate="true" SeriesClick=@OnSeriesClick style="height: 400px">
+                <RadzenBarSeries FillMode="@fillMode" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenBarSeries>
-                <RadzenBarSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                <RadzenBarSeries FillMode="@fillMode" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenBarSeries>
+                <RadzenCategoryAxis />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
                 </RadzenValueAxis>
-                <RadzenBarOptions Radius="5" />
+                <RadzenBarOptions Radius="5" MaxHeight="@(maxHeight > 0 ? maxHeight : null)" CategoryGap="@(categoryGap > 0 ? categoryGap : null)" />
             </RadzenChart>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeLG="6">
             <h4>Custom size bar series</h4>
-            <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+            <RadzenChart Animate="true" SeriesClick=@OnSeriesClick style="height: 400px">
+                <RadzenBarSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenBarSeries>
-                <RadzenBarSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
-                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                <RadzenBarSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
                 </RadzenBarSeries>
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
@@ -48,6 +83,10 @@
 @code {
     EventConsole console;
     bool showDataLabels = false;
+    DataLabelPosition labelPosition = DataLabelPosition.Auto;
+    FillMode fillMode = FillMode.Gradient;
+    double maxHeight = 0;
+    double categoryGap = 0;
 
     void OnSeriesClick(SeriesClickEventArgs args)
     {

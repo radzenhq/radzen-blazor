@@ -1,0 +1,76 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenTabsItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_TableDesignTab)) ?? "Table Design") Visible=@IsActive>
+    <TableDesignPanel Worksheet=@Worksheet />
+</RadzenTabsItem>
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private readonly EventBinding<Worksheet> worksheetBinding;
+
+    public RadzenSpreadsheetTableDesignToolset()
+    {
+        worksheetBinding = new EventBinding<Worksheet>(
+            w =>
+            {
+                w.Selection.Changed += OnSelectionChanged;
+                w.ChromeChanged += OnSelectionChanged;
+            },
+            w =>
+            {
+                w.Selection.Changed -= OnSelectionChanged;
+                w.ChromeChanged -= OnSelectionChanged;
+            });
+    }
+
+    private bool IsActive
+    {
+        get
+        {
+            if (Worksheet is null)
+            {
+                return false;
+            }
+
+            var sel = Worksheet.Selection.Cell;
+            if (sel == CellRef.Invalid)
+            {
+                return false;
+            }
+
+            foreach (var t in Worksheet.Tables)
+            {
+                if (t.Range.Contains(sel.Row, sel.Column))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        worksheetBinding.Bind(Worksheet);
+    }
+
+    // RadzenTabsItem.Visible is captured at parameter-set time, so we need an explicit
+    // StateHasChanged() each time selection moves into or out of a table.
+    private void OnSelectionChanged() => StateHasChanged();
+
+    public void Dispose()
+    {
+        worksheetBinding.Dispose();
+    }
+}

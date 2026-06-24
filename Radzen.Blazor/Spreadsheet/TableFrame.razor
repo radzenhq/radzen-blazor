@@ -1,0 +1,5 @@
+@using Radzen.Documents.Spreadsheet
+@foreach (var range in Context.GetRanges(Table.Range))
+{
+    <TableFrameItem Context=@Context Range=@range.Range Worksheet=@Worksheet FrozenRow=@range.FrozenRow FrozenColumn=@range.FrozenColumn Top=@range.Top Left=@range.Left Bottom=@range.Bottom Right=@range.Right />
+}

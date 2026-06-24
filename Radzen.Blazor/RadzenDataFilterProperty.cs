@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace Radzen.Blazor
     /// Must be placed inside a <see cref="RadzenDataFilter{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the DataFilter item.</typeparam>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenDataFilterProperty<TItem> : ComponentBase, IDisposable
     {
         internal event Action<object>? FilterValueChange;
@@ -317,13 +320,20 @@ namespace Radzen.Blazor
         /// </summary>
         public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
-            if (FilterOperators != null) return FilterOperators;
+            if (FilterOperators != null)
+            {
+                return FilterOperators;
+            }
 
             if (PropertyAccess.IsEnum(FilterPropertyType))
+            {
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
+            }
 
             if (PropertyAccess.IsNullableEnum(FilterPropertyType))
+            {
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull };
+            }
 
             if ((typeof(IEnumerable).IsAssignableFrom(FilterPropertyType) || typeof(IEnumerable<>).IsAssignableFrom(FilterPropertyType))
                 && FilterPropertyType != typeof(string))

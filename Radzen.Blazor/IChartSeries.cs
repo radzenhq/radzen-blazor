@@ -52,6 +52,15 @@ namespace Radzen.Blazor
         RenderFragment RenderOverlays(ScaleBase categoryScale, ScaleBase valueScale);
 
         /// <summary>
+        /// Renders the overlays which display above all series (see <see cref="IChartSeriesOverlay.RenderOnTop" />),
+        /// so later series cannot draw over them.
+        /// </summary>
+        /// <param name="categoryScale">The category scale.</param>
+        /// <param name="valueScale">The value scale.</param>
+        /// <returns>RenderFragment.</returns>
+        RenderFragment RenderTopOverlays(ScaleBase categoryScale, ScaleBase valueScale) => builder => { };
+
+        /// <summary>
         /// Renders the series tooltip.
         /// </summary>
         /// <param name="data">The data.</param>
@@ -110,6 +119,21 @@ namespace Radzen.Blazor
         /// Returns data chart position
         /// </summary>
         IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY);
+
+        /// <summary>
+        /// Gets the data labels for the series at the specified <see cref="DataLabelPosition" />.
+        /// The default implementation ignores the position and returns <see cref="GetDataLabels(double, double)" />.
+        /// </summary>
+        /// <param name="offsetX">The horizontal offset.</param>
+        /// <param name="offsetY">The vertical offset.</param>
+        /// <param name="position">The requested label position.</param>
+        IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position) => GetDataLabels(offsetX, offsetY);
+        /// <summary>
+        /// Specifies whether the chart highlights the hovered data point of this series with an active point
+        /// dot. Range-style series (candlestick, OHLC, high-low, box plot) opt out - a single dot cannot
+        /// represent their value range. The default is <c>true</c>.
+        /// </summary>
+        bool ShowActivePoint => true;
         /// <summary>
         /// Returns series median
         /// </summary>
@@ -126,6 +150,10 @@ namespace Radzen.Blazor
         /// Returns series trend
         /// </summary>
         (double a, double b) GetTrend();
+        /// <summary>
+        /// Returns the series data as scaled (pixel) points ordered by category position.
+        /// </summary>
+        IList<Point> GetScaledDataPoints();
         /// <summary>
         /// Series coordinate system
         /// </summary>
@@ -148,6 +176,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <returns>System.Double.</returns>
         double MeasureLegend();
+        /// <summary>
+        /// Measures the text width of each individual legend item the series contributes. Series that
+        /// render a single legend item return one value; pie-like series return one value per data item.
+        /// Used to estimate how many rows a top or bottom legend wraps into.
+        /// </summary>
+        /// <returns>The text width of each legend item.</returns>
+        System.Collections.Generic.IEnumerable<double> MeasureLegendItems();
         /// <summary>
         /// Invokes the click handler with the provided data item.
         /// </summary>

@@ -1,0 +1,34 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inherits RadzenSpreadsheetToolBase
+
+<RadzenSplitButton Click=@OnClick Icon="merge_type" Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+    <ChildContent>
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_MergeAndCenter)) ?? "Merge && Center") Value="merge-center" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_MergeCells)) ?? "Merge Cells") Value="merge" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_UnmergeCells)) ?? "Unmerge Cells") Value="unmerge" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Merging;
+
+    private async Task OnClick(RadzenSplitButtonItem? item)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        ICommand command = item?.Value switch
+        {
+            "merge" => new MergeCellsCommand(Worksheet, Worksheet.Selection.Range),
+            "unmerge" => new UnmergeCellsCommand(Worksheet, Worksheet.Selection.Cell),
+            _ => new MergeCellsCommand(Worksheet, Worksheet.Selection.Range, center: true),
+        };
+
+        await Spreadsheet.ExecuteAsync(command);
+    }
+}

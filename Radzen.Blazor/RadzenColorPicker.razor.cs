@@ -35,19 +35,23 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenColorPicker : FormComponent<string>
     {
+        private string? toggleAriaLabel;
+
         /// <summary>
         /// Gets or sets the toggle popup aria label text.
         /// </summary>
         /// <value>The toggle popup aria label text.</value>
         [Parameter]
-        public string ToggleAriaLabel { get; set; } = "Toggle";
+        public string ToggleAriaLabel { get => toggleAriaLabel ?? Localize(nameof(RadzenStrings.ColorPicker_ToggleAriaLabel)); set => toggleAriaLabel = value; }
+
+        private string? popupAriaLabel;
 
         /// <summary>
         /// Gets or sets the popup aria label text.
         /// </summary>
         /// <value>The popup aria label text.</value>
         [Parameter]
-        public string PopupAriaLabel { get; set; } = "Color picker";
+        public string PopupAriaLabel { get => popupAriaLabel ?? Localize(nameof(RadzenStrings.ColorPicker_PopupAriaLabel)); set => popupAriaLabel = value; }
 
         /// <summary>
         /// Gets or sets the open callback.
@@ -77,49 +81,61 @@ namespace Radzen.Blazor
         [Parameter]
         public string? IconColor { get; set; }
 
+        private string? hexText;
+
         /// <summary>
         /// Gets or sets the hexadecimal color label text.
         /// </summary>
         /// <value>The hexadecimal text.</value>
         [Parameter]
-        public string HexText { get; set; } = "Hex";
+        public string HexText { get => hexText ?? Localize(nameof(RadzenStrings.ColorPicker_HexText)); set => hexText = value; }
+
+        private string? redText;
 
         /// <summary>
         /// Gets or sets the red color label text.
         /// </summary>
         /// <value>The red text.</value>
         [Parameter]
-        public string RedText { get; set; } = "R";
+        public string RedText { get => redText ?? Localize(nameof(RadzenStrings.ColorPicker_RedText)); set => redText = value; }
+
+        private string? greenText;
 
         /// <summary>
         /// Gets or sets the green color label text.
         /// </summary>
         /// <value>The green text.</value>
         [Parameter]
-        public string GreenText { get; set; } = "G";
+        public string GreenText { get => greenText ?? Localize(nameof(RadzenStrings.ColorPicker_GreenText)); set => greenText = value; }
+
+        private string? blueText;
 
         /// <summary>
         /// Gets or sets the blue color label text.
         /// </summary>
         /// <value>The blue text.</value>
         [Parameter]
-        public string BlueText { get; set; } = "B";
+        public string BlueText { get => blueText ?? Localize(nameof(RadzenStrings.ColorPicker_BlueText)); set => blueText = value; }
+
+        private string? alphaText;
 
         /// <summary>
         /// Gets or sets the alpha label text.
         /// </summary>
         /// <value>The alpha text.</value>
         [Parameter]
-        public string AlphaText { get; set; } = "A";
+        public string AlphaText { get => alphaText ?? Localize(nameof(RadzenStrings.ColorPicker_AlphaText)); set => alphaText = value; }
+
+        private string? buttonText;
 
         /// <summary>
         /// Gets or sets the button text.
         /// </summary>
         /// <value>The button text.</value>
         [Parameter]
-        public string ButtonText { get; set; } = "OK";
+        public string ButtonText { get => buttonText ?? Localize(nameof(RadzenStrings.ColorPicker_ButtonText)); set => buttonText = value; }
 
-        Popup Popup { get; set; } = default!;
+        RadzenPopup Popup { get; set; } = default!;
         bool isPopupOpen;
 
         internal event EventHandler<string>? SelectedColorChanged;
@@ -459,10 +475,23 @@ namespace Radzen.Blazor
                 await Popup.ToggleAsync(Element);
             }
         }
+        /// <summary>
+        /// Gets or sets a value indicating whether the dropdown arrow is shown.
+        /// </summary>
+        /// <value><c>true</c> if the arrow is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowArrow { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the size of the component.
+        /// </summary>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-colorpicker").ToString();
+            return GetClassList("rz-colorpicker").AddInputSize(InputSize).ToString();
         }
 
         /// <inheritdoc />

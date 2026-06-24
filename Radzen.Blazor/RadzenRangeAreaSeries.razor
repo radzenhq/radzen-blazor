@@ -1,0 +1,119 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var category = ComposeCategory(categoryScale);
+        var pathGenerator = GetPathGenerator();
+
+        var min = Min;
+        var max = Max;
+
+        var upperList = Items.Select(item =>
+        {
+            var x = category(item);
+            var y = valueScale.Scale(max(item), true);
+            return new Point<TItem> { X = x, Y = y, Data = item };
+        }).ToList();
+
+        var lowerList = Items.Select(item =>
+        {
+            var x = category(item);
+            var y = valueScale.Scale(min(item), true);
+            return new Point<TItem> { X = x, Y = y, Data = item };
+        }).ToList();
+
+        var index = chart.Series.IndexOf(this);
+        var className = $"rz-range-area-series rz-series-{index}";
+        var gradientId = $"rzRangeAreaGradient{chart.UniqueID}{index}";
+        var gradientColor = Fill ?? "var(--rz-series-color)";
+
+        return
+        @<g class="@className">
+            @if (Items.Any())
+            {
+                var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+                string area;
+                string upperLine;
+                string lowerLine;
+
+                if (Interpolation == Interpolation.Step)
+                {
+                    // Build the fill as independent rectangles per step interval.
+                    // A single polygon creates a fold at the last X where the connector
+                    // and return path cancel under SVG's nonzero winding rule.
+                    var areaPath = new System.Text.StringBuilder();
+
+                    for (var i = 0; i < upperList.Count - 1; i++)
+                    {
+                        areaPath.Append($"M {upperList[i].X.ToInvariantString()} {upperList[i].Y.ToInvariantString()} ");
+                        areaPath.Append($"H {upperList[i + 1].X.ToInvariantString()} ");
+                        areaPath.Append($"V {lowerList[i].Y.ToInvariantString()} ");
+                        areaPath.Append($"H {upperList[i].X.ToInvariantString()} Z ");
+                    }
+
+                    area = areaPath.ToString();
+
+                    // Build stroke paths matching the fill: H-V for intermediate
+                    // transitions, H only for the last point (no vertical drop that
+                    // would extend past the fill at the right edge).
+                    var upperStroke = new System.Text.StringBuilder();
+                    var lowerStroke = new System.Text.StringBuilder();
+
+                    upperStroke.Append($"M {upperList[0].X.ToInvariantString()} {upperList[0].Y.ToInvariantString()}");
+                    lowerStroke.Append($"M {lowerList[0].X.ToInvariantString()} {lowerList[0].Y.ToInvariantString()}");
+
+                    for (var i = 1; i < upperList.Count - 1; i++)
+                    {
+                        upperStroke.Append($" H {upperList[i].X.ToInvariantString()} V {upperList[i].Y.ToInvariantString()}");
+                        lowerStroke.Append($" H {lowerList[i].X.ToInvariantString()} V {lowerList[i].Y.ToInvariantString()}");
+                    }
+
+                    if (upperList.Count > 1)
+                    {
+                        var last = upperList.Count - 1;
+                        upperStroke.Append($" H {upperList[last].X.ToInvariantString()}");
+                        lowerStroke.Append($" H {lowerList[last].X.ToInvariantString()}");
+                    }
+
+                    upperLine = upperStroke.ToString();
+                    lowerLine = lowerStroke.ToString();
+                }
+                else
+                {
+                    var upperPath = pathGenerator.Path(upperList);
+                    var lowerPathForward = pathGenerator.Path(lowerList);
+                    var lowerPathReversed = pathGenerator.Path(lowerList.AsEnumerable().Reverse());
+                    area = $"M {upperPath} L {lowerPathReversed} Z";
+                    upperLine = $"M {upperPath}";
+                    lowerLine = $"M {lowerPathForward}";
+                }
+
+                @if (FillMode == FillMode.Gradient)
+                {
+                    <defs>
+                        <linearGradient id="@gradientId" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" style="@($"stop-color: {gradientColor}; stop-opacity: {GradientStartOpacity.ToInvariantString()}")"></stop>
+                            <stop offset="1" style="@($"stop-color: {gradientColor}; stop-opacity: {GradientEndOpacity.ToInvariantString()}")"></stop>
+                        </linearGradient>
+                    </defs>
+                }
+                @if (FillMode != FillMode.None)
+                {
+                    var fill = FillMode == FillMode.Gradient ? $"url(#{gradientId})" : Fill;
+                    <path @key="@area" style="@style" d="@area" fill="@fill" stroke="none"></path>
+                }
+                <Path @key="@upperLine" D="@upperLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+                <Path @key="@lowerLine" D="@lowerLine" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
+            }
+        </g>;
+    }
+}

@@ -78,12 +78,12 @@ public class ConversationSession
         var messages = new List<object>();
 
         // Add system message
-        messages.Add(new { role = "system", content = systemPrompt });
+        messages.Add(new ChatCompletionMessage { Role = "system", Content = systemPrompt });
 
         // Add conversation messages
         foreach (var message in Messages)
         {
-            messages.Add(new { role = message.Role, content = message.Content });
+            messages.Add(new ChatCompletionMessage { Role = message.Role, Content = message.Content });
         }
 
         return messages;

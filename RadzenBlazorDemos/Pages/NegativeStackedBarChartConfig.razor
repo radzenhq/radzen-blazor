@@ -1,0 +1,53 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart Animate="true" Style="height: 500px">
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@expenses" CategoryProperty="Department" ValueProperty="Amount" Title="Expenses" />
+                <RadzenStackedBarSeries FillMode="FillMode.Gradient" Data="@revenue" CategoryProperty="Department" ValueProperty="Amount" Title="Revenue" />
+                <RadzenBarOptions Radius="0" />
+                <RadzenValueAxis Formatter="@FormatValue" Min="-600" Max="600" Step="200">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Amount (thousands USD)" />
+                </RadzenValueAxis>
+                <RadzenLegend Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    string FormatValue(object value)
+    {
+        return $"{Math.Abs((double)value)}K";
+    }
+
+    class DepartmentData
+    {
+        public string Department { get; set; }
+        public double Amount { get; set; }
+    }
+
+    DepartmentData[] expenses = new[]
+    {
+        new DepartmentData { Department = "Engineering", Amount = -480 },
+        new DepartmentData { Department = "Marketing", Amount = -320 },
+        new DepartmentData { Department = "Sales", Amount = -210 },
+        new DepartmentData { Department = "Support", Amount = -180 },
+        new DepartmentData { Department = "Operations", Amount = -260 },
+        new DepartmentData { Department = "HR", Amount = -140 },
+        new DepartmentData { Department = "Finance", Amount = -95 },
+        new DepartmentData { Department = "Legal", Amount = -110 },
+    };
+
+    DepartmentData[] revenue = new[]
+    {
+        new DepartmentData { Department = "Engineering", Amount = 520 },
+        new DepartmentData { Department = "Marketing", Amount = 410 },
+        new DepartmentData { Department = "Sales", Amount = 560 },
+        new DepartmentData { Department = "Support", Amount = 90 },
+        new DepartmentData { Department = "Operations", Amount = 150 },
+        new DepartmentData { Department = "HR", Amount = 30 },
+        new DepartmentData { Department = "Finance", Amount = 180 },
+        new DepartmentData { Department = "Legal", Amount = 75 },
+    };
+}

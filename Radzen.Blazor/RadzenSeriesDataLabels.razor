@@ -1,3 +1,5 @@
+@using System.Globalization
+@using System.Linq
 @using Radzen.Blazor.Rendering
 @inherits RadzenChartComponentBase
 @implements IChartSeriesOverlay
@@ -33,28 +35,145 @@
         return builder =>
         {
             builder.OpenRegion(0);
-            if (series != null)
+            if (series != null && Chart != null)
             {
-                foreach (var label in series.GetDataLabels(OffsetX, OffsetY))
+                var labels = series.GetDataLabels(OffsetX, OffsetY, Position)
+                    .Where(l => !(double.IsNaN(l.Position.X) || double.IsNaN(l.Position.Y)))
+                    .ToList();
+
+                var seriesIndex = Chart.Series.IndexOf(series);
+                var plotHeight = Chart.ValueScale.OutputSize;
+                var plotWidth = Chart.CategoryScale.OutputSize;
+
+                const double fontSize = 12;
+                const double paddingX = 6;
+                var chip = Appearance == DataLabelAppearance.Chip;
+                var height = chip ? 18.0 : 14.0;
+
+                foreach (var (label, index) in labels.Select((l, i) => (l, i)))
                 {
-                    if (!(double.IsNaN(label.Position.X) || double.IsNaN(label.Position.Y)))
+                    if (!ShouldDisplay(label, index, labels))
                     {
-                        builder.AddContent(1,
-                                @<g>
-                                    <Text @key="@($"{label.Position}-{(Chart != null ? Chart.Series.IndexOf(series) : -1)}")"
-                                            Value="@label.Text" Position="@label.Position" Fill="@Fill" TextAnchor="@label.TextAnchor" class="@GetSeriesDataLabelClass()" />
-                                </g>
-                        );
+                        continue;
                     }
+
+                    var text = FormatLabel(label);
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        continue;
+                    }
+
+                    var x = label.Position.X;
+                    var y = label.Position.Y;
+                    var textAnchor = label.TextAnchor;
+                    var width = TextMeasurer.TextWidth(text, fontSize) + (chip ? paddingX * 2 : 4);
+
+                    double RectX(double textX, string anchor) => anchor switch
+                    {
+                        "start" => textX - (chip ? paddingX : 0),
+                        "end" => textX - width + (chip ? paddingX : 0),
+                        _ => textX - width / 2,
+                    };
+
+                    if (Position == DataLabelPosition.Auto && label.Anchor != null)
+                    {
+                        if (y - height / 2 < 0 || y + height / 2 > plotHeight)
+                        {
+                            var flipped = 2 * label.Anchor.Y - y;
+                            if (flipped - height / 2 >= 0 && flipped + height / 2 <= plotHeight)
+                            {
+                                y = flipped;
+                            }
+                        }
+
+                        var rect = RectX(x, textAnchor);
+                        if (rect < 0 || rect + width > plotWidth)
+                        {
+                            var flippedX = 2 * label.Anchor.X - x;
+                            var flippedAnchor = textAnchor == "start" ? "end" : textAnchor == "end" ? "start" : textAnchor;
+                            var flippedRect = RectX(flippedX, flippedAnchor);
+                            if (flippedRect >= 0 && flippedRect + width <= plotWidth)
+                            {
+                                x = flippedX;
+                                textAnchor = flippedAnchor;
+                            }
+                        }
+                    }
+
+                    var rectX = RectX(x, textAnchor);
+                    var rectY = y - height / 2;
+
+                    if (!AllowOverlap && !Chart.ReserveDataLabelRect(rectX, rectY, width, height))
+                    {
+                        continue;
+                    }
+
+                    var position = new Point { X = x, Y = chip ? y + 1 : y };
+
+                    builder.AddContent(1,
+                            @<g class="rz-series-data-label-group" @key="@($"{label.Position}-{seriesIndex}")">
+                                @if (chip)
+                                {
+                                    <rect class="rz-series-data-label-chip" x="@rectX.ToInvariantString()" y="@rectY.ToInvariantString()" width="@width.ToInvariantString()" height="@height.ToInvariantString()" rx="4" ry="4"></rect>
+                                }
+                                <Text Value="@text" Position="@position" Fill="@Fill" TextAnchor="@textAnchor" class="@GetSeriesDataLabelClass()" />
+                            </g>
+                    );
                 }
             }
             builder.CloseRegion();
         };
     }
 
+    bool ShouldDisplay(ChartDataLabel label, int index, System.Collections.Generic.List<ChartDataLabel> labels)
+    {
+        if (Display == DataLabelDisplay.FirstLast)
+        {
+            return index == 0 || index == labels.Count - 1;
+        }
+
+        if (Display == DataLabelDisplay.MinMax)
+        {
+            var values = labels.Where(l => l.Value is IConvertible).Select(l => Convert.ToDouble(l.Value, CultureInfo.InvariantCulture)).ToList();
+            if (values.Count == 0)
+            {
+                return true;
+            }
+            if (label.Value is not IConvertible)
+            {
+                return false;
+            }
+            var value = Convert.ToDouble(label.Value, CultureInfo.InvariantCulture);
+            return value == values.Min() || value == values.Max();
+        }
+
+        return Step <= 1 || index % Step == 0;
+    }
+
+    string FormatLabel(ChartDataLabel label)
+    {
+        if (Formatter != null && label.Value != null)
+        {
+            return Formatter(label.Value);
+        }
+
+        if (!string.IsNullOrEmpty(FormatString) && label.Value != null)
+        {
+            return string.Format(CultureInfo.CurrentCulture, FormatString, label.Value);
+        }
+
+        return label.Text;
+    }
+
     protected override bool ShouldRefreshChart(ParameterView parameters)
     {
-        return parameters.DidParameterChange(nameof(Visible), Visible);
+        return parameters.DidParameterChange(nameof(Visible), Visible)
+            || parameters.DidParameterChange(nameof(Position), Position)
+            || parameters.DidParameterChange(nameof(Appearance), Appearance)
+            || parameters.DidParameterChange(nameof(AllowOverlap), AllowOverlap)
+            || parameters.DidParameterChange(nameof(FormatString), FormatString)
+            || parameters.DidParameterChange(nameof(Step), Step)
+            || parameters.DidParameterChange(nameof(Display), Display);
     }
 
     public bool Contains(double mouseX, double mouseY, int tolerance)

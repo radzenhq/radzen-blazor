@@ -193,6 +193,22 @@
         }
     }
 
+    .rz-spider-chart-column {
+        cursor: pointer;
+        transition: opacity 0.3s ease-in-out, fill-opacity 0.3s ease-in-out;
+        fill-opacity: 0.7;
+        stroke: var(--rz-base-background-color);
+        stroke-width: 1;
+
+        &.rz-state-hover {
+            fill-opacity: 0.9;
+        }
+
+        &.rz-state-hidden {
+            opacity: 0;
+        }
+    }
+
     .rz-spider-chart-marker {
         cursor: pointer;
         transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;

@@ -48,12 +48,25 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenUpload : RadzenComponent
     {
+        IJSObjectReference? _jsRef;
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
+
+        private string? imageAlternateText;
+
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string ImageAlternateText { get; set; } = "image";
+        public string ImageAlternateText { get => imageAlternateText ?? Localize(nameof(RadzenStrings.Upload_ImageAlternateText)); set => imageAlternateText = value; }
 
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
@@ -81,19 +94,23 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Auto { get; set; } = true;
 
-        /// <summary>
-        /// Gets or sets the choose button text.
-        /// </summary>
-        /// <value>The choose button text.</value>
-        [Parameter]
-        public string ChooseText { get; set; } = "Choose";
+        private string? chooseText;
 
         /// <summary>
         /// Gets or sets the choose button text.
         /// </summary>
         /// <value>The choose button text.</value>
         [Parameter]
-        public string DeleteText { get; set; } = "Delete";
+        public string ChooseText { get => chooseText ?? Localize(nameof(RadzenStrings.Upload_ChooseText)); set => chooseText = value; }
+
+        private string? deleteText;
+
+        /// <summary>
+        /// Gets or sets the choose button text.
+        /// </summary>
+        /// <value>The choose button text.</value>
+        [Parameter]
+        public string DeleteText { get => deleteText ?? Localize(nameof(RadzenStrings.Upload_DeleteText)); set => deleteText = value; }
 
         /// <summary>
         /// Gets or sets the URL.
@@ -186,6 +203,15 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
+        /// Gets or sets the tab order index for keyboard navigation.
+        /// Controls the order in which the Choose button receives focus when the user presses the Tab key.
+        /// Lower values receive focus first. Use -1 to exclude from tab navigation.
+        /// </summary>
+        /// <value>The tab index. Default is 0 (natural tab order).</value>
+        [Parameter]
+        public int TabIndex { get; set; } = 0;
+
+        /// <summary>
         /// Gets the choose class list.
         /// </summary>
         /// <value>The choose class list.</value>
@@ -213,7 +239,11 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Upload()
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple, false, ParameterName);
         }
 
@@ -239,9 +269,22 @@ namespace Radzen.Blazor
         private bool firstRender = true;
 
         /// <inheritdoc />
+        bool _jsParamsChanged;
+
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+
+            if (parameters.DidParameterChange(nameof(Url), Url) ||
+                parameters.DidParameterChange(nameof(Auto), Auto) ||
+                parameters.DidParameterChange(nameof(Multiple), Multiple) ||
+                parameters.DidParameterChange(nameof(ParameterName), ParameterName) ||
+                parameters.DidParameterChange(nameof(Method), Method) ||
+                parameters.DidParameterChange(nameof(Stream), Stream))
+            {
+                _jsParamsChanged = true;
+            }
 
             await base.SetParametersAsync(parameters);
 
@@ -261,13 +304,29 @@ namespace Radzen.Blazor
 
             this.firstRender = firstRender;
 
-            if (firstRender || visibleChanged)
+            if (firstRender || visibleChanged || _jsParamsChanged)
             {
                 visibleChanged = false;
 
                 if (Visible && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Name ?? GetId());
+
+                    if (_jsParamsChanged || firstRender)
+                    {
+                        _jsParamsChanged = false;
+
+                        if (_jsRef != null)
+                        {
+                            await _jsRef.InvokeVoidAsync("dispose");
+                            await _jsRef.DisposeAsync();
+                        }
+
+                        _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                            "Radzen.createUpload", Element,
+                            !string.IsNullOrEmpty(Url) ? Url : null, Auto, Multiple,
+                            ParameterName, Method, Stream);
+                    }
                 }
             }
         }
@@ -367,7 +426,10 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromUpload", Reference, file.Name, Name ?? GetId());
             }
 
-            if (fireChangeEvent) await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
+            if (fireChangeEvent)
+            {
+                await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
+            }
         }
 
         /// <summary>

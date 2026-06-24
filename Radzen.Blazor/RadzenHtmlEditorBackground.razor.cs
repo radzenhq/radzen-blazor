@@ -26,10 +26,12 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public override string Value { get; set; } = "rgb(0, 0, 255)";
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Background color"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Background color";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorBackground_Title)); set => title = value; }
     }
 }

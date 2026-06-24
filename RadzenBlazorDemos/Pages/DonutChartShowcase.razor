@@ -1,0 +1,44 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenStack Style="width: 100%; max-width: 640px;">
+        <RadzenChart Animate="true" Style="height: 420px;">
+            <RadzenDonutSeries Data="@revenue" CategoryProperty="Category" ValueProperty="Revenue" Title="Revenue"
+                               Fills="@palette" FillMode="FillMode.Gradient" SegmentGap="2" CornerRadius="4" Radius="150">
+                <ChildContent>
+                    <RadzenSeriesDataLabels Visible="false" />
+                </ChildContent>
+                <TitleTemplate>
+                    <div class="rz-donut-content">
+                        <div>Total revenue</div>
+                        <div>@Total</div>
+                    </div>
+                </TitleTemplate>
+            </RadzenDonutSeries>
+            <RadzenLegend Position="LegendPosition.Bottom" />
+        </RadzenChart>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Category { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string[] palette = new[] { "#6366f1", "#0ea5e9", "#14b8a6", "#22c55e", "#f59e0b", "#f43f5e", "#a855f7" };
+
+    DataItem[] revenue = new DataItem[]
+    {
+        new DataItem { Category = "Cloud Platform", Revenue = 4820000 },
+        new DataItem { Category = "Licenses", Revenue = 3260000 },
+        new DataItem { Category = "Professional Services", Revenue = 2140000 },
+        new DataItem { Category = "Support", Revenue = 1680000 },
+        new DataItem { Category = "Training", Revenue = 920000 },
+        new DataItem { Category = "Marketplace", Revenue = 760000 },
+        new DataItem { Category = "Hardware", Revenue = 540000 },
+    };
+
+    string Total => (revenue.Sum(r => r.Revenue) / 1_000_000).ToString("C1", CultureInfo.CreateSpecificCulture("en-US")) + "M";
+}

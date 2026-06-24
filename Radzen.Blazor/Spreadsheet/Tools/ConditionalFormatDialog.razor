@@ -1,0 +1,120 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="1rem" Style="min-width: 350px">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_RuleType)) Component="ruleType" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenDropDown @bind-Value=@RuleType Data=@RuleTypes TextProperty="Name" ValueProperty="Value" Name="ruleType" Style="flex: 1" />
+    </RadzenStack>
+
+    @if (RuleType == ConditionalFormatRuleType.GreaterThan || RuleType == ConditionalFormatRuleType.LessThan || RuleType == ConditionalFormatRuleType.EqualTo)
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Value)) Component="value" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+            <RadzenTextBox @bind-Value=@Value1 Name="value" Style="flex: 1" />
+        </RadzenStack>
+    }
+
+    @if (RuleType == ConditionalFormatRuleType.Between)
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Minimum)) Component="minimum" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+            <RadzenTextBox @bind-Value=@Value1 Name="minimum" Style="flex: 1" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Maximum)) Component="maximum" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+            <RadzenTextBox @bind-Value=@Value2 Name="maximum" Style="flex: 1" />
+        </RadzenStack>
+    }
+
+    @if (RuleType == ConditionalFormatRuleType.TextContains)
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+            <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_Text)) Component="text" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+            <RadzenTextBox @bind-Value=@Value1 Name="text" Style="flex: 1" />
+        </RadzenStack>
+    }
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_BackgroundColor)) Component="backgroundColor" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenColorPicker @bind-Value=@BackgroundColor Name="backgroundColor" Style="flex: 1" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TextColor)) Component="textColor" class="rz-text-subtitle2" Style="width: 8rem; text-align: end" />
+        <RadzenColorPicker @bind-Value=@TextColor Name="textColor" Style="flex: 1" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="rz-spreadsheet-dialog-actions">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+    [Inject]
+    public DialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    Localizer Localizer { get; set; } = default!;
+
+    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
+    [Parameter]
+    public ConditionalFormatRuleType RuleType { get; set; } = ConditionalFormatRuleType.GreaterThan;
+
+    private string Value1 { get; set; } = "";
+    private string Value2 { get; set; } = "";
+    private string BackgroundColor { get; set; } = "#FFEB9C";
+    private string TextColor { get; set; } = "#9C5700";
+
+    private List<DropDownItem<ConditionalFormatRuleType>>? ruleTypes;
+    private List<DropDownItem<ConditionalFormatRuleType>> RuleTypes => ruleTypes ??=
+    [
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleGreaterThan)), ConditionalFormatRuleType.GreaterThan),
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleLessThan)), ConditionalFormatRuleType.LessThan),
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleBetween)), ConditionalFormatRuleType.Between),
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleEqualTo)), ConditionalFormatRuleType.EqualTo),
+        new(L(nameof(RadzenStrings.Spreadsheet_RuleTextContains)), ConditionalFormatRuleType.TextContains)
+    ];
+
+    private void OnOk()
+    {
+        var format = new Format { BackgroundColor = BackgroundColor, Color = TextColor };
+        ConditionalFormatBase? rule = RuleType switch
+        {
+            ConditionalFormatRuleType.GreaterThan when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var v) =>
+                new GreaterThanRule { Value = v, Format = format },
+            ConditionalFormatRuleType.LessThan when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var v) =>
+                new LessThanRule { Value = v, Format = format },
+            ConditionalFormatRuleType.Between when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var min) &&
+                double.TryParse(Value2, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var max) =>
+                new BetweenRule { Minimum = min, Maximum = max, Format = format },
+            ConditionalFormatRuleType.EqualTo => new EqualToRule { Value = Value1, Format = format },
+            ConditionalFormatRuleType.TextContains => new TextContainsRule { Text = Value1, Format = format },
+            _ => null
+        };
+
+        if (rule is not null)
+        {
+            DialogService.Close(rule);
+        }
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close(null);
+    }
+
+    private sealed class DropDownItem<T>(string name, T value)
+    {
+        public string Name { get; } = name;
+        public T Value { get; } = value;
+    }
+}

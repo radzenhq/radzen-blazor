@@ -11,6 +11,13 @@
                 <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
                 <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
             </RadzenStack>
+            @if (showDataLabels)
+            {
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Label Step" Component="labelStep" />
+                    <RadzenNumeric @bind-Value="@labelStep" Min="1" Max="4" Style="width: 70px" Name="labelStep" />
+                </RadzenStack>
+            }
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenCheckBox @bind-Value="@showMarkers" Name="markers"></RadzenCheckBox>
                 <RadzenLabel Text="Show Markers" Component="markers" />
@@ -19,22 +26,33 @@
                 <RadzenCheckBox @bind-Value="@sharedTooltip" Name="sharedToltip"></RadzenCheckBox>
                 <RadzenLabel Text="Shared Tooltip" Component="sharedTooltip" />
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Tick Placement" Component="tickPlacement" />
+                <RadzenSelectBar @bind-Value="@tickPlacement" TValue="TickPlacement" Size="ButtonSize.Small" Name="tickPlacement">
+                    <Items>
+                        <RadzenSelectBarItem Value="TickPlacement.Between" Text="Between" />
+                        <RadzenSelectBarItem Value="TickPlacement.On" Text="On" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
 
-   <RadzenChart>
+   <RadzenChart Animate="true">
         <RadzenChartTooltipOptions Shared="@sharedTooltip" />
         <RadzenLineSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue">
             <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" />
-            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+            <RadzenSeriesDataLabels Visible="@showDataLabels" Step="@labelStep" />
         </RadzenLineSeries>
         <RadzenLineSeries Smooth="@smooth" Data="@revenue2024" CategoryProperty="Date" Title="2024" ValueProperty="Revenue">
             <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
-            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+            <RadzenSeriesDataLabels Visible="@showDataLabels" Step="@labelStep" />
         </RadzenLineSeries>
-        <RadzenCategoryAxis Padding="20" />
+        <RadzenCategoryAxis TickPlacement="@tickPlacement">
+            <RadzenAxisCrosshair Visible="true" />
+        </RadzenCategoryAxis>
         <RadzenValueAxis Formatter="@FormatAsUSD">
-            <RadzenGridLines Visible="true" />
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
             <RadzenAxisTitle Text="Revenue in USD" />
         </RadzenValueAxis>
     </RadzenChart>
@@ -44,7 +62,9 @@
     bool smooth = false;
     bool sharedTooltip = true;
     bool showDataLabels = false;
+    int labelStep = 1;
     bool showMarkers = true;
+    TickPlacement tickPlacement = TickPlacement.Between;
 
     class DataItem
     {

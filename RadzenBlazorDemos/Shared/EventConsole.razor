@@ -34,7 +34,7 @@
     {
         if (!firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("eval", $"document.getElementById('event-console').scrollTop = document.getElementById('event-console').scrollHeight");
+            await JSRuntime.InvokeVoidAsync("scrollToBottom", "event-console");
         }
     }
 

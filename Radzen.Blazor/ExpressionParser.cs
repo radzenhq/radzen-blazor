@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,6 +14,7 @@ namespace Radzen;
 /// <summary>
 /// Parse lambda expressions from strings.
 /// </summary>
+[RequiresUnreferencedCode(TrimMessages.ExpressionParserReflection)]
 public class ExpressionParser
 {
     /// <summary>
@@ -44,7 +46,7 @@ public class ExpressionParser
     /// <summary>
     /// Parses a lambda expression that returns untyped result.
     /// </summary>
-    public static LambdaExpression ParseLambda(string expression, Type type, Func<string, Type?>? typeResolver = null)
+    public static LambdaExpression ParseLambda(string expression, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, Func<string, Type?>? typeResolver = null)
     {
         var parser = new ExpressionParser(expression, typeResolver);
 
@@ -96,7 +98,7 @@ public class ExpressionParser
         return tokens[position + offset];
     }
 
-    private LambdaExpression ParseLambda(Type paramType)
+    private LambdaExpression ParseLambda([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type paramType)
     {
         var parameterIdentifier = Expect(TokenType.Identifier);
 
@@ -368,7 +370,7 @@ public class ExpressionParser
         throw new InvalidOperationException($"No suitable method '{methodName}' found for type '{expression.Type}'");
     }
 
-    private static Type? GetItemType(Type enumerableOrArray)
+    private static Type? GetItemType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] Type enumerableOrArray)
     {
         return enumerableOrArray.IsArray ? enumerableOrArray.GetElementType() : enumerableOrArray.GetGenericArguments()[0];
     }
@@ -686,7 +688,7 @@ public class ExpressionParser
         return false;
     }
 
-    private Expression ParseStaticMemberAccess(Type type, ParameterExpression parameter)
+    private Expression ParseStaticMemberAccess([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicMethods)] Type type, ParameterExpression parameter)
     {
         Expect(TokenType.Dot);
 
@@ -711,7 +713,7 @@ public class ExpressionParser
         throw new InvalidOperationException($"Expected method invocation after {token.Value} at position {position}");
     }
 
-    private Expression ParseStaticInvocation(Type type, string methodName, ParameterExpression parameter)
+    private Expression ParseStaticInvocation([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type, string methodName, ParameterExpression parameter)
     {
         Advance(1);
 
@@ -930,6 +932,7 @@ public class ExpressionParser
             ?? ResolveTypeFromAssemblies(typeName);
     }
 
+    [RequiresUnreferencedCode(TrimMessages.AssemblyScanning)]
     private static Type? ResolveTypeFromAssemblies(string typeName)
     {
         return AppDomain.CurrentDomain.GetAssemblies()

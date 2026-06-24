@@ -34,6 +34,9 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenLineSeries<TItem> : CartesianSeries<TItem>
     {
+        /// <inheritdoc />
+        protected internal override bool ShowLineInLegend => true;
+
         /// <summary>
         /// Gets or sets the color of the line.
         /// Supports any valid CSS color value (e.g., "#FF0000", "rgb(255,0,0)", "var(--my-color)").
@@ -113,7 +116,7 @@ namespace Radzen.Blazor
         {
             var chart = RequireChart();
             var category = ComposeCategory(chart.CategoryScale);
-            var value = ComposeValue(chart.ValueScale);
+            var value = ComposeValue(chart.GetValueScale(ValueAxisName));
 
             var points = Items.Select(item => new Point { X = category(item), Y = value(item) }).ToArray();
 

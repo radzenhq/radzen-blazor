@@ -1,0 +1,71 @@
+@using System.Collections.Generic
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2rem" Wrap="FlexWrap.Wrap" class="rz-mb-4">
+    <RadzenSwitch @bind-Value=@editMode Name="EditMode" />
+    <RadzenLabel Text="Edit mode" Component="EditMode" />
+
+    <RadzenSwitch @bind-Value=@showGrid Name="ShowGrid" />
+    <RadzenLabel Text="Show grid" Component="ShowGrid" />
+</RadzenStack>
+
+<RadzenTileLayout Columns="12" Rows="6" RowHeight="80" Gap="8"
+                  EditMode=@editMode ShowGrid=@showGrid Change=@OnChange
+                  Style="height: 560px; border: var(--rz-border-normal); border-radius: var(--rz-border-radius);">
+    @foreach (var tile in tiles)
+    {
+        <RadzenTileLayoutItem @key=@tile.Id Title=@tile.Title Icon=@tile.Icon
+                              @bind-Col=@tile.Col @bind-Row=@tile.Row
+                              @bind-ColSpan=@tile.ColSpan @bind-RowSpan=@tile.RowSpan>
+            <RadzenText TextStyle="TextStyle.DisplayH4" class="rz-m-0">@tile.Value</RadzenText>
+            <RadzenText TextStyle="TextStyle.Caption">@tile.Col,@tile.Row · @tile.ColSpan×@tile.RowSpan</RadzenText>
+        </RadzenTileLayoutItem>
+    }
+    <RadzenTileLayoutItem @bind-Col=@custom.Col @bind-Row=@custom.Row @bind-ColSpan=@custom.ColSpan @bind-RowSpan=@custom.RowSpan>
+        <HeaderTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="4px">
+                <RadzenIcon Icon="insights" Style="color: var(--rz-primary);" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Span" class="rz-flex-grow-1 rz-m-0">Custom header</RadzenText>
+                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Live" />
+            </RadzenStack>
+        </HeaderTemplate>
+        <ChildContent>
+            <RadzenText>This tile uses a custom <code>HeaderTemplate</code> and spans multiple cells.</RadzenText>
+        </ChildContent>
+    </RadzenTileLayoutItem>
+</RadzenTileLayout>
+
+<EventConsole @ref=@console />
+
+@code {
+    bool editMode = true;
+    bool showGrid = true;
+
+    EventConsole console;
+
+    class Tile
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Icon { get; set; }
+        public string Value { get; set; }
+        public int Col { get; set; }
+        public int Row { get; set; }
+        public int ColSpan { get; set; } = 1;
+        public int RowSpan { get; set; } = 1;
+    }
+
+    Tile custom = new() { Col = 1, Row = 5, ColSpan = 6, RowSpan = 2 };
+
+    List<Tile> tiles = new()
+    {
+        new Tile { Id = 1, Title = "Revenue", Icon = "paid", Value = "$24.5k", Col = 1, Row = 1, ColSpan = 4, RowSpan = 2 },
+        new Tile { Id = 2, Title = "Orders", Icon = "shopping_cart", Value = "1,284", Col = 5, Row = 1, ColSpan = 4, RowSpan = 2 },
+        new Tile { Id = 3, Title = "Visitors", Icon = "group", Value = "8,932", Col = 9, Row = 1, ColSpan = 4, RowSpan = 2 },
+        new Tile { Id = 4, Title = "Conversion", Icon = "trending_up", Value = "3.2%", Col = 7, Row = 3, ColSpan = 6, RowSpan = 2 },
+    };
+
+    void OnChange(RadzenTileLayoutItem item)
+    {
+        console.Log($"Tile '{item.Title ?? "Custom"}' changed → Col {item.Col}, Row {item.Row}, ColSpan {item.ColSpan}, RowSpan {item.RowSpan}");
+    }
+}

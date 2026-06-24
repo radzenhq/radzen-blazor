@@ -1,0 +1,55 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart Animate="true">
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@apples" CategoryProperty="Region" ValueProperty="Production" Title="Apples">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@oranges" CategoryProperty="Region" ValueProperty="Production" Title="Oranges">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnSeries FillMode="FillMode.Gradient" Data="@bananas" CategoryProperty="Region" ValueProperty="Production" Title="Bananas">
+                    <RadzenSeriesDataLabels Visible="true" />
+                </RadzenColumnSeries>
+                <RadzenColumnOptions Radius="3" />
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Production (thousand tonnes)" />
+                </RadzenValueAxis>
+                <RadzenLegend Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class FruitData
+    {
+        public string Region { get; set; }
+        public double Production { get; set; }
+    }
+
+    FruitData[] apples = new[]
+    {
+        new FruitData { Region = "North", Production = 52 },
+        new FruitData { Region = "South", Production = 38 },
+        new FruitData { Region = "East", Production = 44 },
+        new FruitData { Region = "West", Production = 61 },
+    };
+
+    FruitData[] oranges = new[]
+    {
+        new FruitData { Region = "North", Production = 18 },
+        new FruitData { Region = "South", Production = 67 },
+        new FruitData { Region = "East", Production = 33 },
+        new FruitData { Region = "West", Production = 42 },
+    };
+
+    FruitData[] bananas = new[]
+    {
+        new FruitData { Region = "North", Production = 9 },
+        new FruitData { Region = "South", Production = 85 },
+        new FruitData { Region = "East", Production = 56 },
+        new FruitData { Region = "West", Production = 29 },
+    };
+}

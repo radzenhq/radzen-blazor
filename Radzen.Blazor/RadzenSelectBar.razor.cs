@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,6 +41,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenSelectBar&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
         /// <summary>
@@ -59,7 +61,9 @@ namespace Radzen.Blazor
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
 
-        string ButtonClass(RadzenSelectBarItem item) => ClassList.Create($"rz-button rz-button-text-only")
+        string ButtonClass(RadzenSelectBarItem item) => ClassList.Create("rz-button")
+                                                                 .Add("rz-button-icon-only", string.IsNullOrEmpty(item.Text) && !string.IsNullOrEmpty(item.Icon))
+                                                                 .Add("rz-button-text-only", !string.IsNullOrEmpty(item.Text) || string.IsNullOrEmpty(item.Icon))
                                                                  .AddButtonSize(Size)
                                                                  .Add("rz-state-active", IsSelected(item))
                                                                  .Add("rz-state-focused", IsFocused(item) && focused)
@@ -214,7 +218,9 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled)
+            {
                 return;
+            }
 
             focusedIndex = allItems.IndexOf(item);
 
@@ -268,7 +274,10 @@ namespace Radzen.Blazor
 
             var item = allItems.ElementAtOrDefault(focusedIndex) ?? allItems.FirstOrDefault();
 
-            if (item == null) return;
+            if (item == null)
+            {
+                return;
+            }
 
             if (key == "ArrowLeft" || key == "ArrowRight")
             {

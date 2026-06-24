@@ -1,0 +1,50 @@
+@using System.Linq
+@using Microsoft.AspNetCore.Components.Sections
+@inject ExampleService ExampleService
+
+@if (scriptHtml != null)
+{
+    <SectionContent SectionName="head-schemas">
+        @((MarkupString)scriptHtml)
+    </SectionContent>
+}
+
+@if (Example?.Faq != null && Example.Faq.Any())
+{
+    <div class="rz-mt-8">
+        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" class="rz-mb-4">Frequently asked questions</RadzenText>
+        @foreach (var faq in Example.Faq)
+        {
+            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4 rz-mb-1">@faq.Question</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P">@faq.Answer</RadzenText>
+        }
+    </div>
+}
+
+@if (Example?.Related != null && Example.Related.Any())
+{
+    <div class="rz-mt-8">
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-2">Related</RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="1rem">
+            @foreach (var path in Example.Related)
+            {
+                <RadzenLink Path="@($"/{path.TrimStart('/')}")" Text="@ExampleService.NameFor(path)" />
+            }
+        </RadzenStack>
+    </div>
+}
+
+@code {
+    [Parameter] public Example Example { get; set; }
+
+    string scriptHtml;
+
+    protected override void OnParametersSet()
+    {
+        // Default JsonSerializer escapes < > & to \uXXXX, so the JSON cannot break out of the
+        // script element. Wrapping the whole tag in the MarkupString keeps the type attribute
+        // raw (the dynamic-component path otherwise renders it as application/ld&#x2B;json).
+        var json = SeoSchema.BuildFor(Example, ExampleService);
+        scriptHtml = json == null ? null : $"<script type=\"application/ld+json\">{json}</script>";
+    }
+}

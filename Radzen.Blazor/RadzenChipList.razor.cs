@@ -4,6 +4,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace Radzen.Blazor
     /// Displays and manages a collection of chips with optional selection and removal.
     /// </summary>
     /// <typeparam name="TValue">The selected value type. Use IEnumerable for multiple selection mode.</typeparam>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenChipList<TValue> : FormComponent<TValue>, IRadzenChipList
     {
         /// <summary>
@@ -99,11 +101,13 @@ namespace Radzen.Blazor
         [Parameter]
         public ChipSize Size { get; set; } = ChipSize.Medium;
 
+        private string? removeChipTitle;
+
         /// <summary>
         /// Gets or sets the close button accessible title.
         /// </summary>
         [Parameter]
-        public string RemoveChipTitle { get; set; } = "Remove";
+        public string RemoveChipTitle { get => removeChipTitle ?? Localize(nameof(RadzenStrings.ChipList_RemoveChipTitle)); set => removeChipTitle = value; }
 
         /// <summary>
         /// Gets or sets the callback invoked when a chip remove action is requested.

@@ -29,7 +29,7 @@
                 @for (var date = start; date < end; date = date.AddMinutes(MinutesPerSlot))
                 {
                     var slotDate = date;
-                    <div @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(date)></div>
+                    <div @onclick=@(args => OnSlotClick(slotDate)) @ondragover:preventDefault @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(date)></div>
                 }
             </div>
         }

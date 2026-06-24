@@ -4,9 +4,125 @@
     Radzen Blazor Chart donut series
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Display proportional data with a center hollow using donut charts.
+    A donut chart is a pie chart with the center removed, freeing the middle for a total or label. The slices still show each category's share of the whole.
 </RadzenText>
 
-<RadzenExample ComponentName="Chart" Example="DonutChartConfig" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
-    <DonutChartConfig />
+<RadzenText Anchor="donut-chart#showcase" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Showcase
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    A real-world revenue breakdown that combines a custom color palette, gradient fills, a total in the center, rounded corners and a subtle segment gap.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartShowcase" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <DonutChartShowcase />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#basic" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Basic donut
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Bind a collection and set <code>CategoryProperty</code> and <code>ValueProperty</code>. Each value is converted to its share of the whole automatically.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartBasic">
+    <DonutChartBasic />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#inner-radius" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Inner radius
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>InnerRadius</code> (in pixels) to control the size of the hole. By default it is half of the outer radius.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartInnerRadius">
+    <DonutChartInnerRadius />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#center-label" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Center label
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Use the <code>TitleTemplate</code> to place a total or any custom markup in the open center.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartCenterLabel">
+    <DonutChartCenterLabel />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#various-radius" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Various radius
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Use the <code>RadiusProperty</code> to assign different outer radius values to each segment based on a data property. The inner radius stays constant while each segment extends outward proportionally.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartVariousRadius">
+    <DonutChartVariousRadius />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#segment-gap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Segment gap
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>SegmentGap</code> to separate adjacent segments by a uniform-width space that runs from the outer rim to the inner hole, regardless of segment size.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartSegmentGap">
+    <DonutChartSegmentGap />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#rounded-corners" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Rounded corners
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>CornerRadius</code> to round the corners of each segment for a softer look.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartCornerRadius">
+    <DonutChartCornerRadius />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#semi-circle" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Semi-circle
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Combine <code>StartAngle</code> and <code>TotalAngle</code> to draw a half donut - useful for gauge-style visuals.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartSemiCircle">
+    <DonutChartSemiCircle />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#explode-on-hover" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Explode on hover
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>ExplodeOffset</code> to make segments move outward from the center when hovered, or use <code>ExplodedProperty</code> to keep a segment permanently exploded.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartExplode">
+    <DonutChartExplode />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#custom-colors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom colors
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Provide your own palette with <code>Fills</code> (and <code>Strokes</code>). Combine with <code>FillMode</code> to switch between solid and gradient fills.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartCustomColors">
+    <DonutChartCustomColors />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#labels-legend" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Labels and legend
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Add <code>RadzenSeriesDataLabels</code> to print values on the segments and position the <code>RadzenLegend</code>. Set <code>ShowTooltipOnLegend</code> to surface tooltips from the legend too.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartLabels">
+    <DonutChartLabels />
+</RadzenExample>
+
+<RadzenText Anchor="donut-chart#playground" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Playground
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Combine the settings above and see how they interact - fill mode, inner radius, segment gap, corner radius, semi-circle, data labels and legend.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="DonutChartPlayground">
+    <DonutChartPlayground />
 </RadzenExample>

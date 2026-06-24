@@ -3,7 +3,7 @@
     Blazor Label
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Associate descriptive text labels with form inputs for better accessibility and usability.
+    The Blazor Label associates descriptive text with a form input for better accessibility - clicking the label focuses its input.
 </RadzenText>
 
 <RadzenText Anchor="label#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
@@ -44,6 +44,16 @@
 </RadzenText>
 <RadzenExample ComponentName="Label" Example="LabelRequiredFields">
     <LabelRequiredFields />
+</RadzenExample>
+
+<RadzenText Anchor="label#typography" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Label Typography
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>TextStyle</code> property to apply the same typography presets available on <code>RadzenText</code> (H1–H6, Subtitle, Body, Caption, Overline, etc.) without losing the semantic <code>&lt;label&gt;</code> element or its association with an input.
+</RadzenText>
+<RadzenExample ComponentName="Label" Example="LabelTextStyleConfig">
+    <LabelTextStyleConfig />
 </RadzenExample>
 
 <RadzenText Anchor="label#styling" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
