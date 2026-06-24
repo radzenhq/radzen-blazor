@@ -193,6 +193,8 @@ namespace RadzenBlazorDemos
 
             var generatedCode = csharpDocument.GeneratedCode
                 .Replace("<Radzen.Group>", "<global::Radzen.Group>")
+                .Replace("<Radzen.CompositeFilterDescriptor>", "<global::Radzen.CompositeFilterDescriptor>")
+                .Replace("<Radzen.Blazor.PagingInformation>", "<global::Radzen.Blazor.PagingInformation>")
                 .Replace("#nullable enable", "#nullable disable")
                 .Replace("where TItem : , notnull", "where TItem : notnull");
 
