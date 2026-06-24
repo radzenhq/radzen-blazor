@@ -1,0 +1,53 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenLabel Text="Fill" Component="fillMode" />
+            <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                <Items>
+                    <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                    <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                    <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                </Items>
+            </RadzenSelectBar>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart Animate="true">
+                <RadzenHorizontalWaterfallSeries Data="@cashFlow" CategoryProperty="Label" ValueProperty="Amount"
+                    SummaryProperty="IsTotal" Title="Cash Flow" FillMode="@fillMode"
+                    PositiveFill="#26A69A" NegativeFill="#EF5350" SummaryFill="#42A5F5" />
+                <RadzenBarOptions Radius="3" />
+                <RadzenCategoryAxis>
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Amount ($)" />
+                </RadzenCategoryAxis>
+                <RadzenValueAxis />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    FillMode fillMode = FillMode.Gradient;
+
+    class DataItem
+    {
+        public string Label { get; set; }
+        public double Amount { get; set; }
+        public bool IsTotal { get; set; }
+    }
+
+    DataItem[] cashFlow = new DataItem[]
+    {
+        new DataItem { Label = "Revenue", Amount = 420 },
+        new DataItem { Label = "Services", Amount = 210 },
+        new DataItem { Label = "COGS", Amount = -170 },
+        new DataItem { Label = "Gross Profit", Amount = 0, IsTotal = true },
+        new DataItem { Label = "Salaries", Amount = -200 },
+        new DataItem { Label = "Marketing", Amount = -80 },
+        new DataItem { Label = "R&D", Amount = -50 },
+        new DataItem { Label = "Net Income", Amount = 0, IsTotal = true },
+    };
+}

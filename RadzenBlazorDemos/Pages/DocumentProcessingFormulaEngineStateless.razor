@@ -1,0 +1,35 @@
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Gap="0.5rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenTextBox @bind-Value=@expression Style="font-family:monospace; flex:1"
+            Change=@(_ => Recompute()) />
+        <RadzenButton Icon="play_arrow" Text="Evaluate" Click=@Recompute />
+    </RadzenStack>
+    <RadzenAlert AlertStyle=@alertStyle Variant="Variant.Flat" AllowClose="false">
+        <strong>Result:</strong> @result
+    </RadzenAlert>
+</RadzenStack>
+
+@code {
+    string expression = "=SUM(1, 2, 3) + IF(2>1, 10, 20)";
+    string result = "";
+    AlertStyle alertStyle = AlertStyle.Light;
+
+    protected override void OnInitialized() => Recompute();
+
+    void Recompute()
+    {
+        try
+        {
+            var value = Formula.Evaluate(expression);
+            result = value?.ToString() ?? "(null)";
+            alertStyle = AlertStyle.Success;
+        }
+        catch (System.Exception ex)
+        {
+            result = ex.Message;
+            alertStyle = AlertStyle.Warning;
+        }
+    }
+}

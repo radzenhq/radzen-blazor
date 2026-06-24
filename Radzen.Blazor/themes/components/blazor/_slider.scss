@@ -72,8 +72,11 @@ $slider-disabled-handle-border: none !default;
     inset-block-start: -1px;
     inset-block-end: -1px;
     inset-inline-start: -1px;
-    border-start-start-radius: var(--rz-slider-border-radius);
-    border-end-start-radius: var(--rz-slider-border-radius);
+
+    &.rz-slider-range-min {
+      border-start-start-radius: var(--rz-slider-border-radius);
+      border-end-start-radius: var(--rz-slider-border-radius);
+    }
   }
 
   .rz-slider-handle {
@@ -93,8 +96,11 @@ $slider-disabled-handle-border: none !default;
     inset-inline-start: -1px;
     inset-inline-end: -1px;
     inset-block-end: -1px;
-    border-end-start-radius: var(--rz-slider-border-radius);
-    border-end-end-radius: var(--rz-slider-border-radius);
+
+    &.rz-slider-range-min {
+      border-end-start-radius: var(--rz-slider-border-radius);
+      border-end-end-radius: var(--rz-slider-border-radius);
+    }
   }
 
     .rz-slider-handle {

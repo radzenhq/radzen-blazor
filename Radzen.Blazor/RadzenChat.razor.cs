@@ -69,11 +69,15 @@ namespace Radzen.Blazor
         public string GetInitials()
         {
             if (string.IsNullOrWhiteSpace(Name))
+            {
                 return "?";
+            }
 
             var parts = Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 1)
+            {
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper(CultureInfo.InvariantCulture);
+            }
 
             return (parts[0].Substring(0, 1) + parts[1].Substring(0, 1)).ToUpper(CultureInfo.InvariantCulture);
         }
@@ -223,6 +227,8 @@ namespace Radzen.Blazor
         [Parameter]
         public string? Title { get; set; }
 
+        private string? placeholder;
+
         /// <summary>
         /// Gets or sets the custom title content rendered in the chat header.
         /// </summary>
@@ -233,19 +239,23 @@ namespace Radzen.Blazor
         /// Gets or sets the placeholder text for the input field.
         /// </summary>
         [Parameter]
-        public string Placeholder { get; set; } = "Type your message...";
+        public string Placeholder { get => placeholder ?? Localize(nameof(RadzenStrings.Chat_Placeholder)); set => placeholder = value; }
+
+        private string? emptyMessage;
 
         /// <summary>
         /// Gets or sets the message displayed when there are no messages.
         /// </summary>
         [Parameter]
-        public string EmptyMessage { get; set; } = "No messages yet. Start a conversation!";
+        public string EmptyMessage { get => emptyMessage ?? Localize(nameof(RadzenStrings.Chat_EmptyMessage)); set => emptyMessage = value; }
+
+        private string? newMessagesText;
 
         /// <summary>
         /// Gets or sets the text displayed on the new messages indicator button.
         /// </summary>
         [Parameter]
-        public string NewMessagesText { get; set; } = "New messages";
+        public string NewMessagesText { get => newMessagesText ?? Localize(nameof(RadzenStrings.Chat_NewMessagesText)); set => newMessagesText = value; }
 
         /// <summary>
         /// Gets or sets the format used to render the timestamp shown next to each message. Defaults to <c>"HH:mm"</c>.
@@ -441,11 +451,15 @@ namespace Radzen.Blazor
         public async Task SendMessage(string content, string? userId = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
+            {
                 return;
+            }
 
             var senderId = userId ?? CurrentUserId;
             if (string.IsNullOrEmpty(senderId))
+            {
                 return;
+            }
 
             // Add message
             var message = await AddMessage(content, senderId);

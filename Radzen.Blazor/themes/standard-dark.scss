@@ -320,7 +320,7 @@ $chip-disabled-opacity: 0.5 !default;
 // SelectButton
 $selectbar-background-color: transparent !default;
 $selectbar-selected-background-color: var(--rz-primary-lighter) !default;
-$selectbar-selected-color: var(--rz-primary-light) !default;
+$selectbar-selected-color: var(--rz-on-primary-lighter) !default;
 $selectbar-selected-border: var(--rz-border-normal) !default;
 
 
@@ -698,6 +698,15 @@ $colorpicker-input-labels-color: var(--rz-text-tertiary-color) !default;
 // ListBox
 $listbox-filter-border: var(--rz-border-base-700) !default;
 
+// Range Navigator
+$range-nav-compact-border-radius: calc(2 * var(--rz-border-radius)) !default;
+$range-nav-compact-window-background-color: var(--rz-primary-lighter) !default;
+$range-nav-handle-width: 1.25rem !default;
+$range-nav-handle-border-radius: calc(4 * var(--rz-border-radius)) !default;
+$range-nav-handle-background-color: var(--rz-base-600) !default;
+$range-nav-handle-height: 1.25rem !default;
+$range-nav-handle-hover-background-color: var(--rz-primary) !default;
+
 // Rating
 $rating-color: var(--rz-text-tertiary-color) !default;
 $rating-focus-color: var(--rz-primary-light) !default;
@@ -731,10 +740,6 @@ $login-register-background-color: var(--rz-base-900) !default;
 
 // Editor
 $editor-toolbar-background-color: var(--rz-base-700) !default;
-$editor-button-background-color: var(--rz-base-700) !default;
-$editor-button-selected-background-color: var(--rz-primary) !default;
-$editor-button-selected-color: var(--rz-on-primary) !default;
-$editor-separator-background-color: var(--rz-base-600) !default;
 
 // Splitter
 $splitter-bar-color: var(--rz-text-secondary-color) !default;
@@ -800,6 +805,12 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
 // Skeleton
 $skeleton-background-color: var(--rz-base-600) !default;
 $skeleton-animation-color: var(--rz-base-500) !default;
+
+// Spreadsheet
+$spreadsheet-cell-border: var(--rz-border-base-700) !default;
+$spreadsheet-header-background-color: var(--rz-base-800) !default;
+$spreadsheet-header-active-background-color: var(--rz-primary-lighter) !default;
+$spreadsheet-splitter-background-color: var(--rz-base-700) !default;
 
 @import 'fonts';
 @import 'components';

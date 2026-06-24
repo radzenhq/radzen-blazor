@@ -1,14 +1,6 @@
 $editor-border: var(--rz-input-border) !default;
 $editor-border-radius: var(--rz-border-radius) !default;
 $editor-toolbar-background-color: var(--rz-base-background-color) !default;
-$editor-toolbar-item-margin: 0.25rem 0.125rem !default;
-$editor-button-padding: 0.5rem !default;
-$editor-button-background-color: var(--rz-base-background-color) !default;
-$editor-button-color: var(--rz-text-color) !default;
-$editor-button-disabled-color: var(--rz-text-disabled-color) !default;
-$editor-button-selected-background-color: var(--rz-secondary) !default;
-$editor-button-selected-color: var(--rz-on-secondary) !default;
-$editor-separator-background-color: var(--rz-base-200) !default;
 $editor-content-background-color: var(--rz-base-background-color) !default;
 $editor-focus-outline: var(--rz-outline-focus) !default;
 $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
@@ -33,6 +25,13 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   padding: 0.5rem;
   outline: none;
   background-color: var(--rz-editor-content-background-color);
+
+  td.rz-html-editor-cell-selected,
+  th.rz-html-editor-cell-selected {
+    outline: 2px solid var(--rz-primary);
+    outline-offset: -2px;
+    background-color: color-mix(in srgb, var(--rz-primary) 12%, transparent);
+  }
 }
 
 .rz-html-editor-source.rz-textarea {
@@ -50,145 +49,8 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 .rz-html-editor-toolbar {
   border-bottom: var(--rz-editor-border);
-  display: flex;
-  line-height: 1rem;
-  flex-wrap: wrap;
   background-color: var(--rz-editor-toolbar-background-color);
-
-  .rzi {
-    font-size: 1rem;
-  }
-
-  > * {
-    margin: var(--rz-editor-toolbar-item-margin);
-  }
-}
-
-.rz-html-editor-colorpicker {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--rz-editor-button-background-color);
-  padding: var(--rz-editor-button-padding);
-
-  .rz-colorpicker-trigger {
-    color: inherit;
-    background-color: var(--rz-editor-button-background-color);
-
-    .rzi {
-      font-size: 1.25rem;
-      height: 1rem;
-    }
-  }
-
-  .rz-colorpicker-value {
-    display: none;
-  }
-
-  .rz-colorpicker {
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    height: auto;
-    background-color: var(--rz-editor-button-background-color);
-
-    &:not(:disabled):not(.rz-state-disabled):hover {
-      border: none;
-      box-shadow: none;
-    }
-  }
-}
-
-.rz-html-editor-color {
-  border: none;
-  display: flex;
-  flex-direction: column;
-  background: inherit;
-  color: inherit;
-  appearance: none;
-  padding: 0;
-  position: relative;
-
-  &:disabled {
-    color: var(--rz-input-disabled-color);
-  }
-}
-
-.rz-html-editor-color-value {
-  position: absolute;
-  bottom: -4px;
-  height: 4px;
-  width: 100%;
-}
-
-.rz-html-editor-button {
-  color: var(--rz-editor-button-color);
-  appearance: none;
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--rz-editor-button-background-color);
-  padding: var(--rz-editor-button-padding);
-
-  &.rz-selected {
-    background-color: var(--rz-editor-button-selected-background-color);
-    color: var(--rz-editor-button-selected-color);
-    border-radius: var(--rz-editor-border-radius);
-  }
-
-  &:disabled {
-    color: var(--rz-editor-button-disabled-color);
-  }
-}
-
-.rz-html-editor-dropdown {
-  display: inline-flex;
-  padding: var(--rz-editor-button-padding);
-  align-items: center;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-
-  &.rz-disabled {
-    color: var(--rz-input-disabled-color);
-    cursor: default;
-  }
-}
-
-.rz-html-editor-dropdown-items {
-  @extend %dropdown-panel;
-}
-
-.rz-html-editor-dropdown-item {
-  cursor: default;
-  font-size: var(--rz-dropdown-item-font-size);
-  padding: var(--rz-dropdown-item-padding);
-  white-space: nowrap;
-
-  @include dropdown-item-hover(0);
-
-  &.rz-selected {
-    background-color: var(--rz-dropdown-item-selected-background-color);
-    color: var(--rz-dropdown-item-selected-color);
-  }
-}
-
-.rz-html-editor-dropdown-trigger {
-  border: none;
-  appearance: none;
-  color: inherit;
-  background-color: inherit;
-
-  .rzi {
-    &:before {
-      content: 'arrow_drop_down';
-    }
-  }
-}
-
-.rz-html-editor-dropdown-items {
-  display: none;
+  padding: 0.25rem;
 }
 
 .rz-html-editor-dialog-item {
@@ -205,25 +67,8 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   text-align: right;
 }
 
-.rz-html-editor-separator {
-  width: 1px;
-  background-color: var(--rz-editor-separator-background-color);
-}
-
-.rz-html-editor-toolbar {
-
-  .rz-html-editor-colorpicker {
-    .rz-colorpicker {
-      &:not(:disabled):not(.rz-state-disabled):hover {
-        border: none;
-      }
-    }
-
-    .rz-colorpicker-trigger {
-      .rzi {
-        font-size: 1.25rem;
-        height: 1rem;
-      }
-    }
-  }
+.rz-html-editor-table-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }

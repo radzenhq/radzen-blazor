@@ -30,9 +30,9 @@
         new(3, "Critical")
     };
 
-    readonly IReadOnlyDictionary<int, string> priorityNames;
+    IReadOnlyDictionary<int, string> priorityNames;
 
-    public DataGridCheckBoxListLookupFilter()
+    protected override void OnInitialized()
     {
         priorityNames = priorities.ToDictionary(p => p.Id, p => p.Name);
     }

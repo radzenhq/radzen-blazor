@@ -13,8 +13,11 @@
             <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
         }
         <div class="rz-colorpicker-value" style="background-color: @Value" ></div>
-        <button aria-label="@ToggleAriaLabel" type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="notranslate rzi" /></button>
-        <Popup id="@($"{GetId()}-popup")" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup
+        @if (ShowArrow)
+        {
+            <button aria-label="@ToggleAriaLabel" type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="notranslate rzi" /></button>
+        }
+        <RadzenPopup id="@($"{GetId()}-popup")" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup
                role="dialog" aria-label="@PopupAriaLabel"
                class="rz-colorpicker-popup" Close=@OnClosePopup Open=@OnPopupOpen>
             @if (ShowHSV)
@@ -117,9 +120,9 @@
             @if (ShowButton)
             {
                 <div class="rz-colorpicker-button rz-colorpicker-section">
-                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click=@OnClick Text=@ButtonText @onclick:preventDefault />
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Click=@OnClick Text=@ButtonText @onclick:preventDefault />
                 </div>
             }
-        </Popup>
+        </RadzenPopup>
     </div>
 }

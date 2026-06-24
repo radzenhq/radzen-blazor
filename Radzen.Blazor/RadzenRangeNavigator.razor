@@ -1,0 +1,48 @@
+@using Radzen.Blazor.Rendering
+@inherits RadzenComponent
+
+<CascadingValue Value="@this">
+    @ChildContent
+</CascadingValue>
+@if (Visible)
+{
+<div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+    @if (NavigatorSeries.Count > 0)
+    {
+        <svg style="width: 100%; height: 100%;">
+            @foreach (var series in NavigatorSeries)
+            {
+                @series.Render(CategoryScale, ValueScale)
+            }
+        </svg>
+    }
+    <div class="rz-range-nav-shade rz-range-nav-shade-start" style="width: @((Start * 100).ToInvariantString())%"></div>
+    <div class="rz-range-nav-window" style="inset-inline-start: @((Start * 100).ToInvariantString())%; width: @(((End - Start) * 100).ToInvariantString())%">
+        <div class="rz-range-nav-handle rz-range-nav-handle-start">
+            @if (ShowHandleLabels && Width > 0)
+            {
+                <div class="rz-range-nav-label @(Start < 0.1 ? "rz-range-nav-label-end" : "rz-range-nav-label-start")">@GetHandleLabel(Start)</div>
+            }
+        </div>
+        <div class="rz-range-nav-handle rz-range-nav-handle-end">
+            @if (ShowHandleLabels && Width > 0)
+            {
+                <div class="rz-range-nav-label @(End > 0.9 ? "rz-range-nav-label-start" : "rz-range-nav-label-end")">@GetHandleLabel(End)</div>
+            }
+        </div>
+    </div>
+    <div class="rz-range-nav-shade rz-range-nav-shade-end" style="width: @(((1 - End) * 100).ToInvariantString())%"></div>
+    @if (ShowAxis && Width > 0)
+    {
+        <div class="rz-range-nav-axis">
+            @foreach (var tick in GetAxisTicks())
+            {
+                <div class="rz-range-nav-tick @tick.CssClass" style="inset-inline-start: @((tick.Position * 100).ToInvariantString())%">
+                    <div class="rz-range-nav-tick-mark"></div>
+                    <div class="rz-range-nav-tick-label">@tick.Label</div>
+                </div>
+            }
+        </div>
+    }
+</div>
+}

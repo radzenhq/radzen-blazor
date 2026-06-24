@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -42,11 +43,53 @@ namespace Radzen.Blazor
         abstract public (double Start, double End, double Step) Ticks(int distance);
 
         /// <summary>
+        /// The values at which axis ticks are rendered. The default implementation enumerates
+        /// <see cref="Ticks(int)" /> uniformly; scales with non-uniform intervals (e.g. calendar months) override it.
+        /// </summary>
+        /// <param name="distance">The desired distance between ticks in pixels.</param>
+        public virtual IEnumerable<double> TickValues(int distance)
+        {
+            var (start, end, step) = Ticks(distance);
+
+            if (step <= 0 || !double.IsFinite(step) || !double.IsFinite(start) || !double.IsFinite(end))
+            {
+                yield return start;
+                yield break;
+            }
+
+            if (IsLogarithmic)
+            {
+                if (step <= 1 || start <= 0)
+                {
+                    yield return start;
+                    yield break;
+                }
+
+                for (var value = start; value <= end; value *= step)
+                {
+                    yield return value;
+                }
+                yield break;
+            }
+
+            for (var value = (decimal)start; value <= (decimal)end; value += (decimal)step)
+            {
+                yield return (double)value;
+            }
+        }
+
+        /// <summary>
         /// Converts the specified value to a value from this scale with optional padding.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="padding">Whether to apply padding.</param>
         abstract public double Scale(double value, bool padding = false);
+
+        /// <summary>
+        /// Gets a value indicating whether this scale uses logarithmic tick stepping.
+        /// When true, the tick loop uses multiplicative stepping (idx *= step) instead of additive (idx += step).
+        /// </summary>
+        public virtual bool IsLogarithmic => false;
 
         /// <summary>
         /// Composes the specified selector.
@@ -62,7 +105,7 @@ namespace Radzen.Blazor
         /// Gets or sets the step.
         /// </summary>
         /// <value>The step.</value>
-        public object? Step { get; set; }
+        public virtual object? Step { get; set; }
 
         /// <summary>
         /// Resizes the scale to the specified values.
@@ -105,17 +148,41 @@ namespace Radzen.Blazor
 
             if (round)
             {
-                if (fraction < 1.5) niceFraction = 1;
-                else if (fraction < 3) niceFraction = 2;
-                else if (fraction < 7) niceFraction = 5;
-                else niceFraction = 10;
+                if (fraction < 1.5)
+                {
+                    niceFraction = 1;
+                }
+                else if (fraction < 3)
+                {
+                    niceFraction = 2;
+                }
+                else if (fraction < 7)
+                {
+                    niceFraction = 5;
+                }
+                else
+                {
+                    niceFraction = 10;
+                }
             }
             else
             {
-                if (fraction <= 1) niceFraction = 1;
-                else if (fraction <= 2) niceFraction = 2;
-                else if (fraction <= 5) niceFraction = 5;
-                else niceFraction = 10;
+                if (fraction <= 1)
+                {
+                    niceFraction = 1;
+                }
+                else if (fraction <= 2)
+                {
+                    niceFraction = 2;
+                }
+                else if (fraction <= 5)
+                {
+                    niceFraction = 5;
+                }
+                else
+                {
+                    niceFraction = 10;
+                }
             }
 
             return sign * niceFraction * Math.Pow(10, exponent);

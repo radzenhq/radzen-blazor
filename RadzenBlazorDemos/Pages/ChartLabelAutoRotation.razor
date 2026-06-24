@@ -18,7 +18,7 @@
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
         <RadzenChart style="@($"width: {width}px")">
-            <RadzenAreaSeries Smooth="true" Data="@revenue2024" CategoryProperty="Date" Title="2024" ValueProperty="Revenue">
+            <RadzenAreaSeries FillMode="FillMode.Gradient" Smooth="true" Data="@revenue2024" CategoryProperty="Date" Title="2024" ValueProperty="Revenue">
                 <RadzenSeriesDataLabels Visible="@showDataLabels" />
             </RadzenAreaSeries>
             <RadzenCategoryAxis Padding="20" LabelAutoRotation="@rotation" />

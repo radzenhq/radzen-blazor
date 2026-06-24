@@ -1,0 +1,32 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<div class="rz-dropdown-items-wrapper" style="max-height: 200px">
+    <div class="rz-dropdown-items">
+        @foreach (var item in Items)
+        {
+            var selected = string.Equals(item, Value, StringComparison.OrdinalIgnoreCase);
+            <div class="rz-dropdown-item @(selected ? "rz-state-highlight" : "")" @onclick="() => OnSelect(item)">
+                @item
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public IReadOnlyList<string> Items { get; set; } = [];
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueSelected { get; set; }
+
+    private async Task OnSelect(string value)
+    {
+        await ValueSelected.InvokeAsync(value);
+    }
+}

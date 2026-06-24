@@ -23,8 +23,11 @@
 
         var className = $"rz-bar-series rz-series-{Chart?.Series.IndexOf(this)}";
 
+        var groupStyle = $"--rz-zero-x: {(Chart?.CategoryScale?.Scale(Math.Max(0, ticks?.Start ?? 0)) ?? 0).ToInvariantString()}px";
+        var grad = new GradientFill(Chart?.UniqueID ?? "", Chart?.Series?.IndexOf(this) ?? -1);
+        var gradient = FillMode == FillMode.Gradient;
         return
-        @<g class="@className">
+        @<g class="@className" style="@groupStyle">
             @foreach (var data in Items)
             {
                 var y = GetBarTop(data, category);
@@ -69,8 +72,13 @@
 
                 var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
                 var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
+                var fillRef = gradient ? grad.Url(fill ?? "var(--rz-series-color)", itemValue < 0 ? -1 : 1) : (FillMode == FillMode.None ? "none" : fill);
 
-                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fillRef" LineType="@LineType" Style="@style" />
+            }
+            @if (gradient)
+            {
+                <GradientDefs Plan="@grad" Vertical="false" StartOpacity="@GradientStartOpacity" EndOpacity="@GradientEndOpacity" />
             }
         </g>;
     }

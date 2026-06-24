@@ -1,0 +1,68 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inherits RadzenSpreadsheetToolBase
+
+<RadzenButton Icon="how_to_reg" Text="Stamp Reviewed"
+              Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+              Disabled=@IsDisabled Click=@OnClickAsync
+              title="Write the reviewer name and the current timestamp into the selected cell" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public string Reviewer { get; set; } = "Me";
+
+    // Declaring the feature lets the host's ReadOnly / AllowEditing / CommandExecuting
+    // gating apply to this tool the same way it does to built-in tools.
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;
+
+    private async Task OnClickAsync()
+    {
+        if (Worksheet is null || Spreadsheet is null)
+        {
+            return;
+        }
+
+        var cell = Worksheet.Selection.Cell;
+        if (cell == CellRef.Invalid)
+        {
+            return;
+        }
+
+        await Spreadsheet.ExecuteAsync(new StampReviewedCommand(Worksheet, cell, Reviewer));
+    }
+
+    // Custom command. Snapshots the previous cell value/formula on Execute and restores
+    // them on Unexecute — that's all undo/redo needs.
+    class StampReviewedCommand(Worksheet sheet, CellRef address, string reviewer) : ICommand
+    {
+        public SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;
+
+        private object? previousValue;
+        private string? previousFormula;
+
+        public bool Execute()
+        {
+            var cell = sheet.Cells[address];
+            previousValue = cell.Value;
+            previousFormula = cell.Formula;
+            cell.Formula = null;
+            cell.Value = $"{reviewer} • {DateTime.Now:yyyy-MM-dd HH:mm}";
+            return true;
+        }
+
+        public void Unexecute()
+        {
+            var cell = sheet.Cells[address];
+            if (previousFormula is not null)
+            {
+                cell.Formula = previousFormula;
+            }
+            else
+            {
+                cell.Value = previousValue;
+            }
+        }
+    }
+}

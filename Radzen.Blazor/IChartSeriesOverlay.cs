@@ -21,6 +21,12 @@ namespace Radzen.Blazor
         bool Visible { get; }
 
         /// <summary>
+        /// When <c>true</c> the overlay renders in a layer above all series, so later series cannot draw over it
+        /// (e.g. value labels). Default is <c>false</c> - the overlay renders with its own series.
+        /// </summary>
+        bool RenderOnTop => false;
+
+        /// <summary>
         /// Hit test
         /// </summary>
         bool Contains(double mouseX, double mouseY, int tolerance);

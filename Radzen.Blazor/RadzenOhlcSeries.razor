@@ -1,0 +1,59 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var category = ComposeCategory(categoryScale);
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+        var className = $"rz-ohlc-series rz-series-{chart.Series.IndexOf(this)}";
+
+        var tickWidth = BarTickWidth;
+
+        var open = Open;
+        var high = High;
+        var low = Low;
+        var close = Close;
+
+        return
+        @<g class="@className">
+            @foreach (var data in Items)
+            {
+                var cx = category(data);
+
+                var openValue = open(data);
+                var highValue = high(data);
+                var lowValue = low(data);
+                var closeValue = close(data);
+
+                var openY = valueScale.Scale(openValue, true);
+                var highY = valueScale.Scale(highValue, true);
+                var lowY = valueScale.Scale(lowValue, true);
+                var closeY = valueScale.Scale(closeValue, true);
+
+                var isBull = closeValue >= openValue;
+                var stroke = isBull ? BullStroke : BearStroke;
+
+                // Vertical line from High to Low
+                var verticalPath = $"M {cx.ToInvariantString()} {highY.ToInvariantString()} L {cx.ToInvariantString()} {lowY.ToInvariantString()}";
+
+                // Open tick (left side)
+                var openPath = $"M {(cx - tickWidth).ToInvariantString()} {openY.ToInvariantString()} L {cx.ToInvariantString()} {openY.ToInvariantString()}";
+
+                // Close tick (right side)
+                var closePath = $"M {cx.ToInvariantString()} {closeY.ToInvariantString()} L {(cx + tickWidth).ToInvariantString()} {closeY.ToInvariantString()}";
+
+                var index = Items.IndexOf(data);
+                <Path @key="@($"hl-{index}")" D="@verticalPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="none" Style="@style" />
+                <Path @key="@($"o-{index}")" D="@openPath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="none" Style="@style" />
+                <Path @key="@($"c-{index}")" D="@closePath" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="none" Style="@style" />
+            }
+        </g>;
+    }
+}

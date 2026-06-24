@@ -200,11 +200,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<int> Change { get; set; }
 
+        private string? pagerButtonAriaLabelFormat;
+
         /// <summary>
         /// Gets or sets the pager button aria-label format. Use {0} for the 1-based slide index.
         /// </summary>
         [Parameter]
-        public string PagerButtonAriaLabelFormat { get; set; } = "Go to slide {0}";
+        public string PagerButtonAriaLabelFormat { get => pagerButtonAriaLabelFormat ?? Localize(nameof(RadzenStrings.Carousel_PagerButtonAriaLabelFormat)); set => pagerButtonAriaLabelFormat = value; }
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -372,7 +374,10 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenCarousel.OnScroll")]
         public async Task OnScroll(int index)
         {
-            if (!AllowScroll) return;
+            if (!AllowScroll)
+            {
+                return;
+            }
 
             if (index >= 0 && index <= items.Count - 1 && selectedIndex != index)
             {
@@ -421,8 +426,8 @@ namespace Radzen.Blazor
 
             if (scrollDisposable != null)
             {
-                try { scrollDisposable.InvokeVoidAsync("dispose"); } catch { }
-                try { scrollDisposable.DisposeAsync(); } catch { }
+                scrollDisposable.InvokeVoid("dispose");
+                scrollDisposable.DisposeFireAndForget();
                 scrollDisposable = null;
             }
 
@@ -434,7 +439,10 @@ namespace Radzen.Blazor
 
         void OnTouchStart(TouchEventArgs args)
         {
-            if (!AllowScroll) return;
+            if (!AllowScroll)
+            {
+                return;
+            }
 
             x = args.Touches[0].ClientX;
             y = args.Touches[0].ClientY;

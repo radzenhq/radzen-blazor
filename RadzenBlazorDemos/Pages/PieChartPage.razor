@@ -4,9 +4,105 @@
     Radzen Blazor Chart pie series
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Display proportional data distribution with circular pie charts.
+    A pie chart splits a whole into slices, with each slice sized by its share of the total. It works best for a few categories where you want to show proportion at a glance.
 </RadzenText>
 
-<RadzenExample ComponentName="Chart" Example="PieChartConfig" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
-    <PieChartConfig />
+<RadzenText Anchor="pie-chart#showcase" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Showcase
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    A real-world revenue breakdown that combines a custom color palette, gradient fills, rounded corners and a subtle segment gap.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartShowcase" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <PieChartShowcase />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#basic" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Basic pie
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Bind a collection and set <code>CategoryProperty</code> and <code>ValueProperty</code>. Each value is converted to its share of the whole automatically.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartBasic">
+    <PieChartBasic />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#various-radius" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Various radius
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Use the <code>RadiusProperty</code> to assign different radius values to each segment based on a data property. This provides visual differentiation through size variation.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartVariousRadius">
+    <PieChartVariousRadius />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#segment-gap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Segment gap
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>SegmentGap</code> to separate adjacent segments by a uniform-width space that runs from the rim to the center, regardless of segment size.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartSegmentGap">
+    <PieChartSegmentGap />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#rounded-corners" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Rounded corners
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>CornerRadius</code> to round the corners of each segment for a softer look.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartCornerRadius">
+    <PieChartCornerRadius />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#semi-circle" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Semi-circle
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Combine <code>StartAngle</code> and <code>TotalAngle</code> to draw a half pie - useful for gauge-style visuals.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartSemiCircle">
+    <PieChartSemiCircle />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#explode-on-hover" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Explode on hover
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>ExplodeOffset</code> to make segments move outward from the center when hovered, or use <code>ExplodedProperty</code> to keep a segment permanently exploded.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartExplode">
+    <PieChartExplode />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#custom-colors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom colors
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Provide your own palette with <code>Fills</code> (and <code>Strokes</code>). Combine with <code>FillMode</code> to switch between solid and gradient fills.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartCustomColors">
+    <PieChartCustomColors />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#labels-legend" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Labels and legend
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Add <code>RadzenSeriesDataLabels</code> to print values on the segments and position the <code>RadzenLegend</code>. Set <code>ShowTooltipOnLegend</code> to surface tooltips from the legend too.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartLabels">
+    <PieChartLabels />
+</RadzenExample>
+
+<RadzenText Anchor="pie-chart#playground" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Playground
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Combine the settings above and see how they interact - fill mode, segment gap, corner radius, semi-circle, data labels and legend.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="PieChartPlayground">
+    <PieChartPlayground />
 </RadzenExample>

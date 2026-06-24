@@ -1,0 +1,87 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="2rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Fill" Component="fillMode" />
+                <RadzenSelectBar @bind-Value="@fillMode" TValue="FillMode" Size="ButtonSize.Small" Name="fillMode">
+                    <Items>
+                        <RadzenSelectBarItem Value="FillMode.Gradient" Text="Gradient" />
+                        <RadzenSelectBarItem Value="FillMode.Solid" Text="Solid" />
+                        <RadzenSelectBarItem Value="FillMode.None" Text="None" />
+                    </Items>
+                </RadzenSelectBar>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Segment gap" Component="segmentGap" />
+                <RadzenNumeric @bind-Value="@segmentGap" TValue="double" Min="0" Max="20" Step="1" Name="segmentGap" InputSize="InputSize.Small" Style="width: 6rem;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenLabel Text="Corner radius" Component="cornerRadius" />
+                <RadzenNumeric @bind-Value="@cornerRadius" TValue="double" Min="0" Max="20" Step="1" Name="cornerRadius" InputSize="InputSize.Small" Style="width: 6rem;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@semiCircle" Name="semiCircle"></RadzenCheckBox>
+                <RadzenLabel Text="Semi-circle" Component="semiCircle" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Data labels" Component="dataLabels" />
+            </RadzenStack>
+            @if (showDataLabels)
+            {
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenLabel Text="Label position" Component="labelPosition" />
+                    <RadzenSelectBar @bind-Value="@labelPosition" TValue="DataLabelPosition" Size="ButtonSize.Small" Name="labelPosition">
+                        <Items>
+                            <RadzenSelectBarItem Value="DataLabelPosition.Auto" Text="Auto" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Inside" Text="Inside" />
+                            <RadzenSelectBarItem Value="DataLabelPosition.Center" Text="Center" />
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenStack>
+            }
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showLegend" Name="legend"></RadzenCheckBox>
+                <RadzenLabel Text="Legend" Component="legend" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenStack AlignItems="AlignItems.Center">
+        <RadzenStack Style="width: 100%; max-width: 600px;">
+            <RadzenChart Animate="true">
+                <RadzenPieSeries Data="@revenue" CategoryProperty="Category" ValueProperty="Value" Title="Revenue"
+                                 FillMode="@fillMode" SegmentGap="@segmentGap" CornerRadius="@cornerRadius"
+                                 StartAngle="@(semiCircle ? 180d : 90d)" TotalAngle="@(semiCircle ? 180d : 360d)">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" Position="@labelPosition" />
+                </RadzenPieSeries>
+                <RadzenLegend Visible="@showLegend" Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    FillMode fillMode = FillMode.Gradient;
+    double segmentGap = 2;
+    double cornerRadius = 4;
+    bool semiCircle = false;
+    bool showDataLabels = true;
+    DataLabelPosition labelPosition = DataLabelPosition.Auto;
+    bool showLegend = true;
+
+    class DataItem
+    {
+        public string Category { get; set; }
+        public double Value { get; set; }
+    }
+
+    DataItem[] revenue = new DataItem[]
+    {
+        new DataItem { Category = "Cloud", Value = 4200 },
+        new DataItem { Category = "Licenses", Value = 3100 },
+        new DataItem { Category = "Services", Value = 2300 },
+        new DataItem { Category = "Support", Value = 1500 },
+        new DataItem { Category = "Training", Value = 900 },
+    };
+}

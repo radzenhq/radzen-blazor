@@ -99,6 +99,28 @@ namespace Radzen.Blazor
         [Parameter]
         public IList<SeriesColorRange>? StrokeRange { get; set; }
 
+        /// <summary>
+        /// Specifies how the series is filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a fill that fades toward the axis baseline, or <see cref="FillMode.None"/> to render only the outline.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Solid;
+
+        /// <summary>
+        /// Specifies the opacity at the value end of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient start opacity. Default is <c>0.85</c>.</value>
+        [Parameter]
+        public double GradientStartOpacity { get; set; } = 0.85;
+
+        /// <summary>
+        /// Specifies the opacity at the baseline of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient end opacity. Default is <c>0.4</c>.</value>
+        [Parameter]
+        public double GradientEndOpacity { get; set; } = 0.4;
+
         /// <inheritdoc />
         public override string Color
         {
@@ -169,6 +191,11 @@ namespace Radzen.Blazor
                 {
                     return chart.ColumnOptions.Width.Value * columnSeries.Count + chart.ColumnOptions.Margin * (columnSeries.Count - 1);
                 }
+                else if (chart.ColumnOptions.CategoryGap is double gap)
+                {
+                    var step = System.Math.Abs(chart.CategoryScale.Scale(1, true) - chart.CategoryScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
                 else
                 {
                     var availableWidth = chart.CategoryScale.OutputSize - (chart.CategoryAxis.Padding * 2);
@@ -192,9 +219,9 @@ namespace Radzen.Blazor
             var index = columnSeries.IndexOf(this);
             var padding = chart.ColumnOptions.Margin;
             var bandWidth = BandWidth;
-            var width = bandWidth / columnSeries.Count - padding + padding / columnSeries.Count;
+            var (width, groupWidth) = Rendering.BandLayout.Resolve(bandWidth, columnSeries.Count, padding, chart.ColumnOptions.EffectiveMaxWidth);
             var category = ComposeCategory(chart.CategoryScale);
-            var x = category(item) - bandWidth / 2 + index * width + index * padding;
+            var x = category(item) - groupWidth / 2 + index * (width + padding);
 
             return x + width / 2;
         }
@@ -209,20 +236,22 @@ namespace Radzen.Blazor
         public override (object, Point) DataAt(double x, double y)
         {
             var chart = RequireChart();
+            var vs = chart.GetValueScale(ValueAxisName);
+            var va = chart.GetValueAxis(ValueAxisName);
             var category = ComposeCategory(chart.CategoryScale);
-            var value = ComposeValue(chart.ValueScale);
-            var ticks = chart.ValueScale.Ticks(chart.ValueAxis.TickDistance);
-            var y0 = chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+            var value = ComposeValue(vs);
+            var ticks = vs.Ticks(va.TickDistance);
+            var y0 = vs.Scale(Math.Max(0, ticks.Start));
 
             var columnSeries = VisibleColumnSeries;
             var index = columnSeries.IndexOf(this);
             var padding = chart.ColumnOptions.Margin;
             var bandWidth = BandWidth;
-            var width = chart.ColumnOptions.Width ?? bandWidth / columnSeries.Count - padding + padding / columnSeries.Count;
+            var (width, groupWidth) = Rendering.BandLayout.Resolve(bandWidth, columnSeries.Count, padding, chart.ColumnOptions.EffectiveMaxWidth);
 
             foreach (var data in Items)
             {
-                var startX = category(data) - bandWidth / 2 + index * width + index * padding;
+                var startX = category(data) - groupWidth / 2 + index * (width + padding);
                 var endX = startX + width;
                 var dataY = value(data);
                 var startY = Math.Min(dataY, y0);
@@ -240,22 +269,47 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
-            var list = new List<ChartDataLabel>();
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
 
-            int sign;
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
+            var list = new List<ChartDataLabel>();
 
             var chart = RequireChart();
             if (Data != null)
             {
+                const double gap = 16;
+                const double inset = 12;
+                var vs = chart.GetValueScale(ValueAxisName);
+                var va = chart.GetValueAxis(ValueAxisName);
+                var ticks = vs.Ticks(va.TickDistance);
+                var y0 = vs.Scale(Math.Max(0, ticks.Start));
+
                 foreach (var d in Data)
                 {
-                    sign = Value(d) < 0 ? -1 : Value(d) == 0 ? 0 : 1;
+                    var value = Value(d);
+                    var sign = value < 0 ? -1 : value == 0 ? 0 : 1;
+                    var anchorX = TooltipX(d);
+                    var end = TooltipY(d);
+
+                    var y = position switch
+                    {
+                        DataLabelPosition.Top => end - gap,
+                        DataLabelPosition.Bottom => end + gap,
+                        DataLabelPosition.Inside => end + inset * sign,
+                        DataLabelPosition.Center => end + (y0 - end) / 2,
+                        _ => end - gap * sign,
+                    };
 
                     list.Add(new ChartDataLabel
                     {
-                        Position = new Point() { X = TooltipX(d) + offsetX, Y = TooltipY(d) - offsetY - (16 * sign) },
+                        Position = new Point() { X = anchorX + offsetX, Y = y - offsetY },
+                        Anchor = new Point() { X = anchorX, Y = end },
+                        Value = value,
                         TextAnchor = "middle",
-                        Text = chart.ValueAxis.Format(chart.ValueScale, Value(d))
+                        Text = va.Format(vs, value)
                     });
                 }
             }

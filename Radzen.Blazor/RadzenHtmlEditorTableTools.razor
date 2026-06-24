@@ -1,0 +1,16 @@
+@inherits RadzenHtmlEditorButtonBase
+
+<RadzenHtmlEditorTable />
+<RadzenHtmlEditorTableCommandButton TableCommand="addRowBefore" Icon="north" Title="@Strings.InsertRowAbove" />
+<RadzenHtmlEditorTableCommandButton TableCommand="addRowAfter" Icon="south" Title="@Strings.InsertRowBelow" />
+<RadzenHtmlEditorTableCommandButton TableCommand="addColumnBefore" Icon="west" Title="@Strings.InsertColumnLeft" />
+<RadzenHtmlEditorTableCommandButton TableCommand="addColumnAfter" Icon="east" Title="@Strings.InsertColumnRight" />
+<RadzenHtmlEditorTableCommandButton TableCommand="deleteRow" Icon="horizontal_rule" Title="@Strings.DeleteRow" />
+<RadzenHtmlEditorTableCommandButton TableCommand="deleteColumn" Icon="vertical_align_center" Title="@Strings.DeleteColumn" />
+<RadzenHtmlEditorTableCommandButton TableCommand="mergeCellRight" Icon="merge_type" Title="@Strings.MergeRight" />
+<RadzenHtmlEditorTableCommandButton TableCommand="mergeCellDown" Icon="merge" Title="@Strings.MergeDown" />
+<RadzenHtmlEditorTableCommandButton TableCommand="splitCell" Icon="call_split" Title="@Strings.SplitCell" />
+
+@code {
+    HtmlEditorTableStrings Strings => TableStrings ?? Editor?.TableStrings ?? new HtmlEditorTableStrings();
+}

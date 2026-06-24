@@ -1,0 +1,54 @@
+@using Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetDialogBase
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableRange)) class="rz-text-subtitle2" />
+        <RangePicker Value=@Draft.RangeFormula ValueChanged=@OnRangeFormulaChanged
+            OnPickRequested=@OnRangePickRequested
+            ShouldFocusOnLoad=@(FocusFieldId == RangeFieldId) />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableName)) Component="nameInput" class="rz-text-subtitle2" />
+        <RadzenTextBox Value=@Draft.Name Change=@OnNameChanged Name="nameInput" Style="width: 100%" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenCheckBox Value=@Draft.HasHeaders Change=@OnHasHeadersChanged Name="hasHeadersCheck" TValue="bool" />
+        <RadzenLabel Text=@L(nameof(RadzenStrings.Spreadsheet_TableHasHeaders)) Component="hasHeadersCheck" class="rz-text-subtitle2" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End" class="rz-spreadsheet-dialog-actions">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined"
+            Click=@OnCancel />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat"
+            Disabled=@string.IsNullOrWhiteSpace(Draft.Name)
+            Click=@OnOk />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+#nullable enable
+
+    internal const string RangeFieldId = "Range";
+
+    [Parameter] public InsertTableDraft Draft { get; set; } = default!;
+    [Parameter] public string? FocusFieldId { get; set; }
+
+    private void OnNameChanged(string value) => Draft.Name = value ?? string.Empty;
+    private void OnHasHeadersChanged(bool value) => Draft.HasHeaders = value;
+    private void OnRangeFormulaChanged(string? value) => Draft.RangeFormula = value ?? string.Empty;
+
+    private void OnRangePickRequested()
+    {
+        DialogService.Close(new RangePickRequest(RangeFieldId, Draft.RangeFormula));
+    }
+
+    private void OnOk()
+    {
+        Draft.Name = Draft.Name.Trim();
+        DialogService.Close(Draft);
+    }
+}

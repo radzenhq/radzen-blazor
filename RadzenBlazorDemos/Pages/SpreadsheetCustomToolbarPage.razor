@@ -1,0 +1,29 @@
+@page "/spreadsheet-custom-toolbar"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Spreadsheet <strong>Custom Toolbar</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Replace the built-in toolbar with your own selection of tools. Pick from the public tool components, reorder them, group them as you like, and add custom tools that dispatch undoable commands.
+</RadzenText>
+
+<RadzenText Anchor="spreadsheet-custom-toolbar#predefined-tools" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Predefined tools in a custom layout
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add any of the <code>RadzenSpreadsheet*</code> tool components (e.g. <code>RadzenSpreadsheetBold</code>, <code>RadzenSpreadsheetColor</code>) to the spreadsheet's <code>ChildContent</code>. The host cascades the active <code>Worksheet</code> so the tools wire themselves up - no parameters needed. Include <code>RadzenSpreadsheetTableDesignToolset</code> to keep the contextual Table Design toolset.
+</RadzenText>
+<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetCustomToolbarTools">
+    <SpreadsheetCustomToolbarTools />
+</RadzenExample>
+
+<RadzenText Anchor="spreadsheet-custom-toolbar#custom-tool" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom tool with an undoable command
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Build your own tool component and dispatch a custom <code>ICommand</code> through <code>ISpreadsheet.ExecuteAsync</code>. Declare a <code>SpreadsheetFeature</code> on the command and your tool participates in <code>ReadOnly</code>, the matching <code>Allow*</code> flag, the <code>CommandExecuting</code> event, and the undo/redo stack for free.
+</RadzenText>
+<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetCustomToolbarCommand"
+    AdditionalSourceCodePages=@(new [] { "StampReviewedTool.razor" })>
+    <SpreadsheetCustomToolbarCommand />
+</RadzenExample>

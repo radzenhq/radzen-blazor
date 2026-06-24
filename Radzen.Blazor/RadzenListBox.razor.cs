@@ -105,7 +105,9 @@ namespace Radzen.Blazor
         {
             ArgumentNullException.ThrowIfNull(args);
             if (Disabled)
+            {
                 return;
+            }
 
             var key = $"{args.Key}".Trim();
 
@@ -178,12 +180,14 @@ namespace Radzen.Blazor
             }
         }
 
+        private string? emptyText;
+
         /// <summary>
         /// Gets or sets the empty text shown when Data is empty.
         /// </summary>
         /// <value>The empty text.</value>
         [Parameter]
-        public string EmptyText { get; set; } = "No records to display.";
+        public string EmptyText { get => emptyText ?? Localize(nameof(RadzenStrings.ListBox_EmptyText)); set => emptyText = value; }
 
         /// <summary>
         /// Gets or sets the empty template shown when Data is empty.
@@ -199,10 +203,17 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ReadOnly { get; set; }
 
+        /// <summary>
+        /// Gets or sets the input size.
+        /// </summary>
+        /// <value>The input size.</value>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList("rz-listbox rz-inputtext").ToString();
+            return GetClassList("rz-listbox rz-inputtext").AddInputSize(InputSize).ToString();
         }
 
         /// <inheritdoc />

@@ -1,0 +1,79 @@
+@using System.Globalization
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">Language</RadzenText>
+        <RadzenSelectBar @bind-Value="@culture" Data="@cultures" TextProperty="Name" ValueProperty="Culture" Size="ButtonSize.Small" />
+    </RadzenStack>
+
+    <CascadingValue Name="DefaultUICulture" Value="@culture">
+    <CascadingValue Name="DefaultCulture" Value="@culture">
+        <RadzenDataGrid @bind-Value="@selectedProducts" Data="@products" TItem="Product" PageSize="5"
+                        AllowSorting="true" AllowFiltering="true" AllowColumnPicker="true"
+                        AllowPaging="true" AllowGrouping="true"
+                        FilterMode="FilterMode.Advanced" SelectionMode="DataGridSelectionMode.Single">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Product.Name)" Title="Name" />
+                <RadzenDataGridColumn Property="@nameof(Product.Category)" Title="Category" />
+                <RadzenDataGridColumn Property="@nameof(Product.Quantity)" Title="Quantity" TextAlign="TextAlign.Right" />
+                <RadzenDataGridColumn Property="@nameof(Product.InStock)" Title="In stock" />
+            </Columns>
+        </RadzenDataGrid>
+
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Start">
+            <RadzenStack Gap="0.5rem">
+                <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">DatePicker</RadzenText>
+                <RadzenDatePicker @bind-Value="@date" Inline="true" ShowTime="true" />
+            </RadzenStack>
+            <RadzenStack Gap="0.5rem">
+                <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">Login</RadzenText>
+                <RadzenTemplateForm Data=@("Localization")>
+                    <RadzenLogin AllowRegister="true" AllowResetPassword="true" AllowRememberMe="true" />
+                </RadzenTemplateForm>
+            </RadzenStack>
+        </RadzenStack>
+    </CascadingValue>
+    </CascadingValue>
+</RadzenStack>
+
+@code {
+    class Product
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public bool InStock { get; set; }
+    }
+
+    class Language
+    {
+        public string Name { get; set; } = string.Empty;
+        public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
+    }
+
+    readonly Language[] cultures =
+    [
+        new() { Name = "English", Culture = new CultureInfo("en") },
+        new() { Name = "Deutsch", Culture = new CultureInfo("de") },
+        new() { Name = "Français", Culture = new CultureInfo("fr") },
+        new() { Name = "Español", Culture = new CultureInfo("es") },
+        new() { Name = "Italiano", Culture = new CultureInfo("it") },
+        new() { Name = "日本語", Culture = new CultureInfo("ja") },
+    ];
+
+    CultureInfo culture = new("de");
+    DateTime date = new(2025, 6, 4, 10, 30, 0);
+    IList<Product> selectedProducts = [];
+
+    readonly List<Product> products =
+    [
+        new() { Name = "Espresso machine", Category = "Appliances", Quantity = 12, InStock = true },
+        new() { Name = "Office chair", Category = "Furniture", Quantity = 0, InStock = false },
+        new() { Name = "Wireless mouse", Category = "Electronics", Quantity = 134, InStock = true },
+        new() { Name = "Notebook", Category = "Stationery", Quantity = 540, InStock = true },
+        new() { Name = "Standing desk", Category = "Furniture", Quantity = 7, InStock = true },
+        new() { Name = "Mechanical keyboard", Category = "Electronics", Quantity = 0, InStock = false },
+        new() { Name = "Desk lamp", Category = "Appliances", Quantity = 56, InStock = true },
+        new() { Name = "Ballpoint pen", Category = "Stationery", Quantity = 980, InStock = true },
+    ];
+}

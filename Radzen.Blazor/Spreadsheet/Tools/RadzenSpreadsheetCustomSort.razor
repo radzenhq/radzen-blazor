@@ -1,0 +1,62 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@inherits RadzenSpreadsheetToolBase
+@inject DialogService DialogService
+
+<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" ButtonType="ButtonType.Button"
+    Disabled=@IsDisabled
+    Click=@OnClick
+    Icon="sort"
+    title=@Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CustomSortTooltip)) />
+
+@code {
+#nullable enable
+
+    protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Sorting;
+
+    private async Task OnClick()
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid) return;
+
+        var range = ResolveSortRange();
+        if (range == RangeRef.Invalid) return;
+
+        var columnNames = new System.Collections.Generic.List<string>();
+        for (var c = range.Start.Column; c <= range.End.Column; c++)
+        {
+            var headerCell = Worksheet.Cells[range.Start.Row, c];
+            columnNames.Add(headerCell.Value?.ToString() ?? "");
+        }
+
+        var args = new System.Collections.Generic.Dictionary<string, object?>
+        {
+            ["Range"] = range,
+            ["ColumnNames"] = columnNames,
+        };
+
+        var result = await DialogService.OpenAsync<CustomSortDialog>(
+            Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CustomSort)) ?? "Custom Sort",
+            args,
+            new DialogOptions { Width = "800px", ShowClose = true });
+
+        if (result is CustomSortDialog.Result r && r.Keys.Length > 0 && Spreadsheet is not null)
+        {
+            var command = new MultiKeySortCommand(Worksheet, range, r.Keys, skipHeaderRow: r.HasHeaders);
+            await Spreadsheet.ExecuteAsync(command);
+        }
+    }
+
+    private RangeRef ResolveSortRange()
+    {
+        var sel = Worksheet!.Selection.Range;
+        if (sel.Start == sel.End)
+        {
+            // A single-cell selection sorts the whole sheet, matching Excel's "Sort..." behavior.
+            return new RangeRef(
+                new CellRef(0, 0),
+                new CellRef(Worksheet.RowCount - 1, Worksheet.ColumnCount - 1));
+        }
+        return sel;
+    }
+}

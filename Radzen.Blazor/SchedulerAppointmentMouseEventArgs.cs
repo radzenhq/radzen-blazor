@@ -18,6 +18,11 @@ namespace Radzen.Blazor
         /// <value>The data.</value>
         public TItem? Data { get; set; }
         /// <summary>
+        /// The appointment that triggered the event, including its resolved <see cref="Radzen.Blazor.AppointmentData.Start" />, <see cref="Radzen.Blazor.AppointmentData.End" /> and <see cref="Radzen.Blazor.AppointmentData.Text" />.
+        /// </summary>
+        /// <value>The appointment data.</value>
+        public AppointmentData? AppointmentData { get; set; }
+        /// <summary>
         /// The horizontal position (X) of the mouse pointer in viewport coordinates.
         /// </summary>
         public double ClientX { get; set; }

@@ -29,6 +29,29 @@ namespace Radzen.Blazor
             return "rz-menu rz-profile-menu";
         }
 
+        IJSObjectReference? _jsRef;
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender && Visible && JSRuntime != null)
+            {
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createProfileMenu", Element);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
+
         /// <summary>
         /// Gets or sets the template.
         /// </summary>
@@ -50,12 +73,14 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowIcon { get; set; } = true;
 
+        private string? toggleAriaLabel;
+
         /// <summary>
         /// Gets or sets the toggle aria label text.
         /// </summary>
         /// <value>The toggle aria label text.</value>
         [Parameter]
-        public string ToggleAriaLabel { get; set; } = "Profile menu";
+        public string ToggleAriaLabel { get => toggleAriaLabel ?? Localize(nameof(RadzenStrings.ProfileMenu_ToggleAriaLabel)); set => toggleAriaLabel = value; }
 
         string contentStyle = "display:none;position:absolute;z-index:1;";
 

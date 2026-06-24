@@ -20,10 +20,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "justifyFull";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Justify"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Justify";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorJustify_Title)); set => title = value; }
     }
 }

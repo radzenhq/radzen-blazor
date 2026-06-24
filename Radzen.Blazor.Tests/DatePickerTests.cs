@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -38,6 +39,96 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"rz-timepicker", component.Markup);
             Assert.Contains(@$"rz-hour-picker", component.Markup);
             Assert.Contains(@$"rz-minute-picker", component.Markup);
+        }
+
+        [Fact]
+        public void DatePicker_Updates_MonthNames_When_Culture_Changes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters => parameters
+                .Add(p => p.Inline, true)
+                .Add(p => p.Value, new DateTime(2025, 1, 15))
+                .Add(p => p.Culture, new CultureInfo("de")));
+
+            Assert.Contains("Januar", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.Culture, new CultureInfo("fr")));
+
+            Assert.Contains("janvier", component.Markup);
+            Assert.DoesNotContain("Januar", component.Markup);
+        }
+
+        [Fact]
+        public void DatePicker_Updates_MonthNames_When_DefaultCulture_Cascade_Changes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            void Build(Bunit.ComponentParameterCollectionBuilder<CascadingValue<CultureInfo>> parameters, CultureInfo culture) => parameters
+                .Add(p => p.Name, "DefaultCulture")
+                .Add(p => p.Value, culture)
+                .AddChildContent<RadzenDatePicker<DateTime>>(picker => picker
+                    .Add(p => p.Inline, true)
+                    .Add(p => p.Value, new DateTime(2025, 1, 15)));
+
+            var component = ctx.RenderComponent<CascadingValue<CultureInfo>>(parameters => Build(parameters, new CultureInfo("de")));
+
+            Assert.Contains("Januar", component.Markup);
+
+            component.SetParametersAndRender(parameters => Build(parameters, new CultureInfo("ja")));
+
+            Assert.Contains("1月", component.Markup);
+            Assert.DoesNotContain("Januar", component.Markup);
+        }
+
+        [Fact]
+        public void DatePicker_Follows_Nested_Culture_Cascades_Like_The_Demo()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            // Mirror the localization demo exactly: nested DefaultUICulture + DefaultCulture
+            // cascades wrapping an inline RadzenDatePicker with ShowTime and no explicit Culture.
+            void Build(Bunit.ComponentParameterCollectionBuilder<CascadingValue<CultureInfo>> outer, CultureInfo culture) => outer
+                .Add(p => p.Name, "DefaultUICulture")
+                .Add(p => p.Value, culture)
+                .AddChildContent<CascadingValue<CultureInfo>>(inner => inner
+                    .Add(p => p.Name, "DefaultCulture")
+                    .Add(p => p.Value, culture)
+                    .AddChildContent<RadzenDatePicker<DateTime>>(picker => picker
+                        .Add(p => p.Inline, true)
+                        .Add(p => p.ShowTime, true)
+                        .Add(p => p.Value, new DateTime(2025, 6, 4))));
+
+            var component = ctx.RenderComponent<CascadingValue<CultureInfo>>(o => Build(o, new CultureInfo("de")));
+            Assert.Contains("Juni", component.Markup);
+
+            component.SetParametersAndRender(o => Build(o, new CultureInfo("ja")));
+            Assert.Contains("6月", component.Markup);
+            Assert.DoesNotContain("Juni", component.Markup);
+        }
+
+        [Fact]
+        public void DatePicker_Renders_Japanese_Month_When_Culture_Is_Ja()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters => parameters
+                .Add(p => p.Inline, true)
+                .Add(p => p.Value, new DateTime(2025, 6, 4))
+                .Add(p => p.Culture, new CultureInfo("ja")));
+
+            // Japanese month/day names must appear; English ones must not.
+            Assert.Contains("6月", component.Markup);
+            Assert.DoesNotContain("June", component.Markup);
         }
 
         [Fact]

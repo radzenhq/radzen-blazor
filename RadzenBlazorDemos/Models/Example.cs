@@ -16,11 +16,21 @@ namespace RadzenBlazorDemos
         public IEnumerable<Example> Children { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public IEnumerable<ExampleSection> Toc { get; set; }
+
+        // SEO enrichment (rendered on-page and as JSON-LD by DemoSeo). Optional.
+        public IEnumerable<string> Related { get; set; }
+        public IEnumerable<FaqItem> Faq { get; set; }
     }
 
     public class ExampleSection
     {
         public string Text { get; set; }
         public string Anchor { get; set; }
+    }
+
+    public class FaqItem
+    {
+        public string Question { get; set; }
+        public string Answer { get; set; }
     }
 }

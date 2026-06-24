@@ -1,0 +1,67 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showLine" Name="showLine" />
+                <RadzenLabel Text="Reference line" Component="showLine" class="rz-color-danger-dark" />
+                <RadzenNumeric @bind-Value="@target" Step="10000" Style="width: 130px;" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showBand" Name="showBand" />
+                <RadzenLabel Text="Reference band" Component="showBand" />
+                <RadzenNumeric @bind-Value="@from" Step="10000" Style="width: 130px;" />
+                <RadzenNumeric @bind-Value="@to" Step="10000" Style="width: 130px;" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenLineSeries Smooth="true" Data="@revenue" CategoryProperty="Date" Title="Monthly revenue" ValueProperty="Revenue" StrokeWidth="2">
+            <RadzenMarkers MarkerType="MarkerType.Circle" />
+            <RadzenSeriesReferenceBand Visible="@showBand" From="@from" To="@to" Title="Acceptable range" />
+            <RadzenSeriesReferenceLine Visible="@showLine" Value="@target" Title="Target" Stroke="var(--rz-danger-dark)" StrokeWidth="2" LineType="LineType.Dashed" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Revenue (USD)" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    bool showLine = true;
+    bool showBand = true;
+    double target = 280000;
+    double from = 230000;
+    double to = 270000;
+
+    class DataItem
+    {
+        public string Date { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue = new[]
+    {
+        new DataItem { Date = "Jan",  Revenue = 234000 },
+        new DataItem { Date = "Feb",  Revenue = 269000 },
+        new DataItem { Date = "Mar",  Revenue = 233000 },
+        new DataItem { Date = "Apr",  Revenue = 244000 },
+        new DataItem { Date = "May",  Revenue = 214000 },
+        new DataItem { Date = "Jun",  Revenue = 253000 },
+        new DataItem { Date = "Jul",  Revenue = 274000 },
+        new DataItem { Date = "Aug",  Revenue = 284000 },
+        new DataItem { Date = "Sept", Revenue = 273000 },
+        new DataItem { Date = "Oct",  Revenue = 282000 },
+        new DataItem { Date = "Nov",  Revenue = 289000 },
+        new DataItem { Date = "Dec",  Revenue = 294000 },
+    };
+}

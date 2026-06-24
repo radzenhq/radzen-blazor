@@ -1,0 +1,313 @@
+using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Radzen.Blazor
+{
+    /// <summary>
+    /// A chart series that displays data as horizontal range bars in a RadzenChart.
+    /// Each bar spans from a minimum value to a maximum value, useful for showing value ranges per category.
+    /// </summary>
+    /// <typeparam name="TItem">The type of data items in the series.</typeparam>
+    /// <example>
+    /// <code>
+    /// &lt;RadzenChart&gt;
+    ///     &lt;RadzenRangeBarSeries Data=@data CategoryProperty="Task"
+    ///         MinProperty="Start" MaxProperty="End" Title="Timeline" /&gt;
+    /// &lt;/RadzenChart&gt;
+    /// </code>
+    /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    public partial class RadzenRangeBarSeries<TItem> : CartesianSeries<TItem>, IChartBarSeries
+    {
+        /// <summary>
+        /// Gets or sets the name of the property that provides the minimum (left) value.
+        /// </summary>
+        [Parameter]
+        public string? MinProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the property that provides the maximum (right) value.
+        /// </summary>
+        [Parameter]
+        public string? MaxProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the fill color of the bars.
+        /// </summary>
+        [Parameter]
+        public string? Fill { get; set; }
+
+        /// <summary>
+        /// Gets or sets a collection of fill colors for individual bars.
+        /// </summary>
+        [Parameter]
+        public IEnumerable<string>? Fills { get; set; }
+
+        /// <summary>
+        /// Gets or sets the stroke (border) color of the bars.
+        /// </summary>
+        [Parameter]
+        public string? Stroke { get; set; }
+
+        /// <summary>
+        /// Gets or sets a collection of stroke colors for individual bars.
+        /// </summary>
+        [Parameter]
+        public IEnumerable<string>? Strokes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the width of the bar border in pixels.
+        /// </summary>
+        [Parameter]
+        public double StrokeWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the line type for bar borders.
+        /// </summary>
+        [Parameter]
+        public LineType LineType { get; set; }
+
+        /// <summary>
+        /// Specifies how the series is filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a fill that fades toward the axis baseline, or <see cref="FillMode.None"/> to render only the outline.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Solid;
+
+        /// <summary>
+        /// Specifies the opacity at the value end of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient start opacity. Default is <c>0.85</c>.</value>
+        [Parameter]
+        public double GradientStartOpacity { get; set; } = 0.85;
+
+        /// <summary>
+        /// Specifies the opacity at the baseline of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient end opacity. Default is <c>0.4</c>.</value>
+        [Parameter]
+        public double GradientEndOpacity { get; set; } = 0.4;
+
+        /// <inheritdoc />
+        public override string Color => Fill ?? string.Empty;
+
+        int IChartBarSeries.Count => Items?.Count ?? 0;
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.TryGetValue<string>(nameof(MaxProperty), out var max) && max != MaxProperty)
+            {
+                ValueProperty = max;
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
+
+        internal Func<TItem, double> Min
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(MinProperty))
+                {
+                    throw new ArgumentException("MinProperty should not be empty");
+                }
+
+                return PropertyAccess.Getter<TItem, double>(MinProperty);
+            }
+        }
+
+        internal Func<TItem, double> Max
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(MaxProperty))
+                {
+                    throw new ArgumentException("MaxProperty should not be empty");
+                }
+
+                return PropertyAccess.Getter<TItem, double>(MaxProperty);
+            }
+        }
+
+        /// <inheritdoc />
+        public override ScaleBase TransformCategoryScale(ScaleBase scale)
+        {
+            ArgumentNullException.ThrowIfNull(scale);
+
+            if (Items != null && Items.Any())
+            {
+                var min = Min;
+                var max = Max;
+
+                var minValue = Items.Min(item => min(item));
+                var maxValue = Items.Max(item => max(item));
+
+                scale.Input.MergeWidth(new ScaleRange { Start = minValue, End = maxValue });
+            }
+
+            return scale;
+        }
+
+        /// <inheritdoc />
+        public override ScaleBase TransformValueScale(ScaleBase scale)
+        {
+            return base.TransformCategoryScale(scale);
+        }
+
+        /// <inheritdoc />
+        protected override IList<object> GetCategories()
+        {
+            return base.GetCategories().Reverse().ToList();
+        }
+
+        private IList<IChartSeries> BarSeries =>
+            RequireChart().Series.Where(s => s is IChartBarSeries).Cast<IChartSeries>().ToList();
+
+        private IList<IChartSeries> VisibleBarSeries =>
+            BarSeries.Where(s => s.Visible).ToList();
+
+        private double BandHeight
+        {
+            get
+            {
+                var barSeries = VisibleBarSeries;
+                if (barSeries.Count == 0)
+                {
+                    return 0;
+                }
+
+                var chart = RequireChart();
+                var barOptions = chart.BarOptions;
+
+                if (barOptions?.Height.HasValue == true)
+                {
+                    return barOptions.Height.Value * barSeries.Count;
+                }
+
+                if (barOptions?.CategoryGap is double gap)
+                {
+                    var step = System.Math.Abs(chart.ValueScale.Scale(1, true) - chart.ValueScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
+
+                var availableHeight = chart.ValueScale.OutputSize;
+                var bands = barSeries.Cast<IChartBarSeries>().Max(s => s.Count) + 2;
+                return availableHeight / bands;
+            }
+        }
+
+        /// <inheritdoc />
+        protected override string TooltipStyle(TItem item)
+        {
+            var style = base.TooltipStyle(item);
+            var index = Items.IndexOf(item);
+
+            if (index >= 0)
+            {
+                var color = PickColor(index, Fills, Fill);
+                if (color != null)
+                {
+                    style = $"{style}; border-color: {color};";
+                }
+            }
+
+            return style;
+        }
+
+        /// <inheritdoc />
+        protected override string TooltipValue(TItem item)
+        {
+            var chart = RequireChart();
+            var minVal = chart.ValueAxis.Format(chart.CategoryScale, chart.CategoryScale.Value(Min(item)));
+            var maxVal = chart.ValueAxis.Format(chart.CategoryScale, chart.CategoryScale.Value(Max(item)));
+            return $"{minVal} - {maxVal}";
+        }
+
+        /// <inheritdoc />
+        protected override string TooltipTitle(TItem item)
+        {
+            var chart = RequireChart();
+            var category = Category(chart.ValueScale);
+            return chart.CategoryAxis.Format(chart.ValueScale, chart.ValueScale.Value(category(item)));
+        }
+
+        /// <inheritdoc />
+        internal override double TooltipX(TItem item)
+        {
+            var chart = RequireChart();
+            return chart.CategoryScale.Scale(Max(item), true);
+        }
+
+        /// <inheritdoc />
+        internal override double TooltipY(TItem item)
+        {
+            var chart = RequireChart();
+            var category = ComposeCategory(chart.ValueScale);
+            var barSeries = VisibleBarSeries;
+            var index = barSeries.IndexOf(this);
+            if (barSeries.Count == 0 || index < 0)
+            {
+                return 0;
+            }
+
+            var padding = chart.BarOptions?.Margin ?? 0;
+            var bandHeight = BandHeight;
+            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
+            var y = category(item) - groupHeight / 2 + index * (height + padding);
+
+            return y + height / 2;
+        }
+
+        /// <inheritdoc />
+        public override bool Contains(double x, double y, double tolerance)
+        {
+            return DataAt(x, y).Item1 != null;
+        }
+
+        /// <inheritdoc />
+        public override (object, Point) DataAt(double x, double y)
+        {
+            var chart = Chart;
+            if (chart == null)
+            {
+                return (default!, new Point());
+            }
+
+            var category = ComposeCategory(chart.ValueScale);
+            var barSeries = VisibleBarSeries;
+            var index = barSeries.IndexOf(this);
+            if (barSeries.Count == 0 || index < 0)
+            {
+                return (default!, new Point());
+            }
+
+            var padding = chart.BarOptions?.Margin ?? 0;
+            var bandHeight = BandHeight;
+            var (height, groupHeight) = Rendering.BandLayout.Resolve(bandHeight, barSeries.Count, padding, chart.BarOptions?.EffectiveMaxHeight);
+
+            foreach (var data in Items)
+            {
+                var startY = category(data) - groupHeight / 2 + index * (height + padding);
+                var endY = startY + height;
+                var minX = chart.CategoryScale.Scale(Min(data), true);
+                var maxX = chart.CategoryScale.Scale(Max(data), true);
+                var sX = Math.Min(minX, maxX);
+                var eX = Math.Max(minX, maxX);
+
+                if (sX <= x && x <= eX && startY <= y && y <= endY)
+                {
+                    return (data!, new Point { X = x, Y = y });
+                }
+            }
+
+            return (default!, new Point());
+        }
+    }
+}

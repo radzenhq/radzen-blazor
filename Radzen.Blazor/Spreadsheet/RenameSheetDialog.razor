@@ -1,0 +1,15 @@
+@using Microsoft.AspNetCore.Components
+@using Radzen.Blazor
+@inherits SpreadsheetDialogBase
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+    <RadzenTextBox @bind-Value=@Name Style="width: 100%" />
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <RadzenText TextStyle="TextStyle.Caption" Style="color: var(--rz-form-error-color, #f44336)">@error</RadzenText>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End" class="rz-spreadsheet-dialog-actions">
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_Cancel)) Click=@OnCancel ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" />
+        <RadzenButton Text=@L(nameof(RadzenStrings.Spreadsheet_OK)) Click=@OnOk ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" />
+    </RadzenStack>
+</RadzenStack>

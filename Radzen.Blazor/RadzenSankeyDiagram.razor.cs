@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Radzen.Blazor
     /// RadzenSankeyDiagram component.
     /// </summary>
     /// <typeparam name="TItem">The type of data item.</typeparam>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenSankeyDiagram<TItem> : RadzenComponent
     {
         /// <summary>
@@ -111,29 +113,37 @@ namespace Radzen.Blazor
         [Parameter]
         public Func<double, string>? ValueFormatter { get; set; }
 
+        private string? valueText;
+
         /// <summary>
         /// Gets or sets the tooltip text for "Value".
         /// </summary>
         [Parameter]
-        public string ValueText { get; set; } = "Value";
+        public string ValueText { get => valueText ?? Localize(nameof(RadzenStrings.SankeyDiagram_ValueText)); set => valueText = value; }
+
+        private string? incomingText;
 
         /// <summary>
         /// Gets or sets the tooltip text for "Incoming".
         /// </summary>
         [Parameter]
-        public string IncomingText { get; set; } = "Incoming";
+        public string IncomingText { get => incomingText ?? Localize(nameof(RadzenStrings.SankeyDiagram_IncomingText)); set => incomingText = value; }
+
+        private string? outgoingText;
 
         /// <summary>
         /// Gets or sets the tooltip text for "Outgoing".
         /// </summary>
         [Parameter]
-        public string OutgoingText { get; set; } = "Outgoing";
+        public string OutgoingText { get => outgoingText ?? Localize(nameof(RadzenStrings.SankeyDiagram_OutgoingText)); set => outgoingText = value; }
+
+        private string? flowText;
 
         /// <summary>
         /// Gets or sets the tooltip text for "Flow".
         /// </summary>
         [Parameter]
-        public string FlowText { get; set; } = "Flow";
+        public string FlowText { get => flowText ?? Localize(nameof(RadzenStrings.SankeyDiagram_FlowText)); set => flowText = value; }
 
         /// <summary>
         /// Gets or sets the CSS style of the tooltip.
@@ -313,7 +323,7 @@ namespace Radzen.Blazor
             if ((firstRender || !Width.HasValue || !Height.HasValue) && JSRuntime != null)
             {
                 var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", Element, Reference);
-                
+
                 if (!Width.HasValue && rect.Width > 0)
                 {
                     Width = rect.Width;
@@ -524,10 +534,17 @@ namespace Radzen.Blazor
 
         private void ShowNodeTooltip(MouseEventArgs args, ComputedSankeyNode node)
         {
-            if (TooltipService == null) return;
-            
+            if (TooltipService == null)
+            {
+                return;
+            }
+
             // Store current tooltip node to prevent re-opening
-            if (currentTooltipNode == node) return;
+            if (currentTooltipNode == node)
+            {
+                return;
+            }
+
             currentTooltipNode = node;
             
             var tooltip = new RenderFragment(builder =>
@@ -597,10 +614,17 @@ namespace Radzen.Blazor
 
         private void ShowLinkTooltip(MouseEventArgs args, ComputedSankeyLink link)
         {
-            if (TooltipService == null) return;
-            
+            if (TooltipService == null)
+            {
+                return;
+            }
+
             // Store current tooltip link to prevent re-opening
-            if (currentTooltipLink == link) return;
+            if (currentTooltipLink == link)
+            {
+                return;
+            }
+
             currentTooltipLink = link;
             
             var sourceLabel = link.SourceNode?.Label ?? link.Source;
@@ -640,15 +664,7 @@ namespace Radzen.Blazor
         {
             if (IsJSRuntimeAvailable)
             {
-                if (JSRuntime == null) return;
-                try
-                {
-                    _ = JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", Element);
-                }
-                catch (Exception)
-                {
-                    // Ignore errors during disposal
-                }
+                JSRuntime!.InvokeVoidAsync("Radzen.disposeElement", Element);
             }
 
             base.Dispose();

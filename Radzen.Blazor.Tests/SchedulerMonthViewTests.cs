@@ -71,5 +71,40 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(slotWidth, left, 1);
             Assert.Equal(3 * slotWidth, width, 1);
         }
+
+        [Fact]
+        public void MonthView_Localizes_ViewStrings_Using_Scheduler_UICulture()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.Services.AddScoped<DialogService>();
+            ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
+                .SetResult(new Rect { Left = 0, Top = 0, Width = 800, Height = 600 });
+
+            var monday = new DateTime(2024, 12, 2);
+            var appointments = new List<Appointment>
+            {
+                new() { Start = monday.AddHours(8),  End = monday.AddHours(9),  Text = "A" },
+                new() { Start = monday.AddHours(9),  End = monday.AddHours(10), Text = "B" },
+                new() { Start = monday.AddHours(10), End = monday.AddHours(11), Text = "C" },
+                new() { Start = monday.AddHours(12), End = monday.AddHours(13), Text = "D" },
+            };
+
+            var cut = ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            {
+                p.Add(x => x.UICulture, new CultureInfo("de"));
+                p.Add(x => x.Date, new DateTime(2024, 12, 9));
+                p.Add(x => x.Data, appointments);
+                p.Add(x => x.StartProperty, nameof(Appointment.Start));
+                p.Add(x => x.EndProperty, nameof(Appointment.End));
+                p.Add(x => x.TextProperty, nameof(Appointment.Text));
+                p.Add(x => x.SelectedIndex, 0);
+                p.AddChildContent<RadzenMonthView>(v => v.Add(x => x.MaxAppointmentsInSlot, 3));
+            });
+
+            // MonthView_MoreText (de) = "+ {0} weitere"; the view must localize via the scheduler's UICulture.
+            Assert.Contains("weitere", cut.Markup);
+            Assert.DoesNotContain("more", cut.Markup);
+        }
     }
 }

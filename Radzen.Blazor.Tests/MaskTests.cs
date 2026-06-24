@@ -9,6 +9,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_CssClass()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -19,6 +20,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_ValueParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -33,6 +35,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_StyleParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -47,6 +50,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_NameParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -61,6 +65,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_IdFromNameParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -75,6 +80,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_TabIndexParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -89,6 +95,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_PlaceholderParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -103,6 +110,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_DisabledParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -116,6 +124,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_ReadOnlyParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -130,6 +139,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_AutoCompleteParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -159,6 +169,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_TypedAutoCompleteParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -187,6 +198,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_MaxLengthParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -201,6 +213,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -213,6 +226,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Raises_ChangedEvent()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -232,6 +246,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_Raises_ValueChangedEvent()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 

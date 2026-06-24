@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
@@ -75,6 +76,40 @@ namespace Radzen.Blazor
                                                                      .Add("rz-menu-flyout", Flyout)
                                                                      .ToString();
 
+        IJSObjectReference? _jsRef;
+        bool _clickToOpenChanged;
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(ClickToOpen), ClickToOpen))
+            {
+                _clickToOpenChanged = true;
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if ((firstRender || _clickToOpenChanged) && Visible && JSRuntime != null)
+            {
+                _clickToOpenChanged = false;
+
+                if (_jsRef != null)
+                {
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                }
+
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createMenu", Element, ClickToOpen);
+            }
+        }
+
         void OnToggle()
         {
             IsOpen = !IsOpen;
@@ -87,12 +122,14 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
+        private string? ariaLabel;
+
         /// <summary>
         /// Gets or sets the menu aria label text.
         /// </summary>
         /// <value>The menu aria label text.</value>
         [Parameter]
-        public string AriaLabel { get; set; } = "Menu";
+        public string AriaLabel { get => ariaLabel ?? Localize(nameof(RadzenStrings.Menu_AriaLabel)); set => ariaLabel = value; }
 
         [Inject]
         NavigationManager? NavigationManager { get; set; }
@@ -280,11 +317,13 @@ namespace Radzen.Blazor
             }
         }
 
+        private string? toggleAriaLabel;
+
         /// <summary>
         /// Gets or sets the add button aria-label attribute.
         /// </summary>
         [Parameter]
-        public string ToggleAriaLabel { get; set; } = "Toggle";
+        public string ToggleAriaLabel { get => toggleAriaLabel ?? Localize(nameof(RadzenStrings.Menu_ToggleAriaLabel)); set => toggleAriaLabel = value; }
 
         /// <inheritdoc />
         protected override void OnInitialized()
@@ -309,6 +348,8 @@ namespace Radzen.Blazor
             {
                 NavigationManager.LocationChanged -= OnLocationChanged;
             }
+            _jsRef?.InvokeVoidAsync("dispose");
+            _jsRef?.DisposeAsync();
             GC.SuppressFinalize(this);
         }
 

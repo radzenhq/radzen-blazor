@@ -20,10 +20,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string CommandName => "insertOrderedList";
 
+        private string? title;
+
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Ordered list"</c> by default.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Ordered list";
+        public string Title { get => title ?? Localize(nameof(RadzenStrings.HtmlEditorOrderedList_Title)); set => title = value; }
     }
 }

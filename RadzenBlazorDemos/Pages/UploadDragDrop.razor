@@ -15,7 +15,7 @@
 <RadzenCard Variant="Variant.Outlined">
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Drag and drop files to upload</RadzenText>
     <RadzenUpload id="uploadWithDragAndDrop" @ref="upload" ChooseText="Drag and drop here or click to choose files" 
-                Auto="false" Multiple="true" Url="upload/multiple" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+                Auto="false" Multiple="true" Url="api/upload/multiple" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
                 Progress=@OnProgress Style="width: 100%" />
     <RadzenButton Text="Upload" Click=@OnUpload class="rz-mt-4" />
 </RadzenCard>

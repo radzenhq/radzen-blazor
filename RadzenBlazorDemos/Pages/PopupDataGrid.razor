@@ -1,7 +1,6 @@
 ﻿@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
-@using Radzen.Blazor.Rendering
 @using Microsoft.JSInterop
 
 @inherits DbContextPage
@@ -26,7 +25,7 @@
                    @onclick="@(args => popup.ToggleAsync(textBox.Element))" @onkeydown=@OnKeyDown />
 </div>
 
-<Popup @ref=popup id="popup" AutoFocusFirstElement="false" class="my-popup">
+<RadzenPopup @ref=popup id="popup" AutoFocusFirstElement="false" class="my-popup">
     <RadzenDataGrid @ref=grid id="grid" TItem="Customer" Data="@customers" RowSelect="@OnRowSelect" AllowSorting="true" Style="height:360px">
         <Columns>
             <RadzenDataGridColumn Property="CustomerID" Title="CustomerID" />
@@ -36,14 +35,14 @@
             <RadzenDataGridColumn Property="Country" Title="Country" />
         </Columns>
     </RadzenDataGrid>
-</Popup>
+</RadzenPopup>
 
 @code {
     RadzenTextBox textBox;
     string value = "";
     string customerId;
     IEnumerable<Customer> customers;
-    Popup popup;
+    RadzenPopup popup;
     RadzenDataGrid<Customer> grid;
 
     protected override async Task OnInitializedAsync()

@@ -1,0 +1,89 @@
+@namespace Radzen.Blazor
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+@implements IDisposable
+
+<RadzenDropDown Value=@CurrentFontFamily ValueChanged=@OnFontFamilyChangedAsync TValue="string" Data=@FontFamilies
+    Disabled=@IsDisabled InputSize="InputSize.Small" Style="width: 140px" />
+
+@code {
+#nullable enable
+
+    [CascadingParameter]
+    public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
+
+    private static readonly List<string> FontFamilies =
+    [
+        "Arial",
+        "Aptos Narrow",
+        "Calibri",
+        "Cambria",
+        "Courier New",
+        "Georgia",
+        "Segoe UI",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana"
+    ];
+
+    private string CurrentFontFamily
+    {
+        get
+        {
+            if (Worksheet?.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.FontFamily ?? "Aptos Narrow";
+            }
+            return "Aptos Narrow";
+        }
+    }
+
+    private async Task OnFontFamilyChangedAsync(string value)
+    {
+        if (Worksheet is null || Worksheet.Selection.Cell == CellRef.Invalid || Spreadsheet is null)
+        {
+            return;
+        }
+
+        if (!Worksheet.Cells.TryGet(Worksheet.Selection.Cell.Row, Worksheet.Selection.Cell.Column, out var cell))
+        {
+            return;
+        }
+
+        var fontFamily = value == "Aptos Narrow" ? null : value;
+        var command = new FormatCommand(Worksheet, Worksheet.Selection.Range, cell.Format.WithFontFamily(fontFamily));
+        await Spreadsheet.ExecuteAsync(command);
+    }
+
+    private bool IsDisabled
+        => Worksheet?.Selection.Cell == CellRef.Invalid
+        || Spreadsheet?.IsFeatureAllowed(SpreadsheetFeature.CellFormatting) == false;
+
+    private readonly EventBinding<Selection> selectionBinding;
+
+    public RadzenSpreadsheetFontFamily()
+    {
+        selectionBinding = new EventBinding<Selection>(
+            s => s.Changed += OnSelectionChanged,
+            s => s.Changed -= OnSelectionChanged);
+    }
+
+    protected override void OnParametersSet()
+    {
+        selectionBinding.Bind(Worksheet?.Selection);
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        selectionBinding.Dispose();
+    }
+}

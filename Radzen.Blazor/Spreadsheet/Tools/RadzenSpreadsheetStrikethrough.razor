@@ -1,0 +1,11 @@
+@namespace Radzen.Blazor
+@using Radzen.Documents.Spreadsheet
+@inherits RadzenSpreadsheetFormatToggleToolBase
+
+<RadzenToggleButton Value=@IsToggled ValueChanged=@OnToggledChangedAsync Icon="strikethrough_s" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+    ToggleVariant="Variant.Flat" ToggleButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Lighter" />
+
+@code {
+    protected override bool GetValue(Format format) => format.Strikethrough;
+    protected override Format WithValue(Format format, bool value) => format.WithStrikethrough(value);
+}

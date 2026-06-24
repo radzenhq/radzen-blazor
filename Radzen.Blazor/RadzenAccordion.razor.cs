@@ -228,7 +228,10 @@ namespace Radzen.Blazor
         
         internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item, bool? value = null)
         {
-            if(item.Disabled) return;
+            if(item.Disabled)
+            {
+                return;
+            }
 
             if (RenderMode == AccordionRenderMode.Client && accordionJs != null && value == null)
             {
@@ -357,11 +360,17 @@ namespace Radzen.Blazor
 
         internal async Task SelectItemOnClient(RadzenAccordionItem item)
         {
-            if (item.Disabled || accordionJs == null) return;
+            if (item.Disabled || accordionJs == null)
+            {
+                return;
+            }
 
             var visibleItems = items.Where(i => i.Visible).ToList();
             var visibleIndex = visibleItems.IndexOf(item);
-            if (visibleIndex < 0) return;
+            if (visibleIndex < 0)
+            {
+                return;
+            }
 
             var expanded = !item.GetSelected();
 
@@ -492,7 +501,9 @@ namespace Radzen.Blazor
 
             if (accordionJs != null)
             {
-                try { accordionJs.InvokeVoidAsync("dispose"); } catch { }
+                accordionJs.InvokeVoid("dispose");
+                accordionJs.DisposeFireAndForget();
+                accordionJs = null;
             }
         }
     }

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Radzen.Blazor.TrimTest</RootNamespace>
+    <Nullable>enable</Nullable>
+
+    <!-- Trimming configuration -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+
+    <!-- Treat IL trimming warnings as errors to catch regressions -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>IL2104;CA2007</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.*-*" PrivateAssets="all" />
+    <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" />
+  </ItemGroup>
+
+</Project>

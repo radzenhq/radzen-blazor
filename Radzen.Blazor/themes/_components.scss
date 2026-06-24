@@ -39,6 +39,7 @@
 @import 'components/blazor/slider';
 @import 'components/blazor/rating';
 @import 'components/blazor/security-code';
+@import 'components/blazor/signature-pad';
 @import 'components/blazor/selectbar';
 @import 'components/blazor/datepicker';
 @import 'components/blazor/numeric';
@@ -63,6 +64,7 @@
 @import 'components/blazor/gauge';
 @import 'components/blazor/progressbar';
 @import 'components/blazor/chart';
+@import 'components/blazor/range-navigator';
 @import 'components/blazor/sankey';
 @import 'components/blazor/spider';
 @import 'components/blazor/gantt';
@@ -70,6 +72,7 @@
 @import 'components/blazor/editor';
 @import 'components/blazor/colorpicker';
 @import 'components/blazor/splitter';
+@import 'components/blazor/tile-layout';
 @import 'components/blazor/layout';
 @import 'components/blazor/breadcrumb';
 @import 'components/blazor/alert';
@@ -86,4 +89,6 @@
 @import 'components/blazor/skeleton';
 @import 'components/blazor/fab';
 @import 'components/blazor/pivot';
+@import 'components/blazor/spreadsheet';
+@import 'components/blazor/toolbar';
 @import 'css-variables';

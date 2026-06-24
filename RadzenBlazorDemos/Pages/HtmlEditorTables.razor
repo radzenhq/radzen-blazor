@@ -1,0 +1,36 @@
+<RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" class="rz-mb-4">
+    Try Shift+Click to select a rectangular cell range, use the context menu for copy/paste, and drag the right cell edge to resize a whole column.
+</RadzenAlert>
+
+<RadzenHtmlEditor @bind-Value=@value Style="height: 420px;">
+</RadzenHtmlEditor>
+
+@code {
+    string value = @"<p>Use the built-in table tools to insert and edit tables.</p>
+<table style='width:100%; border-collapse:collapse' border='1'>
+  <thead>
+    <tr>
+      <th style='width:180px'>Feature</th>
+      <th>Status</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Selection</td>
+      <td>Ready</td>
+      <td>Use Shift+Click for ranges.</td>
+    </tr>
+    <tr>
+      <td>Copy / Paste</td>
+      <td>Ready</td>
+      <td>Works on rectangular cell ranges.</td>
+    </tr>
+    <tr>
+      <td>Resize</td>
+      <td>Ready</td>
+      <td>Drag the right cell edge to resize the column.</td>
+    </tr>
+  </tbody>
+</table>";
+}

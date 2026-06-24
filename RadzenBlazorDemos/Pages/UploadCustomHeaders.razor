@@ -1,6 +1,6 @@
 ﻿
 <RadzenCard Variant="Variant.Outlined">
-    <RadzenUpload Url="upload/custom-header" Style="width: 100%" Complete=@OnComplete
+    <RadzenUpload Url="api/upload/custom-header" Style="width: 100%" Complete=@OnComplete
         InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})">
         <RadzenUploadHeader Name="Authorization" Value=@($"Bearer {token}") />
         <RadzenUploadHeader Name="X-Uploaded-By" Value="Radzen" />

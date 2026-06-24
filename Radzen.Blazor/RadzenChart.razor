@@ -8,29 +8,60 @@
 <CascadingValue Value="@this">
 @ChildContent
 </CascadingValue>
-<div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+<div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@GetChartStyle()" id="@GetId()">
 @if (Width.HasValue && Height.HasValue)
 {
     <CascadingValue Value="@this">
         <Legend />
-        <svg style="width: 100%; height: 100%; overflow: visible;">
+        <svg style="width: 100%; height: 100%; overflow: visible;@(IsRTL ? " direction: ltr;" : "")">
             <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
                 <ClipPath />
                 @if(ShouldRenderAxes())
                 {
                     <ValueAxis />
+                    @foreach (var entry in AdditionalValueAxes)
+                    {
+                        <ValueAxis AxisName="@entry.Key" />
+                    }
                     <CategoryAxis />
+                }
+                @{ ResetValueLabelLayout(); }
+                @foreach (var series in Series.OrderBy(s => s.RenderingOrder))
+                {
+                    @if (series.Visible)
+                    {
+                        var vs = series is IChartValueAxisSeries named ? GetValueScale(named.ValueAxisName) : ValueScale;
+                        @series.Render(CategoryScale, vs);
+                        @series.RenderOverlays(CategoryScale, vs);
+                    }
                 }
                 @foreach (var series in Series.OrderBy(s => s.RenderingOrder))
                 {
                     @if (series.Visible)
                     {
-                        @series.Render(CategoryScale, ValueScale);
-                        @series.RenderOverlays(CategoryScale, ValueScale);
+                        var vs = series is IChartValueAxisSeries named ? GetValueScale(named.ValueAxisName) : ValueScale;
+                        @series.RenderTopOverlays(CategoryScale, vs);
                     }
                 }
+                <HoverOverlay Chart="@this" />
             </g>
         </svg>
+        <TooltipOverlay Chart="@this" />
+        @if ((AllowZoom || AllowPan) && (ZoomStart > 0 || ZoomEnd < 1))
+        {
+            <div class="rz-chart-scrollbar" style="bottom: @(scrollbarBottom.ToInvariantString())px; left: @(MarginLeft.ToInvariantString())px; right: @(MarginRight.ToInvariantString())px;">
+                <div class="rz-chart-scrollbar-track">
+                    @if (IsRTL)
+                    {
+                        <div class="rz-chart-scrollbar-thumb" style="right: @((ZoomStart * 100).ToInvariantString())%; width: @(((ZoomEnd - ZoomStart) * 100).ToInvariantString())%;"></div>
+                    }
+                    else
+                    {
+                        <div class="rz-chart-scrollbar-thumb" style="left: @((ZoomStart * 100).ToInvariantString())%; width: @(((ZoomEnd - ZoomStart) * 100).ToInvariantString())%;"></div>
+                    }
+                </div>
+            </div>
+        }
         @foreach (var series in Series.OrderBy(s => s.RenderingOrder))
         {
             @if (series.Visible && series is IChartDonutSeries donut)
@@ -42,4 +73,15 @@
     </CascadingValue>
 }
 </div>
+@if (RangeNavigator != null && RangeNavigator.Visible && Width.HasValue && Height.HasValue)
+{
+    <RadzenRangeNavigator Start="@ZoomStart" End="@ZoomEnd"
+        StartChanged="@(async start => await OnRangeNavigatorViewChanged(start, ZoomEnd))"
+        EndChanged="@(async end => await OnRangeNavigatorViewChanged(ZoomStart, end))"
+        ShowHandleLabels="@RangeNavigator.ShowHandleLabels"
+        HandleLabelFormatString="@RangeNavigator.HandleLabelFormatString"
+        Style="@($"height: {RangeNavigator.Height.ToInvariantString()}px; margin-top: 0.5rem; margin-inline-start: {MarginLeft.ToInvariantString()}px; margin-inline-end: {MarginRight.ToInvariantString()}px;")">
+        @RangeNavigator.ChildContent
+    </RadzenRangeNavigator>
+}
 }

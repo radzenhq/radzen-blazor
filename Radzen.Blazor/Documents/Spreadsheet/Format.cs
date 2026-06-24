@@ -1,0 +1,531 @@
+using Radzen.Blazor.Rendering;
+using System;
+using System.Linq;
+
+namespace Radzen.Documents.Spreadsheet;
+
+#nullable enable
+
+internal static class FormatColorExtensions
+{
+    public static string ToXLSXColor(this string color)
+    {
+        ArgumentNullException.ThrowIfNull(color);
+        var parsed = RGB.Parse(color) ?? throw new ArgumentException($"Invalid color value: {color}", nameof(color));
+        return $"FF{parsed.ToHex()}";
+    }
+}
+
+/// <summary>
+/// Represents the line style for a cell border.
+/// </summary>
+public enum BorderLineStyle
+{
+    /// <summary>No border.</summary>
+    None,
+    /// <summary>Thin border.</summary>
+    Thin,
+    /// <summary>Medium border.</summary>
+    Medium,
+    /// <summary>Thick border.</summary>
+    Thick,
+    /// <summary>Dashed border.</summary>
+    Dashed,
+    /// <summary>Dotted border.</summary>
+    Dotted,
+    /// <summary>Double border.</summary>
+    Double
+}
+
+/// <summary>
+/// Represents a border style with color and line style.
+/// </summary>
+public class BorderStyle
+{
+    /// <summary>
+    /// Gets or sets the border color.
+    /// </summary>
+    public string Color { get; set; } = "#000000";
+
+    /// <summary>
+    /// Gets or sets the border line style.
+    /// </summary>
+    public BorderLineStyle LineStyle { get; set; } = BorderLineStyle.Thin;
+
+    /// <summary>
+    /// Creates a copy of this border style.
+    /// </summary>
+    public BorderStyle Clone() => new() { Color = Color, LineStyle = LineStyle };
+
+    internal string ToXlsxStyle() => LineStyle switch
+    {
+        BorderLineStyle.Thin => "thin",
+        BorderLineStyle.Medium => "medium",
+        BorderLineStyle.Thick => "thick",
+        BorderLineStyle.Dashed => "dashed",
+        BorderLineStyle.Dotted => "dotted",
+        BorderLineStyle.Double => "double",
+        _ => "thin"
+    };
+
+    internal static BorderLineStyle FromXlsxStyle(string? style) => style switch
+    {
+        "thin" => BorderLineStyle.Thin,
+        "medium" => BorderLineStyle.Medium,
+        "thick" => BorderLineStyle.Thick,
+        "dashed" => BorderLineStyle.Dashed,
+        "dotted" => BorderLineStyle.Dotted,
+        "double" => BorderLineStyle.Double,
+        "hair" => BorderLineStyle.Dotted,
+        "mediumDashed" => BorderLineStyle.Dashed,
+        _ => BorderLineStyle.None
+    };
+}
+
+/// <summary>
+/// Represents a format that can be applied to cells in a spreadsheet.
+/// </summary>
+public class Format
+{
+    private string? color;
+    private string? background;
+    private string? numberFormat;
+    private string? fontFamily;
+    private double? fontSize;
+
+    /// <summary>
+    /// Gets or sets whether the text in the format should be bold.
+    /// </summary>
+    public bool Bold { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the text in the format should be italicized.
+    /// </summary>
+    public bool Italic { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the text in the format should be underlined.
+    /// </summary>
+    public bool Underline { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the text in the format should have a strikethrough.
+    /// </summary>
+    public bool Strikethrough { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether text should wrap within the cell.
+    /// </summary>
+    public bool WrapText { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the cell is locked when sheet protection is active.
+    /// Null means use the default (locked). Only takes effect when sheet protection is enabled.
+    /// </summary>
+    public bool? Locked { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the cell's formula is hidden in the formula bar when sheet protection is active.
+    /// Null means use the default (not hidden). Only takes effect when sheet protection is enabled.
+    /// </summary>
+    public bool? FormulaHidden { get; set; }
+
+    /// <summary>
+    /// Gets the effective locked state (true if Locked is null, since XLSX defaults to locked).
+    /// </summary>
+    public bool IsLocked => Locked ?? true;
+
+    /// <summary>
+    /// Gets the effective formula hidden state (false if FormulaHidden is null).
+    /// </summary>
+    public bool IsFormulaHidden => FormulaHidden ?? false;
+
+    /// <summary>
+    /// Gets or sets the text alignment in the format. Null means unset (default left).
+    /// </summary>
+    public TextAlign? TextAlign { get; set; }
+
+    /// <summary>
+    /// Gets or sets the vertical alignment in the format. Null means unset (default top).
+    /// </summary>
+    public VerticalAlign? VerticalAlign { get; set; }
+
+    /// <summary>
+    /// Gets or sets the font family.
+    /// </summary>
+    public string? FontFamily
+    {
+        get => fontFamily;
+        set
+        {
+            if (fontFamily != value)
+            {
+                fontFamily = value;
+                Changed?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the font size in points.
+    /// </summary>
+    public double? FontSize
+    {
+        get => fontSize;
+        set
+        {
+            if (fontSize != value)
+            {
+                fontSize = value;
+                Changed?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the top border style.
+    /// </summary>
+    public BorderStyle? BorderTop { get; set; }
+
+    /// <summary>
+    /// Gets or sets the right border style.
+    /// </summary>
+    public BorderStyle? BorderRight { get; set; }
+
+    /// <summary>
+    /// Gets or sets the bottom border style.
+    /// </summary>
+    public BorderStyle? BorderBottom { get; set; }
+
+    /// <summary>
+    /// Gets or sets the left border style.
+    /// </summary>
+    public BorderStyle? BorderLeft { get; set; }
+
+    /// <summary>
+    /// Gets or sets the color of the text in the format.
+    /// </summary>
+    public string? Color
+    {
+        get => color;
+        set
+        {
+            if (color != value)
+            {
+                color = value;
+                Changed?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the background color of the format.
+    /// </summary>
+    public string? BackgroundColor
+    {
+        get => background;
+        set
+        {
+            if (background != value)
+            {
+                background = value;
+                Changed?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the number format code (e.g. "#,##0.00", "0%", "yyyy-mm-dd").
+    /// </summary>
+    public string? NumberFormat
+    {
+        get => numberFormat;
+        set
+        {
+            if (numberFormat != value)
+            {
+                numberFormat = value;
+                Changed?.Invoke();
+            }
+        }
+    }
+
+    internal event Action? Changed;
+
+    private sealed record FormatPropertyDescriptor(
+        string Name,
+        Func<Format, object?> Getter,
+        Action<Format, object?> Setter,
+        Func<Format, bool> IsSet,
+        Func<object?, object?>? CopyValue = null)
+    {
+        public object? Copy(object? value) => CopyValue is null ? value : CopyValue(value);
+    }
+
+    private static readonly FormatPropertyDescriptor[] Properties =
+    [
+        new("Bold",
+            f => f.Bold,
+            (f, v) => f.Bold = (bool)v!,
+            f => f.Bold),
+        new("Italic",
+            f => f.Italic,
+            (f, v) => f.Italic = (bool)v!,
+            f => f.Italic),
+        new("Underline",
+            f => f.Underline,
+            (f, v) => f.Underline = (bool)v!,
+            f => f.Underline),
+        new("Strikethrough",
+            f => f.Strikethrough,
+            (f, v) => f.Strikethrough = (bool)v!,
+            f => f.Strikethrough),
+        new("WrapText",
+            f => f.WrapText,
+            (f, v) => f.WrapText = (bool)v!,
+            f => f.WrapText),
+        new("Locked",
+            f => f.Locked,
+            (f, v) => f.Locked = (bool?)v,
+            f => f.Locked is not null),
+        new("FormulaHidden",
+            f => f.FormulaHidden,
+            (f, v) => f.FormulaHidden = (bool?)v,
+            f => f.FormulaHidden is not null),
+        new("TextAlign",
+            f => f.TextAlign,
+            (f, v) => f.TextAlign = (TextAlign?)v,
+            f => f.TextAlign is not null),
+        new("VerticalAlign",
+            f => f.VerticalAlign,
+            (f, v) => f.VerticalAlign = (VerticalAlign?)v,
+            f => f.VerticalAlign is not null),
+        new("FontFamily",
+            f => f.FontFamily,
+            (f, v) => f.FontFamily = (string?)v,
+            f => f.FontFamily is not null),
+        new("FontSize",
+            f => f.FontSize,
+            (f, v) => f.FontSize = (double?)v,
+            f => f.FontSize is not null),
+        new("Color",
+            f => f.Color,
+            (f, v) => f.Color = (string?)v,
+            f => f.Color is not null),
+        new("BackgroundColor",
+            f => f.BackgroundColor,
+            (f, v) => f.BackgroundColor = (string?)v,
+            f => f.BackgroundColor is not null),
+        // NumberFormat uses string.IsNullOrEmpty for IsSet to preserve original IsDefault semantics
+        // (empty string was considered default even though the setter fires Changed for null -> "").
+        new("NumberFormat",
+            f => f.NumberFormat,
+            (f, v) => f.NumberFormat = (string?)v,
+            f => !string.IsNullOrEmpty(f.NumberFormat)),
+        new("BorderTop",
+            f => f.BorderTop,
+            (f, v) => f.BorderTop = (BorderStyle?)v,
+            f => f.BorderTop is not null,
+            v => ((BorderStyle?)v)?.Clone()),
+        new("BorderRight",
+            f => f.BorderRight,
+            (f, v) => f.BorderRight = (BorderStyle?)v,
+            f => f.BorderRight is not null,
+            v => ((BorderStyle?)v)?.Clone()),
+        new("BorderBottom",
+            f => f.BorderBottom,
+            (f, v) => f.BorderBottom = (BorderStyle?)v,
+            f => f.BorderBottom is not null,
+            v => ((BorderStyle?)v)?.Clone()),
+        new("BorderLeft",
+            f => f.BorderLeft,
+            (f, v) => f.BorderLeft = (BorderStyle?)v,
+            f => f.BorderLeft is not null,
+            v => ((BorderStyle?)v)?.Clone()),
+    ];
+
+    /// <summary>
+    /// Gets a value indicating whether all format properties are at their default values.
+    /// </summary>
+    public bool IsDefault => Properties.All(p => !p.IsSet(this));
+
+    internal Format Merge(Format format)
+    {
+        ArgumentNullException.ThrowIfNull(format);
+        var merged = Clone();
+        foreach (var p in Properties)
+        {
+            if (p.IsSet(format))
+            {
+                p.Setter(merged, p.Copy(p.Getter(format)));
+            }
+        }
+        return merged;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new color.
+    /// </summary>
+    public Format WithColor(string? color)
+    {
+        var clone = Clone();
+        clone.Color = color;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new background color.
+    /// </summary>
+    public Format WithBackgroundColor(string? backgroundColor)
+    {
+        var clone = Clone();
+        clone.BackgroundColor = backgroundColor;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new bold setting.
+    /// </summary>
+    public Format WithBold(bool bold)
+    {
+        var clone = Clone();
+        clone.Bold = bold;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new italic setting.
+    /// </summary>
+    public Format WithItalic(bool italic)
+    {
+        var clone = Clone();
+        clone.Italic = italic;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new underline setting.
+    /// </summary>
+    public Format WithUnderline(bool underline)
+    {
+        var clone = Clone();
+        clone.Underline = underline;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new text alignment setting.
+    /// </summary>
+    public Format WithTextAlign(TextAlign? textAlign)
+    {
+        var clone = Clone();
+        clone.TextAlign = textAlign;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new vertical alignment setting.
+    /// </summary>
+    public Format WithVerticalAlign(VerticalAlign? verticalAlign)
+    {
+        var clone = Clone();
+        clone.VerticalAlign = verticalAlign;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new number format code.
+    /// </summary>
+    public Format WithNumberFormat(string? numberFormat)
+    {
+        var clone = Clone();
+        clone.NumberFormat = numberFormat;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new strikethrough setting.
+    /// </summary>
+    public Format WithStrikethrough(bool strikethrough)
+    {
+        var clone = Clone();
+        clone.Strikethrough = strikethrough;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new font family.
+    /// </summary>
+    public Format WithFontFamily(string? fontFamily)
+    {
+        var clone = Clone();
+        clone.FontFamily = fontFamily;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new font size.
+    /// </summary>
+    public Format WithFontSize(double? fontSize)
+    {
+        var clone = Clone();
+        clone.FontSize = fontSize;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new wrap text setting.
+    /// </summary>
+    public Format WithWrapText(bool wrapText)
+    {
+        var clone = Clone();
+        clone.WrapText = wrapText;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with new border styles.
+    /// </summary>
+    public Format WithBorders(BorderStyle? top, BorderStyle? right, BorderStyle? bottom, BorderStyle? left)
+    {
+        var clone = Clone();
+        clone.BorderTop = top?.Clone();
+        clone.BorderRight = right?.Clone();
+        clone.BorderBottom = bottom?.Clone();
+        clone.BorderLeft = left?.Clone();
+        return clone;
+    }
+
+    /// <summary>
+    /// Creates a new instance of the Format class that is a copy of the current instance.
+    /// </summary>
+    public Format Clone()
+    {
+        var clone = new Format();
+        foreach (var p in Properties)
+        {
+            p.Setter(clone, p.Copy(p.Getter(this)));
+        }
+        return clone;
+    }
+
+    /// <summary>
+    /// Creates a copy of the current format with a new locked setting.
+    /// </summary>
+    public Format WithLocked(bool? locked)
+    {
+        var clone = Clone();
+        clone.Locked = locked;
+        return clone;
+    }
+
+    /// <summary>
+    /// Creates a copy of the current format with a new formula hidden setting.
+    /// </summary>
+    public Format WithFormulaHidden(bool? formulaHidden)
+    {
+        var clone = Clone();
+        clone.FormulaHidden = formulaHidden;
+        return clone;
+    }
+}

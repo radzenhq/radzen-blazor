@@ -45,7 +45,7 @@
                                 <RadzenText TextStyle="TextStyle.H2" class="rz-color-success rz-m-0">@openIssues?.Count()</RadzenText>
                             </RadzenStack>
                             <RadzenSparkline Style="width: 100%; height: 80px;">
-                                <RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-success)" />
+                                <RadzenColumnSeries FillMode="FillMode.Gradient" Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-success)" />
                                 <RadzenColumnOptions Margin="0" />
                                 <RadzenCategoryAxis Padding="20" Visible="false" />
                             </RadzenSparkline>
@@ -60,7 +60,7 @@
                                 <RadzenText TextStyle="TextStyle.H2" class="rz-color-danger rz-m-0">@closedIssues?.Count()</RadzenText>
                             </RadzenStack>
                             <RadzenSparkline Style="width: 100%; height: 80px;">
-                                <RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-danger)" />
+                                <RadzenColumnSeries FillMode="FillMode.Gradient" Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-danger)" />
                                 <RadzenColumnOptions Margin="0" Width="30" />
                                 <RadzenCategoryAxis Padding="20" Visible="false" />
                             </RadzenSparkline>
@@ -77,10 +77,10 @@
                         <RadzenText TextStyle="TextStyle.H2" class="rz-m-0">@issues?.Count()</RadzenText>
                     </RadzenStack>
                     <RadzenChart Style="width: 100%; height: 80%;">
-                        <RadzenAreaSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="var(--rz-success)" Fill="var(--rz-success-lighter)">
+                        <RadzenAreaSeries FillMode="FillMode.Gradient" Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="var(--rz-success)" Fill="var(--rz-success-lighter)">
                             <RadzenMarkers Visible="true" MarkerType="MarkerType.Circle" />
                         </RadzenAreaSeries>
-                        <RadzenAreaSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="var(--rz-danger)" Fill="var(--rz-danger-lighter)">
+                        <RadzenAreaSeries FillMode="FillMode.Gradient" Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="var(--rz-danger)" Fill="var(--rz-danger-lighter)">
                             <RadzenMarkers Visible="true" MarkerType="MarkerType.Circle" />
                         </RadzenAreaSeries>
                         <RadzenValueAxis>
@@ -98,12 +98,12 @@
                     <Tabs>
                         <RadzenTabsItem Text="Top Contributors">
                             <RadzenChart Style="width: 100%; height: 100%;">
-                                <RadzenDonutSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" />
+                                <RadzenDonutSeries FillMode="FillMode.Gradient" Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" />
                             </RadzenChart>
                         </RadzenTabsItem>
                         <RadzenTabsItem Text="Top Labels">
                             <RadzenChart Style="width: 100%; height: 100%;">
-                                <RadzenDonutSeries Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Fills=@labelColors />
+                                <RadzenDonutSeries FillMode="FillMode.Gradient" Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Fills=@labelColors />
                             </RadzenChart>
                         </RadzenTabsItem>
                         <RadzenTabsItem Text="Most Active Member">

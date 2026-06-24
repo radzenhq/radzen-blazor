@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -44,6 +45,9 @@ namespace Radzen.Blazor
     /// &lt;/RadzenDataGridColumn&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2090, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenDataGridColumn<TItem> : ComponentBase, IDisposable where TItem : notnull
     {
         /// <summary>
@@ -147,7 +151,9 @@ namespace Radzen.Blazor
         internal int GetColSpan(bool isDataCell = false)
         {
             if (!Grid.AllowCompositeDataCells && isDataCell || Columns == null)
+            {
                 return 1;
+            }
 
             var span = VisibleColumns.Concat(VisibleColumns.SelectManyRecursive(c => c.VisibleColumns)).Sum(c => c.VisibleColumns.Count())
                 - VisibleColumns.SelectManyRecursive(c => c.VisibleColumns).Count(c => c.VisibleColumns.Any())
@@ -159,7 +165,9 @@ namespace Radzen.Blazor
         internal int GetRowSpan(bool isDataCell = false)
         {
             if (!Grid.AllowCompositeDataCells && isDataCell)
+            {
                 return 1;
+            }
 
             if (Columns == null && Parent != null)
             {
@@ -248,9 +256,13 @@ namespace Radzen.Blazor
             }
 
             if (!string.IsNullOrEmpty(Property) && !string.IsNullOrEmpty(FilterProperty))
+            {
                 UniqueID = $"{Property}.{FilterProperty}"; // To be sure the column uniqueID is unique even when filtering on sub property.
+            }
             else
+            {
                 UniqueID = !string.IsNullOrEmpty(Property) ? Property : FilterProperty;
+            }
 
             if (UseDisplayName && !string.IsNullOrEmpty(Property))
             {
@@ -1614,23 +1626,36 @@ namespace Radzen.Blazor
         /// </summary>
         public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
-            if (FilterOperators != null) return FilterOperators;
+            if (FilterOperators != null)
+            {
+                return FilterOperators;
+            }
 
             if (FilterPropertyType != null && (PropertyAccess.IsEnum(FilterPropertyType) || FilterPropertyType == typeof(bool)))
+            {
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
+            }
 
             if (FilterPropertyType != null && (PropertyAccess.IsNullableEnum(FilterPropertyType) || FilterPropertyType == typeof(bool?)))
+            {
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull };
+            }
 
             return Enum.GetValues<FilterOperator>().Where(o =>
             {
-                if (o == FilterOperator.Custom) return false;
+                if (o == FilterOperator.Custom)
+                {
+                    return false;
+                }
 
                 var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
 
                 if ((FilterPropertyType == typeof(string) || !QueryableExtension.IsEnumerable(FilterPropertyType)) &&
-                    (o == FilterOperator.In || o == FilterOperator.NotIn)) return false;
+                    (o == FilterOperator.In || o == FilterOperator.NotIn))
+                {
+                    return false;
+                }
 
                 if (o == FilterOperator.IsNull || o == FilterOperator.IsNotNull)
                 {

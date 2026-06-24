@@ -2,46 +2,67 @@
 @inherits RadzenChartComponentBase
 @if (YAxis?.Visible == true)
 {
-    <g class="rz-axis rz-value-axis">
-    <Line class="rz-line" X1="@x1" Y1="@y1" X2="@x1" Y2="@y2" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
-    @for (var idx = start; idx <= end; idx += step)
+    <g class="rz-axis rz-value-axis @(RenderAsRightSide ? "rz-value-axis-right" : "")">
+    <Line class="rz-line" X1="@axisX" Y1="@Math.Min(y1, y2)" X2="@axisX" Y2="@Math.Max(y1, y2)" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
+    @foreach (var idx in tickValues)
     {
-        var value = Chart?.ValueScale?.Value(idx);
-        var y = Chart?.ValueScale?.Scale(idx) ?? 0;
-        var text = value != null && YAxis != null && Chart?.ValueScale != null ? YAxis.Format(Chart.ValueScale, value) : "";
+        var value = scale?.Value(idx);
+        var y = scale?.Scale(idx) ?? 0;
+        var text = value != null && YAxis != null && scale != null ? YAxis.Format(scale, value) : "";
 
         if (YAxis?.Ticks?.Template != null)
         {
-            var context = new TickTemplateContext { Text = text, Value = value, X = x1, Y = y } ;
+            var context = new TickTemplateContext { Text = text, Value = value, X = axisX, Y = y } ;
 
-            <ValueAxisTick X="@x1" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType">
+            <ValueAxisTick X="@axisX" Y="@y" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType" RightSide="@RenderAsRightSide">
                 @YAxis.Ticks.Template(context)
             </ValueAxisTick>
-        } 
+        }
         else if (!String.IsNullOrEmpty(text))
         {
-            <ValueAxisTick X="@x1" Y="@y" Text="@text" Stroke="@(YAxis?.Ticks?.Stroke ?? YAxis?.Stroke)" StrokeWidth="@(YAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(YAxis?.Ticks?.LineType ?? LineType.Solid)"/>
+            <ValueAxisTick X="@axisX" Y="@y" Text="@text" Stroke="@(YAxis?.Ticks?.Stroke ?? YAxis?.Stroke)" StrokeWidth="@(YAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(YAxis?.Ticks?.LineType ?? LineType.Solid)" RightSide="@RenderAsRightSide" />
         }
 
         if (YAxis?.GridLines?.Visible == true && idx > start)
         {
-            <Line class="rz-grid-line" X1="@x1" Y1="@y" X2="@x2" Y2="@y" Stroke="@(YAxis.GridLines.Stroke)" StrokeWidth="@(YAxis.GridLines.StrokeWidth)" LineType="@(YAxis.GridLines.LineType)" />
+            <Line class="rz-grid-line" X1="@Math.Min(gridX1, gridX2)" Y1="@y" X2="@Math.Max(gridX1, gridX2)" Y2="@y" Stroke="@(YAxis.GridLines.Stroke)" StrokeWidth="@(YAxis.GridLines.StrokeWidth)" LineType="@(YAxis.GridLines.LineType)" />
         }
     }
     @if (!String.IsNullOrEmpty(YAxis?.Title?.Text))
     {
-        <ValueAxisTitle X="@(x1 - (Chart?.ValueAxis?.Size ?? 0) + (YAxis?.Title?.Size ?? 0))" Y="@((y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" />
+        if (RenderAsRightSide)
+        {
+            <ValueAxisTitle X="@(titleX + (YAxis?.Size ?? 0) - (YAxis?.Title?.Size ?? 0))" Y="@(Math.Abs(y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" RightSide="true" />
+        }
+        else
+        {
+            <ValueAxisTitle X="@(titleX - (Chart?.ValueAxis?.Size ?? 0) + (YAxis?.Title?.Size ?? 0))" Y="@(Math.Abs(y1 - y2)/2)" Text="@(YAxis?.Title?.Text ?? "")" />
+        }
     }
     </g>
 }
 @code {
+    [Parameter]
+    public string? AxisName { get; set; }
+
+    bool IsRightSide => !string.IsNullOrEmpty(AxisName);
+    bool RenderAsRightSide => IsRightSide || isFlippedToRight;
+
     double start;
     double end;
     double step;
+    System.Collections.Generic.List<double> tickValues = new();
     double x1;
     double x2;
     double y1;
     double y2;
+    double axisX;
+    double gridX1;
+    double gridX2;
+    double titleX;
+    ScaleBase? scale;
+    bool isLogarithmic;
+    bool isFlippedToRight;
     private AxisBase? XAxis { get; set; }
     private AxisBase? YAxis { get; set; }
 
@@ -52,24 +73,78 @@
             return;
         }
 
-        YAxis = Chart.ValueAxis;
-        XAxis = Chart.CategoryAxis;
-
-        if (Chart.ShouldInvertAxes())
+        if (IsRightSide)
         {
-            YAxis = Chart.CategoryAxis;
-            XAxis = Chart.ValueAxis;
+            YAxis = Chart.GetValueAxis(AxisName);
+            scale = Chart.GetValueScale(AxisName);
+        }
+        else
+        {
+            YAxis = Chart.ValueAxis;
+            scale = Chart.ValueScale;
+
+            if (Chart.ShouldInvertAxes())
+            {
+                YAxis = Chart.CategoryAxis;
+                XAxis = Chart.ValueAxis;
+            }
+            else
+            {
+                XAxis = Chart.CategoryAxis;
+            }
         }
 
-        var ticks = Chart.ValueScale.Ticks(YAxis?.TickDistance ?? 0);
+        if (XAxis == null)
+        {
+            XAxis = Chart.CategoryAxis;
+        }
+
+        isLogarithmic = scale!.IsLogarithmic;
+
+        var ticks = scale.Ticks(YAxis?.TickDistance ?? 0);
         start = ticks.Start;
         end = ticks.End;
         step = ticks.Step;
+        // Enumerate via TickValues so ordinal (category) scales place labels on integer categories
+        // rather than stepping across the domain (which may carry half-band slack). Equivalent to the
+        // old start..end stepping for numeric/logarithmic value scales.
+        tickValues = scale.TickValues(YAxis?.TickDistance ?? 0).ToList();
 
         var categoryTicks = Chart.CategoryScale.Ticks(XAxis.TickDistance);
         x1 = Chart.CategoryScale.Scale(categoryTicks.Start);
         x2 = Chart.CategoryScale.Scale(categoryTicks.End);
-        y1 = Chart.ValueScale.Scale(start);
-        y2 = Chart.ValueScale.Scale(end);
+        y1 = scale.Scale(start);
+        y2 = scale.Scale(end);
+
+        gridX1 = x1;
+        gridX2 = x2;
+
+        // Detect if the primary value axis has been flipped to the right side (due to category inversion or RTL)
+        isFlippedToRight = string.IsNullOrEmpty(AxisName) && x1 > x2;
+
+        if (IsRightSide)
+        {
+            // Calculate right-side X position: after the category axis end, offset by preceding additional axes
+            axisX = x2;
+            foreach (var entry in Chart!.AdditionalValueAxes)
+            {
+                if (entry.Key == AxisName) break;
+                axisX += entry.Value.Measure(Chart, Chart.GetValueScale(entry.Key));
+            }
+        }
+        else
+        {
+            axisX = x1;
+
+            var crossesAt = YAxis?.GetCrossesAtValue();
+            if (crossesAt.HasValue)
+            {
+                var clampedValue = Math.Max(Math.Min(crossesAt.Value, categoryTicks.End), categoryTicks.Start);
+                axisX = Chart!.CategoryScale.Scale(clampedValue);
+            }
+        }
+
+        // Title stays at the chart edge, not the crossing position
+        titleX = IsRightSide ? axisX : (YAxis?.GetCrossesAtValue() != null ? x1 : axisX);
     }
 }

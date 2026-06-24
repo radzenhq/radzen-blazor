@@ -20,6 +20,14 @@ namespace Radzen.Blazor
         /// <summary>
         /// The legend is below the series.
         /// </summary>
-        Bottom
+        Bottom,
+        /// <summary>
+        /// The legend is at the inline-start side of the series &#8212; left in left-to-right mode, right in right-to-left mode.
+        /// </summary>
+        Start,
+        /// <summary>
+        /// The legend is at the inline-end side of the series &#8212; right in left-to-right mode, left in right-to-left mode.
+        /// </summary>
+        End
     }
 }

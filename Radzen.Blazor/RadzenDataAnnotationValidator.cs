@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -39,6 +40,7 @@ namespace Radzen.Blazor
     /// &lt;RadzenDataAnnotationValidator Component="Name" MessageSeparator=" | " /&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.ModelTypePreserved)]
     public class RadzenDataAnnotationValidator : ValidatorBase
     {
         /// <summary>
@@ -50,13 +52,15 @@ namespace Radzen.Blazor
         [Parameter]
         public override string Text { get; set; } = string.Empty;
 
+        private string? messageSeparator;
+
         /// <summary>
         /// Gets or sets the text used to join multiple validation error messages.
         /// When multiple data annotation attributes fail (e.g., both Required and StringLength), their messages are combined with this separator.
         /// </summary>
         /// <value>The message separator text. Default is " and ".</value>
         [Parameter]
-        public string MessageSeparator { get; set; } = " and ";
+        public string MessageSeparator { get => messageSeparator ?? Localize(nameof(RadzenStrings.DataAnnotationValidator_MessageSeparator)); set => messageSeparator = value; }
 
         /// <summary>
         /// Service provider injected from the Dependency Injection (DI) container.
@@ -65,6 +69,10 @@ namespace Radzen.Blazor
         public IServiceProvider? ServiceProvider { get; set; }
 
         /// <inheritdoc />
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.ModelTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.ModelTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.ModelTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.ModelTypePreserved)]
         protected override bool Validate(IRadzenFormComponent component)
         {
             ArgumentNullException.ThrowIfNull(component);

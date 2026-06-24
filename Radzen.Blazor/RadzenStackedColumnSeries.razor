@@ -19,8 +19,11 @@
         var width = ColumnWidth;
         var className = $"rz-column-series rz-series-{Chart?.Series?.IndexOf(this) ?? -1}";
 
+        var groupStyle = $"--rz-zero-y: {valueScale.Scale(Math.Max(0, valueScale.Ticks(Chart?.ValueAxis?.TickDistance ?? 0).Start)).ToInvariantString()}px";
+        var grad = new GradientFill(Chart?.UniqueID ?? "", Chart?.Series?.IndexOf(this) ?? -1);
+        var gradient = FillMode == FillMode.Gradient;
         return
-        @<g class="@className">
+        @<g class="@className" style="@groupStyle">
             @foreach(var data in Items)
             {
                 var x = GetColumnLeft(data, category);
@@ -63,8 +66,13 @@
                 }
                 var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
                 var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
+                var fillRef = gradient ? grad.Url(fill ?? "var(--rz-series-color)", itemValue < 0 ? -1 : 1) : (FillMode == FillMode.None ? "none" : fill);
 
-                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fill" LineType="@LineType" Style="@style" />
+                <Path @key="@path" D="@path" Stroke="@stroke" StrokeWidth="@StrokeWidth" Fill="@fillRef" LineType="@LineType" Style="@style" />
+            }
+            @if (gradient)
+            {
+                <GradientDefs Plan="@grad" Vertical="true" StartOpacity="@GradientStartOpacity" EndOpacity="@GradientEndOpacity" />
             }
         </g>;
     }

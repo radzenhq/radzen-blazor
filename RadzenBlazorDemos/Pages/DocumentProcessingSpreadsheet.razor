@@ -1,0 +1,144 @@
+@using Microsoft.JSInterop
+@using System.IO
+@using Radzen.Documents.Spreadsheet
+@inject IJSRuntime JSRuntime
+
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenButton Icon="download" Text="Download XLSX" ButtonStyle="ButtonStyle.Primary"
+            Click=@DownloadXlsx />
+        <RadzenButton Icon="download" Text="Download CSV" ButtonStyle="ButtonStyle.Light"
+            Click=@DownloadCsv />
+    </RadzenStack>
+
+    <RadzenTable>
+        <RadzenTableHeader>
+            <RadzenTableHeaderRow>
+                @foreach (var headerCell in rows[0])
+                {
+                    <RadzenTableHeaderCell>@headerCell</RadzenTableHeaderCell>
+                }
+            </RadzenTableHeaderRow>
+        </RadzenTableHeader>
+        <RadzenTableBody>
+            @for (var r = 1; r < rows.Count; r++)
+            {
+                var row = rows[r];
+                <RadzenTableRow>
+                    @foreach (var cell in row)
+                    {
+                        <RadzenTableCell>@cell</RadzenTableCell>
+                    }
+                </RadzenTableRow>
+            }
+        </RadzenTableBody>
+    </RadzenTable>
+</RadzenStack>
+
+@code {
+    Workbook workbook = BuildSampleWorkbook();
+    List<List<string>> rows = new();
+
+    protected override void OnInitialized()
+    {
+        Render(workbook);
+    }
+
+    class ProductSales
+    {
+        public string Name { get; set; } = "";
+        public string Category { get; set; } = "";
+        public double Q1 { get; set; }
+        public double Q2 { get; set; }
+    }
+
+    static List<ProductSales> products = new()
+    {
+        new() { Name = "Laptop Pro",      Category = "Electronics", Q1 = 45200, Q2 = 52100 },
+        new() { Name = "Ultra Monitor",   Category = "Electronics", Q1 = 18500, Q2 = 21300 },
+        new() { Name = "Ergo Keyboard",   Category = "Accessories", Q1 = 8200,  Q2 = 7600 },
+        new() { Name = "Wireless Mouse",  Category = "Accessories", Q1 = 5400,  Q2 = 6100 },
+        new() { Name = "Noise Headset",   Category = "Audio",       Q1 = 12300, Q2 = 14500 },
+        new() { Name = "USB Dock",        Category = "Electronics", Q1 = 22100, Q2 = 25400 },
+        new() { Name = "Office Chair",    Category = "Furniture",   Q1 = 15800, Q2 = 17200 },
+        new() { Name = "Standing Desk",   Category = "Furniture",   Q1 = 28500, Q2 = 31200 },
+    };
+
+    static Workbook BuildSampleWorkbook()
+    {
+        var wb = new Workbook();
+        var sheet = wb.AddSheet("Sales", products.Count + 2, 5);
+        sheet.BeginUpdate();
+
+        var headerFormat = new Format
+        {
+            Bold = true,
+            BackgroundColor = "#305496",
+            Color = "#ffffff",
+            TextAlign = TextAlign.Center,
+        };
+        var currencyFormat = new Format { NumberFormat = "$#,##0.00" };
+
+        sheet.Columns[0] = 150; sheet.Columns[1] = 120;
+        for (var c = 2; c < 5; c++) sheet.Columns[c] = 110;
+
+        string[] headers = { "Product", "Category", "Q1", "Q2", "Total" };
+        for (var c = 0; c < headers.Length; c++)
+        {
+            sheet.Cells[0, c].Value = headers[c];
+            sheet.Cells[0, c].Format = headerFormat;
+        }
+
+        for (var i = 0; i < products.Count; i++)
+        {
+            var r = i + 1;
+            var p = products[i];
+            sheet.Cells[r, 0].Value = p.Name;
+            sheet.Cells[r, 1].Value = p.Category;
+            sheet.Cells[r, 2].Value = p.Q1; sheet.Cells[r, 2].Format = currencyFormat;
+            sheet.Cells[r, 3].Value = p.Q2; sheet.Cells[r, 3].Format = currencyFormat;
+            sheet.Cells[r, 4].Formula = $"=C{r + 1}+D{r + 1}";
+            sheet.Cells[r, 4].Format = new Format { Bold = true, NumberFormat = "$#,##0.00" };
+        }
+        sheet.Rows.Frozen = 1;
+        sheet.EndUpdate();
+        return wb;
+    }
+
+    void Render(Workbook wb)
+    {
+        rows.Clear();
+        var sheet = wb.Sheets[0];
+        for (var r = 0; r < sheet.RowCount; r++)
+        {
+            var row = new List<string>();
+            var hasContent = false;
+            for (var c = 0; c < sheet.ColumnCount; c++)
+            {
+                var cell = sheet.Cells[r, c];
+                var text = cell.GetValueAsString() ?? "";
+                if (!string.IsNullOrEmpty(text)) hasContent = true;
+                row.Add(text);
+            }
+            if (hasContent) rows.Add(row);
+        }
+    }
+
+    async Task DownloadXlsx()
+    {
+        using var ms = new MemoryStream();
+        workbook.SaveToStream(ms);
+        ms.Position = 0;
+        using var streamRef = new DotNetStreamReference(ms);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "sales.xlsx", streamRef);
+    }
+
+    async Task DownloadCsv()
+    {
+        using var ms = new MemoryStream();
+        workbook.SaveAsCsv(ms);
+        ms.Position = 0;
+        using var streamRef = new DotNetStreamReference(ms);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", "sales.csv", streamRef);
+    }
+}

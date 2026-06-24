@@ -1,0 +1,60 @@
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenSpreadsheet Workbook=@workbook SelectedToolsetIndex="0" style="height: 500px">
+    <RadzenTabsItem Text="Review">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.125rem" AlignItems="AlignItems.Center">
+            <RadzenSpreadsheetUndo />
+            <RadzenSpreadsheetRedo />
+            <div class="rz-toolbar-separator"></div>
+            <StampReviewedTool />
+        </RadzenStack>
+    </RadzenTabsItem>
+</RadzenSpreadsheet>
+
+@code {
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Reviews", 10, 4);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 160;
+        sheet.Columns[1] = 260;
+        sheet.Columns[2] = 240;
+
+        var headerFormat = new Format { Bold = true, BackgroundColor = "#1565c0", Color = "#ffffff", TextAlign = Radzen.TextAlign.Center };
+
+        string[] headers = { "Product", "Notes", "Reviewed" };
+        for (int i = 0; i < headers.Length; i++)
+        {
+            sheet.Cells[0, i].Value = headers[i];
+            sheet.Cells[0, i].Format = headerFormat;
+        }
+
+        var rows = new (string Product, string Notes)[]
+        {
+            ("Laptop Pro 14",  "Looks great"),
+            ("Ultra Monitor",  "Verify color accuracy"),
+            ("Ergo Keyboard",  "Approved"),
+            ("Wireless Mouse", "Battery life?"),
+            ("Noise Headset",  "Solid mic"),
+            ("USB Dock",       "Heat under load"),
+        };
+
+        for (int i = 0; i < rows.Length; i++)
+        {
+            int r = i + 1;
+            sheet.Cells[r, 0].Value = rows[i].Product;
+            sheet.Cells[r, 1].Value = rows[i].Notes;
+        }
+
+        // Start the cursor on the first empty Reviewed cell so the tool is one click away.
+        sheet.Selection.Select(CellRef.Parse("C2"));
+        sheet.Rows.Frozen = 1;
+
+        sheet.EndUpdate();
+    }
+}

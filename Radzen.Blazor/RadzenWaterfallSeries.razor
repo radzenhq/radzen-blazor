@@ -1,0 +1,62 @@
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@typeparam TItem
+@inherits Radzen.Blazor.CartesianSeries<TItem>
+@implements IChartColumnSeries
+
+<CascadingValue Value="@this">
+  @ChildContent
+</CascadingValue>
+@code {
+    public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
+    {
+        var chart = RequireChart();
+        var grad = new GradientFill(chart.UniqueID, chart.Series.IndexOf(this));
+        var gradient = FillMode == FillMode.Gradient;
+        var category = ComposeCategory(categoryScale);
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+
+        var columnSeries = VisibleColumnSeries;
+        var seriesIndex = columnSeries.IndexOf(this);
+        var padding = chart.ColumnOptions.Margin;
+        var bandWidth = BandWidth;
+        var (width, groupWidth) = BandLayout.Resolve(bandWidth, columnSeries.Count, padding, chart.ColumnOptions.EffectiveMaxWidth);
+        var className = $"rz-waterfall-series rz-series-{chart.Series.IndexOf(this)}";
+        var radius = chart.ColumnOptions.Radius;
+
+        var wfItems = ComputeWaterfallItems();
+
+        return
+        @<g class="@className">
+            @for (var i = 0; i < Items.Count; i++)
+            {
+                var data = Items[i];
+                var wf = wfItems[i];
+
+                var x = category(data) - groupWidth / 2 + seriesIndex * (width + padding);
+                var y1 = valueScale.Scale(wf.Start, true);
+                var y2 = valueScale.Scale(wf.End, true);
+
+                var top = Math.Min(y1, y2);
+                var bottom = Math.Max(y1, y2);
+                var height = bottom - top;
+                if (height < 1) { height = 1; }
+
+                var r = radius;
+                if (r > width / 2 || r > height) { r = 0; }
+
+                var fill = wf.IsSummary ? SummaryFill : (wf.End >= wf.Start ? PositiveFill : NegativeFill);
+                var sign = (wf.IsSummary || wf.End >= wf.Start) ? 1 : -1;
+                var fillRef = gradient ? grad.Url(fill ?? "var(--rz-series-color)", sign) : (FillMode == FillMode.None ? "none" : fill);
+
+                var path = $"M {x.ToInvariantString()} {(top + r).ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + r).ToInvariantString()} {top.ToInvariantString()} L {(x + width - r).ToInvariantString()} {top.ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(top + r).ToInvariantString()} L {(x + width).ToInvariantString()} {(bottom - r).ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {(x + width - r).ToInvariantString()} {bottom.ToInvariantString()} L {(x + r).ToInvariantString()} {bottom.ToInvariantString()} A {r.ToInvariantString()} {r.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(bottom - r).ToInvariantString()} Z";
+
+                <Path @key="@($"wf-{i}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Fill="@fillRef" LineType="@LineType" Style="@style" />
+            }
+            @if (gradient)
+            {
+                <GradientDefs Plan="@grad" Vertical="true" StartOpacity="@GradientStartOpacity" EndOpacity="@GradientEndOpacity" />
+            }
+        </g>;
+    }
+}

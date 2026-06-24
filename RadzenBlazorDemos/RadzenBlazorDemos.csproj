@@ -20,6 +20,9 @@
     <TrimmerRootDescriptor Include="linker.xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Localization/RadzenTranslations.json" />
+  </ItemGroup>
+  <ItemGroup>
     <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.dll" />
     <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.CSharp.dll" />
     <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.Razor.dll" />

@@ -6,6 +6,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,6 +32,7 @@ namespace Radzen.Blazor
     ///                      MinLength="2" FilterDelay="300" Placeholder="Type to search products..." /&gt;
     /// </code>
     /// </example>
+    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class RadzenAutoComplete : DataBoundFormComponent<string>
     {
         object? selectedItem;
@@ -212,7 +214,11 @@ namespace Radzen.Blazor
 
         async Task DebounceFilter()
         {
-            if (JSRuntime == null) return;
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
 
             value = $"{value}";
@@ -337,8 +343,21 @@ namespace Radzen.Blazor
             return $"Radzen.openPopup(this.parentNode, '{PopupID}', true)";
         }
 
+        /// <summary>
+        /// Gets or sets the size of the component.
+        /// </summary>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
         /// <inheritdoc />
-        protected override string GetComponentCssClass() => GetClassList("rz-autocomplete").ToString();
+        protected override string GetComponentCssClass() => GetClassList("rz-autocomplete").AddInputSize(InputSize).ToString();
+
+        string PopupCssClass => ClassList.Create("rz-autocomplete-panel")
+                                         .AddInputSize(InputSize)
+                                         .ToString();
+
+        IJSObjectReference? _jsRef;
+        bool _jsParamsChanged;
 
         /// <inheritdoc />
         public override void Dispose()
@@ -348,6 +367,13 @@ namespace Radzen.Blazor
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
+            }
+
+            if (_jsRef != null)
+            {
+                _jsRef.InvokeVoid("dispose");
+                _jsRef.DisposeFireAndForget();
+                _jsRef = null;
             }
 
             GC.SuppressFinalize(this);
@@ -360,11 +386,25 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="firstRender">if set to <c>true</c> is first render.</param>
         /// <returns>Task.</returns>
-        protected override Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             this.firstRender = firstRender;
 
-            return base.OnAfterRenderAsync(firstRender);
+            await base.OnAfterRenderAsync(firstRender);
+
+            if ((firstRender || _jsParamsChanged) && Visible && JSRuntime != null)
+            {
+                _jsParamsChanged = false;
+
+                if (_jsRef != null)
+                {
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                }
+
+                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "Radzen.createAutoComplete", Element, PopupID, OpenOnFocus);
+            }
         }
 
         /// <inheritdoc />
@@ -376,6 +416,11 @@ namespace Radzen.Blazor
             {
                 var visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
                 shouldClose = !visible;
+            }
+
+            if (parameters.DidParameterChange(nameof(OpenOnFocus), OpenOnFocus))
+            {
+                _jsParamsChanged = true;
             }
 
             if (parameters.DidParameterChange(nameof(SelectedItem), SelectedItem))

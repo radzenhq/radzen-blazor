@@ -50,3 +50,17 @@
     background-position: -200% 0;
   }
 }
+
+// Accessibility: honor the user's OS "reduce motion" preference.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    transition-timing-function: linear !important;
+    animation-duration: 0.01ms !important;
+    animation-timing-function: linear !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

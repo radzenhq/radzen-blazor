@@ -67,6 +67,16 @@
   --rz-transition-all: #{$rz-transition-all};
   --rz-expander-transition: #{$rz-expander-transition};
 
+  /* Motion easing & duration tokens (Material 3) */
+  --rz-easing-emphasized: #{$rz-easing-emphasized};
+  --rz-easing-emphasized-decelerate: #{$rz-easing-emphasized-decelerate};
+  --rz-easing-emphasized-accelerate: #{$rz-easing-emphasized-accelerate};
+  --rz-easing-spring: #{$rz-easing-spring};
+  --rz-duration-short: #{$rz-duration-short};
+  --rz-duration-medium: #{$rz-duration-medium};
+  --rz-duration-long: #{$rz-duration-long};
+  --rz-ripple-duration: #{$rz-ripple-duration};
+
   /* Layout Body */
   --rz-layout-body-margin: #{$layout-body-margin};
   --rz-layout-body-padding: #{$layout-body-padding};
@@ -146,6 +156,10 @@
   --rz-button-active-background-size: #{$button-active-background-size};
   --rz-button-disabled-opacity: #{$button-disabled-opacity};
   --rz-button-empty-opacity: #{$button-empty-opacity};
+  --rz-button-size-xs: #{$button-size-xs};
+  --rz-button-size-sm: #{$button-size-sm};
+  --rz-button-size-md: #{$button-size-md};
+  --rz-button-size-lg: #{$button-size-lg};
 
   /* Card */
   --rz-card-padding: #{$card-padding};
@@ -180,6 +194,8 @@
 
   /* Chart */
   --rz-chart-axis-color: #{$chart-axis-color};
+  --rz-chart-grid-line-color: #{$chart-grid-line-color};
+  --rz-chart-area-opacity: #{$chart-area-opacity};
   --rz-chart-axis-label-color: #{$chart-axis-label-color};
   --rz-chart-axis-font-size: #{$chart-axis-font-size};
   --rz-chart-legend-font-size: #{$chart-legend-font-size};
@@ -192,6 +208,24 @@
   --rz-chart-tooltip-item-border-radius: #{$chart-tooltip-item-border-radius};
   --rz-chart-tooltip-item-hover-background-color: #{$chart-tooltip-item-hover-background-color};
   --rz-chart-marker-stroke: #{$chart-marker-stroke};
+
+  /* Range Navigator */
+  --rz-range-nav-height: #{$range-nav-height};
+  --rz-range-nav-compact-height: #{$range-nav-compact-height};
+  --rz-range-nav-border-radius: #{$range-nav-border-radius};
+  --rz-range-nav-border: #{$range-nav-border};
+  --rz-range-nav-shade-background-color: #{$range-nav-shade-background-color};
+  --rz-range-nav-shade-opacity: #{$range-nav-shade-opacity};
+  --rz-range-nav-compact-background-color: #{$range-nav-compact-background-color};
+  --rz-range-nav-compact-border-radius: #{$range-nav-compact-border-radius};
+  --rz-range-nav-compact-window-background-color: #{$range-nav-compact-window-background-color};
+  --rz-range-nav-handle-width: #{$range-nav-handle-width};
+  --rz-range-nav-handle-border-radius: #{$range-nav-handle-border-radius};
+  --rz-range-nav-handle-background-color: #{$range-nav-handle-background-color};
+  --rz-range-nav-handle-hover-background-color: #{$range-nav-handle-hover-background-color};
+  --rz-range-nav-handle-height: #{$range-nav-handle-height};
+  --rz-range-nav-handle-shadow: #{$range-nav-handle-shadow};
+  --rz-range-nav-handle-hover-shadow: #{$range-nav-handle-hover-shadow};
 
   /* Chat */
   --rz-chat-background-color: #{$rz-chat-background-color};
@@ -281,6 +315,16 @@
   --rz-colorpicker-focus-outline: #{$colorpicker-focus-outline};
   --rz-colorpicker-focus-outline-offset: #{$colorpicker-focus-outline-offset};
   --rz-colorpicker-value-border-radius: #{$colorpicker-value-border-radius};
+  --rz-colorpicker-value-size-xs: #{$colorpicker-value-size-xs};
+  --rz-colorpicker-value-size-sm: #{$colorpicker-value-size-sm};
+  --rz-colorpicker-value-size-md: #{$colorpicker-value-size-md};
+  --rz-colorpicker-value-size-lg: #{$colorpicker-value-size-lg};
+  --rz-colorpicker-value-size: var(--rz-colorpicker-value-size-md);
+  --rz-colorpicker-trigger-icon-size-xs: #{$colorpicker-trigger-icon-size-xs};
+  --rz-colorpicker-trigger-icon-size-sm: #{$colorpicker-trigger-icon-size-sm};
+  --rz-colorpicker-trigger-icon-size-md: #{$colorpicker-trigger-icon-size-md};
+  --rz-colorpicker-trigger-icon-size-lg: #{$colorpicker-trigger-icon-size-lg};
+  --rz-colorpicker-trigger-icon-size: var(--rz-colorpicker-trigger-icon-size-md);
   --rz-colorpicker-items-gap: #{$colorpicker-items-gap};
   --rz-colorpicker-item-size: #{$colorpicker-item-size};
   --rz-colorpicker-item-border-radius: #{$colorpicker-item-border-radius};
@@ -318,8 +362,11 @@
   --rz-datalist-item-background-color: #{$datalist-item-background-color};
 
   /* DatePicker */
-  --rz-datepicker-trigger-icon-width: #{$datepicker-trigger-icon-width};
-  --rz-datepicker-trigger-icon-height: #{$datepicker-trigger-icon-height};
+  --rz-datepicker-trigger-icon-size-xs: #{$datepicker-trigger-icon-size-xs};
+  --rz-datepicker-trigger-icon-size-sm: #{$datepicker-trigger-icon-size-sm};
+  --rz-datepicker-trigger-icon-size-md: #{$datepicker-trigger-icon-size-md};
+  --rz-datepicker-trigger-icon-size-lg: #{$datepicker-trigger-icon-size-lg};
+  --rz-datepicker-trigger-icon-size: var(--rz-datepicker-trigger-icon-size-md);
   --rz-datepicker-line-height: #{$datepicker-line-height};
   --rz-datepicker-trigger-icon-color: #{$datepicker-trigger-icon-color};
   --rz-datepicker-trigger-icon-hover-color: #{$datepicker-trigger-icon-hover-color};
@@ -444,14 +491,6 @@
   --rz-editor-border: #{$editor-border};
   --rz-editor-border-radius: #{$editor-border-radius};
   --rz-editor-toolbar-background-color: #{$editor-toolbar-background-color};
-  --rz-editor-toolbar-item-margin: #{$editor-toolbar-item-margin};
-  --rz-editor-button-padding: #{$editor-button-padding};
-  --rz-editor-button-background-color: #{$editor-button-background-color};
-  --rz-editor-button-color: #{$editor-button-color};
-  --rz-editor-button-disabled-color: #{$editor-button-disabled-color};
-  --rz-editor-button-selected-background-color: #{$editor-button-selected-background-color};
-  --rz-editor-button-selected-color: #{$editor-button-selected-color};
-  --rz-editor-separator-background-color: #{$editor-separator-background-color};
   --rz-editor-content-background-color: #{$editor-content-background-color};
   --rz-editor-focus-outline: #{$editor-focus-outline};
   --rz-editor-focus-outline-offset: #{$editor-focus-outline-offset};
@@ -514,6 +553,26 @@
   --rz-form-field-filled-focus-border: #{$form-field-filled-focus-border};
   --rz-form-field-filled-border-radius: #{$form-field-filled-border-radius};
   --rz-form-field-filled-label-floating-top: #{$form-field-filled-label-floating-top};
+  --rz-form-field-filled-height-xs: #{$form-field-filled-height-xs};
+  --rz-form-field-filled-height-sm: #{$form-field-filled-height-sm};
+  --rz-form-field-filled-height-md: #{$form-field-filled-height-md};
+  --rz-form-field-filled-height-lg: #{$form-field-filled-height-lg};
+  --rz-form-field-filled-padding-block-xs: #{$form-field-filled-padding-block-xs};
+  --rz-form-field-filled-padding-block-sm: #{$form-field-filled-padding-block-sm};
+  --rz-form-field-filled-padding-block-md: #{$form-field-filled-padding-block-md};
+  --rz-form-field-filled-padding-block-lg: #{$form-field-filled-padding-block-lg};
+  --rz-form-field-filled-padding-inline-xs: #{$form-field-filled-padding-inline-xs};
+  --rz-form-field-filled-padding-inline-sm: #{$form-field-filled-padding-inline-sm};
+  --rz-form-field-filled-padding-inline-md: #{$form-field-filled-padding-inline-md};
+  --rz-form-field-filled-padding-inline-lg: #{$form-field-filled-padding-inline-lg};
+  --rz-form-field-filled-label-floating-top-xs: #{$form-field-filled-label-floating-top-xs};
+  --rz-form-field-filled-label-floating-top-sm: #{$form-field-filled-label-floating-top-sm};
+  --rz-form-field-filled-label-floating-top-md: #{$form-field-filled-label-floating-top-md};
+  --rz-form-field-filled-label-floating-top-lg: #{$form-field-filled-label-floating-top-lg};
+  --rz-form-field-filled-label-floating-font-size-xs: #{$form-field-filled-label-floating-font-size-xs};
+  --rz-form-field-filled-label-floating-font-size-sm: #{$form-field-filled-label-floating-font-size-sm};
+  --rz-form-field-filled-label-floating-font-size-md: #{$form-field-filled-label-floating-font-size-md};
+  --rz-form-field-filled-label-floating-font-size-lg: #{$form-field-filled-label-floating-font-size-lg};
   --rz-form-field-filled-hover-shadow: #{$form-field-filled-hover-shadow};
   --rz-form-field-filled-focus-shadow: #{$form-field-filled-focus-shadow};
   --rz-form-field-filled-underline-display: #{$form-field-filled-underline-display};
@@ -687,9 +746,27 @@
   --rz-icon-grade: #{$rz-icon-grade};
   --rz-icon-optical-size: #{$rz-icon-optical-size};
 
+  /* Input sizing per size */
+  --rz-input-size-xs: #{$input-size-xs};
+  --rz-input-size-sm: #{$input-size-sm};
+  --rz-input-size-md: #{$input-size-md};
+  --rz-input-size-lg: #{$input-size-lg};
+  --rz-input-padding-block-xs: #{$input-padding-block-xs};
+  --rz-input-padding-block-sm: #{$input-padding-block-sm};
+  --rz-input-padding-block-md: #{$input-padding-block-md};
+  --rz-input-padding-block-lg: #{$input-padding-block-lg};
+  --rz-input-padding-inline-xs: #{$input-padding-inline-xs};
+  --rz-input-padding-inline-sm: #{$input-padding-inline-sm};
+  --rz-input-padding-inline-md: #{$input-padding-inline-md};
+  --rz-input-padding-inline-lg: #{$input-padding-inline-lg};
+  --rz-input-font-size-xs: #{$input-font-size-xs};
+  --rz-input-font-size-sm: #{$input-font-size-sm};
+  --rz-input-font-size-md: #{$input-font-size-md};
+  --rz-input-font-size-lg: #{$input-font-size-lg};
+
   /* Input */
   --rz-input-font-size: #{$input-font-size};
-  --rz-input-height: #{$input-height};
+  --rz-input-height: var(--rz-input-size-md);
   --rz-input-line-height: #{$input-line-height};
   --rz-input-padding-block: #{$input-padding-block};
   --rz-input-padding-inline: #{$input-padding-inline};
@@ -812,11 +889,31 @@
 
   /* Numeric */
   --rz-numeric-line-height: #{$numeric-line-height};
-  --rz-numeric-input-padding-block: #{$numeric-input-padding-block};
-  --rz-numeric-input-padding-inline: #{$numeric-input-padding-inline};
-  --rz-numeric-button-width: #{$numeric-button-width};
-  --rz-numeric-button-height: #{$numeric-button-height};
-  --rz-numeric-button-offset: #{$numeric-button-offset};
+  --rz-numeric-input-padding-block-xs: #{$numeric-input-padding-block-xs};
+  --rz-numeric-input-padding-block-sm: #{$numeric-input-padding-block-sm};
+  --rz-numeric-input-padding-block-md: #{$numeric-input-padding-block-md};
+  --rz-numeric-input-padding-block-lg: #{$numeric-input-padding-block-lg};
+  --rz-numeric-input-padding-block: var(--rz-numeric-input-padding-block-md);
+  --rz-numeric-input-padding-inline-xs: #{$numeric-input-padding-inline-xs};
+  --rz-numeric-input-padding-inline-sm: #{$numeric-input-padding-inline-sm};
+  --rz-numeric-input-padding-inline-md: #{$numeric-input-padding-inline-md};
+  --rz-numeric-input-padding-inline-lg: #{$numeric-input-padding-inline-lg};
+  --rz-numeric-input-padding-inline: var(--rz-numeric-input-padding-inline-md);
+  --rz-numeric-button-width-xs: #{$numeric-button-width-xs};
+  --rz-numeric-button-width-sm: #{$numeric-button-width-sm};
+  --rz-numeric-button-width-md: #{$numeric-button-width-md};
+  --rz-numeric-button-width-lg: #{$numeric-button-width-lg};
+  --rz-numeric-button-width: var(--rz-numeric-button-width-md);
+  --rz-numeric-button-height-xs: #{$numeric-button-height-xs};
+  --rz-numeric-button-height-sm: #{$numeric-button-height-sm};
+  --rz-numeric-button-height-md: #{$numeric-button-height-md};
+  --rz-numeric-button-height-lg: #{$numeric-button-height-lg};
+  --rz-numeric-button-height: var(--rz-numeric-button-height-md);
+  --rz-numeric-button-offset-xs: #{$numeric-button-offset-xs};
+  --rz-numeric-button-offset-sm: #{$numeric-button-offset-sm};
+  --rz-numeric-button-offset-md: #{$numeric-button-offset-md};
+  --rz-numeric-button-offset-lg: #{$numeric-button-offset-lg};
+  --rz-numeric-button-offset: var(--rz-numeric-button-offset-md);
   --rz-numeric-button-border-radius: #{$numeric-button-border-radius};
   --rz-numeric-button-background-color: #{$numeric-button-background-color};
   --rz-numeric-button-disabled-background-color: #{$numeric-button-disabled-background-color};
@@ -1039,6 +1136,9 @@
   --rz-scheduler-header-background-color: #{$scheduler-header-background-color};
   --rz-scheduler-header-font-size: #{$scheduler-header-font-size};
   --rz-scheduler-header-font-size-small: #{$scheduler-header-font-size-small};
+  --rz-scheduler-header-agenda-font-size: #{$scheduler-header-agenda-font-size};
+  --rz-scheduler-header-agenda-font-weight: #{$scheduler-header-agenda-font-weight};
+  --rz-scheduler-header-agenda-font-size-small: #{$scheduler-header-agenda-font-size-small};
   --rz-scheduler-header-text-transform: #{$scheduler-header-text-transform};
   --rz-scheduler-header-color: #{$scheduler-header-color};
   --rz-scheduler-header-border: #{$scheduler-header-border};
@@ -1084,6 +1184,15 @@
   --rz-security-code-input-font-size: #{$rz-security-code-input-font-size};
   --rz-security-code-input-font-weight: #{$rz-security-code-input-font-weight};
   --rz-security-code-input-line-height: #{$rz-security-code-input-line-height};
+
+  /* SignaturePad */
+  --rz-signature-pad-border: #{$rz-signature-pad-border};
+  --rz-signature-pad-border-radius: #{$rz-signature-pad-border-radius};
+  --rz-signature-pad-background-color: #{$rz-signature-pad-background-color};
+  --rz-signature-pad-placeholder-color: #{$rz-signature-pad-placeholder-color};
+  --rz-signature-pad-clear-color: #{$rz-signature-pad-clear-color};
+  --rz-signature-pad-clear-hover-color: #{$rz-signature-pad-clear-hover-color};
+
 
   /* SelectBar */
   --rz-selectbar-background-color: #{$selectbar-background-color};
@@ -1246,8 +1355,11 @@
 
   /* TimestampPicker */
   --rz-timespanpicker-line-height: #{$timespanpicker-line-height};
-  --rz-timespanpicker-trigger-icon-width: #{$timespanpicker-trigger-icon-width};
-  --rz-timespanpicker-trigger-icon-height: #{$timespanpicker-trigger-icon-height};
+  --rz-timespanpicker-trigger-icon-size-xs: #{$timespanpicker-trigger-icon-size-xs};
+  --rz-timespanpicker-trigger-icon-size-sm: #{$timespanpicker-trigger-icon-size-sm};
+  --rz-timespanpicker-trigger-icon-size-md: #{$timespanpicker-trigger-icon-size-md};
+  --rz-timespanpicker-trigger-icon-size-lg: #{$timespanpicker-trigger-icon-size-lg};
+  --rz-timespanpicker-trigger-icon-size: var(--rz-timespanpicker-trigger-icon-size-md);
   --rz-timespanpicker-trigger-icon-color: #{$timespanpicker-trigger-icon-color};
   --rz-timespanpicker-trigger-icon-hover-color: #{$timespanpicker-trigger-icon-hover-color};
   --rz-timespanpicker-focus-outline: #{$timespanpicker-focus-outline};
@@ -1338,4 +1450,11 @@
   --rz-upload-cancel-background-color: #{$upload-cancel-background-color};
   --rz-upload-cancel-color: #{$upload-cancel-color};
   --rz-upload-button-background-color: #{$upload-button-background-color};
+
+  /* Spreadsheet */
+  --rz-spreadsheet-tab-font-size: #{$spreadsheet-tab-font-size};
+  --rz-spreadsheet-cell-border: #{$spreadsheet-cell-border};
+  --rz-spreadsheet-header-background-color: #{$spreadsheet-header-background-color};
+  --rz-spreadsheet-header-active-background-color: #{$spreadsheet-header-active-background-color};
+  --rz-spreadsheet-splitter-background-color: #{$spreadsheet-splitter-background-color};
 }

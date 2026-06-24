@@ -1,0 +1,38 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenChart Style="height: 480px">
+                <RadzenLineSeries Data="@data" CategoryProperty="X" ValueProperty="Y" Title="Cubic Spline"
+                    Stroke="var(--rz-series-1)" LineType="LineType.Solid" Smooth="true">
+                    <RadzenMarkers MarkerType="MarkerType.Diamond" Fill="var(--rz-series-2)" Stroke="var(--rz-series-2)" Size="8" />
+                </RadzenLineSeries>
+                <RadzenCategoryAxis CrossesAt="0" FormatString="{0}" />
+                <RadzenValueAxis CrossesAt="0">
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+                <RadzenChartTooltipOptions Visible="true" />
+                <RadzenLegend Position="LegendPosition.Bottom" />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    class DataPoint
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+    }
+
+    DataPoint[] data = new DataPoint[]
+    {
+        new DataPoint { X = -6, Y = 3 },
+        new DataPoint { X = -3, Y = -5 },
+        new DataPoint { X = -1, Y = -1 },
+        new DataPoint { X = 0, Y = 0 },
+        new DataPoint { X = 1, Y = 1 },
+        new DataPoint { X = 3, Y = 3.5 },
+        new DataPoint { X = 5, Y = 4 },
+        new DataPoint { X = 7, Y = 3.8 },
+    };
+}

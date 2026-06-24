@@ -86,7 +86,7 @@ namespace Radzen.Blazor
             }
 
             var category = ComposeCategory(chart.CategoryScale);
-            var value = ComposeValue(chart.ValueScale);
+            var value = ComposeValue(chart.GetValueScale(ValueAxisName));
 
             return Items.Any(item =>
             {
@@ -134,7 +134,8 @@ namespace Radzen.Blazor
         protected override string TooltipValue(TItem item)
         {
             var chart = RequireChart();
-            return chart.ValueAxis.Format(chart.ValueScale, chart.ValueScale.Value(Value(item)));
+            var vs = chart.GetValueScale(ValueAxisName);
+            return chart.GetValueAxis(ValueAxisName).Format(vs, vs.Value(Value(item)));
         }
 
         /// <inheritdoc />

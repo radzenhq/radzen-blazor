@@ -9,6 +9,8 @@ $switch-circle-background-color: var(--rz-text-contrast-color) !default;
 $switch-checked-circle-background-color: var(--rz-on-secondary) !default;
 $switch-focus-outline: var(--rz-outline-focus) !default;
 $switch-focus-outline-offset: var(--rz-outline-offset) !default;
+$switch-transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s !default;
+$switch-thumb-transition: transform 0.2s linear !default;
 
 .rz-switch {
   box-sizing: border-box;
@@ -50,7 +52,7 @@ $switch-focus-outline-offset: var(--rz-outline-offset) !default;
 
 .rz-switch .rz-switch-circle {
   background: var(--rz-switch-background-color);
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition: $switch-transition;
   border-radius: calc(5 * var(--rz-border-radius));
 }
 
@@ -65,7 +67,7 @@ $switch-focus-outline-offset: var(--rz-outline-offset) !default;
   inset-inline-start: $switch-circle-offset;
   margin-block-start: round($switch-circle-size*-500)/1000;
   border-radius: calc((5 * var(--rz-border-radius)) - 3px);
-  transition: transform 0.2s linear;
+  transition: $switch-thumb-transition;
   box-shadow: var(--rz-switch-box-shadow);
 }
 

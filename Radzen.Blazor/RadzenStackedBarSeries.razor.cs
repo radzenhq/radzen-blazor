@@ -68,6 +68,28 @@ namespace Radzen.Blazor
         [Parameter]
         public IList<SeriesColorRange>? StrokeRange { get; set; }
 
+        /// <summary>
+        /// Specifies how the series is filled. Set to <see cref="FillMode.Solid"/> by default.
+        /// Use <see cref="FillMode.Gradient"/> for a fill that fades toward the axis baseline, or <see cref="FillMode.None"/> to render only the outline.
+        /// </summary>
+        /// <value>The fill mode. Default is <see cref="FillMode.Solid"/>.</value>
+        [Parameter]
+        public FillMode FillMode { get; set; } = FillMode.Solid;
+
+        /// <summary>
+        /// Specifies the opacity at the value end of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient start opacity. Default is <c>0.85</c>.</value>
+        [Parameter]
+        public double GradientStartOpacity { get; set; } = 0.85;
+
+        /// <summary>
+        /// Specifies the opacity at the baseline of the gradient fill. Used when <see cref="FillMode"/> is <see cref="FillMode.Gradient"/>.
+        /// </summary>
+        /// <value>The gradient end opacity. Default is <c>0.4</c>.</value>
+        [Parameter]
+        public double GradientEndOpacity { get; set; } = 0.4;
+
         /// <inheritdoc />
         public override string Color
         {
@@ -150,6 +172,11 @@ namespace Radzen.Blazor
                 {
                     return Chart.BarOptions.Height.Value * barSeries.Count;
                 }
+                else if (Chart?.BarOptions?.CategoryGap is double gap)
+                {
+                    var step = System.Math.Abs(Chart.ValueScale.Scale(1, true) - Chart.ValueScale.Scale(0, true));
+                    return step * (1 - gap);
+                }
                 else if (Chart != null)
                 {
                     var availableHeight = Chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
@@ -161,7 +188,20 @@ namespace Radzen.Blazor
             }
         }
 
-        double BarHeight => Chart?.BarOptions?.Height ?? (Chart != null ? BandHeight - Chart.BarOptions.Margin : 0);
+        double BarHeight
+        {
+            get
+            {
+                if (Chart == null)
+                {
+                    return 0;
+                }
+
+                var h = Chart.BarOptions.Height ?? (BandHeight - Chart.BarOptions.Margin);
+                var max = Chart.BarOptions.EffectiveMaxHeight;
+                return max is double m && h > m ? m : h;
+            }
+        }
 
         int BarIndex => VisibleBarSeries.IndexOf(this);
 
@@ -357,6 +397,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
+            return GetDataLabels(offsetX, offsetY, DataLabelPosition.Auto);
+        }
+
+        /// <inheritdoc />
+        public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY, DataLabelPosition position)
+        {
             if (Chart == null)
             {
                 return Enumerable.Empty<ChartDataLabel>();
@@ -366,17 +412,34 @@ namespace Radzen.Blazor
             var list = new List<ChartDataLabel>();
             var barIndex = BarIndex;
             var stackedBarSeries = StackedBarSeries;
+            const double gap = 16;
+            const double inset = 8;
 
             foreach (var data in Items)
             {
                 var left = GetBarLeft(data, barIndex, category, stackedBarSeries);
                 var right = GetBarRight(data, barIndex, category, stackedBarSeries);
-                var x = left + (right - left) / 2;
+                var value = Value(data);
+                var end = value < 0 ? left : right;
+                var center = left + (right - left) / 2;
+                var anchorY = TooltipY(data);
+                var sign = Math.Sign(end - center);
+
+                var (x, y, textAnchor) = position switch
+                {
+                    DataLabelPosition.Top => (center, anchorY - gap, "middle"),
+                    DataLabelPosition.Bottom => (center, anchorY + gap, "middle"),
+                    DataLabelPosition.Inside => (end - inset * sign, anchorY, sign < 0 ? "start" : sign > 0 ? "end" : "middle"),
+                    _ => (center, anchorY, "middle"),
+                };
+
                 list.Add(new ChartDataLabel
                 {
-                    Position = new Point() { X = x + offsetX, Y = TooltipY(data) + offsetY },
-                    TextAnchor = "middle",
-                    Text = Chart.ValueAxis.Format(Chart.CategoryScale, Value(data))
+                    Position = new Point() { X = x + offsetX, Y = y + offsetY },
+                    Anchor = new Point() { X = center, Y = anchorY },
+                    Value = value,
+                    TextAnchor = textAnchor,
+                    Text = Chart.ValueAxis.Format(Chart.CategoryScale, value)
                 });
             }
 

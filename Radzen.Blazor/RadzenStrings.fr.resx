@@ -1,0 +1,1746 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute name="xml:space" use="optional" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Spreadsheet: Tab names -->
+  <data name="Spreadsheet_FileTab" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
+  <data name="Spreadsheet_HomeTab" xml:space="preserve">
+    <value>Accueil</value>
+  </data>
+  <data name="Spreadsheet_FormatTab" xml:space="preserve">
+    <value>Format</value>
+  </data>
+  <data name="Spreadsheet_InsertTab" xml:space="preserve">
+    <value>Insertion</value>
+  </data>
+  <data name="Spreadsheet_ViewTab" xml:space="preserve">
+    <value>Affichage</value>
+  </data>
+  <data name="Spreadsheet_DataTab" xml:space="preserve">
+    <value>Données</value>
+  </data>
+  <!-- Spreadsheet: Common buttons -->
+  <data name="Spreadsheet_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Spreadsheet_Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <!-- Spreadsheet: Format Cells dialog trigger -->
+  <data name="Spreadsheet_FormatCells" xml:space="preserve">
+    <value>Format de cellule...</value>
+  </data>
+  <!-- Spreadsheet: Sheet tab actions -->
+  <data name="Spreadsheet_Rename" xml:space="preserve">
+    <value>Renommer</value>
+  </data>
+  <data name="Spreadsheet_Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="Spreadsheet_MoveLeft" xml:space="preserve">
+    <value>Déplacer à gauche</value>
+  </data>
+  <data name="Spreadsheet_MoveRight" xml:space="preserve">
+    <value>Déplacer à droite</value>
+  </data>
+  <!-- Spreadsheet: CellMenu -->
+  <data name="Spreadsheet_SortAscending" xml:space="preserve">
+    <value>Trier par ordre croissant</value>
+  </data>
+  <data name="Spreadsheet_SortDescending" xml:space="preserve">
+    <value>Trier par ordre décroissant</value>
+  </data>
+  <data name="Spreadsheet_ClearFilter" xml:space="preserve">
+    <value>Effacer le filtre</value>
+  </data>
+  <data name="Spreadsheet_CustomFilter" xml:space="preserve">
+    <value>Filtre personnalisé...</value>
+  </data>
+  <data name="Spreadsheet_SelectAll" xml:space="preserve">
+    <value>(Tout sélectionner)</value>
+  </data>
+  <data name="Spreadsheet_Blank" xml:space="preserve">
+    <value>(Vide)</value>
+  </data>
+  <!-- Spreadsheet: Context menu -->
+  <data name="Spreadsheet_Cut" xml:space="preserve">
+    <value>Couper</value>
+  </data>
+  <data name="Spreadsheet_Copy" xml:space="preserve">
+    <value>Copier</value>
+  </data>
+  <data name="Spreadsheet_Paste" xml:space="preserve">
+    <value>Coller</value>
+  </data>
+  <data name="Spreadsheet_ClearContents" xml:space="preserve">
+    <value>Effacer le contenu</value>
+  </data>
+  <data name="Spreadsheet_ContextSortAscending" xml:space="preserve">
+    <value>Trier par ordre croissant</value>
+  </data>
+  <data name="Spreadsheet_ContextSortDescending" xml:space="preserve">
+    <value>Trier par ordre décroissant</value>
+  </data>
+  <data name="Spreadsheet_InsertRowAbove" xml:space="preserve">
+    <value>Insérer une ligne au-dessus</value>
+  </data>
+  <data name="Spreadsheet_InsertRowBelow" xml:space="preserve">
+    <value>Insérer une ligne en dessous</value>
+  </data>
+  <data name="Spreadsheet_DeleteRow" xml:space="preserve">
+    <value>Supprimer la ligne</value>
+  </data>
+  <data name="Spreadsheet_HideRow" xml:space="preserve">
+    <value>Masquer la ligne</value>
+  </data>
+  <data name="Spreadsheet_UnhideRow" xml:space="preserve">
+    <value>Afficher la ligne</value>
+  </data>
+  <data name="Spreadsheet_InsertColumnBefore" xml:space="preserve">
+    <value>Insérer une colonne avant</value>
+  </data>
+  <data name="Spreadsheet_InsertColumnAfter" xml:space="preserve">
+    <value>Insérer une colonne après</value>
+  </data>
+  <data name="Spreadsheet_DeleteColumn" xml:space="preserve">
+    <value>Supprimer la colonne</value>
+  </data>
+  <data name="Spreadsheet_HideColumn" xml:space="preserve">
+    <value>Masquer la colonne</value>
+  </data>
+  <data name="Spreadsheet_UnhideColumn" xml:space="preserve">
+    <value>Afficher la colonne</value>
+  </data>
+  <!-- Spreadsheet: Dialog titles -->
+  <data name="Spreadsheet_RenameSheetTitle" xml:space="preserve">
+    <value>Renommer la feuille</value>
+  </data>
+  <data name="Spreadsheet_CustomFilterTitle" xml:space="preserve">
+    <value>Filtre personnalisé</value>
+  </data>
+  <data name="Spreadsheet_FormatCellsTitle" xml:space="preserve">
+    <value>Format de cellule</value>
+  </data>
+  <data name="Spreadsheet_InsertHyperlinkTitle" xml:space="preserve">
+    <value>Insérer un lien hypertexte</value>
+  </data>
+  <data name="Spreadsheet_ConditionalFormattingTitle" xml:space="preserve">
+    <value>Mise en forme conditionnelle</value>
+  </data>
+  <data name="Spreadsheet_DataValidationTitle" xml:space="preserve">
+    <value>Validation des données</value>
+  </data>
+  <data name="Spreadsheet_InformationTitle" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Spreadsheet_WarningTitle" xml:space="preserve">
+    <value>Avertissement</value>
+  </data>
+  <data name="Spreadsheet_InvalidValueTitle" xml:space="preserve">
+    <value>Valeur non valide</value>
+  </data>
+  <!-- Spreadsheet: Validation messages -->
+  <data name="Spreadsheet_DoYouWantToContinue" xml:space="preserve">
+    <value>Voulez-vous continuer ?</value>
+  </data>
+  <data name="Spreadsheet_NameCannotBeEmpty" xml:space="preserve">
+    <value>Le nom ne peut pas être vide.</value>
+  </data>
+  <data name="Spreadsheet_SheetNameAlreadyExists" xml:space="preserve">
+    <value>Une feuille nommée '{0}' existe déjà.</value>
+  </data>
+  <data name="Spreadsheet_DefaultValidationError" xml:space="preserve">
+    <value>La valeur saisie n'est pas valide.</value>
+  </data>
+  <!-- Spreadsheet: FilterDialog -->
+  <data name="Spreadsheet_ShowRowsWhere" xml:space="preserve">
+    <value>Afficher les lignes où :</value>
+  </data>
+  <data name="Spreadsheet_SelectOperator" xml:space="preserve">
+    <value>Sélectionner un opérateur...</value>
+  </data>
+  <data name="Spreadsheet_EnterValue" xml:space="preserve">
+    <value>Saisir une valeur...</value>
+  </data>
+  <data name="Spreadsheet_ColumnFormat" xml:space="preserve">
+    <value>Colonne {0}</value>
+  </data>
+  <data name="Spreadsheet_FilterEquals" xml:space="preserve">
+    <value>est égal à</value>
+  </data>
+  <data name="Spreadsheet_FilterDoesNotEqual" xml:space="preserve">
+    <value>n'est pas égal à</value>
+  </data>
+  <data name="Spreadsheet_FilterGreaterThan" xml:space="preserve">
+    <value>est supérieur à</value>
+  </data>
+  <data name="Spreadsheet_FilterGreaterThanOrEqual" xml:space="preserve">
+    <value>est supérieur ou égal à</value>
+  </data>
+  <data name="Spreadsheet_FilterLessThan" xml:space="preserve">
+    <value>est inférieur à</value>
+  </data>
+  <data name="Spreadsheet_FilterLessThanOrEqual" xml:space="preserve">
+    <value>est inférieur ou égal à</value>
+  </data>
+  <data name="Spreadsheet_FilterBeginsWith" xml:space="preserve">
+    <value>commence par</value>
+  </data>
+  <data name="Spreadsheet_FilterDoesNotBeginWith" xml:space="preserve">
+    <value>ne commence pas par</value>
+  </data>
+  <data name="Spreadsheet_FilterEndsWith" xml:space="preserve">
+    <value>se termine par</value>
+  </data>
+  <data name="Spreadsheet_FilterDoesNotEndWith" xml:space="preserve">
+    <value>ne se termine pas par</value>
+  </data>
+  <data name="Spreadsheet_FilterContains" xml:space="preserve">
+    <value>contient</value>
+  </data>
+  <data name="Spreadsheet_FilterDoesNotContain" xml:space="preserve">
+    <value>ne contient pas</value>
+  </data>
+  <data name="Spreadsheet_FilterIsEmpty" xml:space="preserve">
+    <value>est vide</value>
+  </data>
+  <data name="Spreadsheet_FilterIsNotEmpty" xml:space="preserve">
+    <value>n'est pas vide</value>
+  </data>
+  <data name="Spreadsheet_FilterAnd" xml:space="preserve">
+    <value>ET</value>
+  </data>
+  <data name="Spreadsheet_FilterOr" xml:space="preserve">
+    <value>OU</value>
+  </data>
+  <!-- Spreadsheet: FormatCellsDialog -->
+  <data name="Spreadsheet_Sample" xml:space="preserve">
+    <value>Exemple</value>
+  </data>
+  <data name="Spreadsheet_DecimalPlaces" xml:space="preserve">
+    <value>Décimales</value>
+  </data>
+  <data name="Spreadsheet_UseThousandsSeparator" xml:space="preserve">
+    <value>Utiliser le séparateur de milliers</value>
+  </data>
+  <data name="Spreadsheet_Symbol" xml:space="preserve">
+    <value>Symbole</value>
+  </data>
+  <data name="Spreadsheet_Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Spreadsheet_FormatCode" xml:space="preserve">
+    <value>Code de format</value>
+  </data>
+  <!-- Spreadsheet: ConditionalFormat tool -->
+  <data name="Spreadsheet_Conditional" xml:space="preserve">
+    <value>Conditionnel</value>
+  </data>
+  <data name="Spreadsheet_GreaterThanMenu" xml:space="preserve">
+    <value>Supérieur à...</value>
+  </data>
+  <data name="Spreadsheet_LessThanMenu" xml:space="preserve">
+    <value>Inférieur à...</value>
+  </data>
+  <data name="Spreadsheet_BetweenMenu" xml:space="preserve">
+    <value>Entre...</value>
+  </data>
+  <data name="Spreadsheet_EqualToMenu" xml:space="preserve">
+    <value>Égal à...</value>
+  </data>
+  <data name="Spreadsheet_TextContainsMenu" xml:space="preserve">
+    <value>Le texte contient...</value>
+  </data>
+  <!-- Spreadsheet: ConditionalFormatDialog -->
+  <data name="Spreadsheet_RuleType" xml:space="preserve">
+    <value>Type de règle</value>
+  </data>
+  <data name="Spreadsheet_Value" xml:space="preserve">
+    <value>Valeur</value>
+  </data>
+  <data name="Spreadsheet_Minimum" xml:space="preserve">
+    <value>Minimum</value>
+  </data>
+  <data name="Spreadsheet_Maximum" xml:space="preserve">
+    <value>Maximum</value>
+  </data>
+  <data name="Spreadsheet_Text" xml:space="preserve">
+    <value>Texte</value>
+  </data>
+  <data name="Spreadsheet_BackgroundColor" xml:space="preserve">
+    <value>Couleur d'arrière-plan</value>
+  </data>
+  <data name="Spreadsheet_TextColor" xml:space="preserve">
+    <value>Couleur du texte</value>
+  </data>
+  <data name="Spreadsheet_RuleGreaterThan" xml:space="preserve">
+    <value>Supérieur à</value>
+  </data>
+  <data name="Spreadsheet_RuleLessThan" xml:space="preserve">
+    <value>Inférieur à</value>
+  </data>
+  <data name="Spreadsheet_RuleBetween" xml:space="preserve">
+    <value>Entre</value>
+  </data>
+  <data name="Spreadsheet_RuleEqualTo" xml:space="preserve">
+    <value>Égal à</value>
+  </data>
+  <data name="Spreadsheet_RuleTextContains" xml:space="preserve">
+    <value>Le texte contient</value>
+  </data>
+  <!-- Spreadsheet: DataValidation tool -->
+  <data name="Spreadsheet_Validation" xml:space="preserve">
+    <value>Validation</value>
+  </data>
+  <data name="Spreadsheet_DataValidationMenu" xml:space="preserve">
+    <value>Validation des données...</value>
+  </data>
+  <data name="Spreadsheet_ClearValidation" xml:space="preserve">
+    <value>Effacer la validation</value>
+  </data>
+  <!-- Spreadsheet: DataValidationDialog -->
+  <data name="Spreadsheet_ValidationType" xml:space="preserve">
+    <value>Type de validation</value>
+  </data>
+  <data name="Spreadsheet_Operator" xml:space="preserve">
+    <value>Opérateur</value>
+  </data>
+  <data name="Spreadsheet_Formula" xml:space="preserve">
+    <value>Formule</value>
+  </data>
+  <data name="Spreadsheet_ValuesCommaSeparated" xml:space="preserve">
+    <value>Valeurs (séparées par des virgules)</value>
+  </data>
+  <data name="Spreadsheet_AllowBlank" xml:space="preserve">
+    <value>Autoriser les valeurs vides</value>
+  </data>
+  <data name="Spreadsheet_ErrorAlert" xml:space="preserve">
+    <value>Alerte d'erreur</value>
+  </data>
+  <data name="Spreadsheet_Style" xml:space="preserve">
+    <value>Style</value>
+  </data>
+  <data name="Spreadsheet_Title" xml:space="preserve">
+    <value>Titre</value>
+  </data>
+  <data name="Spreadsheet_Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Spreadsheet_InputPrompt" xml:space="preserve">
+    <value>Invite de saisie</value>
+  </data>
+  <data name="Spreadsheet_ShowInputMessage" xml:space="preserve">
+    <value>Afficher le message de saisie lorsque la cellule est sélectionnée</value>
+  </data>
+  <data name="Spreadsheet_ValidationWholeNumber" xml:space="preserve">
+    <value>Nombre entier</value>
+  </data>
+  <data name="Spreadsheet_ValidationDecimal" xml:space="preserve">
+    <value>Décimal</value>
+  </data>
+  <data name="Spreadsheet_ValidationList" xml:space="preserve">
+    <value>Liste</value>
+  </data>
+  <data name="Spreadsheet_ValidationDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Spreadsheet_ValidationTime" xml:space="preserve">
+    <value>Heure</value>
+  </data>
+  <data name="Spreadsheet_ValidationTextLength" xml:space="preserve">
+    <value>Longueur du texte</value>
+  </data>
+  <data name="Spreadsheet_ValidationCustom" xml:space="preserve">
+    <value>Personnalisé</value>
+  </data>
+  <data name="Spreadsheet_OperatorBetween" xml:space="preserve">
+    <value>Entre</value>
+  </data>
+  <data name="Spreadsheet_OperatorNotBetween" xml:space="preserve">
+    <value>Pas entre</value>
+  </data>
+  <data name="Spreadsheet_OperatorEqualTo" xml:space="preserve">
+    <value>Égal à</value>
+  </data>
+  <data name="Spreadsheet_OperatorNotEqualTo" xml:space="preserve">
+    <value>Différent de</value>
+  </data>
+  <data name="Spreadsheet_OperatorGreaterThan" xml:space="preserve">
+    <value>Supérieur à</value>
+  </data>
+  <data name="Spreadsheet_OperatorLessThan" xml:space="preserve">
+    <value>Inférieur à</value>
+  </data>
+  <data name="Spreadsheet_OperatorGreaterThanOrEqual" xml:space="preserve">
+    <value>Supérieur ou égal</value>
+  </data>
+  <data name="Spreadsheet_OperatorLessThanOrEqual" xml:space="preserve">
+    <value>Inférieur ou égal</value>
+  </data>
+  <data name="Spreadsheet_ErrorStyleStop" xml:space="preserve">
+    <value>Arrêter</value>
+  </data>
+  <data name="Spreadsheet_ErrorStyleWarning" xml:space="preserve">
+    <value>Avertissement</value>
+  </data>
+  <data name="Spreadsheet_ErrorStyleInformation" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <!-- Spreadsheet: Freeze tool -->
+  <data name="Spreadsheet_FreezePanes" xml:space="preserve">
+    <value>Figer les volets</value>
+  </data>
+  <data name="Spreadsheet_FreezeTopRow" xml:space="preserve">
+    <value>Figer la ligne supérieure</value>
+  </data>
+  <data name="Spreadsheet_FreezeSelectedRows" xml:space="preserve">
+    <value>Figer les lignes sélectionnées</value>
+  </data>
+  <data name="Spreadsheet_FreezeFirstColumn" xml:space="preserve">
+    <value>Figer la première colonne</value>
+  </data>
+  <data name="Spreadsheet_FreezeSelectedColumns" xml:space="preserve">
+    <value>Figer les colonnes sélectionnées</value>
+  </data>
+  <data name="Spreadsheet_Unfreeze" xml:space="preserve">
+    <value>Libérer les volets</value>
+  </data>
+  <!-- Spreadsheet: MergeCells tool -->
+  <data name="Spreadsheet_MergeAndCenter" xml:space="preserve">
+    <value>Fusionner et centrer</value>
+  </data>
+  <data name="Spreadsheet_MergeCells" xml:space="preserve">
+    <value>Fusionner les cellules</value>
+  </data>
+  <data name="Spreadsheet_UnmergeCells" xml:space="preserve">
+    <value>Annuler la fusion des cellules</value>
+  </data>
+  <!-- Spreadsheet: CellBorders tool -->
+  <data name="Spreadsheet_AllBorders" xml:space="preserve">
+    <value>Toutes les bordures</value>
+  </data>
+  <data name="Spreadsheet_OutsideBorders" xml:space="preserve">
+    <value>Bordures extérieures</value>
+  </data>
+  <data name="Spreadsheet_TopBorder" xml:space="preserve">
+    <value>Bordure supérieure</value>
+  </data>
+  <data name="Spreadsheet_BottomBorder" xml:space="preserve">
+    <value>Bordure inférieure</value>
+  </data>
+  <data name="Spreadsheet_LeftBorder" xml:space="preserve">
+    <value>Bordure gauche</value>
+  </data>
+  <data name="Spreadsheet_RightBorder" xml:space="preserve">
+    <value>Bordure droite</value>
+  </data>
+  <data name="Spreadsheet_NoBorder" xml:space="preserve">
+    <value>Aucune bordure</value>
+  </data>
+  <!-- Spreadsheet: DataFormat tool -->
+  <data name="Spreadsheet_FormatGeneral" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="Spreadsheet_FormatNumber" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Spreadsheet_FormatCurrency" xml:space="preserve">
+    <value>Monétaire</value>
+  </data>
+  <data name="Spreadsheet_FormatAccounting" xml:space="preserve">
+    <value>Comptabilité</value>
+  </data>
+  <data name="Spreadsheet_FormatPercentage" xml:space="preserve">
+    <value>Pourcentage</value>
+  </data>
+  <data name="Spreadsheet_FormatScientific" xml:space="preserve">
+    <value>Scientifique</value>
+  </data>
+  <data name="Spreadsheet_FormatDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Spreadsheet_FormatTime" xml:space="preserve">
+    <value>Heure</value>
+  </data>
+  <data name="Spreadsheet_FormatText" xml:space="preserve">
+    <value>Texte</value>
+  </data>
+  <!-- Spreadsheet: HyperlinkDialog -->
+  <data name="Spreadsheet_URL" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Spreadsheet_DisplayText" xml:space="preserve">
+    <value>Texte à afficher</value>
+  </data>
+  <!-- Spreadsheet: IncreaseDecimals / DecreaseDecimals tooltips -->
+  <data name="Spreadsheet_IncreaseDecimalPlaces" xml:space="preserve">
+    <value>Ajouter une décimale</value>
+  </data>
+  <data name="Spreadsheet_DecreaseDecimalPlaces" xml:space="preserve">
+    <value>Réduire les décimales</value>
+  </data>
+  <!-- Spreadsheet: Chart context menu and edit dialog -->
+  <data name="Spreadsheet_EditChart" xml:space="preserve">
+    <value>Modifier le graphique...</value>
+  </data>
+  <data name="Spreadsheet_DeleteChart" xml:space="preserve">
+    <value>Supprimer le graphique</value>
+  </data>
+  <data name="Spreadsheet_EditChartTitle" xml:space="preserve">
+    <value>Modifier le graphique</value>
+  </data>
+  <data name="Spreadsheet_ChartType" xml:space="preserve">
+    <value>Type de graphique</value>
+  </data>
+  <data name="Spreadsheet_ChartTitle" xml:space="preserve">
+    <value>Titre</value>
+  </data>
+  <data name="Spreadsheet_ShowLegend" xml:space="preserve">
+    <value>Afficher la légende</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition" xml:space="preserve">
+    <value>Position de la légende</value>
+  </data>
+  <data name="Spreadsheet_Series" xml:space="preserve">
+    <value>Série</value>
+  </data>
+  <data name="Spreadsheet_SeriesColor" xml:space="preserve">
+    <value>Couleur</value>
+  </data>
+  <data name="Spreadsheet_CategoryRange" xml:space="preserve">
+    <value>Plage de catégories</value>
+  </data>
+  <data name="Spreadsheet_ValueRange" xml:space="preserve">
+    <value>Plage de valeurs</value>
+  </data>
+  <data name="Spreadsheet_SeriesTitle" xml:space="preserve">
+    <value>Titre</value>
+  </data>
+  <data name="Spreadsheet_AddSeries" xml:space="preserve">
+    <value>Ajouter une série</value>
+  </data>
+  <data name="Spreadsheet_SeriesFormat" xml:space="preserve">
+    <value>Série {0}</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Column" xml:space="preserve">
+    <value>Colonne</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Bar" xml:space="preserve">
+    <value>Barre</value>
+  </data>
+  <data name="Spreadsheet_ChartType_StackedColumn" xml:space="preserve">
+    <value>Colonne empilée</value>
+  </data>
+  <data name="Spreadsheet_ChartType_StackedBar" xml:space="preserve">
+    <value>Barre empilée</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Line" xml:space="preserve">
+    <value>Courbe</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Area" xml:space="preserve">
+    <value>Aires</value>
+  </data>
+  <data name="Spreadsheet_ChartType_StackedArea" xml:space="preserve">
+    <value>Aires empilées</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Pie" xml:space="preserve">
+    <value>Secteurs</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Donut" xml:space="preserve">
+    <value>Anneau</value>
+  </data>
+  <data name="Spreadsheet_ChartType_Scatter" xml:space="preserve">
+    <value>Nuage de points</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition_Right" xml:space="preserve">
+    <value>Droite</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition_Left" xml:space="preserve">
+    <value>Gauche</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition_Top" xml:space="preserve">
+    <value>Haut</value>
+  </data>
+  <data name="Spreadsheet_LegendPosition_Bottom" xml:space="preserve">
+    <value>Bas</value>
+  </data>
+  <!-- Spreadsheet: Insert tab tooltips -->
+  <data name="Spreadsheet_InsertHyperlink" xml:space="preserve">
+    <value>Insérer un lien hypertexte</value>
+  </data>
+  <data name="Spreadsheet_InsertImage" xml:space="preserve">
+    <value>Insérer une image</value>
+  </data>
+  <data name="Spreadsheet_InsertChart" xml:space="preserve">
+    <value>Insérer un graphique</value>
+  </data>
+  <data name="Spreadsheet_InsertTable" xml:space="preserve">
+    <value>Insérer un tableau</value>
+  </data>
+  <data name="Spreadsheet_TableName" xml:space="preserve">
+    <value>Nom du tableau</value>
+  </data>
+  <data name="Spreadsheet_TableHasHeaders" xml:space="preserve">
+    <value>Mon tableau comporte des en-têtes</value>
+  </data>
+  <data name="Spreadsheet_TableRange" xml:space="preserve">
+    <value>Plage</value>
+  </data>
+  <!-- Spreadsheet: Table Design tab -->
+  <data name="Spreadsheet_TableDesignTab" xml:space="preserve">
+    <value>Création de tableau</value>
+  </data>
+  <data name="Spreadsheet_TableDesignName" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="Spreadsheet_TableDesignStyle" xml:space="preserve">
+    <value>Style</value>
+  </data>
+  <data name="Spreadsheet_TableDesignHeader" xml:space="preserve">
+    <value>En-tête</value>
+  </data>
+  <data name="Spreadsheet_TableDesignTotals" xml:space="preserve">
+    <value>Totaux</value>
+  </data>
+  <data name="Spreadsheet_TableDesignFilter" xml:space="preserve">
+    <value>Filtrer</value>
+  </data>
+  <data name="Spreadsheet_TableDesignBandedRows" xml:space="preserve">
+    <value>Lignes à bandes</value>
+  </data>
+  <data name="Spreadsheet_TableDesignBandedColumns" xml:space="preserve">
+    <value>Colonnes à bandes</value>
+  </data>
+  <data name="Spreadsheet_TableDesignFirstColumn" xml:space="preserve">
+    <value>1re col.</value>
+  </data>
+  <data name="Spreadsheet_TableDesignLastColumn" xml:space="preserve">
+    <value>Dern. col.</value>
+  </data>
+  <data name="Spreadsheet_TableDesignTotalsForColumn" xml:space="preserve">
+    <value>Totaux : {0}</value>
+  </data>
+  <data name="Spreadsheet_ConvertTableToRange" xml:space="preserve">
+    <value>Convertir en plage</value>
+  </data>
+  <data name="Spreadsheet_DeleteTable" xml:space="preserve">
+    <value>Supprimer le tableau</value>
+  </data>
+  <!-- Spreadsheet: TotalsCalculation labels -->
+  <data name="Spreadsheet_TotalsNone" xml:space="preserve">
+    <value>Aucun</value>
+  </data>
+  <data name="Spreadsheet_TotalsSum" xml:space="preserve">
+    <value>Somme</value>
+  </data>
+  <data name="Spreadsheet_TotalsAverage" xml:space="preserve">
+    <value>Moyenne</value>
+  </data>
+  <data name="Spreadsheet_TotalsCount" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Spreadsheet_TotalsCountNumbers" xml:space="preserve">
+    <value>Nombre (nombres)</value>
+  </data>
+  <data name="Spreadsheet_TotalsMin" xml:space="preserve">
+    <value>Min</value>
+  </data>
+  <data name="Spreadsheet_TotalsMax" xml:space="preserve">
+    <value>Max</value>
+  </data>
+  <data name="Spreadsheet_TotalsStdDev" xml:space="preserve">
+    <value>Écart-type</value>
+  </data>
+  <data name="Spreadsheet_TotalsVar" xml:space="preserve">
+    <value>Variance</value>
+  </data>
+  <!-- Spreadsheet: Custom Sort dialog -->
+  <data name="Spreadsheet_CustomSort" xml:space="preserve">
+    <value>Tri personnalisé</value>
+  </data>
+  <data name="Spreadsheet_CustomSortTooltip" xml:space="preserve">
+    <value>Tri personnalisé...</value>
+  </data>
+  <data name="Spreadsheet_SortHasHeaders" xml:space="preserve">
+    <value>Mes données comportent des en-têtes</value>
+  </data>
+  <data name="Spreadsheet_SortLevelColumn" xml:space="preserve">
+    <value>Colonne</value>
+  </data>
+  <data name="Spreadsheet_SortLevelSortOn" xml:space="preserve">
+    <value>Trier sur</value>
+  </data>
+  <data name="Spreadsheet_SortLevelOrder" xml:space="preserve">
+    <value>Ordre</value>
+  </data>
+  <data name="Spreadsheet_SortLevelCustomList" xml:space="preserve">
+    <value>Liste personnalisée</value>
+  </data>
+  <data name="Spreadsheet_SortLevelCustomListPlaceholder" xml:space="preserve">
+    <value>Séparés par des virgules</value>
+  </data>
+  <data name="Spreadsheet_SortLevelCase" xml:space="preserve">
+    <value>Respecter la casse</value>
+  </data>
+  <data name="Spreadsheet_SortLevelAddLevel" xml:space="preserve">
+    <value>Ajouter un niveau</value>
+  </data>
+  <data name="Spreadsheet_SortOnValues" xml:space="preserve">
+    <value>Valeurs</value>
+  </data>
+  <data name="Spreadsheet_SortOnCellColor" xml:space="preserve">
+    <value>Couleur de cellule</value>
+  </data>
+  <data name="Spreadsheet_SortOnFontColor" xml:space="preserve">
+    <value>Couleur de police</value>
+  </data>
+  <data name="Spreadsheet_SortOrderAscending" xml:space="preserve">
+    <value>Croissant</value>
+  </data>
+  <data name="Spreadsheet_SortOrderDescending" xml:space="preserve">
+    <value>Décroissant</value>
+  </data>
+  <!-- Spreadsheet: Top 10 filter dialog -->
+  <data name="Spreadsheet_Top10Filter" xml:space="preserve">
+    <value>10 premiers</value>
+  </data>
+  <data name="Spreadsheet_Top10FilterTooltip" xml:space="preserve">
+    <value>10 premiers...</value>
+  </data>
+  <data name="Spreadsheet_Top10Show" xml:space="preserve">
+    <value>Afficher</value>
+  </data>
+  <data name="Spreadsheet_Top10DirectionTop" xml:space="preserve">
+    <value>Haut</value>
+  </data>
+  <data name="Spreadsheet_Top10DirectionBottom" xml:space="preserve">
+    <value>Bas</value>
+  </data>
+  <data name="Spreadsheet_Top10UnitItems" xml:space="preserve">
+    <value>Éléments</value>
+  </data>
+  <data name="Spreadsheet_Top10UnitPercent" xml:space="preserve">
+    <value>Pourcentage</value>
+  </data>
+  <!-- Spreadsheet: Dynamic filter shortcuts -->
+  <data name="Spreadsheet_FilterAboveAverage" xml:space="preserve">
+    <value>Au-dessus de la moyenne</value>
+  </data>
+  <data name="Spreadsheet_FilterBelowAverage" xml:space="preserve">
+    <value>En dessous de la moyenne</value>
+  </data>
+  <!-- DropDown -->
+  <data name="DropDown_RemoveChipTitle" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="DropDown_ClearAriaLabel" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="DropDown_SearchAriaLabel" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="DropDown_EmptyAriaLabel" xml:space="preserve">
+    <value>Vide</value>
+  </data>
+  <!-- AIChat -->
+  <data name="AIChat_Placeholder" xml:space="preserve">
+    <value>Saisissez votre message...</value>
+  </data>
+  <data name="AIChat_EmptyMessage" xml:space="preserve">
+    <value>Aucun message pour le moment. Démarrez une conversation !</value>
+  </data>
+  <data name="AIChat_UserAvatarText" xml:space="preserve">
+    <value>U</value>
+  </data>
+  <data name="AIChat_AssistantAvatarText" xml:space="preserve">
+    <value>IA</value>
+  </data>
+  <!-- Button -->
+  <data name="Button_ImageAlternateText" xml:space="preserve">
+    <value>bouton</value>
+  </data>
+  <!-- Carousel -->
+  <data name="Carousel_PagerButtonAriaLabelFormat" xml:space="preserve">
+    <value>Aller à la diapositive {0}</value>
+  </data>
+  <!-- Chat -->
+  <data name="Chat_Placeholder" xml:space="preserve">
+    <value>Saisissez votre message...</value>
+  </data>
+  <data name="Chat_EmptyMessage" xml:space="preserve">
+    <value>Aucun message pour le moment. Démarrez une conversation !</value>
+  </data>
+  <data name="Chat_NewMessagesText" xml:space="preserve">
+    <value>Nouveaux messages</value>
+  </data>
+  <!-- Chip -->
+  <data name="Chip_RemoveChipTitle" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <!-- ChipList -->
+  <data name="ChipList_RemoveChipTitle" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <!-- ColorPicker -->
+  <data name="ColorPicker_ToggleAriaLabel" xml:space="preserve">
+    <value>Basculer</value>
+  </data>
+  <data name="ColorPicker_PopupAriaLabel" xml:space="preserve">
+    <value>Sélecteur de couleur</value>
+  </data>
+  <data name="ColorPicker_HexText" xml:space="preserve">
+    <value>Hex</value>
+  </data>
+  <data name="ColorPicker_RedText" xml:space="preserve">
+    <value>R</value>
+  </data>
+  <data name="ColorPicker_GreenText" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="ColorPicker_BlueText" xml:space="preserve">
+    <value>B</value>
+  </data>
+  <data name="ColorPicker_AlphaText" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="ColorPicker_ButtonText" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <!-- DataAnnotationValidator -->
+  <data name="DataAnnotationValidator_MessageSeparator" xml:space="preserve">
+    <value> et </value>
+  </data>
+  <!-- DataFilter -->
+  <data name="DataFilter_FilterText" xml:space="preserve">
+    <value>Filtrer</value>
+  </data>
+  <data name="DataFilter_EnumFilterSelectText" xml:space="preserve">
+    <value>Sélectionner...</value>
+  </data>
+  <data name="DataFilter_AndOperatorText" xml:space="preserve">
+    <value>Et</value>
+  </data>
+  <data name="DataFilter_OrOperatorText" xml:space="preserve">
+    <value>Ou</value>
+  </data>
+  <data name="DataFilter_ApplyFilterText" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="DataFilter_ClearFilterText" xml:space="preserve">
+    <value>Tout effacer</value>
+  </data>
+  <data name="DataFilter_AddFilterText" xml:space="preserve">
+    <value>Ajouter un filtre</value>
+  </data>
+  <data name="DataFilter_RemoveFilterText" xml:space="preserve">
+    <value>Supprimer le filtre</value>
+  </data>
+  <data name="DataFilter_AddFilterGroupText" xml:space="preserve">
+    <value>Ajouter un groupe de filtres</value>
+  </data>
+  <data name="DataFilter_EqualsText" xml:space="preserve">
+    <value>Est égal à</value>
+  </data>
+  <data name="DataFilter_NotEqualsText" xml:space="preserve">
+    <value>N'est pas égal à</value>
+  </data>
+  <data name="DataFilter_LessThanText" xml:space="preserve">
+    <value>Inférieur à</value>
+  </data>
+  <data name="DataFilter_LessThanOrEqualsText" xml:space="preserve">
+    <value>Inférieur ou égal à</value>
+  </data>
+  <data name="DataFilter_GreaterThanText" xml:space="preserve">
+    <value>Supérieur à</value>
+  </data>
+  <data name="DataFilter_GreaterThanOrEqualsText" xml:space="preserve">
+    <value>Supérieur ou égal à</value>
+  </data>
+  <data name="DataFilter_EndsWithText" xml:space="preserve">
+    <value>Se termine par</value>
+  </data>
+  <data name="DataFilter_ContainsText" xml:space="preserve">
+    <value>Contient</value>
+  </data>
+  <data name="DataFilter_DoesNotContainText" xml:space="preserve">
+    <value>Ne contient pas</value>
+  </data>
+  <data name="DataFilter_InText" xml:space="preserve">
+    <value>Dans</value>
+  </data>
+  <data name="DataFilter_NotInText" xml:space="preserve">
+    <value>Pas dans</value>
+  </data>
+  <data name="DataFilter_StartsWithText" xml:space="preserve">
+    <value>Commence par</value>
+  </data>
+  <data name="DataFilter_IsNotNullText" xml:space="preserve">
+    <value>N'est pas nul</value>
+  </data>
+  <data name="DataFilter_IsNullText" xml:space="preserve">
+    <value>Est nul</value>
+  </data>
+  <data name="DataFilter_IsEmptyText" xml:space="preserve">
+    <value>Est vide</value>
+  </data>
+  <data name="DataFilter_IsNotEmptyText" xml:space="preserve">
+    <value>N'est pas vide</value>
+  </data>
+  <data name="DataFilter_CustomText" xml:space="preserve">
+    <value>Personnalisé</value>
+  </data>
+  <!-- DataGrid -->
+  <data name="DataGrid_FilterText" xml:space="preserve">
+    <value>Filtrer</value>
+  </data>
+  <data name="DataGrid_EnumFilterSelectText" xml:space="preserve">
+    <value>Sélectionner...</value>
+  </data>
+  <data name="DataGrid_EnumNullFilterText" xml:space="preserve">
+    <value>Aucune valeur</value>
+  </data>
+  <data name="DataGrid_AndOperatorText" xml:space="preserve">
+    <value>Et</value>
+  </data>
+  <data name="DataGrid_OrOperatorText" xml:space="preserve">
+    <value>Ou</value>
+  </data>
+  <data name="DataGrid_ApplyFilterText" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="DataGrid_ClearFilterText" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="DataGrid_EqualsText" xml:space="preserve">
+    <value>Est égal à</value>
+  </data>
+  <data name="DataGrid_NotEqualsText" xml:space="preserve">
+    <value>N'est pas égal à</value>
+  </data>
+  <data name="DataGrid_LessThanText" xml:space="preserve">
+    <value>Inférieur à</value>
+  </data>
+  <data name="DataGrid_LessThanOrEqualsText" xml:space="preserve">
+    <value>Inférieur ou égal à</value>
+  </data>
+  <data name="DataGrid_GreaterThanText" xml:space="preserve">
+    <value>Supérieur à</value>
+  </data>
+  <data name="DataGrid_GreaterThanOrEqualsText" xml:space="preserve">
+    <value>Supérieur ou égal à</value>
+  </data>
+  <data name="DataGrid_EndsWithText" xml:space="preserve">
+    <value>Se termine par</value>
+  </data>
+  <data name="DataGrid_ContainsText" xml:space="preserve">
+    <value>Contient</value>
+  </data>
+  <data name="DataGrid_DoesNotContainText" xml:space="preserve">
+    <value>Ne contient pas</value>
+  </data>
+  <data name="DataGrid_InText" xml:space="preserve">
+    <value>Dans</value>
+  </data>
+  <data name="DataGrid_NotInText" xml:space="preserve">
+    <value>Pas dans</value>
+  </data>
+  <data name="DataGrid_StartsWithText" xml:space="preserve">
+    <value>Commence par</value>
+  </data>
+  <data name="DataGrid_IsNotNullText" xml:space="preserve">
+    <value>N'est pas nul</value>
+  </data>
+  <data name="DataGrid_IsNullText" xml:space="preserve">
+    <value>Est nul</value>
+  </data>
+  <data name="DataGrid_IsEmptyText" xml:space="preserve">
+    <value>Est vide</value>
+  </data>
+  <data name="DataGrid_IsNotEmptyText" xml:space="preserve">
+    <value>N'est pas vide</value>
+  </data>
+  <data name="DataGrid_CustomText" xml:space="preserve">
+    <value>Personnalisé</value>
+  </data>
+  <data name="DataGrid_ColumnsShowingText" xml:space="preserve">
+    <value>colonnes affichées</value>
+  </data>
+  <data name="DataGrid_AllColumnsText" xml:space="preserve">
+    <value>Toutes</value>
+  </data>
+  <data name="DataGrid_ColumnsText" xml:space="preserve">
+    <value>Colonnes</value>
+  </data>
+  <data name="DataGrid_RemoveGroupAriaLabel" xml:space="preserve">
+    <value>Supprimer le groupe</value>
+  </data>
+  <data name="DataGrid_SelectVisibleColumnsAriaLabel" xml:space="preserve">
+    <value>sélectionner les colonnes visibles</value>
+  </data>
+  <data name="DataGrid_LogicalOperatorAriaLabel" xml:space="preserve">
+    <value> opérateur de filtre logique </value>
+  </data>
+  <data name="DataGrid_FilterOperatorAriaLabel" xml:space="preserve">
+    <value> opérateur de filtre </value>
+  </data>
+  <data name="DataGrid_SecondFilterOperatorAriaLabel" xml:space="preserve">
+    <value> deuxième opérateur de filtre </value>
+  </data>
+  <data name="DataGrid_FilterValueAriaLabel" xml:space="preserve">
+    <value> valeur du filtre </value>
+  </data>
+  <data name="DataGrid_SecondFilterValueAriaLabel" xml:space="preserve">
+    <value> deuxième valeur du filtre </value>
+  </data>
+  <data name="DataGrid_GroupPanelText" xml:space="preserve">
+    <value>Faites glisser un en-tête de colonne ici pour regrouper par cette colonne</value>
+  </data>
+  <data name="DataGrid_ExpandAllTitle" xml:space="preserve">
+    <value>Tout développer</value>
+  </data>
+  <data name="DataGrid_CollapseAllTitle" xml:space="preserve">
+    <value>Tout réduire</value>
+  </data>
+  <!-- DatePicker -->
+  <data name="DatePicker_CalendarWeekTitle" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="DatePicker_ToggleAriaLabel" xml:space="preserve">
+    <value>Basculer</value>
+  </data>
+  <data name="DatePicker_PopupAriaLabel" xml:space="preserve">
+    <value>Sélecteur de date</value>
+  </data>
+  <data name="DatePicker_ClearAriaLabel" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="DatePicker_HourAriaLabel" xml:space="preserve">
+    <value>Heure</value>
+  </data>
+  <data name="DatePicker_MinutesAriaLabel" xml:space="preserve">
+    <value>Minutes</value>
+  </data>
+  <data name="DatePicker_SecondsAriaLabel" xml:space="preserve">
+    <value>Secondes</value>
+  </data>
+  <data name="DatePicker_OkAriaLabel" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="DatePicker_PrevMonthAriaLabel" xml:space="preserve">
+    <value>Mois précédent</value>
+  </data>
+  <data name="DatePicker_NextMonthAriaLabel" xml:space="preserve">
+    <value>Mois suivant</value>
+  </data>
+  <data name="DatePicker_ToggleAmPmAriaLabel" xml:space="preserve">
+    <value>Basculer AM/PM</value>
+  </data>
+  <!-- DropDown -->
+  <data name="DropDown_SelectedItemsText" xml:space="preserve">
+    <value>éléments sélectionnés</value>
+  </data>
+  <!-- DropDownDataGrid -->
+  <data name="DropDownDataGrid_PagingSummaryFormat" xml:space="preserve">
+    <value>Page {0} sur {1} ({2} éléments)</value>
+  </data>
+  <data name="DropDownDataGrid_FirstPageTitle" xml:space="preserve">
+    <value>Première page.</value>
+  </data>
+  <data name="DropDownDataGrid_FirstPageAriaLabel" xml:space="preserve">
+    <value>Aller à la première page.</value>
+  </data>
+  <data name="DropDownDataGrid_PrevPageTitle" xml:space="preserve">
+    <value>Page précédente</value>
+  </data>
+  <data name="DropDownDataGrid_PrevPageAriaLabel" xml:space="preserve">
+    <value>Aller à la page précédente.</value>
+  </data>
+  <data name="DropDownDataGrid_LastPageTitle" xml:space="preserve">
+    <value>Dernière page</value>
+  </data>
+  <data name="DropDownDataGrid_LastPageAriaLabel" xml:space="preserve">
+    <value>Aller à la dernière page.</value>
+  </data>
+  <data name="DropDownDataGrid_NextPageTitle" xml:space="preserve">
+    <value>Page suivante</value>
+  </data>
+  <data name="DropDownDataGrid_NextPageAriaLabel" xml:space="preserve">
+    <value>Aller à la page suivante.</value>
+  </data>
+  <data name="DropDownDataGrid_PageTitleFormat" xml:space="preserve">
+    <value>Page {0}</value>
+  </data>
+  <data name="DropDownDataGrid_PageAriaLabelFormat" xml:space="preserve">
+    <value>Aller à la page {0}.</value>
+  </data>
+  <data name="DropDownDataGrid_EmptyText" xml:space="preserve">
+    <value>Aucun enregistrement à afficher.</value>
+  </data>
+  <data name="DropDownDataGrid_SearchTextPlaceholder" xml:space="preserve">
+    <value>Rechercher...</value>
+  </data>
+  <data name="DropDownDataGrid_AddAriaLabel" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="DropDownDataGrid_SelectedItemsText" xml:space="preserve">
+    <value>éléments sélectionnés</value>
+  </data>
+  <!-- FileInput -->
+  <data name="FileInput_ChooseText" xml:space="preserve">
+    <value>Choisir</value>
+  </data>
+  <data name="FileInput_DeleteText" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="FileInput_ImageAlternateText" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <!-- Gantt -->
+  <data name="Gantt_TodayText" xml:space="preserve">
+    <value>Aujourd'hui</value>
+  </data>
+  <data name="Gantt_PrevText" xml:space="preserve">
+    <value>Précédent</value>
+  </data>
+  <data name="Gantt_NextText" xml:space="preserve">
+    <value>Suivant</value>
+  </data>
+  <data name="Gantt_ZoomToFitText" xml:space="preserve">
+    <value>Ajuster le zoom</value>
+  </data>
+  <data name="Gantt_EmptyText" xml:space="preserve">
+    <value>Aucun enregistrement à afficher.</value>
+  </data>
+  <data name="Gantt_FilterText" xml:space="preserve">
+    <value>Filtrer</value>
+  </data>
+  <data name="Gantt_AndOperatorText" xml:space="preserve">
+    <value>Et</value>
+  </data>
+  <data name="Gantt_OrOperatorText" xml:space="preserve">
+    <value>Ou</value>
+  </data>
+  <data name="Gantt_ApplyFilterText" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="Gantt_ClearFilterText" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="Gantt_EqualsText" xml:space="preserve">
+    <value>Est égal à</value>
+  </data>
+  <data name="Gantt_NotEqualsText" xml:space="preserve">
+    <value>N'est pas égal à</value>
+  </data>
+  <data name="Gantt_LessThanText" xml:space="preserve">
+    <value>Inférieur à</value>
+  </data>
+  <data name="Gantt_LessThanOrEqualsText" xml:space="preserve">
+    <value>Inférieur ou égal à</value>
+  </data>
+  <data name="Gantt_GreaterThanText" xml:space="preserve">
+    <value>Supérieur à</value>
+  </data>
+  <data name="Gantt_GreaterThanOrEqualsText" xml:space="preserve">
+    <value>Supérieur ou égal à</value>
+  </data>
+  <data name="Gantt_ContainsText" xml:space="preserve">
+    <value>Contient</value>
+  </data>
+  <data name="Gantt_DoesNotContainText" xml:space="preserve">
+    <value>Ne contient pas</value>
+  </data>
+  <data name="Gantt_StartsWithText" xml:space="preserve">
+    <value>Commence par</value>
+  </data>
+  <data name="Gantt_EndsWithText" xml:space="preserve">
+    <value>Se termine par</value>
+  </data>
+  <data name="Gantt_IsNullText" xml:space="preserve">
+    <value>Est nul</value>
+  </data>
+  <data name="Gantt_IsNotNullText" xml:space="preserve">
+    <value>N'est pas nul</value>
+  </data>
+  <data name="Gantt_IsEmptyText" xml:space="preserve">
+    <value>Est vide</value>
+  </data>
+  <data name="Gantt_IsNotEmptyText" xml:space="preserve">
+    <value>N'est pas vide</value>
+  </data>
+  <!-- Gravatar -->
+  <data name="Gravatar_AlternateText" xml:space="preserve">
+    <value>gravatar</value>
+  </data>
+  <!-- HtmlEditorAlignCenter -->
+  <data name="HtmlEditorAlignCenter_Title" xml:space="preserve">
+    <value>Centrer</value>
+  </data>
+  <!-- HtmlEditorAlignLeft -->
+  <data name="HtmlEditorAlignLeft_Title" xml:space="preserve">
+    <value>Aligner à gauche</value>
+  </data>
+  <!-- HtmlEditorAlignRight -->
+  <data name="HtmlEditorAlignRight_Title" xml:space="preserve">
+    <value>Aligner à droite</value>
+  </data>
+  <!-- HtmlEditorBackground -->
+  <data name="HtmlEditorBackground_Title" xml:space="preserve">
+    <value>Couleur d'arrière-plan</value>
+  </data>
+  <!-- HtmlEditorBold -->
+  <data name="HtmlEditorBold_Title" xml:space="preserve">
+    <value>Gras</value>
+  </data>
+  <!-- HtmlEditorColor -->
+  <data name="HtmlEditorColor_Title" xml:space="preserve">
+    <value>Couleur du texte</value>
+  </data>
+  <data name="HtmlEditorColor_HexText" xml:space="preserve">
+    <value>Hex</value>
+  </data>
+  <data name="HtmlEditorColor_RedText" xml:space="preserve">
+    <value>R</value>
+  </data>
+  <data name="HtmlEditorColor_GreenText" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="HtmlEditorColor_BlueText" xml:space="preserve">
+    <value>B</value>
+  </data>
+  <data name="HtmlEditorColor_AlphaText" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="HtmlEditorColor_ButtonText" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <!-- HtmlEditorFontName -->
+  <data name="HtmlEditorFontName_Placeholder" xml:space="preserve">
+    <value>Police</value>
+  </data>
+  <data name="HtmlEditorFontName_Title" xml:space="preserve">
+    <value>Nom de la police</value>
+  </data>
+  <!-- HtmlEditorFontSize -->
+  <data name="HtmlEditorFontSize_Placeholder" xml:space="preserve">
+    <value>Taille de police</value>
+  </data>
+  <data name="HtmlEditorFontSize_Title" xml:space="preserve">
+    <value>Taille de police</value>
+  </data>
+  <!-- HtmlEditorImage -->
+  <data name="HtmlEditorImage_Title" xml:space="preserve">
+    <value>Insérer une image</value>
+  </data>
+  <data name="HtmlEditorImage_SelectText" xml:space="preserve">
+    <value>Sélectionner le fichier image à téléverser</value>
+  </data>
+  <data name="HtmlEditorImage_UploadChooseText" xml:space="preserve">
+    <value>Parcourir</value>
+  </data>
+  <data name="HtmlEditorImage_UrlText" xml:space="preserve">
+    <value>ou saisir une adresse web</value>
+  </data>
+  <data name="HtmlEditorImage_AltText" xml:space="preserve">
+    <value>Texte alternatif</value>
+  </data>
+  <data name="HtmlEditorImage_OkText" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="HtmlEditorImage_CancelText" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="HtmlEditorImage_WidthText" xml:space="preserve">
+    <value>Largeur de l'image</value>
+  </data>
+  <data name="HtmlEditorImage_HeightText" xml:space="preserve">
+    <value>Hauteur de l'image</value>
+  </data>
+  <!-- HtmlEditorIndent -->
+  <data name="HtmlEditorIndent_Title" xml:space="preserve">
+    <value>Augmenter le retrait</value>
+  </data>
+  <!-- HtmlEditorItalic -->
+  <data name="HtmlEditorItalic_Title" xml:space="preserve">
+    <value>Italique</value>
+  </data>
+  <!-- HtmlEditorJustify -->
+  <data name="HtmlEditorJustify_Title" xml:space="preserve">
+    <value>Justifier</value>
+  </data>
+  <!-- HtmlEditorLink -->
+  <data name="HtmlEditorLink_Title" xml:space="preserve">
+    <value>Insérer un lien</value>
+  </data>
+  <data name="HtmlEditorLink_UrlText" xml:space="preserve">
+    <value>Adresse web</value>
+  </data>
+  <data name="HtmlEditorLink_OpenInNewWindowText" xml:space="preserve">
+    <value>Ouvrir dans une nouvelle fenêtre</value>
+  </data>
+  <data name="HtmlEditorLink_LinkText" xml:space="preserve">
+    <value>Texte</value>
+  </data>
+  <data name="HtmlEditorLink_OkText" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="HtmlEditorLink_CancelText" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <!-- HtmlEditorOrderedList -->
+  <data name="HtmlEditorOrderedList_Title" xml:space="preserve">
+    <value>Liste numérotée</value>
+  </data>
+  <!-- HtmlEditorOutdent -->
+  <data name="HtmlEditorOutdent_Title" xml:space="preserve">
+    <value>Diminuer le retrait</value>
+  </data>
+  <!-- HtmlEditorRedo -->
+  <data name="HtmlEditorRedo_Title" xml:space="preserve">
+    <value>Rétablir</value>
+  </data>
+  <!-- HtmlEditorRemoveFormat -->
+  <data name="HtmlEditorRemoveFormat_Title" xml:space="preserve">
+    <value>Supprimer la mise en forme</value>
+  </data>
+  <!-- HtmlEditorSource -->
+  <data name="HtmlEditorSource_Title" xml:space="preserve">
+    <value>Afficher la source</value>
+  </data>
+  <!-- HtmlEditorStrikeThrough -->
+  <data name="HtmlEditorStrikeThrough_Title" xml:space="preserve">
+    <value>Barré</value>
+  </data>
+  <!-- HtmlEditorSubscript -->
+  <data name="HtmlEditorSubscript_Title" xml:space="preserve">
+    <value>Indice</value>
+  </data>
+  <!-- HtmlEditorSuperscript -->
+  <data name="HtmlEditorSuperscript_Title" xml:space="preserve">
+    <value>Exposant</value>
+  </data>
+  <!-- HtmlEditorUnderline -->
+  <data name="HtmlEditorUnderline_Title" xml:space="preserve">
+    <value>Souligné</value>
+  </data>
+  <!-- HtmlEditorUndo -->
+  <data name="HtmlEditorUndo_Title" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <!-- HtmlEditorUnlink -->
+  <data name="HtmlEditorUnlink_Title" xml:space="preserve">
+    <value>Supprimer le lien</value>
+  </data>
+  <!-- HtmlEditorUnorderedList -->
+  <data name="HtmlEditorUnorderedList_Title" xml:space="preserve">
+    <value>Liste à puces</value>
+  </data>
+  <!-- Image -->
+  <data name="Image_AlternateText" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <!-- Link -->
+  <data name="Link_ImageAlternateText" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <!-- ListBox -->
+  <data name="ListBox_EmptyText" xml:space="preserve">
+    <value>Aucun enregistrement à afficher.</value>
+  </data>
+  <!-- Login -->
+  <data name="Login_LoginText" xml:space="preserve">
+    <value>Connexion</value>
+  </data>
+  <data name="Login_RegisterText" xml:space="preserve">
+    <value>S'inscrire</value>
+  </data>
+  <data name="Login_RememberMeText" xml:space="preserve">
+    <value>Se souvenir de moi</value>
+  </data>
+  <data name="Login_RegisterMessageText" xml:space="preserve">
+    <value>Vous n'avez pas encore de compte ?</value>
+  </data>
+  <data name="Login_ResetPasswordText" xml:space="preserve">
+    <value>Mot de passe oublié ?</value>
+  </data>
+  <data name="Login_UserText" xml:space="preserve">
+    <value>Nom d'utilisateur</value>
+  </data>
+  <data name="Login_UserRequired" xml:space="preserve">
+    <value>Le nom d'utilisateur est obligatoire</value>
+  </data>
+  <data name="Login_PasswordText" xml:space="preserve">
+    <value>Mot de passe</value>
+  </data>
+  <data name="Login_PasswordRequired" xml:space="preserve">
+    <value>Le mot de passe est obligatoire</value>
+  </data>
+  <!-- Menu -->
+  <data name="Menu_AriaLabel" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="Menu_ToggleAriaLabel" xml:space="preserve">
+    <value>Basculer</value>
+  </data>
+  <!-- MenuItem -->
+  <data name="MenuItem_ImageAlternateText" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <!-- MonthView -->
+  <data name="MonthView_MoreText" xml:space="preserve">
+    <value>+ {0} de plus</value>
+  </data>
+  <!-- Numeric -->
+  <data name="Numeric_UpAriaLabel" xml:space="preserve">
+    <value>Haut</value>
+  </data>
+  <data name="Numeric_DownAriaLabel" xml:space="preserve">
+    <value>Bas</value>
+  </data>
+  <!-- Pager -->
+  <data name="Pager_FirstPageTitle" xml:space="preserve">
+    <value>Première page</value>
+  </data>
+  <data name="Pager_FirstPageAriaLabel" xml:space="preserve">
+    <value>Aller à la première page.</value>
+  </data>
+  <data name="Pager_PrevPageTitle" xml:space="preserve">
+    <value>Page précédente</value>
+  </data>
+  <data name="Pager_PrevPageAriaLabel" xml:space="preserve">
+    <value>Aller à la page précédente.</value>
+  </data>
+  <data name="Pager_LastPageTitle" xml:space="preserve">
+    <value>Dernière page</value>
+  </data>
+  <data name="Pager_LastPageAriaLabel" xml:space="preserve">
+    <value>Aller à la dernière page.</value>
+  </data>
+  <data name="Pager_NextPageTitle" xml:space="preserve">
+    <value>Page suivante</value>
+  </data>
+  <data name="Pager_NextPageAriaLabel" xml:space="preserve">
+    <value>Aller à la page suivante.</value>
+  </data>
+  <data name="Pager_PageTitleFormat" xml:space="preserve">
+    <value>Page {0}</value>
+  </data>
+  <data name="Pager_PageAriaLabelFormat" xml:space="preserve">
+    <value>Aller à la page {0}.</value>
+  </data>
+  <data name="Pager_PageSizeText" xml:space="preserve">
+    <value>éléments par page</value>
+  </data>
+  <data name="Pager_NavigationAriaLabel" xml:space="preserve">
+    <value>Pagination</value>
+  </data>
+  <data name="Pager_PagingSummaryFormat" xml:space="preserve">
+    <value>Page {0} sur {1} ({2} éléments)</value>
+  </data>
+  <!-- Panel -->
+  <data name="Panel_ExpandTitle" xml:space="preserve">
+    <value>Développer</value>
+  </data>
+  <data name="Panel_CollapseTitle" xml:space="preserve">
+    <value>Réduire</value>
+  </data>
+  <!-- PanelMenu -->
+  <data name="PanelMenu_AriaLabel" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <!-- PanelMenuItem -->
+  <data name="PanelMenuItem_ImageAlternateText" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <!-- PickList -->
+  <data name="PickList_EmptyText" xml:space="preserve">
+    <value>Aucun enregistrement à afficher.</value>
+  </data>
+  <data name="PickList_SourceToTargetTitle" xml:space="preserve">
+    <value>Déplacer tous les éléments de la source vers la collection cible</value>
+  </data>
+  <data name="PickList_SelectedSourceToTargetTitle" xml:space="preserve">
+    <value>Déplacer tous les éléments sélectionnés de la source vers la collection cible</value>
+  </data>
+  <data name="PickList_TargetToSourceTitle" xml:space="preserve">
+    <value>Déplacer tous les éléments de la cible vers la collection source</value>
+  </data>
+  <data name="PickList_SelectedTargetToSourceTitle" xml:space="preserve">
+    <value>Déplacer les éléments cibles sélectionnés vers la collection source</value>
+  </data>
+  <!-- PivotDataGrid -->
+  <data name="PivotDataGrid_EmptyText" xml:space="preserve">
+    <value>Aucun enregistrement à afficher.</value>
+  </data>
+  <data name="PivotDataGrid_FieldsPickerHeaderText" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="PivotDataGrid_RowsText" xml:space="preserve">
+    <value>Lignes</value>
+  </data>
+  <data name="PivotDataGrid_ColumnsText" xml:space="preserve">
+    <value>Colonnes</value>
+  </data>
+  <data name="PivotDataGrid_AggregatesText" xml:space="preserve">
+    <value>Agrégats</value>
+  </data>
+  <data name="PivotDataGrid_SortAriaLabelFormat" xml:space="preserve">
+    <value>Trier par {0}</value>
+  </data>
+  <data name="PivotDataGrid_FilterText" xml:space="preserve">
+    <value>Filtrer</value>
+  </data>
+  <data name="PivotDataGrid_EnumFilterSelectText" xml:space="preserve">
+    <value>Sélectionner...</value>
+  </data>
+  <data name="PivotDataGrid_ApplyText" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="PivotDataGrid_ClearText" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="PivotDataGrid_FilterOperatorAriaLabel" xml:space="preserve">
+    <value>Opérateur de filtre</value>
+  </data>
+  <data name="PivotDataGrid_FilterValueAriaLabel" xml:space="preserve">
+    <value>Valeur du filtre</value>
+  </data>
+  <data name="PivotDataGrid_SecondFilterOperatorAriaLabel" xml:space="preserve">
+    <value>Deuxième opérateur de filtre</value>
+  </data>
+  <data name="PivotDataGrid_SecondFilterValueAriaLabel" xml:space="preserve">
+    <value>Deuxième valeur du filtre</value>
+  </data>
+  <data name="PivotDataGrid_LogicalOperatorAriaLabel" xml:space="preserve">
+    <value>Opérateur logique</value>
+  </data>
+  <data name="PivotDataGrid_AndOperatorText" xml:space="preserve">
+    <value>Et</value>
+  </data>
+  <data name="PivotDataGrid_OrOperatorText" xml:space="preserve">
+    <value>Ou</value>
+  </data>
+  <data name="PivotDataGrid_EqualsText" xml:space="preserve">
+    <value>Est égal à</value>
+  </data>
+  <data name="PivotDataGrid_NotEqualsText" xml:space="preserve">
+    <value>N'est pas égal à</value>
+  </data>
+  <data name="PivotDataGrid_LessThanText" xml:space="preserve">
+    <value>Inférieur à</value>
+  </data>
+  <data name="PivotDataGrid_LessThanOrEqualsText" xml:space="preserve">
+    <value>Inférieur ou égal à</value>
+  </data>
+  <data name="PivotDataGrid_GreaterThanText" xml:space="preserve">
+    <value>Supérieur à</value>
+  </data>
+  <data name="PivotDataGrid_GreaterThanOrEqualsText" xml:space="preserve">
+    <value>Supérieur ou égal à</value>
+  </data>
+  <data name="PivotDataGrid_EndsWithText" xml:space="preserve">
+    <value>Se termine par</value>
+  </data>
+  <data name="PivotDataGrid_ContainsText" xml:space="preserve">
+    <value>Contient</value>
+  </data>
+  <data name="PivotDataGrid_DoesNotContainText" xml:space="preserve">
+    <value>Ne contient pas</value>
+  </data>
+  <data name="PivotDataGrid_InText" xml:space="preserve">
+    <value>Dans</value>
+  </data>
+  <data name="PivotDataGrid_NotInText" xml:space="preserve">
+    <value>Pas dans</value>
+  </data>
+  <data name="PivotDataGrid_StartsWithText" xml:space="preserve">
+    <value>Commence par</value>
+  </data>
+  <data name="PivotDataGrid_IsNotNullText" xml:space="preserve">
+    <value>N'est pas nul</value>
+  </data>
+  <data name="PivotDataGrid_IsNullText" xml:space="preserve">
+    <value>Est nul</value>
+  </data>
+  <data name="PivotDataGrid_IsEmptyText" xml:space="preserve">
+    <value>Est vide</value>
+  </data>
+  <data name="PivotDataGrid_IsNotEmptyText" xml:space="preserve">
+    <value>N'est pas vide</value>
+  </data>
+  <data name="PivotDataGrid_CustomText" xml:space="preserve">
+    <value>Personnalisé</value>
+  </data>
+  <!-- ProfileMenu -->
+  <data name="ProfileMenu_ToggleAriaLabel" xml:space="preserve">
+    <value>Menu du profil</value>
+  </data>
+  <!-- ProfileMenuItem -->
+  <data name="ProfileMenuItem_ImageAlternateText" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <!-- Rating -->
+  <data name="Rating_ClearAriaLabel" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="Rating_RateAriaLabel" xml:space="preserve">
+    <value>Noter</value>
+  </data>
+  <!-- SankeyDiagram -->
+  <data name="SankeyDiagram_ValueText" xml:space="preserve">
+    <value>Valeur</value>
+  </data>
+  <data name="SankeyDiagram_IncomingText" xml:space="preserve">
+    <value>Entrant</value>
+  </data>
+  <data name="SankeyDiagram_OutgoingText" xml:space="preserve">
+    <value>Sortant</value>
+  </data>
+  <data name="SankeyDiagram_FlowText" xml:space="preserve">
+    <value>Flux</value>
+  </data>
+  <!-- Scheduler -->
+  <data name="Scheduler_TodayText" xml:space="preserve">
+    <value>Aujourd'hui</value>
+  </data>
+  <data name="Scheduler_NextText" xml:space="preserve">
+    <value>Suivant</value>
+  </data>
+  <data name="Scheduler_PrevText" xml:space="preserve">
+    <value>Précédent</value>
+  </data>
+  <!-- SidebarToggle -->
+  <data name="SidebarToggle_ToggleAriaLabel" xml:space="preserve">
+    <value>Basculer</value>
+  </data>
+  <!-- SignaturePad -->
+  <data name="SignaturePad_ClearAriaLabel" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <!-- SpeechToTextButton -->
+  <data name="SpeechToTextButton_Title" xml:space="preserve">
+    <value>Appuyez pour démarrer la reconnaissance vocale</value>
+  </data>
+  <data name="SpeechToTextButton_StopTitle" xml:space="preserve">
+    <value>Appuyez pour arrêter la reconnaissance vocale</value>
+  </data>
+  <!-- SplitButton -->
+  <data name="SplitButton_ImageAlternateText" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <data name="SplitButton_OpenAriaLabel" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="SplitButton_ButtonAriaLabel" xml:space="preserve">
+    <value>Bouton</value>
+  </data>
+  <!-- TimeSpanPicker -->
+  <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
+    <value>Basculer la fenêtre contextuelle</value>
+  </data>
+  <data name="TimeSpanPicker_PopupAriaLabel" xml:space="preserve">
+    <value>Sélecteur de durée</value>
+  </data>
+  <data name="TimeSpanPicker_ClearAriaLabel" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="TimeSpanPicker_ConfirmationButtonText" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="TimeSpanPicker_PositiveButtonText" xml:space="preserve">
+    <value>+</value>
+  </data>
+  <data name="TimeSpanPicker_NegativeButtonText" xml:space="preserve">
+    <value>−</value>
+  </data>
+  <data name="TimeSpanPicker_NegativeValueText" xml:space="preserve">
+    <value>−</value>
+  </data>
+  <data name="TimeSpanPicker_DaysUnitText" xml:space="preserve">
+    <value>Jours</value>
+  </data>
+  <data name="TimeSpanPicker_HoursUnitText" xml:space="preserve">
+    <value>Heures</value>
+  </data>
+  <data name="TimeSpanPicker_MinutesUnitText" xml:space="preserve">
+    <value>Minutes</value>
+  </data>
+  <data name="TimeSpanPicker_SecondsUnitText" xml:space="preserve">
+    <value>Secondes</value>
+  </data>
+  <data name="TimeSpanPicker_MillisecondsUnitText" xml:space="preserve">
+    <value>Millisecondes</value>
+  </data>
+  <data name="TimeSpanPicker_MicrosecondsUnitText" xml:space="preserve">
+    <value>Microsecondes</value>
+  </data>
+  <!-- Upload -->
+  <data name="Upload_ImageAlternateText" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <data name="Upload_ChooseText" xml:space="preserve">
+    <value>Choisir</value>
+  </data>
+  <data name="Upload_DeleteText" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <!-- YearPlannerView -->
+  <data name="YearPlannerView_MoreText" xml:space="preserve">
+    <value>+{0}</value>
+  </data>
+  <!-- YearTimelineView -->
+  <data name="YearTimelineView_MoreText" xml:space="preserve">
+    <value>+ {0} de plus</value>
+  </data>
+  <!-- YearView -->
+  <data name="YearView_MoreText" xml:space="preserve">
+    <value>+ {0} de plus</value>
+  </data>
+  <data name="YearView_NoDayEventsText" xml:space="preserve">
+    <value>Aucun événement n'est prévu ce jour-là</value>
+  </data>
+  <!-- DataList -->
+  <data name="DataList_EmptyText" xml:space="preserve">
+    <value>Aucun enregistrement à afficher.</value>
+  </data>
+</root>
