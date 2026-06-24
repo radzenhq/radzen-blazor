@@ -53,13 +53,13 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
         // Get formatted messages including conversation history
         var messages = session.GetFormattedMessages(systemPrompt ?? Options.SystemPrompt);
 
-        var payload = new
+        var payload = new ChatCompletionRequest
         {
-            model = model ?? Options.Model,
-            messages = messages,
-            temperature = temperature ?? Options.Temperature,
-            max_tokens = maxTokens ?? Options.MaxTokens,
-            stream = true
+            Model = model ?? Options.Model,
+            Messages = messages,
+            Temperature = temperature ?? Options.Temperature,
+            MaxTokens = maxTokens ?? Options.MaxTokens,
+            Stream = true
         };
 
         using var request = new HttpRequestMessage(HttpMethod.Post, url)
@@ -230,4 +230,31 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
             return string.Empty;
         }
     }
+}
+
+internal class ChatCompletionMessage
+{
+    [JsonPropertyName("role")]
+    public string? Role { get; set; }
+
+    [JsonPropertyName("content")]
+    public string? Content { get; set; }
+}
+
+internal class ChatCompletionRequest
+{
+    [JsonPropertyName("model")]
+    public string? Model { get; set; }
+
+    [JsonPropertyName("messages")]
+    public List<object>? Messages { get; set; }
+
+    [JsonPropertyName("temperature")]
+    public double Temperature { get; set; }
+
+    [JsonPropertyName("max_tokens")]
+    public int? MaxTokens { get; set; }
+
+    [JsonPropertyName("stream")]
+    public bool Stream { get; set; }
 }

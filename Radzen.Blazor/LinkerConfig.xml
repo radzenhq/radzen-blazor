@@ -13,6 +13,12 @@
     <type fullname="Radzen.DropDownItem`1" preserve="all" />
     <!-- Preserve OData service result types for JSON deserialization -->
     <type fullname="Radzen.ODataServiceResult`1" preserve="all" />
+    <!-- Preserve Google Map marker types serialized to JS interop -->
+    <type fullname="Radzen.Blazor.GoogleMapMarkerData" preserve="all" />
+    <type fullname="Radzen.GoogleMapPosition" preserve="all" />
+    <!-- Preserve AI chat request types serialized to the chat API -->
+    <type fullname="Radzen.ChatCompletionRequest" preserve="all" />
+    <type fullname="Radzen.ChatCompletionMessage" preserve="all" />
     <!-- Preserve all types with [JSInvokable] methods (called from JS, invisible to trimmer) -->
     <type fullname="Radzen.DialogService" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenChart" preserve="methods" />
