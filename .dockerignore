@@ -1,0 +1,29 @@
+# Keep the Docker build context small. Without this, `COPY . .` ships the
+# entire .git history (~115MB) and every bin/obj into the build context,
+# bloating uploads and invalidating layer caches on every build.
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# .NET build outputs - rebuilt inside the image
+**/bin/
+**/obj/
+**/.vs/
+*.user
+
+# Editor / OS cruft
+.vscode/
+.idea/
+.DS_Store
+
+# Node tooling (if any)
+**/node_modules/
+
+# CI config - never needed at build or runtime
+.github/
+
+# The Docker build files themselves
+Dockerfile
+.dockerignore
