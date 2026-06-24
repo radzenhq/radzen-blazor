@@ -4,8 +4,8 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <NoWarn>BL9993;BL0007;BL0005</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <IsTrimmable>true</IsTrimmable>
-    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <IsTrimmable>false</IsTrimmable>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <RazorLangVersion>7.0</RazorLangVersion>
     <LangVersion>latest</LangVersion>
@@ -13,7 +13,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>11.0.2</Version>
+    <Version>11.0.3</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Radzen Blazor is the most sophisticated free UI component library for Blazor, featuring 110+ native components including DataGrid, Scheduler, Charts, and advanced theming with full support for Material Design and Fluent UI.</Description>
