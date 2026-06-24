@@ -6,5 +6,7 @@
 	<assembly fullname="Microsoft.AspNetCore.Components.WebAssembly">
 		<type fullname="Microsoft.AspNetCore.Components.Forms.DefaultAntiforgeryStateProvider" preserve="all"/>
 	</assembly>
+	<!-- The runtime Razor/Roslyn compiler behind Edit Source / Playground relies on the [EventHandler] metadata (e.g. oninput -> ChangeEventArgs) on Microsoft.AspNetCore.Components.Web.EventHandlers to recognize event attributes. Trimming removes that compile-time-only class, so handlers like @oninput=@(args => ...) become literal attributes and fail with CS1660 "Cannot convert lambda expression to type 'bool'". Preserve the assembly so demos compile online. -->
+	<assembly fullname="Microsoft.AspNetCore.Components.Web" preserve="all"/>
 </linker>
 
