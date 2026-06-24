@@ -5756,10 +5756,10 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
   }};
 };
 class Spreadsheet {
-  constructor(options) {
-    this.element = options.element;
-    this.dotNetRef = options.dotNetRef;
-    this.shortcuts = options.shortcuts;
+  constructor(element, dotNetRef, shortcuts) {
+    this.element = element;
+    this.dotNetRef = dotNetRef;
+    this.shortcuts = shortcuts;
     this.element.addEventListener('keydown', this.onKeyDown);
     this.element.addEventListener('pointerdown', this.onPointerDown);
     this.element.addEventListener('dblclick', this.onDoubleClick);
@@ -6069,17 +6069,17 @@ Radzen.endRangePickKeyHandler = function () {
 };
 
 class SheetEditor {
-  constructor(options) {
-    this.element = options.element;
-    this.element.innerText = options.value;
-    this.dotNetRef = options.dotNetRef;
+  constructor(element, value, autoFocus, dotNetRef) {
+    this.element = element;
+    this.element.innerText = value;
+    this.dotNetRef = dotNetRef;
     this.element.addEventListener('input', this.onInput);
     this.element.addEventListener('keydown', this.onKeyDown);
     this.element.addEventListener('blur', this.onBlur);
     this.element.addEventListener('focus', this.onFocus);
     this.element.addEventListener('paste', this.onPaste);
     document.addEventListener('selectionchange', this.onSelectionChange);
-    if (options.autoFocus) {
+    if (autoFocus) {
       this.focus();
     }
   }
@@ -6201,8 +6201,8 @@ class SheetEditor {
 
 
 
-Radzen.createSheetEditor = (options) => new SheetEditor(options);
-Radzen.createSpreadsheet = (options) => new Spreadsheet(options);
+Radzen.createSheetEditor = (element, value, autoFocus, dotNetRef) => new SheetEditor(element, value, autoFocus, dotNetRef);
+Radzen.createSpreadsheet = (element, dotNetRef, shortcuts) => new Spreadsheet(element, dotNetRef, shortcuts);
 Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
   var height = scrollable.clientHeight;
   var width = scrollable.clientWidth;

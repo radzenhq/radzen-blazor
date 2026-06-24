@@ -86,7 +86,7 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
         {
             dotNetRef = DotNetObjectReference.Create(this);
 
-            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSheetEditor", new { element, value, AutoFocus, dotNetRef });
+            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSheetEditor", element, value, AutoFocus, dotNetRef);
         }
         else
         {
