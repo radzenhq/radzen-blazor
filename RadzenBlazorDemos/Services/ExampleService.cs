@@ -276,9 +276,18 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Overview",
                     Path = "spreadsheet",
-                    Title = "Free Open-Source Blazor Spreadsheet Component | Radzen",
+                    Title = "Open-Source Blazor Spreadsheet Component | Free UI Components by Radzen",
                     Description = "Free open-source Blazor Spreadsheet component with Excel-like editing, formulas, cell formatting, filtering, sorting, data validation, conditional formatting, frozen panes, XLSX import/export, clipboard, autofill, undo/redo, multiple sheets, virtualization, custom cell types, and data binding.",
                     Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" },
+                    Related = new [] { "spreadsheet-formulas", "spreadsheet-cell-formatting", "spreadsheet-conditional-formatting", "spreadsheet-charts", "spreadsheet-data-validation" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "What can the Blazor Spreadsheet do?", Answer = "It offers Excel-like editing with formulas, cell formatting, filtering and sorting, data validation, conditional formatting, frozen panes, multiple sheets, and XLSX import/export." },
+                        new FaqItem { Question = "Does the Blazor Spreadsheet import and export Excel files?", Answer = "Yes. It reads and writes XLSX files, so you can load existing workbooks and let users download edited ones, and it also supports CSV." },
+                        new FaqItem { Question = "Does the Blazor Spreadsheet support formulas?", Answer = "Yes. It includes built-in functions such as SUM, AVERAGE, VLOOKUP, and IF, recalculated automatically as cell values change." },
+                        new FaqItem { Question = "Can the Blazor Spreadsheet handle large data?", Answer = "Yes. It virtualizes rows so it stays responsive with tens of thousands of rows, even with live formula calculations." },
+                        new FaqItem { Question = "Can I customize cells and the toolbar?", Answer = "Yes. You can define custom cell types (renderers and editors) and replace or extend the toolbar with your own tools." }
+                    },
                     Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ]
                 },
                 new Example
@@ -287,7 +296,12 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-formulas",
                     Title = "Blazor Spreadsheet Formulas | Free UI Components by Radzen",
                     Description = "Use built-in formula functions including SUM, AVERAGE, VLOOKUP, IF, and more.",
-                    Tags = new [] { "spreadsheet", "formula", "function", "sum", "average", "vlookup", "if", "calculate" }
+                    Tags = new [] { "spreadsheet", "formula", "function", "sum", "average", "vlookup", "if", "calculate" },
+                    Related = new [] { "spreadsheet", "spreadsheet-data-validation", "spreadsheet-large-data" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Which formula functions does the Blazor Spreadsheet support?", Answer = "Built-in functions include SUM, AVERAGE, VLOOKUP, IF, and many more, recalculated automatically when cell values change." }
+                    }
                 },
                 new Example
                 {
@@ -295,7 +309,8 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-cell-formatting",
                     Title = "Blazor Spreadsheet Cell Formatting | Free UI Components by Radzen",
                     Description = "Apply fonts, colors, alignment, number formats, borders, and text styles to spreadsheet cells.",
-                    Tags = new [] { "spreadsheet", "format", "font", "color", "alignment", "number", "style", "border" }
+                    Tags = new [] { "spreadsheet", "format", "font", "color", "alignment", "number", "style", "border" },
+                    Related = new [] { "spreadsheet", "spreadsheet-conditional-formatting", "spreadsheet-merge-cells-borders" }
                 },
                 new Example
                 {
@@ -303,7 +318,8 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-filtering-sorting",
                     Title = "Blazor Spreadsheet Filtering & Sorting | Free UI Components by Radzen",
                     Description = "Filter and sort spreadsheet data using auto-filter and sort operations.",
-                    Tags = new [] { "spreadsheet", "filter", "sort", "autofilter", "data" }
+                    Tags = new [] { "spreadsheet", "filter", "sort", "autofilter", "data" },
+                    Related = new [] { "spreadsheet", "spreadsheet-tables", "spreadsheet-data-validation" }
                 },
                 new Example
                 {
@@ -311,7 +327,8 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-tables",
                     Title = "Blazor Spreadsheet Tables | Free UI Components by Radzen",
                     Description = "Wrap a range in an Excel-style table with style, banded rows, calculated columns, and a totals row.",
-                    Tags = new [] { "spreadsheet", "table", "tables", "listobject", "totals", "subtotal", "calculated column", "banded rows", "table style" }
+                    Tags = new [] { "spreadsheet", "table", "tables", "listobject", "totals", "subtotal", "calculated column", "banded rows", "table style" },
+                    Related = new [] { "spreadsheet", "spreadsheet-filtering-sorting", "spreadsheet-formulas" }
                 },
                 new Example
                 {
@@ -319,7 +336,12 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-data-validation",
                     Title = "Blazor Spreadsheet Data Validation | Free UI Components by Radzen",
                     Description = "Add validation rules to cells including number ranges, lists, dates, and custom formulas.",
-                    Tags = new [] { "spreadsheet", "validation", "rule", "list", "number", "date", "custom" }
+                    Tags = new [] { "spreadsheet", "validation", "rule", "list", "number", "date", "custom" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-conditional-formatting" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I restrict what users can enter in a cell?", Answer = "Add data validation rules - number ranges, dropdown lists, dates, or custom formulas - to control the accepted input." }
+                    }
                 },
                 new Example
                 {
@@ -327,7 +349,12 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-conditional-formatting",
                     Title = "Blazor Spreadsheet Conditional Formatting | Free UI Components by Radzen",
                     Description = "Apply conditional formatting rules to highlight cells based on their values.",
-                    Tags = new [] { "spreadsheet", "conditional", "formatting", "highlight", "rule", "color" }
+                    Tags = new [] { "spreadsheet", "conditional", "formatting", "highlight", "rule", "color" },
+                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-data-validation" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I highlight cells based on their value?", Answer = "Add conditional formatting rules and matching cells are styled automatically when their values meet the condition." }
+                    }
                 },
                 new Example
                 {
@@ -335,7 +362,12 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-frozen-panes",
                     Title = "Blazor Spreadsheet Frozen Panes | Free UI Components by Radzen",
                     Description = "Freeze rows and columns to keep headers visible while scrolling.",
-                    Tags = new [] { "spreadsheet", "freeze", "frozen", "panes", "rows", "columns", "scroll" }
+                    Tags = new [] { "spreadsheet", "freeze", "frozen", "panes", "rows", "columns", "scroll" },
+                    Related = new [] { "spreadsheet", "spreadsheet-large-data", "spreadsheet-multiple-sheets" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I keep headers visible while scrolling a spreadsheet?", Answer = "Freeze the top rows and/or left columns so the headers stay in place as users scroll." }
+                    }
                 },
                 new Example
                 {
@@ -343,7 +375,8 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-images-hyperlinks",
                     Title = "Blazor Spreadsheet Images & Hyperlinks | Free UI Components by Radzen",
                     Description = "Insert and manage images and hyperlinks in spreadsheet cells.",
-                    Tags = new [] { "spreadsheet", "image", "hyperlink", "link", "picture" }
+                    Tags = new [] { "spreadsheet", "image", "hyperlink", "link", "picture" },
+                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-charts" }
                 },
                 new Example
                 {
@@ -351,7 +384,8 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-merge-cells-borders",
                     Title = "Blazor Spreadsheet Merge Cells | Free UI Components by Radzen",
                     Description = "Merge cells to create headers and build form layouts in the spreadsheet.",
-                    Tags = new [] { "spreadsheet", "merge", "cells", "layout" }
+                    Tags = new [] { "spreadsheet", "merge", "cells", "layout" },
+                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-templates" }
                 },
                 new Example
                 {
@@ -359,7 +393,8 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-custom-cell-types",
                     Title = "Blazor Spreadsheet Custom Cell Types | Free UI Components by Radzen",
                     Description = "Create custom cell renderers and editors for the Radzen Blazor Spreadsheet.",
-                    Tags = new [] { "spreadsheet", "custom", "cell", "type", "renderer", "editor" }
+                    Tags = new [] { "spreadsheet", "custom", "cell", "type", "renderer", "editor" },
+                    Related = new [] { "spreadsheet", "spreadsheet-custom-toolbar", "spreadsheet-cell-formatting" }
                 },
                 new Example
                 {
@@ -367,7 +402,8 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-multiple-sheets",
                     Title = "Blazor Spreadsheet Multiple Sheets | Free UI Components by Radzen",
                     Description = "Work with multiple worksheets and use cross-sheet references to aggregate data across sheets.",
-                    Tags = new [] { "spreadsheet", "sheets", "worksheets", "tabs", "cross-sheet", "reference" }
+                    Tags = new [] { "spreadsheet", "sheets", "worksheets", "tabs", "cross-sheet", "reference" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-frozen-panes" }
                 },
                 new Example
                 {
@@ -375,7 +411,12 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-large-data",
                     Title = "Blazor Spreadsheet Large Data | Free UI Components by Radzen",
                     Description = "Virtualized spreadsheet with 10,000 rows and formula calculations for smooth scrolling performance.",
-                    Tags = new [] { "spreadsheet", "performance", "virtualization", "large", "data", "virtual", "scrolling" }
+                    Tags = new [] { "spreadsheet", "performance", "virtualization", "large", "data", "virtual", "scrolling" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-frozen-panes" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How many rows can the Blazor Spreadsheet handle?", Answer = "Row virtualization keeps it smooth with tens of thousands of rows, even with formula calculations." }
+                    }
                 },
                 new Example
                 {
@@ -383,7 +424,8 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-templates",
                     Title = "Blazor Spreadsheet Templates | Free UI Components by Radzen",
                     Description = "Real-world spreadsheet templates: annual budget tracker and weekly timesheet with formulas and conditional formatting.",
-                    Tags = new [] { "spreadsheet", "template", "budget", "timesheet", "invoice", "financial", "planning" }
+                    Tags = new [] { "spreadsheet", "template", "budget", "timesheet", "invoice", "financial", "planning" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-conditional-formatting" }
                 },
                 new Example
                 {
@@ -391,15 +433,25 @@ namespace RadzenBlazorDemos
                     Path = "spreadsheet-protection",
                     Title = "Blazor Spreadsheet Protection | Free UI Components by Radzen",
                     Description = "Protect sheets to prevent editing of locked cells while allowing input in unlocked cells with XLSX round-trip support.",
-                    Tags = new [] { "spreadsheet", "protection", "locked", "unlock", "readonly", "security", "sheet" }
+                    Tags = new [] { "spreadsheet", "protection", "locked", "unlock", "readonly", "security", "sheet" },
+                    Related = new [] { "spreadsheet", "spreadsheet-permissions", "spreadsheet-data-validation" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I make a spreadsheet read-only or lock specific cells?", Answer = "Protect the sheet to lock chosen cells while allowing input in others, with XLSX round-trip support." }
+                    }
                 },
                 new Example
                 {
                     Name = "Charts",
                     Path = "spreadsheet-charts",
-                    Title = "Blazor Spreadsheet Charts - Embed Column, Bar, Line, Pie Charts in Spreadsheet | Radzen",
+                    Title = "Blazor Spreadsheet Charts - Embed Column, Bar, Line, Pie Charts | Free UI Components by Radzen",
                     Description = "Embed interactive charts in Blazor spreadsheet cells. Supports column, bar, line, area, pie, donut, and scatter charts with live data binding and XLSX import/export.",
-                    Tags = new [] { "spreadsheet", "chart", "charts", "graph", "visualization", "column chart", "bar chart", "line chart", "pie chart", "donut chart", "scatter chart", "area chart", "excel chart", "embedded chart", "data visualization", "xlsx", "dashboard" }
+                    Tags = new [] { "spreadsheet", "chart", "charts", "graph", "visualization", "column chart", "bar chart", "line chart", "pie chart", "donut chart", "scatter chart", "area chart", "excel chart", "embedded chart", "data visualization", "xlsx", "dashboard" },
+                    Related = new [] { "spreadsheet", "spreadsheet-formulas", "spreadsheet-cell-formatting" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "Can I embed charts in the Blazor Spreadsheet?", Answer = "Yes. Embed column, bar, line, area, pie, donut, and scatter charts in cells, bound to live spreadsheet data." }
+                    }
                 },
                 new Example
                 {
@@ -408,6 +460,7 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Spreadsheet Custom Toolbar | Free UI Components by Radzen",
                     Description = "Replace the built-in toolbar with your own selection of tools. Reuse the predefined tool components in any order or layout, and add custom tools that dispatch undoable commands.",
                     Tags = new [] { "spreadsheet", "toolbar", "custom", "custom tools", "childcontent", "command", "icommand", "undo", "extend" },
+                    Related = new [] { "spreadsheet", "spreadsheet-custom-cell-types", "spreadsheet-permissions" },
                     Toc = [ new () { Text = "Predefined tools in a custom layout", Anchor = "#predefined-tools" }, new () { Text = "Custom tool with an undoable command", Anchor = "#custom-tool" } ]
                 },
                 new Example
@@ -417,6 +470,7 @@ namespace RadzenBlazorDemos
                     Title = "Blazor Spreadsheet Permissions | Free UI Components by Radzen",
                     Description = "Lock the spreadsheet for view-only embedding with ReadOnly, disable individual features with Allow* flags, or veto commands dynamically with a CommandExecuting handler.",
                     Tags = new [] { "spreadsheet", "permissions", "readonly", "read-only", "view-only", "allow", "allowediting", "allowfiltering", "allowsorting", "commandexecuting", "preventdefault", "audit", "role", "restrict" },
+                    Related = new [] { "spreadsheet", "spreadsheet-protection", "spreadsheet-custom-toolbar" },
                     Toc = [ new () { Text = "Read-only mode", Anchor = "#read-only" }, new () { Text = "Configuration toggles", Anchor = "#toggles" }, new () { Text = "Dynamic veto with CommandExecuting", Anchor = "#dynamic-veto" } ]
                 },
             }
@@ -4503,6 +4557,13 @@ namespace RadzenBlazorDemos
         {
             var pivot = Examples.FirstOrDefault(c => c.Name == "PivotDataGrid");
             return pivot?.Children != null ? CollectLeaves(pivot.Children).ToList() : Enumerable.Empty<Example>();
+        }
+
+        // Every leaf page under the "Spreadsheet" category. Article-eligible for schema.
+        public IEnumerable<Example> GetSpreadsheetPages()
+        {
+            var spreadsheet = Examples.FirstOrDefault(c => c.Name == "Spreadsheet");
+            return spreadsheet?.Children != null ? CollectLeaves(spreadsheet.Children).ToList() : Enumerable.Empty<Example>();
         }
 
         // Maps each Forms page path to its component hub (display label + primary page path). Unlike
