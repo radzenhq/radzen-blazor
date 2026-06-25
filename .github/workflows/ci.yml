@@ -67,12 +67,11 @@ jobs:
         npx playwright install --with-deps chromium
         node trim-smoke.mjs
 
-  # Manual-only (workflow_dispatch): publish the demos with the WASM client member-trimmed
-  # (Radzen.Blazor from local source), serve via the host, crawl high-risk component pages.
-  # Discovers Radzen-OWN render/JS-interop trim breakage. Heavy - runs on the runner, never an
-  # agent. See e2e/DEMOS_TRIM_FINDINGS.md.
+  # Runs on every CI build: publish the demos with the WASM client member-trimmed (Radzen.Blazor
+  # from local source), serve via the host, crawl high-risk component pages. Catches Radzen-OWN
+  # render/JS-interop trim regressions across the full component surface (complements the synthetic
+  # trim-wasm-e2e gate). Runs on the runner. See e2e/DEMOS_TRIM_FINDINGS.md.
   demos-trim-crawl:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
