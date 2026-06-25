@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
@@ -6,7 +7,8 @@ namespace Radzen.Blazor
     /// Renders donut series in <see cref="RadzenChart" />.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
-    public partial class RadzenDonutSeries<TItem> : RadzenPieSeries<TItem>, IChartDonutSeries
+    public partial class RadzenDonutSeries<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenPieSeries<TItem>, IChartDonutSeries
     {
         /// <summary>
         /// Gets or sets the inner radius of the donut.

@@ -22,7 +22,8 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenBubbleSeries<TItem> : RadzenScatterSeries<TItem>
+    public partial class RadzenBubbleSeries<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenScatterSeries<TItem>
     {
         /// <summary>
         /// Gets or sets the property name for the size dimension. Must be numeric.

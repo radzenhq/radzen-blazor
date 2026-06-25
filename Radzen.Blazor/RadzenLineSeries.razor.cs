@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
@@ -32,7 +33,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenChart&gt;
     /// </code>
     /// </example>
-    public partial class RadzenLineSeries<TItem> : CartesianSeries<TItem>
+    public partial class RadzenLineSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
         /// <inheritdoc />
         protected internal override bool ShowLineInLegend => true;

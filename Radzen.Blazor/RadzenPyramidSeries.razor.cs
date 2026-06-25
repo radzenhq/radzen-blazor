@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
@@ -12,7 +13,7 @@ namespace Radzen.Blazor
     /// A chart series that displays data as a pyramid chart with trapezoid segments, widest at the bottom.
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the series.</typeparam>
-    public partial class RadzenPyramidSeries<TItem> : CartesianSeries<TItem>
+    public partial class RadzenPyramidSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
         /// <summary>
         /// Gets or sets a collection of fill colors applied to individual pyramid segments.
