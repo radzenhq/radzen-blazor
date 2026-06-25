@@ -1,6 +1,5 @@
 @using Radzen
 @using Radzen.Blazor
-@using System.Linq.Dynamic.Core
 @using Radzen.Blazor.TrimTest.Models
 
 @*
@@ -68,18 +67,28 @@
     {
         if (!firstRender) return Task.CompletedTask;
 
-        // Synchronous, catchable dynamic-LINQ over the model - the same engine the grid uses for
-        // sort/filter/group. ErrorBoundary does NOT catch OnAfterRenderAsync exceptions, so we catch here.
+        // Drive the grid's REAL in-memory filter/group engine over the trimmed model (not the raw
+        // dynamic-LINQ string-predicate parser, which is inherently trim-unsafe by design and not what
+        // the grid uses for in-memory data). Where(filters) -> GetExpression -> typeof(string).GetMethod;
+        // GroupByMany -> reflection over T. ErrorBoundary does NOT catch OnAfterRenderAsync, so catch here.
         try
         {
-            _ = orders.AsQueryable().OrderBy("CustomerName").ToList();
-            _ = orders.AsQueryable().Where("CustomerName.Contains(@0)", new object[] { "A" }).ToList();
+            var filters = new List<FilterDescriptor>
+            {
+                new() { Property = "CustomerName", FilterValue = "A", FilterOperator = FilterOperator.Contains },
+                new() { Property = "Total", FilterValue = 10.0, FilterOperator = FilterOperator.GreaterThan },
+            };
+            _ = orders.AsQueryable()
+                .Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive)
+                .ToList();
             _ = orders.AsQueryable().GroupByMany(new[] { "Status" }).ToList();
             status = "done";
         }
         catch (Exception ex)
         {
-            status = $"error:{ex.GetType().Name}: {ex.Message}";
+            // Surface the inner exception too - DynamicExtensions/QueryableExtension wrap the real cause.
+            var root = ex.GetBaseException();
+            status = $"error:{root.GetType().Name}: {root.Message}";
         }
 
         StateHasChanged();
