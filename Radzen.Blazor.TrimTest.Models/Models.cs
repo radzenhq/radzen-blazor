@@ -38,3 +38,26 @@ public class Sale
     public string Region { get; set; } = "";
     public double Revenue { get; set; }
 }
+
+// Dedicated types for the chart-series / Gantt / Sankey runtime gate. Each is used ONLY by the one
+// component below, so its survival under trimming is attributable to THAT component's DAM (not another
+// component's) - removing the chart/Gantt/Sankey DAM would fail the gate, not just the contract test.
+public class ChartPoint
+{
+    public string Category { get; set; } = "";
+    public double Value { get; set; }
+}
+
+public class GanttRow
+{
+    public DateTime Start { get; set; }
+    public DateTime End { get; set; }
+    public string Text { get; set; } = "";
+}
+
+public class Flow
+{
+    public string Source { get; set; } = "";
+    public string Target { get; set; } = "";
+    public double Amount { get; set; }
+}

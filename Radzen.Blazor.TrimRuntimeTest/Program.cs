@@ -29,6 +29,9 @@ object[] rooted =
     new RadzenScheduler<Appt>(),
     new RadzenPivotDataGrid<Sale>(),
     new RadzenDataFilter<Order>(),
+    new RadzenColumnSeries<ChartPoint>(),   // representative chart series (CartesianSeries<TItem> DAM)
+    new RadzenGantt<GanttRow>(),
+    new RadzenSankeyDiagram<Flow>(),
 ];
 GC.KeepAlive(rooted);
 
@@ -41,6 +44,9 @@ GC.KeepAlive(rooted);
     (typeof(Order), ["CustomerName", "Total", "Status", "Customer"]),
     (typeof(Appt), ["Start", "End", "Text"]),
     (typeof(Sale), ["Region", "Revenue"]),
+    (typeof(ChartPoint), ["Category", "Value"]),   // chart-series DAM (CartesianSeries<TItem>)
+    (typeof(GanttRow), ["Start", "End", "Text"]),  // RadzenGantt<TItem> DAM
+    (typeof(Flow), ["Source", "Target", "Amount"]), // RadzenSankeyDiagram<TItem> DAM
 ];
 
 // Look members up via a runtime VARIABLE (never a constant): the trimmer intrinsically roots
