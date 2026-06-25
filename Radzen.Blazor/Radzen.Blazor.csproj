@@ -70,6 +70,8 @@
 
   <Target Name="CompileSass" BeforeTargets="MoveCss" Condition="'$(TargetFramework)' == 'net10.0'"
           Inputs="@(SassFile)" Outputs="$(IntermediateOutputPath)sass.stamp">
+    <!-- The target runs before the compiler creates the intermediate dir, so the Touch below fails on a clean build. -->
+    <MakeDir Directories="$(IntermediateOutputPath)" />
     <SassCompile InputFiles="@(SassFile)" OutputStyle="compressed" />
     <Touch Files="$(IntermediateOutputPath)sass.stamp" AlwaysCreate="true" />
   </Target>
