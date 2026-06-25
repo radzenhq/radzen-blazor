@@ -120,7 +120,6 @@
                                         {
                                             <button type="button" @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true"
                                                     @onmousedown="@(() => { if (row != null) _ = ToggleFilter(row, filterIconRefKey); })"
-                                                    @onclick="@(() => { if (row != null) _ = ToggleFilter(row, filterIconRefKey); })"
                                                     class="@(row != null ? GetFilterIconCss(row) : "")"
                                                     aria-label="@FilterText" aria-haspopup="dialog"
                                                     aria-controls="@($"pivot-filter-{row?.Property}")" aria-expanded="false">
@@ -175,7 +174,6 @@
                                         {
                                             <button type="button" @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true"
                                                     @onmousedown="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
-                                                    @onclick="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
                                                     class="@(column != null ? GetFilterIconCss(column) : "")"
                                                     aria-label="@FilterText" aria-haspopup="dialog"
                                                     aria-controls="@($"pivot-filter-{column?.Property}")" aria-expanded="false">
@@ -230,7 +228,6 @@
                                         {
                                             <button type="button" @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true"
                                                     @onmousedown="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
-                                                    @onclick="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
                                                     class="@(column != null ? GetFilterIconCss(column) : "")"
                                                     aria-label="@FilterText" aria-haspopup="dialog"
                                                     aria-controls="@($"pivot-filter-{column?.Property}")" aria-expanded="false">

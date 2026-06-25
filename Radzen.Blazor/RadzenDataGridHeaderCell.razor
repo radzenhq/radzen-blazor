@@ -426,13 +426,6 @@ else
         if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand && popup != null)
         {
             await popup.ToggleAsync(filterButton);
-
-            Grid.allColumns
-            .Where(c => c.GetVisible() && c.UniqueID != Column.UniqueID)
-            .Select(c => c.headerCell)
-            .Where(cell => cell != null)
-            .ToList()
-            .ForEach(cell => InvokeAsync(cell!.CloseFilter));
         }
         else if (Grid.FilterPopupRenderMode == PopupRenderMode.Initial)
         {
@@ -442,6 +435,13 @@ else
                 await jsRuntime.InvokeVoidAsync("Radzen.togglePopup", filterButton, Column.GetColumnPopupID(), false, null, null, true, true);
             }
         }
+
+        Grid.allColumns
+        .Where(c => c.GetVisible() && c.UniqueID != Column.UniqueID)
+        .Select(c => c.headerCell)
+        .Where(cell => cell != null)
+        .ToList()
+        .ForEach(cell => InvokeAsync(cell!.CloseFilter));
     }
 
     async Task ClearFilter()
