@@ -696,6 +696,13 @@ namespace Radzen
         }
 
         [RequiresUnreferencedCode(ReflectionWarning)]
+        // String filter operators resolve these via typeof(string).GetMethod(...); trimming strips them
+        // unless rooted. Anchored here so they survive app-wide (covers the Expression.Call path here and
+        // the dynamic-LINQ predicate path). Enumerable filter methods are kept via LinkerConfig.
+        [DynamicDependency("Contains", typeof(string))]
+        [DynamicDependency("StartsWith", typeof(string))]
+        [DynamicDependency("EndsWith", typeof(string))]
+        [DynamicDependency("ToLower", typeof(string))]
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)
         {
             Type? valueType = filter.FilterValue != null ? filter.FilterValue.GetType() : null;
