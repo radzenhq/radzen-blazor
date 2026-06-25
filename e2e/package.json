@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Playwright runtime gate for the trimmed Radzen.Blazor.TrimTest WASM app",
+  "description": "Playwright runtime gates for the trimmed Radzen WASM apps (TrimTest smoke, demos crawl, demos deep-interaction crawl)",
   "scripts": {
-    "smoke": "node trim-smoke.mjs"
+    "smoke": "node trim-smoke.mjs",
+    "crawl": "node demos-crawl.mjs",
+    "deep-crawl": "node demos-deep-crawl.mjs"
   },
   "devDependencies": {
     "playwright": "^1.48.0"
