@@ -150,7 +150,8 @@ namespace Radzen
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.ODataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.ODataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.ODataTypePreserved)]
-    public class ComplexPropertiesConverter<T> : JsonConverter<T>
+    public class ComplexPropertiesConverter<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> : JsonConverter<T>
     {
         /// <summary>
         /// The complex properties
