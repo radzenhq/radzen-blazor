@@ -66,11 +66,12 @@
                                 TValue="IEnumerable<string>" Style="width: 100%;" Value="@(selectedAggregates.Select(a => a.Property).Distinct())"
                                     AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" >
                                 <Template>
-                                    <RadzenLabel Component="Aggregate" Text="@context.Title" />
-                                    <RadzenSelectBar Name="Aggregate" TValue="AggregateFunction?" Data="@GetAggregates(context.Property)" 
+                                    @{ var aggregateField = (RadzenPivotField<TItem>)context; }
+                                    <RadzenLabel Component="Aggregate" Text="@aggregateField.Title" />
+                                    <RadzenSelectBar Name="Aggregate" TValue="AggregateFunction?" Data="@GetAggregates(aggregateField.Property!)"
                                         Size="ButtonSize.ExtraSmall" @onclick:stopPropagation="true" Style="width: 100%;"
-                                        Value="@(selectedAggregates.FirstOrDefault(a => a.Property == context.Property)?.Aggregate)"
-                                        Change="@(args => UpdateAggregate((string)context.Property, args))" />
+                                        Value="@(selectedAggregates.FirstOrDefault(a => a.Property == aggregateField.Property)?.Aggregate)"
+                                        Change="@(args => UpdateAggregate(aggregateField.Property!, args))" />
                                 </Template>
                                 <ValueTemplate>
                                     @string.Join(",", selectedAggregates.Select(a => $"{a.Property} ({Enum.GetName(a.Aggregate)})"))
