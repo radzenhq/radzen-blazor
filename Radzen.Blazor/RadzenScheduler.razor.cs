@@ -53,7 +53,8 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenScheduler<TItem> : RadzenComponent, IScheduler
+    public partial class RadzenScheduler<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenComponent, IScheduler
     {
         /// <summary>
         /// Gets or sets the child content of the scheduler. Use to specify what views to render.

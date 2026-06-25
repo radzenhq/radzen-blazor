@@ -28,7 +28,8 @@ namespace Radzen.Blazor
     ///                 Data=@items TextProperty="Name" ValueProperty="Id" Style="height: 400px;" /&gt;
     /// </code>
     /// </example>
-    public partial class RadzenListBox<TValue> : DropDownBase<TValue>
+    public partial class RadzenListBox<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TValue> : DropDownBase<TValue>
     {
         bool stopKeydownPropagation;
         async Task OnFilterKeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)

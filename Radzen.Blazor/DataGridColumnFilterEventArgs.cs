@@ -6,7 +6,8 @@ namespace Radzen;
 /// Supplies information about a <see cref="RadzenDataGrid{TItem}.Filter" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class DataGridColumnFilterEventArgs<T> where T : notnull
+public class DataGridColumnFilterEventArgs<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] T> where T : notnull
 {
     /// <summary>
     /// Gets the filtered RadzenDataGridColumn.

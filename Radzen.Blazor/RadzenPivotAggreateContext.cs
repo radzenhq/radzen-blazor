@@ -6,7 +6,8 @@ namespace Radzen;
 /// <summary>
 /// RadzenPivotAggreateContext.
 /// </summary>
-public class RadzenPivotAggreateContext<T>
+public class RadzenPivotAggreateContext<
+    [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] T>
 {
     /// <summary>
     /// Gets the query.

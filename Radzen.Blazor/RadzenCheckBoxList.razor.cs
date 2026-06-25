@@ -43,7 +43,8 @@ namespace Radzen.Blazor
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [CascadingTypeParameter(nameof(TValue))]
-    public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>, IRadzenCheckBoxList
+    public partial class RadzenCheckBoxList<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TValue> : FormComponent<IEnumerable<TValue>>, IRadzenCheckBoxList
     {
         string ItemClass(IRadzenCheckBoxListItem item) => ClassList.Create("rz-chkbox-box")
                                                                           .Add("rz-state-active", IsSelected(item))
