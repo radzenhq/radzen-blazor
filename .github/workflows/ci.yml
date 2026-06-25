@@ -66,3 +66,47 @@ jobs:
         npm install
         npx playwright install --with-deps chromium
         node trim-smoke.mjs
+
+  # Manual-only (workflow_dispatch): publish the demos with the WASM client member-trimmed
+  # (Radzen.Blazor from local source), serve via the host, crawl high-risk component pages.
+  # Discovers Radzen-OWN render/JS-interop trim breakage. Heavy - runs on the runner, never an
+  # agent. See e2e/DEMOS_TRIM_FINDINGS.md.
+  demos-trim-crawl:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Publish demos host (WASM client trimmed, local Radzen)
+      run: |
+        dotnet publish RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj -c Release \
+          -p:RadzenLocalProject=true -p:TrimWasmClient=true \
+          -p:GenerateLlmsTxt=false -p:CopyDemoPagesToWwwroot=false \
+          -o ${{ runner.temp }}/demos
+        mkdir -p ${{ runner.temp }}/demos/wwwroot/demos ${{ runner.temp }}/demos/wwwroot/images
+    - name: Serve published host
+      working-directory: ${{ runner.temp }}/demos
+      env:
+        ASPNETCORE_URLS: http://localhost:8088
+        ASPNETCORE_ENVIRONMENT: Production
+      run: |
+        dotnet RadzenBlazorDemos.Host.dll &
+        for i in $(seq 1 30); do curl -sf http://localhost:8088/ >/dev/null && break; sleep 2; done
+    - name: Crawl component pages
+      working-directory: e2e
+      env:
+        DEMOS_URL: http://localhost:8088
+        DEMOS_REPORT: ${{ runner.temp }}/demos-crawl.json
+      run: |
+        npm install
+        npx playwright install --with-deps chromium
+        node demos-crawl.mjs
+    - name: Upload crawl report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: demos-crawl-report
+        path: ${{ runner.temp }}/demos-crawl.json
