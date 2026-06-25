@@ -27,7 +27,8 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenGantt<TItem> where TItem : notnull
+    public partial class RadzenGantt<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> where TItem : notnull
     {
         private RadzenScheduler<TItem>? scheduler;
         private RadzenGanttDayView<TItem>? dayView;
