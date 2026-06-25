@@ -109,3 +109,53 @@ jobs:
       with:
         name: demos-crawl-report
         path: ${{ runner.temp }}/demos-crawl.json
+
+  # Deep-INTERACTION trim crawl: same trimmed publish + serve as demos-trim-crawl, but
+  # instead of only loading each page it DRIVES the trim-risky components (DataGrid
+  # filter/sort/group/enum-filter, DropDown/DropDownDataGrid/AutoComplete filtering,
+  # PivotDataGrid aggregates, Upload, HtmlEditor, Spreadsheet, Chart, Dialog, Scheduler)
+  # through a real interaction and watches for #blazor-error-ui / pageerror / console.error.
+  # Exercises the reflection / dynamic-LINQ / anonymous-object / [JSInvokable] / interop
+  # paths that a load-only crawl never touches. See e2e/DEMOS_DEEP_FINDINGS.md.
+  #
+  # NON-BLOCKING for now (continue-on-error): DOM interactions can be flaky on a cold
+  # runner. Promote to blocking once it has proven stable across a few runs.
+  demos-deep-interaction-crawl:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Publish demos host (WASM client trimmed, local Radzen)
+      run: |
+        dotnet publish RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj -c Release \
+          -p:RadzenLocalProject=true -p:TrimWasmClient=true \
+          -p:GenerateLlmsTxt=false -p:CopyDemoPagesToWwwroot=false \
+          -o ${{ runner.temp }}/demos-deep
+        mkdir -p ${{ runner.temp }}/demos-deep/wwwroot/demos ${{ runner.temp }}/demos-deep/wwwroot/images
+    - name: Serve published host
+      working-directory: ${{ runner.temp }}/demos-deep
+      env:
+        ASPNETCORE_URLS: http://localhost:8088
+        ASPNETCORE_ENVIRONMENT: Production
+      run: |
+        dotnet RadzenBlazorDemos.Host.dll &
+        for i in $(seq 1 30); do curl -sf http://localhost:8088/ >/dev/null && break; sleep 2; done
+    - name: Deep-interaction crawl of component pages
+      working-directory: e2e
+      env:
+        DEMOS_URL: http://localhost:8088
+        DEMOS_REPORT: ${{ runner.temp }}/demos-deep-crawl.json
+      run: |
+        npm install
+        npx playwright install --with-deps chromium
+        node demos-deep-crawl.mjs
+    - name: Upload deep-crawl report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: demos-deep-crawl-report
+        path: ${{ runner.temp }}/demos-deep-crawl.json
