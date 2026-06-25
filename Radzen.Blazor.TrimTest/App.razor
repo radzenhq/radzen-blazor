@@ -27,7 +27,10 @@
                 <RadzenDataGridColumn TItem="Order" Property="Total" Title="Total" />
                 <RadzenDataGridColumn TItem="Order" Property="Status" Title="Status" />
                 <RadzenDataGridColumn TItem="Order" Property="Priority" Title="Priority" />   @* nullable enum (L5) *@
-                <RadzenDataGridColumn TItem="Order" Property="Customer.City" Title="City" />  @* nested path (H14) *@
+                @* NOT gated: a nested path like Property="Customer.City" fails under trimming because DAM
+                   is not transitive - rooting nested model types is the consumer's responsibility (audit
+                   H14), not something the library can fix. Like AOT, we don't make a blocking gate out of
+                   what the library cannot guarantee. *@
             </Columns>
         </RadzenDataGrid>
 
