@@ -16,6 +16,10 @@
     <!-- Preserve Google Map marker types serialized to JS interop -->
     <type fullname="Radzen.Blazor.GoogleMapMarkerData" preserve="all" />
     <type fullname="Radzen.GoogleMapPosition" preserve="all" />
+    <!-- JSInvokable parameter DTOs deserialized from JS (OnMapClick / Upload OnChange/OnProgress) -->
+    <type fullname="Radzen.GoogleMapClickEventArgs" preserve="all" />
+    <type fullname="Radzen.FileInfo" preserve="all" />
+    <type fullname="Radzen.PreviewFileInfo" preserve="all" />
     <!-- Preserve AI chat request types serialized to the chat API -->
     <type fullname="Radzen.ChatCompletionRequest" preserve="all" />
     <type fullname="Radzen.ChatCompletionMessage" preserve="all" />
