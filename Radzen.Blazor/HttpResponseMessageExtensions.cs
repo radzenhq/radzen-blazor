@@ -24,7 +24,8 @@ namespace Radzen
         /// <exception cref="Exception"></exception>
         /// <exception cref="Exception">Unable to parse the response.</exception>
         /// <exception cref="Exception"></exception>
-        public static async Task<T?> ReadAsync<T>(this HttpResponseMessage response)
+        public static async Task<T?> ReadAsync<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this HttpResponseMessage response)
         {
             ArgumentNullException.ThrowIfNull(response);
             try
