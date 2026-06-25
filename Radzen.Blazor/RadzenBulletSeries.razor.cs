@@ -15,7 +15,7 @@ namespace Radzen.Blazor
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the series.</typeparam>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenBulletSeries<TItem> : CartesianSeries<TItem>
+    public partial class RadzenBulletSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
         /// <summary>
         /// Gets or sets the name of the property that provides the target/comparative value.
