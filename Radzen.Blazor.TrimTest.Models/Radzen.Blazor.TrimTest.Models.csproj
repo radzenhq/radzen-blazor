@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--
+      The trimming gate's whole point: this model assembly is opted into trimming, exactly like a
+      consumer's "Shared"/"Models" project that is referenced by a trimmed app. Members that are only
+      SET (via object initializers) and read by Radzen via reflection have no static reference, so the
+      trimmer removes them - unless a Radzen component flows a [DynamicallyAccessedMembers] annotation.
+    -->
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+
+</Project>
