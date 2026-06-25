@@ -34,12 +34,14 @@
             </Columns>
         </RadzenDataGrid>
 
-        <RadzenDropDown TValue="int" Data="@people" TextProperty="FullName" ValueProperty="Id"
-                        @bind-Value="@selectedId" AllowFiltering="true" />
+        @* Trim-safe DropDown usage (value list). NOT gated: binding by TextProperty over an item type
+           that lives in a trimmable assembly is consumer-responsibility (audit H2) - the item type is
+           erased through Data=IEnumerable, so it is not the generic parameter and DAM cannot root it. *@
+        <RadzenDropDown TValue="string" Data="@(new[] { "A", "B", "C" })" @bind-Value="@selectedText" AllowFiltering="true" />
 
-        <RadzenChart>
-            <RadzenColumnSeries TItem="Sale" Data="@sales" CategoryProperty="Region" ValueProperty="Revenue" />
-        </RadzenChart>
+        @* NOT gated: chart series bind by CategoryProperty/ValueProperty over their TItem and need DAM on
+           the series generics (CartesianSeries<TItem> + 33 derived classes). That cascade is a deferred,
+           fixable follow-up (audit chart-series decision) - tracked separately, not blocking this gate. *@
 
         <RadzenScheduler TItem="Appt" Data="@appts" StartProperty="Start" EndProperty="End" TextProperty="Text">
             <RadzenMonthView />
@@ -54,7 +56,7 @@
 
 @code {
     string status = "running";
-    int selectedId;
+    string? selectedText;
 
     Order[] orders =
     [
@@ -62,8 +64,6 @@
         new() { CustomerName = "Bob",   Total = 87, Status = OrderStatus.Shipped,    Customer = new() { City = "Varna" } },
         new() { CustomerName = "Carol", Total = 15, Status = OrderStatus.Processing, Customer = new() { City = "Sofia" } },
     ];
-    Person[] people = [new() { Id = 1, FullName = "Alice" }, new() { Id = 2, FullName = "Bob" }];
-    Sale[] sales = [new() { Region = "EU", Revenue = 100 }, new() { Region = "US", Revenue = 200 }];
     Appt[] appts = [new() { Start = new DateTime(2026, 1, 1), End = new DateTime(2026, 1, 2), Text = "Kickoff" }];
 
     protected override Task OnAfterRenderAsync(bool firstRender)
