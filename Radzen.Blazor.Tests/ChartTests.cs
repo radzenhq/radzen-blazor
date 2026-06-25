@@ -117,4 +117,27 @@ public class ChartTests
         var (barHovered, _) = instance.FindClosestSeries(linePoint.X, linePoint.Y + 80, 25);
         Assert.Same(column, barHovered);
     }
+
+    [Fact]
+    public void Chart_Renders_AllowZoom_DataAttribute_And_Updates_On_Runtime_Change()
+    {
+        using var ctx = CreateChartContext();
+
+        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+            .AddChildContent<RadzenColumnSeries<MultiAxisItem>>(series => series
+                .Add(p => p.CategoryProperty, nameof(MultiAxisItem.Month))
+                .Add(p => p.ValueProperty, nameof(MultiAxisItem.Revenue))
+                .Add(p => p.Data, TallBarData)));
+
+        var root = chart.Find("[data-allow-zoom]");
+        Assert.Equal("false", root.GetAttribute("data-allow-zoom"));
+        Assert.Equal("0", root.GetAttribute("data-zoom-start"));
+        Assert.Equal("1", root.GetAttribute("data-zoom-end"));
+
+        chart.SetParametersAndRender(parameters => parameters.Add(p => p.AllowZoom, true));
+        Assert.Equal("true", chart.Find("[data-allow-zoom]").GetAttribute("data-allow-zoom"));
+
+        chart.SetParametersAndRender(parameters => parameters.Add(p => p.AllowZoom, false));
+        Assert.Equal("false", chart.Find("[data-allow-zoom]").GetAttribute("data-allow-zoom"));
+    }
 }

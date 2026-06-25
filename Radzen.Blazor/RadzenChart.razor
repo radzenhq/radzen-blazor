@@ -8,7 +8,7 @@
 <CascadingValue Value="@this">
 @ChildContent
 </CascadingValue>
-<div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@GetChartStyle()" id="@GetId()">
+<div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@GetChartStyle()" id="@GetId()" data-allow-zoom="@(AllowZoom ? "true" : "false")" data-zoom-start="@ZoomStart.ToInvariantString()" data-zoom-end="@ZoomEnd.ToInvariantString()">
 @if (Width.HasValue && Height.HasValue)
 {
     <CascadingValue Value="@this">
