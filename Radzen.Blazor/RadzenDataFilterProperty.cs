@@ -16,7 +16,8 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of the DataFilter item.</typeparam>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenDataFilterProperty<TItem> : ComponentBase, IDisposable
+    public partial class RadzenDataFilterProperty<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : ComponentBase, IDisposable
     {
         internal event Action<object>? FilterValueChange;
 

@@ -51,7 +51,8 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenPivotDataGrid<TItem> : PagedDataBoundComponent<TItem>
+    public partial class RadzenPivotDataGrid<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : PagedDataBoundComponent<TItem>
     {
         private class RowHeaderCell
         {

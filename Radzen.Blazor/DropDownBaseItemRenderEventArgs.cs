@@ -5,7 +5,8 @@ namespace Radzen;
 /// <summary>
 /// Supplies information about RadzenDropDown ItemRender event.
 /// </summary>
-public class DropDownBaseItemRenderEventArgs<TValue>
+public class DropDownBaseItemRenderEventArgs<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TValue>
 {
     /// <summary>
     /// Gets the data item.

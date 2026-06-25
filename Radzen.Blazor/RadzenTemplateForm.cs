@@ -30,7 +30,8 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [CascadingTypeParameter(nameof(TItem))]
-    public class RadzenTemplateForm<TItem> : RadzenComponent, IRadzenForm
+    public class RadzenTemplateForm<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenComponent, IRadzenForm
     {
         /// <summary>
         /// Returns the validity of the form.

@@ -48,7 +48,8 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2090, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenDataGridColumn<TItem> : ComponentBase, IDisposable where TItem : notnull
+    public partial class RadzenDataGridColumn<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : ComponentBase, IDisposable where TItem : notnull
     {
         /// <summary>
         /// Gets or sets the parent RadzenDataGrid that contains this column.

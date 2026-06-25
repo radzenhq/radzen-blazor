@@ -19,7 +19,8 @@ namespace Radzen
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.DataTypePreserved)]
-    public class PagedDataBoundComponent<T> : RadzenComponent
+    public class PagedDataBoundComponent<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T> : RadzenComponent
     {
         /// <summary>
         /// Gets or sets the pager position. Set to <c>PagerPosition.Bottom</c> by default.

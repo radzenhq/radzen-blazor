@@ -9,7 +9,8 @@ namespace Radzen.Blazor
     /// RadzenRadioButtonListItem component.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public class RadzenRadioButtonListItem<TValue> : RadzenComponent, IRadzenRadioButtonListItem
+    public class RadzenRadioButtonListItem<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TValue> : RadzenComponent, IRadzenRadioButtonListItem
     {
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
