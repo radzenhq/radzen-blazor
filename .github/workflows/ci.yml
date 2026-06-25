@@ -5,7 +5,7 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "trim" ]
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
