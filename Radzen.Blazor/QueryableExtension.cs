@@ -249,7 +249,8 @@ namespace Radzen
         /// Projects each element of a sequence to an IEnumerable and flattens the resulting sequences into one sequence.
         /// </summary>
         [RequiresUnreferencedCode(ReflectionWarning)]
-        public static IQueryable<GroupResult> GroupByMany<T>(this IQueryable<T> source, string[] properties)
+        public static IQueryable<GroupResult> GroupByMany<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T>(this IQueryable<T> source, string[] properties)
         {
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(properties);
@@ -263,7 +264,8 @@ namespace Radzen
         }
 
         [RequiresUnreferencedCode(ReflectionWarning)]
-        private static IQueryable<GroupResult> GroupByMany<T>(IQueryable<T> source, Expression<Func<T, object>>[] expressions, int index)
+        private static IQueryable<GroupResult> GroupByMany<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T>(IQueryable<T> source, Expression<Func<T, object>>[] expressions, int index)
         {
             if (index < expressions.Length - 1)
             {
