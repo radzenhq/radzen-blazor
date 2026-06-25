@@ -2132,6 +2132,10 @@ window.Radzen = {
 
     Radzen.popups.push({ id, instance, callback, parent });
 
+    if (popup.parentNode && popup.parentNode !== document.body) {
+        popup.__radzenHome = popup.parentNode;
+    }
+
     document.body.appendChild(popup);
 
     if (!position) {
@@ -2373,11 +2377,28 @@ window.Radzen = {
           popup.removeEventListener('keydown', popup.__escapeHandler, true);
           delete popup.__escapeHandler;
       }
-      if (popup.parentNode === document.body) {
+      if (popup.__viewportResizeHandler) {
+          if (window.visualViewport) {
+              window.visualViewport.removeEventListener('resize', popup.__viewportResizeHandler);
+          }
+          delete popup.__viewportResizeHandler;
+          delete popup.__originalWrapperMaxHeight;
+          delete popup.__originalPopupTop;
+      }
+      if (popup.__radzenHome && popup.__radzenHome.isConnected) {
+          popup.__radzenHome.appendChild(popup);
+      } else if (popup.parentNode === document.body) {
           document.body.removeChild(popup);
       }
+      delete popup.__radzenHome;
     }
     document.removeEventListener('mousedown', Radzen[id]);
+    document.removeEventListener('contextmenu', Radzen[id]);
+    window.removeEventListener('resize', Radzen[id]);
+    Radzen[id] = null;
+    Radzen.popups = (Radzen.popups || []).filter(function (obj) {
+        return obj.id !== id;
+    });
   },
   scrollDataGrid: function (e) {
     var scrollLeft =
