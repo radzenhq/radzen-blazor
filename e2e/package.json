@@ -1,0 +1,13 @@
+{
+  "name": "radzen-trim-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Playwright runtime gate for the trimmed Radzen.Blazor.TrimTest WASM app",
+  "scripts": {
+    "smoke": "node trim-smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0"
+  }
+}

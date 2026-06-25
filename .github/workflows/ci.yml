@@ -26,4 +26,44 @@ jobs:
     - name: Build
       run: dotnet build Radzen.Blazor/Radzen.Blazor.csproj
     - name: Test
+      # Includes TrimmingContractTests (TRIMMING_AUDIT.md). These fail until the audit fixes land.
       run: dotnet test Radzen.Blazor.Tests/Radzen.Blazor.Tests.csproj
+
+    # Runtime trimming gate: publish the console consumer trimmed and run it. Exit 1 until the library
+    # annotates the item-typed component generics with [DynamicallyAccessedMembers]. See e2e/README.md.
+    - name: Trimming runtime gate (console)
+      if: ${{ !cancelled() }}
+      run: |
+        dotnet publish Radzen.Blazor.TrimRuntimeTest/Radzen.Blazor.TrimRuntimeTest.csproj \
+          -c Release -r linux-x64 --self-contained -p:PublishTrimmed=true
+        ./Radzen.Blazor.TrimRuntimeTest/bin/Release/net10.0/linux-x64/publish/Radzen.Blazor.TrimRuntimeTest
+
+    # Note: Native AOT (IL3050) is deliberately not gated. Blazor does not run under Native AOT, and the
+    # IL3050 surface is inherent to dynamic-data binding (it can never reach zero). See the comment in
+    # TrimmingContractTests.cs.
+
+  # Optional: faithful browser repro - publish the WASM app trimmed and drive it with Playwright.
+  # Fails until the DAM fix lands (the drive throws over the trimmed model). See e2e/README.md.
+  trim-wasm-e2e:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Publish WASM app (trimmed)
+      run: dotnet publish Radzen.Blazor.TrimTest/Radzen.Blazor.TrimTest.csproj -c Release
+    - name: Serve published app
+      run: |
+        dotnet tool install -g dotnet-serve
+        dotnet serve -d Radzen.Blazor.TrimTest/bin/Release/net10.0/publish/wwwroot -p 5050 &
+        sleep 3
+    - name: Run Playwright runtime gate
+      working-directory: e2e
+      env:
+        TRIM_URL: http://localhost:5050
+      run: |
+        npm install
+        npx playwright install --with-deps chromium
+        node trim-smoke.mjs
