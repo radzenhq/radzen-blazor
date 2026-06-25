@@ -34,7 +34,8 @@ GC.KeepAlive(rooted);
 
 // (model type, public members the components read by reflection). Only members directly covered by
 // DAM on the item-type generic parameter are gated. Customer.City (nested) is intentionally excluded -
-// DAM is not transitive; rooting nested types is a documented consumer responsibility (H14).
+// DAM is not transitive, so rooting nested model types is the consumer's responsibility, not something
+// the library can fix here.
 (Type Type, string[] Members)[] expectations =
 [
     (typeof(Order), ["CustomerName", "Total", "Status", "Customer"]),
