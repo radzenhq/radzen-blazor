@@ -24,7 +24,7 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenWaterfallSeries<TItem> : CartesianSeries<TItem>, IChartColumnSeries
+    public partial class RadzenWaterfallSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartColumnSeries
     {
         /// <summary>
         /// Gets or sets the fill color for positive value columns.

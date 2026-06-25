@@ -22,7 +22,7 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenRangeColumnSeries<TItem> : CartesianSeries<TItem>, IChartColumnSeries
+    public partial class RadzenRangeColumnSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartColumnSeries
     {
         /// <summary>
         /// Gets or sets the name of the property that provides the minimum (bottom) value.

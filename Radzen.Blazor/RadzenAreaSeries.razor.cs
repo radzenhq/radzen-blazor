@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
@@ -9,7 +10,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Renders area series in <see cref="RadzenChart" />.
     /// </summary>
-    public partial class RadzenAreaSeries<TItem> : CartesianSeries<TItem>
+    public partial class RadzenAreaSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
         /// <summary>
         /// Specifies the color of the line.

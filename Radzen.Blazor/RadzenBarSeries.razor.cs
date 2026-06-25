@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
@@ -10,7 +11,7 @@ namespace Radzen.Blazor
     /// Renders bar series in <see cref="RadzenChart" />.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
-    public partial class RadzenBarSeries<TItem> : CartesianSeries<TItem>, IChartBarSeries
+    public partial class RadzenBarSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartBarSeries
     {
         /// <summary>
         /// Specifies the fill (background color) of the bar series.

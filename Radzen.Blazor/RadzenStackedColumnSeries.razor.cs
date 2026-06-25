@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
@@ -10,7 +11,7 @@ namespace Radzen.Blazor
     /// Renders column series in <see cref="RadzenChart" />
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
-    public partial class RadzenStackedColumnSeries<TItem> : CartesianSeries<TItem>, IChartStackedColumnSeries
+    public partial class RadzenStackedColumnSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartStackedColumnSeries
     {
         /// <summary>
         /// Specifies the fill (background color) of the column series.

@@ -16,7 +16,8 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of the series data.</typeparam>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
-    public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IDisposable
+    public abstract class CartesianSeries<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : RadzenChartComponentBase, IChartSeries, IChartValueAxisSeries, IDisposable
     {
         /// <summary>
         /// Cache for the value returned by <see cref="Category"/> when that value is only dependent on

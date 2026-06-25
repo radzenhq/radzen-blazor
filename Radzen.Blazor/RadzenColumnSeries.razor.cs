@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
@@ -30,7 +31,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenChart&gt;
     /// </code>
     /// </example>
-    public partial class RadzenColumnSeries<TItem> : CartesianSeries<TItem>, IChartColumnSeries
+    public partial class RadzenColumnSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartColumnSeries
     {
         /// <summary>
         /// Gets or sets the fill (background) color applied to all columns in the series.

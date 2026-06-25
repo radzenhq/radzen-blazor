@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenChart&gt;
     /// </code>
     /// </example>
-    public partial class RadzenScatterSeries<TItem> : CartesianSeries<TItem>
+    public partial class RadzenScatterSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
         /// <summary>
         /// Gets or sets the marker outline color.

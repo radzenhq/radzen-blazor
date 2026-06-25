@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
@@ -9,7 +10,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Renders 100% stacked area series in <see cref="RadzenChart" />.
     /// </summary>
-    public partial class RadzenFullStackedAreaSeries<TItem> : CartesianSeries<TItem>, IChartFullStackedAreaSeries
+    public partial class RadzenFullStackedAreaSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartFullStackedAreaSeries
     {
         /// <summary>
         /// Specifies the color of the line.
