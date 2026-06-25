@@ -1,10 +1,12 @@
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -747,6 +749,158 @@ namespace Radzen.Blazor.Tests
 
             var mentionBadge = component.FindAll(".rz-mention-badge");
             Assert.NotEmpty(mentionBadge);
+        }
+
+        [Fact]
+        public async Task RadzenChat_ShouldRenderSelectedMentionWithUserNameInInput()
+        {
+            var users = new List<ChatUser>
+            {
+                new ChatUser { Id = "user1", Name = "John" },
+                new ChatUser { Id = "user2", Name = "Jane Smith" }
+            };
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, users)
+                .Add(p => p.Messages, new List<ChatMessage>())
+                .Add(p => p.MentionCharacter, '@')
+                .Add(p => p.MentionDisplayTemplate, (RenderFragment<string>)((userId) => builder =>
+                {
+                    builder.OpenElement(0, "span");
+                    builder.AddContent(1, $"@{users.First(u => u.Id == userId).Name}");
+                    builder.CloseElement();
+                }))
+            );
+
+            SetPrivateProperty(component.Instance, "CurrentInput", "@ja");
+            SetPrivateField(component.Instance, "mentionStartPosition", 0);
+            SetPrivateField(component.Instance, "mentionSearchText", "ja");
+            await InvokePrivateAsync(component.Instance, "InsertMention", new MentionUserContext { UserId = "user2", UserName = "Jane Smith", IsInChat = true });
+
+            component.WaitForAssertion(() =>
+            {
+                var updatedTextarea = component.Find(".rz-chat-textarea");
+                Assert.Equal("@Jane Smith", updatedTextarea.GetAttribute("value"));
+            });
+        }
+
+        [Fact]
+        public async Task RadzenChat_ShouldSendCanonicalMentionFormatWhenInputShowsUserName()
+        {
+            var users = new List<ChatUser>
+            {
+                new ChatUser { Id = "user1", Name = "John" },
+                new ChatUser { Id = "user2", Name = "Jane Smith" }
+            };
+
+            ChatMessage sentMessage = null;
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, users)
+                .Add(p => p.Messages, new List<ChatMessage>())
+                .Add(p => p.MentionCharacter, '@')
+                .Add(p => p.MentionDisplayTemplate, (RenderFragment<string>)((userId) => builder =>
+                {
+                    builder.OpenElement(0, "span");
+                    builder.AddContent(1, $"@{users.First(u => u.Id == userId).Name}");
+                    builder.CloseElement();
+                }))
+                .Add(p => p.MessageSent, EventCallback.Factory.Create<ChatMessage>(this, message => sentMessage = message))
+            );
+
+            SetPrivateProperty(component.Instance, "CurrentInput", "Hi @ja");
+            SetPrivateField(component.Instance, "mentionStartPosition", 3);
+            SetPrivateField(component.Instance, "mentionSearchText", "ja");
+            await InvokePrivateAsync(component.Instance, "InsertMention", new MentionUserContext { UserId = "user2", UserName = "Jane Smith", IsInChat = true });
+
+            component.WaitForAssertion(() =>
+            {
+                var updatedTextarea = component.Find(".rz-chat-textarea");
+                Assert.Equal("Hi @Jane Smith", updatedTextarea.GetAttribute("value"));
+            });
+
+            var textarea = component.Find(".rz-chat-textarea");
+            textarea.KeyDown(new KeyboardEventArgs { Key = "Enter" });
+
+            component.WaitForAssertion(() =>
+            {
+                Assert.NotNull(sentMessage);
+                Assert.Equal("Hi @[user2]", sentMessage!.Content);
+            });
+        }
+
+        [Fact]
+        public async Task RadzenChat_ShouldDeleteSelectedMentionInOneStep()
+        {
+            var users = new List<ChatUser>
+            {
+                new ChatUser { Id = "user1", Name = "John" },
+                new ChatUser { Id = "user2", Name = "Jane Smith" }
+            };
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Setup<int[]>("Radzen.getSelectionRange", _ => true).SetResult(new[] { 11, 11 });
+
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, users)
+                .Add(p => p.Messages, new List<ChatMessage>())
+                .Add(p => p.MentionCharacter, '@')
+                .Add(p => p.MentionDisplayTemplate, (RenderFragment<string>)((userId) => builder =>
+                {
+                    builder.OpenElement(0, "span");
+                    builder.AddContent(1, $"@{users.First(u => u.Id == userId).Name}");
+                    builder.CloseElement();
+                }))
+            );
+
+            SetPrivateProperty(component.Instance, "CurrentInput", "@ja");
+            SetPrivateField(component.Instance, "mentionStartPosition", 0);
+            SetPrivateField(component.Instance, "mentionSearchText", "ja");
+            await InvokePrivateAsync(component.Instance, "InsertMention", new MentionUserContext { UserId = "user2", UserName = "Jane Smith", IsInChat = true });
+
+            component.WaitForAssertion(() =>
+            {
+                var updatedTextarea = component.Find(".rz-chat-textarea");
+                Assert.Equal("@Jane Smith", updatedTextarea.GetAttribute("value"));
+            });
+
+            var textarea = component.Find(".rz-chat-textarea");
+            textarea.KeyDown(new KeyboardEventArgs { Key = "Backspace" });
+
+            component.WaitForAssertion(() =>
+            {
+                var updatedTextarea = component.Find(".rz-chat-textarea");
+                Assert.Equal(string.Empty, updatedTextarea.GetAttribute("value"));
+            });
+        }
+
+        static void SetPrivateField(object instance, string fieldName, object value)
+        {
+            var field = instance.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            field.SetValue(instance, value);
+        }
+
+        static void SetPrivateProperty(object instance, string propertyName, object value)
+        {
+            var property = instance.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.NonPublic);
+            property.SetValue(instance, value);
+        }
+
+        static async Task InvokePrivateAsync(object instance, string methodName, params object[] args)
+        {
+            var method = instance.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+            var task = (Task)method.Invoke(instance, args);
+            await task;
         }
     }
 }

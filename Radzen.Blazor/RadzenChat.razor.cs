@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -132,6 +133,17 @@ namespace Radzen.Blazor
         private int selectedMentionIndex = -1;
         private int mentionStartPosition = -1;
         private CancellationTokenSource? mentionSearchCts;
+        private readonly List<MentionInputSegment> mentionInputSegments = new();
+
+        private sealed class MentionInputSegment
+        {
+            public int Start { get; set; }
+            public int Length { get; set; }
+            public string UserId { get; set; } = string.Empty;
+            public string DisplayText { get; set; } = string.Empty;
+
+            public int End => Start + Length;
+        }
 
         /// <summary>
         /// Gets or sets the message template.
@@ -535,6 +547,7 @@ namespace Radzen.Blazor
 
             // Clear input
             CurrentInput = string.Empty;
+            mentionInputSegments.Clear();
             await SetCurrentUserTyping(false);
             await InvokeAsync(StateHasChanged);
         }
@@ -624,7 +637,9 @@ namespace Radzen.Blazor
 
         private async Task OnInput(ChangeEventArgs e)
         {
+            var previousInput = CurrentInput;
             CurrentInput = e.Value?.ToString() ?? "";
+            ReconcileMentionInputSegments(previousInput, CurrentInput);
             await NotifyCurrentUserTyping();
             await DetectMentionTrigger(CurrentInput);
             await InvokeAsync(StateHasChanged);
@@ -729,6 +744,15 @@ namespace Radzen.Blazor
                 }
             }
 
+            if (MentionCharacter.HasValue && mentionInputSegments.Count > 0 && (e.Key == "Backspace" || e.Key == "Delete"))
+            {
+                if (await HandleMentionDeletion(e.Key))
+                {
+                    preventDefault = true;
+                    return;
+                }
+            }
+
             // Handle normal message sending
             if (e.Key == "Enter" && !e.ShiftKey && JSRuntime != null)
             {
@@ -742,9 +766,10 @@ namespace Radzen.Blazor
 
         private async Task OnSendMessage()
         {
-            if (!string.IsNullOrWhiteSpace(CurrentInput))
+            var content = BuildStoredMessageInput();
+            if (!string.IsNullOrWhiteSpace(content))
             {
-                await SendMessage(CurrentInput);
+                await SendMessage(content);
             }
         }
 
@@ -843,9 +868,20 @@ namespace Radzen.Blazor
             // Replace the search text with the mention
             var beforeMention = CurrentInput.Substring(0, mentionStartPosition);
             var afterMention = CurrentInput.Substring(mentionStartPosition + 1 + mentionSearchText.Length);
-            
-            var mention = $"{MentionCharacter}[{user.UserId}]";
-            CurrentInput = beforeMention + mention + afterMention;
+            var displayName = ResolveMentionDisplayName(user);
+            var displayMention = $"{MentionCharacter}{displayName}";
+            var replacedLength = 1 + mentionSearchText.Length;
+
+            ShiftMentionSegmentsAfterEdit(mentionStartPosition, replacedLength, displayMention.Length);
+            mentionInputSegments.Add(new MentionInputSegment
+            {
+                Start = mentionStartPosition,
+                Length = displayMention.Length,
+                UserId = user.UserId,
+                DisplayText = displayMention
+            });
+
+            CurrentInput = beforeMention + displayMention + afterMention;
 
             await CloseMentionPopup();
             await InvokeAsync(StateHasChanged);
@@ -874,6 +910,180 @@ namespace Radzen.Blazor
         private async Task OnMentionItemClick(MentionUserContext user)
         {
             await InsertMention(user);
+        }
+
+        private string BuildStoredMessageInput()
+        {
+            if (mentionInputSegments.Count == 0 || !MentionCharacter.HasValue)
+            {
+                return CurrentInput;
+            }
+
+            var orderedSegments = mentionInputSegments.OrderBy(segment => segment.Start).ToList();
+            var builder = new StringBuilder();
+            var currentIndex = 0;
+
+            foreach (var segment in orderedSegments)
+            {
+                if (segment.Start < currentIndex || segment.End > CurrentInput.Length)
+                {
+                    continue;
+                }
+
+                var segmentText = CurrentInput.Substring(segment.Start, segment.Length);
+                if (!string.Equals(segmentText, segment.DisplayText, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                builder.Append(CurrentInput.AsSpan(currentIndex, segment.Start - currentIndex));
+                builder.Append(MentionCharacter.Value);
+                builder.Append('[');
+                builder.Append(segment.UserId);
+                builder.Append(']');
+                currentIndex = segment.End;
+            }
+
+            if (currentIndex < CurrentInput.Length)
+            {
+                builder.Append(CurrentInput.AsSpan(currentIndex));
+            }
+
+            return builder.ToString();
+        }
+
+        private string ResolveMentionDisplayName(MentionUserContext user)
+        {
+            if (!string.IsNullOrWhiteSpace(user.UserName))
+            {
+                return user.UserName;
+            }
+
+            var userId = user.UserId ?? string.Empty;
+            var chatUser = GetUser(userId);
+            if (!string.IsNullOrWhiteSpace(chatUser?.Name))
+            {
+                return chatUser.Name;
+            }
+
+            return userId;
+        }
+
+        private void ReconcileMentionInputSegments(string previousInput, string nextInput)
+        {
+            if (mentionInputSegments.Count == 0 || string.Equals(previousInput, nextInput, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            var commonPrefixLength = 0;
+            var maxPrefixLength = Math.Min(previousInput.Length, nextInput.Length);
+            while (commonPrefixLength < maxPrefixLength && previousInput[commonPrefixLength] == nextInput[commonPrefixLength])
+            {
+                commonPrefixLength++;
+            }
+
+            var previousSuffixIndex = previousInput.Length;
+            var nextSuffixIndex = nextInput.Length;
+            while (previousSuffixIndex > commonPrefixLength &&
+                   nextSuffixIndex > commonPrefixLength &&
+                   previousInput[previousSuffixIndex - 1] == nextInput[nextSuffixIndex - 1])
+            {
+                previousSuffixIndex--;
+                nextSuffixIndex--;
+            }
+
+            var previousChangedEnd = previousSuffixIndex;
+            var lengthDelta = nextInput.Length - previousInput.Length;
+
+            var updatedSegments = new List<MentionInputSegment>(mentionInputSegments.Count);
+            foreach (var segment in mentionInputSegments.OrderBy(segment => segment.Start))
+            {
+                if (segment.End <= commonPrefixLength)
+                {
+                    updatedSegments.Add(segment);
+                    continue;
+                }
+
+                if (segment.Start >= previousChangedEnd)
+                {
+                    segment.Start += lengthDelta;
+                    updatedSegments.Add(segment);
+                    continue;
+                }
+            }
+
+            mentionInputSegments.Clear();
+            mentionInputSegments.AddRange(updatedSegments);
+        }
+
+        private void ShiftMentionSegmentsAfterEdit(int editStart, int replacedLength, int insertedLength)
+        {
+            if (mentionInputSegments.Count == 0)
+            {
+                return;
+            }
+
+            var editEnd = editStart + replacedLength;
+            var delta = insertedLength - replacedLength;
+
+            mentionInputSegments.RemoveAll(segment => segment.Start < editEnd && segment.End > editStart);
+
+            foreach (var segment in mentionInputSegments.Where(segment => segment.Start >= editEnd))
+            {
+                segment.Start += delta;
+            }
+        }
+
+        private async Task<bool> HandleMentionDeletion(string key)
+        {
+            if (JSRuntime == null)
+            {
+                return false;
+            }
+
+            var selection = await JSRuntime.InvokeAsync<int[]?>("Radzen.getSelectionRange", inputElement);
+            if (selection == null || selection.Length < 2)
+            {
+                return false;
+            }
+
+            var selectionStart = selection[0];
+            var selectionEnd = selection[1];
+
+            MentionInputSegment? segmentToRemove = null;
+            if (selectionStart != selectionEnd)
+            {
+                segmentToRemove = mentionInputSegments.FirstOrDefault(segment => segment.Start < selectionEnd && segment.End > selectionStart);
+            }
+            else
+            {
+                var targetIndex = key == "Backspace" ? selectionStart - 1 : selectionStart;
+                if (targetIndex < 0)
+                {
+                    return false;
+                }
+
+                segmentToRemove = mentionInputSegments.FirstOrDefault(segment => segment.Start <= targetIndex && segment.End > targetIndex);
+            }
+
+            if (segmentToRemove == null)
+            {
+                return false;
+            }
+
+            CurrentInput = CurrentInput.Remove(segmentToRemove.Start, segmentToRemove.Length);
+            mentionInputSegments.Remove(segmentToRemove);
+            foreach (var segment in mentionInputSegments.Where(segment => segment.Start > segmentToRemove.Start))
+            {
+                segment.Start -= segmentToRemove.Length;
+            }
+
+            await JSRuntime.InvokeVoidAsync("Radzen.setInputValue", inputElement, CurrentInput);
+            await JSRuntime.InvokeVoidAsync("Radzen.setSelectionRange", inputElement, segmentToRemove.Start, segmentToRemove.Start);
+            await DetectMentionTrigger(CurrentInput);
+            await InvokeAsync(StateHasChanged);
+            return true;
         }
 
         internal List<(int start, int end, string userId)> ParseMentions(string text)
