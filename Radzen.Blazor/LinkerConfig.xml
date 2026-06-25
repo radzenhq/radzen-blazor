@@ -19,9 +19,27 @@
     <!-- Preserve AI chat request types serialized to the chat API -->
     <type fullname="Radzen.ChatCompletionRequest" preserve="all" />
     <type fullname="Radzen.ChatCompletionMessage" preserve="all" />
+    <!-- Preserve spreadsheet event args deserialized from JS interop callbacks -->
+    <type fullname="Radzen.Blazor.Spreadsheet.CellEventArgs" preserve="all" />
+    <type fullname="Radzen.Blazor.Spreadsheet.ImageResizeEventArgs" preserve="all" />
+    <!-- Preserve dialog options serialized to JS (openDialog/openSideDialog read draggable, resizable, closeDialogOnEsc, autoFocusFirstElement) -->
+    <type fullname="Radzen.DialogOptionsBase" preserve="all" />
+    <type fullname="Radzen.DialogOptions" preserve="all" />
+    <type fullname="Radzen.SideDialogOptions" preserve="all" />
+    <type fullname="Radzen.AlertOptions" preserve="all" />
+    <type fullname="Radzen.ConfirmOptions" preserve="all" />
+    <!-- Preserve types deserialized from JS interop return values -->
+    <type fullname="Radzen.Blazor.Rendering.Rect" preserve="all" />
+    <type fullname="Radzen.HtmlEditorTableSelection" preserve="all" />
+    <type fullname="Radzen.Blazor.RadzenHtmlEditorCommandState" preserve="all" />
+    <type fullname="Radzen.Blazor.Spreadsheet.VirtualRegion" preserve="all" />
+    <type fullname="Radzen.Blazor.RadzenHtmlEditorImage/ImageAttributes" preserve="all" />
+    <type fullname="Radzen.Blazor.RadzenHtmlEditorLink/LinkAttributes" preserve="all" />
     <!-- Preserve all types with [JSInvokable] methods (called from JS, invisible to trimmer) -->
     <type fullname="Radzen.DialogService" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenCarousel" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenChart" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenChartTooltip" preserve="methods" />
     <type fullname="Radzen.RadzenComponent" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenContextMenu" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenDataGrid`1" preserve="methods" />
@@ -34,18 +52,30 @@
     <type fullname="Radzen.Blazor.RadzenHeatmap" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenHtmlEditor" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenMediaQuery" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenPopup" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenRangeNavigator" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSankeyDiagram`1" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenScheduler`1" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSecurityCode" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenSignaturePad" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSlider`1" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSpeechToTextButton" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSpiderChart" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenSpreadsheet" preserve="methods" />
+    <type fullname="Radzen.Blazor.Spreadsheet.SheetEditor" preserve="methods" />
+    <type fullname="Radzen.Blazor.Spreadsheet.VirtualGrid" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenSplitter" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenToc" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenTooltip" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenTreemap" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenUpload" preserve="methods" />
     <type fullname="Radzen.Blazor.GaugeBase" preserve="methods" />
+    <type fullname="Radzen.Blazor.Rendering.Appointment" preserve="methods" />
+    <type fullname="Radzen.Blazor.Rendering.DialogContainer" preserve="methods" />
+    <type fullname="Radzen.Blazor.Rendering.Draggable" preserve="methods" />
+    <type fullname="Radzen.Blazor.Rendering.GanttTimelineView`1" preserve="methods" />
+    <type fullname="Radzen.Blazor.Rendering.MonthView" preserve="methods" />
+    <type fullname="Radzen.Blazor.Spreadsheet.RangePickerBar" preserve="methods" />
     <!-- Preserve GroupResult for dynamic Key access -->
     <type fullname="Radzen.GroupResult" preserve="all" />
   </assembly>
