@@ -324,16 +324,16 @@ namespace Radzen.Blazor
                 topWidth = valueWidth;
                 bottomWidth = index < count - 1
                     ? AvailableWidth * (Value(orderedItems[index + 1]) / maxValue)
-                    : AvailableWidth * 0.15;
+                    : Math.Min(AvailableWidth * 0.15, valueWidth);
             }
             else
             {
                 // Default: wide at visual top, narrow at visual bottom.
                 // In polar coords, index 0 = visual bottom → narrow the first segment's "top" (visual bottom edge).
-                topWidth = index == 0 ? AvailableWidth * 0.15 : valueWidth;
                 bottomWidth = index < count - 1
                     ? AvailableWidth * (Value(orderedItems[index + 1]) / maxValue)
                     : valueWidth;
+                topWidth = index == 0 ? Math.Min(AvailableWidth * 0.15, bottomWidth) : valueWidth;
             }
 
             var topY = this.TopY + index * segHeight;
