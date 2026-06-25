@@ -122,7 +122,7 @@ public class ExpressionSerializer : ExpressionVisitor
                     _sb.Append(", ");
                 }
 
-                Visit(node.Arguments[i]);
+                VisitMethodArgument(node.Arguments[i]);
             }
 
             _sb.Append(")");
@@ -146,13 +146,30 @@ public class ExpressionSerializer : ExpressionVisitor
                     _sb.Append(", ");
                 }
 
-                Visit(node.Arguments[i]);
+                VisitMethodArgument(node.Arguments[i]);
             }
 
             _sb.Append(")");
         }
 
         return node;
+    }
+
+    // FormatValue serializes enums as bare numbers, but a method argument needs its enum type for the
+    // parser's overload resolution (e.g. DateTime.Parse(s, provider, DateTimeStyles)). Emit the cast here
+    // (not in FormatValue) so overloads still bind while comparison/array enums stay numeric.
+    private void VisitMethodArgument(Expression argument)
+    {
+        if (argument is ConstantExpression { Value: not null } constant)
+        {
+            var type = Nullable.GetUnderlyingType(constant.Type) ?? constant.Type;
+            if (type.IsEnum)
+            {
+                _sb.Append(CultureInfo.InvariantCulture, $"({type.DisplayName(true).Replace("+", ".", StringComparison.Ordinal)})");
+            }
+        }
+
+        Visit(argument);
     }
 
     /// <inheritdoc/>
@@ -218,8 +235,11 @@ public class ExpressionSerializer : ExpressionVisitor
             TimeOnly timeOnly => $"TimeOnly.Parse(\"{timeOnly.ToString("HH:mm:ss", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
             Guid guid => $"Guid.Parse(\"{guid.ToString("D", CultureInfo.InvariantCulture)}\")",
             IEnumerable enumerable when value is not string => FormatEnumerable(enumerable),
+            // Emit the underlying numeric value (not a (Namespace.EnumType) cast): the cast forces
+            // ResolveTypeFromAssemblies (AppDomain.GetTypes) on deserialization, which is trim/AOT hostile.
+            // The enum type is recovered on parse from the compared member / typed array prefix.
             _ => value.GetType().IsEnum
-                ? $"({value.GetType()?.FullName?.Replace("+", ".", StringComparison.Ordinal)})" + Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()), CultureInfo.InvariantCulture).ToString()
+                ? Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()), CultureInfo.InvariantCulture).ToString()
                 : Convert.ToString(value, CultureInfo.InvariantCulture)
         };
     }
@@ -236,8 +256,14 @@ public class ExpressionSerializer : ExpressionVisitor
     {
         var arrayType = enumerable.AsQueryable().ElementType;
 
+        // Enum elements are serialized as bare numbers (see FormatValue); emit the typed array prefix so the
+        // parser binds the array as the enum type (required for Intersect/Except). Nullable elements already
+        // need the prefix to carry the Nullable<> wrapper.
+        var underlying = Nullable.GetUnderlyingType(arrayType) ?? arrayType;
+        var needsTypePrefix = Nullable.GetUnderlyingType(arrayType) != null || underlying.IsEnum;
+
         var items = enumerable.Cast<object>().Select(FormatValue);
-        return $"new {(Nullable.GetUnderlyingType(arrayType) != null ? arrayType.DisplayName(true).Replace("+", ".", StringComparison.Ordinal) : "")}[] {{ {string.Join(", ", items)} }}";
+        return $"new {(needsTypePrefix ? arrayType.DisplayName(true).Replace("+", ".", StringComparison.Ordinal) : "")}[] {{ {string.Join(", ", items)} }}";
     }
 
     /// <inheritdoc/>
@@ -252,7 +278,15 @@ public class ExpressionSerializer : ExpressionVisitor
             _sb.Append("(");
         }
 
-        _sb.Append("new [] { ");
+        // Enum elements serialize as bare numbers (see FormatValue); emit the typed array prefix so the
+        // parser binds the array as the enum type (required for Intersect/Except) instead of int[].
+        var elementType = node.Type.GetElementType();
+        var underlying = elementType != null ? Nullable.GetUnderlyingType(elementType) ?? elementType : null;
+        var typePrefix = underlying != null && (underlying.IsEnum || Nullable.GetUnderlyingType(elementType!) != null)
+            ? elementType!.DisplayName(true).Replace("+", ".", StringComparison.Ordinal)
+            : "";
+
+        _sb.Append(CultureInfo.InvariantCulture, $"new {typePrefix}[] {{ ");
         bool first = true;
         foreach (var expr in node.Expressions)
         {
