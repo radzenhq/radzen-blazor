@@ -37,7 +37,7 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenPieSeries<TItem> : CartesianSeries<TItem>
+    public partial class RadzenPieSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>
     {
         /// <summary>
         /// Gets or sets the horizontal center position of the pie chart in pixels.
