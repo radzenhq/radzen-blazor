@@ -214,6 +214,35 @@ namespace Radzen.Blazor.Tests
                 + "in LinkerConfig.xml:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
         }
 
+        // ----- Test 7b: the DataGrid filter engine resolves System.String filter methods by reflection
+        // (typeof(string).GetMethod) for the string operators; trimming strips them unless rooted. They
+        // must be kept via [DynamicDependency] on QueryableExtension.GetExpression. Found by the WASM e2e
+        // gate (the metadata/console gates structurally cannot - they don't exercise the filter engine).
+        [Fact]
+        public void String_Filter_Methods_Are_Rooted_For_Trimming()
+        {
+            var type = LibraryAssembly.GetType("Radzen.QueryableExtension");
+            Assert.True(type != null, "Test out of date: Radzen.QueryableExtension not found.");
+            var method = type!.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(m => m.Name == "GetExpression");
+            Assert.True(method != null, "Test out of date: QueryableExtension.GetExpression not found.");
+
+            var rootedStringMembers = method!.GetCustomAttributesData()
+                .Where(a => a.AttributeType.Name == "DynamicDependencyAttribute"
+                    && a.ConstructorArguments.Count == 2
+                    && a.ConstructorArguments[1].Value as Type == typeof(string))
+                .Select(a => a.ConstructorArguments[0].Value as string)
+                .ToHashSet();
+
+            string[] required = { "Contains", "StartsWith", "EndsWith", "ToLower" };
+            var missing = required.Where(m => !rootedStringMembers.Contains(m)).ToList();
+
+            Assert.True(missing.Count == 0,
+                "DataGrid string filter operators resolve these System.String methods by reflection; root "
+                + "them via [DynamicDependency(\"<name>\", typeof(string))] on QueryableExtension.GetExpression "
+                + "so trimming keeps them:" + Environment.NewLine + string.Join(Environment.NewLine, missing));
+        }
+
         // ----- Test 8: M7/M8 - RadzenDataGrid/RadzenPivotDataGrid carry broad CLASS-LEVEL trim
         // suppressions that auto-silence ALL future reflection warnings on the type. Suppressions must be
         // scoped to the specific members that need them. RED now: both carry class-level IL2026/IL2070/
