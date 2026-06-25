@@ -268,7 +268,9 @@ namespace Radzen.Blazor.Tests
         public void Serializes_EnumArrayInValueOposite()
         {
             Expression<Func<TestEntity, bool>> expr = e => new[] { Status.Active, Status.Inactive }.Intersect(e.Statuses).Any();
-            Assert.Equal("e => (new [] { (Radzen.Blazor.Tests.Status)0, (Radzen.Blazor.Tests.Status)1 }).Intersect(e.Statuses).Any()", _serializer.Serialize(expr));
+            // Enum elements serialize as bare numbers; the typed array prefix carries the enum type so the
+            // parser binds Status[] for Intersect, without per-value casts that force assembly type scanning.
+            Assert.Equal("e => (new Radzen.Blazor.Tests.Status[] { 0, 1 }).Intersect(e.Statuses).Any()", _serializer.Serialize(expr));
         }
 
         [Fact]
