@@ -6,7 +6,8 @@ namespace Radzen;
 /// Supplies information about a <see cref="Radzen.Blazor.RadzenDataGrid{TItem}" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class RowRenderEventArgs<T>
+public class RowRenderEventArgs<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] T>
 {
     private IDictionary<string, object>? attributes;
 

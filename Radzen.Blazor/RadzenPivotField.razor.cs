@@ -14,7 +14,8 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of the PivotDataGrid item.</typeparam>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenPivotField<TItem> : ComponentBase, IDisposable
+    public partial class RadzenPivotField<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : ComponentBase, IDisposable
     {
         /// <summary>
         /// Gets or sets the property name.

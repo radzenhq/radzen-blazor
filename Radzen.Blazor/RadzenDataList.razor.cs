@@ -36,7 +36,8 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [CascadingTypeParameter(nameof(TItem))]
-    public partial class RadzenDataList<TItem> : PagedDataBoundComponent<TItem>
+    public partial class RadzenDataList<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TItem> : PagedDataBoundComponent<TItem>
     {
         /// <inheritdoc />
         protected override string GetComponentCssClass()
