@@ -3,6 +3,10 @@
   <assembly fullname="System.Core">
     <type fullname="System.Linq.Queryable" preserve="all" />
   </assembly>
+  <!-- In/NotIn/Contains filter branches resolve Enumerable.Contains/Any/Intersect/Except by reflection -->
+  <assembly fullname="System.Linq">
+    <type fullname="System.Linq.Enumerable" preserve="all" />
+  </assembly>
   <assembly fullname="System.Linq.Expressions">
     <type fullname="System.Linq.Expressions.Expression" preserve="all" />
     <type fullname="System.Linq.Expressions.ExpressionVisitor" preserve="all" />
@@ -82,5 +86,7 @@
     <type fullname="Radzen.Blazor.Spreadsheet.RangePickerBar" preserve="methods" />
     <!-- Preserve GroupResult for dynamic Key access -->
     <type fullname="Radzen.GroupResult" preserve="all" />
+    <!-- Spreadsheet chart series read ChartDataPoint getters via reflection (string Category/Value property) -->
+    <type fullname="Radzen.Documents.Spreadsheet.ChartDataPoint" preserve="all" />
   </assembly>
 </linker>
