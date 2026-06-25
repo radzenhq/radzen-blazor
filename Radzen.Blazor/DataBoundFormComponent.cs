@@ -24,7 +24,8 @@ namespace Radzen
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2067, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2070, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2072, Justification = TrimMessages.DataTypePreserved)]
-    public class DataBoundFormComponent<T> : RadzenComponent, IRadzenFormComponent
+    public class DataBoundFormComponent<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>
         /// Gets or sets the index of the tab.

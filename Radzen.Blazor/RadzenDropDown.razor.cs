@@ -33,7 +33,8 @@ namespace Radzen.Blazor
     /// &lt;RadzenDropDown @bind-Value=@selectedIds TValue="IEnumerable&lt;int&gt;" Data=@items Multiple="true" Chips="true" /&gt;
     /// </code>
     /// </example>
-    public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
+    public partial class RadzenDropDown<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TValue> : DropDownBase<TValue>
     {
         IJSObjectReference? _jsRef;
 

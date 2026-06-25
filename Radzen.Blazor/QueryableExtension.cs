@@ -1955,7 +1955,8 @@ namespace Radzen
             return result.Concat(result.SelectManyRecursive(selector));
         }
 
-        private static List<RadzenDataGridColumn<T>> GetFilterableColumns<T>(IEnumerable<RadzenDataGridColumn<T>> columns) where T : notnull
+        private static List<RadzenDataGridColumn<T>> GetFilterableColumns<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T>(IEnumerable<RadzenDataGridColumn<T>> columns) where T : notnull
         {
             return columns
                 .Where(c => c.Filterable

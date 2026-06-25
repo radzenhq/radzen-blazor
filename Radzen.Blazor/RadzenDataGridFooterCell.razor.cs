@@ -3,7 +3,8 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenDataGridFooterCell.
     /// </summary>
-    public partial class RadzenDataGridFooterCell<TItem> where TItem : notnull
+    public partial class RadzenDataGridFooterCell<
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields)] TItem> where TItem : notnull
     {
     }
 }
