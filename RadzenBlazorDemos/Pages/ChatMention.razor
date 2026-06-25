@@ -1,0 +1,175 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Text="Mention Users in Chat" />
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenChat @ref="basicChat"
+                CurrentUserId="user1"
+                Users="@users"
+                Messages="@messages"
+                MessagesChanged="@OnMessagesChanged"
+                Placeholder="@PlaceholderText"
+                Style="height: 500px;"
+                ShowTypingIndicator="true"
+                MessageAdded="@OnMessageAdded"
+                MessageSent="@OnMessageSent"
+                ChatCleared="@OnChatCleared"
+                TypingChanged="@OnTypingChanged"
+                MentionCharacter="@MentionCharacter"
+                MentionMaxResults="5"
+                MentionSearch="@LoadMentions"
+                MentionItemTemplate="@MentionItemTemplate"
+                MentionDisplayTemplate="@MentionDisplayTemplate">
+        <TitleContent>
+            <RadzenBadge>Chat with Mentions</RadzenBadge>
+        </TitleContent>
+    </RadzenChat>
+</RadzenStack>
+
+<EventConsole @ref="console" Style="min-height: 230px;" />
+
+@code {
+    RadzenChat basicChat;
+    EventConsole console;
+    
+    private List<ChatUser> users = new();
+    private List<ChatMessage> messages = new();
+    private const char MentionCharacter = '@';
+    private const string PlaceholderText = "Type your message... (try typing @ to mention someone)";
+
+    protected override void OnInitialized()
+    {
+        // Initialize users
+        users.AddRange(new[]
+        {
+            new ChatUser { Id = "user1", Name = "John Doe", Color = "#1976d2" },
+            new ChatUser { Id = "user2", Name = "Jane Smith", Color = "#388e3c" },
+            new ChatUser { Id = "user3", Name = "Bob Johnson", Color = "#f57c00" }
+        });
+
+        // Add some sample messages
+        messages.AddRange(new[]
+        {
+            new ChatMessage { Content = "Welcome to the team chat! 👋", UserId = "user1", Timestamp = DateTime.Now.AddMinutes(-30) },
+            new ChatMessage { Content = "Thanks John! Looking forward to working together.", UserId = "user2", Timestamp = DateTime.Now.AddMinutes(-29) },
+            new ChatMessage { Content = "Same here! Let's make this project amazing! 🚀", UserId = "user3", Timestamp = DateTime.Now.AddMinutes(-28) }
+        });
+    }
+
+    // Template for rendering individual mention search results
+    private RenderFragment<MentionUserContext> MentionItemTemplate => (context) => builder =>
+    {
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "rz-mention-item");
+        builder.AddAttribute(2, "style", "display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;");
+
+        // User avatar/initials
+        var user = users.FirstOrDefault(u => u.Id == context.UserId);
+        builder.OpenElement(3, "div");
+        builder.AddAttribute(4, "style", $"width: 24px; height: 24px; border-radius: 50%; background: {user?.Color ?? "#ccc"}; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;");
+        builder.AddContent(5, user?.GetInitials() ?? "?");
+        builder.CloseElement();
+
+        // User name
+        builder.OpenElement(6, "span");
+        builder.AddContent(7, context.UserName ?? "");
+        builder.CloseElement();
+
+        // Online indicator
+        if (context.IsInChat)
+        {
+            builder.OpenElement(8, "span");
+            builder.AddAttribute(9, "style", "margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: #4caf50;");
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+    };
+
+    // Template for rendering stored mentions in chat messages
+    private RenderFragment<string> MentionDisplayTemplate => (userId) => builder =>
+    {
+        var mentionedUser = users.FirstOrDefault(u => u.Id == userId);
+        
+        builder.OpenElement(0, "span");
+        builder.AddAttribute(1, "class", "rz-mention-badge");
+        builder.AddAttribute(2, "style", $"background: {mentionedUser?.Color ?? "#ccc"}20; color: {mentionedUser?.Color ?? "#ccc"}; padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: 500;");
+        builder.AddAttribute(3, "title", mentionedUser?.Name ?? userId);
+        builder.AddContent(4, $"@{mentionedUser?.Name ?? userId}");
+        builder.CloseElement();
+    };
+
+    async Task LoadMentions(MentionSearchArgs args)
+    {
+        // Simulate a small delay for network request
+        await Task.Delay(100);
+
+        // Filter users based on search text
+        var searchText = args.Filter ?? string.Empty;
+        var filteredUsers = users
+            .Where(u => u.Id != "user1") // Exclude current user
+            .Where(u => u.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+            .Skip(args.Skip ?? 0)
+            .Take(args.Top ?? 5)
+            .Select(u => new MentionUserContext
+            {
+                UserId = u.Id,
+                UserName = u.Name,
+                IsInChat = true
+            })
+            .ToList();
+
+        // Update search results in the chat component
+        await basicChat?.SetMentionSearchResults(filteredUsers);
+
+        console.Log($"Mention search: '{searchText}' - Found {filteredUsers.Count} results", AlertStyle.Info);
+    }
+
+    void OnMessageAdded(ChatMessage message)
+    {
+        var participant = users.FirstOrDefault(p => p.Id == message.UserId);
+        var participantName = participant?.Name ?? "Unknown";
+        var contentPreview = message.Content.Substring(0, Math.Min(50, message.Content.Length));
+        console.Log($"Message added: {participantName} - {contentPreview}...", 
+                   message.UserId == "user1" ? AlertStyle.Info : AlertStyle.Success);
+    }
+
+    void OnMessageSent(ChatMessage message)
+    {
+        console.Log($"Message sent: {message.Content}", AlertStyle.Info);
+    }
+
+    void OnMessagesChanged(IEnumerable<ChatMessage> newMessages)
+    {
+        messages = newMessages.ToList();
+        StateHasChanged();
+    }
+
+    void OnChatCleared()
+    {
+        console.Log("Chat cleared", AlertStyle.Warning);
+    }
+
+    async Task SimulateJaneTyping()
+    {
+        if (basicChat == null)
+        {
+            return;
+        }
+
+        await basicChat.SetUserTyping("user2", true);
+        await Task.Delay(1500);
+        await basicChat.SetUserTyping("user2", false);
+    }
+
+    void OnTypingChanged(ChatTypingEventArgs args)
+    {
+        // In a real app you would broadcast this via SignalR to other clients.
+        console.Log($"TypingChanged: {args.UserId} => {args.IsTyping}", AlertStyle.Info);
+    }
+}

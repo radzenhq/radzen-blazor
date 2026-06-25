@@ -126,7 +126,15 @@
                                 }
                                 else
                                 {
-                                    <RadzenMarkdown Text=@message.Content />
+                                    @if (MentionCharacter.HasValue && MentionDisplayTemplate != null && message.Content.Contains($"{MentionCharacter}["))
+                                    {
+                                        // Parse and render mentions
+                                        @RenderMessageWithMentions(message.Content)
+                                    }
+                                    else
+                                    {
+                                        <RadzenMarkdown Text=@message.Content />
+                                    }
                                 }
                             </div>
                             
@@ -184,6 +192,27 @@
                                 Title="Send message"
                                 class="rz-chat-send-btn" />
             </div>
+
+            @if (isMentionPopupOpen && MentionCharacter.HasValue && mentionSearchResults.Count > 0)
+            {
+                <div class="rz-chat-mention-popup">
+                    @foreach (var (user, index) in mentionSearchResults.Select((u, i) => (u, i)))
+                    {
+                        var isSelected = index == selectedMentionIndex;
+                        <div class="rz-chat-mention-item @(isSelected ? "rz-chat-mention-item-selected" : "")" 
+                             @onclick="@((MouseEventArgs e) => OnMentionItemClick(user))">
+                            @if (MentionItemTemplate != null)
+                            {
+                                @MentionItemTemplate(user)
+                            }
+                            else
+                            {
+                                <span>@user.UserName</span>
+                            }
+                        </div>
+                    }
+                </div>
+            }
         </div>
     </div>
 }
