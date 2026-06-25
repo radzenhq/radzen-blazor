@@ -21,10 +21,21 @@ expression building, `MakeGenericType` aggregates) - not the consumer-model haza
 
 ## Result
 
-**14/14 component interactions PASS, 0 FAIL, 0 selector-unresolved** against the
-demos served from local Radzen source. No risky component broke under the interaction.
-(Validated on a non-trimmed Debug serve during development; CI runs the identical
-script against the WASM-client-trimmed publish - see ci.yml `demos-deep-interaction-crawl`.)
+**14/14 component interactions PASS, 0 FAIL, 0 selector-unresolved** - verified against
+the **actual WASM-client-trimmed publish** (not just the Debug serve). No risky
+component broke under deep interaction.
+
+Proof trimming was in effect for the verification run: the IL linker ran ("Optimizing
+assemblies for size"), `Radzen.Blazor.wasm` was emitted at ~4.0 MB (the trimmed size),
+and the publish produced **0 IL2xxx/IL3xxx** warnings. The interaction signals were
+byte-for-byte identical between the trimmed and the non-trimmed Debug serve (same row
+counts, same 60 enum options, same 96/185 filtered items, same 314 pivot aggregate
+cells, Bold still mutated the markup, the chart tooltip still rendered, dialogs still
+opened) - so every reflection / dynamic-LINQ / anonymous-object / `[JSInvokable]` /
+`MakeGenericType` / interop path the interactions touch survives trimming.
+
+CI runs the identical script against the same trimmed publish on every build - see
+ci.yml `demos-deep-interaction-crawl` (non-blocking).
 
 ## Components driven, the hazard each exercises, and the interaction signal
 
