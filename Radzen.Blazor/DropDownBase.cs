@@ -15,7 +15,8 @@ namespace Radzen
     /// Base class of components that display a list of items.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DropDownBase<T> : DataBoundFormComponent<T>
+    public class DropDownBase<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] T> : DataBoundFormComponent<T>
     {
         /// <summary>
         /// Gets or sets a value that determines how many additional items will be rendered before and after the visible region. This help to reduce the frequency of rendering during scrolling. However, higher values mean that more elements will be present in the page.

@@ -96,7 +96,8 @@ namespace Radzen.Blazor
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2080, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2087, Justification = TrimMessages.DataTypePreserved)]
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2091, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem> where TItem : notnull
+    public partial class RadzenDataGrid<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : PagedDataBoundComponent<TItem> where TItem : notnull
     {
         private static readonly string[] DefaultGroupProperty = new string[] { "it" };
 
