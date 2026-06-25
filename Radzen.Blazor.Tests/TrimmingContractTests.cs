@@ -89,6 +89,15 @@ namespace Radzen.Blazor.Tests
             "Radzen.Blazor.RadzenPickList`1",
         };
 
+        // Exempt for a different reason: Razor @typeparam view sub-components cannot carry
+        // [DynamicallyAccessedMembers] on the type parameter at RazorLangVersion 7.0 (the source generator
+        // drops the generic). Their model T is preserved transitively by the parent RadzenGantt<TItem>'s
+        // DAM, which instantiates them with the same TItem - so the bound members survive trimming anyway.
+        private static readonly HashSet<string> DamExemptRazorTypeParam = new()
+        {
+            "Radzen.Blazor.Rendering.GanttTimelineView`1",
+        };
+
         [Fact]
         public void DataComponent_Generic_Parameters_Have_DAM()
         {
@@ -107,6 +116,7 @@ namespace Radzen.Blazor.Tests
             {
                 if (!type.IsGenericTypeDefinition) continue;
                 if (DamExemptValueTypedInputs.Contains(type.FullName!)) continue;
+                if (DamExemptRazorTypeParam.Contains(type.FullName!)) continue;
                 if (!BindsModelMemberByStringName(type)) continue;
                 if (!GenericParameterHasDam(type, DynamicallyAccessedMemberTypes.PublicProperties))
                     offenders.Add(type.FullName!);
