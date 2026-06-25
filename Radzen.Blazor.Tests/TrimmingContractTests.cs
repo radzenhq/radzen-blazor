@@ -66,52 +66,72 @@ namespace Radzen.Blazor.Tests
         // model members. RED now: none are annotated (they rely on suppressions instead). Annotate the
         // base classes first (PagedDataBoundComponent/DataBoundFormComponent/DropDownBase) so derived
         // generics inherit, except those that derive from FormComponent<T> directly.
+        // Bucket B exemptions: the value-typed input family. Here the generic parameter is the VALUE type
+        // (T = the bound value), NOT the item type of the Data list. The items are bound through the
+        // non-generic Data property and reflected by ValueProperty/TextProperty string names, so a DAM on
+        // the value parameter cannot root the item members - that is a consumer responsibility, not a
+        // library-fixable contract. Skip these generic type definitions by full name. (FormComponent`1 and
+        // RadzenAutoComplete`1 carry no matching *Property parameter / are not open generics today, but are
+        // listed so the family is auditable at a glance.)
+        private static readonly HashSet<string> DamExemptValueTypedInputs = new()
+        {
+            "Radzen.DropDownBase`1",
+            "Radzen.DataBoundFormComponent`1",
+            "Radzen.FormComponent`1",
+            "Radzen.Blazor.RadzenDropDown`1",
+            "Radzen.Blazor.RadzenDropDownDataGrid`1",
+            "Radzen.Blazor.RadzenListBox`1",
+            "Radzen.Blazor.RadzenAutoComplete`1",
+            "Radzen.Blazor.RadzenCheckBoxList`1",
+            "Radzen.Blazor.RadzenRadioButtonList`1",
+            "Radzen.Blazor.RadzenSelectBar`1",
+            "Radzen.Blazor.RadzenChipList`1",
+            "Radzen.Blazor.RadzenPickList`1",
+        };
+
         [Fact]
         public void DataComponent_Generic_Parameters_Have_DAM()
         {
-            string[] genericTypeNames =
-            {
-                // bases (namespace Radzen)
-                "Radzen.PagedDataBoundComponent`1",
-                "Radzen.DataBoundFormComponent`1",
-                "Radzen.DropDownBase`1",
-                // grid family
-                "Radzen.Blazor.RadzenDataGrid`1",
-                "Radzen.Blazor.RadzenDataGridColumn`1",
-                "Radzen.Blazor.RadzenDataList`1",
-                "Radzen.Blazor.RadzenPivotDataGrid`1",
-                // dropdown / list family (last three derive from FormComponent<T>, NOT DropDownBase<T>,
-                // so they will not inherit the base annotation - they need their own)
-                "Radzen.Blazor.RadzenDropDown`1",
-                "Radzen.Blazor.RadzenDropDownDataGrid`1",
-                "Radzen.Blazor.RadzenListBox`1",
-                "Radzen.Blazor.RadzenCheckBoxList`1",
-                "Radzen.Blazor.RadzenRadioButtonList`1",
-                "Radzen.Blazor.RadzenSelectBar`1",
-                "Radzen.Blazor.RadzenPickList`1",
-                // data filter + scheduler + form
-                "Radzen.Blazor.RadzenDataFilter`1",
-                "Radzen.Blazor.RadzenDataFilterProperty`1",
-                "Radzen.Blazor.RadzenScheduler`1",
-                "Radzen.Blazor.RadzenTemplateForm`1",
-            };
-
+            // DISCOVERY-based gate (replaces the old hard-coded list): reflect over the whole assembly and
+            // find every open generic type that exposes a [Parameter]-attributed `public string` property
+            // whose name ends with "Property" (CategoryProperty, ValueProperty, StartProperty,
+            // FilterProperty, ...). Such a property binds a member of the consumer model T by string name
+            // and is read back via reflection. The generic parameter must therefore carry
+            // [DynamicallyAccessedMembers] including at least PublicProperties, or the trimmer drops the
+            // bound member from a consumer's model (blank columns / series, sort+filter throw).
+            // Discovering the surface means a NEW such component is gated automatically and cannot slip
+            // through a stale hand-curated list.
             var offenders = new List<string>();
-            foreach (var name in genericTypeNames)
+
+            foreach (var type in LibraryAssembly.GetTypes())
             {
-                var type = LibraryAssembly.GetType(name);
-                Assert.True(type != null, $"Test out of date: type '{name}' not found in Radzen.Blazor.");
-                if (!GenericParameterHasDam(type!, DynamicallyAccessedMemberTypes.PublicProperties))
-                    offenders.Add(name);
+                if (!type.IsGenericTypeDefinition) continue;
+                if (DamExemptValueTypedInputs.Contains(type.FullName!)) continue;
+                if (!BindsModelMemberByStringName(type)) continue;
+                if (!GenericParameterHasDam(type, DynamicallyAccessedMemberTypes.PublicProperties))
+                    offenders.Add(type.FullName!);
             }
 
+            offenders.Sort(StringComparer.Ordinal);
+
             Assert.True(offenders.Count == 0,
-                "These public generic data components reflect over the consumer model T but do not flow a "
-                + "[DynamicallyAccessedMembers(PublicProperties|PublicFields)] annotation on their type "
-                + "parameter, so a consumer's trimmed model loses its members (blank columns / sort+filter "
-                + "throw). Annotate the type parameter (start at the base classes):" + Environment.NewLine
-                + string.Join(Environment.NewLine, offenders));
+                "These public generic components bind a member of the consumer model T by string name "
+                + "(a [Parameter] `public string ...Property`) and reflect over T, but do not flow a "
+                + "[DynamicallyAccessedMembers] annotation on their type parameter, so a consumer's trimmed "
+                + "model loses the bound member (blank columns / series, sort+filter throw). Add "
+                + "[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | "
+                + "DynamicallyAccessedMemberTypes.PublicFields)] to the generic parameter of each:"
+                + Environment.NewLine + string.Join(Environment.NewLine, offenders));
         }
+
+        // A generic type "binds a model member by string name" when it declares (or inherits) at least one
+        // [Parameter]-attributed `public string` property whose name ends with "Property".
+        private static bool BindsModelMemberByStringName(Type type) =>
+            type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Any(p => p.PropertyType == typeof(string)
+                    && p.Name.EndsWith("Property", StringComparison.Ordinal)
+                    && p.GetCustomAttributesData().Any(a =>
+                        a.AttributeType.FullName == "Microsoft.AspNetCore.Components.ParameterAttribute"));
 
         // ----- Test 3: H9 / M18 / M29 / M30 - generic methods/types that reflect over T must flow DAM.
         [Fact]
