@@ -29,7 +29,9 @@ namespace Radzen
         /// </summary>
         /// <typeparam name="TOriginal"></typeparam>
         /// <typeparam name="TOverride"></typeparam>
-        public void Override<TOriginal, TOverride>()
+        public void Override<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TOriginal,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TOverride>()
         {
             Override(typeof(TOriginal), typeof(TOverride));
         }
@@ -39,7 +41,9 @@ namespace Radzen
         /// </summary>
         /// <param name="original"></param>
         /// <param name="override"></param>
-        public void Override(Type original, Type @override)
+        public void Override(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type original,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type @override)
         {
             replacedTypes.Add(original, @override);
         }
