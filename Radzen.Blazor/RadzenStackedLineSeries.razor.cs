@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
@@ -10,7 +11,7 @@ namespace Radzen.Blazor
     /// Renders stacked line series in <see cref="RadzenChart" />.
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the series.</typeparam>
-    public partial class RadzenStackedLineSeries<TItem> : CartesianSeries<TItem>, IChartStackedAreaSeries
+    public partial class RadzenStackedLineSeries<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TItem> : CartesianSeries<TItem>, IChartStackedAreaSeries
     {
         /// <inheritdoc />
         protected internal override bool ShowLineInLegend => true;
