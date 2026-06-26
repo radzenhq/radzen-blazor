@@ -752,7 +752,11 @@ namespace Radzen
 
             var constant = Expression.Constant(constantValue, constantType);
 
-            if (caseInsensitive && !isEnumerable)
+            if (caseInsensitive && !isEnumerable
+                && filter.FilterOperator != FilterOperator.IsNull
+                && filter.FilterOperator != FilterOperator.IsNotNull
+                && filter.FilterOperator != FilterOperator.IsEmpty
+                && filter.FilterOperator != FilterOperator.IsNotEmpty)
             {
                 property = Expression.Call(notNullCheck(property), typeof(string).GetMethod("ToLower", Type.EmptyTypes)!);
             }
