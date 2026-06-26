@@ -752,11 +752,9 @@ namespace Radzen
 
             var constant = Expression.Constant(constantValue, constantType);
 
-            if (caseInsensitive && !isEnumerable
-                && filter.FilterOperator != FilterOperator.IsNull
-                && filter.FilterOperator != FilterOperator.IsNotNull
-                && filter.FilterOperator != FilterOperator.IsEmpty
-                && filter.FilterOperator != FilterOperator.IsNotEmpty)
+            var rawProperty = property;
+
+            if (caseInsensitive && !isEnumerable)
             {
                 property = Expression.Call(notNullCheck(property), typeof(string).GetMethod("ToLower", Type.EmptyTypes)!);
             }
@@ -816,10 +814,10 @@ namespace Radzen
                         Expression.Call(typeof(Enumerable), nameof(Enumerable.Except), new Type[] { collectionItemType! }, constant, notNullCheck(property))) : Expression.Constant(true),
                 FilterOperator.StartsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("StartsWith", new[] { typeof(string) })!, constant),
                 FilterOperator.EndsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("EndsWith", new[] { typeof(string) })!, constant),
-                FilterOperator.IsNull => Expression.Equal(property, Expression.Constant(null, property.Type)),
-                FilterOperator.IsNotNull => Expression.NotEqual(property, Expression.Constant(null, property.Type)),
-                FilterOperator.IsEmpty => Expression.Equal(property, Expression.Constant(String.Empty)),
-                FilterOperator.IsNotEmpty => Expression.NotEqual(property, Expression.Constant(String.Empty)),
+                FilterOperator.IsNull => Expression.Equal(rawProperty, Expression.Constant(null, rawProperty.Type)),
+                FilterOperator.IsNotNull => Expression.NotEqual(rawProperty, Expression.Constant(null, rawProperty.Type)),
+                FilterOperator.IsEmpty => Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
+                FilterOperator.IsNotEmpty => Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
                 _ => null
             };
 
@@ -834,24 +832,29 @@ namespace Radzen
             }
 
         Expression? secondExpression = null;
-            if (secondConstant != null)
+            var secondIsNullOrEmptyOperator = filter.SecondFilterOperator == FilterOperator.IsNull
+                || filter.SecondFilterOperator == FilterOperator.IsNotNull
+                || filter.SecondFilterOperator == FilterOperator.IsEmpty
+                || filter.SecondFilterOperator == FilterOperator.IsNotEmpty;
+
+            if (secondConstant != null || secondIsNullOrEmptyOperator)
             {
                 secondExpression = filter.SecondFilterOperator switch
                 {
-                    FilterOperator.Equals => Expression.Equal(notNullCheck(property), secondConstant),
-                    FilterOperator.NotEquals => Expression.NotEqual(notNullCheck(property), secondConstant),
-                    FilterOperator.LessThan => Expression.LessThan(notNullCheck(property), secondConstant),
-                    FilterOperator.LessThanOrEquals => Expression.LessThanOrEqual(notNullCheck(property), secondConstant),
-                    FilterOperator.GreaterThan => Expression.GreaterThan(notNullCheck(property), secondConstant),
-                    FilterOperator.GreaterThanOrEquals => Expression.GreaterThanOrEqual(notNullCheck(property), secondConstant),
-                    FilterOperator.Contains => Expression.Call(notNullCheck(property), typeof(string).GetMethod("Contains", new[] { typeof(string) })!, secondConstant),
-                    FilterOperator.DoesNotContain => Expression.Not(Expression.Call(notNullCheck(property), property.Type.GetMethod("Contains", new[] { typeof(string) })!, secondConstant)),
-                    FilterOperator.StartsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("StartsWith", new[] { typeof(string) })!, secondConstant),
-                    FilterOperator.EndsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("EndsWith", new[] { typeof(string) })!, secondConstant),
-                    FilterOperator.IsNull => Expression.Equal(property, Expression.Constant(null, property.Type)),
-                    FilterOperator.IsNotNull => Expression.NotEqual(property, Expression.Constant(null, property.Type)),
-                    FilterOperator.IsEmpty => Expression.Equal(property, Expression.Constant(String.Empty)),
-                    FilterOperator.IsNotEmpty => Expression.NotEqual(property, Expression.Constant(String.Empty)),
+                    FilterOperator.Equals => Expression.Equal(notNullCheck(property), secondConstant!),
+                    FilterOperator.NotEquals => Expression.NotEqual(notNullCheck(property), secondConstant!),
+                    FilterOperator.LessThan => Expression.LessThan(notNullCheck(property), secondConstant!),
+                    FilterOperator.LessThanOrEquals => Expression.LessThanOrEqual(notNullCheck(property), secondConstant!),
+                    FilterOperator.GreaterThan => Expression.GreaterThan(notNullCheck(property), secondConstant!),
+                    FilterOperator.GreaterThanOrEquals => Expression.GreaterThanOrEqual(notNullCheck(property), secondConstant!),
+                    FilterOperator.Contains => Expression.Call(notNullCheck(property), typeof(string).GetMethod("Contains", new[] { typeof(string) })!, secondConstant!),
+                    FilterOperator.DoesNotContain => Expression.Not(Expression.Call(notNullCheck(property), property.Type.GetMethod("Contains", new[] { typeof(string) })!, secondConstant!)),
+                    FilterOperator.StartsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("StartsWith", new[] { typeof(string) })!, secondConstant!),
+                    FilterOperator.EndsWith => Expression.Call(notNullCheck(property), typeof(string).GetMethod("EndsWith", new[] { typeof(string) })!, secondConstant!),
+                    FilterOperator.IsNull => Expression.Equal(rawProperty, Expression.Constant(null, rawProperty.Type)),
+                    FilterOperator.IsNotNull => Expression.NotEqual(rawProperty, Expression.Constant(null, rawProperty.Type)),
+                    FilterOperator.IsEmpty => Expression.Equal(rawProperty, Expression.Constant(String.Empty)),
+                    FilterOperator.IsNotEmpty => Expression.NotEqual(rawProperty, Expression.Constant(String.Empty)),
                     _ => null
                 };
             }

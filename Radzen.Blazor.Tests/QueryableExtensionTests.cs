@@ -340,6 +340,123 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Test", result[0].Name);
         }
 
+        private static IQueryable<TestItem> NullEmptyTestData() => new List<TestItem>
+        {
+            new TestItem { Id = 1, Name = null },
+            new TestItem { Id = 2, Name = "" },
+            new TestItem { Id = 3, Name = "Test" }
+        }.AsQueryable();
+
+        [Fact]
+        public void Where_FiltersWithIsNull_CaseInsensitive()
+        {
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Name", FilterOperator = FilterOperator.IsNull }
+            };
+
+            var result = NullEmptyTestData().Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive).ToList();
+
+            Assert.Single(result);
+            Assert.Equal(1, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersWithIsNotNull_CaseInsensitive()
+        {
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Name", FilterOperator = FilterOperator.IsNotNull }
+            };
+
+            var result = NullEmptyTestData().Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive).ToList();
+
+            Assert.Equal(new[] { 2, 3 }, result.Select(r => r.Id).OrderBy(i => i).ToArray());
+        }
+
+        [Fact]
+        public void Where_FiltersWithIsEmpty_CaseInsensitive()
+        {
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Name", FilterOperator = FilterOperator.IsEmpty }
+            };
+
+            var result = NullEmptyTestData().Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive).ToList();
+
+            Assert.Single(result);
+            Assert.Equal(2, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersWithIsNotEmpty_CaseInsensitive()
+        {
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor { Property = "Name", FilterOperator = FilterOperator.IsNotEmpty }
+            };
+
+            var result = NullEmptyTestData().Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive).ToList();
+
+            Assert.Equal(new[] { 1, 3 }, result.Select(r => r.Id).OrderBy(i => i).ToArray());
+        }
+
+        [Fact]
+        public void Where_ContainsPrimary_WithIsNullSecondary_CaseInsensitive()
+        {
+            var data = new List<TestItem>
+            {
+                new TestItem { Id = 1, Name = null },
+                new TestItem { Id = 2, Name = "ABC" },
+                new TestItem { Id = 3, Name = "xyz" }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Name",
+                    FilterValue = "abc",
+                    FilterOperator = FilterOperator.Contains,
+                    LogicalFilterOperator = LogicalFilterOperator.Or,
+                    SecondFilterValue = null,
+                    SecondFilterOperator = FilterOperator.IsNull
+                }
+            };
+
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive).ToList();
+
+            Assert.Equal(new[] { 1, 2 }, result.Select(r => r.Id).OrderBy(i => i).ToArray());
+        }
+
+        [Fact]
+        public void Where_IsEmptyPrimary_WithContainsSecondary_CaseInsensitive()
+        {
+            var data = new List<TestItem>
+            {
+                new TestItem { Id = 1, Name = null },
+                new TestItem { Id = 2, Name = "" },
+                new TestItem { Id = 3, Name = "ABC" },
+                new TestItem { Id = 4, Name = "xyz" }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Name",
+                    FilterOperator = FilterOperator.IsEmpty,
+                    LogicalFilterOperator = LogicalFilterOperator.Or,
+                    SecondFilterValue = "abc",
+                    SecondFilterOperator = FilterOperator.Contains
+                }
+            };
+
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive).ToList();
+
+            Assert.Equal(new[] { 2, 3 }, result.Select(r => r.Id).OrderBy(i => i).ToArray());
+        }
+
         [Fact]
         public void Where_CombinesFiltersWithAnd()
         {
