@@ -467,7 +467,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Accordion_DoesNotFocusFirstItem_BeforeKeyboardNavigation()
+        public void Accordion_Container_HasNoTabindexOrRole()
         {
             using var ctx = new TestContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
@@ -478,21 +478,94 @@ namespace Radzen.Blazor.Tests
                     builder.AddAttribute(1, "Text", "Item 1");
                     builder.AddAttribute(2, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
                     builder.CloseComponent();
-
-                    builder.OpenComponent<RadzenAccordionItem>(3);
-                    builder.AddAttribute(4, "Text", "Item 2");
-                    builder.AddAttribute(5, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 2")));
-                    builder.CloseComponent();
                 });
             });
 
-            Assert.DoesNotContain("rz-state-focused", component.Markup);
+            var container = component.Find(".rz-accordion");
+            Assert.False(container.HasAttribute("tabindex"));
+            Assert.False(container.HasAttribute("role"));
         }
 
         [Fact]
-        public void Accordion_FocusesFirstItem_OnArrowDown()
+        public void Accordion_AllHeaderButtons_AreInTabOrder()
         {
             using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenAccordionItem>(0);
+                    builder.AddAttribute(1, "Text", "Item 1");
+                    builder.AddAttribute(2, "Selected", true);
+                    builder.AddAttribute(3, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenAccordionItem>(4);
+                    builder.AddAttribute(5, "Text", "Item 2");
+                    builder.AddAttribute(6, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 2")));
+                    builder.CloseComponent();
+                });
+            });
+
+            // No header button should be removed from the tab order via tabindex="-1"
+            foreach (var button in component.FindAll(".rz-accordion-header button"))
+            {
+                Assert.False(button.HasAttribute("tabindex"),
+                    "Header buttons must remain in the natural tab order so every panel is reachable with Tab.");
+            }
+        }
+
+        [Fact]
+        public void Accordion_DisabledItem_RendersDisabledButton()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenAccordionItem>(0);
+                    builder.AddAttribute(1, "Text", "Disabled Item");
+                    builder.AddAttribute(2, "Disabled", true);
+                    builder.AddAttribute(3, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content")));
+                    builder.CloseComponent();
+                });
+            });
+
+            var button = component.Find(".rz-accordion-header button");
+            Assert.True(button.HasAttribute("disabled"));
+        }
+
+        [Fact]
+        public void Accordion_HeaderButtons_ExposeAriaExpanded()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenAccordionItem>(0);
+                    builder.AddAttribute(1, "Text", "Item 1");
+                    builder.AddAttribute(2, "Selected", true);
+                    builder.AddAttribute(3, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenAccordionItem>(4);
+                    builder.AddAttribute(5, "Text", "Item 2");
+                    builder.AddAttribute(6, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 2")));
+                    builder.CloseComponent();
+                });
+            });
+
+            var buttons = component.FindAll(".rz-accordion-header button");
+            Assert.Equal("true", buttons[0].GetAttribute("aria-expanded"));
+            Assert.Equal("false", buttons[1].GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public void Accordion_ArrowDown_MovesFocusToNextHeader()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -509,11 +582,13 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            component.Find(".rz-accordion").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+            var buttons = component.FindAll(".rz-accordion-header button");
 
-            var headers = component.FindAll(".rz-accordion-header");
-            Assert.Contains("rz-state-focused", headers[0].ClassName);
-            Assert.DoesNotContain("rz-state-focused", headers[1].ClassName);
+            // Arrow navigation moves real DOM focus via FocusAsync (JS interop) without throwing.
+            buttons[0].KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+
+            Assert.Contains(ctx.JSInterop.Invocations,
+                i => i.Identifier == "Blazor._internal.domWrapper.focus");
         }
     }
 }

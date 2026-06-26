@@ -217,6 +217,8 @@ namespace Radzen.Blazor
             GC.SuppressFinalize(this);
         }
 
+        internal ElementReference HeaderElement;
+
         internal string? GetItemId()
         {
             return GetId();
@@ -224,7 +226,7 @@ namespace Radzen.Blazor
 
         internal string GetItemCssClass()
         {
-            return $"{GetCssClass()} {(Accordion?.IsFocused(this) == true ? "rz-state-focused" : "")}".Trim();
+            return GetCssClass();
         }
 
         /// <inheritdoc />

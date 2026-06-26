@@ -411,43 +411,42 @@ namespace Radzen.Blazor
             shouldRender = true;
         }
 
-        internal int focusedIndex = -1;
-        bool preventKeyPress = true;
-
-        bool stopKeydownPropagation = true;
-        void OnGuardKeyDown(KeyboardEventArgs args)
+        async Task OnHeaderKeyDown(KeyboardEventArgs args, RadzenAccordionItem item)
         {
             var key = args.Code ?? args.Key;
-            stopKeydownPropagation = key != "Escape";
-        }
-        async Task OnKeyPress(KeyboardEventArgs args)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "ArrowUp" || key == "ArrowDown")
+            if (key != "ArrowDown" && key != "ArrowUp" && key != "Home" && key != "End")
             {
-                preventKeyPress = true;
-
-                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
+                return;
             }
-            else if (key == "Space" || key == "Enter")
-            {
-                preventKeyPress = true;
 
-                if (focusedIndex >= 0 && focusedIndex < items.Count)
+            var navigable = items.Where(i => i.Visible && !i.Disabled).ToList();
+            var current = navigable.IndexOf(item);
+
+            if (current < 0)
+            {
+                return;
+            }
+
+            var target = key switch
+            {
+                "ArrowUp" => Math.Max(current - 1, 0),
+                "ArrowDown" => Math.Min(current + 1, navigable.Count - 1),
+                "Home" => 0,
+                "End" => navigable.Count - 1,
+                _ => current
+            };
+
+            if (target != current)
+            {
+                try
                 {
-                    await SelectItem(items.Where(i => i.Visible).ElementAt(focusedIndex));
+                    await navigable[target].HeaderElement.FocusAsync(preventScroll: true);
+                }
+                catch (JSDisconnectedException)
+                {
                 }
             }
-            else
-            {
-                preventKeyPress = false;
-            }
-        }
-
-        internal bool IsFocused(RadzenAccordionItem item)
-        {
-            return items.Where(i => i.Visible).ToList().IndexOf(item) == focusedIndex && focusedIndex != -1;
         }
 
         /// <inheritdoc />

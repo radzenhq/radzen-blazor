@@ -1,21 +1,82 @@
-﻿<div class="rz-p-sm-12">
+<div class="rz-p-sm-12">
     <RadzenAccordion>
         <Items>
             <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet" CollapseTitle="Collapse orders."
                                  ExpandTitle="Expand orders." CollapseAriaLabel="Collapse the order details."
                                  ExpandAriaLabel="Expand the order details.">
-                Details for Orders
+                <RadzenStack Gap="1rem">
+                    <RadzenFormField Text="Order ID" Variant="Variant.Outlined">
+                        <RadzenTextBox @bind-Value=@order.Id />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Quantity" Variant="Variant.Outlined">
+                        <RadzenNumeric @bind-Value=@order.Quantity Min="0" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Status" Variant="Variant.Outlined">
+                        <RadzenDropDown @bind-Value=@order.Status Data=@statuses />
+                    </RadzenFormField>
+                </RadzenStack>
             </RadzenAccordionItem>
             <RadzenAccordionItem Text="Employees" Icon="account_box" CollapseTitle="Collapse employees."
                                  ExpandTitle="Expand employees." CollapseAriaLabel="Collapse the employee details."
                                  ExpandAriaLabel="Expand the employee details.">
-                Details for Employees
+                <RadzenStack Gap="1rem">
+                    <RadzenFormField Text="Name" Variant="Variant.Outlined">
+                        <RadzenTextBox @bind-Value=@employee.Name />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Department" Variant="Variant.Outlined">
+                        <RadzenDropDown @bind-Value=@employee.Department Data=@departments />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Salary" Variant="Variant.Outlined">
+                        <RadzenNumeric @bind-Value=@employee.Salary Format="c" Min="0" />
+                    </RadzenFormField>
+                </RadzenStack>
             </RadzenAccordionItem>
             <RadzenAccordionItem Text="Customers" Icon="accessibility" CollapseTitle="Collapse customers."
                                  ExpandTitle="Expand customers." CollapseAriaLabel="Collapse the customer details."
                                  ExpandAriaLabel="Expand the customer details.">
-                Details for Customers
+                <RadzenStack Gap="1rem">
+                    <RadzenFormField Text="Company" Variant="Variant.Outlined">
+                        <RadzenTextBox @bind-Value=@customer.Company />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Email" Variant="Variant.Outlined">
+                        <RadzenTextBox @bind-Value=@customer.Email />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Country" Variant="Variant.Outlined">
+                        <RadzenDropDown @bind-Value=@customer.Country Data=@countries />
+                    </RadzenFormField>
+                </RadzenStack>
             </RadzenAccordionItem>
         </Items>
     </RadzenAccordion>
 </div>
+
+@code {
+    class Order
+    {
+        public string Id { get; set; } = "ORD-1001";
+        public int Quantity { get; set; } = 1;
+        public string Status { get; set; } = "New";
+    }
+
+    class Employee
+    {
+        public string Name { get; set; } = "Nancy Davolio";
+        public string Department { get; set; } = "Sales";
+        public decimal Salary { get; set; } = 2500;
+    }
+
+    class Customer
+    {
+        public string Company { get; set; } = "Around the Horn";
+        public string Email { get; set; } = "info@aroundthehorn.com";
+        public string Country { get; set; } = "UK";
+    }
+
+    Order order = new Order();
+    Employee employee = new Employee();
+    Customer customer = new Customer();
+
+    string[] statuses = new[] { "New", "Processing", "Shipped", "Delivered" };
+    string[] departments = new[] { "Sales", "Engineering", "Support", "HR" };
+    string[] countries = new[] { "USA", "UK", "Germany", "France" };
+}
