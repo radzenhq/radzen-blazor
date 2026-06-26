@@ -2843,6 +2843,7 @@ window.Radzen = {
           children.classList.remove('rz-close');
 
           var isRtl = getComputedStyle(item).direction === 'rtl';
+          var round = function (value) { return Math.round(value * 1000) / 1000; };
           var el = item.parentElement;
           var scrollParent = null;
           while (el && el !== document.body) {
@@ -2860,12 +2861,12 @@ window.Radzen = {
             var itemRect = item.getBoundingClientRect();
             if (isRtl) {
               var leftBoundary = scrollParent ? scrollParent.getBoundingClientRect().left : 0;
-              if (itemRect.left - childRect.width < leftBoundary) {
+              if (round(itemRect.left - childRect.width) < round(leftBoundary)) {
                 children.setAttribute('data-flyout-flip', '');
               }
             } else {
               var rightBoundary = scrollParent ? scrollParent.getBoundingClientRect().right : document.documentElement.clientWidth;
-              if (itemRect.right + childRect.width > rightBoundary) {
+              if (round(itemRect.right + childRect.width) > round(rightBoundary)) {
                 children.setAttribute('data-flyout-flip', '');
               }
             }
@@ -2876,10 +2877,10 @@ window.Radzen = {
           var childRect = children.getBoundingClientRect();
           var rightBoundary = scrollParent ? scrollParent.getBoundingClientRect().right : document.documentElement.clientWidth;
           var leftBoundary = scrollParent ? scrollParent.getBoundingClientRect().left : 0;
-          if (!isRtl && childRect.right > rightBoundary) {
+          if (!isRtl && round(childRect.right) > round(rightBoundary)) {
             var offset = parseFloat(children.style.insetInlineStart) || 0;
             children.style.insetInlineStart = (offset + rightBoundary - childRect.right) + 'px';
-          } else if (isRtl && childRect.left < leftBoundary) {
+          } else if (isRtl && round(childRect.left) < round(leftBoundary)) {
             var offset = parseFloat(children.style.insetInlineStart) || 0;
             children.style.insetInlineStart = (offset + leftBoundary - childRect.left) + 'px';
           }
