@@ -487,14 +487,6 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override void OnInitialized()
-        {
-            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
-
-            base.OnInitialized();
-        }
-
-        /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();

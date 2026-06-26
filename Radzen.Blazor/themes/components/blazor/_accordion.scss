@@ -56,6 +56,15 @@ $accordion-shadow: none !default;
 
   &:focus-visible {
     outline: var(--rz-accordion-item-focus-outline);
+
+    &:has(.rz-accordion-header.rz-state-focused) {
+      outline: none;
+    }
+
+    .rz-accordion-header.rz-state-focused {
+      outline: var(--rz-accordion-item-focus-outline);
+      outline-offset: var(--rz-accordion-item-focus-outline-offset);
+    }
   }
 
   .rz-accordion-header {
@@ -93,11 +102,6 @@ $accordion-shadow: none !default;
         font-size: var(--rz-accordion-icon-font-size);
         margin-inline: var(--rz-accordion-icon-margin-inline);
       }
-    }
-
-    :focus-visible &.rz-state-focused {
-      outline: var(--rz-accordion-item-focus-outline);
-      outline-offset: var(--rz-accordion-item-focus-outline-offset);
     }
   }
 

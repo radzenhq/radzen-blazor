@@ -465,6 +465,56 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(1, selectedIndex);
         }
+
+        [Fact]
+        public void Accordion_DoesNotFocusFirstItem_BeforeKeyboardNavigation()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenAccordionItem>(0);
+                    builder.AddAttribute(1, "Text", "Item 1");
+                    builder.AddAttribute(2, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenAccordionItem>(3);
+                    builder.AddAttribute(4, "Text", "Item 2");
+                    builder.AddAttribute(5, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 2")));
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.DoesNotContain("rz-state-focused", component.Markup);
+        }
+
+        [Fact]
+        public void Accordion_FocusesFirstItem_OnArrowDown()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenAccordionItem>(0);
+                    builder.AddAttribute(1, "Text", "Item 1");
+                    builder.AddAttribute(2, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenAccordionItem>(3);
+                    builder.AddAttribute(4, "Text", "Item 2");
+                    builder.AddAttribute(5, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 2")));
+                    builder.CloseComponent();
+                });
+            });
+
+            component.Find(".rz-accordion").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+
+            var headers = component.FindAll(".rz-accordion-header");
+            Assert.Contains("rz-state-focused", headers[0].ClassName);
+            Assert.DoesNotContain("rz-state-focused", headers[1].ClassName);
+        }
     }
 }
 
