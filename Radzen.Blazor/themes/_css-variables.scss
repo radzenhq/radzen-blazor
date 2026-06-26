@@ -1341,6 +1341,15 @@
   --rz-text-area-padding-block: #{$text-area-padding-block};
   --rz-text-area-padding-inline: #{$text-area-padding-inline};
 
+  /* TileLayout */
+  --rz-tile-layout-item-background-color: #{$tile-background-color};
+  --rz-tile-layout-item-border: #{$tile-border};
+  --rz-tile-layout-item-border-radius: #{$tile-border-radius};
+  --rz-tile-layout-item-shadow: #{$tile-shadow};
+  --rz-tile-layout-item-header-background-color: #{$tile-header-background-color};
+  --rz-tile-layout-overlay-background-color: #{$tile-overlay-background-color};
+  --rz-tile-layout-overlay-border-color: #{$tile-overlay-border-color};
+
   /* Timeline */
   --rz-timeline-item-padding: #{$rz-timeline-item-padding};
   --rz-timeline-axis-size: #{$rz-timeline-axis-size};

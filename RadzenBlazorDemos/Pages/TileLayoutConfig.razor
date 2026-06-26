@@ -10,7 +10,7 @@
 
 <RadzenTileLayout Columns="12" Rows="6" RowHeight="80" Gap="8"
                   EditMode=@editMode ShowGrid=@showGrid Change=@OnChange
-                  Style="height: 560px; border: var(--rz-border-normal); border-radius: var(--rz-border-radius);">
+                  Style="height: 560px; border: var(--rz-card-border); border-radius: var(--rz-card-border-radius);">
     @foreach (var tile in tiles)
     {
         <RadzenTileLayoutItem @key=@tile.Id Title=@tile.Title Icon=@tile.Icon

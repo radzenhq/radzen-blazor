@@ -1,9 +1,9 @@
 $tile-layout-gap: var(--rz-gap, 0.5rem) !default;
 $tile-background-color: var(--rz-base-background-color) !default;
-$tile-border: var(--rz-border-normal) !default;
-$tile-border-radius: var(--rz-border-radius) !default;
-$tile-shadow: var(--rz-shadow-1) !default;
-$tile-header-background-color: var(--rz-base-100) !default;
+$tile-border: var(--rz-card-border) !default;
+$tile-border-radius: var(--rz-card-border-radius) !default;
+$tile-shadow: var(--rz-card-shadow) !default;
+$tile-header-background-color: var(--rz-base) !default;
 $tile-overlay-border-color: var(--rz-border-color) !default;
 $tile-overlay-background-color: var(--rz-primary-lighter) !default;
 
