@@ -6,6 +6,150 @@ namespace Radzen.Blazor.Tests
 {
     public class MenuTests
     {
+        static RenderFragment MenuWithSubmenu => builder =>
+        {
+            builder.OpenComponent<RadzenMenuItem>(0);
+            builder.AddAttribute(1, "Text", "Home");
+            builder.AddAttribute(2, "id", "home-item");
+            builder.CloseComponent();
+
+            builder.OpenComponent<RadzenMenuItem>(3);
+            builder.AddAttribute(4, "Text", "Data");
+            builder.AddAttribute(5, "id", "data-item");
+            builder.AddAttribute(6, "ChildContent", (RenderFragment)(inner =>
+            {
+                inner.OpenComponent<RadzenMenuItem>(0);
+                inner.AddAttribute(1, "Text", "Orders");
+                inner.AddAttribute(2, "id", "orders-item");
+                inner.CloseComponent();
+            }));
+            builder.CloseComponent();
+        };
+
+        [Fact]
+        public void Menu_Renders_Menubar_Role_And_Orientation()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            var menubar = component.Find("ul[role=menubar]");
+            Assert.Equal("horizontal", menubar.GetAttribute("aria-orientation"));
+        }
+
+        [Fact]
+        public void Menu_Renders_MenuItem_Roles_And_Haspopup()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            var items = component.FindAll("li[role=menuitem]");
+            Assert.True(items.Count >= 3);
+
+            var dataItem = component.Find("#data-item");
+            Assert.Equal("menu", dataItem.GetAttribute("aria-haspopup"));
+            Assert.Equal("false", dataItem.GetAttribute("aria-expanded"));
+            Assert.Equal("data-item-submenu", dataItem.GetAttribute("aria-controls"));
+
+            var homeItem = component.Find("#home-item");
+            Assert.Null(homeItem.GetAttribute("aria-haspopup"));
+            Assert.Null(homeItem.GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public void Menu_Exposes_ActiveDescendant_On_Focus()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            var menubar = component.Find("ul[role=menubar]");
+            Assert.True(string.IsNullOrEmpty(menubar.GetAttribute("aria-activedescendant")));
+
+            menubar.Focus();
+
+            menubar = component.Find("ul[role=menubar]");
+            Assert.Equal("home-item", menubar.GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void Menu_Uses_Roving_Tabindex_For_Active_Item()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            var menubar = component.Find("ul[role=menubar]");
+            menubar.Focus();
+
+            Assert.Equal("0", component.Find("#home-item").GetAttribute("tabindex"));
+            Assert.Equal("-1", component.Find("#data-item").GetAttribute("tabindex"));
+
+            menubar = component.Find("ul[role=menubar]");
+            menubar.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            Assert.Equal("-1", component.Find("#home-item").GetAttribute("tabindex"));
+            Assert.Equal("0", component.Find("#data-item").GetAttribute("tabindex"));
+            Assert.Equal("data-item", component.Find("ul[role=menubar]").GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void Menu_ActiveDescendant_Moves_With_Arrow_Keys()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            var menubar = component.Find("ul[role=menubar]");
+            menubar.Focus();
+
+            menubar = component.Find("ul[role=menubar]");
+            menubar.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+            Assert.Equal("data-item", component.Find("ul[role=menubar]").GetAttribute("aria-activedescendant"));
+
+            menubar = component.Find("ul[role=menubar]");
+            menubar.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowLeft" });
+            Assert.Equal("home-item", component.Find("ul[role=menubar]").GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void Menu_Aria_Expanded_Reflects_Submenu_State()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            var menubar = component.Find("ul[role=menubar]");
+            menubar.Focus();
+
+            menubar = component.Find("ul[role=menubar]");
+            menubar.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            menubar = component.Find("ul[role=menubar]");
+            menubar.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+
+            Assert.Equal("true", component.Find("#data-item").GetAttribute("aria-expanded"));
+        }
+
         [Fact]
         public void Menu_Renders_WithClassName()
         {

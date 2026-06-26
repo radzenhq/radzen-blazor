@@ -163,5 +163,15 @@ namespace Radzen.Blazor
         {
             return $"{GetCssClass()} {(Parent?.IsFocused(this) == true ? "rz-state-focused" : "")}".Trim();
         }
+
+        internal string GetItemId()
+        {
+            return $"{GetId()}";
+        }
+
+        internal string GetItemTabIndex()
+        {
+            return Parent?.IsFocused(this) == true ? "0" : "-1";
+        }
     }
 }

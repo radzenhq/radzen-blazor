@@ -34,6 +34,13 @@
             @if (IsResizable)
             {
                 <span tabindex="0" class="rz-resize" id="@(GetId() + "-resize")"
+                    role="separator"
+                    aria-orientation="@AriaOrientation"
+                    aria-controls="@AriaControls"
+                    aria-label="@AriaLabel"
+                    aria-valuenow="@AriaValueNow.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                    aria-valuemin="@AriaValueMin.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                    aria-valuemax="@AriaValueMax.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                     @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation=stopKeydownPropagation>
                 </span>
             }

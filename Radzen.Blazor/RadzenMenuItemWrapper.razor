@@ -6,10 +6,10 @@
 @if (Item?.Parent?.ClickToOpen == true)
 {
     <li style=@Style @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation role="menuitem"
-        tabindex="@(Item?.Disabled == true ? -1 : 0)" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
+        tabindex="@TabIndex" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
         aria-haspopup="@(Item?.ChildContent != null ? "menu" : null)"
         aria-controls="@Item?.SubmenuId"
-        aria-expanded="@(Item?.ChildContent != null ? "false" : null)"
+        aria-expanded="@ExpandedAttribute"
         @onkeydown="OnKeyDown">
         @ChildContent
     </li>
@@ -19,18 +19,18 @@ else
     if (Item?.ChildContent != null)
     {
         <li style=@Style @attributes="@Attributes"
-            role="menuitem" tabindex="@(Item?.Disabled == true ? -1 : 0)" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
-            aria-haspopup="menu" aria-controls="@Item?.SubmenuId" aria-expanded="false" @onkeydown="OnKeyDown">
+            role="menuitem" tabindex="@TabIndex" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
+            aria-haspopup="menu" aria-controls="@Item?.SubmenuId" aria-expanded="@ExpandedAttribute" @onkeydown="OnKeyDown">
             @ChildContent
         </li>
     }
     else
     {
         <li style=@Style @attributes="@Attributes" @onclick="@(Item!.OnClick)" @onclick:stopPropagation role="menuitem"
-            tabindex="@(Item?.Disabled == true ? -1 : 0)" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
+            tabindex="@TabIndex" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
             aria-haspopup="@(Item?.ChildContent != null ? "menu" : null)"
             aria-controls="@Item?.SubmenuId"
-            aria-expanded="@(Item?.ChildContent != null ? "false" : null)"
+            aria-expanded="@ExpandedAttribute"
             @onkeydown="OnKeyDown">
             @ChildContent
         </li>
@@ -45,6 +45,10 @@ else
     /// <value>The menu item.</value>
     [Parameter]
     public RadzenMenuItem? Item { get; set; }
+
+    int TabIndex => Item?.IsActive == true ? 0 : -1;
+
+    string? ExpandedAttribute => Item?.ChildContent != null ? (Item.Expanded ? "true" : "false") : null;
 
     async Task OnKeyDown(KeyboardEventArgs args)
     {

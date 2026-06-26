@@ -107,7 +107,37 @@ namespace Radzen.Blazor
         public void Close()
         {
             contentStyle = "display:none;";
+            focusedIndex = -1;
             StateHasChanged();
+        }
+
+        ElementReference toggleElement;
+        ElementReference menuElement;
+
+        string? ActiveDescendantId => !Collapsed && focusedIndex >= 0 && focusedIndex < items.Count
+            ? items[focusedIndex].GetItemId()
+            : null;
+
+        async Task RestoreFocusToToggle()
+        {
+            try
+            {
+                await toggleElement.FocusAsync();
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
+        async Task FocusMenu()
+        {
+            try
+            {
+                await menuElement.FocusAsync();
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
 
         [Inject]
@@ -126,7 +156,26 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
+                if (Collapsed)
+                {
+                    await Toggle(new MouseEventArgs());
+                    await FocusMenu();
+                }
+
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
+            }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                if (Collapsed)
+                {
+                    await Toggle(new MouseEventArgs());
+                    await FocusMenu();
+                }
+
+                focusedIndex = key == "Home" ? 0 : items.Count - 1;
             }
             else if (key == "Space" || key == "Enter")
             {
@@ -153,6 +202,7 @@ namespace Radzen.Blazor
                     if (!Collapsed)
                     {
                         focusedIndex = focusedIndex != -1 ? focusedIndex : 0;
+                        await FocusMenu();
                     }
                 }
             }
@@ -162,6 +212,8 @@ namespace Radzen.Blazor
                 stopKeydownPropagation = true;
 
                 Close();
+
+                await RestoreFocusToToggle();
             }
             else
             {

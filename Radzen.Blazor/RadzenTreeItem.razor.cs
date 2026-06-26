@@ -128,6 +128,25 @@ namespace Radzen.Blazor
 
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
+        internal string ElementId => $"treeitem-{GetHashCode()}";
+
+        internal int Level
+        {
+            get
+            {
+                var level = 1;
+                var parent = ParentItem;
+
+                while (parent != null)
+                {
+                    level++;
+                    parent = parent.ParentItem;
+                }
+
+                return level;
+            }
+        }
+
         /// <summary>
         /// Toggles the checked state of the tree node in response to a mouse event, if checkboxes are enabled and the
         /// node is checkable.

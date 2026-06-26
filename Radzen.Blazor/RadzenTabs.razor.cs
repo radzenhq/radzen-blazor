@@ -386,6 +386,8 @@ namespace Radzen.Blazor
             return tabs?.Where(t => t.Visible).FirstOrDefault();
         }
 
+        internal bool IsVertical => TabPosition == TabPosition.Left || TabPosition == TabPosition.Right;
+
         internal int focusedIndex = -1;
         bool preventKeyPress = true;
         bool stopKeydownPropagation;
@@ -415,12 +417,15 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if (key == "ArrowLeft" || key == "ArrowRight")
+            var previousKey = IsVertical ? "ArrowUp" : "ArrowLeft";
+            var nextKey = IsVertical ? "ArrowDown" : "ArrowRight";
+
+            if (key == previousKey || key == nextKey)
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
+                focusedIndex = Math.Clamp(focusedIndex + (key == previousKey ? -1 : 1), 0, tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
             }
             else if (key == "Home" || key == "End")
             {

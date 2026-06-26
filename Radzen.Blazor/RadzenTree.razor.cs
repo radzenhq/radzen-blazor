@@ -54,6 +54,12 @@ namespace Radzen.Blazor
         [Parameter]
         public string? SelectItemAriaLabel { get; set; } = "Select item";
 
+        /// <summary>
+        /// Gets or sets the accessible name of the tree, exposed via the <c>aria-label</c> attribute on the <c>role="tree"</c> container.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
@@ -236,7 +242,14 @@ namespace Radzen.Blazor
         {
             if (items.IndexOf(item) == -1)
             {
+                var wasEmpty = items.Count == 0;
+
                 items.Add(item);
+
+                if (wasEmpty)
+                {
+                    InvokeAsync(StateHasChanged);
+                }
             }
         }
 
@@ -558,6 +571,19 @@ namespace Radzen.Blazor
         internal bool IsFocused(RadzenTreeItem item)
         {
             return CurrentItems.IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        internal string? ActiveDescendantId
+        {
+            get
+            {
+                if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+                {
+                    return CurrentItems[focusedIndex].ElementId;
+                }
+
+                return null;
+            }
         }
 
         internal void InsertInCurrentItems(int index, RadzenTreeItem item)

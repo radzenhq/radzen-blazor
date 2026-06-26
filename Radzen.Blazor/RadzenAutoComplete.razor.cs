@@ -200,9 +200,14 @@ namespace Radzen.Blazor
                     await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                 }
             }
-            else if (key == "Escape" && JSRuntime != null)
+            else if (key == "Escape")
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                selectedIndex = -1;
+
+                if (JSRuntime != null)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                }
             }
             else
             {
@@ -250,6 +255,10 @@ namespace Radzen.Blazor
         }
 
         private string ListId => $"{PopupID}-list";
+
+        private string ItemId(int index) => $"{ListId}-{index}";
+
+        private string? ActiveDescendantId => selectedIndex >= 0 ? ItemId(selectedIndex) : null;
 
         private bool IsPopupOpen => OpenOnFocus || (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(customSearchText));
 

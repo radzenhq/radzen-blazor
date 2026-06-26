@@ -199,14 +199,38 @@ namespace Radzen.Blazor
                 {
                     if (AlwaysOpenPopup)
                     {
+                        IsOpen = !IsOpen;
+
+                        if (IsOpen && focusedIndex == -1 && items.Count > 0)
+                        {
+                            focusedIndex = 0;
+                        }
+
                         await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
                     }
                     else
                     {
+                        IsOpen = false;
+
                         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                         await Click.InvokeAsync(null);
                     }
                 }
+            }
+        }
+
+        void OnToggleClick()
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            IsOpen = !IsOpen;
+
+            if (IsOpen && focusedIndex == -1 && items.Count > 0)
+            {
+                focusedIndex = 0;
             }
         }
 
@@ -215,6 +239,8 @@ namespace Radzen.Blazor
         /// </summary>
         public void Close()
         {
+            IsOpen = false;
+
             if (JSRuntime != null)
             {
                 JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
@@ -320,10 +346,19 @@ namespace Radzen.Blazor
 
                 focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
 
+                IsOpen = true;
+
                 if (JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
                 }
+            }
+            else if ((key == "Home" || key == "End") && IsOpen && items.Count > 0)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                focusedIndex = key == "Home" ? 0 : items.Count - 1;
             }
             else if (key == "ArrowUp" || key == "ArrowDown")
             {
@@ -352,6 +387,11 @@ namespace Radzen.Blazor
                 stopKeydownPropagation = true;
 
                 Close();
+
+                if (JSRuntime != null)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId());
+                }
             }
             else
             {
@@ -363,6 +403,27 @@ namespace Radzen.Blazor
         internal bool IsFocused(RadzenSplitButtonItem item)
         {
             return items?.IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        internal bool IsOpen { get; private set; }
+
+        internal string ItemId(RadzenSplitButtonItem item)
+        {
+            var index = items?.IndexOf(item) ?? -1;
+            return $"{GetId()}-item-{index}";
+        }
+
+        internal string? ActiveDescendantId
+        {
+            get
+            {
+                if (IsOpen && focusedIndex >= 0 && focusedIndex < items.Count)
+                {
+                    return $"{GetId()}-item-{focusedIndex}";
+                }
+
+                return null;
+            }
         }
 
         List<RadzenSplitButtonItem> items = new List<RadzenSplitButtonItem>();

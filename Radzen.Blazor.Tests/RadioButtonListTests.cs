@@ -1,4 +1,5 @@
 using Bunit;
+using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using Xunit;
 
@@ -6,6 +7,242 @@ namespace Radzen.Blazor.Tests
 {
     public class RadioButtonListTests
     {
+        private static void AddThreeItems(ComponentParameterCollectionBuilder<RadzenRadioButtonList<int>> parameters)
+        {
+            parameters.Add(p => p.Items, builder =>
+            {
+                builder.OpenComponent<RadzenRadioButtonListItem<int>>(0);
+                builder.AddAttribute(1, "Text", "Option A");
+                builder.AddAttribute(2, "Value", 1);
+                builder.CloseComponent();
+
+                builder.OpenComponent<RadzenRadioButtonListItem<int>>(3);
+                builder.AddAttribute(4, "Text", "Option B");
+                builder.AddAttribute(5, "Value", 2);
+                builder.CloseComponent();
+
+                builder.OpenComponent<RadzenRadioButtonListItem<int>>(6);
+                builder.AddAttribute(7, "Text", "Option C");
+                builder.AddAttribute(8, "Value", 3);
+                builder.CloseComponent();
+            });
+        }
+
+        [Fact]
+        public void RadioButtonList_Renders_RadioGroupRole()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(AddThreeItems);
+
+            var group = component.Find("[role=radiogroup]");
+            Assert.Equal("radiogroup", group.GetAttribute("role"));
+
+            var radios = component.FindAll("[role=radio]");
+            Assert.Equal(3, radios.Count);
+            Assert.All(radios, radio => Assert.NotNull(radio.GetAttribute("aria-checked")));
+        }
+
+        [Fact]
+        public void RadioButtonList_Renders_AriaCheckedReflectsValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Value, 2);
+                AddThreeItems(parameters);
+            });
+
+            var radios = component.FindAll("[role=radio]");
+            Assert.Equal("false", radios[0].GetAttribute("aria-checked"));
+            Assert.Equal("true", radios[1].GetAttribute("aria-checked"));
+            Assert.Equal("false", radios[2].GetAttribute("aria-checked"));
+        }
+
+        [Fact]
+        public void RadioButtonList_Sets_GroupAriaLabelFromName()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Name, "Shipping options");
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            Assert.Equal("Shipping options", group.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void RadioButtonList_Exposes_ActiveDescendantOnFocus()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Value, 1);
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            group.Focus();
+
+            group = component.Find("[role=radiogroup]");
+            var active = group.GetAttribute("aria-activedescendant");
+            Assert.False(string.IsNullOrEmpty(active));
+
+            var radios = component.FindAll("[role=radio]");
+            Assert.Equal(active, radios[0].GetAttribute("id"));
+        }
+
+        [Fact]
+        public void RadioButtonList_Arrow_MovesActiveDescendantAndChecks()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var value = 1;
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            group.Focus();
+
+            group = component.Find("[role=radiogroup]");
+            group.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            Assert.Equal(2, value);
+
+            var radios = component.FindAll("[role=radio]");
+            Assert.Equal("true", radios[1].GetAttribute("aria-checked"));
+
+            group = component.Find("[role=radiogroup]");
+            Assert.Equal(radios[1].GetAttribute("id"), group.GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void RadioButtonList_Arrow_WrapsAtEnds()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var value = 1;
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            group.Focus();
+
+            group = component.Find("[role=radiogroup]");
+            group.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowLeft" });
+
+            Assert.Equal(3, value);
+        }
+
+        [Fact]
+        public void RadioButtonList_Arrow_BothAxesWork()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var value = 1;
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Orientation, Orientation.Horizontal);
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            group.Focus();
+
+            group = component.Find("[role=radiogroup]");
+            group.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+
+            Assert.Equal(2, value);
+        }
+
+        [Fact]
+        public void RadioButtonList_HomeEnd_SelectFirstAndLast()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var value = 2;
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            group.Focus();
+
+            group = component.Find("[role=radiogroup]");
+            group.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "End" });
+            Assert.Equal(3, value);
+
+            group = component.Find("[role=radiogroup]");
+            group.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Home" });
+            Assert.Equal(1, value);
+        }
+
+        [Fact]
+        public void RadioButtonList_Arrow_SkipsDisabledItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var value = 1;
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenRadioButtonListItem<int>>(0);
+                    builder.AddAttribute(1, "Text", "Option A");
+                    builder.AddAttribute(2, "Value", 1);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenRadioButtonListItem<int>>(3);
+                    builder.AddAttribute(4, "Text", "Option B");
+                    builder.AddAttribute(5, "Value", 2);
+                    builder.AddAttribute(6, "Disabled", true);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenRadioButtonListItem<int>>(7);
+                    builder.AddAttribute(8, "Text", "Option C");
+                    builder.AddAttribute(9, "Value", 3);
+                    builder.CloseComponent();
+                });
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            group.Focus();
+
+            group = component.Find("[role=radiogroup]");
+            group.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            Assert.Equal(3, value);
+        }
+
         [Fact]
         public void RadioButtonList_Renders_WithClassName()
         {

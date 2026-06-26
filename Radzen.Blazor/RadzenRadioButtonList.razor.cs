@@ -294,18 +294,17 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if ((Orientation == Orientation.Horizontal && (key == "ArrowLeft" || key == "ArrowRight")) ||
-                (Orientation == Orientation.Vertical && (key == "ArrowUp" || key == "ArrowDown")))
+            if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
+
                 var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
+                var next = FindNextSelectable(focusedIndex, direction);
 
-                focusedIndex = Math.Clamp(focusedIndex + direction, 0, allItems.FindLastIndex(t => t.Visible && !t.Disabled));
-
-                while (allItems.ElementAtOrDefault(focusedIndex)?.Disabled == true)
+                if (next >= 0 && next != focusedIndex)
                 {
-                    focusedIndex = focusedIndex + direction;
+                    await SelectItem(allItems[next]);
                 }
             }
             else if (key == "Home" || key == "End")
@@ -313,16 +312,21 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                focusedIndex = key == "Home" ? 0 : allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
+                var next = key == "Home" ? FindNextSelectable(-1, 1) : FindNextSelectable(allItems.Count, -1);
+
+                if (next >= 0)
+                {
+                    await SelectItem(allItems[next]);
+                }
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                if (focusedIndex >= 0 && focusedIndex < allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
+                if (!item.Disabled && item.Visible)
                 {
-                    await SelectItem(allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex]);
+                    await SelectItem(item);
                 }
             }
             else
@@ -332,10 +336,38 @@ namespace Radzen.Blazor
             }
         }
 
-        bool HasInvisibleBefore(RadzenRadioButtonListItem<TValue> item)
+        int FindNextSelectable(int from, int direction)
         {
-            return allItems.Take(allItems.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
+            var count = allItems.Count;
+
+            if (count == 0)
+            {
+                return -1;
+            }
+
+            for (var step = 1; step <= count; step++)
+            {
+                var index = from + direction * step;
+                index = ((index % count) + count) % count;
+
+                var candidate = allItems[index];
+
+                if (candidate.Visible && !candidate.Disabled)
+                {
+                    return index;
+                }
+            }
+
+            return -1;
         }
+
+        string? ActiveDescendantId => focusedIndex >= 0 && focusedIndex < allItems.Count && focused
+            ? allItems[focusedIndex].GetItemId()
+            : null;
+
+        string? GroupAriaLabel => Attributes != null && Attributes.ContainsKey("aria-label")
+            ? null
+            : Name;
 
         bool IsFocused(RadzenRadioButtonListItem<TValue> item)
         {
@@ -343,7 +375,12 @@ namespace Radzen.Blazor
         }
         void OnFocus()
         {
-            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+            if (focusedIndex < 0 || focusedIndex >= allItems.Count)
+            {
+                var selected = allItems.FindIndex(IsSelected);
+                focusedIndex = selected >= 0 ? selected : FindNextSelectable(-1, 1);
+            }
+
             focused = true;
         }
         void OnBlur()

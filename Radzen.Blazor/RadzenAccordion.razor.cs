@@ -71,6 +71,15 @@ namespace Radzen.Blazor
         public AccordionRenderMode RenderMode { get; set; } = AccordionRenderMode.Server;
 
         /// <summary>
+        /// Gets or sets the ARIA heading level applied to each accordion header.
+        /// The header button is wrapped in an element with <c>role="heading"</c> and this <c>aria-level</c>
+        /// so screen-reader users can navigate the accordion by heading, as required by the WAI-ARIA Accordion pattern.
+        /// </summary>
+        /// <value>The heading level (typically 1-6). Default is 3.</value>
+        [Parameter]
+        public int AriaLevel { get; set; } = 3;
+
+        /// <summary>
         /// Gets or sets the zero-based index of the currently expanded item.
         /// Use with @bind-SelectedIndex for two-way binding to programmatically control which item is expanded.
         /// In multiple expand mode, this represents the last expanded item.

@@ -2568,6 +2568,12 @@ window.Radzen = {
       };
   },
   openDialog: function (options, dialogService, dialog) {
+    if (!Radzen.dialogInvokerElement) {
+        var invoker = document.activeElement;
+        if (invoker && invoker !== document.body && !invoker.closest('.rz-dialog-content')) {
+            Radzen.dialogInvokerElement = invoker;
+        }
+    }
     if (Radzen.closeAllPopups) {
         Radzen.closeAllPopups();
     }
@@ -2674,6 +2680,14 @@ window.Radzen = {
     if (dialogs.length <= 1) {
         document.removeEventListener('keydown', Radzen.closePopupOrDialog);
         delete Radzen.dialogService;
+        Radzen.restoreDialogInvokerFocus();
+    }
+  },
+  restoreDialogInvokerFocus: function () {
+    var invoker = Radzen.dialogInvokerElement;
+    Radzen.dialogInvokerElement = null;
+    if (invoker && typeof invoker.focus === 'function' && document.body.contains(invoker)) {
+        invoker.focus();
     }
   },
   disableKeydown: function (e) {
@@ -5239,6 +5253,7 @@ window.Radzen = {
         var el = document.getElementById(id);
         var pane = document.getElementById(paneId);
         var paneNext = document.getElementById(paneNextId);
+        var separator = pane ? document.getElementById(pane.id + '-resize') : null;
         var paneLength;
         var paneNextLength;
         var panePerc;
@@ -5357,6 +5372,16 @@ window.Radzen = {
                     pane.style.flexBasis = newPerc + '%';
                     if (paneNext)
                         paneNext.style.flexBasis = (spacePerc - newPerc) + '%';
+
+                    if (separator) {
+                        var valueMin = parseFloat(separator.getAttribute('aria-valuemin')) || 0;
+                        var valueMax = parseFloat(separator.getAttribute('aria-valuemax'));
+                        if (!isFinite(valueMax)) valueMax = 100;
+                        var valueNow = Math.round(newPerc);
+                        if (valueNow < valueMin) valueNow = valueMin;
+                        if (valueNow > valueMax) valueNow = valueMax;
+                        separator.setAttribute('aria-valuenow', valueNow);
+                    }
                 }
             },
             touchMoveHandler: function(e) {

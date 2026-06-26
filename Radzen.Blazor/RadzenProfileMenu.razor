@@ -2,11 +2,11 @@
 
 @if (Visible)
 {
-    <ul @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" 
-        role="menu" aria-label="@ToggleAriaLabel" tabindex="0"
+    <ul @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
+        role="presentation" tabindex="0"
         @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
-        <li class="rz-navigation-item">
-            <div class="rz-navigation-item-wrapper" role="button" tabindex="0" aria-haspopup="menu"
+        <li class="rz-navigation-item" role="presentation">
+            <div @ref="@toggleElement" class="rz-navigation-item-wrapper" role="button" tabindex="0" aria-haspopup="menu"
                  aria-label="@ToggleAriaLabel"
                  aria-expanded="@((!Collapsed).ToString().ToLowerInvariant())" aria-controls="@($"{GetId()}-menu")"
                  @onkeydown="OnToggleKeyDown">
@@ -23,8 +23,10 @@
                     }
                 </div>
             </div>
-            <ul id="@($"{GetId()}-menu")" class="rz-navigation-menu" role="menu" style="@contentStyle"
-                aria-hidden="@(Collapsed ? "true" : "false")" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+            <ul @ref="@menuElement" id="@($"{GetId()}-menu")" class="rz-navigation-menu" role="menu" style="@contentStyle"
+                tabindex="-1" aria-label="@ToggleAriaLabel" aria-hidden="@(Collapsed ? "true" : "false")"
+                aria-activedescendant="@ActiveDescendantId"
+                @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
                 <CascadingValue Value=this>
                     @ChildContent
                 </CascadingValue>

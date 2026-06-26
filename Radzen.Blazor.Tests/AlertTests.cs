@@ -152,6 +152,49 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Alert_Renders_AlertRole()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            {
+                parameters.Add(p => p.Text, "Alert message");
+            });
+
+            var alert = component.Find("div[role=\"alert\"]");
+            Assert.Equal("alert", alert.GetAttribute("role"));
+            Assert.Equal("true", alert.GetAttribute("aria-atomic"));
+        }
+
+        [Fact]
+        public void Alert_Does_Not_Set_AriaLive()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            {
+                parameters.Add(p => p.Text, "Alert message");
+            });
+
+            var alert = component.Find("div[role=\"alert\"]");
+            Assert.False(alert.HasAttribute("aria-live"));
+        }
+
+        [Fact]
+        public void Alert_Does_Not_Steal_Focus()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenAlert>(parameters =>
+            {
+                parameters.Add(p => p.Text, "Alert message");
+            });
+
+            var alert = component.Find("div[role=\"alert\"]");
+            Assert.False(alert.HasAttribute("tabindex"));
+        }
+
+        [Fact]
         public void Alert_Visible_ControlsDisplay()
         {
             using var ctx = new TestContext();

@@ -200,6 +200,56 @@ namespace Radzen.Blazor
             }
         }
 
+        internal Orientation BarOrientation => Splitter?.Orientation == Orientation.Vertical ? Orientation.Vertical : Orientation.Horizontal;
+
+        internal string AriaOrientation => Splitter?.Orientation == Orientation.Vertical ? "horizontal" : "vertical";
+
+        internal string? AriaControls => GetId();
+
+        internal string AriaLabel => $"Resize {GetId()}";
+
+        static double? ParsePercent(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            value = value.Trim();
+
+            if (value.EndsWith('%')
+                && double.TryParse(value.AsSpan(0, value.Length - 1), NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
+            {
+                return result;
+            }
+
+            return null;
+        }
+
+        internal double AriaValueMin => ParsePercent(Min) ?? 0d;
+
+        internal double AriaValueMax => ParsePercent(Max) ?? 100d;
+
+        internal double AriaValueNow
+        {
+            get
+            {
+                var value = ParsePercent(Size) ?? AriaValueMin;
+
+                if (value < AriaValueMin)
+                {
+                    value = AriaValueMin;
+                }
+
+                if (value > AriaValueMax)
+                {
+                    value = AriaValueMax;
+                }
+
+                return Math.Round(value);
+            }
+        }
+
         internal void SetCollapsed(bool value)
         {
             collapsed = value;
@@ -257,6 +307,12 @@ namespace Radzen.Blazor
         bool preventKeyPress;
         bool stopKeydownPropagation;
         bool stopKeypressPropagation;
+
+        static bool IsArrowKey(string? key)
+        {
+            return key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown";
+        }
+
         async Task OnKeyPress(KeyboardEventArgs args, bool? expand = null)
         {
             var key = args.Code != null ? args.Code : args.Key;
@@ -265,6 +321,20 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
                 stopKeypressPropagation = true;
+
+                if (expand == null)
+                {
+                    if (IsCollapsible && Splitter != null)
+                    {
+                        await Splitter.OnCollapse(Index);
+                    }
+                    else if (IsExpandable && Splitter != null)
+                    {
+                        await Splitter.OnExpand(Index);
+                    }
+
+                    return;
+                }
 
                 string? id = null;
 
@@ -284,7 +354,7 @@ namespace Radzen.Blazor
                     await JSRuntime.InvokeVoidAsync("Radzen.delayedFocus", id, 200);
                 }
             }
-            else if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
+            else if (IsArrowKey(key) || key == "Home" || key == "End")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
@@ -302,10 +372,44 @@ namespace Radzen.Blazor
                     ClientY = rect.Top
                 }, Index);
 
+                var deltaX = 0d;
+                var deltaY = 0d;
+
+                if (key == "Home")
+                {
+                    if (BarOrientation == Orientation.Horizontal)
+                    {
+                        deltaX = -100000d;
+                    }
+                    else
+                    {
+                        deltaY = -100000d;
+                    }
+                }
+                else if (key == "End")
+                {
+                    if (BarOrientation == Orientation.Horizontal)
+                    {
+                        deltaX = 100000d;
+                    }
+                    else
+                    {
+                        deltaY = 100000d;
+                    }
+                }
+                else if (BarOrientation == Orientation.Horizontal)
+                {
+                    deltaX = key == "ArrowLeft" ? -1 : key == "ArrowRight" ? 1 : 0;
+                }
+                else
+                {
+                    deltaY = key == "ArrowUp" ? -1 : key == "ArrowDown" ? 1 : 0;
+                }
+
                 await JSRuntime.InvokeVoidAsync("Radzen.resizeSplitter", UniqueID, new MouseEventArgs()
                 {
-                    ClientX = rect.Left + (key == "ArrowLeft" ? -1 : key == "ArrowRight" ? 1 : 0),
-                    ClientY = rect.Top + (key == "ArrowUp" ? -1 : key == "ArrowDown" ? 1 : 0)
+                    ClientX = rect.Left + deltaX,
+                    ClientY = rect.Top + deltaY
                 });
             }
             else

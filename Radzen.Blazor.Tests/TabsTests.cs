@@ -318,6 +318,160 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("Second-Content", component.Markup);
             Assert.DoesNotContain("First-Content", component.Markup);
         }
+
+        [Theory]
+        [InlineData(TabPosition.Top, "horizontal")]
+        [InlineData(TabPosition.Bottom, "horizontal")]
+        [InlineData(TabPosition.TopRight, "horizontal")]
+        [InlineData(TabPosition.BottomRight, "horizontal")]
+        [InlineData(TabPosition.Left, "vertical")]
+        [InlineData(TabPosition.Right, "vertical")]
+        public void Tabs_Wrapper_HasAriaOrientation_MatchingTabPosition(TabPosition position, string expected)
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, position)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            Assert.Equal(expected, wrapper.GetAttribute("aria-orientation"));
+        }
+
+        static string SelectedTabText(IRenderedComponent<RadzenTabs> component)
+        {
+            return component.Find("[role='tab'][aria-selected='true']").TextContent;
+        }
+
+        static string ActiveDescendantText(IRenderedComponent<RadzenTabs> component)
+        {
+            var wrapper = component.Find("div.rz-tabview");
+            var active = wrapper.GetAttribute("aria-activedescendant");
+            return component.Find($"[id='{active}']").TextContent;
+        }
+
+        [Fact]
+        public void Tabs_VerticalOrientation_ArrowDown_MovesActiveDescendantToNextTab()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Left)
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowDown", Code = "ArrowDown" });
+
+            Assert.Equal("Two", ActiveDescendantText(component));
+        }
+
+        [Fact]
+        public void Tabs_VerticalOrientation_ArrowUp_MovesActiveDescendantToPreviousTab()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Right)
+                .Add(p => p.SelectedIndex, 2)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowUp", Code = "ArrowUp" });
+
+            Assert.Equal("Two", ActiveDescendantText(component));
+        }
+
+        [Fact]
+        public void Tabs_VerticalOrientation_ArrowLeftRight_DoNotMoveActiveDescendant()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Left)
+                .Add(p => p.SelectedIndex, 1)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowRight", Code = "ArrowRight" });
+            Assert.Equal("Two", ActiveDescendantText(component));
+
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowLeft", Code = "ArrowLeft" });
+            Assert.Equal("Two", ActiveDescendantText(component));
+        }
+
+        [Fact]
+        public void Tabs_HorizontalOrientation_ArrowRight_MovesActiveDescendantToNextTab()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Top)
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowRight", Code = "ArrowRight" });
+
+            Assert.Equal("Two", ActiveDescendantText(component));
+        }
+
+        [Fact]
+        public void Tabs_HorizontalOrientation_ArrowUpDown_DoNotMoveActiveDescendant()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Top)
+                .Add(p => p.SelectedIndex, 1)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowDown", Code = "ArrowDown" });
+            Assert.Equal("Two", ActiveDescendantText(component));
+
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowUp", Code = "ArrowUp" });
+            Assert.Equal("Two", ActiveDescendantText(component));
+        }
+
+        [Fact]
+        public void Tabs_VerticalOrientation_HomeAndEnd_MoveActiveDescendantToEnds()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Left)
+                .Add(p => p.SelectedIndex, 1)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "End", Code = "End" });
+            Assert.Equal("Three", ActiveDescendantText(component));
+
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "Home", Code = "Home" });
+            Assert.Equal("One", ActiveDescendantText(component));
+        }
+
+        [Fact]
+        public void Tabs_VerticalOrientation_EnterActivatesFocusedTab()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Left)
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("One", "One-Content"), ("Two", "Two-Content"), ("Three", "Three-Content")))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowDown", Code = "ArrowDown" });
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "Enter", Code = "Enter" });
+
+            Assert.Equal("Two", SelectedTabText(component));
+            Assert.Contains("Two-Content", component.Markup);
+        }
     }
 }
 

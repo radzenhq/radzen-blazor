@@ -300,6 +300,10 @@ namespace Radzen.Blazor
             return focusedIndex != -1 && currentItems.IndexOf(item) == focusedIndex;
         }
 
+        internal RadzenMenuItem? ActiveItem => focusedIndex >= 0 && focusedIndex < currentItems.Count ? currentItems[focusedIndex] : null;
+
+        string? ActiveDescendantId => ActiveItem?.GetMenuItemId();
+
         List<RadzenMenuItem> currentItems = new();
 
         internal List<RadzenMenuItem> items = new List<RadzenMenuItem>();
@@ -355,6 +359,11 @@ namespace Radzen.Blazor
 
         void OnFocus()
         {
+            if (currentItems.Count == 0)
+            {
+                currentItems = items.Where(i => i.Visible && !i.Disabled).ToList();
+            }
+
             focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
         }
     }

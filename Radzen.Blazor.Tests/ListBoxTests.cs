@@ -1,6 +1,8 @@
 using Bunit;
 using Xunit;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Radzen.Blazor.Tests
 {
@@ -256,6 +258,127 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.DoesNotContain("rz-listbox-empty-message", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Renders_ListboxRole_OnFocusableElement()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string> { "Apple", "Banana" });
+            });
+
+            var listbox = component.Find("div[role=\"listbox\"]");
+
+            Assert.NotNull(listbox.GetAttribute("tabindex"));
+            Assert.Equal("false", listbox.GetAttribute("aria-multiselectable"));
+        }
+
+        [Fact]
+        public void ListBox_Renders_AccessibleName()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string> { "Apple", "Banana" });
+                parameters.Add(p => p.EmptyAriaLabel, "Fruits");
+            });
+
+            var listbox = component.Find("div[role=\"listbox\"]");
+
+            Assert.Equal("Fruits", listbox.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void ListBox_Renders_Multiselectable_WhenMultiple()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenListBox<IEnumerable<string>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Data, new List<string> { "Apple", "Banana" });
+            });
+
+            var listbox = component.Find("div[role=\"listbox\"]");
+
+            Assert.Equal("true", listbox.GetAttribute("aria-multiselectable"));
+        }
+
+        [Fact]
+        public void ListBox_Renders_Options_WithStableIds()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string> { "Apple", "Banana", "Cherry" });
+            });
+
+            var options = component.FindAll("li[role=\"option\"]");
+
+            Assert.Equal(3, options.Count);
+
+            foreach (var option in options)
+            {
+                Assert.False(string.IsNullOrEmpty(option.GetAttribute("id")));
+            }
+
+            Assert.Equal(options.Count, options.Select(o => o.GetAttribute("id")).Distinct().Count());
+        }
+
+        [Fact]
+        public void ListBox_Renders_AriaSelected_OnSelectedOption()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string> { "Apple", "Banana", "Cherry" });
+                parameters.Add(p => p.Value, "Banana");
+            });
+
+            var options = component.FindAll("li[role=\"option\"]");
+
+            Assert.Equal("false", options[0].GetAttribute("aria-selected"));
+            Assert.Equal("true", options[1].GetAttribute("aria-selected"));
+            Assert.Equal("false", options[2].GetAttribute("aria-selected"));
+        }
+
+        [Fact]
+        public void ListBox_Exposes_ActiveDescendant_AsFocusMoves()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Setup<int>("Radzen.focusListItem", _ => true).SetResult(0);
+            ctx.JSInterop.Setup<bool>("Radzen.popupOpened", _ => true).SetResult(false);
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string> { "Apple", "Banana", "Cherry" });
+            });
+
+            var listbox = component.Find("div[role=\"listbox\"]");
+
+            Assert.True(string.IsNullOrEmpty(listbox.GetAttribute("aria-activedescendant")));
+
+            listbox.KeyDown(new KeyboardEventArgs { Key = "ArrowDown" });
+
+            listbox = component.Find("div[role=\"listbox\"]");
+            var active = listbox.GetAttribute("aria-activedescendant");
+
+            Assert.False(string.IsNullOrEmpty(active));
+
+            var activeOption = component.Find($"li[id=\"{active}\"]");
+            Assert.Equal("option", activeOption.GetAttribute("role"));
         }
     }
 }

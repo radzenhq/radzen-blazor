@@ -590,6 +590,83 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(ctx.JSInterop.Invocations,
                 i => i.Identifier == "Blazor._internal.domWrapper.focus");
         }
+
+        [Fact]
+        public void Accordion_Header_HasHeadingRoleAndDefaultLevel()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenAccordionItem>(0);
+                    builder.AddAttribute(1, "Text", "Item 1");
+                    builder.AddAttribute(2, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
+                    builder.CloseComponent();
+                });
+            });
+
+            var header = component.Find(".rz-accordion-header");
+
+            Assert.Equal("heading", header.GetAttribute("role"));
+            Assert.Equal("3", header.GetAttribute("aria-level"));
+            Assert.NotNull(header.QuerySelector("button"));
+        }
+
+        [Fact]
+        public void Accordion_Header_HonorsCustomAriaLevel()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
+            {
+                parameters.Add(p => p.AriaLevel, 2);
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenAccordionItem>(0);
+                    builder.AddAttribute(1, "Text", "Item 1");
+                    builder.AddAttribute(2, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenAccordionItem>(3);
+                    builder.AddAttribute(4, "Text", "Item 2");
+                    builder.AddAttribute(5, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 2")));
+                    builder.CloseComponent();
+                });
+            });
+
+            var headers = component.FindAll(".rz-accordion-header");
+
+            Assert.All(headers, header =>
+            {
+                Assert.Equal("heading", header.GetAttribute("role"));
+                Assert.Equal("2", header.GetAttribute("aria-level"));
+            });
+        }
+
+        [Fact]
+        public void Accordion_HeaderButton_KeepsAriaWiringInsideHeading()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenAccordionItem>(0);
+                    builder.AddAttribute(1, "Text", "Item 1");
+                    builder.AddAttribute(2, "Selected", true);
+                    builder.AddAttribute(3, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Content 1")));
+                    builder.CloseComponent();
+                });
+            });
+
+            var header = component.Find(".rz-accordion-header[role='heading']");
+            var button = header.QuerySelector("button");
+
+            Assert.NotNull(button);
+            Assert.Equal("button", button!.GetAttribute("type"));
+            Assert.Equal("true", button.GetAttribute("aria-expanded"));
+            Assert.False(string.IsNullOrEmpty(button.GetAttribute("aria-controls")));
+        }
     }
 }
 

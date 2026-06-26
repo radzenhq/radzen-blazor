@@ -97,6 +97,8 @@ namespace Radzen.Blazor
             }
         }
 
+        string TabIndexValue => Disabled || SplitButton?.IsFocused(this) != true ? "-1" : "0";
+
         string ItemClass => ClassList.Create("rz-menuitem")
                                      .AddDisabled(Disabled)
                                      .Add("rz-state-highlight", SplitButton?.IsFocused(this) == true)

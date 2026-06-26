@@ -300,6 +300,36 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        async Task SetValueToBound(bool toMin)
+        {
+            if (Disabled || ReadOnly)
+            {
+                return;
+            }
+
+            var bound = toMin ? Min : Max;
+
+            if (!bound.HasValue)
+            {
+                return;
+            }
+
+            var newValue = ConvertFromDecimal(bound.Value);
+
+            if (object.Equals(newValue, Value))
+            {
+                return;
+            }
+
+            Value = newValue!;
+
+            await ValueChanged.InvokeAsync(Value);
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            await Change.InvokeAsync(Value);
+
+            StateHasChanged();
+        }
+
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
@@ -351,6 +381,52 @@ namespace Radzen.Blazor
             set
             {
                 _ = InternalValueChanged(value);
+            }
+        }
+
+        /// <summary>
+        /// Gets the value exposed via the <c>aria-valuenow</c> attribute of the spinbutton input.
+        /// Returns the current numeric value formatted with the invariant culture, or <c>null</c> when there is no value.
+        /// </summary>
+        protected string? AriaValueNow
+        {
+            get
+            {
+                if (_value == null)
+                {
+                    return null;
+                }
+
+                return ConvertToDecimal(_value).ToString(CultureInfo.InvariantCulture);
+            }
+        }
+
+        /// <summary>
+        /// Gets the value exposed via the <c>aria-valuemin</c> attribute of the spinbutton input.
+        /// Returns the configured <see cref="Min" /> formatted with the invariant culture, or <c>null</c> when <see cref="Min" /> is not set.
+        /// </summary>
+        protected string? AriaValueMin => Min?.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Gets the value exposed via the <c>aria-valuemax</c> attribute of the spinbutton input.
+        /// Returns the configured <see cref="Max" /> formatted with the invariant culture, or <c>null</c> when <see cref="Max" /> is not set.
+        /// </summary>
+        protected string? AriaValueMax => Max?.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Gets the value exposed via the <c>aria-valuetext</c> attribute of the spinbutton input.
+        /// Returns the formatted display value when a non-trivial <see cref="Format" /> is applied, or <c>null</c> otherwise.
+        /// </summary>
+        protected string? AriaValueText
+        {
+            get
+            {
+                if (_value == null || string.IsNullOrEmpty(Format))
+                {
+                    return null;
+                }
+
+                return FormattedValue;
             }
         }
 
@@ -710,6 +786,15 @@ namespace Radzen.Blazor
                 {
                     await UpdateValueWithStep(false);
                 }
+
+                preventKeyPress = false;
+            }
+            else if ((key == "Home" && Min.HasValue || key == "End" && Max.HasValue) && keyDownArgs?.IsDefaultPrevented != true)
+            {
+                stopKeydownPropagation = true;
+                preventKeyPress = true;
+
+                await SetValueToBound(key == "Home");
 
                 preventKeyPress = false;
             }

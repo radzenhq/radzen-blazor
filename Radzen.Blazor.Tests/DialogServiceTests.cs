@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -510,6 +511,49 @@ namespace Radzen.Blazor.Tests
 				// Assert
 				Assert.True(closed);
 				Assert.True(sideClosed);
+			}
+		}
+
+		public class FocusRestorationTests
+		{
+			[Fact(DisplayName = "Opening a dialog invokes Radzen.openDialog so the invoking element is captured")]
+			public void OpenDialog_Invokes_RadzenOpenDialog()
+			{
+				using var ctx = new TestContext();
+				ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+				ctx.Services.AddScoped<DialogService>();
+
+				var cut = ctx.RenderComponent<RadzenDialog>();
+				var dialogService = ctx.Services.GetRequiredService<DialogService>();
+
+				cut.InvokeAsync(() => dialogService.Open("Test", typeof(RadzenButton),
+					new Dictionary<string, object>(), new DialogOptions()));
+
+				cut.WaitForAssertion(() =>
+				{
+					Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.openDialog"));
+				});
+			}
+
+			[Fact(DisplayName = "Closing the last dialog invokes Radzen.closeDialog so focus is restored to the invoker")]
+			public void CloseDialog_Invokes_RadzenCloseDialog()
+			{
+				using var ctx = new TestContext();
+				ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+				ctx.Services.AddScoped<DialogService>();
+
+				var cut = ctx.RenderComponent<RadzenDialog>();
+				var dialogService = ctx.Services.GetRequiredService<DialogService>();
+
+				cut.InvokeAsync(() => dialogService.Open("Test", typeof(RadzenButton),
+					new Dictionary<string, object>(), new DialogOptions()));
+
+				cut.InvokeAsync(() => dialogService.Close());
+
+				cut.WaitForAssertion(() =>
+				{
+					Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.closeDialog"));
+				});
 			}
 		}
 	}

@@ -82,11 +82,22 @@ namespace Radzen.Blazor
             return args;
         }
 
+        private int itemIndex;
+
+        internal override RenderFragment RenderItems()
+        {
+            itemIndex = -1;
+            return base.RenderItems();
+        }
+
         internal override void RenderItem(RenderTreeBuilder builder, object item)
         {
+            itemIndex++;
+
             builder.OpenComponent(0, typeof(RadzenListBoxItem<TValue>));
             builder.AddAttribute(1, "ListBox", this);
             builder.AddAttribute(2, "Item", item);
+            builder.AddAttribute(4, "Index", AllowVirtualization ? -1 : itemIndex);
 
             if (DisabledProperty != null)
             {
@@ -95,6 +106,40 @@ namespace Radzen.Blazor
 
             builder.SetKey(GetKey(item));
             builder.CloseComponent();
+        }
+
+        /// <summary>
+        /// Gets the identifier of the listbox option at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the option.</param>
+        /// <returns>A stable element identifier for the option.</returns>
+        internal string GetItemId(int index)
+        {
+            return $"{ListId}-{index}";
+        }
+
+        /// <summary>
+        /// Gets the identifier of the currently active (keyboard focused) option, or null when none is active.
+        /// </summary>
+        /// <returns>The active option identifier or null.</returns>
+        internal string? ActiveDescendantId => !AllowVirtualization && selectedIndex >= 0 ? GetItemId(selectedIndex) : null;
+
+        /// <summary>
+        /// Gets the accessible name applied to the listbox, falling back to the empty selection label
+        /// unless the consumer supplies an explicit aria-label or aria-labelledby attribute.
+        /// </summary>
+        /// <returns>The accessible name or null when one is supplied via attributes.</returns>
+        internal string? ListboxAriaLabel
+        {
+            get
+            {
+                if (Attributes != null && (Attributes.ContainsKey("aria-label") || Attributes.ContainsKey("aria-labelledby")))
+                {
+                    return null;
+                }
+
+                return EmptyAriaLabel;
+            }
         }
 
         /// <summary>

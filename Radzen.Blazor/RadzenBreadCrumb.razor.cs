@@ -39,6 +39,14 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment<RadzenBreadCrumbItem>? Template { get; set; }
 
+        /// <summary>
+        /// Gets or sets the accessible label for the breadcrumb navigation landmark.
+        /// Rendered as the <c>aria-label</c> attribute on the root <c>&lt;nav&gt;</c> element so assistive technology can distinguish this landmark from other navigation regions.
+        /// </summary>
+        /// <value>The navigation landmark label. Defaults to <c>"breadcrumb"</c>.</value>
+        [Parameter]
+        public string AriaLabel { get; set; } = "breadcrumb";
+
         /// <inheritdoc/>
         protected override string GetComponentCssClass()
         {
