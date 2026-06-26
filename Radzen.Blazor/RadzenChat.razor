@@ -195,7 +195,7 @@
 
             @if (isMentionPopupOpen && MentionCharacter.HasValue && mentionSearchResults.Count > 0)
             {
-                <div class="rz-chat-mention-popup">
+                <div class="rz-chat-mention-popup" @ref="mentionPopupElement" @onscroll="OnMentionPopupScroll" style="max-height: 16rem; overflow-y: auto;">
                     @foreach (var (user, index) in mentionSearchResults.Select((u, i) => (u, i)))
                     {
                         var isSelected = index == selectedMentionIndex;

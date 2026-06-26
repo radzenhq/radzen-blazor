@@ -2757,6 +2757,15 @@ window.Radzen = {
       }
     } catch (ex) { }
   },
+  isScrolledToBottom: function (arg, threshold) {
+    var element =
+      arg instanceof Element || arg instanceof HTMLDocument
+        ? arg
+        : document.getElementById(arg);
+    if (!element) return false;
+    var offset = typeof threshold === 'number' ? threshold : 0;
+    return element.scrollTop + element.clientHeight >= element.scrollHeight - offset;
+  },
   blur: function (el, e) { 
     if (el) {
         e.preventDefault();

@@ -621,27 +621,92 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public async Task RadzenChat_ShouldSetMentionSearchResults()
+        public void RadzenChat_ShouldRenderMentionUsersFromProperty()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
-                .Add(p => p.CurrentUserId, "user1")
-                .Add(p => p.Users, new List<ChatUser>())
-                .Add(p => p.Messages, new List<ChatMessage>())
-                .Add(p => p.MentionCharacter, '@')
-            );
 
-            var chat = component.Instance;
             var results = new List<MentionUserContext>
             {
                 new MentionUserContext { UserId = "user-1", UserName = "Alice", IsInChat = true },
                 new MentionUserContext { UserId = "user-2", UserName = "Bob", IsInChat = false }
             };
 
-            await chat.SetMentionSearchResults(results);
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, new List<ChatUser>())
+                .Add(p => p.Messages, new List<ChatMessage>())
+                .Add(p => p.MentionCharacter, '@')
+                .Add(p => p.MentionUsers, results)
+                .Add(p => p.MentionUsersCount, 2)
+            );
 
-            Assert.Equal(2, results.Count);
+            var popupItems = component.FindAll(".rz-chat-mention-item");
+            Assert.Equal(2, popupItems.Count);
+            Assert.Contains("Alice", component.Markup);
+            Assert.Contains("Bob", component.Markup);
+        }
+
+        [Fact]
+        public async Task RadzenChat_ShouldLoadNextMentionUsersPageWhenScrolledToBottom()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Setup<bool>("Radzen.isScrolledToBottom", _ => true).SetResult(true);
+
+            var firstPage = new List<MentionUserContext>
+            {
+                new MentionUserContext { UserId = "user-1", UserName = "Alice", IsInChat = true },
+                new MentionUserContext { UserId = "user-2", UserName = "Bob", IsInChat = true }
+            };
+
+            var secondPage = new List<MentionUserContext>
+            {
+                new MentionUserContext { UserId = "user-3", UserName = "Carol", IsInChat = false },
+                new MentionUserContext { UserId = "user-4", UserName = "Dan", IsInChat = false }
+            };
+
+            var allUsers = firstPage.Concat(secondPage).ToList();
+            MentionSearchArgs? capturedArgs = null;
+            var mentionUsers = firstPage.ToList();
+            int? mentionCount = 4;
+
+            var component = ctx.RenderComponent<RadzenChat>(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, new List<ChatUser>())
+                .Add(p => p.Messages, new List<ChatMessage>())
+                .Add(p => p.MentionCharacter, '@')
+                .Add(p => p.MentionDisplaySize, 2)
+                .Add(p => p.MentionUsers, mentionUsers)
+                .Add(p => p.MentionUsersCount, mentionCount)
+                .Add(p => p.MentionSearch, EventCallback.Factory.Create<MentionSearchArgs>(this, args =>
+                {
+                    capturedArgs = args;
+                    mentionUsers = allUsers.Skip(args.Skip ?? 0).Take(args.Top ?? 2).ToList();
+                    return Task.CompletedTask;
+                }))
+            );
+
+            Assert.Equal(2, component.FindAll(".rz-chat-mention-item").Count);
+
+            await InvokePrivateAsync(component.Instance, "OnMentionPopupScroll");
+
+            component.SetParametersAndRender(parameters => parameters
+                .Add(p => p.CurrentUserId, "user1")
+                .Add(p => p.Users, new List<ChatUser>())
+                .Add(p => p.Messages, new List<ChatMessage>())
+                .Add(p => p.MentionCharacter, '@')
+                .Add(p => p.MentionDisplaySize, 2)
+                .Add(p => p.MentionUsers, mentionUsers)
+                .Add(p => p.MentionUsersCount, mentionCount)
+            );
+
+            Assert.NotNull(capturedArgs);
+            Assert.Equal(2, capturedArgs!.Skip);
+            Assert.Equal(2, capturedArgs.Top);
+            Assert.Equal(4, component.FindAll(".rz-chat-mention-item").Count);
+            Assert.Contains("Carol", component.Markup);
+            Assert.Contains("Dan", component.Markup);
         }
 
         [Fact]

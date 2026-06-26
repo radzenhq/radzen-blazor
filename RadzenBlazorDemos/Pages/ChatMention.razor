@@ -21,8 +21,10 @@
                 ChatCleared="@OnChatCleared"
                 TypingChanged="@OnTypingChanged"
                 MentionCharacter="@MentionCharacter"
-                MentionMaxResults="5"
+                MentionDisplaySize="5"
                 MentionSearch="@LoadMentions"
+                MentionUsers="@mentionUsers"
+                MentionUsersCount="@mentionUsersCount"
                 MentionItemTemplate="@MentionItemTemplate"
                 MentionDisplayTemplate="@MentionDisplayTemplate">
         <TitleContent>
@@ -39,6 +41,8 @@
     
     private List<ChatUser> users = new();
     private List<ChatMessage> messages = new();
+    private List<MentionUserContext> mentionUsers = new();
+    private int? mentionUsersCount;
     private const char MentionCharacter = '@';
     private const string PlaceholderText = "Type your message... (try typing @ to mention someone)";
 
@@ -124,8 +128,17 @@
             })
             .ToList();
 
-        // Update search results in the chat component
-        await basicChat?.SetMentionSearchResults(filteredUsers);
+        if ((args.Skip ?? 0) == 0)
+        {
+            mentionUsers = filteredUsers;
+        }
+        else
+        {
+            mentionUsers.AddRange(filteredUsers);
+        }
+
+        mentionUsersCount = users.Count(u => u.Id != "user1" && u.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+        StateHasChanged();
 
         console.Log($"Mention search: '{searchText}' - Found {filteredUsers.Count} results", AlertStyle.Info);
     }
