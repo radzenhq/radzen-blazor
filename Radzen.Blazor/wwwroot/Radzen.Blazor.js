@@ -1839,6 +1839,36 @@ window.Radzen = {
     if (duration) {
       Radzen[id + 'duration'] = setTimeout(Radzen.closePopup, duration, id, instance, callback);
     }
+
+    // WCAG 1.4.13 (Content on Hover or Focus): the tooltip stays visible as long as
+    // the pointer is over it, so the user can move onto and read/interact with it.
+    var tooltipPopup = document.getElementById(id);
+    if (tooltipPopup) {
+        Radzen[id + 'tooltipEnter'] = function () {
+            if (Radzen[id + 'duration']) {
+                clearTimeout(Radzen[id + 'duration']);
+                Radzen[id + 'duration'] = null;
+            }
+        };
+        Radzen[id + 'tooltipLeave'] = function () {
+            if (duration) {
+                Radzen[id + 'duration'] = setTimeout(Radzen.closePopup, duration, id, instance, callback);
+            }
+        };
+        tooltipPopup.addEventListener('mouseenter', Radzen[id + 'tooltipEnter']);
+        tooltipPopup.addEventListener('mouseleave', Radzen[id + 'tooltipLeave']);
+    }
+
+    // WAI-ARIA APG Tooltip pattern: Escape dismisses the tooltip.
+    Radzen[id + 'esc'] = function (e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            Radzen.closeTooltip(id);
+            if (instance && callback) {
+                try { suppressDisposed(instance.invokeMethodAsync(callback, null)); } catch (ex) { }
+            }
+        }
+    };
+    document.addEventListener('keydown', Radzen[id + 'esc']);
   },
   closeTooltip(id) {
     Radzen.activeElement = null;
@@ -1847,6 +1877,23 @@ window.Radzen = {
     if (target) {
         target.removeAttribute('aria-describedby');
         Radzen[id + 'target'] = null;
+    }
+
+    if (Radzen[id + 'esc']) {
+        document.removeEventListener('keydown', Radzen[id + 'esc']);
+        Radzen[id + 'esc'] = null;
+    }
+
+    var tooltipPopup = document.getElementById(id);
+    if (tooltipPopup) {
+        if (Radzen[id + 'tooltipEnter']) {
+            tooltipPopup.removeEventListener('mouseenter', Radzen[id + 'tooltipEnter']);
+            Radzen[id + 'tooltipEnter'] = null;
+        }
+        if (Radzen[id + 'tooltipLeave']) {
+            tooltipPopup.removeEventListener('mouseleave', Radzen[id + 'tooltipLeave']);
+            Radzen[id + 'tooltipLeave'] = null;
+        }
     }
 
     Radzen.closePopup(id);
