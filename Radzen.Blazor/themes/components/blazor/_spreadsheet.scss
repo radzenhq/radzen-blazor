@@ -45,6 +45,8 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 
 .rz-virtual-grid-content {
     position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0;
     z-index: 1;
     overflow: hidden;
 }
@@ -88,7 +90,8 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 
 .rz-spreadsheet-cell {
     position: absolute;
-    border-right: var(--rz-spreadsheet-cell-border);
+    isolation: isolate;
+    border-inline-end: var(--rz-spreadsheet-cell-border);
     border-bottom: var(--rz-spreadsheet-cell-border);
     cursor: cell;
     font-size: 0.75rem;
@@ -113,7 +116,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-selection-cell-right {
-    border-right: 2px solid var(--rz-primary);
+    border-inline-end: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-cell-bottom {
@@ -121,7 +124,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-selection-cell-left {
-    border-left: 2px solid var(--rz-primary);
+    border-inline-start: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-range {
@@ -137,7 +140,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-selection-range-right {
-    border-right: 2px solid var(--rz-primary);
+    border-inline-end: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-range-bottom {
@@ -145,7 +148,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-selection-range-left {
-    border-left: 2px solid var(--rz-primary);
+    border-inline-start: 2px solid var(--rz-primary);
 }
 
 .rz-spreadsheet-selection-range-mask {
@@ -154,6 +157,14 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
                 linear-gradient(white, white);
     mask-composite: exclude;
     mask-repeat: no-repeat;
+    mask-size: 100% 100%, var(--rz-spreadsheet-mask-w) var(--rz-spreadsheet-mask-h);
+    mask-position: 0 0, var(--rz-spreadsheet-mask-x) var(--rz-spreadsheet-mask-y);
+}
+
+[dir="rtl"] .rz-spreadsheet-selection-range-mask {
+    // mask-position % resolves against (container - image), so mirror with the 4-value
+    // edge-offset form instead: the hole's inline-end edge sits --mask-x from the right.
+    mask-position: 0 0, right var(--rz-spreadsheet-mask-x) top var(--rz-spreadsheet-mask-y);
 }
 
 .rz-spreadsheet-autofill-handle {
@@ -181,7 +192,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-autofill-range-right {
-    border-right: 2px dashed var(--rz-primary);
+    border-inline-end: 2px dashed var(--rz-primary);
 }
 
 .rz-spreadsheet-autofill-range-bottom {
@@ -189,7 +200,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-autofill-range-left {
-    border-left: 2px dashed var(--rz-primary);
+    border-inline-start: 2px dashed var(--rz-primary);
 }
 
 .rz-spreadsheet-autofill-handle.rz-spreadsheet-frozen-row,
@@ -215,7 +226,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     position: absolute;
     box-sizing: border-box;
     background: var(--rz-spreadsheet-header-background-color);
-    border-right: var(--rz-spreadsheet-cell-border);
+    border-inline-end: var(--rz-spreadsheet-cell-border);
     border-bottom: var(--rz-spreadsheet-cell-border);
     font-weight: 500;
     font-size: 0.75rem;
@@ -459,11 +470,11 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-table-frame-left {
-    border-left: 1px solid var(--rz-text-color);
+    border-inline-start: 1px solid var(--rz-text-color);
 }
 
 .rz-spreadsheet-table-frame-right {
-    border-right: 1px solid var(--rz-text-color);
+    border-inline-end: 1px solid var(--rz-text-color);
 }
 
 .rz-spreadsheet-table-frame-bottom {
@@ -505,7 +516,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 .rz-spreadsheet-cell-chevron {
     position: absolute;
     top: 2px;
-    right: 2px;
+    inset-inline-end: 2px;
     border-radius: 0;
     padding: 0 !important;
 }
@@ -581,18 +592,19 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
     &::after {
         content: '';
         position: absolute;
-        top: 0;
-        right: 0;
+        inset-block-start: 0;
+        inset-inline-end: 0;
         width: 0;
         height: 0;
-        border-style: solid;
-        border-width: 0 6px 6px 0;
-        border-color: transparent var(--rz-danger) transparent transparent;
+        // Logical border longhands flip the danger triangle to the inline-end corner
+        // in both directions, so no [dir=rtl] override is needed.
+        border-block-end: 6px solid transparent;
+        border-inline-end: 6px solid var(--rz-danger);
     }
 }
 
 .rz-spreadsheet-cell-number {
-    text-align: right;
+    text-align: end;
 }
 
 .rz-spreadsheet-cell-error {
@@ -600,7 +612,7 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 }
 
 .rz-spreadsheet-cell-editor-number {
-    text-align: right;
+    text-align: end;
 }
 
 
@@ -670,6 +682,13 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
 .rz-spreadsheet-resize-s { cursor: ns-resize; }
 .rz-spreadsheet-resize-sw { cursor: nesw-resize; }
 .rz-spreadsheet-resize-w { cursor: ew-resize; }
+
+[dir="rtl"] {
+    .rz-spreadsheet-resize-nw { cursor: nesw-resize; }
+    .rz-spreadsheet-resize-ne { cursor: nwse-resize; }
+    .rz-spreadsheet-resize-se { cursor: nesw-resize; }
+    .rz-spreadsheet-resize-sw { cursor: nwse-resize; }
+}
 
 .rz-spreadsheet-chart {
     position: absolute;

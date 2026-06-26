@@ -91,7 +91,7 @@ public class CellSelectionTests : TestContext
 
         // Assert
         var element = cut.Find(".rz-spreadsheet-selection-cell");
-        Assert.Equal("transform: translate(0px, 0px); width: 100px; height: 24px", element.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 0px; inset-block-start: 0px; width: 100px; height: 24px;", element.GetAttribute("style"));
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class CellSelectionTests : TestContext
         Assert.NotNull(frozen);
         
         // First element (frozen)
-        Assert.Equal("transform: translate(0px, 0px); width: 100px; height: 24px", frozen.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 0px; inset-block-start: 0px; width: 100px; height: 24px;", frozen.GetAttribute("style"));
         Assert.Contains("rz-spreadsheet-selection-cell-top", frozen.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-left", frozen.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-right", frozen.ClassName);
@@ -130,7 +130,7 @@ public class CellSelectionTests : TestContext
         Assert.NotNull(unfrozen);
         
         // Second element (non-frozen)
-        Assert.Equal("transform: translate(0px, 24px); width: 100px; height: 48px", unfrozen.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 0px; inset-block-start: 24px; width: 100px; height: 48px;", unfrozen.GetAttribute("style"));
         Assert.DoesNotContain("rz-spreadsheet-selection-cell-top", unfrozen.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-left", unfrozen.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-right", unfrozen.ClassName);
@@ -163,7 +163,7 @@ public class CellSelectionTests : TestContext
         
         // First element (frozen)
         Assert.Contains("rz-spreadsheet-frozen-column", frozen.ClassName);
-        Assert.Equal("transform: translate(0px, 0px); width: 100px; height: 24px", frozen.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 0px; inset-block-start: 0px; width: 100px; height: 24px;", frozen.GetAttribute("style"));
         Assert.Contains("rz-spreadsheet-selection-cell-top", frozen.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-left", frozen.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-bottom", frozen.ClassName);
@@ -173,7 +173,7 @@ public class CellSelectionTests : TestContext
 
         Assert.NotNull(unfrozen);
         // Second element (non-frozen)
-        Assert.Equal("transform: translate(100px, 0px); width: 200px; height: 24px", unfrozen.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 100px; inset-block-start: 0px; width: 200px; height: 24px;", unfrozen.GetAttribute("style"));
         Assert.Contains("rz-spreadsheet-selection-cell-top", unfrozen.ClassName);
         Assert.DoesNotContain("rz-spreadsheet-selection-cell-left", unfrozen.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-bottom", unfrozen.ClassName);
@@ -206,7 +206,7 @@ public class CellSelectionTests : TestContext
         Assert.NotNull(both);
         Assert.Contains("rz-spreadsheet-frozen-row", both.ClassName);
         Assert.Contains("rz-spreadsheet-frozen-column", both.ClassName);
-        Assert.Equal("transform: translate(0px, 0px); width: 100px; height: 24px", both.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 0px; inset-block-start: 0px; width: 100px; height: 24px;", both.GetAttribute("style"));
         Assert.Contains("rz-spreadsheet-selection-cell-top", both.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-left", both.ClassName);
         Assert.DoesNotContain("rz-spreadsheet-selection-cell-bottom", both.ClassName);
@@ -217,7 +217,7 @@ public class CellSelectionTests : TestContext
         Assert.NotNull(frozenColumn);
         Assert.DoesNotContain("rz-spreadsheet-frozen-row", frozenColumn.ClassName);
         Assert.Contains("rz-spreadsheet-frozen-column", frozenColumn.ClassName);
-        Assert.Equal("transform: translate(0px, 24px); width: 100px; height: 48px", frozenColumn.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 0px; inset-block-start: 24px; width: 100px; height: 48px;", frozenColumn.GetAttribute("style"));
         Assert.DoesNotContain("rz-spreadsheet-selection-cell-top", frozenColumn.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-left", frozenColumn.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-bottom", frozenColumn.ClassName);
@@ -228,7 +228,7 @@ public class CellSelectionTests : TestContext
         Assert.NotNull(frozenRow);
         Assert.Contains("rz-spreadsheet-frozen-row", frozenRow.ClassName);
         Assert.DoesNotContain("rz-spreadsheet-frozen-column", frozenRow.ClassName);
-        Assert.Equal("transform: translate(100px, 0px); width: 200px; height: 24px", frozenRow.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 100px; inset-block-start: 0px; width: 200px; height: 24px;", frozenRow.GetAttribute("style"));
         Assert.Contains("rz-spreadsheet-selection-cell-top", frozenRow.ClassName);
         Assert.DoesNotContain("rz-spreadsheet-selection-cell-left", frozenRow.ClassName);
         Assert.DoesNotContain("rz-spreadsheet-selection-cell-bottom", frozenRow.ClassName);
@@ -239,7 +239,7 @@ public class CellSelectionTests : TestContext
         Assert.NotNull(neither);
         Assert.DoesNotContain("rz-spreadsheet-frozen-row", neither.ClassName);
         Assert.DoesNotContain("rz-spreadsheet-frozen-column", neither.ClassName);
-        Assert.Equal("transform: translate(100px, 24px); width: 200px; height: 48px", neither.GetAttribute("style"));
+        Assert.Equal("inset-inline-start: 100px; inset-block-start: 24px; width: 200px; height: 48px;", neither.GetAttribute("style"));
         Assert.DoesNotContain("rz-spreadsheet-selection-cell-top", neither.ClassName);
         Assert.DoesNotContain("rz-spreadsheet-selection-cell-left", neither.ClassName);
         Assert.Contains("rz-spreadsheet-selection-cell-bottom", neither.ClassName);

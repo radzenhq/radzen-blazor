@@ -373,13 +373,13 @@ public partial class CellView : CellBase, IDisposable
             }
             if (isLeftCol)
             {
-                sb.Append("border-left:1px solid ");
+                sb.Append("border-inline-start:1px solid ");
                 sb.Append(preset.BorderColor);
                 sb.Append(';');
             }
             if (isRightCol)
             {
-                sb.Append("border-right:1px solid ");
+                sb.Append("border-inline-end:1px solid ");
                 sb.Append(preset.BorderColor);
                 sb.Append(';');
             }

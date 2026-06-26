@@ -231,7 +231,7 @@ public abstract class DrawingOverlayBase<TDrawing> : ComponentBase, IDisposable 
     private string GetZoneStyle(RangeInfo zone)
     {
         var rect = Context.GetRectangle(zone.Range.Start.Row, zone.Range.Start.Column, zone.Range.End.Row, zone.Range.End.Column);
-        return $"transform: translate({rect.Left.ToPx()}, {rect.Top.ToPx()}); width: {rect.Width.ToPx()}; height: {rect.Height.ToPx()};";
+        return rect.ToStyle();
     }
 
     private string GetContainerStyle(TDrawing drawing, RangeRef range, RangeInfo zone)
@@ -239,7 +239,7 @@ public abstract class DrawingOverlayBase<TDrawing> : ComponentBase, IDisposable 
         var (width, height) = GetDimensions(drawing, range);
         var (offsetX, offsetY) = GetZoneOffset(drawing, zone);
 
-        return $"position: absolute; left: {offsetX.ToPx()}; top: {offsetY.ToPx()}; width: {width.ToPx()}; height: {height.ToPx()};";
+        return $"position: absolute; inset-inline-start: {offsetX.ToPx()}; inset-block-start: {offsetY.ToPx()}; width: {width.ToPx()}; height: {height.ToPx()};";
     }
 
     private string GetClass(bool frozenRow, bool frozenColumn)
@@ -282,7 +282,7 @@ public abstract class DrawingOverlayBase<TDrawing> : ComponentBase, IDisposable 
             case "w":  x = offsetX - half; y = offsetY + height / 2 - half; break;
         }
 
-        return $"position: absolute; left: {x.ToPx()}; top: {y.ToPx()};";
+        return $"position: absolute; inset-inline-start: {x.ToPx()}; inset-block-start: {y.ToPx()};";
     }
 
     /// <inheritdoc/>

@@ -3,7 +3,7 @@
 @using Radzen.Blazor
 
 <div class="rz-range-picker" style=@Style>
-    <RadzenTextBox @ref=textBox Value=@Value Change=@OnTextChanged InputSize=@InputSize Style="width: 100%; padding-right: 2rem;" />
+    <RadzenTextBox @ref=textBox Value=@Value Change=@OnTextChanged InputSize=@InputSize Style="width: 100%; padding-inline-end: 2rem;" />
     <button type="button" class="rz-range-picker-collapse" @onclick=@OnPickClick title=@Title>
         <i class="notranslate rzi">grid_on</i>
     </button>
