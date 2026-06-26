@@ -38,5 +38,5 @@ public partial class ColumnHeader : HeaderBase
                                      .Add("rz-spreadsheet-header-selected", Selected)
                                      .ToString();
 
-    private string ResizeHandleStyle => $"left: {Rect.Right.ToPx()}; top: {Rect.Top.ToPx()}; height: {Rect.Height.ToPx()};";
+    private string ResizeHandleStyle => $"inset-inline-start: {Rect.Right.ToPx()}; inset-block-start: {Rect.Top.ToPx()}; height: {Rect.Height.ToPx()};";
 }

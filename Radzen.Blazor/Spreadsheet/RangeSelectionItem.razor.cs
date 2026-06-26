@@ -95,7 +95,7 @@ public partial class RangeSelectionItem
             var offsetX = intersectionRect.Left - rect.Left;
             var offsetY = intersectionRect.Top - rect.Top;
 
-            return $@"transform: translate({rect.Left.ToPx()}, {rect.Top.ToPx()}); width: {rect.Width.ToPx()}; height: {rect.Height.ToPx()}; mask-size: 100% 100%, {intersectionRect.Width.ToPx()} {intersectionRect.Height.ToPx()}; mask-position: 0 0, {offsetX.ToPx()} {offsetY.ToPx()};";
+            return rect.ToStyle() + $" --rz-spreadsheet-mask-x: {offsetX.ToPx()}; --rz-spreadsheet-mask-y: {offsetY.ToPx()}; --rz-spreadsheet-mask-w: {intersectionRect.Width.ToPx()}; --rz-spreadsheet-mask-h: {intersectionRect.Height.ToPx()};";
         }
     }
 }

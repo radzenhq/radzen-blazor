@@ -104,15 +104,25 @@ public readonly struct PixelRectangle(PixelRange x, PixelRange y)
     public void AppendStyle(StringBuilder sb)
     {
         ArgumentNullException.ThrowIfNull(sb);
-        sb.Append("transform: translate(");
+        sb.Append("inset-inline-start: ");
         sb.Append(Left.ToPx());
-        sb.Append(',');
+        sb.Append("; inset-block-start: ");
         sb.Append(Top.ToPx());
-        sb.Append("); width: ");
+        sb.Append("; width: ");
         sb.Append(Width.ToPx());
         sb.Append("; height: ");
         sb.Append(Height.ToPx());
         sb.Append(';');
+    }
+
+    /// <summary>
+    /// Returns the rectangle's position and dimensions as a CSS style string.
+    /// </summary>
+    public string ToStyle()
+    {
+        var sb = StringBuilderCache.Acquire();
+        AppendStyle(sb);
+        return StringBuilderCache.GetStringAndRelease(sb);
     }
 }
 

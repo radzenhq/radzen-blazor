@@ -36,8 +36,8 @@ public class RangeSelectionItemTests : TestContext
         // The style should include mask properties that account for the merged cell
         var style = element.GetAttribute("style");
         Assert.NotNull(style);
-        Assert.Contains("mask-size", style);
-        Assert.Contains("mask-position", style);
+        Assert.Contains("--rz-spreadsheet-mask-w", style);
+        Assert.Contains("--rz-spreadsheet-mask-x", style);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class RangeSelectionItemTests : TestContext
         
         var style = element.GetAttribute("style");
         Assert.NotNull(style);
-        Assert.Contains("transform", style);
+        Assert.Contains("inset-inline-start", style);
         Assert.Contains("width", style);
         Assert.Contains("height", style);
     }
@@ -105,8 +105,8 @@ public class RangeSelectionItemTests : TestContext
         
         var frozenStyle = frozenElement.GetAttribute("style");
         Assert.NotNull(frozenStyle);
-        Assert.Contains("mask-size", frozenStyle);
-        Assert.Contains("mask-position", frozenStyle);
+        Assert.Contains("--rz-spreadsheet-mask-w", frozenStyle);
+        Assert.Contains("--rz-spreadsheet-mask-x", frozenStyle);
 
         // Test the non-frozen part (B1:B1)
         var nonFrozenRange = ranges.First(r => !r.FrozenColumn);
@@ -128,7 +128,7 @@ public class RangeSelectionItemTests : TestContext
         
         var nonFrozenStyle = nonFrozenElement.GetAttribute("style");
         Assert.NotNull(nonFrozenStyle);
-        Assert.Contains("mask-size", nonFrozenStyle);
-        Assert.Contains("mask-position", nonFrozenStyle);
+        Assert.Contains("--rz-spreadsheet-mask-w", nonFrozenStyle);
+        Assert.Contains("--rz-spreadsheet-mask-x", nonFrozenStyle);
     }
 } 

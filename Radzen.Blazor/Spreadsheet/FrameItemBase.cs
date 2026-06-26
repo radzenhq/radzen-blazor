@@ -76,7 +76,7 @@ public abstract partial class FrameItemBase : ComponentBase
         get
         {
             var rect = Context.GetRectangle(Range.Start.Row, Range.Start.Column, Range.End.Row, Range.End.Column);
-            return $"transform: translate({rect.Left.ToPx()}, {rect.Top.ToPx()}); width: {rect.Width.ToPx()}; height: {rect.Height.ToPx()}";
+            return rect.ToStyle();
         }
     }
 }

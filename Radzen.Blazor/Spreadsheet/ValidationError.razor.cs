@@ -97,7 +97,7 @@ public partial class ValidationError : IDisposable
         var rect = Context.GetRectangle(cell.Row, cell.Column);
         var left = rect.Left + 4;
         var top = rect.Top + rect.Height + 2;
-        style = $"transform: translate({left.ToPx()}, {top.ToPx()});";
+        style = $"inset-inline-start: {left.ToPx()}; inset-block-start: {top.ToPx()};";
 
         className = ClassList.Create("rz-spreadsheet-validation-error")
             .Add("rz-spreadsheet-frozen-column", Worksheet is not null && cell.Column < Worksheet.Columns.Frozen)

@@ -5784,6 +5784,7 @@ class Spreadsheet {
     this.element = element;
     this.dotNetRef = dotNetRef;
     this.shortcuts = shortcuts;
+    this.rtl = Radzen.isRTL(element);
     this.element.addEventListener('keydown', this.onKeyDown);
     this.element.addEventListener('pointerdown', this.onPointerDown);
     this.element.addEventListener('dblclick', this.onDoubleClick);
@@ -5827,6 +5828,8 @@ class Spreadsheet {
 
   onPointerDown = async (e) => {
     if (e.button != 0) return;
+
+    this.rtl = Radzen.isRTL(this.element);
 
     if (e.target.matches('.rz-spreadsheet-autofill-handle')) {
       addEventListener('pointermove', this.onAutofillPointerMove);
@@ -6002,9 +6005,9 @@ class Spreadsheet {
       type: e.type,
       button: e.button,
       buttons: e.buttons,
-      clientX: e.clientX,
+      clientX: this.rtl ? -e.clientX : e.clientX,
       clientY: e.clientY,
-      offsetX: e.offsetX,
+      offsetX: this.rtl ? (e.target?.offsetWidth ?? 0) - e.offsetX : e.offsetX,
       offsetY: e.offsetY,
       pageX: e.pageX,
       pageY: e.pageY,
@@ -6241,9 +6244,13 @@ Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
     e.preventDefault();
   });
 
+  var rtl = Radzen.isRTL(scrollable);
+
   scrollable.addEventListener('scroll', function () {
     var scrollTop = scrollable.scrollTop;
-    var scrollLeft = scrollable.scrollLeft;
+    // In RTL the native scrollLeft is 0 at the right and negative toward the left;
+    // report a non-negative logical scroll so the C# layout math stays direction-agnostic.
+    var scrollLeft = rtl ? -scrollable.scrollLeft : scrollable.scrollLeft;
 
     ref.invokeMethodAsync('OnScroll', scrollLeft, scrollTop);
   });
@@ -6260,7 +6267,7 @@ Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
   return { width, height, scrollHeight, scrollWidth };
 };
 Radzen.scrollElementTo = (scrollable, left, top) => {
-  scrollable.scrollTo({ top: top, left: left });
+  scrollable.scrollTo({ top: top, left: Radzen.isRTL(scrollable) ? -left : left });
 };
 Radzen.createFormField = function(el) {
   if (!el || typeof el.addEventListener !== 'function') return null;
