@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+#pragma warning disable IDE0008, IDE0022, IDE0028, IDE0040, IDE0045, IDE0046, IDE0055, IDE0057, IDE0058, IDE1006
+
 namespace Radzen.Blazor
 {
     /// <summary>
@@ -84,6 +86,8 @@ namespace Radzen.Blazor
         }
     }
 
+    #pragma warning restore IDE0008, IDE0022, IDE0028, IDE0040, IDE0045, IDE0046, IDE0055, IDE0057, IDE0058, IDE1006
+
     /// <summary>
     /// A chat interface component for displaying and sending messages in multi-participant conversations.
     /// RadzenChat provides a complete chat UI with message history, user avatars, typing indicators, and message composition.
@@ -119,6 +123,7 @@ namespace Radzen.Blazor
         private bool preventDefault;
         private ElementReference inputElement;
         private ElementReference messagesContainer;
+        private ElementReference mentionPopupElement;
         private bool hasNewMessages;
         private int previousMessageCount;
 
@@ -133,6 +138,10 @@ namespace Radzen.Blazor
         private int selectedMentionIndex = -1;
         private int mentionStartPosition = -1;
         private CancellationTokenSource? mentionSearchCts;
+        private bool isLoadingMentionUsers;
+        private bool hasMoreMentionUsers;
+        private bool appendMentionUsersOnNextUpdate;
+        private bool mentionSearchRequested;
         private readonly List<MentionInputSegment> mentionInputSegments = new();
 
         private sealed class MentionInputSegment
@@ -402,34 +411,34 @@ namespace Radzen.Blazor
         public RenderFragment<string>? MentionDisplayTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the mention users displayed in the mention popup.
+        /// Populate this property in the parent component from the <see cref="MentionSearch"/> callback.
+        /// </summary>
+        [Parameter]
+        public IEnumerable<MentionUserContext> MentionUsers { get; set; } = new List<MentionUserContext>();
+
+        /// <summary>
+        /// Gets or sets the total mention users count for paging scenarios.
+        /// When null, mention popup paging is disabled and only the provided page is displayed.
+        /// </summary>
+        [Parameter]
+        public int? MentionUsersCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of mention users to display per page. Defaults to 10.
+        /// </summary>
+        [Parameter]
+        public int MentionDisplaySize { get; set; } = 10;
+
+        /// <summary>
         /// Gets or sets the maximum number of mention search results to display in the popup. Defaults to 10.
+        /// Kept for backward compatibility. Use <see cref="MentionDisplaySize"/> instead.
         /// </summary>
         [Parameter]
-        public int MentionMaxResults { get; set; } = 10;
-
-        /// <summary>
-        /// Gets or sets the event callback that stores mention search results from the MentionSearch callback.
-        /// </summary>
-        [Parameter]
-        public EventCallback<IEnumerable<MentionUserContext>> MentionSearchResultsChanged { get; set; }
-
-        /// <summary>
-        /// Updates the mention search results and refreshes the popup.
-        /// Call this from within your MentionSearch event callback handler.
-        /// </summary>
-        /// <param name="results">The search results to display.</param>
-        public async Task SetMentionSearchResults(IEnumerable<MentionUserContext>? results)
+        public int MentionMaxResults
         {
-            mentionSearchResults = results?.ToList() ?? new();
-            selectedMentionIndex = mentionSearchResults.Count > 0 ? 0 : -1;
-            isMentionPopupOpen = mentionSearchResults.Count > 0;
-
-            if (MentionSearchResultsChanged.HasDelegate)
-            {
-                await MentionSearchResultsChanged.InvokeAsync(mentionSearchResults);
-            }
-
-            await InvokeAsync(StateHasChanged);
+            get => MentionDisplaySize;
+            set => MentionDisplaySize = value;
         }
 
         /// <summary>
@@ -450,6 +459,13 @@ namespace Radzen.Blazor
         public ChatUser? GetUser(string userId)
         {
             return Users.FirstOrDefault(p => p.Id == userId);
+        }
+
+        /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+            ApplyMentionUsersFromParameters();
         }
 
         /// <summary>
@@ -717,6 +733,10 @@ namespace Radzen.Blazor
                 {
                     selectedMentionIndex = Math.Min(selectedMentionIndex + 1, mentionSearchResults.Count - 1);
                     preventDefault = true;
+                    if (selectedMentionIndex == mentionSearchResults.Count - 1)
+                    {
+                        await LoadMoreMentionUsersIfNeeded();
+                    }
                     await InvokeAsync(StateHasChanged);
                     return;
                 }
@@ -777,6 +797,10 @@ namespace Radzen.Blazor
         {
             if (!MentionCharacter.HasValue || MentionSearch.HasDelegate == false)
             {
+                if (isMentionPopupOpen)
+                {
+                    await CloseMentionPopup();
+                }
                 return;
             }
 
@@ -785,7 +809,7 @@ namespace Radzen.Blazor
 
             // Check if mention character appears at the start or after whitespace
             int mentionPos = -1;
-            
+
             for (int i = trimmedInput.Length - 1; i >= 0; i--)
             {
                 if (trimmedInput[i] == char_code)
@@ -807,7 +831,7 @@ namespace Radzen.Blazor
             {
                 // Extract search text after the mention character
                 var searchText = trimmedInput.Substring(mentionPos + 1);
-                
+
                 // Check if this is a continuous mention (no spaces in search text)
                 if (!searchText.Contains(' ', StringComparison.Ordinal))
                 {
@@ -823,6 +847,11 @@ namespace Radzen.Blazor
 
         private async Task PerformMentionSearch(string filter)
         {
+            await PerformMentionSearch(filter, 0, append: false);
+        }
+
+        private async Task PerformMentionSearch(string filter, int skip, bool append)
+        {
             if (!MentionSearch.HasDelegate)
             {
                 return;
@@ -834,22 +863,19 @@ namespace Radzen.Blazor
 
             try
             {
-                var searchArgs = new MentionSearchArgs 
-                { 
+                mentionSearchRequested = true;
+                appendMentionUsersOnNextUpdate = append;
+                isLoadingMentionUsers = true;
+
+                var searchArgs = new MentionSearchArgs
+                {
                     Filter = filter,
-                    Skip = 0,
-                    Top = MentionMaxResults
+                    Skip = skip,
+                    Top = Math.Max(1, MentionDisplaySize)
                 };
 
                 await MentionSearch.InvokeAsync(searchArgs);
-                isMentionPopupOpen = true;
-                selectedMentionIndex = 0;
-                
-                if (MentionSearchResultsChanged.HasDelegate)
-                {
-                    await MentionSearchResultsChanged.InvokeAsync(mentionSearchResults);
-                }
-
+                isLoadingMentionUsers = false;
                 await InvokeAsync(StateHasChanged);
             }
             catch (OperationCanceledException)
@@ -894,15 +920,14 @@ namespace Radzen.Blazor
             mentionSearchText = string.Empty;
             selectedMentionIndex = -1;
             mentionStartPosition = -1;
-            
+            isLoadingMentionUsers = false;
+            hasMoreMentionUsers = false;
+            mentionSearchRequested = false;
+            appendMentionUsersOnNextUpdate = false;
+
             mentionSearchCts?.Cancel();
             mentionSearchCts?.Dispose();
             mentionSearchCts = null;
-
-            if (MentionSearchResultsChanged.HasDelegate)
-            {
-                await MentionSearchResultsChanged.InvokeAsync(mentionSearchResults);
-            }
 
             await InvokeAsync(StateHasChanged);
         }
@@ -910,6 +935,77 @@ namespace Radzen.Blazor
         private async Task OnMentionItemClick(MentionUserContext user)
         {
             await InsertMention(user);
+        }
+
+        private async Task OnMentionPopupScroll()
+        {
+            await LoadMoreMentionUsersIfNeeded();
+        }
+
+        private async Task LoadMoreMentionUsersIfNeeded()
+        {
+            if (!isMentionPopupOpen || !hasMoreMentionUsers || isLoadingMentionUsers || !MentionSearch.HasDelegate || JSRuntime == null)
+            {
+                return;
+            }
+
+            var isNearBottom = await JSRuntime.InvokeAsync<bool>("Radzen.isScrolledToBottom", mentionPopupElement, 8);
+            if (!isNearBottom)
+            {
+                return;
+            }
+
+            await PerformMentionSearch(mentionSearchText, mentionSearchResults.Count, append: true);
+        }
+
+        private void ApplyMentionUsersFromParameters()
+        {
+            if (!MentionCharacter.HasValue)
+            {
+                isMentionPopupOpen = false;
+                mentionSearchResults.Clear();
+                hasMoreMentionUsers = false;
+                appendMentionUsersOnNextUpdate = false;
+                mentionSearchRequested = false;
+                isLoadingMentionUsers = false;
+                return;
+            }
+
+            if (!mentionSearchRequested && !isMentionPopupOpen && !appendMentionUsersOnNextUpdate && !(MentionUsers?.Any() == true))
+            {
+                return;
+            }
+
+            var incomingUsers = MentionUsers?.ToList() ?? new List<MentionUserContext>();
+            var hasIncomingUsers = incomingUsers.Count > 0;
+            if (appendMentionUsersOnNextUpdate && mentionSearchResults.Count > 0)
+            {
+                foreach (var incomingUser in incomingUsers)
+                {
+                    if (!mentionSearchResults.Any(existingUser =>
+                        string.Equals(existingUser.UserId, incomingUser.UserId, StringComparison.Ordinal) &&
+                        string.Equals(existingUser.UserName, incomingUser.UserName, StringComparison.Ordinal)))
+                    {
+                        mentionSearchResults.Add(incomingUser);
+                    }
+                }
+            }
+            else
+            {
+                mentionSearchResults = incomingUsers;
+                selectedMentionIndex = mentionSearchResults.Count > 0 ? 0 : -1;
+            }
+
+            hasMoreMentionUsers = MentionUsersCount.HasValue && MentionUsersCount.Value > mentionSearchResults.Count;
+            isMentionPopupOpen = hasIncomingUsers || (mentionSearchRequested && isLoadingMentionUsers);
+            appendMentionUsersOnNextUpdate = false;
+            mentionSearchRequested = false;
+            isLoadingMentionUsers = false;
+
+            if (selectedMentionIndex >= mentionSearchResults.Count)
+            {
+                selectedMentionIndex = mentionSearchResults.Count - 1;
+            }
         }
 
         private string BuildStoredMessageInput()
@@ -1089,7 +1185,7 @@ namespace Radzen.Blazor
         internal List<(int start, int end, string userId)> ParseMentions(string text)
         {
             var mentions = new List<(int, int, string)>();
-            
+
             if (string.IsNullOrEmpty(text) || !MentionCharacter.HasValue)
             {
                 return mentions;
@@ -1097,7 +1193,7 @@ namespace Radzen.Blazor
 
             var pattern = $@"\{MentionCharacter}\[([^\]]+)\]";
             var regex = new System.Text.RegularExpressions.Regex(pattern);
-            
+
             foreach (System.Text.RegularExpressions.Match match in regex.Matches(text))
             {
                 var userId = match.Groups[1].Value;
