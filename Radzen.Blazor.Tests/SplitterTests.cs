@@ -76,7 +76,7 @@ namespace Radzen.Blazor.Tests
             var controls = separator.GetAttribute("aria-controls");
 
             Assert.False(string.IsNullOrEmpty(controls));
-            component.Find($"#{controls}");
+            component.Find($"[id=\"{controls}\"]");
         }
 
         [Fact]
