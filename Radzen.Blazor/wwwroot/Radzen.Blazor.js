@@ -5842,10 +5842,11 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
   }};
 };
 class Spreadsheet {
-  constructor(element, dotNetRef, shortcuts) {
+  constructor(element, dotNetRef, shortcuts, globalShortcuts) {
     this.element = element;
     this.dotNetRef = dotNetRef;
     this.shortcuts = shortcuts;
+    this.globalShortcuts = globalShortcuts || [];
     this.rtl = Radzen.isRTL(element);
     this.element.addEventListener('keydown', this.onKeyDown);
     this.element.addEventListener('pointerdown', this.onPointerDown);
@@ -5977,6 +5978,10 @@ class Spreadsheet {
       e.preventDefault();
       const column = +e.target.dataset.column;
       this.dotNetRef.invokeMethodAsync('OnColumnContextMenuAsync', { column, pointer: this.toEventArgs(e) });
+    } else if (e.target === this.element) {
+      // Keyboard-triggered (Shift+F10 / Menu key) lands on the grid root, not a cell. Suppress the
+      // browser's native menu; the C# Shift+F10 shortcut opens our menu at the active cell.
+      e.preventDefault();
     }
   }
 
@@ -6036,7 +6041,15 @@ class Spreadsheet {
 
     key += e.code.replace('Key', '').replace('Digit', '').replace('Numpad', '');
 
-    if (this.shortcuts.includes(key)) {
+    // Grid context = focus on THIS spreadsheet's root or inside one of ITS cell/formula editors.
+    // Scope the editor check to this.element so a sibling spreadsheet on the same page can never
+    // match. Outside the grid (a toolbar button, sheet tab, ...) only global shortcuts act, so Tab
+    // etc. stay native and the chrome is keyboard-navigable.
+    const editorInput = e.target.closest && e.target.closest('.rz-spreadsheet-editor-input');
+    const isGridContext = e.target === this.element ||
+      (editorInput != null && this.element.contains(editorInput));
+
+    if (this.globalShortcuts.includes(key) || (isGridContext && this.shortcuts.includes(key))) {
       e.preventDefault();
     }
 
@@ -6047,7 +6060,72 @@ class Spreadsheet {
       e.preventDefault();
     }
 
-    this.invokeAsync('OnKeyDownAsync', e);
+    this.dotNetRef.invokeMethodAsync('OnKeyDownAsync', this.toEventArgs(e), isGridContext);
+  }
+
+  // F6 / Shift+F6 cycle focus between the spreadsheet regions: ribbon tabs -> active toolbar ->
+  // formula bar -> grid -> sheet tabs. This is the advertised escape from the grid (WCAG 2.1.2).
+  focusAdjacent = (forward) => {
+    // this.element IS this spreadsheet's root (.rz-spreadsheet, role=application). querySelector
+    // only matches descendants of root, so regions from another spreadsheet on the page are never
+    // matched.
+    const root = this.element;
+    const regions = [
+      root.querySelector('[role="tablist"], .rz-tabs-nav'),
+      root.querySelector('.rz-toolbar'),
+      root.querySelector('.rz-spreadsheet-formula-editor .rz-spreadsheet-editor-input'),
+      root,
+      root.querySelector('.rz-spreadsheet-sheet-tabs')
+    ].filter(r => r);
+
+    if (regions.length === 0) {
+      return;
+    }
+
+    // Regions nest (the ribbon tabview contains the toolbar; the root contains everything), so pick
+    // the INNERMOST region that contains the focused element - otherwise an outer region captures
+    // focus that belongs to a nested one and F6 gets stuck cycling between two regions.
+    const active = document.activeElement;
+    let index = -1;
+    let best = null;
+    regions.forEach((r, i) => {
+      if ((r === active || r.contains(active)) && (best === null || best.contains(r))) {
+        best = r;
+        index = i;
+      }
+    });
+    if (index === -1) {
+      index = regions.indexOf(root);
+    }
+
+    const next = (index + (forward ? 1 : -1) + regions.length) % regions.length;
+    this.focusRegion(regions[next]);
+  }
+
+  focusRegion = (region) => {
+    if (region === this.element) {
+      region.focus();
+      return;
+    }
+
+    const focusable = region.matches('.rz-spreadsheet-editor-input')
+      ? region
+      : region.querySelector('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]');
+
+    (focusable || region).focus();
+  }
+
+  // Opens the cell context menu at the active cell (Shift+F10 / ContextMenu key). The cell element is
+  // scoped to this spreadsheet; a synthetic pointer carries its on-screen position.
+  openCellContextMenu = (row, column) => {
+    const cell = this.element.querySelector('.rz-spreadsheet-cell[data-row="' + row + '"][data-column="' + column + '"]');
+    const rect = (cell || this.element).getBoundingClientRect();
+    const pointer = {
+      clientX: Math.round(rect.left + 8),
+      clientY: Math.round(cell ? rect.bottom : rect.top + 8),
+      button: 0, buttons: 0, pointerType: 'mouse', isPrimary: true
+    };
+    this.dotNetRef.invokeMethodAsync('OnCellContextMenuAsync', { row, column, pointer });
   }
 
   invokeAsync(name, e) {
@@ -6057,7 +6135,9 @@ class Spreadsheet {
   toEventArgs(e) {
     return {
       key: e.key,
-      code: e.code,
+      code: this.rtl && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')
+        ? (e.code === 'ArrowLeft' ? 'ArrowRight' : 'ArrowLeft')
+        : e.code,
       location: e.location,
       repeat: e.repeat,
       ctrlKey: e.ctrlKey,
@@ -6248,7 +6328,7 @@ class SheetEditor {
          e.stopPropagation();
          e.preventDefault();
          this.dotNetRef.invokeMethodAsync('OnKeyDownAsync', { key: e.key });
-       } else if (e.key != 'Enter' && e.key != 'Escape' && e.key != 'Tab') {
+       } else if (e.key != 'Enter' && e.key != 'Escape' && e.key != 'Tab' && e.key != 'F6') {
          e.stopPropagation();
        }
     }
@@ -6291,7 +6371,7 @@ class SheetEditor {
 
 
 Radzen.createSheetEditor = (element, value, autoFocus, dotNetRef) => new SheetEditor(element, value, autoFocus, dotNetRef);
-Radzen.createSpreadsheet = (element, dotNetRef, shortcuts) => new Spreadsheet(element, dotNetRef, shortcuts);
+Radzen.createSpreadsheet = (element, dotNetRef, shortcuts, globalShortcuts) => new Spreadsheet(element, dotNetRef, shortcuts, globalShortcuts);
 Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
   var height = scrollable.clientHeight;
   var width = scrollable.clientWidth;

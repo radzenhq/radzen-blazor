@@ -6,7 +6,7 @@
 @inherits RadzenSpreadsheetToolBase
 @inject DialogService DialogService
 
-<RadzenButton Icon="link" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click=@OnClickAsync Size="ButtonSize.Small"
+<RadzenButton aria-label=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertHyperlink))) Icon="link" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click=@OnClickAsync Size="ButtonSize.Small"
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertHyperlink)) ?? "Insert Hyperlink") />
 
 @code {

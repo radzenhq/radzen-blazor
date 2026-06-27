@@ -4,7 +4,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenDropDown Value=@CurrentFormat ValueChanged=@OnFormatChangedAsync TValue="string" Data=@FormatOptions TextProperty="Name" ValueProperty="FormatCode"
+<RadzenDropDown EmptyAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataFormat))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataFormat))) Value=@CurrentFormat ValueChanged=@OnFormatChangedAsync TValue="string" Data=@FormatOptions TextProperty="Name" ValueProperty="FormatCode"
     Disabled=@IsDisabled InputSize="InputSize.Small" Style="width: 130px" />
 
 @code {

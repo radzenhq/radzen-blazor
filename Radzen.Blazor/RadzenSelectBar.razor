@@ -23,7 +23,7 @@
             <button type="button" @ref="@item.Element" id="@item.GetItemId()"
                 @onclick="@(args => SelectItem(item))"
                 @attributes="item.Attributes" style="@item.Style" class=@ButtonClass(item)
-                aria-label="@item.Text" aria-pressed="@(IsSelected(item)? "true" : "false")"
+                aria-label="@(item.AriaLabel ?? item.Text)" aria-pressed="@(IsSelected(item)? "true" : "false")"
                 disabled="@(Disabled || item.Disabled)" tabindex="-1">
                 @if (item.Template != null)
                 {

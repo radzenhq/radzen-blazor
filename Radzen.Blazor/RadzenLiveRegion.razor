@@ -1,0 +1,23 @@
+@namespace Radzen.Blazor
+@*
+    A visually-hidden ARIA live region. The element is rendered on first render with empty text so
+    assistive technology registers it before any message is injected (injecting a live region together
+    with its first message is a common WCAG 4.1.3 Status Messages failure). Set Text to announce.
+*@
+<div role=@(Assertive ? "alert" : "status") aria-live=@(Assertive ? "assertive" : "polite") aria-atomic="true"
+     style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0">@Text</div>
+
+@code {
+    /// <summary>
+    /// The message to announce. Assigning a new (different) value triggers an announcement.
+    /// </summary>
+    [Parameter]
+    public string? Text { get; set; }
+
+    /// <summary>
+    /// When <c>true</c> the region is <c>role="alert"</c> / <c>aria-live="assertive"</c> (interrupts the
+    /// user). Default is a polite <c>role="status"</c> region.
+    /// </summary>
+    [Parameter]
+    public bool Assertive { get; set; }
+}

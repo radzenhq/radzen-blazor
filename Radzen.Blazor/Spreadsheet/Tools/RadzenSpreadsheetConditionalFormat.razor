@@ -6,7 +6,7 @@
 @inject DialogService DialogService
 @inherits RadzenSpreadsheetToolBase
 
-<RadzenSplitButton Click=@OnClickAsync Icon="format_color_fill" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Conditional)) ?? "Conditional") Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+<RadzenSplitButton ButtonAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ConditionalFormatTool))) OpenAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ConditionalFormatTool))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ConditionalFormatTool))) Click=@OnClickAsync Icon="format_color_fill" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Conditional)) ?? "Conditional") Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_GreaterThanMenu)) ?? "Greater Than...") Value="greater" />
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_LessThanMenu)) ?? "Less Than...") Value="less" />

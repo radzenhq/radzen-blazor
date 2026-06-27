@@ -3,7 +3,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenToggleButton Value=@IsAutoFilterEnabled ValueChanged=@OnToggleAutoFilterAsync Icon="filter_list" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+<RadzenToggleButton AriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AutoFilter))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AutoFilter))) Value=@IsAutoFilterEnabled ValueChanged=@OnToggleAutoFilterAsync Icon="filter_list" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
     ToggleVariant="Variant.Flat" ToggleButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Lighter" />
 
 @code {

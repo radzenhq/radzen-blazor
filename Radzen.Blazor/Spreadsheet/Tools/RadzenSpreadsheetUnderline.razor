@@ -2,7 +2,7 @@
 @using Radzen.Documents.Spreadsheet
 @inherits RadzenSpreadsheetFormatToggleToolBase
 
-<RadzenToggleButton Value=@IsToggled ValueChanged=@OnToggledChangedAsync Icon="format_underlined" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
+<RadzenToggleButton AriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Underline))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Underline))) Value=@IsToggled ValueChanged=@OnToggledChangedAsync Icon="format_underlined" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
     ToggleVariant="Variant.Flat" ToggleButtonStyle="ButtonStyle.Primary" ToggleShade="Shade.Lighter" />
 
 @code {

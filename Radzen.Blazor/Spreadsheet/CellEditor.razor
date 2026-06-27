@@ -18,7 +18,8 @@
     else
     {
         <SheetEditor @bind-Value=@Editor.Value AutoFocus=@(Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
-            Worksheet=@Worksheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) style=@editorStyle />
+            Worksheet=@Worksheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) style=@editorStyle
+            InputAttributes=@(new Dictionary<string, object> { { "aria-label", Spreadsheet.Localize(nameof(RadzenStrings.Spreadsheet_CellEditorLabel)) } }) />
     }
 </div>
 }

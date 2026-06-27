@@ -3,7 +3,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnRedoAsync Icon="redo" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+<RadzenButton aria-label=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Redo))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Redo))) Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnRedoAsync Icon="redo" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
 
 @code {
 #nullable enable

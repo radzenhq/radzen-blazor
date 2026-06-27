@@ -3,7 +3,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenDropDown Value=@CurrentFontFamily ValueChanged=@OnFontFamilyChangedAsync TValue="string" Data=@FontFamilies
+<RadzenDropDown EmptyAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FontFamily))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_FontFamily))) Value=@CurrentFontFamily ValueChanged=@OnFontFamilyChangedAsync TValue="string" Data=@FontFamilies
     Disabled=@IsDisabled InputSize="InputSize.Small" Style="width: 140px" />
 
 @code {
