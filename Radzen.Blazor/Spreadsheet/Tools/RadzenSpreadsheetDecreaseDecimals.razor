@@ -4,7 +4,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenButton Text=".0-" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnClick title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DecreaseDecimalPlaces)) ?? "Decrease decimal places") />
+<RadzenButton aria-label=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DecreaseDecimalPlaces))) Text=".0-" Disabled=@IsDisabled Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnClick title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DecreaseDecimalPlaces)) ?? "Decrease decimal places") />
 
 @code {
 #nullable enable

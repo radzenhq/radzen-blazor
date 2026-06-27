@@ -5,9 +5,9 @@
 
 <RadzenSelectBar Value=@CurrentTextAlign ValueChanged=@OnTextAlignChangedAsync TValue="Radzen.TextAlign" Disabled=@IsDisabled Size="ButtonSize.Small">
     <Items>
-        <RadzenSelectBarItem Value=@Radzen.TextAlign.Left Icon="format_align_left" />
-        <RadzenSelectBarItem Value=@Radzen.TextAlign.Center Icon="format_align_center" />
-        <RadzenSelectBarItem Value=@Radzen.TextAlign.Right Icon="format_align_right" />
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Left Icon="format_align_left" AriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AlignLeft))) />
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Center Icon="format_align_center" AriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AlignCenter))) />
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Right Icon="format_align_right" AriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AlignRight))) />
     </Items>
 </RadzenSelectBar>
 

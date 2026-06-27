@@ -4,7 +4,7 @@
 @using Radzen.Documents.Spreadsheet
 @inherits RadzenSpreadsheetToolBase
 
-<RadzenSplitButton Click=@OnClick Icon="border_all" Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+<RadzenSplitButton ButtonAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CellBorders))) OpenAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CellBorders))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CellBorders))) Click=@OnClick Icon="border_all" Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AllBorders)) ?? "All Borders") Value="all" />
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_OutsideBorders)) ?? "Outside Borders") Value="outside" />

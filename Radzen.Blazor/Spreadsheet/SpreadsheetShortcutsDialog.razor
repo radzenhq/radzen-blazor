@@ -1,0 +1,39 @@
+@namespace Radzen.Blazor.Spreadsheet
+@using Radzen.Blazor
+
+@* A read-only reference of keyboard shortcuts, opened from the grid via Alt+/. The rows are built
+   and localized by the host (RadzenSpreadsheet) and passed in, so this dialog needs no cascade. *@
+<RadzenTable class="rz-spreadsheet-shortcuts">
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell>@ShortcutColumn</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>@ActionColumn</RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        @foreach (var shortcut in Shortcuts)
+        {
+            <RadzenTableRow>
+                <RadzenTableCell style="white-space:nowrap"><kbd>@shortcut.Keys</kbd></RadzenTableCell>
+                <RadzenTableCell>@shortcut.Description</RadzenTableCell>
+            </RadzenTableRow>
+        }
+    </RadzenTableBody>
+</RadzenTable>
+
+@code {
+    /// <summary>Represents one keyboard shortcut row: the key combination and what it does.</summary>
+    public sealed record Shortcut(string Keys, string Description);
+
+    /// <summary>The localized shortcut rows to display, supplied by the host.</summary>
+    [Parameter]
+    public IReadOnlyList<Shortcut> Shortcuts { get; set; } = [];
+
+    /// <summary>Localized "Shortcut" column header.</summary>
+    [Parameter]
+    public string? ShortcutColumn { get; set; }
+
+    /// <summary>Localized "Action" column header.</summary>
+    [Parameter]
+    public string? ActionColumn { get; set; }
+}

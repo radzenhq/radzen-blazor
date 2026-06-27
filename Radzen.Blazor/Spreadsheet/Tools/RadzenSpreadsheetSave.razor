@@ -4,7 +4,7 @@
 @using System.IO
 @inject IJSRuntime JSRuntime
 
-<RadzenSplitButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Icon="download" ButtonType="ButtonType.Button" Size="ButtonSize.Small"
+<RadzenSplitButton ButtonAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Save))) OpenAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Save))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Save))) Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Icon="download" ButtonType="ButtonType.Button" Size="ButtonSize.Small"
     Disabled=@(Workbook is null) Click=@OnClickAsync>
     <ChildContent>
         <RadzenSplitButtonItem Text="Excel (.xlsx)" Icon="table_view" Value="xlsx" />
@@ -17,6 +17,9 @@
 
     [CascadingParameter]
     public Worksheet? Worksheet { get; set; }
+
+    [CascadingParameter]
+    public ISpreadsheet? Spreadsheet { get; set; }
 
     private Workbook? Workbook => Worksheet?.Workbook;
 

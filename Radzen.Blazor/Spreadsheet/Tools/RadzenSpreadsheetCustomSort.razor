@@ -4,7 +4,7 @@
 @inherits RadzenSpreadsheetToolBase
 @inject DialogService DialogService
 
-<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" ButtonType="ButtonType.Button"
+<RadzenButton aria-label=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_CustomSort))) Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" ButtonType="ButtonType.Button"
     Disabled=@IsDisabled
     Click=@OnClick
     Icon="sort"

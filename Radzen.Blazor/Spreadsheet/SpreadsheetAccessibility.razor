@@ -1,0 +1,8 @@
+@namespace Radzen.Blazor.Spreadsheet
+@using Radzen.Blazor
+
+@* Three live regions, present (empty) from first render. nav = cell navigation, action = transient
+   action results, alert = assertive validation/error messages. *@
+<RadzenLiveRegion Text=@navText />
+<RadzenLiveRegion Text=@actionText />
+<RadzenLiveRegion Text=@alertText Assertive="true" />

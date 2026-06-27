@@ -2,7 +2,7 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 @inherits RadzenSpreadsheetToolBase
-<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnInsertRowBeforeClick Icon="add_row_above" ButtonType="ButtonType.Button" Disabled=@IsDisabled
+<RadzenButton aria-label=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertRowAbove))) Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Click=@OnInsertRowBeforeClick Icon="add_row_above" ButtonType="ButtonType.Button" Disabled=@IsDisabled
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertRowAbove)) ?? "Insert Row Above") />
 @code {
     protected override SpreadsheetFeature? Feature => SpreadsheetFeature.Editing;

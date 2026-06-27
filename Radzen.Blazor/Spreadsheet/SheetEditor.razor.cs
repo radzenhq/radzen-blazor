@@ -68,6 +68,14 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
     public IReadOnlyDictionary<string, object>? Attributes { get; set; }
 
     /// <summary>
+    /// Gets or sets HTML attributes applied to the inner contenteditable (the focusable text field):
+    /// e.g. <c>aria-label</c>, <c>aria-invalid</c>, <c>tabindex</c>. Unlike <see cref="Attributes"/>
+    /// (which lands on the outer wrapper), these reach the element the screen reader names and focuses.
+    /// </summary>
+    [Parameter]
+    public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the content editable element should automatically receive focus when rendered.
     /// </summary>
     [Parameter]

@@ -6,7 +6,7 @@
 @inject DialogService DialogService
 @inherits RadzenSpreadsheetToolBase
 
-<RadzenSplitButton Click=@OnClickAsync Icon="rule" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Validation)) ?? "Validation") Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
+<RadzenSplitButton ButtonAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationTool))) OpenAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationTool))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationTool))) Click=@OnClickAsync Icon="rule" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Validation)) ?? "Validation") Disabled=@IsDisabled Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small">
     <ChildContent>
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationMenu)) ?? "Data Validation...") Value="validate" />
         <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ClearValidation)) ?? "Clear Validation") Value="clear" />

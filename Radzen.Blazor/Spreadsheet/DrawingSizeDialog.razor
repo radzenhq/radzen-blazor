@@ -1,0 +1,54 @@
+@namespace Radzen.Blazor.Spreadsheet
+@using Radzen.Blazor
+@inject DialogService DialogService
+
+@* Keyboard resize for a selected image/chart - the non-drag pointer alternative (WCAG 2.5.7).
+   The host supplies the current size and localized labels; OK returns the new Size. *@
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text=@WidthLabel Component="rz-drawing-width" style="min-width:6rem" />
+        <RadzenNumeric @bind-Value=@width TValue="double" Min="1" Name="rz-drawing-width" aria-label=@WidthLabel />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text=@HeightLabel Component="rz-drawing-height" style="min-width:6rem" />
+        <RadzenNumeric @bind-Value=@height TValue="double" Min="1" Name="rz-drawing-height" aria-label=@HeightLabel />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+        <RadzenButton Text=@CancelText Click=@(() => DialogService.Close(null)) Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" />
+        <RadzenButton Text=@OkText Click=@OnOk ButtonStyle="ButtonStyle.Primary" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    /// <summary>Represents the chosen drawing size in pixels.</summary>
+    public sealed record Size(double Width, double Height);
+
+    /// <summary>The current width in pixels.</summary>
+    [Parameter] public double Width { get; set; }
+
+    /// <summary>The current height in pixels.</summary>
+    [Parameter] public double Height { get; set; }
+
+    /// <summary>Localized label for the width input.</summary>
+    [Parameter] public string? WidthLabel { get; set; }
+
+    /// <summary>Localized label for the height input.</summary>
+    [Parameter] public string? HeightLabel { get; set; }
+
+    /// <summary>Localized confirm-button text.</summary>
+    [Parameter] public string? OkText { get; set; }
+
+    /// <summary>Localized cancel-button text.</summary>
+    [Parameter] public string? CancelText { get; set; }
+
+    private double width;
+    private double height;
+
+    protected override void OnInitialized()
+    {
+        width = Width;
+        height = Height;
+    }
+
+    private void OnOk() => DialogService.Close(new Size(width, height));
+}

@@ -66,6 +66,14 @@ namespace Radzen.Blazor
         public object? Value { get; set; }
 
         /// <summary>
+        /// Gets or sets the accessible label (<c>aria-label</c>) for the item. Falls back to <see cref="Text"/> when
+        /// not set. Use this to name icon-only items that have no visible <see cref="Text"/> (WCAG 4.1.2).
+        /// </summary>
+        /// <value>The accessible label.</value>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenSelectBarItem"/> is disabled.
         /// </summary>
         /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>

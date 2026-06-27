@@ -3,7 +3,7 @@
 @using Radzen.Documents.Spreadsheet
 @implements IDisposable
 
-<RadzenColorPicker Value=@CurrentColor ValueChanged=@OnColorChangedAsync Icon="opacity" Disabled=@IsDisabled InputSize="InputSize.Small" ShowArrow="false" />
+<RadzenColorPicker ToggleAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_BackgroundColor))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_BackgroundColor))) Value=@CurrentColor ValueChanged=@OnColorChangedAsync Icon="opacity" Disabled=@IsDisabled InputSize="InputSize.Small" ShowArrow="false" />
 
 @code {
 #nullable enable
