@@ -27,7 +27,6 @@ public partial class SpreadsheetAccessibility : ComponentBase, IDisposable
     private string? navText;
     private string? actionText;
     private string? alertText;
-    private string? lastNav;
     private string? lastRange;
 
     private readonly EventBinding<Selection> selectionBinding;
@@ -59,9 +58,8 @@ public partial class SpreadsheetAccessibility : ComponentBase, IDisposable
 
         // Active cell (polite nav region) - skip identical consecutive announcements.
         var nav = BuildAnnouncement(Worksheet, Worksheet.Selection.Cell, Localize);
-        if (nav != lastNav)
+        if (nav != navText)
         {
-            lastNav = nav;
             navText = nav;
             changed = true;
         }

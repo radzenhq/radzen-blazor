@@ -985,6 +985,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task CycleSelectionAsync(int rowOffset, int columnOffset)
     {
+        // The formula bar is a persistent editor, so after Tab/Enter commits there focus stays in it
+        // unless we move it back to the grid (Excel/Sheets parity). The in-cell editor closes on
+        // commit, so it doesn't need this. AcceptAsync resets the mode, so capture it first.
+        var fromFormulaBar = Editor?.Mode == EditMode.Formula;
+
         if (await AcceptAsync())
         {
             if (Worksheet is not null)
@@ -992,6 +997,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 var address = Worksheet.Selection.Cycle(rowOffset, columnOffset);
 
                 await ScrollToAsync(address);
+
+                if (fromFormulaBar)
+                {
+                    await Element.FocusAsync();
+                }
             }
         }
     }
@@ -1102,8 +1112,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
         else
         {
-            var found = false;
-
+            // Skip blanks to the next populated cell; if there is none, this walks to the sheet edge.
             while (InBounds(r + dRow, c + dColumn))
             {
                 r += dRow;
@@ -1111,17 +1120,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                 if (Has(r, c))
                 {
-                    found = true;
                     break;
-                }
-            }
-
-            if (!found)
-            {
-                while (InBounds(r + dRow, c + dColumn))
-                {
-                    r += dRow;
-                    c += dColumn;
                 }
             }
         }
@@ -1210,13 +1209,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             if (Worksheet.Images.Count > 0)
             {
                 Worksheet.SelectedImage = Worksheet.Images[0];
-                AnnounceDrawing();
             }
             else if (Worksheet.Charts.Count > 0)
             {
                 Worksheet.SelectedChart = Worksheet.Charts[0];
-                AnnounceDrawing();
             }
+
+            AnnounceDrawing();
         }
         else
         {
@@ -1453,11 +1452,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         return Task.CompletedTask;
     }
 
-    private readonly Dictionary<string, Func<KeyboardEventArgs, Task>> shortcuts = [];
+    // A keyboard shortcut: the action to run, and whether it acts regardless of focus context. Global
+    // shortcuts (F6 region escape, undo/redo, help) fire from anywhere; the rest are grid-only.
+    private sealed record Shortcut(Func<KeyboardEventArgs, Task> Action, bool Global = false);
 
-    // Shortcuts that fire regardless of focus context (from the toolbar, formula bar, etc.).
-    // Everything else in shortcuts is grid-only - dispatched only when focus is in the grid/editor.
-    private readonly HashSet<string> globalShortcuts = [];
+    private readonly Dictionary<string, Shortcut> shortcuts = [];
+
+    private void Bind(string key, Func<KeyboardEventArgs, Task> action, bool global = false)
+        => shortcuts.Add(key, new Shortcut(action, global));
 
     // Approximate page size (rows) for PageUp/PageDown - a screenful without coupling to the viewport.
     private const int PageRows = 20;
@@ -1468,67 +1470,61 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     protected override void OnInitialized()
     {
         workbook = Workbook;
-        shortcuts.Add("Enter", _ => CycleSelectionAsync(1, 0));
-        shortcuts.Add("Escape", _ => CancelEditAsync());
-        shortcuts.Add("Tab", _ => CycleSelectionAsync(0, 1));
-        shortcuts.Add("ArrowUp", _ => MoveSelectionAsync(-1, 0));
-        shortcuts.Add("ArrowDown", _ => MoveSelectionAsync(1, 0));
-        shortcuts.Add("ArrowLeft", _ => MoveSelectionAsync(0, -1));
-        shortcuts.Add("ArrowRight", _ => MoveSelectionAsync(0, 1));
-        shortcuts.Add("Shift+Tab", _ => CycleSelectionAsync(0, -1));
-        shortcuts.Add("Shift+Enter", _ => CycleSelectionAsync(-1, 0));
-        shortcuts.Add("Shift+ArrowUp", _ => ExtendSelectionAsync(-1, 0));
-        shortcuts.Add("Shift+ArrowDown", _ => ExtendSelectionAsync(1, 0));
-        shortcuts.Add("Shift+ArrowLeft", _ => ExtendSelectionAsync(0, -1));
-        shortcuts.Add("Shift+ArrowRight", _ => ExtendSelectionAsync(0, 1));
-        shortcuts.Add("Home", _ => MoveToAsync(c => new CellRef(c.Row, 0)));
-        shortcuts.Add("End", _ => MoveToAsync(c => new CellRef(c.Row, GetUsedEnd().Column)));
-        shortcuts.Add("Ctrl+Home", _ => MoveToAsync(_ => new CellRef(0, 0)));
-        shortcuts.Add("Ctrl+End", _ => MoveToAsync(_ => GetUsedEnd()));
-        shortcuts.Add("Ctrl+A", _ => SelectUsedRangeAsync());
-        shortcuts.Add("Shift+Home", _ => ExtendToAsync(c => new CellRef(c.Row, 0)));
-        shortcuts.Add("Shift+End", _ => ExtendToAsync(c => new CellRef(c.Row, GetUsedEnd().Column)));
-        shortcuts.Add("Ctrl+Shift+Home", _ => ExtendToAsync(_ => new CellRef(0, 0)));
-        shortcuts.Add("Ctrl+Shift+End", _ => ExtendToAsync(_ => GetUsedEnd()));
-        shortcuts.Add("Ctrl+ArrowUp", _ => MoveToAsync(c => FindEdge(c, -1, 0)));
-        shortcuts.Add("Ctrl+ArrowDown", _ => MoveToAsync(c => FindEdge(c, 1, 0)));
-        shortcuts.Add("Ctrl+ArrowLeft", _ => MoveToAsync(c => FindEdge(c, 0, -1)));
-        shortcuts.Add("Ctrl+ArrowRight", _ => MoveToAsync(c => FindEdge(c, 0, 1)));
-        shortcuts.Add("Ctrl+Shift+ArrowUp", _ => ExtendToAsync(c => FindEdge(c, -1, 0)));
-        shortcuts.Add("Ctrl+Shift+ArrowDown", _ => ExtendToAsync(c => FindEdge(c, 1, 0)));
-        shortcuts.Add("Ctrl+Shift+ArrowLeft", _ => ExtendToAsync(c => FindEdge(c, 0, -1)));
-        shortcuts.Add("Ctrl+Shift+ArrowRight", _ => ExtendToAsync(c => FindEdge(c, 0, 1)));
-        shortcuts.Add("Ctrl+Space", _ => SelectColumnAsync());
-        shortcuts.Add("Shift+Space", _ => SelectRowAsync());
-        shortcuts.Add("Shift+F10", _ => OpenContextMenuAtActiveCellAsync());
-        shortcuts.Add("ContextMenu", _ => OpenContextMenuAtActiveCellAsync());
-        shortcuts.Add("Ctrl+Alt+5", _ => EnterDrawingLayerAsync());
-        shortcuts.Add("PageDown", _ => MoveSelectionAsync(PageRows, 0));
-        shortcuts.Add("PageUp", _ => MoveSelectionAsync(-PageRows, 0));
-        shortcuts.Add("Shift+PageDown", _ => ExtendSelectionAsync(PageRows, 0));
-        shortcuts.Add("Shift+PageUp", _ => ExtendSelectionAsync(-PageRows, 0));
-        shortcuts.Add("Ctrl+D", _ => FillAsync(down: true));
-        shortcuts.Add("Ctrl+R", _ => FillAsync(down: false));
-        shortcuts.Add("Ctrl+C", _ => CopySelectionAsync());
-        shortcuts.Add("Ctrl+Z", _ => UndoAsync());
-        shortcuts.Add("Ctrl+X", _ => CutSelectionAsync());
-        shortcuts.Add("Ctrl+Shift+Z", _ => RedoAsync());
-        shortcuts.Add("Ctrl+Y", _ => RedoAsync());
-        shortcuts.Add("Delete", _ => DeleteSelectedAsync());
-        shortcuts.Add("Backspace", _ => DeleteSelectedAsync());
-        shortcuts.Add("F2", _ => StartEditActiveCellAsync());
-        shortcuts.Add("F6", _ => FocusRegionAsync(true));
-        shortcuts.Add("Shift+F6", _ => FocusRegionAsync(false));
-        shortcuts.Add("Alt+Slash", _ => OpenShortcutsHelpAsync());
+        Bind("Enter", _ => CycleSelectionAsync(1, 0));
+        Bind("Escape", _ => CancelEditAsync());
+        Bind("Tab", _ => CycleSelectionAsync(0, 1));
+        Bind("ArrowUp", _ => MoveSelectionAsync(-1, 0));
+        Bind("ArrowDown", _ => MoveSelectionAsync(1, 0));
+        Bind("ArrowLeft", _ => MoveSelectionAsync(0, -1));
+        Bind("ArrowRight", _ => MoveSelectionAsync(0, 1));
+        Bind("Shift+Tab", _ => CycleSelectionAsync(0, -1));
+        Bind("Shift+Enter", _ => CycleSelectionAsync(-1, 0));
+        Bind("Shift+ArrowUp", _ => ExtendSelectionAsync(-1, 0));
+        Bind("Shift+ArrowDown", _ => ExtendSelectionAsync(1, 0));
+        Bind("Shift+ArrowLeft", _ => ExtendSelectionAsync(0, -1));
+        Bind("Shift+ArrowRight", _ => ExtendSelectionAsync(0, 1));
+        Bind("Home", _ => MoveToAsync(c => new CellRef(c.Row, 0)));
+        Bind("End", _ => MoveToAsync(c => new CellRef(c.Row, GetUsedEnd().Column)));
+        Bind("Ctrl+Home", _ => MoveToAsync(_ => new CellRef(0, 0)));
+        Bind("Ctrl+End", _ => MoveToAsync(_ => GetUsedEnd()));
+        Bind("Ctrl+A", _ => SelectUsedRangeAsync());
+        Bind("Shift+Home", _ => ExtendToAsync(c => new CellRef(c.Row, 0)));
+        Bind("Shift+End", _ => ExtendToAsync(c => new CellRef(c.Row, GetUsedEnd().Column)));
+        Bind("Ctrl+Shift+Home", _ => ExtendToAsync(_ => new CellRef(0, 0)));
+        Bind("Ctrl+Shift+End", _ => ExtendToAsync(_ => GetUsedEnd()));
+        Bind("Ctrl+ArrowUp", _ => MoveToAsync(c => FindEdge(c, -1, 0)));
+        Bind("Ctrl+ArrowDown", _ => MoveToAsync(c => FindEdge(c, 1, 0)));
+        Bind("Ctrl+ArrowLeft", _ => MoveToAsync(c => FindEdge(c, 0, -1)));
+        Bind("Ctrl+ArrowRight", _ => MoveToAsync(c => FindEdge(c, 0, 1)));
+        Bind("Ctrl+Shift+ArrowUp", _ => ExtendToAsync(c => FindEdge(c, -1, 0)));
+        Bind("Ctrl+Shift+ArrowDown", _ => ExtendToAsync(c => FindEdge(c, 1, 0)));
+        Bind("Ctrl+Shift+ArrowLeft", _ => ExtendToAsync(c => FindEdge(c, 0, -1)));
+        Bind("Ctrl+Shift+ArrowRight", _ => ExtendToAsync(c => FindEdge(c, 0, 1)));
+        Bind("Ctrl+Space", _ => SelectColumnAsync());
+        Bind("Shift+Space", _ => SelectRowAsync());
+        Bind("Shift+F10", _ => OpenContextMenuAtActiveCellAsync());
+        Bind("ContextMenu", _ => OpenContextMenuAtActiveCellAsync());
+        Bind("Ctrl+Alt+5", _ => EnterDrawingLayerAsync());
+        Bind("PageDown", _ => MoveSelectionAsync(PageRows, 0));
+        Bind("PageUp", _ => MoveSelectionAsync(-PageRows, 0));
+        Bind("Shift+PageDown", _ => ExtendSelectionAsync(PageRows, 0));
+        Bind("Shift+PageUp", _ => ExtendSelectionAsync(-PageRows, 0));
+        Bind("Ctrl+D", _ => FillAsync(down: true));
+        Bind("Ctrl+R", _ => FillAsync(down: false));
+        Bind("Ctrl+C", _ => CopySelectionAsync());
+        Bind("Ctrl+X", _ => CutSelectionAsync());
+        Bind("Delete", _ => DeleteSelectedAsync());
+        Bind("Backspace", _ => DeleteSelectedAsync());
+        Bind("F2", _ => StartEditActiveCellAsync());
 
-        // F6 region escape, the shortcut help and undo/redo work from any focused element; the rest
-        // are grid-only.
-        globalShortcuts.Add("F6");
-        globalShortcuts.Add("Shift+F6");
-        globalShortcuts.Add("Alt+Slash");
-        globalShortcuts.Add("Ctrl+Z");
-        globalShortcuts.Add("Ctrl+Shift+Z");
-        globalShortcuts.Add("Ctrl+Y");
+        // Global: act from any focused element so F6 can always cycle/return, and undo/redo and the
+        // shortcut help still work from the toolbar or formula bar.
+        Bind("F6", _ => FocusRegionAsync(true), global: true);
+        Bind("Shift+F6", _ => FocusRegionAsync(false), global: true);
+        Bind("Alt+Slash", _ => OpenShortcutsHelpAsync(), global: true);
+        Bind("Ctrl+Z", _ => UndoAsync(), global: true);
+        Bind("Ctrl+Shift+Z", _ => RedoAsync(), global: true);
+        Bind("Ctrl+Y", _ => RedoAsync(), global: true);
     }
 
     private async Task OpenShortcutsHelpAsync()
@@ -2032,7 +2028,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (firstRender && JSRuntime != null)
         {
             dotNetRef = DotNetObjectReference.Create(this);
-            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSpreadsheet", Element, dotNetRef, shortcuts.Keys, globalShortcuts);
+            // Serialize one map of key -> isGlobal; the JS gate needs nothing more than that.
+            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSpreadsheet", Element, dotNetRef,
+                shortcuts.ToDictionary(s => s.Key, s => s.Value.Global));
         }
     }
 
@@ -2485,13 +2483,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         var shortcut = TranslateShortcut(args);
-        if (shortcuts.TryGetValue(shortcut, out var action))
+        if (shortcuts.TryGetValue(shortcut, out var entry))
         {
             // Grid-only shortcuts run only when focus is in the grid or its editor; global ones
             // (F6 region escape, undo/redo) run from anywhere so the chrome stays operable.
-            if (isGridContext || globalShortcuts.Contains(shortcut))
+            if (isGridContext || entry.Global)
             {
-                await action(args);
+                await entry.Action(args);
             }
 
             return;
