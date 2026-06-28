@@ -602,7 +602,6 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_Save { get { return ResourceManager.GetString("Spreadsheet_Save", resourceCulture); } }
         public static string Spreadsheet_TextWrap { get { return ResourceManager.GetString("Spreadsheet_TextWrap", resourceCulture); } }
         public static string Spreadsheet_AutoFilter { get { return ResourceManager.GetString("Spreadsheet_AutoFilter", resourceCulture); } }
-        public static string Spreadsheet_Freeze { get { return ResourceManager.GetString("Spreadsheet_Freeze", resourceCulture); } }
         public static string Spreadsheet_InsertRowAfter { get { return ResourceManager.GetString("Spreadsheet_InsertRowAfter", resourceCulture); } }
         public static string Spreadsheet_InsertRowBefore { get { return ResourceManager.GetString("Spreadsheet_InsertRowBefore", resourceCulture); } }
         public static string Spreadsheet_AlignLeft { get { return ResourceManager.GetString("Spreadsheet_AlignLeft", resourceCulture); } }
@@ -626,11 +625,8 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_A11yFormula { get { return ResourceManager.GetString("Spreadsheet_A11yFormula", resourceCulture); } }
         public static string Spreadsheet_A11yError { get { return ResourceManager.GetString("Spreadsheet_A11yError", resourceCulture); } }
         public static string Spreadsheet_A11yReadOnly { get { return ResourceManager.GetString("Spreadsheet_A11yReadOnly", resourceCulture); } }
-        public static string Spreadsheet_A11yValidation { get { return ResourceManager.GetString("Spreadsheet_A11yValidation", resourceCulture); } }
         public static string Spreadsheet_A11yHyperlink { get { return ResourceManager.GetString("Spreadsheet_A11yHyperlink", resourceCulture); } }
         public static string Spreadsheet_A11yFiltered { get { return ResourceManager.GetString("Spreadsheet_A11yFiltered", resourceCulture); } }
-        public static string Spreadsheet_A11yConditionalFormat { get { return ResourceManager.GetString("Spreadsheet_A11yConditionalFormat", resourceCulture); } }
-        public static string Spreadsheet_A11yLeaveHint { get { return ResourceManager.GetString("Spreadsheet_A11yLeaveHint", resourceCulture); } }
         public static string Spreadsheet_CellEditorLabel { get { return ResourceManager.GetString("Spreadsheet_CellEditorLabel", resourceCulture); } }
         public static string Spreadsheet_FormulaBarLabel { get { return ResourceManager.GetString("Spreadsheet_FormulaBarLabel", resourceCulture); } }
         public static string Spreadsheet_HelpTitle { get { return ResourceManager.GetString("Spreadsheet_HelpTitle", resourceCulture); } }
@@ -652,7 +648,6 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_SizeTitle { get { return ResourceManager.GetString("Spreadsheet_SizeTitle", resourceCulture); } }
         public static string Spreadsheet_SizeWidth { get { return ResourceManager.GetString("Spreadsheet_SizeWidth", resourceCulture); } }
         public static string Spreadsheet_SizeHeight { get { return ResourceManager.GetString("Spreadsheet_SizeHeight", resourceCulture); } }
-        public static string Spreadsheet_SizeApply { get { return ResourceManager.GetString("Spreadsheet_SizeApply", resourceCulture); } }
         public static string Spreadsheet_A11ySorted { get { return ResourceManager.GetString("Spreadsheet_A11ySorted", resourceCulture); } }
         public static string Spreadsheet_A11yFilterApplied { get { return ResourceManager.GetString("Spreadsheet_A11yFilterApplied", resourceCulture); } }
         public static string Spreadsheet_A11yRowInserted { get { return ResourceManager.GetString("Spreadsheet_A11yRowInserted", resourceCulture); } }

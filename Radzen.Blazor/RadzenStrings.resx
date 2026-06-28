@@ -1773,9 +1773,6 @@
   <data name="Spreadsheet_AutoFilter" xml:space="preserve">
     <value>Filter</value>
   </data>
-  <data name="Spreadsheet_Freeze" xml:space="preserve">
-    <value>Freeze panes</value>
-  </data>
   <data name="Spreadsheet_InsertRowAfter" xml:space="preserve">
     <value>Insert row below</value>
   </data>
@@ -1845,20 +1842,11 @@
   <data name="Spreadsheet_A11yReadOnly" xml:space="preserve">
     <value>locked</value>
   </data>
-  <data name="Spreadsheet_A11yValidation" xml:space="preserve">
-    <value>data validation</value>
-  </data>
   <data name="Spreadsheet_A11yHyperlink" xml:space="preserve">
     <value>hyperlink</value>
   </data>
   <data name="Spreadsheet_A11yFiltered" xml:space="preserve">
     <value>filtered</value>
-  </data>
-  <data name="Spreadsheet_A11yConditionalFormat" xml:space="preserve">
-    <value>conditional formatting</value>
-  </data>
-  <data name="Spreadsheet_A11yLeaveHint" xml:space="preserve">
-    <value>Press F6 to leave the grid</value>
   </data>
   <data name="Spreadsheet_CellEditorLabel" xml:space="preserve">
     <value>Cell editor</value>
@@ -1922,9 +1910,6 @@
   </data>
   <data name="Spreadsheet_SizeHeight" xml:space="preserve">
     <value>Height (px)</value>
-  </data>
-  <data name="Spreadsheet_SizeApply" xml:space="preserve">
-    <value>Apply</value>
   </data>
   <data name="Spreadsheet_A11ySorted" xml:space="preserve">
     <value>Sorted</value>

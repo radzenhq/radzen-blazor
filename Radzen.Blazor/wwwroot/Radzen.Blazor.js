@@ -5842,11 +5842,10 @@ Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, s
   }};
 };
 class Spreadsheet {
-  constructor(element, dotNetRef, shortcuts, globalShortcuts) {
+  constructor(element, dotNetRef, shortcuts) {
     this.element = element;
     this.dotNetRef = dotNetRef;
-    this.shortcuts = shortcuts;
-    this.globalShortcuts = globalShortcuts || [];
+    this.shortcuts = shortcuts || {}; // map of key -> isGlobal (true = global, false = grid-only)
     this.rtl = Radzen.isRTL(element);
     this.element.addEventListener('keydown', this.onKeyDown);
     this.element.addEventListener('pointerdown', this.onPointerDown);
@@ -6045,11 +6044,14 @@ class Spreadsheet {
     // Scope the editor check to this.element so a sibling spreadsheet on the same page can never
     // match. Outside the grid (a toolbar button, sheet tab, ...) only global shortcuts act, so Tab
     // etc. stay native and the chrome is keyboard-navigable.
-    const editorInput = e.target.closest && e.target.closest('.rz-spreadsheet-editor-input');
-    const isGridContext = e.target === this.element ||
-      (editorInput != null && this.element.contains(editorInput));
+    let isGridContext = e.target === this.element;
+    if (!isGridContext && e.target.closest) {
+      const editorInput = e.target.closest('.rz-spreadsheet-editor-input');
+      isGridContext = editorInput != null && this.element.contains(editorInput);
+    }
 
-    if (this.globalShortcuts.includes(key) || (isGridContext && this.shortcuts.includes(key))) {
+    const global = this.shortcuts[key]; // true = global, false = grid-only, undefined = not a shortcut
+    if (global === true || (global === false && isGridContext)) {
       e.preventDefault();
     }
 
@@ -6103,15 +6105,15 @@ class Spreadsheet {
   }
 
   focusRegion = (region) => {
-    if (region === this.element) {
+    // The grid root and the formula bar (a tabindex=-1 contenteditable) are focused directly; for the
+    // other regions, focus the first focusable child - the tab header (which carries a roving
+    // tabindex=-1, so it must be matched by tag, not by tabindex>=0) or the first button.
+    if (region === this.element || region.matches('.rz-spreadsheet-editor-input')) {
       region.focus();
       return;
     }
 
-    const focusable = region.matches('.rz-spreadsheet-editor-input')
-      ? region
-      : region.querySelector('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]');
-
+    const focusable = region.querySelector('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]');
     (focusable || region).focus();
   }
 
@@ -6371,7 +6373,7 @@ class SheetEditor {
 
 
 Radzen.createSheetEditor = (element, value, autoFocus, dotNetRef) => new SheetEditor(element, value, autoFocus, dotNetRef);
-Radzen.createSpreadsheet = (element, dotNetRef, shortcuts, globalShortcuts) => new Spreadsheet(element, dotNetRef, shortcuts, globalShortcuts);
+Radzen.createSpreadsheet = (element, dotNetRef, shortcuts) => new Spreadsheet(element, dotNetRef, shortcuts);
 Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
   var height = scrollable.clientHeight;
   var width = scrollable.clientWidth;
