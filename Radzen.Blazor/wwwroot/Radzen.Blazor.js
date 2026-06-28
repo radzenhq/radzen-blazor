@@ -6105,10 +6105,11 @@ class Spreadsheet {
   }
 
   focusRegion = (region) => {
-    // The grid root and the formula bar (a tabindex=-1 contenteditable) are focused directly; for the
-    // other regions, focus the first focusable child - the tab header (which carries a roving
-    // tabindex=-1, so it must be matched by tag, not by tabindex>=0) or the first button.
-    if (region === this.element || region.matches('.rz-spreadsheet-editor-input')) {
+    // Focus the region itself when it is the tab stop: the grid root and the ribbon tablist both have
+    // tabindex=0 (the tablist owns arrow-key tab switching via aria-activedescendant, so focusing an
+    // individual tab would break the arrows), and the formula bar is a tabindex=-1 contenteditable.
+    // Otherwise focus the region's first focusable child (e.g. the first toolbar button).
+    if (region.tabIndex >= 0 || region.matches('.rz-spreadsheet-editor-input')) {
       region.focus();
       return;
     }
