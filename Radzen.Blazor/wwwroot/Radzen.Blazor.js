@@ -3719,6 +3719,10 @@ window.Radzen = {
     return html;
   },
   buildTableContext: function (ref, element) {
+    if (!ref) {
+      return { ref: ref };
+    }
+
     if (!element || !ref.contains(element)) {
       return { ref: ref };
     }
