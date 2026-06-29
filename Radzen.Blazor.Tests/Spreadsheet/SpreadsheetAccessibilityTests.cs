@@ -105,6 +105,17 @@ public class SpreadsheetAccessibilityTests
         Assert.Contains("aria-label=\"Undo\"", c.Markup);  // RadzenButton splatted aria-label
     }
 
+    [Fact]
+    public void Ribbon_Has_HelpButton_WithAccessibleName()
+    {
+        using var ctx = CreateContext();
+        var (wb, _) = NewWorkbook();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        // Reuses the already-localized HelpShowShortcuts string as the button's accessible name.
+        Assert.Contains("aria-label=\"Show keyboard shortcuts\"", c.Markup);
+    }
+
     // ── Editor naming (WI6) ─────────────────────────────────────────────
 
     [Fact]
