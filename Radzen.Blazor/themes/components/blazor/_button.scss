@@ -146,7 +146,7 @@ $button-sizes: map-merge(
         box-shadow: var(--rz-button-hover-shadow);
       }
       
-      &:focus-visible {
+      &:not(.rz-variant-text):not(.rz-variant-flat):not(.rz-variant-outlined):focus-visible {
         text-decoration: none;
         background-image: var(--rz-button-focus-gradient);
         background-size: var(--rz-button-focus-background-size);

@@ -39,6 +39,15 @@ $selectbar-sizes: xs, sm, md, lg;
     outline: var(--rz-selectbar-border);
     outline-offset: -1px;
     border-radius: 0;
+    box-shadow: none;
+
+    &:not(.rz-state-active):not(.rz-state-disabled) {
+      @include rz-hover-state {
+        @include variant-hover-bg('base');
+        background-image: none;
+        box-shadow: none;
+      }
+    }
 
     &.rz-state-active {
       background-color: var(--rz-selectbar-selected-background-color);
