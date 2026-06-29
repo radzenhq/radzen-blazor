@@ -2154,7 +2154,8 @@ window.Radzen = {
         }
 
         var closestLink = e.target.closest && (e.target.closest('.rz-link') || e.target.closest('.rz-navigation-item-link'));
-        if (e.type == 'resize' && !/Android/i.test(navigator.userAgent)) {
+        if (e.type == 'resize' && !/Android/i.test(navigator.userAgent) &&
+            !['input', 'textarea'].includes(document.activeElement ? document.activeElement.tagName.toLowerCase() : '')) {
             if (closestLink && closestLink.closest && closestLink.closest('a') && e.button == 0) {
                 closestLink.closest('a').click();
                 Radzen.closeAllPopups();
