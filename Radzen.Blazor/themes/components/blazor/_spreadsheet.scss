@@ -826,3 +826,35 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
         min-width: 6rem;
     }
 }
+
+.rz-spreadsheet-shortcuts-table {
+    // Cap the height so the dialog does not grow to the full viewport; the list scrolls instead.
+    max-height: 60vh;
+    overflow-y: auto;
+
+    // RadzenTable reuses the DataGrid cell styling, whose `.rz-grid-table td .rz-cell-data` rule
+    // truncates with an ellipsis. Match its depth so this wins and the descriptions read in full.
+    .rz-grid-table td .rz-cell-data {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+
+    // Shrink the key column to its content so the descriptions get the remaining width.
+    td:first-child {
+        width: 1%;
+    }
+
+    .rz-badge {
+        margin-inline-end: 0.25rem;
+        white-space: nowrap;
+    }
+
+    // Keep the column headers visible while the list scrolls.
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: var(--rz-base-background-color);
+    }
+}

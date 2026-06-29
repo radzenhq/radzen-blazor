@@ -14,8 +14,10 @@
 <RadzenText Anchor="spreadsheet#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Keyboard Navigation
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Spreadsheet component.
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    These are the most common keys for navigating and editing the spreadsheet. Press
+    <span class="rz-badge rz-badge-primary rz-variant-filled rz-shade-default">Alt+/</span>
+    in the spreadsheet to see all supported keyboard shortcuts.
 </RadzenText>
 
 <KeyboardNavigationDataGrid Data="@data" />
@@ -23,25 +25,11 @@
 @code {
     List<KeyboardShortcut> data = new List<KeyboardShortcut>
     {
+        new KeyboardShortcut { Key = "Arrow keys", Action = "Move between cells." },
         new KeyboardShortcut { Key = "Tab", Action = "Move to the next cell." },
-        new KeyboardShortcut { Key = "Shift + Tab", Action = "Move to the previous cell." },
         new KeyboardShortcut { Key = "Enter", Action = "Confirm edit and move to the cell below." },
-        new KeyboardShortcut { Key = "Shift + Enter", Action = "Confirm edit and move to the cell above." },
-        new KeyboardShortcut { Key = "Escape", Action = "Cancel the current edit." },
-        new KeyboardShortcut { Key = "ArrowUp", Action = "Move to the cell above." },
-        new KeyboardShortcut { Key = "ArrowDown", Action = "Move to the cell below." },
-        new KeyboardShortcut { Key = "ArrowLeft", Action = "Move to the cell on the left." },
-        new KeyboardShortcut { Key = "ArrowRight", Action = "Move to the cell on the right." },
-        new KeyboardShortcut { Key = "Shift + ArrowUp", Action = "Extend selection up." },
-        new KeyboardShortcut { Key = "Shift + ArrowDown", Action = "Extend selection down." },
-        new KeyboardShortcut { Key = "Shift + ArrowLeft", Action = "Extend selection left." },
-        new KeyboardShortcut { Key = "Shift + ArrowRight", Action = "Extend selection right." },
-        new KeyboardShortcut { Key = "Ctrl + C", Action = "Copy the selected cells." },
-        new KeyboardShortcut { Key = "Ctrl + X", Action = "Cut the selected cells." },
+        new KeyboardShortcut { Key = "F6", Action = "Move between the toolbar, grid and sheet tabs (Shift + F6 to go back)." },
         new KeyboardShortcut { Key = "Ctrl + Z", Action = "Undo the last action." },
-        new KeyboardShortcut { Key = "Ctrl + Shift + Z", Action = "Redo the last undone action." },
-        new KeyboardShortcut { Key = "Delete", Action = "Delete the content of the selected cells." },
-        new KeyboardShortcut { Key = "Backspace", Action = "Delete the content of the selected cells." },
-        new KeyboardShortcut { Key = "Any letter, digit or symbol", Action = "Start editing the active cell." },
+        new KeyboardShortcut { Key = "Alt + /", Action = "Show all keyboard shortcuts." },
     };
 }

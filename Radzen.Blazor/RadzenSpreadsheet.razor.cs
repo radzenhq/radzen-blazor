@@ -1469,6 +1469,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// <inheritdoc/>
     protected override void OnInitialized()
     {
+        // Assigns UniqueID so GetId() is non-empty - the a11y instructions span id and its
+        // aria-describedby reference derive from it and must be unique per spreadsheet on the page.
+        base.OnInitialized();
         workbook = Workbook;
         Bind("Enter", _ => CycleSelectionAsync(1, 0));
         Bind("Escape", _ => CancelEditAsync());
@@ -1527,32 +1530,63 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         Bind("Ctrl+Y", _ => RedoAsync(), global: true);
     }
 
+    // One documented shortcut row: the key chords to display (split on " / " into badges by the
+    // dialog), the resx description key, and the registered binding keys it covers. The Bindings let
+    // a unit test assert every registered shortcut is documented, so the help cannot silently drift.
+    private readonly record struct HelpEntry(string Keys, string DescriptionKey, string[] Bindings);
+
+    // Ordered by priority - the most common navigation and editing keys first, with F6 region
+    // movement near the top as the primary keyboard/accessibility escape.
+    private static readonly HelpEntry[] ShortcutHelp =
+    [
+        new("Arrow keys", nameof(RadzenStrings.Spreadsheet_HelpMove), ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]),
+        new("Tab / Shift+Tab", nameof(RadzenStrings.Spreadsheet_HelpNextCell), ["Tab", "Shift+Tab"]),
+        new("Enter / Shift+Enter", nameof(RadzenStrings.Spreadsheet_HelpConfirmMove), ["Enter", "Shift+Enter"]),
+        new("F6 / Shift+F6", nameof(RadzenStrings.Spreadsheet_HelpRegions), ["F6", "Shift+F6"]),
+        new("F2", nameof(RadzenStrings.Spreadsheet_HelpEdit), ["F2"]),
+        new("Escape", nameof(RadzenStrings.Spreadsheet_HelpCancel), ["Escape"]),
+        new("Shift+Arrow keys", nameof(RadzenStrings.Spreadsheet_HelpExtend), ["Shift+ArrowUp", "Shift+ArrowDown", "Shift+ArrowLeft", "Shift+ArrowRight"]),
+        new("Ctrl+Arrow keys", nameof(RadzenStrings.Spreadsheet_HelpEdge), ["Ctrl+ArrowUp", "Ctrl+ArrowDown", "Ctrl+ArrowLeft", "Ctrl+ArrowRight"]),
+        new("Ctrl+Shift+Arrow keys", nameof(RadzenStrings.Spreadsheet_HelpExtendEdge), ["Ctrl+Shift+ArrowUp", "Ctrl+Shift+ArrowDown", "Ctrl+Shift+ArrowLeft", "Ctrl+Shift+ArrowRight"]),
+        new("Home / Ctrl+Home", nameof(RadzenStrings.Spreadsheet_HelpRowStart), ["Home", "Ctrl+Home"]),
+        new("End / Ctrl+End", nameof(RadzenStrings.Spreadsheet_HelpLastCell), ["End", "Ctrl+End"]),
+        new("Shift+Home / Shift+End", nameof(RadzenStrings.Spreadsheet_HelpExtendRow), ["Shift+Home", "Shift+End"]),
+        new("Ctrl+Shift+Home / Ctrl+Shift+End", nameof(RadzenStrings.Spreadsheet_HelpExtendSheet), ["Ctrl+Shift+Home", "Ctrl+Shift+End"]),
+        new("Page Up / Page Down", nameof(RadzenStrings.Spreadsheet_HelpPage), ["PageUp", "PageDown"]),
+        new("Shift+Page Up / Shift+Page Down", nameof(RadzenStrings.Spreadsheet_HelpExtendPage), ["Shift+PageUp", "Shift+PageDown"]),
+        new("Ctrl+A", nameof(RadzenStrings.Spreadsheet_HelpSelectAll), ["Ctrl+A"]),
+        new("Ctrl+Space", nameof(RadzenStrings.Spreadsheet_HelpSelectColumn), ["Ctrl+Space"]),
+        new("Shift+Space", nameof(RadzenStrings.Spreadsheet_HelpSelectRow), ["Shift+Space"]),
+        new("Ctrl+C / Ctrl+X / Ctrl+V", nameof(RadzenStrings.Spreadsheet_HelpClipboard), ["Ctrl+C", "Ctrl+X"]),
+        new("Ctrl+Z / Ctrl+Y", nameof(RadzenStrings.Spreadsheet_HelpUndoRedo), ["Ctrl+Z", "Ctrl+Shift+Z", "Ctrl+Y"]),
+        new("Ctrl+D / Ctrl+R", nameof(RadzenStrings.Spreadsheet_HelpFill), ["Ctrl+D", "Ctrl+R"]),
+        new("Delete", nameof(RadzenStrings.Spreadsheet_HelpClear), ["Delete", "Backspace"]),
+        new("Shift+F10", nameof(RadzenStrings.Spreadsheet_HelpContextMenu), ["Shift+F10", "ContextMenu"]),
+        new("Ctrl+Alt+5", nameof(RadzenStrings.Spreadsheet_HelpDrawings), ["Ctrl+Alt+5"]),
+        new("Alt+/", nameof(RadzenStrings.Spreadsheet_HelpShowShortcuts), ["Alt+Slash"]),
+    ];
+
+    // The keys actually bound, and the keys the help documents - compared by a drift-guard test.
+    internal IEnumerable<string> RegisteredShortcutKeys => shortcuts.Keys;
+    internal static IEnumerable<string> DocumentedShortcutKeys => ShortcutHelp.SelectMany(e => e.Bindings);
+
     private async Task OpenShortcutsHelpAsync()
     {
-        var rows = new List<Spreadsheet.SpreadsheetShortcutsDialog.Shortcut>
-        {
-            new("Arrow keys", Localize(nameof(RadzenStrings.Spreadsheet_HelpMove))),
-            new("Tab / Shift+Tab", Localize(nameof(RadzenStrings.Spreadsheet_HelpNextCell))),
-            new("F2", Localize(nameof(RadzenStrings.Spreadsheet_HelpEdit))),
-            new("F6 / Shift+F6", Localize(nameof(RadzenStrings.Spreadsheet_HelpRegions))),
-            new("Home / Ctrl+Home", Localize(nameof(RadzenStrings.Spreadsheet_HelpRowStart))),
-            new("Ctrl+End", Localize(nameof(RadzenStrings.Spreadsheet_HelpLastCell))),
-            new("Ctrl+A", Localize(nameof(RadzenStrings.Spreadsheet_HelpSelectAll))),
-            new("Ctrl+C / Ctrl+X / Ctrl+V", Localize(nameof(RadzenStrings.Spreadsheet_HelpClipboard))),
-            new("Ctrl+Z / Ctrl+Y", Localize(nameof(RadzenStrings.Spreadsheet_HelpUndoRedo))),
-            new("Delete", Localize(nameof(RadzenStrings.Spreadsheet_HelpClear))),
-            new("Shift+F10", Localize(nameof(RadzenStrings.Spreadsheet_HelpContextMenu))),
-        };
+        var rows = ShortcutHelp
+            .Select(e => new Spreadsheet.SpreadsheetShortcutsDialog.Shortcut(e.Keys, Localize(e.DescriptionKey)))
+            .ToList();
 
         var parameters = new Dictionary<string, object?>
         {
             { nameof(Spreadsheet.SpreadsheetShortcutsDialog.Shortcuts), rows },
             { nameof(Spreadsheet.SpreadsheetShortcutsDialog.ShortcutColumn), Localize(nameof(RadzenStrings.Spreadsheet_HelpShortcutColumn)) },
             { nameof(Spreadsheet.SpreadsheetShortcutsDialog.ActionColumn), Localize(nameof(RadzenStrings.Spreadsheet_HelpActionColumn)) },
+            { nameof(Spreadsheet.SpreadsheetShortcutsDialog.FilterPlaceholder), Localize(nameof(RadzenStrings.Spreadsheet_HelpFilterPlaceholder)) },
+            { nameof(Spreadsheet.SpreadsheetShortcutsDialog.NoResultsText), Localize(nameof(RadzenStrings.Spreadsheet_HelpNoResults)) },
         };
 
         await OpenDialogAsync<Spreadsheet.SpreadsheetShortcutsDialog>(
-            Localize(nameof(RadzenStrings.Spreadsheet_HelpTitle)), parameters, new DialogOptions { Width = "560px" });
+            Localize(nameof(RadzenStrings.Spreadsheet_HelpTitle)), parameters, new DialogOptions { Width = "600px" });
     }
 
     // Opens a dialog and returns focus to the grid after it closes (WCAG 2.4.3 focus order).

@@ -643,6 +643,22 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_HelpUndoRedo { get { return ResourceManager.GetString("Spreadsheet_HelpUndoRedo", resourceCulture); } }
         public static string Spreadsheet_HelpClear { get { return ResourceManager.GetString("Spreadsheet_HelpClear", resourceCulture); } }
         public static string Spreadsheet_HelpContextMenu { get { return ResourceManager.GetString("Spreadsheet_HelpContextMenu", resourceCulture); } }
+        public static string Spreadsheet_HelpConfirmMove { get { return ResourceManager.GetString("Spreadsheet_HelpConfirmMove", resourceCulture); } }
+        public static string Spreadsheet_HelpCancel { get { return ResourceManager.GetString("Spreadsheet_HelpCancel", resourceCulture); } }
+        public static string Spreadsheet_HelpExtend { get { return ResourceManager.GetString("Spreadsheet_HelpExtend", resourceCulture); } }
+        public static string Spreadsheet_HelpEdge { get { return ResourceManager.GetString("Spreadsheet_HelpEdge", resourceCulture); } }
+        public static string Spreadsheet_HelpExtendEdge { get { return ResourceManager.GetString("Spreadsheet_HelpExtendEdge", resourceCulture); } }
+        public static string Spreadsheet_HelpExtendRow { get { return ResourceManager.GetString("Spreadsheet_HelpExtendRow", resourceCulture); } }
+        public static string Spreadsheet_HelpExtendSheet { get { return ResourceManager.GetString("Spreadsheet_HelpExtendSheet", resourceCulture); } }
+        public static string Spreadsheet_HelpPage { get { return ResourceManager.GetString("Spreadsheet_HelpPage", resourceCulture); } }
+        public static string Spreadsheet_HelpExtendPage { get { return ResourceManager.GetString("Spreadsheet_HelpExtendPage", resourceCulture); } }
+        public static string Spreadsheet_HelpSelectColumn { get { return ResourceManager.GetString("Spreadsheet_HelpSelectColumn", resourceCulture); } }
+        public static string Spreadsheet_HelpSelectRow { get { return ResourceManager.GetString("Spreadsheet_HelpSelectRow", resourceCulture); } }
+        public static string Spreadsheet_HelpFill { get { return ResourceManager.GetString("Spreadsheet_HelpFill", resourceCulture); } }
+        public static string Spreadsheet_HelpDrawings { get { return ResourceManager.GetString("Spreadsheet_HelpDrawings", resourceCulture); } }
+        public static string Spreadsheet_HelpShowShortcuts { get { return ResourceManager.GetString("Spreadsheet_HelpShowShortcuts", resourceCulture); } }
+        public static string Spreadsheet_HelpFilterPlaceholder { get { return ResourceManager.GetString("Spreadsheet_HelpFilterPlaceholder", resourceCulture); } }
+        public static string Spreadsheet_HelpNoResults { get { return ResourceManager.GetString("Spreadsheet_HelpNoResults", resourceCulture); } }
         public static string Spreadsheet_A11yImageSelected { get { return ResourceManager.GetString("Spreadsheet_A11yImageSelected", resourceCulture); } }
         public static string Spreadsheet_A11yChartSelected { get { return ResourceManager.GetString("Spreadsheet_A11yChartSelected", resourceCulture); } }
         public static string Spreadsheet_SizeTitle { get { return ResourceManager.GetString("Spreadsheet_SizeTitle", resourceCulture); } }
