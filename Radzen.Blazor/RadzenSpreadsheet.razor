@@ -8,7 +8,7 @@
 @inject ContextMenuService ContextMenuService
 @inherits RadzenComponent
 
-<div @ref=@Element class=@GetCssClass() style=@Style @attributes=@Attributes tabindex="0"
+<div @ref=@Element class=@GetCssClass() style=@Style tabindex="0" @attributes=@Attributes id=@GetId()
      role="application" aria-label=@(AriaLabel ?? Localize(nameof(RadzenStrings.Spreadsheet_A11yGridLabel)))
      aria-keyshortcuts="F6 Shift+F6" aria-describedby=@($"{GetId()}-a11y-instructions")>
     <CascadingValue TValue="ISpreadsheet" Value=this IsFixed="true">
@@ -116,7 +116,7 @@
         }
 @if (Worksheet != null)
 {
-        <span id=@($"{GetId()}-a11y-instructions") style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">@Localize(nameof(RadzenStrings.Spreadsheet_A11yInstructions))</span>
+        <span id=@($"{GetId()}-a11y-instructions") class="rz-sr-only">@Localize(nameof(RadzenStrings.Spreadsheet_A11yInstructions))</span>
         <SpreadsheetAccessibility @ref=@accessibility Worksheet=@Worksheet Spreadsheet=this />
         <CascadingValue Value="@CellTypes">
         @if (ShowFormulaBar)
