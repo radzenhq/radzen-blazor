@@ -108,6 +108,25 @@ namespace Radzen.Blazor
 
         int ActivePage => ItemsPerPage > 1 ? selectedIndex / ItemsPerPage : selectedIndex;
 
+        internal bool IsItemActive(int index)
+        {
+            if (ItemsPerPage > 1)
+            {
+                var start = ActivePage * ItemsPerPage;
+                return index >= start && index < start + ItemsPerPage;
+            }
+
+            return index == selectedIndex;
+        }
+
+        void RefreshItems()
+        {
+            foreach (var item in items)
+            {
+                item.Refresh();
+            }
+        }
+
         async Task Prev()
         {
             if (ItemsPerPage > 1)
@@ -145,6 +164,7 @@ namespace Radzen.Blazor
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element, AnimationDuration.HasValue ? (object)AnimationDuration.Value : null);
                 }
+                RefreshItems();
                 StateHasChanged();
             }
         }
@@ -235,6 +255,8 @@ namespace Radzen.Blazor
 
             if (shouldUpdate)
             {
+                RefreshItems();
+
                 if (JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element, AnimationDuration.HasValue ? (object)AnimationDuration.Value : null);
@@ -390,6 +412,7 @@ namespace Radzen.Blazor
                     await Reset();
                 }
 
+                RefreshItems();
                 StateHasChanged();
             }
         }
