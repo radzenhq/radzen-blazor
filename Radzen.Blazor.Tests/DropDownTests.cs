@@ -79,33 +79,37 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void DropDown_TabAfterArrow_InvokesFocusNextOnce()
+        public void DropDown_NonFilterable_TabWhenOpen_DoesNotInvokeFocusNext()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = DropDown<int>(ctx);
+            var component = ctx.RenderComponent<RadzenDropDown<string>>(p =>
+            {
+                p.Add(x => x.Data, new[] { "one", "two" });
+            });
 
-            var input = component.Find("[role='combobox']");
+            var combo = component.Find("[role='combobox']");
 
-            input.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
-            input.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab" });
+            combo.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" });
+            combo.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab" });
 
             var focusNextCalls = ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.focusNext");
-            Assert.Equal(1, focusNextCalls);
+            Assert.Equal(0, focusNextCalls);
         }
 
         [Fact]
-        public void DropDown_TabWithoutKeydownSuppression_DoesNotInvokeFocusNext()
+        public void DropDown_NonFilterable_TabAfterArrow_DoesNotInvokeFocusNext()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = DropDown<int>(ctx);
 
-            var input = component.Find("[role='combobox']");
+            var combo = component.Find("[role='combobox']");
 
-            input.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab" });
+            combo.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+            combo.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab" });
 
             var focusNextCalls = ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.focusNext");
             Assert.Equal(0, focusNextCalls);
