@@ -46,7 +46,7 @@ else
     [Parameter]
     public RadzenMenuItem? Item { get; set; }
 
-    int TabIndex => Item?.IsActive == true ? 0 : -1;
+    int TabIndex => -1;
 
     string? ExpandedAttribute => Item?.ChildContent != null ? (Item.Expanded ? "true" : "false") : null;
 

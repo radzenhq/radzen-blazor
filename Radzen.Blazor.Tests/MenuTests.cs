@@ -83,7 +83,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Menu_Uses_Roving_Tabindex_For_Active_Item()
+        public void Menu_Keeps_Items_NonTabbable_And_Roves_ActiveDescendant()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -95,14 +95,15 @@ namespace Radzen.Blazor.Tests
             var menubar = component.Find("ul[role=menubar]");
             menubar.Focus();
 
-            Assert.Equal("0", component.Find("#home-item").GetAttribute("tabindex"));
+            Assert.Equal("-1", component.Find("#home-item").GetAttribute("tabindex"));
             Assert.Equal("-1", component.Find("#data-item").GetAttribute("tabindex"));
+            Assert.Equal("home-item", component.Find("ul[role=menubar]").GetAttribute("aria-activedescendant"));
 
             menubar = component.Find("ul[role=menubar]");
             menubar.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
 
             Assert.Equal("-1", component.Find("#home-item").GetAttribute("tabindex"));
-            Assert.Equal("0", component.Find("#data-item").GetAttribute("tabindex"));
+            Assert.Equal("-1", component.Find("#data-item").GetAttribute("tabindex"));
             Assert.Equal("data-item", component.Find("ul[role=menubar]").GetAttribute("aria-activedescendant"));
         }
 
