@@ -1827,9 +1827,6 @@
   <data name="Spreadsheet_A11yMerged" xml:space="preserve">
     <value>merged</value>
   </data>
-  <data name="Spreadsheet_A11yPosition" xml:space="preserve">
-    <value>row {0} of {1}, column {2} of {3}</value>
-  </data>
   <data name="Spreadsheet_A11ySelection" xml:space="preserve">
     <value>{0}, {1} by {2}</value>
   </data>

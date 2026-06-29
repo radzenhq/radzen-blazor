@@ -620,7 +620,6 @@ namespace Radzen.Blazor {
         public static string Spreadsheet_A11yInstructions { get { return ResourceManager.GetString("Spreadsheet_A11yInstructions", resourceCulture); } }
         public static string Spreadsheet_A11yBlank { get { return ResourceManager.GetString("Spreadsheet_A11yBlank", resourceCulture); } }
         public static string Spreadsheet_A11yMerged { get { return ResourceManager.GetString("Spreadsheet_A11yMerged", resourceCulture); } }
-        public static string Spreadsheet_A11yPosition { get { return ResourceManager.GetString("Spreadsheet_A11yPosition", resourceCulture); } }
         public static string Spreadsheet_A11ySelection { get { return ResourceManager.GetString("Spreadsheet_A11ySelection", resourceCulture); } }
         public static string Spreadsheet_A11yFormula { get { return ResourceManager.GetString("Spreadsheet_A11yFormula", resourceCulture); } }
         public static string Spreadsheet_A11yError { get { return ResourceManager.GetString("Spreadsheet_A11yError", resourceCulture); } }
