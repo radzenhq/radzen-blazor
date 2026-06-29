@@ -1,5 +1,3 @@
-@using Microsoft.JSInterop
-@using Microsoft.AspNetCore.Components.Forms
 @using Radzen
 @typeparam TItem
 @inherits PagedDataBoundComponent<TItem>
@@ -53,16 +51,48 @@
                 @if (AllowColumnPicking)
                 {
                     <div class="rz-column-picker">
-                        <RadzenDropDown SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
-                            MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectVisibleColumnsAriaLabel }})"
-                            SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
-                            @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                            Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
-                            Placeholder="@ColumnsText"
-                            Data="allPickableColumns"
-                            TextProperty="ColumnPickerTitle" />
-                    </div>
 
+                        @if (!AllowSortingColumnPicker)
+                        {
+                            <RadzenDropDown SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
+                                            MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectVisibleColumnsAriaLabel }})"
+                                            SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
+                                            @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                                            Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
+                                            Placeholder="@ColumnsText"
+                                            Data="allPickableColumns"
+                                            TextProperty="ColumnPickerTitle" />
+                        }
+                        else
+                        {
+                            <RadzenDropDownDataGrid @ref="columnPickerGrid" AllowSelectAll="@AllowPickAllColumns"
+                                            MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectVisibleColumnsAriaLabel }})"
+                                            SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
+                                            @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                                            Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering" AllowSorting="true"
+                                            Placeholder="@ColumnsText"
+                                            Data="allPickableColumns"
+                                            TextProperty="ColumnPickerTitle">
+                                <Columns>
+                                    <RadzenDropDownDataGridColumn Width="60px" Sortable="false">
+                                        <HeaderTemplate>
+                                            <RadzenCheckBox TriState="false" TValue="bool" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", AllColumnsText }})"
+                                                            Value="@(selectedColumns != null && ((IEnumerable<object>)selectedColumns).Any())"
+                                                            Change="@(async args => { selectedColumns = args ? allPickableColumns.Cast<object>().ToList() : new List<object>(); await ToggleColumns(); })" />
+                                        </HeaderTemplate>
+                                        <Template Context="data">
+                                            <RadzenCheckBox TriState="false" TValue="bool" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select column" }})"
+                                                            Value="@(selectedColumns != null && ((IEnumerable<object>)selectedColumns).Contains((object)data))"
+                                                            Change="@(args => columnPickerGrid!.SelectItem((object)data))" @onclick:stopPropagation />
+                                        </Template>
+                                    </RadzenDropDownDataGridColumn>
+                                    <RadzenDropDownDataGridColumn Property="ColumnPickerTitle" Title="@ColumnsText" />
+                                </Columns>
+                            </RadzenDropDownDataGrid>
+
+                        }
+
+                    </div>
                 }
             </div>
         }

@@ -803,6 +803,8 @@ namespace Radzen.Blazor
 
         internal object? selectedColumns;
 
+        RadzenDropDownDataGrid<object>? columnPickerGrid;
+
         /// <summary>
         /// Gets or sets the columns.
         /// </summary>
@@ -1701,6 +1703,13 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if column picking is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowColumnPicking { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether sorting in column picker is allowed.
+        /// </summary>
+        /// <value><c>true</c> if sorting in column picker is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowSortingColumnPicker { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether cell data should be shown as tooltip.

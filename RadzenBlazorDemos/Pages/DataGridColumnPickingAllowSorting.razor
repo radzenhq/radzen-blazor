@@ -1,6 +1,6 @@
-﻿@using RadzenBlazorDemos.Data
+﻿@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
-@using Microsoft.EntityFrameworkCore
 
 @inherits DbContextPage
 
@@ -10,7 +10,9 @@
                 ColumnWidth="300px"
                 AllowColumnPicking="true"
                 PickedColumnsChanged="@PickedColumnsChanged"
-                ColumnsPickerAllowFiltering="true" QueryOnlyVisibleColumns="true">
+                ColumnsPickerAllowFiltering="true"
+                QueryOnlyVisibleColumns="true"
+                AllowSortingColumnPicker="true">
     <Columns>
         <RadzenDataGridColumn Property=@nameof(Employee.EmployeeID)
                               Title="ID"
