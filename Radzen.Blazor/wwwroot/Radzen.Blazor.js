@@ -5338,7 +5338,7 @@ window.Radzen = {
                     if (paneNext) {
                         var nextSpace=spaceLength-length;
                         if (minNextValue && nextSpace < minNextValue) length = spaceLength-minNextValue;
-                        if (maxNextValue && nextSpace > maxNextValue) length = spaceLength+maxNextValue;
+                        if (maxNextValue && nextSpace > maxNextValue) length = spaceLength-maxNextValue;
                     }
 
                     var perc = length / Radzen[el].paneLength;
