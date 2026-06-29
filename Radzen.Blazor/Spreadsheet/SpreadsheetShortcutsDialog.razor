@@ -1,25 +1,47 @@
 @namespace Radzen.Blazor.Spreadsheet
+@using System
+@using System.Linq
 @using Radzen.Blazor
 
-@* A read-only reference of keyboard shortcuts, opened from the grid via Alt+/. The rows are built
-   and localized by the host (RadzenSpreadsheet) and passed in, so this dialog needs no cascade. *@
-<RadzenTable class="rz-spreadsheet-shortcuts">
-    <RadzenTableHeader>
-        <RadzenTableHeaderRow>
-            <RadzenTableHeaderCell>@ShortcutColumn</RadzenTableHeaderCell>
-            <RadzenTableHeaderCell>@ActionColumn</RadzenTableHeaderCell>
-        </RadzenTableHeaderRow>
-    </RadzenTableHeader>
-    <RadzenTableBody>
-        @foreach (var shortcut in Shortcuts)
-        {
-            <RadzenTableRow>
-                <RadzenTableCell style="white-space:nowrap"><kbd>@shortcut.Keys</kbd></RadzenTableCell>
-                <RadzenTableCell>@shortcut.Description</RadzenTableCell>
-            </RadzenTableRow>
-        }
-    </RadzenTableBody>
-</RadzenTable>
+@* A read-only, filterable reference of keyboard shortcuts, opened from the grid via Alt+/. The rows
+   are built and localized by the host (RadzenSpreadsheet) and passed in, so this needs no cascade. *@
+<RadzenStack Gap="0.75rem" class="rz-spreadsheet-shortcuts">
+    <RadzenTextBox @ref=@filterBox Immediate="true" @bind-Value=@filter Placeholder=@FilterPlaceholder
+                   aria-label=@FilterPlaceholder class="rz-w-100" />
+
+    @{
+        var rows = Filtered();
+    }
+    @if (rows.Count == 0)
+    {
+        <RadzenText role="status" TextStyle="TextStyle.Body2" class="rz-color-base-500">@NoResultsText</RadzenText>
+    }
+    else
+    {
+        <RadzenTable class="rz-spreadsheet-shortcuts-table">
+            <RadzenTableHeader>
+                <RadzenTableHeaderRow>
+                    <RadzenTableHeaderCell>@ShortcutColumn</RadzenTableHeaderCell>
+                    <RadzenTableHeaderCell>@ActionColumn</RadzenTableHeaderCell>
+                </RadzenTableHeaderRow>
+            </RadzenTableHeader>
+            <RadzenTableBody>
+                @foreach (var shortcut in rows)
+                {
+                    <RadzenTableRow>
+                        <RadzenTableCell>
+                            @foreach (var chord in shortcut.Keys.Split(" / "))
+                            {
+                                <span class="rz-badge rz-badge-primary rz-variant-filled rz-shade-default">@chord</span>
+                            }
+                        </RadzenTableCell>
+                        <RadzenTableCell>@shortcut.Description</RadzenTableCell>
+                    </RadzenTableRow>
+                }
+            </RadzenTableBody>
+        </RadzenTable>
+    }
+</RadzenStack>
 
 @code {
     /// <summary>Represents one keyboard shortcut row: the key combination and what it does.</summary>
@@ -36,4 +58,37 @@
     /// <summary>Localized "Action" column header.</summary>
     [Parameter]
     public string? ActionColumn { get; set; }
+
+    /// <summary>Localized placeholder for the filter box.</summary>
+    [Parameter]
+    public string? FilterPlaceholder { get; set; }
+
+    /// <summary>Localized message shown when the filter matches nothing.</summary>
+    [Parameter]
+    public string? NoResultsText { get; set; }
+
+    private string filter = string.Empty;
+    private RadzenTextBox? filterBox;
+
+    private List<Shortcut> Filtered()
+    {
+        if (string.IsNullOrWhiteSpace(filter))
+        {
+            return Shortcuts.ToList();
+        }
+
+        return Shortcuts
+            .Where(s => s.Keys.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                     || s.Description.Contains(filter, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && filterBox is not null)
+        {
+            await filterBox.FocusAsync();
+        }
+    }
 }

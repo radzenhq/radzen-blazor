@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Bunit;
 using Microsoft.AspNetCore.Components.Web;
@@ -251,7 +252,8 @@ public class SpreadsheetAccessibilityTests
             .Add(x => x.ActionColumn, "Action"));
 
         Assert.Contains("rz-datatable", c.Markup);              // RadzenTable, not a naked <table>
-        Assert.Contains("<kbd>F6</kbd>", c.Markup);
+        Assert.Contains("rz-badge", c.Markup);                  // keys render as badges (house style)
+        Assert.Contains(">F6</span>", c.Markup);
         Assert.Contains("Move between regions", c.Markup);
         Assert.Contains("Select the used range", c.Markup);
     }
@@ -311,5 +313,24 @@ public class SpreadsheetAccessibilityTests
         await c.InvokeAsync(() => c.Instance.Undo());
 
         Assert.Equal(startWidth, sheet.Columns[2]); // Ctrl+Z reverts the resize
+    }
+
+    // ── Shortcuts help completeness ─────────────────────────────────────
+
+    [Fact]
+    public void ShortcutHelp_DocumentsExactlyTheRegisteredShortcuts()
+    {
+        using var ctx = CreateContext();
+        var (wb, _) = NewWorkbook();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        var registered = c.Instance.RegisteredShortcutKeys.ToHashSet();
+        var documented = RadzenSpreadsheet.DocumentedShortcutKeys.ToHashSet();
+
+        var missing = registered.Except(documented).ToList(); // bound but not in the help dialog
+        var stale = documented.Except(registered).ToList();    // in the help dialog but not bound
+
+        Assert.True(missing.Count == 0 && stale.Count == 0,
+            $"Shortcut help drift. Missing from help: [{string.Join(", ", missing)}]. Stale in help: [{string.Join(", ", stale)}].");
     }
 }
