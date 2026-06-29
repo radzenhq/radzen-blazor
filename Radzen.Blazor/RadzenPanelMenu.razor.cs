@@ -229,6 +229,10 @@ namespace Radzen.Blazor
             return currentItems?.IndexOf(item) == focusedIndex && focusedIndex != -1;
         }
 
+        string? ActiveDescendantId => focusedIndex >= 0 && currentItems != null && focusedIndex < currentItems.Count
+            ? currentItems[focusedIndex].GetItemId()
+            : null;
+
         internal void RemoveItem(RadzenPanelMenuItem item)
         {
             items.Remove(item);

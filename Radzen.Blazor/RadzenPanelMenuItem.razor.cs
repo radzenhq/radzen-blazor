@@ -19,6 +19,8 @@ namespace Radzen.Blazor
             .AddDisabled(Disabled)
             .ToString();
 
+        internal string? GetItemId() => GetId();
+
         /// <summary>
         /// Gets or sets the target.
         /// </summary>

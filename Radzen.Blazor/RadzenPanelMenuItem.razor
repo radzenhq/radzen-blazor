@@ -4,7 +4,7 @@
 @if (Visible)
 {
     <li @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
-        role="menuitem" tabindex="@(Disabled ? -1 : 0)" aria-disabled="@(Disabled ? "true" : "false")"
+        role="menuitem" tabindex="-1" aria-disabled="@(Disabled ? "true" : "false")"
         aria-haspopup="@(ChildContent != null ? "menu" : null)"
         aria-controls="@(ChildContent != null ? $"{GetId()}-submenu" : null)"
         aria-expanded="@(ChildContent != null ? expanded.ToString().ToLowerInvariant() : null)"
