@@ -20,5 +20,9 @@ $rz-expander-transition: .2s ease-in-out !default;
 
     &.rz-state-collapsed {
         grid-template-rows: 0fr;
+
+        .rz-expander-content {
+            visibility: hidden;
+        }
     }
 }
