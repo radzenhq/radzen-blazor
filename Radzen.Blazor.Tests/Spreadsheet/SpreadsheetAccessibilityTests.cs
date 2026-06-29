@@ -31,11 +31,10 @@ public class SpreadsheetAccessibilityTests
         return (wb, sheet);
     }
 
-    // A test localizer: friendly text for the keys the announcer composes, and the position format.
+    // A test localizer: friendly text for the keys the announcer composes.
     private static string L(string key) => key switch
     {
         nameof(RadzenStrings.Spreadsheet_A11yBlank) => "blank",
-        nameof(RadzenStrings.Spreadsheet_A11yPosition) => "row {0} of {1}, column {2} of {3}",
         nameof(RadzenStrings.Spreadsheet_A11yMerged) => "merged",
         nameof(RadzenStrings.Spreadsheet_A11yFormula) => "has formula",
         _ => key
@@ -44,25 +43,25 @@ public class SpreadsheetAccessibilityTests
     // ── Announcer compose (pure function) ───────────────────────────────
 
     [Fact]
-    public void BuildAnnouncement_EmptyCell_AddressBlankAndPosition()
+    public void BuildAnnouncement_EmptyCell_IsBlankThenAddress()
     {
         var (_, sheet) = NewWorkbook();
 
         var text = SpreadsheetAccessibility.BuildAnnouncement(sheet, new CellRef(0, 0), L);
 
-        Assert.StartsWith("A1, blank", text);
-        Assert.Contains("row 1 of 10, column A of 10", text);
+        // Value-first (Excel/Sheets order), the address conveys the position, and no "row N of M" totals.
+        Assert.Equal("blank, A1", text);
     }
 
     [Fact]
-    public void BuildAnnouncement_Position_IsOneBasedWithColumnLetter()
+    public void BuildAnnouncement_Address_IsColumnLetterAndOneBasedRow()
     {
         var (_, sheet) = NewWorkbook();
 
         var text = SpreadsheetAccessibility.BuildAnnouncement(sheet, new CellRef(2, 2), L);
 
-        Assert.StartsWith("C3,", text);
-        Assert.Contains("row 3 of 10, column C of 10", text);
+        Assert.Equal("blank, C3", text);
+        Assert.DoesNotContain(" of ", text); // no position/total announcement
     }
 
     [Fact]

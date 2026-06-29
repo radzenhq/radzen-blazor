@@ -123,15 +123,17 @@ public partial class SpreadsheetAccessibility : ComponentBase, IDisposable
 
         var parts = new List<string>();
 
-        // Address first ("B3").
-        parts.Add(cell.ToString());
-
-        // Content (formatted) or "blank".
+        // Content (formatted) or "blank" first - matches the value-then-reference order Excel and
+        // Google Sheets use (Excel narrates Value, Name, Context, Properties). The address already
+        // conveys the row and column, so we do not also announce "row R of N, column C of M" totals.
         worksheet.Cells.TryGet(cell.Row, cell.Column, out var c);
         var content = GetCellText(c);
         parts.Add(string.IsNullOrEmpty(content)
             ? localize(nameof(RadzenStrings.Spreadsheet_A11yBlank))
             : content);
+
+        // Address ("B3").
+        parts.Add(cell.ToString());
 
         // Header from a frozen header row (suppressed when there is none or it would echo the content).
         var header = GetHeader(worksheet, cell, content);
@@ -139,10 +141,6 @@ public partial class SpreadsheetAccessibility : ComponentBase, IDisposable
         {
             parts.Add(header);
         }
-
-        // Position: "row R of N, column C of M".
-        parts.Add(string.Format(CultureInfo.CurrentCulture, localize(nameof(RadzenStrings.Spreadsheet_A11yPosition)),
-            cell.Row + 1, worksheet.RowCount, ColumnRef.ToString(cell.Column), worksheet.ColumnCount));
 
         // Merged span.
         if (worksheet.MergedCells.Contains(cell))
