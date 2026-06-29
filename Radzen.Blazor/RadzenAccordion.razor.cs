@@ -346,7 +346,6 @@ namespace Radzen.Blazor
 
         IJSObjectReference? accordionJs;
         bool shouldRender = true;
-        bool renderModeNeedsInit;
 
         /// <inheritdoc />
         protected override bool ShouldRender()
@@ -359,9 +358,8 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if ((firstRender || renderModeNeedsInit) && RenderMode == AccordionRenderMode.Client && JSRuntime != null)
+            if (firstRender && accordionJs == null && JSRuntime != null)
             {
-                renderModeNeedsInit = false;
                 accordionJs = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "Radzen.createAccordion", Element, Multiple);
             }
@@ -466,20 +464,6 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(Multiple), Multiple) && accordionJs != null)
             {
                 await accordionJs.InvokeVoidAsync("setMultiple", parameters.GetValueOrDefault<bool>(nameof(Multiple)));
-            }
-
-            var renderModeChanged = parameters.DidParameterChange(nameof(RenderMode), RenderMode);
-            if (renderModeChanged)
-            {
-                var newRenderMode = parameters.GetValueOrDefault<AccordionRenderMode>(nameof(RenderMode));
-
-                if (newRenderMode == AccordionRenderMode.Server && accordionJs != null)
-                {
-                    try { await accordionJs.InvokeVoidAsync("dispose"); } catch { }
-                    accordionJs = null;
-                }
-
-                renderModeNeedsInit = newRenderMode == AccordionRenderMode.Client && accordionJs == null;
             }
 
             if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))

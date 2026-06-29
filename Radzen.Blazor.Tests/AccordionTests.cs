@@ -8,10 +8,17 @@ namespace Radzen.Blazor.Tests
 {
     public class AccordionTests
     {
+        static TestContext CreateContext()
+        {
+            var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            return ctx;
+        }
+
         [Fact]
         public void Accordion_Renders_CssClasses()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>();
 
             Assert.Contains(@"rz-accordion", component.Markup);
@@ -20,7 +27,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_Renders_AccordionItems()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -42,7 +49,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_Renders_ItemWithIcon()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -65,7 +72,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_SingleExpand_OnlyOneItemExpanded()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Multiple, false); // Single expand mode
@@ -91,7 +98,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_MultipleExpand_AllowsMultipleItemsExpanded()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
@@ -103,7 +110,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_Raises_ExpandEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             
             var expandRaised = false;
             int expandedIndex = -1;
@@ -135,7 +142,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_Raises_CollapseEvent()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             
             var collapseRaised = false;
             int collapsedIndex = -1;
@@ -168,7 +175,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_DisabledItem_CannotExpand()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             
             var expandRaised = false;
 
@@ -195,7 +202,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_RenderMode_DefaultsToServer()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>();
 
             Assert.Equal(AccordionRenderMode.Server, component.Instance.RenderMode);
@@ -204,8 +211,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_RenderMode_CanBeSetToClient()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.RenderMode, AccordionRenderMode.Client);
@@ -226,8 +232,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_ClientMode_RendersAllItems()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.RenderMode, AccordionRenderMode.Client);
@@ -259,8 +264,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_ClientMode_Raises_ExpandEvent()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
 
             var expandRaised = false;
             int expandedIndex = -1;
@@ -292,8 +296,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_ClientMode_Raises_CollapseEvent()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
 
             var collapseRaised = false;
             int collapsedIndex = -1;
@@ -326,8 +329,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_ClientMode_DisabledItem_CannotExpand()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
 
             var expandRaised = false;
 
@@ -354,8 +356,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_ClientMode_SingleExpand_CollapsesOthers()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
 
             var collapseRaised = false;
             int collapsedIndex = -1;
@@ -395,8 +396,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_ClientMode_Multiple_DoesNotCollapseOthers()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
 
             var collapsedIndices = new System.Collections.Generic.List<int>();
 
@@ -434,8 +434,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_ClientMode_SelectedIndexChanged_Fires()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
 
             int selectedIndex = -1;
 
@@ -469,7 +468,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_Container_HasNoTabindexOrRole()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -489,7 +488,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_AllHeaderButtons_AreInTabOrder()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -518,7 +517,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_DisabledItem_RendersDisabledButton()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -538,7 +537,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_HeaderButtons_ExposeAriaExpanded()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -564,8 +563,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_ArrowDown_MovesFocusToNextHeader()
         {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -594,7 +592,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_Header_HasHeadingRoleAndDefaultLevel()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>
@@ -616,7 +614,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_Header_HonorsCustomAriaLevel()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.AriaLevel, 2);
@@ -646,7 +644,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Accordion_HeaderButton_KeepsAriaWiringInsideHeading()
         {
-            using var ctx = new TestContext();
+            using var ctx = CreateContext();
             var component = ctx.RenderComponent<RadzenAccordion>(parameters =>
             {
                 parameters.Add(p => p.Items, builder =>

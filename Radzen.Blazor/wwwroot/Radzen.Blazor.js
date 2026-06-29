@@ -710,10 +710,23 @@ window.Radzen = {
         items.expanders[index].setAttribute('aria-hidden', expanded ? 'false' : 'true');
     }
 
+    function onKeyDown(e) {
+        var key = e.code || e.key;
+        if (key !== 'ArrowUp' && key !== 'ArrowDown' && key !== 'Home' && key !== 'End') {
+            return;
+        }
+        var target = e.target;
+        if (target && target.closest && target.closest('.rz-accordion-header')) {
+            e.preventDefault();
+        }
+    }
+
+    el.addEventListener('keydown', onKeyDown);
+
     return {
         toggle: function (index, expanded) { toggleItem(index, expanded); },
         setMultiple: function (value) { multiple = value; },
-        dispose: function () { }
+        dispose: function () { el.removeEventListener('keydown', onKeyDown); }
     };
   },
   loadGoogleMaps: function (defaultView, apiKey, resolve, reject, language) {
