@@ -2893,12 +2893,54 @@ window.Radzen = {
 
     return readAsDataURL(fileInput);
   },
+  closeMenuItem: function (item) {
+    if (!item || !item.classList || !item.classList.contains('rz-navigation-item-active')) {
+      return;
+    }
+
+    item.classList.remove('rz-navigation-item-active');
+
+    var wrapper = item.querySelector('.rz-navigation-item-wrapper');
+    if (wrapper) {
+      wrapper.classList.remove('rz-navigation-item-wrapper-active');
+    }
+
+    var children = item.querySelector('.rz-navigation-menu');
+    if (children) {
+      item.setAttribute('aria-expanded', false);
+      children.onanimationend = function () {
+        children.style.display = 'none';
+        children.style.insetInlineStart = '';
+        children.onanimationend = null;
+      };
+      children.classList.remove('rz-open');
+      children.classList.add('rz-close');
+
+      children.querySelectorAll('.rz-navigation-item-active').forEach(function (nested) {
+        Radzen.closeMenuItem(nested);
+      });
+    }
+
+    var icon = item.querySelector('.rz-navigation-item-icon-children');
+    if (icon) {
+      icon.classList.remove('rz-state-expanded');
+      icon.classList.add('rz-state-collapsed');
+    }
+  },
   toggleMenuItem: function (target, event, defaultActive, clickToOpen) {
     var item = target.closest('.rz-navigation-item');
 
     var active = defaultActive != undefined ? defaultActive : !item.classList.contains('rz-navigation-item-active');
 
     function toggle(active) {
+      if (active && item.parentElement) {
+        Array.prototype.forEach.call(item.parentElement.children, function (sibling) {
+          if (sibling !== item) {
+            Radzen.closeMenuItem(sibling);
+          }
+        });
+      }
+
       item.classList.toggle('rz-navigation-item-active', active);
 
       target.classList.toggle('rz-navigation-item-wrapper-active', active);
