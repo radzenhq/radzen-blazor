@@ -173,16 +173,6 @@ $chip-list-gap: 0.5rem !default;
   }
 }
 
-@each $style, $map in map-merge($severity-styles-map, $base-styles-map) {
-  .rz-chip-#{$style}:focus-visible:not(.rz-state-disabled) {
-    @if $style != 'dark' and $style != 'light' {
-      outline-color: var(--rz-#{$style});
-    } @else {
-      outline-color: var(--rz-outline-color);
-    }
-  }
-}
-
 .rz-chip-list {
   display: flex;
   gap: var(--rz-chip-list-gap);
