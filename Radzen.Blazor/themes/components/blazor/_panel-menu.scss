@@ -175,8 +175,8 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     transition: var(--rz-panel-menu-item-transition);
   }
 
-  /* Stacked (NavigationRail) style */
-  &.rz-panel-menu-stacked {
+  /* Stacked (NavigationRail) style - applies to first-level items only */
+  &.rz-panel-menu-stacked > .rz-navigation-item > .rz-navigation-item-wrapper {
     .rz-navigation-item-link {
       flex-direction: column;
       align-items: center;
@@ -191,6 +191,13 @@ $panel-menu-toggle-icon-opacity: 1 !default;
 
     .rz-navigation-item-icon {
       margin-inline: 0;
+    }
+
+    .rz-navigation-item-icon-children {
+      position: absolute;
+      inset-block-start: 0.25rem;
+      inset-inline-end: 0.25rem;
+      margin-inline-start: 0;
     }
   }
 
