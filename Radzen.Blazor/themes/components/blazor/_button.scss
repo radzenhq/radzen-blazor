@@ -189,17 +189,6 @@ $button-sizes: map-merge(
   }
 }
 
-// Focus Styles
-@each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
-  .rz-button.rz-#{$style}:focus-visible {
-    @if $style != 'dark' and $style != 'light' {
-      outline-color: var(--rz-#{$style});
-    } @else {
-      outline-color: var(--rz-outline-color);
-    }
-  }
-}
-
 @each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
   .rz-button.rz-#{$style} {
     @each $name, $value in $button {
@@ -218,15 +207,6 @@ $button-sizes: map-merge(
     }
     &.rz-variant-flat {
       box-shadow: none !important;
-
-      &:focus-visible {
-        @if $style != 'dark' and $style != 'light' {
-          outline-color: var(--rz-#{$style});
-        } 
-        @else {
-          outline-color: var(--rz-outline-color);
-        }
-      }
     }
   }
 }

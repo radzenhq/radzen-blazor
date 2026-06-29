@@ -7,6 +7,16 @@ $splitbutton-sizes: xs, sm, md, lg;
 .rz-splitbutton {
   box-sizing: border-box;
   display: inline-flex;
+  border-radius: var(--rz-button-border-radius);
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-button-focus-outline);
+    outline-offset: var(--rz-button-focus-outline-offset);
+  }
 
   .rz-button-icon-only {
     .rz-button-text {

@@ -40,7 +40,7 @@ $input-hover-border: var(--rz-border-hover) !default;
 $input-hover-border-block-end: var(--rz-input-hover-border) !default;
 $input-focus-shadow: $input-shadow !default;
 $input-focus-background-color: var(--rz-base-background-color) !default;
-$input-focus-border: var(--rz-border-focus) !default;
+$input-focus-border: var(--rz-border-width) solid var(--rz-outline-color) !default;
 $input-focus-border-block-end: var(--rz-input-focus-border) !default;
 $input-focus-outline: var(--rz-outline-normal) !default;
 $input-focus-outline-offset: 0 !default;
