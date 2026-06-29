@@ -903,16 +903,6 @@ $selectbar-selected-color: var(--rz-on-primary-lighter) !default;
 $selectbar-selected-border: var(--rz-border-base-600) !default;
 $selectbar-border-radius: var(--rz-border-radius) !default;
 
-.rz-selectbar {
-  .rz-button {
-    box-shadow: none;
-    &:hover {
-      box-shadow: none !important;
-      background: var(--rz-base-600);
-    }
-  }
-}
-
 // DatePicker
 $datepicker-line-height: 1.5rem !default;
 $datepicker-trigger-icon-color: var(--rz-text-secondary-color) !default;
