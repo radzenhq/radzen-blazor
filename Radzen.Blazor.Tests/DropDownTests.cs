@@ -79,6 +79,39 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDown_TabAfterArrow_InvokesFocusNextOnce()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx);
+
+            var input = component.Find("[role='combobox']");
+
+            input.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+            input.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab" });
+
+            var focusNextCalls = ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.focusNext");
+            Assert.Equal(1, focusNextCalls);
+        }
+
+        [Fact]
+        public void DropDown_TabWithoutKeydownSuppression_DoesNotInvokeFocusNext()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx);
+
+            var input = component.Find("[role='combobox']");
+
+            input.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab" });
+
+            var focusNextCalls = ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.focusNext");
+            Assert.Equal(0, focusNextCalls);
+        }
+
+        [Fact]
         public void DropDown_AppliesSelectionStyleForIntValue()
         {
             using var ctx = new TestContext();

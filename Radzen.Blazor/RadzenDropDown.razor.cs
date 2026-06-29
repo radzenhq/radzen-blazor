@@ -395,7 +395,7 @@ namespace Radzen.Blazor
                 await base.HandleKeyPress(args, isFilter, shouldSelectOnChange);
 
                 var key = args.Code ?? args.Key;
-                if (key == "Tab" && (wasOpen || wasPreventKeydown) && JSRuntime != null)
+                if (key == "Tab" && (isFilter ? wasOpen : wasPreventKeydown) && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.focusNext", Element, args.ShiftKey);
                 }
