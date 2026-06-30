@@ -409,7 +409,8 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.resizeSplitter", UniqueID, new MouseEventArgs()
                 {
                     ClientX = rect.Left + deltaX,
-                    ClientY = rect.Top + deltaY
+                    ClientY = rect.Top + deltaY,
+                    Buttons = 1
                 });
             }
             else

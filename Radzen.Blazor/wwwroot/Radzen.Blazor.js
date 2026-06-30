@@ -5463,7 +5463,9 @@ window.Radzen = {
         var el = document.getElementById(id);
         if (el && Radzen[el]) {
             Radzen[el].mouseMoveHandler(e);
-            Radzen[el].mouseUpHandler(e);
+            if (Radzen[el]) {
+                Radzen[el].mouseUpHandler(e);
+            }
         }
     },
     openWaiting: function() {
