@@ -438,7 +438,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (Worksheet?.Selection.Cell == CellRef.Invalid)
         {
-            sheet.Selection.Select(new CellRef(0, 0));
+            Worksheet.Selection.Select(new CellRef(0, 0));
         }
     }
 
