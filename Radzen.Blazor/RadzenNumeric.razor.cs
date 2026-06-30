@@ -431,6 +431,31 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets the value exposed via the <c>aria-invalid</c> attribute of the spinbutton input.
+        /// Returns <c>"true"</c> when the current value is outside the configured <see cref="Min" />/<see cref="Max" /> range,
+        /// or <c>null</c> when the value is within range or <see cref="Min" />/<see cref="Max" /> are not set.
+        /// </summary>
+        protected string? AriaInvalid
+        {
+            get
+            {
+                if (_value == null || (Min == null && Max == null))
+                {
+                    return null;
+                }
+
+                var current = ConvertToDecimal(_value);
+
+                if (Min != null && current < Min.Value || Max != null && current > Max.Value)
+                {
+                    return "true";
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether this instance has value.
         /// </summary>
         /// <value><c>true</c> if this instance has value; otherwise, <c>false</c>.</value>
@@ -822,6 +847,36 @@ namespace Radzen.Blazor
             {
                 stopKeydownPropagation = false;
                 preventKeyPress = false;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the accessible name applied to the spinbutton input via the <c>aria-label</c> attribute.
+        /// When not set, the component falls back to <see cref="FormComponent{T}.Name" /> so the spinbutton has an accessible name by default.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        /// <summary>
+        /// Gets the accessible name applied to the spinbutton input. Returns <c>null</c> when the consumer has already
+        /// supplied an <c>aria-label</c> or <c>aria-labelledby</c> attribute via <see cref="RadzenComponent.Attributes" /> or
+        /// <see cref="InputAttributes" />, so a consumer-supplied accessible name is never overridden.
+        /// </summary>
+        protected string? InputAriaLabel
+        {
+            get
+            {
+                if (Attributes != null && (Attributes.ContainsKey("aria-label") || Attributes.ContainsKey("aria-labelledby")))
+                {
+                    return null;
+                }
+
+                if (InputAttributes != null && (InputAttributes.ContainsKey("aria-label") || InputAttributes.ContainsKey("aria-labelledby")))
+                {
+                    return null;
+                }
+
+                return !string.IsNullOrEmpty(AriaLabel) ? AriaLabel : Name;
             }
         }
 

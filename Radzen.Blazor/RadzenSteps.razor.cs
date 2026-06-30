@@ -455,6 +455,13 @@ namespace Radzen.Blazor
             return SelectedIndex == index;
         }
 
+        int? focusedIndex;
+
+        bool IsFocused(int index)
+        {
+            return (focusedIndex ?? SelectedIndex) == index;
+        }
+
         /// <summary>
         /// Selects the specified step.
         /// </summary>
@@ -484,6 +491,7 @@ namespace Radzen.Blazor
             {
                 transitionKey++;
                 SelectedIndex = newIndex;
+                focusedIndex = newIndex;
 
                 if (raiseChange)
                 {
@@ -619,6 +627,9 @@ namespace Radzen.Blazor
 
             if (target >= 0 && target < steps.Count && JSRuntime != null)
             {
+                focusedIndex = target;
+                StateHasChanged();
+
                 await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId() + target.ToString(System.Globalization.CultureInfo.InvariantCulture) + "s");
             }
         }

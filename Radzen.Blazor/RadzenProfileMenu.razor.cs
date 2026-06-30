@@ -151,9 +151,10 @@ namespace Radzen.Blazor
 
                     focusedIndex = key == "ArrowUp" ? items.Count - 1 : 0;
                 }
-                else
+                else if (items.Count > 0)
                 {
-                    focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
+                    var start = Math.Clamp(focusedIndex, 0, items.Count - 1);
+                    focusedIndex = (start + (key == "ArrowUp" ? -1 : 1) + items.Count) % items.Count;
                 }
             }
             else if (key == "Home" || key == "End")
@@ -213,6 +214,26 @@ namespace Radzen.Blazor
                 if (!Collapsed)
                 {
                     Close();
+                }
+            }
+            else if (!Collapsed && args.Key != null && args.Key.Length == 1 && !char.IsControl(args.Key[0]) && items.Count > 0)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                var search = args.Key;
+                var start = focusedIndex < 0 ? 0 : focusedIndex;
+
+                for (var offset = 1; offset <= items.Count; offset++)
+                {
+                    var index = (start + offset) % items.Count;
+                    var text = items[index].Text;
+
+                    if (text != null && text.StartsWith(search, StringComparison.OrdinalIgnoreCase))
+                    {
+                        focusedIndex = index;
+                        break;
+                    }
                 }
             }
             else

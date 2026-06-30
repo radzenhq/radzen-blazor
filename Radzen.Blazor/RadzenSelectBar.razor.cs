@@ -149,6 +149,13 @@ namespace Radzen.Blazor
         public string? AriaLabel { get; set; }
 
         /// <summary>
+        /// Gets or sets the aria-labelledby of the select bar. References the id of a visible element that labels the group.
+        /// </summary>
+        /// <value>The aria-labelledby.</value>
+        [Parameter]
+        public string? AriaLabelledBy { get; set; }
+
+        /// <summary>
         /// Gets or sets the items.
         /// </summary>
         /// <value>The items.</value>
@@ -374,10 +381,12 @@ namespace Radzen.Blazor
             }
 
             focused = true;
+            StateHasChanged();
         }
         void OnBlur()
         {
             focused = false;
+            StateHasChanged();
         }
     }
 }

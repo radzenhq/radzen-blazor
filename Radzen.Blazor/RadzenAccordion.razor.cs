@@ -418,14 +418,19 @@ namespace Radzen.Blazor
             shouldRender = true;
         }
 
+        bool preventKeyPress;
+
         async Task OnHeaderKeyDown(KeyboardEventArgs args, RadzenAccordionItem item)
         {
             var key = args.Code ?? args.Key;
 
             if (key != "ArrowDown" && key != "ArrowUp" && key != "Home" && key != "End")
             {
+                preventKeyPress = false;
                 return;
             }
+
+            preventKeyPress = true;
 
             var navigable = items.Where(i => i.Visible && !i.Disabled).ToList();
             var current = navigable.IndexOf(item);

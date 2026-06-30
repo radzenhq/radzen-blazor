@@ -500,7 +500,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Tabs_SelectedPanel_HasTabIndexZero()
+        public void Tabs_SelectedPanel_HasNoTabIndex()
         {
             using var ctx = new TestContext();
             var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
@@ -509,7 +509,7 @@ namespace Radzen.Blazor.Tests
             );
 
             var panel = component.Find("div.rz-tabview-panel");
-            Assert.Equal("0", panel.GetAttribute("tabindex"));
+            Assert.Null(panel.GetAttribute("tabindex"));
         }
 
         [Fact]

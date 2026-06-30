@@ -23,10 +23,11 @@
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {
-        new KeyboardShortcut { Key = "Tab", Action = "Move focus to a resize bar." },
+        new KeyboardShortcut { Key = "Tab", Action = "Move focus to the next resize bar or collapse/expand button." },
         new KeyboardShortcut { Key = "Left or Right Arrow", Action = "Resize the panes of a horizontal Splitter." },
         new KeyboardShortcut { Key = "Up or Down Arrow", Action = "Resize the panes of a vertical Splitter." },
-        new KeyboardShortcut { Key = "Home", Action = "Collapse the pane to its minimum size." },
-        new KeyboardShortcut { Key = "End", Action = "Expand the pane to its maximum size." }
+        new KeyboardShortcut { Key = "Home", Action = "Resize the pane to its minimum (smallest allowed) size." },
+        new KeyboardShortcut { Key = "End", Action = "Resize the pane to its maximum (largest allowed) size." },
+        new KeyboardShortcut { Key = "Enter or Space", Action = "Collapse or restore the focused pane (on the resize bar or the collapse/expand button)." }
     };
 }

@@ -214,24 +214,5 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        bool preventKeyPress;
-        bool stopKeypressPropagation;
-        async Task OnKeyPress(KeyboardEventArgs args, Task task)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
-
-            if (key == "Space" || key == "Enter")
-            {
-                preventKeyPress = true;
-                stopKeypressPropagation = true;
-
-                await task;
-            }
-            else
-            {
-                preventKeyPress = false;
-                stopKeypressPropagation = false;
-            }
-        }
     }
 }

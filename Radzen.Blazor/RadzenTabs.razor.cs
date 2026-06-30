@@ -133,7 +133,7 @@ namespace Radzen.Blazor
 
         internal List<RadzenTabsItem> NavigableTabs()
         {
-            var item = tabs.ElementAtOrDefault(focusedIndex) ?? tabs.FirstOrDefault();
+            var item = tabs.ElementAtOrDefault(selectedIndex) ?? tabs.FirstOrDefault();
 
             if (item == null)
             {
@@ -305,16 +305,28 @@ namespace Radzen.Blazor
         {
             selectedIndex = SelectedIndex;
 
-            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+            SetFocusedIndex();
+
+            if (focusedIndex == -1)
+            {
+                focusedIndex = 0;
+            }
 
             base.OnInitialized();
         }
 
         void SetFocusedIndex()
         {
-            if (focusedIndex != selectedIndex)
+            var selected = tabs.ElementAtOrDefault(selectedIndex);
+
+            if (selected != null)
             {
-                focusedIndex = selectedIndex;
+                var navigableIndex = NavigableTabs().IndexOf(selected);
+
+                if (navigableIndex != -1)
+                {
+                    focusedIndex = navigableIndex;
+                }
             }
         }
 
@@ -469,7 +481,17 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                focusedIndex = key == "Home" ? 0 : navigableTabs.Count - 1;
+                var count = navigableTabs.Count;
+                var direction = key == "Home" ? 1 : -1;
+
+                focusedIndex = key == "Home" ? 0 : count - 1;
+
+                var steps = 0;
+                while (navigableTabs.ElementAtOrDefault(focusedIndex)?.Disabled == true && steps < count)
+                {
+                    focusedIndex = ((focusedIndex + direction) % count + count) % count;
+                    steps++;
+                }
             }
             else if (key == "Space" || key == "Enter")
             {

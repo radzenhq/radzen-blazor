@@ -962,6 +962,67 @@ namespace Radzen.Blazor
                     //
                 }
             }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeydown = true;
+
+                try
+                {
+                    var newSelectedIndex = key == "Home" ? 0 : items.Count - 1;
+                    var shouldChange = newSelectedIndex != selectedIndex && newSelectedIndex >= 0;
+                    if (shouldChange && JSRuntime != null)
+                    {
+                        selectedIndex = newSelectedIndex;
+                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", gridInstance.GridId(), key == "Home" ? "ArrowDown" : "ArrowUp", key == "Home" ? selectedIndex - 1 : selectedIndex + 1, null);
+                        await gridInstance.OnRowSelect(items[selectedIndex], false);
+                    }
+
+                    if (!Multiple && JSRuntime != null)
+                    {
+                        var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+                        if (shouldChange && (!popupOpened || gridInstance.IsVirtualizationAllowed()))
+                        {
+                            await OnSelectItem(items[selectedIndex], true);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+            else if (key == "PageUp" || key == "PageDown")
+            {
+                preventKeydown = true;
+
+                try
+                {
+                    var pageStep = PageSize > 0 ? PageSize : 1;
+                    var startIndex = selectedIndex >= 0 ? selectedIndex : (key == "PageDown" ? -1 : items.Count);
+                    var newSelectedIndex = Math.Clamp(startIndex + (key == "PageUp" ? -pageStep : pageStep), 0, items.Count - 1);
+                    var shouldChange = newSelectedIndex != selectedIndex && newSelectedIndex >= 0;
+                    if (shouldChange && JSRuntime != null)
+                    {
+                        var previousIndex = selectedIndex;
+                        selectedIndex = newSelectedIndex;
+                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", gridInstance.GridId(), key == "PageUp" ? "ArrowUp" : "ArrowDown", previousIndex, null);
+                        await gridInstance.OnRowSelect(items[selectedIndex], false);
+                    }
+
+                    if (!Multiple && JSRuntime != null)
+                    {
+                        var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+                        if (shouldChange && (!popupOpened || gridInstance.IsVirtualizationAllowed()))
+                        {
+                            await OnSelectItem(items[selectedIndex], true);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
             else if ((key == "ArrowLeft" || key == "ArrowRight") && !gridInstance.IsVirtualizationAllowed())
             {
                 if (key == "ArrowLeft")

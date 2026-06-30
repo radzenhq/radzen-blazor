@@ -14,7 +14,7 @@
         else if (menu?.Options?.Items != null && menu.Options.Items.Any())
         {
             <div class="rz-context-menu">
-                <RadzenMenu Click="@(args => { if (menu?.Options?.Click != null) { menu.Options.Click(args); } })" Responsive="false" IsContextMenu="true">
+                <RadzenMenu Click="@(args => { if (menu?.Options?.Click != null) { menu.Options.Click(args); } })" Close="@(() => Service!.Close())" Responsive="false" IsContextMenu="true">
                     @foreach (var item in menu.Options.Items)
                     {
                         <RadzenMenuItem Text="@item.Text" Value="@item.Value" Icon="@item.Icon" IconColor="@item.IconColor" Image="@item.Image" ImageStyle="@item.ImageStyle" Disabled=@item.Disabled></RadzenMenuItem>

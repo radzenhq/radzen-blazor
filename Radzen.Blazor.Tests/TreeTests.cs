@@ -233,6 +233,84 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Tree_Renders_AriaLabelledBy()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.AriaLabelledBy, "tree-heading");
+            });
+
+            var container = component.Find("[role=tree]");
+
+            Assert.Equal("tree-heading", container.GetAttribute("aria-labelledby"));
+        }
+
+        [Fact]
+        public void Tree_Renders_SetSizeAndPosInSet()
+        {
+            using var ctx = new TestContext();
+            var data = new List<Category>
+            {
+                new Category
+                {
+                    Name = "Electronics",
+                    Products = new List<Product>
+                    {
+                        new Product { Name = "Laptop" },
+                        new Product { Name = "Phone" },
+                        new Product { Name = "Tablet" }
+                    }
+                },
+                new Category
+                {
+                    Name = "Books",
+                    Products = new List<Product>()
+                }
+            };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.AddAttribute(2, "ChildrenProperty", "Products");
+                    builder.AddAttribute(3, "Expanded", (object c) => true);
+                    builder.AddAttribute(4, "HasChildren", (object c) => c is Category);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenTreeLevel>(5);
+                    builder.AddAttribute(6, "TextProperty", "Name");
+                    builder.AddAttribute(7, "HasChildren", (object product) => false);
+                    builder.CloseComponent();
+                });
+            });
+
+            var treeItems = component.FindAll("[role=treeitem]");
+
+            var roots = treeItems.Where(i => i.GetAttribute("aria-level") == "1").ToList();
+
+            Assert.Equal(2, roots.Count);
+
+            Assert.Equal("2", roots[0].GetAttribute("aria-setsize"));
+            Assert.Equal("1", roots[0].GetAttribute("aria-posinset"));
+            Assert.Equal("2", roots[1].GetAttribute("aria-setsize"));
+            Assert.Equal("2", roots[1].GetAttribute("aria-posinset"));
+
+            var children = treeItems.Where(i => i.GetAttribute("aria-level") == "2").ToList();
+
+            Assert.Equal(3, children.Count);
+
+            for (var i = 0; i < children.Count; i++)
+            {
+                Assert.Equal("3", children[i].GetAttribute("aria-setsize"));
+                Assert.Equal((i + 1).ToString(), children[i].GetAttribute("aria-posinset"));
+            }
+        }
+
+        [Fact]
         public void Tree_Renders_TreeItemRoleAndLevel()
         {
             using var ctx = new TestContext();

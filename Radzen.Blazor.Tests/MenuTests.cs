@@ -210,6 +210,53 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void ContextMenu_ArrowDown_Wraps_From_Last_To_First()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.IsContextMenu, true);
+                parameters.Add(p => p.Responsive, false);
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            var menu = component.Find("ul[role=menu]");
+            menu.Focus();
+
+            menu = component.Find("ul[role=menu]");
+            menu.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+
+            Assert.Equal("data-item", component.Find("ul[role=menu]").GetAttribute("aria-activedescendant"));
+
+            menu = component.Find("ul[role=menu]");
+            menu.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+
+            Assert.Equal("home-item", component.Find("ul[role=menu]").GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void ContextMenu_ArrowUp_Wraps_From_First_To_Last()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenMenu>(parameters =>
+            {
+                parameters.Add(p => p.IsContextMenu, true);
+                parameters.Add(p => p.Responsive, false);
+                parameters.Add(p => p.ChildContent, MenuWithSubmenu);
+            });
+
+            var menu = component.Find("ul[role=menu]");
+            menu.Focus();
+
+            menu = component.Find("ul[role=menu]");
+            menu.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowUp" });
+
+            Assert.Equal("data-item", component.Find("ul[role=menu]").GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
         public void ContextMenu_ArrowRight_Opens_Submenu()
         {
             using var ctx = new TestContext();

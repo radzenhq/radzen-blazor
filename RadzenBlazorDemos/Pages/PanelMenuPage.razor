@@ -60,13 +60,14 @@
     public List<KeyboardShortcut> shortcuts = new()
     {
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a PanelMenu." },
-        new KeyboardShortcut { Key = "DownArrow", Action = "Focus next PanelMenu item." },
-        new KeyboardShortcut { Key = "UpArrow", Action = "Focus previous PanelMenu item." },
+        new KeyboardShortcut { Key = "DownArrow", Action = "Move focus to the next visible item, descending into expanded submenus and back out at submenu boundaries." },
+        new KeyboardShortcut { Key = "UpArrow", Action = "Move focus to the previous visible item, descending into expanded submenus and back out at submenu boundaries." },
         new KeyboardShortcut { Key = "Home", Action = "Focus first PanelMenu item." },
         new KeyboardShortcut { Key = "End", Action = "Focus last PanelMenu item." },
-        new KeyboardShortcut { Key = "RightArrow", Action = "Expand a collapsed item, or move focus to its first child if already expanded." },
+        new KeyboardShortcut { Key = "RightArrow", Action = "Expand a collapsed item; if already expanded, move focus to its first child; no effect on items without children." },
         new KeyboardShortcut { Key = "LeftArrow or Esc", Action = "Collapse the current submenu and move focus to its parent item." },
         new KeyboardShortcut { Key = "Space or Enter on an expandable item", Action = "Change the state of a focused PanelMenu item switching between expanded and collapsed." },
-        new KeyboardShortcut { Key = "Space or Enter on a non-expandable item", Action = "Navigate." }
+        new KeyboardShortcut { Key = "Space or Enter on a non-expandable item", Action = "Navigate." },
+        new KeyboardShortcut { Key = "Disabled items", Action = "Disabled items can receive focus but cannot be activated or expanded." }
     };
 }

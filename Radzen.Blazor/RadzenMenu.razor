@@ -3,7 +3,7 @@
 @if (Visible)
 {
     <ul @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() role="@(IsContextMenu ? "menu" : "menubar")" aria-label="@AriaLabel"
-        aria-orientation="@(IsContextMenu ? "vertical" : "horizontal")" aria-activedescendant="@ActiveDescendantId"
+        aria-orientation="@(IsContextMenu ? "vertical" : "horizontal")" aria-activedescendant="@(string.IsNullOrEmpty(ActiveDescendantId) ? null : ActiveDescendantId)"
         tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation"
         @onfocus=@OnFocus>
         @if (Responsive)

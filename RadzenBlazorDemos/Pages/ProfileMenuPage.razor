@@ -26,10 +26,11 @@
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a ProfileMenu." },
         new KeyboardShortcut { Key = "Space or Enter", Action = "Open the ProfileMenu." },
         new KeyboardShortcut { Key = "Space or Enter on a ProfileMenu item", Action = "Navigate." },
-        new KeyboardShortcut { Key = "DownArrow", Action = "Focus next ProfileMenu item." },
-        new KeyboardShortcut { Key = "UpArrow", Action = "Focus previous ProfileMenu item." },
-        new KeyboardShortcut { Key = "Home", Action = "Focus first ProfileMenu item." },
-        new KeyboardShortcut { Key = "End", Action = "Focus last ProfileMenu item." },
+        new KeyboardShortcut { Key = "DownArrow", Action = "Open the menu (focus the first item) when closed, or focus the next item when open." },
+        new KeyboardShortcut { Key = "UpArrow", Action = "Open the menu (focus the last item) when closed, or focus the previous item when open." },
+        new KeyboardShortcut { Key = "Home", Action = "Open the menu if closed and focus the first item." },
+        new KeyboardShortcut { Key = "End", Action = "Open the menu if closed and focus the last item." },
+        new KeyboardShortcut { Key = "A-Z, a-z, 0-9", Action = "Type a character to focus the next item whose text starts with it." },
         new KeyboardShortcut { Key = "Esc", Action = "Close the ProfileMenu." }
     };
 }

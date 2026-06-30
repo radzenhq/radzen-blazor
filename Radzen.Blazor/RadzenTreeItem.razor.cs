@@ -147,6 +147,20 @@ namespace Radzen.Blazor
             }
         }
 
+        List<RadzenTreeItem> Siblings => ParentItem?.items ?? Tree?.items ?? new List<RadzenTreeItem>();
+
+        internal int SetSize => Siblings.Count;
+
+        internal int PosInSet
+        {
+            get
+            {
+                var index = Siblings.IndexOf(this);
+
+                return index >= 0 ? index + 1 : 1;
+            }
+        }
+
         /// <summary>
         /// Toggles the checked state of the tree node in response to a mouse event, if checkboxes are enabled and the
         /// node is checkable.
@@ -429,6 +443,11 @@ namespace Radzen.Blazor
                     await UpdateCheckedValuesWithParents(value);
                 }
             }
+        }
+
+        internal async Task OnCheckBoxChange(bool? value)
+        {
+            await CheckedChange(!(IsChecked() ?? true));
         }
 
         internal bool? IsChecked()

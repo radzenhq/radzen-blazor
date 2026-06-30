@@ -225,6 +225,11 @@ namespace Radzen.Blazor
                 {
                     var item = currentItems[focusedIndex];
 
+                    if (item.Disabled)
+                    {
+                        return;
+                    }
+
                     if (item.items.Count > 0)
                     {
                         await item.Toggle();

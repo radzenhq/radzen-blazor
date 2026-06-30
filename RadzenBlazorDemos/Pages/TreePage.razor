@@ -25,12 +25,12 @@
         new KeyboardShortcut { Key = "Tab", Action = "Move focus into the Tree." },
         new KeyboardShortcut { Key = "UpArrow", Action = "Move focus to the previous item." },
         new KeyboardShortcut { Key = "DownArrow", Action = "Move focus to the next item." },
-        new KeyboardShortcut { Key = "RightArrow", Action = "Expand the focused item, or move to its first child if already expanded." },
+        new KeyboardShortcut { Key = "RightArrow", Action = "Expand the focused collapsed item; if already expanded, move focus to its first child; no effect on leaf items." },
         new KeyboardShortcut { Key = "LeftArrow", Action = "Collapse the focused item, or move to its parent if collapsed or a leaf." },
         new KeyboardShortcut { Key = "Home", Action = "Move focus to the first item." },
         new KeyboardShortcut { Key = "End", Action = "Move focus to the last item." },
         new KeyboardShortcut { Key = "Enter", Action = "Select the focused item; on an expandable item also expand or collapse it." },
-        new KeyboardShortcut { Key = "Space", Action = "Select the focused item (and check/uncheck it when checkboxes are enabled)." },
+        new KeyboardShortcut { Key = "Space", Action = "Select the focused item; when checkboxes are enabled, also toggle its checkbox." },
         new KeyboardShortcut { Key = "Alphanumeric", Action = "Move focus to the next item whose text starts with the typed character." }
     };
 }

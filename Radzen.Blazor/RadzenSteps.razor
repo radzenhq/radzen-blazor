@@ -26,7 +26,7 @@
                     <button type="button" role="tab" id="@(GetId() + i.ToString() + "s")" title="@step.Title" aria-label="@step.AriaLabel"
                        aria-selected="@(IsSelected(i, step) ? "true" : "false")"
                        aria-controls="@($"{GetId()}-panel-{i}")"
-                       tabindex="@(IsSelected(i, step) ? 0 : -1)"
+                       tabindex="@(IsFocused(i) ? 0 : -1)"
                        @onclick="@(async (args) => { if (!step.Disabled && AllowStepSelect) { await SelectStep(step, true); } })"
                        @onkeydown="@(args => OnTabKeyDown(args, step, index))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeypressPropagation"
                        aria-disabled="@step.Disabled" class="rz-menuitem-link">

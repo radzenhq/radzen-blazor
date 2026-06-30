@@ -1861,6 +1861,11 @@ window.Radzen = {
   openContextMenu: function (x,y,id, instance, callback) {
     Radzen.closePopup(id);
 
+    var invoker = document.activeElement;
+    if (invoker && invoker !== document.body) {
+        Radzen[id + 'contextMenuInvoker'] = invoker;
+    }
+
     Radzen.openPopup(null, id, false, null, x, y, instance, callback);
 
     requestAnimationFrame(function () {
@@ -1872,6 +1877,13 @@ window.Radzen = {
             }
         }
     });
+  },
+  restoreContextMenuFocus: function (id) {
+    var invoker = Radzen[id + 'contextMenuInvoker'];
+    Radzen[id + 'contextMenuInvoker'] = null;
+    if (invoker && document.body.contains(invoker) && typeof invoker.focus === 'function') {
+        invoker.focus();
+    }
   },
   openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback, clientX, clientY) {
     Radzen.closeTooltip(id);

@@ -9,7 +9,7 @@
 @if (Visible)
 {
     <div @ref="@Element" aria-label="@(!Multiple && selectedItem != null ? GetItemOrValueFromProperty(selectedItem, TextProperty ?? string.Empty) : EmptyAriaLabel)" @attributes="Attributes" class="@GetCssClass()"
-         role="combobox" aria-haspopup="listbox" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@ListId" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
+         role="combobox" aria-haspopup="listbox" aria-autocomplete="@(AllowFiltering ? "list" : "none")" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@ListId" aria-activedescendant="@ActiveDescendantId" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
          @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown" id="@GetId()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         <div class="rz-helper-hidden-accessible">
@@ -218,4 +218,8 @@
                     @onclick="@ClearAll" @onclick:stopPropagation="true"></button>
         }
     </div>
+}
+
+@code {
+    internal string? ActiveDescendantId => isPopupOpen && selectedIndex >= 0 ? $"{ListId}-{selectedIndex}" : null;
 }

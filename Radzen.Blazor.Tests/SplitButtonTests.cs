@@ -32,7 +32,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SplitButton_Renders_ToggleButton_AriaHasPopupAndExpanded()
+        public void SplitButton_Renders_Wrapper_AriaHasPopupAndExpanded()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -67,7 +67,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SplitButton_ArrowDown_MovesActiveDescendant_RovingTabindex()
+        public void SplitButton_ArrowDown_MovesActiveDescendant()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -83,7 +83,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(items[1].Id, activeDescendant);
             Assert.Equal("-1", items[0].GetAttribute("tabindex"));
-            Assert.Equal("0", items[1].GetAttribute("tabindex"));
+            Assert.Equal("-1", items[1].GetAttribute("tabindex"));
         }
 
         [Fact]

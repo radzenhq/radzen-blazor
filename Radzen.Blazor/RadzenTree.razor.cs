@@ -60,6 +60,12 @@ namespace Radzen.Blazor
         [Parameter]
         public string? AriaLabel { get; set; }
 
+        /// <summary>
+        /// Gets or sets the id of the element that labels the tree, exposed via the <c>aria-labelledby</c> attribute on the <c>role="tree"</c> container.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabelledBy { get; set; }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
@@ -657,12 +663,19 @@ namespace Radzen.Blazor
 
             var start = focusedIndex >= 0 ? focusedIndex : 0;
 
+            var search = typeAheadBuffer;
+
+            if (typeAheadBuffer.Length > 1 && typeAheadBuffer.All(c => c == typeAheadBuffer[0]))
+            {
+                search = typeAheadBuffer[0].ToString();
+            }
+
             for (var offset = 1; offset <= CurrentItems.Count; offset++)
             {
                 var index = (start + offset) % CurrentItems.Count;
                 var text = CurrentItems[index].Text;
 
-                if (!string.IsNullOrEmpty(text) && text.StartsWith(typeAheadBuffer, StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrEmpty(text) && text.StartsWith(search, StringComparison.OrdinalIgnoreCase))
                 {
                     focusedIndex = index;
                     break;

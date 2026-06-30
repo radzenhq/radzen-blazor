@@ -130,6 +130,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
+        /// <summary>
+        /// Gets or sets a callback invoked when the menu requests to be dismissed, such as pressing Escape at the root of a context menu.
+        /// </summary>
+        /// <value>The close callback.</value>
+        [Parameter]
+        public EventCallback Close { get; set; }
+
         private string? ariaLabel;
 
         /// <summary>
@@ -172,11 +179,15 @@ namespace Radzen.Blazor
 
                 if (subMenuOpen || IsContextMenu)
                 {
-                    focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
+                    if (currentItems.Count > 0)
+                    {
+                        var start = Math.Clamp(focusedIndex, 0, currentItems.Count - 1);
+                        focusedIndex = (start + (key == "ArrowUp" ? -1 : 1) + currentItems.Count) % currentItems.Count;
+                    }
                 }
                 else
                 {
-                    if (key == "ArrowDown" && currentItems.Count > 0)
+                    if (currentItems.Count > 0)
                     {
                         focusedIndex = Math.Clamp(focusedIndex, 0, currentItems.Count - 1);
 
@@ -185,7 +196,7 @@ namespace Radzen.Blazor
                         if (item.items.Count > 0)
                         {
                             currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
-                            focusedIndex = -1;
+                            focusedIndex = key == "ArrowUp" ? currentItems.Count - 1 : 0;
                             subMenuOpen = true;
                             await item.Open();
                         }
@@ -226,8 +237,7 @@ namespace Radzen.Blazor
                     return;
                 }
 
-                // Flyout mode: ArrowRight opens nested submenu, ArrowLeft closes it
-                if (Flyout && subMenuOpen)
+                if (subMenuOpen)
                 {
                     if (key == "ArrowRight" && focusedIndex >= 0 && focusedIndex < currentItems.Count)
                     {
@@ -282,7 +292,7 @@ namespace Radzen.Blazor
                     if (item.items.Count > 0)
                     {
                         currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
-                        focusedIndex = -1;
+                        focusedIndex = 0;
                         subMenuOpen = true;
                         await item.Toggle();
                     }
@@ -300,7 +310,7 @@ namespace Radzen.Blazor
                     if (item.items.Count > 0)
                     {
                         currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
-                        focusedIndex = -1;
+                        focusedIndex = 0;
                         subMenuOpen = true;
                         await item.Toggle();
                     }
@@ -332,6 +342,29 @@ namespace Radzen.Blazor
                         focusedIndex = currentItems.IndexOf(parentItem);
                         subMenuOpen = parentItem.ParentItem != null;
                         await parentItem.Close();
+                    }
+                }
+                else if (IsContextMenu && Close.HasDelegate)
+                {
+                    await Close.InvokeAsync();
+                }
+            }
+            else if (args.Key != null && args.Key.Length == 1 && !char.IsControl(args.Key[0]) && currentItems.Count > 0)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                var search = args.Key;
+
+                for (var offset = 1; offset <= currentItems.Count; offset++)
+                {
+                    var index = (focusedIndex + offset) % currentItems.Count;
+                    var text = currentItems[index].Text;
+
+                    if (text != null && text.StartsWith(search, StringComparison.OrdinalIgnoreCase))
+                    {
+                        focusedIndex = index;
+                        break;
                     }
                 }
             }

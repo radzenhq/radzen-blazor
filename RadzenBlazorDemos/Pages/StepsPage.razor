@@ -44,10 +44,10 @@
     public List<KeyboardShortcut> shortcuts = new()
     {
         new KeyboardShortcut { Key = "Tab", Action = "Move focus to the selected step." },
-        new KeyboardShortcut { Key = "Left Arrow", Action = "Move focus to the previous step." },
-        new KeyboardShortcut { Key = "Right Arrow", Action = "Move focus to the next step." },
+        new KeyboardShortcut { Key = "Left Arrow", Action = "Move focus to the previous step, wrapping from the first step to the last." },
+        new KeyboardShortcut { Key = "Right Arrow", Action = "Move focus to the next step, wrapping from the last step to the first." },
         new KeyboardShortcut { Key = "Home", Action = "Move focus to the first step." },
         new KeyboardShortcut { Key = "End", Action = "Move focus to the last step." },
-        new KeyboardShortcut { Key = "Space or Enter", Action = "Select the focused step." }
+        new KeyboardShortcut { Key = "Space or Enter", Action = "Select the focused step when step selection is allowed and the step is not disabled." }
     };
 }

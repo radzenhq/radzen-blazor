@@ -339,7 +339,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ProfileMenu_RovingTabindex_FollowsActiveItem()
+        public void ProfileMenu_ActiveDescendant_FollowsActiveItem()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -362,8 +362,14 @@ namespace Radzen.Blazor.Tests
             var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
             toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
 
-            var activeItems = component.FindAll("li[role=menuitem][tabindex=\"0\"]");
-            Assert.Single(activeItems);
+            Assert.All(component.FindAll("li[role=menuitem]"), item => Assert.Equal("-1", item.GetAttribute("tabindex")));
+
+            var activeId = toggle.GetAttribute("aria-activedescendant");
+            Assert.False(string.IsNullOrEmpty(activeId));
+
+            var focusedItems = component.FindAll("li[role=menuitem].rz-state-focused");
+            Assert.Single(focusedItems);
+            Assert.Equal(activeId, focusedItems[0].GetAttribute("id"));
         }
 
         [Fact]

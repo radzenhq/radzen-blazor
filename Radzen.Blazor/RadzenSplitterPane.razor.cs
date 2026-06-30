@@ -372,13 +372,18 @@ namespace Radzen.Blazor
 
                 if (expand == null)
                 {
-                    if (IsCollapsible && Splitter != null)
+                    stopKeydownPropagation = true;
+
+                    if (Splitter != null)
                     {
-                        await Splitter.OnCollapse(Index);
-                    }
-                    else if (IsExpandable && Splitter != null)
-                    {
-                        await Splitter.OnExpand(Index);
+                        if (GetCollapsed())
+                        {
+                            await Splitter.OnExpand(Index);
+                        }
+                        else if (IsCollapsible)
+                        {
+                            await Splitter.OnCollapse(Index);
+                        }
                     }
 
                     return;

@@ -12,7 +12,7 @@
             class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
             placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" @bind:get="FormattedValue" @bind:set="SetValue"
             maxlength="@MaxLength"
-            role="spinbutton" aria-valuenow="@AriaValueNow" aria-valuemin="@AriaValueMin" aria-valuemax="@AriaValueMax" aria-valuetext="@AriaValueText"
+            role="spinbutton" aria-label="@InputAriaLabel" aria-valuenow="@AriaValueNow" aria-valuemin="@AriaValueMin" aria-valuemax="@AriaValueMax" aria-valuetext="@AriaValueText" aria-invalid="@AriaInvalid"
             @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation" />
         @if (ShowUpDown)
         {

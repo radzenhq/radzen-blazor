@@ -899,7 +899,7 @@ namespace Radzen
 
                     if (!popupOpened)
                     {
-                        if (key != "Space")
+                        if (key != "Space" || !isFilter)
                         {
                             await OpenPopup(key, isFilter);
                         }
@@ -918,6 +918,12 @@ namespace Radzen
                 preventKeydown = true;
 
                 await OpenPopup(key, isFilter);
+            }
+            else if (args.AltKey && key == "ArrowUp")
+            {
+                preventKeydown = true;
+
+                await ClosePopup(key);
             }
             else if (key == "Escape" || key == "Tab")
             {
