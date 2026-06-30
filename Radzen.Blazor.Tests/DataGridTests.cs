@@ -3448,6 +3448,35 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DataGrid_ActiveDescendant_IsClearedWhenNoActiveRow()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1 }, new { Id = 2 } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.CloseComponent();
+                });
+            });
+
+            var instance = component.Instance;
+
+            Assert.False(string.IsNullOrEmpty(instance.GetActiveDescendantId()));
+
+            instance.HasActiveDescendant = () => false;
+            Assert.Null(instance.GetActiveDescendantId());
+
+            instance.HasActiveDescendant = () => true;
+            Assert.False(string.IsNullOrEmpty(instance.GetActiveDescendantId()));
+        }
+
+        [Fact]
         public void DataGrid_AppliesAriaGridRolesToTableDescendants()
         {
             using var ctx = new TestContext();

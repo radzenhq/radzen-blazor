@@ -561,6 +561,11 @@ namespace Radzen.Blazor
         {
             isFirstRender = firstRender;
 
+            if (grid != null)
+            {
+                grid.HasActiveDescendant ??= () => selectedIndex >= 0;
+            }
+
             if (firstRender)
             {
                 if(Visible && LoadData.HasDelegate && Data == null)

@@ -598,8 +598,15 @@ namespace Radzen.Blazor
         int focusedIndex = -1;
         int focusedCellIndex;
 
+        internal Func<bool>? HasActiveDescendant { get; set; }
+
         internal string? GetActiveDescendantId()
         {
+            if (HasActiveDescendant != null && !HasActiveDescendant())
+            {
+                return null;
+            }
+
             return $"{GetId()}-active-item";
         }
 
