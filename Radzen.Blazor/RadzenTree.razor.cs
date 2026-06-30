@@ -531,7 +531,7 @@ namespace Radzen.Blazor
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, CurrentItems.Count - 1);
             }
-            else if (key == "ArrowLeft" || key == "ArrowRight")
+            else if (key == "ArrowRight")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
@@ -540,11 +540,54 @@ namespace Radzen.Blazor
                 {
                     var item = CurrentItems[focusedIndex];
 
-                    if (item.ChildContent != null || item.HasChildren)
+                    if (item.IsExpandable)
                     {
-                        await item.ExpandCollapse(key == "ArrowRight");
+                        if (!item.IsExpanded)
+                        {
+                            await item.ExpandCollapse(true);
+                        }
+                        else if (item.items.Count > 0)
+                        {
+                            var childIndex = CurrentItems.IndexOf(item.items[0]);
+
+                            if (childIndex >= 0)
+                            {
+                                focusedIndex = childIndex;
+                            }
+                        }
                     }
                 }
+            }
+            else if (key == "ArrowLeft")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+                {
+                    var item = CurrentItems[focusedIndex];
+
+                    if (item.IsExpandable && item.IsExpanded)
+                    {
+                        await item.ExpandCollapse(false);
+                    }
+                    else if (item.ParentItem != null)
+                    {
+                        var parentIndex = CurrentItems.IndexOf(item.ParentItem);
+
+                        if (parentIndex >= 0)
+                        {
+                            focusedIndex = parentIndex;
+                        }
+                    }
+                }
+            }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                focusedIndex = key == "Home" ? 0 : CurrentItems.Count - 1;
             }
             else if (key == "Enter" || key == "Space")
             {

@@ -608,6 +608,14 @@ namespace Radzen.Blazor
             return GetId();
         }
 
+        /// <summary>
+        /// Gets or sets the tabindex applied to the grid element. Set to <c>0</c> by default so the grid is a tab stop.
+        /// Embedding components can set it to <c>-1</c> to remove the grid from the tab order.
+        /// </summary>
+        /// <value>The tabindex of the grid element.</value>
+        [Parameter]
+        public int TabIndex { get; set; }
+
         async Task FocusRow(string key)
         {
             try

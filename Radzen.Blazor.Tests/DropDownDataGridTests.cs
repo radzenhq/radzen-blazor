@@ -106,6 +106,44 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDownDataGrid_SearchInput_HasComboboxAriaAttributes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1", "Item2" };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.Data, data);
+            });
+
+            var searchInput = component.Find("input.rz-lookup-search-input");
+
+            Assert.Equal("combobox", searchInput.GetAttribute("role"));
+            Assert.NotNull(searchInput.GetAttribute("aria-controls"));
+            Assert.Equal("list", searchInput.GetAttribute("aria-autocomplete"));
+            Assert.NotNull(searchInput.GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public void DropDownDataGrid_EmbeddedGrid_IsNotTabbable()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1", "Item2" };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+            });
+
+            var grid = component.Find("div[role='grid']");
+
+            Assert.Equal("-1", grid.GetAttribute("tabindex"));
+        }
+
+        [Fact]
         public void DropDownDataGrid_Renders_Placeholder()
         {
             using var ctx = new TestContext();

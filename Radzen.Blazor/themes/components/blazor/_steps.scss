@@ -49,6 +49,19 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
       text-decoration: none;
       color: var(--rz-steps-title-selected-color) !important;
     }
+
+    &:focus {
+      outline: var(--rz-outline-normal);
+    }
+
+    &:focus-visible {
+      outline: var(--rz-outline-normal);
+
+      .rz-steps-number {
+        outline: var(--rz-steps-number-focus-outline);
+        outline-offset: var(--rz-steps-number-focus-outline-offset);
+      }
+    }
   }
 
   .rz-state-disabled {
@@ -76,19 +89,6 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
 
 .rz-steps-item {
   display: inline-block;
-
-  &:focus {
-    outline: var(--rz-outline-normal);
-  }
-
-  &:focus-visible {
-    outline: var(--rz-outline-normal);
-    
-    .rz-steps-number {
-      outline: var(--rz-steps-number-focus-outline);
-      outline-offset: var(--rz-steps-number-focus-outline-offset);
-    }
-  }
 }
 
 .rz-steps-title {

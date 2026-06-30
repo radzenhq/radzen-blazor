@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -393,6 +394,13 @@ namespace Radzen.Blazor
         public bool AllowStepSelect { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets the aria-label applied to the steps tab list.
+        /// </summary>
+        /// <value>The tab list aria-label. Default is <c>"Steps"</c>.</value>
+        [Parameter]
+        public string TabListAriaLabel { get; set; } = "Steps";
+
+        /// <summary>
         /// The collection of steps.
         /// </summary>
         protected List<RadzenStepsItem> steps = new List<RadzenStepsItem>();
@@ -555,6 +563,75 @@ namespace Radzen.Blazor
                 preventKeyPress = false;
                 stopKeypressPropagation = false;
             }
+        }
+
+        async Task OnTabKeyDown(KeyboardEventArgs args, RadzenStepsItem step, int index)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+                stopKeypressPropagation = true;
+
+                if (!step.Disabled && AllowStepSelect)
+                {
+                    await SelectStep(step, true);
+                }
+            }
+            else if (key == "ArrowLeft" || key == "ArrowRight" || key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+                stopKeypressPropagation = true;
+
+                await FocusTab(key, index);
+            }
+            else
+            {
+                preventKeyPress = false;
+                stopKeypressPropagation = false;
+            }
+        }
+
+        async Task FocusTab(string key, int index)
+        {
+            var target = -1;
+
+            if (key == "Home")
+            {
+                target = NextFocusableTab(-1, 1);
+            }
+            else if (key == "End")
+            {
+                target = NextFocusableTab(steps.Count, -1);
+            }
+            else
+            {
+                var direction = key == "ArrowLeft" ? -1 : 1;
+                target = NextFocusableTab(index + direction, direction);
+            }
+
+            if (target >= 0 && target < steps.Count && JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId() + target.ToString(System.Globalization.CultureInfo.InvariantCulture) + "s");
+            }
+        }
+
+        int NextFocusableTab(int start, int direction)
+        {
+            var i = start;
+
+            while (i >= 0 && i < steps.Count)
+            {
+                if (steps[i].Visible && !steps[i].Disabled)
+                {
+                    return i;
+                }
+
+                i += direction;
+            }
+
+            return -1;
         }
     }
 }

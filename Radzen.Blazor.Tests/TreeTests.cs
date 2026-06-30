@@ -379,6 +379,146 @@ namespace Radzen.Blazor.Tests
             Assert.NotEqual(firstId, secondId);
             Assert.Equal(secondId, container.GetAttribute("aria-activedescendant"));
         }
+
+        [Fact]
+        public void Tree_HomeEnd_MoveActiveDescendant()
+        {
+            using var ctx = new TestContext();
+            var data = new List<Category>
+            {
+                new Category { Name = "Electronics" },
+                new Category { Name = "Clothing" },
+                new Category { Name = "Books" }
+            };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.CloseComponent();
+                });
+            });
+
+            var items = component.FindAll("[role=treeitem]");
+            var firstId = items.First().GetAttribute("id");
+            var lastId = items.Last().GetAttribute("id");
+
+            var container = component.Find("[role=tree]");
+            container.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "End" });
+
+            container = component.Find("[role=tree]");
+            Assert.Equal(lastId, container.GetAttribute("aria-activedescendant"));
+
+            container.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Home" });
+
+            container = component.Find("[role=tree]");
+            Assert.Equal(firstId, container.GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void Tree_ArrowRight_ExpandsThenMovesToFirstChild()
+        {
+            using var ctx = new TestContext();
+            var data = new List<Category>
+            {
+                new Category
+                {
+                    Name = "Electronics",
+                    Products = new List<Product>
+                    {
+                        new Product { Name = "Laptop" }
+                    }
+                }
+            };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.AddAttribute(2, "ChildrenProperty", "Products");
+                    builder.AddAttribute(3, "HasChildren", (object c) => c is Category);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenTreeLevel>(4);
+                    builder.AddAttribute(5, "TextProperty", "Name");
+                    builder.AddAttribute(6, "HasChildren", (object product) => false);
+                    builder.CloseComponent();
+                });
+            });
+
+            var container = component.Find("[role=tree]");
+            var rootId = component.FindAll("[role=treeitem]").First().GetAttribute("id");
+            Assert.Equal(rootId, container.GetAttribute("aria-activedescendant"));
+
+            container.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            container = component.Find("[role=tree]");
+            Assert.Equal(rootId, container.GetAttribute("aria-activedescendant"));
+
+            container.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            container = component.Find("[role=tree]");
+            var childId = component.FindAll("[role=treeitem]").Last().GetAttribute("id");
+
+            Assert.NotEqual(rootId, childId);
+            Assert.Equal(childId, container.GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void Tree_ArrowLeft_CollapsesThenMovesToParent()
+        {
+            using var ctx = new TestContext();
+            var data = new List<Category>
+            {
+                new Category
+                {
+                    Name = "Electronics",
+                    Products = new List<Product>
+                    {
+                        new Product { Name = "Laptop" }
+                    }
+                }
+            };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.AddAttribute(2, "ChildrenProperty", "Products");
+                    builder.AddAttribute(3, "Expanded", (object c) => true);
+                    builder.AddAttribute(4, "HasChildren", (object c) => c is Category);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenTreeLevel>(5);
+                    builder.AddAttribute(6, "TextProperty", "Name");
+                    builder.AddAttribute(7, "HasChildren", (object product) => false);
+                    builder.CloseComponent();
+                });
+            });
+
+            var container = component.Find("[role=tree]");
+            var rootId = component.FindAll("[role=treeitem]").First().GetAttribute("id");
+
+            container.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+
+            container = component.Find("[role=tree]");
+            var childId = component.FindAll("[role=treeitem]").Last().GetAttribute("id");
+            Assert.Equal(childId, container.GetAttribute("aria-activedescendant"));
+
+            container.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowLeft" });
+
+            container = component.Find("[role=tree]");
+            Assert.Equal(rootId, container.GetAttribute("aria-activedescendant"));
+        }
     }
 }
 

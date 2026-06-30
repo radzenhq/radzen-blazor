@@ -15,18 +15,20 @@
 @if (Visible)
 {
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-    <ul role="tablist">
+    <ul role="tablist" aria-orientation="horizontal" aria-label="@TabListAriaLabel">
         @for (var i = 0; i < steps.Count; i++)
         {
             var step = steps[i];
+            var index = i;
             @if (step.Visible)
             {
                     <li class="@step.GetItemCssClass()" @attributes="step.Attributes" style="@step.Style">
                     <button type="button" role="tab" id="@(GetId() + i.ToString() + "s")" title="@step.Title" aria-label="@step.AriaLabel"
                        aria-selected="@(IsSelected(i, step) ? "true" : "false")"
                        aria-controls="@($"{GetId()}-panel-{i}")"
+                       tabindex="@(IsSelected(i, step) ? 0 : -1)"
                        @onclick="@(async (args) => { if (!step.Disabled && AllowStepSelect) { await SelectStep(step, true); } })"
-                       @onkeypress="@(args => OnKeyPress(args, SelectStep(step, true)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation"
+                       @onkeydown="@(args => OnTabKeyDown(args, step, index))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeypressPropagation"
                        disabled="@step.Disabled" aria-disabled="@step.Disabled" class="rz-menuitem-link">
                         <span class="rz-steps-number">@(steps.Where(s => s.Visible).ToList().IndexOf(step) + 1)</span>
                         @if (step.Template != null)

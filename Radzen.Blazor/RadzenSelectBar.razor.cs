@@ -279,12 +279,12 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if (key == "ArrowLeft" || key == "ArrowRight")
+            if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                var direction = key == "ArrowLeft" ? -1 : 1;
+                var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
 
                 focusedIndex = Math.Clamp(focusedIndex + direction, 0, allItems.FindLastIndex(t => t.Visible && !t.Disabled));
 

@@ -115,6 +115,18 @@ namespace Radzen.Blazor
 
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
+        internal List<RadzenTabsItem> NavigableTabs()
+        {
+            var item = tabs.ElementAtOrDefault(focusedIndex) ?? tabs.FirstOrDefault();
+
+            if (item == null)
+            {
+                return new List<RadzenTabsItem>();
+            }
+
+            return tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList();
+        }
+
         internal string? GetActiveDescendantId()
         {
             if (focusedIndex < 0)
@@ -122,8 +134,7 @@ namespace Radzen.Blazor
                 return null;
             }
 
-            var visibleTabs = tabs.Where(t => t.Visible).ToList();
-            var focused = visibleTabs.ElementAtOrDefault(focusedIndex);
+            var focused = NavigableTabs().ElementAtOrDefault(focusedIndex);
             if (focused == null)
             {
                 return null;
@@ -410,9 +421,9 @@ namespace Radzen.Blazor
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            var item = tabs.ElementAtOrDefault(focusedIndex) ?? tabs.FirstOrDefault();
+            var navigableTabs = NavigableTabs();
 
-            if (item == null)
+            if (navigableTabs.Count == 0)
             {
                 return;
             }
@@ -425,23 +436,30 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                focusedIndex = Math.Clamp(focusedIndex + (key == previousKey ? -1 : 1), 0, tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
+                var direction = key == previousKey ? -1 : 1;
+
+                focusedIndex = Math.Clamp(focusedIndex + direction, 0, navigableTabs.Count - 1);
+
+                while (navigableTabs.ElementAtOrDefault(focusedIndex)?.Disabled == true && focusedIndex + direction >= 0 && focusedIndex + direction < navigableTabs.Count)
+                {
+                    focusedIndex += direction;
+                }
             }
             else if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                focusedIndex = key == "Home" ? 0 : tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
+                focusedIndex = key == "Home" ? 0 : navigableTabs.Count - 1;
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                if (focusedIndex >= 0 && focusedIndex < tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
+                if (focusedIndex >= 0 && focusedIndex < navigableTabs.Count)
                 {
-                    await tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex].OnClick();
+                    await navigableTabs[focusedIndex].OnClick();
                 }
             }
             else
@@ -456,7 +474,7 @@ namespace Radzen.Blazor
         }
         internal bool IsFocused(RadzenTabsItem item)
         {
-            return tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList().IndexOf(item) == focusedIndex && focusedIndex != -1;
+            return NavigableTabs().IndexOf(item) == focusedIndex && focusedIndex != -1;
         }
 
         internal bool HasInvisibleBefore(RadzenTabsItem item)

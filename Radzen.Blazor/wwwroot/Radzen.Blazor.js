@@ -1260,7 +1260,7 @@ window.Radzen = {
     }
   },
   selectListItem: function (input, ul, index) {
-    if (!input || !ul) return;
+    if (!ul) return;
 
     var childNodes = ul.getElementsByTagName('LI');
 
@@ -1285,7 +1285,7 @@ window.Radzen = {
     }
   },
   focusListItem: function (input, ul, isDown, startIndex) {
-    if (!input || !ul) return;
+    if (!ul) return;
     var childNodes = ul.getElementsByTagName('LI');
 
     if (!childNodes || childNodes.length == 0) return;
@@ -1817,7 +1817,7 @@ window.Radzen = {
 
     Radzen.openPopup(null, id, false, null, x, y, instance, callback);
 
-    setTimeout(function () {
+    requestAnimationFrame(function () {
         var popup = document.getElementById(id);
         if (popup) {
             var menu = popup.querySelector('.rz-menu');
@@ -1825,7 +1825,7 @@ window.Radzen = {
                 menu.focus();
             }
         }
-    }, 500);
+    });
   },
   openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback, clientX, clientY) {
     Radzen.closeTooltip(id);
@@ -2941,7 +2941,11 @@ window.Radzen = {
     }
   },
   toggleMenuItem: function (target, event, defaultActive, clickToOpen) {
+    if (!target) return;
+
     var item = target.closest('.rz-navigation-item');
+
+    if (!item) return;
 
     var active = defaultActive != undefined ? defaultActive : !item.classList.contains('rz-navigation-item-active');
 

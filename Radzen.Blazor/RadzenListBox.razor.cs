@@ -97,7 +97,7 @@ namespace Radzen.Blazor
             builder.OpenComponent(0, typeof(RadzenListBoxItem<TValue>));
             builder.AddAttribute(1, "ListBox", this);
             builder.AddAttribute(2, "Item", item);
-            builder.AddAttribute(4, "Index", AllowVirtualization ? -1 : itemIndex);
+            builder.AddAttribute(4, "Index", AllowVirtualization ? VirtualStartIndex + itemIndex : itemIndex);
 
             if (DisabledProperty != null)
             {
@@ -122,7 +122,7 @@ namespace Radzen.Blazor
         /// Gets the identifier of the currently active (keyboard focused) option, or null when none is active.
         /// </summary>
         /// <returns>The active option identifier or null.</returns>
-        internal string? ActiveDescendantId => !AllowVirtualization && selectedIndex >= 0 ? GetItemId(selectedIndex) : null;
+        internal string? ActiveDescendantId => selectedIndex >= 0 ? GetItemId(selectedIndex) : null;
 
         /// <summary>
         /// Gets the accessible name applied to the listbox, falling back to the empty selection label

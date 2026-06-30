@@ -39,6 +39,8 @@ namespace Radzen
         List<object>? virtualItems;
         int virtualStartIndex;
 
+        internal int VirtualStartIndex => virtualStartIndex;
+
         [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {

@@ -330,7 +330,7 @@ namespace Radzen.Blazor.Tests
             var root = component.Find("ul.rz-profile-menu");
             root.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
 
-            var menu = component.Find("ul.rz-navigation-menu");
+            var menu = component.Find("ul.rz-profile-menu");
             var activeId = menu.GetAttribute("aria-activedescendant");
 
             Assert.False(string.IsNullOrEmpty(activeId));
@@ -390,7 +390,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(1, component.Instance.focusedIndex);
 
-            var menu = component.Find("ul.rz-navigation-menu");
+            var menu = component.Find("ul.rz-profile-menu");
             var activeId = menu.GetAttribute("aria-activedescendant");
             var lastItem = component.FindAll("li[role=menuitem]")[1];
 

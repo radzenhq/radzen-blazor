@@ -129,17 +129,6 @@ namespace Radzen.Blazor
             }
         }
 
-        async Task FocusMenu()
-        {
-            try
-            {
-                await menuElement.FocusAsync();
-            }
-            catch (InvalidOperationException)
-            {
-            }
-        }
-
         [Inject]
         NavigationManager? NavigationManager { get; set; }
 
@@ -159,7 +148,6 @@ namespace Radzen.Blazor
                 if (Collapsed)
                 {
                     await Toggle(new MouseEventArgs());
-                    await FocusMenu();
                 }
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
@@ -172,7 +160,6 @@ namespace Radzen.Blazor
                 if (Collapsed)
                 {
                     await Toggle(new MouseEventArgs());
-                    await FocusMenu();
                 }
 
                 focusedIndex = key == "Home" ? 0 : items.Count - 1;
@@ -202,7 +189,6 @@ namespace Radzen.Blazor
                     if (!Collapsed)
                     {
                         focusedIndex = focusedIndex != -1 ? focusedIndex : 0;
-                        await FocusMenu();
                     }
                 }
             }

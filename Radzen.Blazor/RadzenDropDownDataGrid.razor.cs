@@ -518,6 +518,12 @@ namespace Radzen.Blazor
         int count;
 
         /// <summary>
+        /// Gets the identifier of the currently active (keyboard highlighted) grid row, or null when none is active.
+        /// </summary>
+        /// <returns>The active row identifier or null.</returns>
+        internal string? ActiveDescendantId => selectedIndex >= 0 && grid != null ? $"{grid.GridId()}-active-item" : null;
+
+        /// <summary>
         /// Gets or sets the number of maximum selected labels.
         /// </summary>
         /// <value>The maximum selected labels.</value>

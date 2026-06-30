@@ -208,6 +208,71 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Steps_TabList_HasOrientationAndAriaLabel()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            {
+                parameters.Add<RenderFragment>(p => p.Steps, builder =>
+                {
+                    builder.OpenComponent<RadzenStepsItem>(0);
+                    builder.AddAttribute(1, "Text", "Step 1");
+                    builder.CloseComponent();
+                });
+            });
+
+            var tablist = component.Find("ul[role=tablist]");
+            Assert.Equal("horizontal", tablist.GetAttribute("aria-orientation"));
+            Assert.Equal("Steps", tablist.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void Steps_TabList_RendersCustomAriaLabel()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            {
+                parameters.Add(p => p.TabListAriaLabel, "Checkout steps");
+                parameters.Add<RenderFragment>(p => p.Steps, builder =>
+                {
+                    builder.OpenComponent<RadzenStepsItem>(0);
+                    builder.AddAttribute(1, "Text", "Step 1");
+                    builder.CloseComponent();
+                });
+            });
+
+            var tablist = component.Find("ul[role=tablist]");
+            Assert.Equal("Checkout steps", tablist.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void Steps_Tabs_HaveRovingTabindex()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenSteps>(parameters =>
+            {
+                parameters.Add(p => p.SelectedIndex, 1);
+                parameters.Add<RenderFragment>(p => p.Steps, builder =>
+                {
+                    builder.OpenComponent<RadzenStepsItem>(0);
+                    builder.AddAttribute(1, "Text", "Step 1");
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenStepsItem>(2);
+                    builder.AddAttribute(3, "Text", "Step 2");
+                    builder.CloseComponent();
+                    builder.OpenComponent<RadzenStepsItem>(4);
+                    builder.AddAttribute(5, "Text", "Step 3");
+                    builder.CloseComponent();
+                });
+            });
+
+            var tabs = component.FindAll("button[role=tab]");
+            Assert.Equal("-1", tabs[0].GetAttribute("tabindex"));
+            Assert.Equal("0", tabs[1].GetAttribute("tabindex"));
+            Assert.Equal("-1", tabs[2].GetAttribute("tabindex"));
+        }
+
+        [Fact]
         public void Steps_Renders_StyleParameter()
         {
             using var ctx = new TestContext();

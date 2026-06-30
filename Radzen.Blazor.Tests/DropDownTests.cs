@@ -906,6 +906,26 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDown_NoFilter_Combobox_ControlsListbox()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.AllowFiltering, false);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            Assert.Empty(component.FindAll("input.rz-dropdown-filter"));
+
+            var combobox = component.Find("div[role='combobox']");
+            var listbox = component.Find("ul[role='listbox']");
+
+            Assert.Equal(listbox.Id, combobox.GetAttribute("aria-controls"));
+        }
+
+        [Fact]
         public void DropDown_Multiple_FilterInput_HasComboboxAriaAttributes()
         {
             using var ctx = new TestContext();

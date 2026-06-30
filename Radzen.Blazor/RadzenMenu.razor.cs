@@ -67,6 +67,14 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Flyout { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this menu is rendered as a context menu popup.
+        /// When enabled, the root element uses role="menu" with vertical orientation instead of a horizontal menubar.
+        /// </summary>
+        /// <value><c>true</c> to render as a vertical context menu popup; otherwise <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool IsContextMenu { get; set; }
+
         private bool IsOpen { get; set; }
 
         /// <inheritdoc />

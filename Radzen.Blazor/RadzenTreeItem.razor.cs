@@ -197,6 +197,11 @@ namespace Radzen.Blazor
         }
 
         bool clientExpanded;
+
+        internal bool IsExpanded => clientExpanded;
+
+        internal bool IsExpandable => ChildContent != null || HasChildren;
+
         async Task Toggle()
         {
             if (expanded && Tree?.SingleExpand != true)
@@ -293,24 +298,6 @@ namespace Radzen.Blazor
         {
             selected = true;
             Tree?.SelectItem(this);
-        }
-
-        void OnKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
-            if (key == "Enter" || key == "Space")
-            {
-                Select();
-            }
-        }
-
-        async Task OnToggleKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
-            if (key == "Enter" || key == "Space")
-            {
-                await Toggle();
-            }
         }
 
         internal void Unselect()

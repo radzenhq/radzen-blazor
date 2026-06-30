@@ -8,10 +8,10 @@
          aria-level="@Level"
          aria-selected="@(selected.ToString().ToLowerInvariant())"
          aria-expanded="@(ChildContent != null || HasChildren ? clientExpanded.ToString().ToLowerInvariant() : null)"
-         @onclick="@Select" @onkeydown="OnKeyDown">
+         @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {
-            <span class=@IconClass role="button" tabindex="-1" aria-label="@Text" @onclick="@Toggle" @onclick:stopPropagation @onkeydown="OnToggleKeyDown"></span>
+            <span class=@IconClass role="button" tabindex="-1" aria-label="@Text" @onclick="@Toggle" @onclick:stopPropagation></span>
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
