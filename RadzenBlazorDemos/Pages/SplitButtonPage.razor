@@ -120,11 +120,13 @@
     public List<KeyboardShortcut> shortcuts = new()
     {
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to the SplitButton." },
-        new KeyboardShortcut { Key = "Alt + DownArrow", Action = "Open/Close SplitButton popup." },
-        new KeyboardShortcut { Key = "DownArrow on closed popup", Action = "Select next SplitButton item." },
-        new KeyboardShortcut { Key = "UpArrow on closed popup", Action = "Select previous SplitButton item." },
-        new KeyboardShortcut { Key = "Space or Enter on opened popup", Action = "Selects the focused SplitButton item and closes the popup." },
-        new KeyboardShortcut { Key = "Escape", Action = "Closes the SplitButton popup." },
-        new KeyboardShortcut { Key = "Space or Enter", Action = "Clicks SplitButton." }
+        new KeyboardShortcut { Key = "Space or Enter", Action = "Trigger the main SplitButton action." },
+        new KeyboardShortcut { Key = "DownArrow or Alt + DownArrow on closed popup", Action = "Open the popup and focus the first item." },
+        new KeyboardShortcut { Key = "UpArrow on closed popup", Action = "Open the popup and focus the last item." },
+        new KeyboardShortcut { Key = "DownArrow or UpArrow in an opened popup", Action = "Focus next or previous SplitButton item." },
+        new KeyboardShortcut { Key = "Home or End in an opened popup", Action = "Focus first or last SplitButton item." },
+        new KeyboardShortcut { Key = "Space or Enter in an opened popup", Action = "Select the focused SplitButton item and close the popup." },
+        new KeyboardShortcut { Key = "Escape", Action = "Close the SplitButton popup." },
+        new KeyboardShortcut { Key = "Alphanumeric in an opened popup", Action = "Focus next SplitButton item starting with typed key." }
     };
 }

@@ -354,21 +354,21 @@ namespace Radzen.Blazor
 
             if (!IsOpen)
             {
-                if ((key == "Enter" || key == "Space" || key == "NumpadEnter") && items.Count == 0)
+                if (key == "Enter" || key == "Space" || key == "NumpadEnter")
                 {
                     preventKeyPress = true;
                     stopKeydownPropagation = true;
 
                     await OnClick(new MouseEventArgs());
                 }
-                else if (key == "ArrowDown" || key == "Enter" || key == "Space" || key == "NumpadEnter")
+                else if (key == "ArrowDown" && items.Count > 0)
                 {
                     preventKeyPress = true;
                     stopKeydownPropagation = true;
 
                     await Open(0);
                 }
-                else if (key == "ArrowUp")
+                else if (key == "ArrowUp" && items.Count > 0)
                 {
                     preventKeyPress = true;
                     stopKeydownPropagation = true;
