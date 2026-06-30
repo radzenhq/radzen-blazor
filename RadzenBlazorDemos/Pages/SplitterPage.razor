@@ -10,3 +10,23 @@
 <RadzenExample ComponentName="Splitter" Example="SplitterConfig">
     <SplitterConfig />
 </RadzenExample>
+
+<RadzenText Anchor="splitter#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys resize the panes when a resize bar is focused.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Move focus to a resize bar." },
+        new KeyboardShortcut { Key = "Left or Right Arrow", Action = "Resize the panes of a horizontal Splitter." },
+        new KeyboardShortcut { Key = "Up or Down Arrow", Action = "Resize the panes of a vertical Splitter." },
+        new KeyboardShortcut { Key = "Home", Action = "Collapse the pane to its minimum size." },
+        new KeyboardShortcut { Key = "End", Action = "Expand the pane to its maximum size." }
+    };
+}

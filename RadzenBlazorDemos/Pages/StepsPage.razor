@@ -30,3 +30,24 @@
 <RadzenExample ComponentName="StepsCanChange" Example="StepsCanChange">
     <StepsCanChange />
 </RadzenExample>
+
+<RadzenText Anchor="steps#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Steps component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Move focus to the selected step." },
+        new KeyboardShortcut { Key = "Left Arrow", Action = "Move focus to the previous step." },
+        new KeyboardShortcut { Key = "Right Arrow", Action = "Move focus to the next step." },
+        new KeyboardShortcut { Key = "Home", Action = "Move focus to the first step." },
+        new KeyboardShortcut { Key = "End", Action = "Move focus to the last step." },
+        new KeyboardShortcut { Key = "Space or Enter", Action = "Select the focused step." }
+    };
+}
