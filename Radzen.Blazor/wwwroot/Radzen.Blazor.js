@@ -6065,8 +6065,9 @@ class Spreadsheet {
     this.dotNetRef.invokeMethodAsync('OnKeyDownAsync', this.toEventArgs(e), isGridContext);
   }
 
-  // F6 / Shift+F6 cycle focus between the spreadsheet regions: ribbon tabs -> active toolbar ->
-  // formula bar -> grid -> sheet tabs. This is the advertised escape from the grid (WCAG 2.1.2).
+  // F6 / Shift+F6 cycle focus between the spreadsheet regions in their visible top-to-bottom order:
+  // ribbon tabs -> active toolbar -> formula bar -> grid -> sheet tabs. This is the advertised escape
+  // from the grid (WCAG 2.1.2).
   focusAdjacent = (forward) => {
     // this.element IS this spreadsheet's root (.rz-spreadsheet, role=application). querySelector
     // only matches descendants of root, so regions from another spreadsheet on the page are never
@@ -6114,8 +6115,12 @@ class Spreadsheet {
       return;
     }
 
-    const focusable = region.querySelector('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]');
-    (focusable || region).focus();
+    // Skip hidden focusables: inline-rendered but closed popups (color pickers, numeric steppers)
+    // match the selector yet calling focus() on a hidden element silently fails, which would strand
+    // the user on the previous region. Pick the first one that is actually rendered.
+    const focusables = region.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]');
+    const target = [...focusables].find(el => el.offsetParent !== null || el.getClientRects().length > 0);
+    (target || region).focus();
   }
 
   // Opens the cell context menu at the active cell (Shift+F10 / ContextMenu key). The cell element is

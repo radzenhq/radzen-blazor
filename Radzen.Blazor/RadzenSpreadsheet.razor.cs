@@ -429,7 +429,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         workbook = value;
         workbookView = null;
-        sheetIndex = 0;
+        SetActiveSheet(0);
+    }
+
+    private void SetActiveSheet(int index)
+    {
+        sheetIndex = index;
+
+        if (Worksheet?.Selection.Cell == CellRef.Invalid)
+        {
+            sheet.Selection.Select(new CellRef(0, 0));
+        }
     }
 
     private async Task CloseMenusAsync()
@@ -451,7 +461,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         await CloseMenusAsync();
 
-        sheetIndex = index;
+        SetActiveSheet(index);
     }
 
     private async Task OnAddSheetAsync()
@@ -465,7 +475,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         var name = GenerateSheetName();
         workbook.AddSheet(name, 100, 26);
-        sheetIndex = workbook.Sheets.Count - 1;
+        SetActiveSheet(workbook.Sheets.Count - 1);
     }
 
     private async Task OnSheetAction(RadzenSplitButtonItem? item, Worksheet sheet)
@@ -505,14 +515,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         workbook.RemoveSheet(sheet);
         workbookView?.Remove(sheet);
 
-        if (sheetIndex >= workbook.Sheets.Count)
-        {
-            sheetIndex = workbook.Sheets.Count - 1;
-        }
-        else if (removedIndex < sheetIndex)
-        {
-            sheetIndex--;
-        }
+        // Re-activate even when the index stays the same: deleting the active, non-last sheet shifts a
+        // different sheet into that index, which still needs its active cell ensured.
+        SetActiveSheet(
+            sheetIndex >= workbook.Sheets.Count ? workbook.Sheets.Count - 1 :
+            removedIndex < sheetIndex ? sheetIndex - 1 :
+            sheetIndex);
     }
 
     private async Task OnRenameSheetAsync(Worksheet sheet)
@@ -695,8 +703,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    // Builds a sort command scoped to the data the clicked cell belongs to, never including a
-    // table/auto-filter header (or table totals) row in the sorted range.
     private SortCommand BuildSortCommand(int row, int column, SortOrder order)
     {
         foreach (var table in Worksheet!.Tables)
