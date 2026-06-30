@@ -9,8 +9,7 @@
         tabindex="@TabIndex" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
         aria-haspopup="@(Item?.ChildContent != null ? "menu" : null)"
         aria-controls="@Item?.SubmenuId"
-        aria-expanded="@ExpandedAttribute"
-        @onkeydown="OnKeyDown">
+        aria-expanded="@ExpandedAttribute">
         @ChildContent
     </li>
 }
@@ -20,7 +19,7 @@ else
     {
         <li style=@Style @attributes="@Attributes"
             role="menuitem" tabindex="@TabIndex" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
-            aria-haspopup="menu" aria-controls="@Item?.SubmenuId" aria-expanded="@ExpandedAttribute" @onkeydown="OnKeyDown">
+            aria-haspopup="menu" aria-controls="@Item?.SubmenuId" aria-expanded="@ExpandedAttribute">
             @ChildContent
         </li>
     }
@@ -30,8 +29,7 @@ else
             tabindex="@TabIndex" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
             aria-haspopup="@(Item?.ChildContent != null ? "menu" : null)"
             aria-controls="@Item?.SubmenuId"
-            aria-expanded="@ExpandedAttribute"
-            @onkeydown="OnKeyDown">
+            aria-expanded="@ExpandedAttribute">
             @ChildContent
         </li>
     }
@@ -49,25 +47,4 @@ else
     int TabIndex => -1;
 
     string? ExpandedAttribute => Item?.ChildContent != null ? (Item.Expanded ? "true" : "false") : null;
-
-    async Task OnKeyDown(KeyboardEventArgs args)
-    {
-        if (Item == null || Item.Disabled)
-        {
-            return;
-        }
-
-        var key = args.Code != null ? args.Code : args.Key;
-        if (key == "Enter" || key == "Space")
-        {
-            if (Item.ChildContent != null)
-            {
-                await Item.Toggle();
-            }
-            else
-            {
-                await Item.OnClick(new MouseEventArgs());
-            }
-        }
-    }
 }

@@ -113,6 +113,22 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment? Tabs { get; set; }
 
+        /// <summary>
+        /// Gets or sets the accessible name applied to the tab list via <c>aria-label</c>.
+        /// Use this to give assistive technologies a label describing the group of tabs.
+        /// </summary>
+        /// <value>The tab list aria-label. Default is <c>null</c>.</value>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the id of the element that labels the tab list via <c>aria-labelledby</c>.
+        /// Use this when a visible element already provides the accessible name for the group of tabs.
+        /// </summary>
+        /// <value>The id of the labelling element. Default is <c>null</c>.</value>
+        [Parameter]
+        public string? AriaLabelledBy { get; set; }
+
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
         internal List<RadzenTabsItem> NavigableTabs()
@@ -437,12 +453,15 @@ namespace Radzen.Blazor
                 stopKeydownPropagation = true;
 
                 var direction = key == previousKey ? -1 : 1;
+                var count = navigableTabs.Count;
 
-                focusedIndex = Math.Clamp(focusedIndex + direction, 0, navigableTabs.Count - 1);
+                focusedIndex = ((focusedIndex + direction) % count + count) % count;
 
-                while (navigableTabs.ElementAtOrDefault(focusedIndex)?.Disabled == true && focusedIndex + direction >= 0 && focusedIndex + direction < navigableTabs.Count)
+                var steps = 0;
+                while (navigableTabs.ElementAtOrDefault(focusedIndex)?.Disabled == true && steps < count)
                 {
-                    focusedIndex += direction;
+                    focusedIndex = ((focusedIndex + direction) % count + count) % count;
+                    steps++;
                 }
             }
             else if (key == "Home" || key == "End")

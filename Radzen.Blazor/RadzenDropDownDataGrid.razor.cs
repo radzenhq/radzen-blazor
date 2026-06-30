@@ -1011,6 +1011,7 @@ namespace Radzen.Blazor
             {
                 preventKeydown = false;
                 await ClosePopup(key);
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
             }
             else if (key == "Tab")
             {
@@ -1072,6 +1073,7 @@ namespace Radzen.Blazor
             if (key == "Escape" && JSRuntime != null)
             {
                 await ClosePopup(key);
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
             }
         }
 

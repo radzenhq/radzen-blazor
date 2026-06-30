@@ -26,6 +26,9 @@
             @if (IsCollapsible)
             {
                 <span tabindex="0" class="rz-collapse" id="@(GetId() + "-collapse")"
+                    role="button"
+                    aria-label="@CollapseAriaLabel"
+                    aria-expanded="@AriaExpanded"
                     @onkeypress="@(args => OnKeyPress(args, false))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation=stopKeypressPropagation
                     @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter!.OnCollapse(Index))>
                 </span>
@@ -37,6 +40,7 @@
                     role="separator"
                     aria-orientation="@AriaOrientation"
                     aria-controls="@AriaControls"
+                    aria-labelledby="@AriaLabelledBy"
                     aria-label="@AriaLabel"
                     aria-valuenow="@AriaValueNow.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                     aria-valuemin="@AriaValueMin.ToString(System.Globalization.CultureInfo.InvariantCulture)"
@@ -48,6 +52,9 @@
             @if (IsExpandable)
             {
                 <span tabindex="0" class="rz-expand" id="@(GetId() + "-expand")"
+                    role="button"
+                    aria-label="@ExpandAriaLabel"
+                    aria-expanded="@AriaExpanded"
                     @onkeypress="@(args => OnKeyPress(args, true))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation=stopKeypressPropagation
                     @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter!.OnExpand(Index))>
                 </span>

@@ -7,7 +7,7 @@
 @{var firstLevel = Grid?.AllowCompositeDataCells == true ? 0 : (Grid?.deepestChildColumnLevel ?? 0); }
 @for(var i = firstLevel; (Grid?.AllowCompositeDataCells == true ? i <= (Grid?.deepestChildColumnLevel ?? 0) + 1 : i < (Grid?.deepestChildColumnLevel ?? 0) + 1); i++)
 {
-<tr role="row" class="@(Grid?.RowStyle(Item, Index) ?? "")" @attributes="@(rowArgs?.Item2)">
+<tr role="row" aria-selected="@(Grid?.RowAriaSelected(Item, Index))" class="@(Grid?.RowStyle(Item, Index) ?? "")" @attributes="@(rowArgs?.Item2)">
     @if (Grid?.ShowGroupExpandColumn == true)
     {
         @foreach(var g in Grid.Groups)

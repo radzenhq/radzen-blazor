@@ -819,6 +819,43 @@ namespace Radzen
                     //
                 }
             }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeydown = true;
+
+                try
+                {
+                    if (JSRuntime != null)
+                    {
+                        if (useVirtualization)
+                        {
+                            selectedIndex = key == "Home" ? 0 : virtualTotalCount - 1;
+
+                            await JSRuntime.InvokeVoidAsync("Radzen.focusVirtualListItem", list, selectedIndex, virtualTotalCount);
+                        }
+                        else
+                        {
+                            selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "Home", key == "Home" ? -1 : items.Count);
+                        }
+
+                        var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+                        if (!Multiple && !popupOpened && shouldSelectOnChange != false)
+                        {
+                            object? selectedItemToChange = useVirtualization
+                                ? View?.Cast<object>().AsQueryable().Skip(selectedIndex).FirstOrDefault()
+                                : items.ElementAtOrDefault(selectedIndex);
+                            if (selectedItemToChange != null)
+                            {
+                                await OnSelectItem(selectedItemToChange, true);
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
             else if (key == "Enter" || key == "NumpadEnter" || (key == "Space" && !isFilter))
             {
                 preventKeydown = true;

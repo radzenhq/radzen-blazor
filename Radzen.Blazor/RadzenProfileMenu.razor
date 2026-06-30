@@ -3,13 +3,12 @@
 @if (Visible)
 {
     <ul @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-        role="presentation" tabindex="0" aria-activedescendant="@ActiveDescendantId"
-        @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
+        role="presentation" tabindex="-1">
         <li class="rz-navigation-item" role="presentation">
             <div @ref="@toggleElement" class="rz-navigation-item-wrapper" role="button" tabindex="0" aria-haspopup="menu"
-                 aria-label="@ToggleAriaLabel"
+                 aria-label="@ToggleAriaLabel" aria-activedescendant="@ActiveDescendantId"
                  aria-expanded="@((!Collapsed).ToString().ToLowerInvariant())" aria-controls="@($"{GetId()}-menu")"
-                 @onkeydown="OnToggleKeyDown">
+                 @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
                 <div class="rz-navigation-item-link">
                     <div class="item-text" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
                         @if (Template != null)

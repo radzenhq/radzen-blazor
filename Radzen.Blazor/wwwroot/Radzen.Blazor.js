@@ -1229,8 +1229,9 @@ window.Radzen = {
     // The popup is appended to document.body when opened, so ul.closest('[role="combobox"]')
     // fails once the dropdown is open. Fall back to a reverse lookup via aria-controls.
     // There can be more than one combobox referencing the same listbox (the trigger and a
-    // filter input inside the popup), so update them all so screen readers announce the
-    // active option regardless of which element currently has focus.
+    // filter input inside the popup). aria-activedescendant must be set only on the element
+    // that currently has DOM focus (the filter input while filtering, otherwise the trigger),
+    // so a non-focused combobox never carries a stale active-descendant.
     var comboboxes = [];
     var ancestor = ul.closest('[role="combobox"]');
     if (ancestor) {
@@ -1247,16 +1248,30 @@ window.Radzen = {
         }
       }
     }
-    if (li) {
+
+    var focused = null;
+    for (var f = 0; f < comboboxes.length; f++) {
+      if (comboboxes[f] === document.activeElement) {
+        focused = comboboxes[f];
+        break;
+      }
+    }
+    if (!focused && comboboxes.length) {
+      focused = comboboxes[0];
+    }
+
+    for (var c = 0; c < comboboxes.length; c++) {
+      if (comboboxes[c] !== focused) {
+        comboboxes[c].removeAttribute('aria-activedescendant');
+      }
+    }
+
+    if (li && focused) {
       var itemId = ul.id + '-' + index;
       li.id = itemId;
-      for (var j = 0; j < comboboxes.length; j++) {
-        comboboxes[j].setAttribute('aria-activedescendant', itemId);
-      }
-    } else {
-      for (var k = 0; k < comboboxes.length; k++) {
-        comboboxes[k].removeAttribute('aria-activedescendant');
-      }
+      focused.setAttribute('aria-activedescendant', itemId);
+    } else if (focused) {
+      focused.removeAttribute('aria-activedescendant');
     }
   },
   selectListItem: function (input, ul, index) {
@@ -1486,9 +1501,23 @@ window.Radzen = {
     var activeId = gridId + '-active-item';
     var setActiveDescendant = function (el) {
         var prev = document.getElementById(activeId);
-        if (prev && prev !== el) { prev.removeAttribute('id'); }
+        if (prev && prev !== el) {
+            prev.removeAttribute('id');
+            if (prev.hasAttribute('data-rz-active-selected')) {
+                prev.removeAttribute('data-rz-active-selected');
+                if (prev.hasAttribute('aria-selected')) {
+                    prev.setAttribute('aria-selected', 'false');
+                }
+            }
+        }
         if (el && el.id !== activeId) { el.id = activeId; }
-        if (el) { grid.setAttribute('aria-activedescendant', activeId); }
+        if (el) {
+            grid.setAttribute('aria-activedescendant', activeId);
+            if (el.tagName === 'TR' && el.hasAttribute('aria-selected')) {
+                el.setAttribute('aria-selected', 'true');
+                el.setAttribute('data-rz-active-selected', '');
+            }
+        }
     };
 
     if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && cellIndex != null && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
@@ -2287,6 +2316,10 @@ window.Radzen = {
     }
     popup.__escapeHandler = function (e) {
         if (e.key === 'Escape' || e.key === 'Esc') {
+            var menu = popup.querySelector('.rz-menu[role="menu"]');
+            if (menu && menu.querySelector('.rz-navigation-item-active')) {
+                return;
+            }
             Radzen.closePopup(id, instance, callback, e);
         }
         if (e.key === 'Tab' && parent && (popup.classList.contains('rz-dropdown-panel') || popup.classList.contains('rz-multiselect-panel'))) {

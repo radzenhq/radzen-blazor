@@ -8,8 +8,8 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)
-         role="combobox" aria-haspopup="listbox" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@PopupID" aria-disabled="@(Disabled.ToString().ToLowerInvariant())" aria-activedescendant="@ActiveDescendantId"
+    <div @ref="@Element" aria-label="@(!Multiple && internalValue != null ? PropertyAccess.GetItemOrValueFromProperty(internalValue, TextProperty) : EmptyAriaLabel)" @attributes="Attributes" class="@GetCssClass()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)
+         role="combobox" aria-haspopup="grid" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@PopupID" aria-disabled="@(Disabled.ToString().ToLowerInvariant())" aria-activedescendant="@ActiveDescendantId"
          style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown">
         <div class="rz-helper-hidden-accessible">

@@ -98,6 +98,8 @@ namespace Radzen.Blazor
             }
         }
 
+        internal string AriaExpanded => (!GetCollapsed()).ToString(CultureInfo.InvariantCulture).ToLowerInvariant();
+
         internal string ClassName
         {
             get
@@ -206,7 +208,53 @@ namespace Radzen.Blazor
 
         internal string? AriaControls => GetId();
 
-        internal string AriaLabel => $"Resize {GetId()}";
+        /// <summary>
+        /// Gets or sets the id of an element that labels the resize separator. When set, it is exposed as <c>aria-labelledby</c> and takes precedence over the generated <see cref="ResizeAriaLabel"/>.
+        /// </summary>
+        /// <value>The id of the labelling element.</value>
+        [Parameter]
+        public string? AriaLabelledBy { get; set; }
+
+        private string? resizeAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the accessible label of the resize separator. Defaults to a localizable "Resize {0}" text.
+        /// </summary>
+        /// <value>The accessible label of the resize separator.</value>
+        [Parameter]
+        public string? ResizeAriaLabel
+        {
+            get => resizeAriaLabel ?? string.Format(CultureInfo.CurrentCulture, Localize(nameof(RadzenStrings.Splitter_ResizeAriaLabel)), GetId());
+            set => resizeAriaLabel = value;
+        }
+
+        private string? collapseAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the accessible label of the collapse button. Defaults to a localizable "Collapse pane" text.
+        /// </summary>
+        /// <value>The accessible label of the collapse button.</value>
+        [Parameter]
+        public string? CollapseAriaLabel
+        {
+            get => collapseAriaLabel ?? Localize(nameof(RadzenStrings.Splitter_CollapseAriaLabel));
+            set => collapseAriaLabel = value;
+        }
+
+        private string? expandAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the accessible label of the expand button. Defaults to a localizable "Expand pane" text.
+        /// </summary>
+        /// <value>The accessible label of the expand button.</value>
+        [Parameter]
+        public string? ExpandAriaLabel
+        {
+            get => expandAriaLabel ?? Localize(nameof(RadzenStrings.Splitter_ExpandAriaLabel));
+            set => expandAriaLabel = value;
+        }
+
+        internal string? AriaLabel => AriaLabelledBy != null ? null : ResizeAriaLabel;
 
         static double? ParsePercent(string? value)
         {
@@ -365,6 +413,7 @@ namespace Radzen.Blazor
                 }
 
                 var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", GetId() + "-resize");
+                var splitterRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", Splitter.ElementId);
 
                 await Splitter.StartResize(new PointerEventArgs()
                 {
@@ -374,6 +423,9 @@ namespace Radzen.Blazor
 
                 var deltaX = 0d;
                 var deltaY = 0d;
+
+                var stepX = Math.Max(1d, splitterRect.Width / 100d);
+                var stepY = Math.Max(1d, splitterRect.Height / 100d);
 
                 if (key == "Home")
                 {
@@ -399,11 +451,11 @@ namespace Radzen.Blazor
                 }
                 else if (BarOrientation == Orientation.Horizontal)
                 {
-                    deltaX = key == "ArrowLeft" ? -1 : key == "ArrowRight" ? 1 : 0;
+                    deltaX = key == "ArrowLeft" ? -stepX : key == "ArrowRight" ? stepX : 0;
                 }
                 else
                 {
-                    deltaY = key == "ArrowUp" ? -1 : key == "ArrowDown" ? 1 : 0;
+                    deltaY = key == "ArrowUp" ? -stepY : key == "ArrowDown" ? stepY : 0;
                 }
 
                 await JSRuntime.InvokeVoidAsync("Radzen.resizeSplitter", UniqueID, new MouseEventArgs()

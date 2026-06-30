@@ -181,6 +181,75 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Splitter_CollapseButton_HasRoleAndLabel()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            {
+                parameters.AddChildContent<RadzenSplitterPane>(pane =>
+                {
+                    pane.Add(p => p.Size, "30%");
+                    pane.Add(p => p.Collapsible, true);
+                });
+                parameters.AddChildContent<RadzenSplitterPane>();
+            });
+
+            var collapse = component.Find("span.rz-collapse");
+
+            Assert.Equal("button", collapse.GetAttribute("role"));
+            Assert.False(string.IsNullOrEmpty(collapse.GetAttribute("aria-label")));
+            Assert.Equal("true", collapse.GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public void Splitter_ExpandButton_HasRoleAndLabel()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            {
+                parameters.AddChildContent<RadzenSplitterPane>(pane =>
+                {
+                    pane.Add(p => p.Size, "30%");
+                    pane.Add(p => p.Collapsible, true);
+                    pane.Add(p => p.Collapsed, true);
+                });
+                parameters.AddChildContent<RadzenSplitterPane>();
+            });
+
+            var expand = component.Find("span.rz-expand");
+
+            Assert.Equal("button", expand.GetAttribute("role"));
+            Assert.False(string.IsNullOrEmpty(expand.GetAttribute("aria-label")));
+            Assert.Equal("false", expand.GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public void Splitter_Separator_AriaLabelledBy_TakesPrecedence()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            {
+                parameters.AddChildContent<RadzenSplitterPane>(pane =>
+                {
+                    pane.Add(p => p.Size, "30%");
+                    pane.Add(p => p.AriaLabelledBy, "pane-label");
+                });
+                parameters.AddChildContent<RadzenSplitterPane>();
+            });
+
+            var separator = component.Find("span.rz-resize");
+
+            Assert.Equal("pane-label", separator.GetAttribute("aria-labelledby"));
+            Assert.True(string.IsNullOrEmpty(separator.GetAttribute("aria-label")));
+        }
+
+        [Fact]
         public void Splitter_Renders_WithClassName()
         {
             using var ctx = new TestContext();

@@ -365,7 +365,14 @@ namespace Radzen.Blazor
             ? allItems[focusedIndex].GetItemId()
             : null;
 
-        string? GroupAriaLabel => Attributes != null && Attributes.ContainsKey("aria-label")
+        /// <summary>
+        /// Gets or sets the id of an external element that labels the radio group. Sets the aria-labelledby attribute.
+        /// </summary>
+        /// <value>The aria-labelledby value.</value>
+        [Parameter]
+        public string? AriaLabelledBy { get; set; }
+
+        string? GroupAriaLabel => (Attributes != null && Attributes.ContainsKey("aria-label")) || !string.IsNullOrEmpty(AriaLabelledBy)
             ? null
             : Name;
 

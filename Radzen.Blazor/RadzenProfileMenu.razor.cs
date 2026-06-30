@@ -148,9 +148,13 @@ namespace Radzen.Blazor
                 if (Collapsed)
                 {
                     await Toggle(new MouseEventArgs());
-                }
 
-                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
+                    focusedIndex = key == "ArrowUp" ? items.Count - 1 : 0;
+                }
+                else
+                {
+                    focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
+                }
             }
             else if (key == "Home" || key == "End")
             {
@@ -201,6 +205,16 @@ namespace Radzen.Blazor
 
                 await RestoreFocusToToggle();
             }
+            else if (key == "Tab")
+            {
+                preventKeyPress = false;
+                stopKeydownPropagation = false;
+
+                if (!Collapsed)
+                {
+                    Close();
+                }
+            }
             else
             {
                 preventKeyPress = false;
@@ -213,15 +227,6 @@ namespace Radzen.Blazor
         {
             var key = args.Code ?? args.Key;
             stopGuardKeydownPropagation = key != "Escape";
-        }
-
-        async Task OnToggleKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
-            if (key == "Space" || key == "Enter")
-            {
-                await Toggle(new MouseEventArgs());
-            }
         }
 
         internal bool IsFocused(RadzenProfileMenuItem item)

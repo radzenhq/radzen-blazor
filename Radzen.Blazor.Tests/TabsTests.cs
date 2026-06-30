@@ -472,6 +472,77 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("Two", SelectedTabText(component));
             Assert.Contains("Two-Content", component.Markup);
         }
+
+        [Fact]
+        public void Tabs_AriaLabel_AppliedToTabList()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.AriaLabel, "Sections")
+                .Add(p => p.Tabs, TabsFragment("One", "Two"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            Assert.Equal("Sections", wrapper.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void Tabs_AriaLabelledBy_AppliedToTabList()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.AriaLabelledBy, "heading-id")
+                .Add(p => p.Tabs, TabsFragment("One", "Two"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            Assert.Equal("heading-id", wrapper.GetAttribute("aria-labelledby"));
+        }
+
+        [Fact]
+        public void Tabs_SelectedPanel_HasTabIndexZero()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
+            );
+
+            var panel = component.Find("div.rz-tabview-panel");
+            Assert.Equal("0", panel.GetAttribute("tabindex"));
+        }
+
+        [Fact]
+        public void Tabs_HorizontalOrientation_ArrowRight_WrapsFromLastToFirst()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Top)
+                .Add(p => p.SelectedIndex, 2)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowRight", Code = "ArrowRight" });
+
+            Assert.Equal("One", ActiveDescendantText(component));
+        }
+
+        [Fact]
+        public void Tabs_HorizontalOrientation_ArrowLeft_WrapsFromFirstToLast()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.TabPosition, TabPosition.Top)
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
+            );
+
+            var wrapper = component.Find("div.rz-tabview");
+            wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowLeft", Code = "ArrowLeft" });
+
+            Assert.Equal("Three", ActiveDescendantText(component));
+        }
     }
 }
 

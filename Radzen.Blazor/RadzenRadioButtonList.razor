@@ -16,7 +16,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          role="radiogroup" aria-disabled="@(Disabled ? "true" : "false")" @onfocus=@OnFocus @onblur=@OnBlur
-         aria-activedescendant="@ActiveDescendantId" aria-label="@GroupAriaLabel"
+         aria-activedescendant="@ActiveDescendantId" aria-label="@GroupAriaLabel" aria-labelledby="@AriaLabelledBy"
         tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
         <RadzenStack Orientation="@Orientation" JustifyContent="@JustifyContent" AlignItems="@AlignItems" Gap="@Gap" Wrap="@Wrap">
         @foreach (var item in allItems.Where(i => i.Visible))
@@ -24,11 +24,11 @@
             <div @ref="@item.Element" id="@item.GetItemId()" @onclick="@(args => SelectItem(item))" @onkeydown="@(args => OnItemKeyDown(args, item))"
                  @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style"
                  role="radio" tabindex="-1"
-                 aria-checked=@(IsSelected(item)? "true" : "false") aria-label="@item.Text"
+                 aria-checked=@(IsSelected(item)? "true" : "false") aria-label="@(string.IsNullOrEmpty(item.Text) ? null : item.Text)"
                  aria-disabled="@(Disabled || item.Disabled ? "true" : "false")">
                 <div class="rz-radiobutton">
                     <div class="rz-helper-hidden-accessible">
-                        <input type="radio" disabled="@(Disabled || item.Disabled)" name="@Name" value="@item.Value" tabindex="-1" aria-label="@(item.Text + " " + item.Value)" @attributes="item.InputAttributes">
+                        <input type="radio" disabled="@(Disabled || item.Disabled)" name="@Name" value="@item.Value" tabindex="-1" aria-hidden="true" aria-label="@(item.Text + " " + item.Value)" @attributes="item.InputAttributes">
                     </div>
                     <div class=@ItemClass(item)>
                         <span class=@IconClass(item)></span>

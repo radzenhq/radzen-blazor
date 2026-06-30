@@ -607,8 +607,14 @@ namespace Radzen.Blazor
             }
             else
             {
-                var direction = key == "ArrowLeft" ? -1 : 1;
+                var forward = key != "ArrowLeft";
+                var direction = forward ? 1 : -1;
                 target = NextFocusableTab(index + direction, direction);
+
+                if (target == -1)
+                {
+                    target = forward ? NextFocusableTab(0, 1) : NextFocusableTab(steps.Count - 1, -1);
+                }
             }
 
             if (target >= 0 && target < steps.Count && JSRuntime != null)
@@ -623,7 +629,7 @@ namespace Radzen.Blazor
 
             while (i >= 0 && i < steps.Count)
             {
-                if (steps[i].Visible && !steps[i].Disabled)
+                if (steps[i].Visible)
                 {
                     return i;
                 }

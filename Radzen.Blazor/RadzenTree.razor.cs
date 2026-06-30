@@ -589,7 +589,24 @@ namespace Radzen.Blazor
 
                 focusedIndex = key == "Home" ? 0 : CurrentItems.Count - 1;
             }
-            else if (key == "Enter" || key == "Space")
+            else if (key == "Enter")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+                {
+                    var item = CurrentItems[focusedIndex];
+
+                    await SelectItem(item);
+
+                    if (item.IsExpandable)
+                    {
+                        await item.ExpandCollapse(!item.IsExpanded);
+                    }
+                }
+            }
+            else if (key == "Space")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
@@ -604,10 +621,52 @@ namespace Radzen.Blazor
                     }
                 }
             }
+            else if (args.Key != null && args.Key.Length == 1 && !char.IsControl(args.Key[0]) && !args.CtrlKey && !args.AltKey && !args.MetaKey)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                TypeAhead(args.Key);
+            }
             else
             {
                 preventKeyPress = false;
                 stopKeydownPropagation = false;
+            }
+        }
+
+        string typeAheadBuffer = string.Empty;
+        DateTime lastTypeAhead = DateTime.MinValue;
+
+        void TypeAhead(string character)
+        {
+            var now = DateTime.UtcNow;
+
+            if ((now - lastTypeAhead).TotalMilliseconds > 500)
+            {
+                typeAheadBuffer = string.Empty;
+            }
+
+            lastTypeAhead = now;
+            typeAheadBuffer += character;
+
+            if (CurrentItems.Count == 0)
+            {
+                return;
+            }
+
+            var start = focusedIndex >= 0 ? focusedIndex : 0;
+
+            for (var offset = 1; offset <= CurrentItems.Count; offset++)
+            {
+                var index = (start + offset) % CurrentItems.Count;
+                var text = CurrentItems[index].Text;
+
+                if (!string.IsNullOrEmpty(text) && text.StartsWith(typeAheadBuffer, StringComparison.OrdinalIgnoreCase))
+                {
+                    focusedIndex = index;
+                    break;
+                }
             }
         }
 
@@ -671,7 +730,17 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnInitialized()
         {
-            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+            if (focusedIndex == -1)
+            {
+                var selectedIndex = SelectedItem != null ? CurrentItems.IndexOf(SelectedItem) : -1;
+
+                if (selectedIndex < 0 && Value != null)
+                {
+                    selectedIndex = CurrentItems.FindIndex(i => object.Equals(i.Value, Value));
+                }
+
+                focusedIndex = selectedIndex >= 0 ? selectedIndex : 0;
+            }
 
             base.OnInitialized();
         }

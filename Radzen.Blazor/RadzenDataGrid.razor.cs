@@ -2764,6 +2764,16 @@ namespace Radzen.Blazor
             return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Any(i => ItemEquals(i, item)) ? $"rz-state-highlight rz-data-row {isInEditMode} " : $"rz-data-row {isInEditMode} ";
         }
 
+        internal string? RowAriaSelected(TItem item, int index)
+        {
+            if (!(RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple))
+            {
+                return null;
+            }
+
+            return selectedItems.Keys.Any(i => ItemEquals(i, item)) ? "true" : "false";
+        }
+
         internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)
         {
             var args = new Radzen.RowRenderEventArgs<TItem>() { Data = item, Index = index, Expandable = Template != null || LoadChildData.HasDelegate };

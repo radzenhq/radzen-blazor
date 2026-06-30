@@ -179,6 +179,87 @@ namespace Radzen.Blazor
                 catch
                 { }
             }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                focusedIndex = key == "Home" ? 0 : currentItems.Count - 1;
+
+                if (JSRuntime == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
+                }
+                catch
+                { }
+            }
+            else if (key == "ArrowRight")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                var item = currentItems.ElementAtOrDefault(focusedIndex);
+
+                if (item != null && item.items.Count > 0)
+                {
+                    if (!item.IsExpanded)
+                    {
+                        await item.Toggle();
+                    }
+
+                    if (item.IsExpanded)
+                    {
+                        currentItems = item.items.Where(i => i.Visible).ToList();
+                        focusedIndex = 0;
+                    }
+                }
+
+                if (JSRuntime == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
+                }
+                catch
+                { }
+            }
+            else if (key == "ArrowLeft" || key == "Escape")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                var firstItem = currentItems.FirstOrDefault();
+                var parentItem = firstItem?.ParentItem;
+
+                if (parentItem != null)
+                {
+                    await parentItem.CollapseAsync();
+
+                    var targetItems = parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent?.items ?? items;
+                    currentItems = targetItems.Where(i => i.Visible).ToList();
+                    focusedIndex = currentItems.IndexOf(parentItem);
+                }
+
+                if (JSRuntime == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
+                }
+                catch
+                { }
+            }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;

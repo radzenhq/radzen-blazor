@@ -39,10 +39,10 @@ namespace Radzen.Blazor.Tests
 
             var component = RenderWithItems(ctx);
 
-            var toggle = component.Find(".rz-splitbutton-menubutton");
+            var wrapper = component.Find("div.rz-splitbutton");
 
-            Assert.Equal("menu", toggle.GetAttribute("aria-haspopup"));
-            Assert.Equal("false", toggle.GetAttribute("aria-expanded"));
+            Assert.Equal("menu", wrapper.GetAttribute("aria-haspopup"));
+            Assert.Equal("false", wrapper.GetAttribute("aria-expanded"));
         }
 
         [Fact]
@@ -56,9 +56,8 @@ namespace Radzen.Blazor.Tests
             component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown", AltKey = true });
 
             var wrapper = component.Find("div.rz-splitbutton");
-            var toggle = component.Find(".rz-splitbutton-menubutton");
 
-            Assert.Equal("true", toggle.GetAttribute("aria-expanded"));
+            Assert.Equal("true", wrapper.GetAttribute("aria-expanded"));
 
             var activeDescendant = wrapper.GetAttribute("aria-activedescendant");
             Assert.False(string.IsNullOrEmpty(activeDescendant));
@@ -131,11 +130,11 @@ namespace Radzen.Blazor.Tests
             var component = RenderWithItems(ctx);
 
             component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown", AltKey = true });
-            Assert.Equal("true", component.Find(".rz-splitbutton-menubutton").GetAttribute("aria-expanded"));
+            Assert.Equal("true", component.Find("div.rz-splitbutton").GetAttribute("aria-expanded"));
 
             component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "Escape" });
 
-            Assert.Equal("false", component.Find(".rz-splitbutton-menubutton").GetAttribute("aria-expanded"));
+            Assert.Equal("false", component.Find("div.rz-splitbutton").GetAttribute("aria-expanded"));
             Assert.Null(component.Find("div.rz-splitbutton").GetAttribute("aria-activedescendant"));
         }
 

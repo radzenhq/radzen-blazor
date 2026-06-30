@@ -29,7 +29,7 @@
                        tabindex="@(IsSelected(i, step) ? 0 : -1)"
                        @onclick="@(async (args) => { if (!step.Disabled && AllowStepSelect) { await SelectStep(step, true); } })"
                        @onkeydown="@(args => OnTabKeyDown(args, step, index))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeypressPropagation"
-                       disabled="@step.Disabled" aria-disabled="@step.Disabled" class="rz-menuitem-link">
+                       aria-disabled="@step.Disabled" class="rz-menuitem-link">
                         <span class="rz-steps-number">@(steps.Where(s => s.Visible).ToList().IndexOf(step) + 1)</span>
                         @if (step.Template != null)
                         {
@@ -58,6 +58,10 @@
                         @step.ChildContent
                     }
                 </div>
+            }
+            else
+            {
+                <div class="@GetContentCssClass()" role="tabpanel" id="@($"{GetId()}-panel-{i}")" aria-labelledby="@(GetId() + i.ToString() + "s")" hidden></div>
             }
         }
     }

@@ -571,6 +571,9 @@ namespace Radzen.Blazor {
         public static string SplitButton_ImageAlternateText { get { return ResourceManager.GetString("SplitButton_ImageAlternateText", resourceCulture); } }
         public static string SplitButton_OpenAriaLabel { get { return ResourceManager.GetString("SplitButton_OpenAriaLabel", resourceCulture); } }
         public static string SplitButton_ButtonAriaLabel { get { return ResourceManager.GetString("SplitButton_ButtonAriaLabel", resourceCulture); } }
+        public static string Splitter_ResizeAriaLabel { get { return ResourceManager.GetString("Splitter_ResizeAriaLabel", resourceCulture); } }
+        public static string Splitter_CollapseAriaLabel { get { return ResourceManager.GetString("Splitter_CollapseAriaLabel", resourceCulture); } }
+        public static string Splitter_ExpandAriaLabel { get { return ResourceManager.GetString("Splitter_ExpandAriaLabel", resourceCulture); } }
         public static string TimeSpanPicker_TogglePopupAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_TogglePopupAriaLabel", resourceCulture); } }
         public static string TimeSpanPicker_PopupAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_PopupAriaLabel", resourceCulture); } }
         public static string TimeSpanPicker_ClearAriaLabel { get { return ResourceManager.GetString("TimeSpanPicker_ClearAriaLabel", resourceCulture); } }

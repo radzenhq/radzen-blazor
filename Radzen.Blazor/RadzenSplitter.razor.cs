@@ -313,6 +313,8 @@ namespace Radzen.Blazor
         }
 
 
+        internal string? ElementId => GetId();
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {

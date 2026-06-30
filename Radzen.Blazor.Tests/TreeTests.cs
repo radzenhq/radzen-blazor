@@ -519,6 +519,108 @@ namespace Radzen.Blazor.Tests
             container = component.Find("[role=tree]");
             Assert.Equal(rootId, container.GetAttribute("aria-activedescendant"));
         }
+
+        [Fact]
+        public void Tree_TypeAhead_MovesActiveDescendant()
+        {
+            using var ctx = new TestContext();
+            var data = new List<Category>
+            {
+                new Category { Name = "Electronics" },
+                new Category { Name = "Clothing" },
+                new Category { Name = "Books" }
+            };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.CloseComponent();
+                });
+            });
+
+            var items = component.FindAll("[role=treeitem]");
+            var booksId = items.Last().GetAttribute("id");
+
+            var container = component.Find("[role=tree]");
+            container.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "b" });
+
+            container = component.Find("[role=tree]");
+            Assert.Equal(booksId, container.GetAttribute("aria-activedescendant"));
+        }
+
+        [Fact]
+        public void Tree_Enter_TogglesExpandableNode()
+        {
+            using var ctx = new TestContext();
+            var data = new List<Category>
+            {
+                new Category
+                {
+                    Name = "Electronics",
+                    Products = new List<Product>
+                    {
+                        new Product { Name = "Laptop" }
+                    }
+                }
+            };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.AddAttribute(2, "ChildrenProperty", "Products");
+                    builder.AddAttribute(3, "HasChildren", (object c) => c is Category);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenTreeLevel>(4);
+                    builder.AddAttribute(5, "TextProperty", "Name");
+                    builder.AddAttribute(6, "HasChildren", (object product) => false);
+                    builder.CloseComponent();
+                });
+            });
+
+            var root = component.Find("[role=treeitem]");
+            Assert.Equal("false", root.GetAttribute("aria-expanded"));
+
+            var container = component.Find("[role=tree]");
+            container.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" });
+
+            root = component.Find("[role=treeitem]");
+            Assert.Equal("true", root.GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public void Tree_DoesNotRender_AriaSelected_WhenCheckBoxesAllowed()
+        {
+            using var ctx = new TestContext();
+            var data = new List<Category>
+            {
+                new Category { Name = "Electronics" }
+            };
+
+            var component = ctx.RenderComponent<RadzenTree>(parameters =>
+            {
+                parameters.Add(p => p.AllowCheckBoxes, true);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenTreeLevel>(0);
+                    builder.AddAttribute(1, "TextProperty", "Name");
+                    builder.CloseComponent();
+                });
+            });
+
+            var item = component.Find("[role=treeitem]");
+
+            Assert.False(item.HasAttribute("aria-selected"));
+        }
     }
 }
 

@@ -1674,6 +1674,16 @@
   <data name="SplitButton_ButtonAriaLabel" xml:space="preserve">
     <value>Button</value>
   </data>
+  <!-- Splitter -->
+  <data name="Splitter_ResizeAriaLabel" xml:space="preserve">
+    <value>Resize {0}</value>
+  </data>
+  <data name="Splitter_CollapseAriaLabel" xml:space="preserve">
+    <value>Collapse pane</value>
+  </data>
+  <data name="Splitter_ExpandAriaLabel" xml:space="preserve">
+    <value>Expand pane</value>
+  </data>
   <!-- TimeSpanPicker -->
   <data name="TimeSpanPicker_TogglePopupAriaLabel" xml:space="preserve">
     <value>Toggle popup</value>

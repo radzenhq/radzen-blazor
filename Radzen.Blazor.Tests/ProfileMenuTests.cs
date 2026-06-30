@@ -327,11 +327,10 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var root = component.Find("ul.rz-profile-menu");
-            root.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
 
-            var menu = component.Find("ul.rz-profile-menu");
-            var activeId = menu.GetAttribute("aria-activedescendant");
+            var activeId = component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant");
 
             Assert.False(string.IsNullOrEmpty(activeId));
 
@@ -360,8 +359,8 @@ namespace Radzen.Blazor.Tests
             var items = component.FindAll("li[role=menuitem]");
             Assert.All(items, item => Assert.Equal("-1", item.GetAttribute("tabindex")));
 
-            var root = component.Find("ul.rz-profile-menu");
-            root.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
 
             var activeItems = component.FindAll("li[role=menuitem][tabindex=\"0\"]");
             Assert.Single(activeItems);
@@ -385,13 +384,12 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var root = component.Find("ul.rz-profile-menu");
-            root.KeyDown(new KeyboardEventArgs { Code = "End" });
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "End" });
 
             Assert.Equal(1, component.Instance.focusedIndex);
 
-            var menu = component.Find("ul.rz-profile-menu");
-            var activeId = menu.GetAttribute("aria-activedescendant");
+            var activeId = component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant");
             var lastItem = component.FindAll("li[role=menuitem]")[1];
 
             Assert.Equal(lastItem.Id, activeId);
@@ -415,9 +413,9 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var root = component.Find("ul.rz-profile-menu");
-            root.KeyDown(new KeyboardEventArgs { Code = "End" });
-            root.KeyDown(new KeyboardEventArgs { Code = "Home" });
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "End" });
+            toggle.KeyDown(new KeyboardEventArgs { Code = "Home" });
 
             Assert.Equal(0, component.Instance.focusedIndex);
         }
@@ -436,17 +434,18 @@ namespace Radzen.Blazor.Tests
                 });
             });
 
-            var root = component.Find("ul.rz-profile-menu");
-            root.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
 
             Assert.True(component.Instance.focusedIndex >= 0);
 
-            root.KeyDown(new KeyboardEventArgs { Code = "Escape" });
+            toggle.KeyDown(new KeyboardEventArgs { Code = "Escape" });
 
             Assert.Equal(-1, component.Instance.focusedIndex);
 
+            Assert.True(string.IsNullOrEmpty(component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant")));
+
             var menu = component.Find("ul.rz-navigation-menu");
-            Assert.True(string.IsNullOrEmpty(menu.GetAttribute("aria-activedescendant")));
             Assert.Equal("true", menu.GetAttribute("aria-hidden"));
         }
     }

@@ -6,7 +6,7 @@
     @oncontextmenu="OnContextMenu" @oncontextmenu:preventDefault="@(Tree?.ItemContextMenu.HasDelegate ?? false)" @oncontextmenu:stopPropagation>
     <div id="@ElementId" class=@ContentClass role="treeitem" tabindex="-1"
          aria-level="@Level"
-         aria-selected="@(selected.ToString().ToLowerInvariant())"
+         aria-selected="@(Tree?.AllowCheckBoxes == true ? null : selected.ToString().ToLowerInvariant())"
          aria-expanded="@(ChildContent != null || HasChildren ? clientExpanded.ToString().ToLowerInvariant() : null)"
          @onclick="@Select">
         @if (ChildContent != null || HasChildren)
