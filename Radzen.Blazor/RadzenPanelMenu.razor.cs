@@ -126,6 +126,8 @@ namespace Radzen.Blazor
 
             currentItems ??= [.. items.Where(i => i.Visible)];
 
+            var renderRequired = false;
+
             if (key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
@@ -166,18 +168,6 @@ namespace Radzen.Blazor
                 {
                     focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
                 }
-
-                if (JSRuntime == null)
-                {
-                    return;
-                }
-
-                try
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
-                }
-                catch
-                { }
             }
             else if (key == "Home" || key == "End")
             {
@@ -185,18 +175,6 @@ namespace Radzen.Blazor
                 stopKeydownPropagation = true;
 
                 focusedIndex = key == "Home" ? 0 : currentItems.Count - 1;
-
-                if (JSRuntime == null)
-                {
-                    return;
-                }
-
-                try
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
-                }
-                catch
-                { }
             }
             else if (key == "ArrowRight")
             {
@@ -210,6 +188,7 @@ namespace Radzen.Blazor
                     if (!item.IsExpanded)
                     {
                         await item.Toggle();
+                        renderRequired = true;
                     }
 
                     if (item.IsExpanded)
@@ -218,18 +197,6 @@ namespace Radzen.Blazor
                         focusedIndex = 0;
                     }
                 }
-
-                if (JSRuntime == null)
-                {
-                    return;
-                }
-
-                try
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
-                }
-                catch
-                { }
             }
             else if (key == "ArrowLeft" || key == "Escape")
             {
@@ -242,23 +209,12 @@ namespace Radzen.Blazor
                 if (parentItem != null)
                 {
                     await parentItem.CollapseAsync();
+                    renderRequired = true;
 
                     var targetItems = parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent?.items ?? items;
                     currentItems = targetItems.Where(i => i.Visible).ToList();
                     focusedIndex = currentItems.IndexOf(parentItem);
                 }
-
-                if (JSRuntime == null)
-                {
-                    return;
-                }
-
-                try
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
-                }
-                catch
-                { }
             }
             else if (key == "Space" || key == "Enter")
             {
@@ -272,6 +228,7 @@ namespace Radzen.Blazor
                     if (item.items.Count > 0)
                     {
                         await item.Toggle();
+                        renderRequired = true;
 
                     var targetItems = item.IsExpanded ? item.items :
                         item.ParentItem != null ? item.ParentItem.items : item.Parent?.items;
@@ -299,15 +256,39 @@ namespace Radzen.Blazor
                 stopKeydownPropagation = false;
             }
 
-            if (preventKeyPress)
+            if (!preventKeyPress)
+            {
+                return;
+            }
+
+            if (renderRequired)
             {
                 StateHasChanged();
+
+                if (JSRuntime != null && focusedIndex >= 0 && focusedIndex < currentItems.Count)
+                {
+                    try
+                    {
+                        await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
+                    }
+                    catch
+                    { }
+                }
+            }
+            else if (JSRuntime != null)
+            {
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusPanelMenuItem", Element, ActiveDescendantId);
+                }
+                catch
+                { }
             }
         }
 
         internal bool IsFocused(RadzenPanelMenuItem item)
         {
-            return currentItems?.IndexOf(item) == focusedIndex && focusedIndex != -1;
+            return currentItems != null && focusedIndex >= 0 && focusedIndex < currentItems.Count && currentItems[focusedIndex] == item;
         }
 
         string? ActiveDescendantId => focusedIndex >= 0 && currentItems != null && focusedIndex < currentItems.Count

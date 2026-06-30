@@ -1224,6 +1224,23 @@ window.Radzen = {
         el.scrollIntoView();
     }
   },
+  focusPanelMenuItem: function (menu, activeId) {
+    if (!menu) return;
+    var focused = menu.querySelectorAll('.rz-navigation-item.rz-state-focused');
+    for (var i = 0; i < focused.length; i++) {
+        focused[i].classList.remove('rz-state-focused');
+    }
+    if (activeId) {
+        menu.setAttribute('aria-activedescendant', activeId);
+        var el = document.getElementById(activeId);
+        if (el) {
+            el.classList.add('rz-state-focused');
+            Radzen.scrollIntoViewIfNeeded(el);
+        }
+    } else {
+        menu.removeAttribute('aria-activedescendant');
+    }
+  },
   updateActiveDescendant: function (ul, li, index) {
     if (!ul) return;
     // The popup is appended to document.body when opened, so ul.closest('[role="combobox"]')
