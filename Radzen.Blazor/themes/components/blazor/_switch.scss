@@ -23,11 +23,11 @@ $switch-thumb-transition: transform 0.2s linear !default;
   height: $switch-height;
   border-radius: calc(5 * var(--rz-border-radius));
 
-  &:focus {
+  &:focus-within {
     outline: var(--rz-outline-normal);
   }
 
-  &:focus-visible {
+  &:has(:focus-visible) {
     outline: var(--rz-switch-focus-outline);
     outline-offset: var(--rz-switch-focus-outline-offset);
   }
