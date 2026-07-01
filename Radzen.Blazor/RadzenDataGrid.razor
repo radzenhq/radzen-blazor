@@ -76,12 +76,15 @@
                                 <Columns>
                                     <RadzenDropDownDataGridColumn Width="60px" Sortable="false">
                                         <HeaderTemplate>
-                                            <RadzenCheckBox TriState="false" TValue="bool" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", AllColumnsText }})"
-                                                            Value="@(selectedColumns != null && ((IEnumerable<object>)selectedColumns).Any())"
-                                                            Change="@(async args => { selectedColumns = args ? allPickableColumns.Cast<object>().ToList() : new List<object>(); await ToggleColumns(); })" />
+                                            @if (AllowPickAllColumns)
+                                            {
+                                                <RadzenCheckBox TriState="true" TValue="bool?" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", AllColumnsText }})"
+                                                                Value="@(selectedColumns == null || !((IEnumerable<object>)selectedColumns).Any() ? (bool?)false : ((IEnumerable<object>)selectedColumns).Count() >= allPickableColumns.Count ? (bool?)true : (bool?)null)"
+                                                                Change="@(async args => { var allSelected = selectedColumns != null && ((IEnumerable<object>)selectedColumns).Count() >= allPickableColumns.Count; selectedColumns = allSelected ? new List<object>() : allPickableColumns.Cast<object>().ToList(); await ToggleColumns(); })" />
+                                            }
                                         </HeaderTemplate>
                                         <Template Context="data">
-                                            <RadzenCheckBox TriState="false" TValue="bool" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select column" }})"
+                                                <RadzenCheckBox TriState="false" TValue="bool" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", SelectVisibleColumnsAriaLabel } })"
                                                             Value="@(selectedColumns != null && ((IEnumerable<object>)selectedColumns).Contains((object)data))"
                                                             Change="@(args => columnPickerGrid!.SelectItem((object)data))" @onclick:stopPropagation />
                                         </Template>

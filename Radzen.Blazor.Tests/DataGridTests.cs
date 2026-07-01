@@ -4018,6 +4018,46 @@ namespace Radzen.Blazor.Tests
             Assert.NotNull(capturedArgs);
             Assert.Contains(capturedArgs.Filters, f => f.Property == "Country");
         }
+
+        [Fact]
+        public void DataGrid_ColumnPickerSorting_TogglesColumnAndSortsPicker()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Id = 1, Name = "A" }, new { Id = 2, Name = "B" } });
+                parameterBuilder.Add(p => p.AllowColumnPicking, true);
+                parameterBuilder.Add(p => p.AllowSortingColumnPicker, true);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "Id");
+                    builder.CloseComponent();
+                    builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(4, "Property", "Name");
+                    builder.AddAttribute(5, "Title", "Name");
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.NotNull(component.Find(".rz-column-picker th.rz-sortable-column"));
+            Assert.Contains("aria-label=\"All\"", component.Find(".rz-column-picker thead").ToMarkup());
+
+            Assert.Contains("2 columns showing", component.Find(".rz-column-picker .rz-dropdown-label").TextContent);
+
+            component.Find(".rz-column-picker tbody tr .rz-chkbox").Click();
+            var label = component.Find(".rz-column-picker .rz-dropdown-label");
+            Assert.DoesNotContain("2 columns showing", label.TextContent);
+            Assert.Equal("Name", label.TextContent.Trim());
+
+            Assert.Equal("none", component.Find(".rz-column-picker th.rz-sortable-column").GetAttribute("aria-sort"));
+            component.Find(".rz-column-picker th.rz-sortable-column > div").Click();
+            Assert.Equal("ascending", component.Find(".rz-column-picker th.rz-sortable-column").GetAttribute("aria-sort"));
+        }
     }
 
     public class SortComparerItem
