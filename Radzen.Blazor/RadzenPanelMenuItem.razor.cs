@@ -170,6 +170,8 @@ namespace Radzen.Blazor
 
         string ExpandableClass => ChildContent != null && Parent?.RenderMode == PanelMenuRenderMode.Server ? " rz-navigation-item-expandable" : string.Empty;
 
+        bool RenderSubmenu => ChildContent != null && (Parent?.RenderMode != PanelMenuRenderMode.Server || expanded);
+
         string ToggleClass => ClassList.Create("notranslate rzi rz-navigation-item-icon-children")
                             .Add("rz-state-expanded", expanded)
                             .Add("rz-state-collapsed", !expanded)
