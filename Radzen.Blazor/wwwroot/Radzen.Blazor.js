@@ -5677,7 +5677,7 @@ Radzen.createDataGrid = function(el) {
     var label = e.target.closest('.rz-cell-filter-label');
     if (label) { e.preventDefault(); }
     var btn = e.target.closest('button[aria-haspopup][aria-controls]');
-    if (btn && el.contains(btn) && label && label.contains(btn) && btn.getAttribute('aria-controls')) {
+    if (btn && !btn.closest('.rz-datepicker') && el.contains(btn) && label && label.contains(btn) && btn.getAttribute('aria-controls')) {
       Radzen.togglePopup(btn.parentNode, btn.getAttribute('aria-controls'));
     }
   }
