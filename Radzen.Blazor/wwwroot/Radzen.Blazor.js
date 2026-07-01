@@ -1224,6 +1224,12 @@ window.Radzen = {
         el.scrollIntoView();
     }
   },
+  scrollIntoViewIfNeededById: function (id) {
+    var el = document.getElementById(id);
+    if (el) {
+        Radzen.scrollIntoViewIfNeeded(el);
+    }
+  },
   focusPanelMenuItem: function (menu, activeId) {
     if (!menu) return;
     var focused = menu.querySelectorAll('.rz-navigation-item.rz-state-focused');

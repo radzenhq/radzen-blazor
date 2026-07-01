@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -638,6 +639,17 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = false;
                 stopKeydownPropagation = false;
+            }
+
+            if (preventKeyPress && JSRuntime != null && focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+            {
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeededById", CurrentItems[focusedIndex].ElementId);
+                }
+                catch
+                {
+                }
             }
         }
 
