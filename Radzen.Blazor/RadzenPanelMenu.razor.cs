@@ -66,6 +66,14 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowArrow { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets how child items of expandable items are rendered. Set to <see cref="PanelMenuRenderMode.Client" /> by default which renders the whole menu up front.
+        /// Use <see cref="PanelMenuRenderMode.Server" /> to render collapsed branches only when they are expanded, which keeps the DOM small for large menus.
+        /// </summary>
+        /// <value>The render mode. Default is <see cref="PanelMenuRenderMode.Client" />.</value>
+        [Parameter]
+        public PanelMenuRenderMode RenderMode { get; set; } = PanelMenuRenderMode.Client;
+
         internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
         /// <summary>
@@ -183,7 +191,7 @@ namespace Radzen.Blazor
 
                 var item = currentItems.ElementAtOrDefault(focusedIndex);
 
-                if (item != null && item.items.Count > 0)
+                if (item != null && item.ChildContent != null)
                 {
                     if (!item.IsExpanded)
                     {
@@ -191,7 +199,7 @@ namespace Radzen.Blazor
                         renderRequired = true;
                     }
 
-                    if (item.IsExpanded)
+                    if (item.IsExpanded && item.items.Count > 0)
                     {
                         currentItems = item.items.Where(i => i.Visible).ToList();
                         focusedIndex = 0;
@@ -230,17 +238,22 @@ namespace Radzen.Blazor
                         return;
                     }
 
-                    if (item.items.Count > 0)
+                    if (item.ChildContent != null)
                     {
                         await item.Toggle();
                         renderRequired = true;
 
-                    var targetItems = item.IsExpanded ? item.items :
-                        item.ParentItem != null ? item.ParentItem.items : item.Parent?.items;
-
-                    currentItems = (targetItems ?? Enumerable.Empty<RadzenPanelMenuItem>()).Where(i => i.Visible).ToList();
-
-                        focusedIndex = item.IsExpanded ? 0 : currentItems.IndexOf(item);
+                        if (item.IsExpanded && item.items.Count > 0)
+                        {
+                            currentItems = item.items.Where(i => i.Visible).ToList();
+                            focusedIndex = 0;
+                        }
+                        else
+                        {
+                            var targetItems = item.ParentItem != null ? item.ParentItem.items : item.Parent?.items;
+                            currentItems = (targetItems ?? Enumerable.Empty<RadzenPanelMenuItem>()).Where(i => i.Visible).ToList();
+                            focusedIndex = currentItems.IndexOf(item);
+                        }
                     }
                     else
                     {

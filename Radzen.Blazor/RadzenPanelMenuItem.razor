@@ -3,7 +3,7 @@
 @inherits RadzenComponent
 @if (Visible)
 {
-    <li @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
+    <li @ref=@Element style=@Style @attributes=@Attributes class="@(GetCssClass() + ExpandableClass)" id=@GetId()
         role="menuitem" tabindex="-1" aria-disabled="@(Disabled ? "true" : "false")"
         aria-haspopup="@(ChildContent != null ? "menu" : null)"
         aria-controls="@(ChildContent != null ? $"{GetId()}-submenu" : null)"
@@ -70,7 +70,10 @@
             <Expander Expanded=@expanded>
                 <ul id="@($"{GetId()}-submenu")" class="rz-navigation-menu" role="menu">
                     <CascadingValue Value=this>
-                        @ChildContent
+                        @if (Parent?.RenderMode != PanelMenuRenderMode.Server || expanded)
+                        {
+                            @ChildContent
+                        }
                     </CascadingValue>
                 </ul>
             </Expander>
