@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
@@ -716,6 +717,84 @@ public class SpreadsheetTests
 
         Assert.False(ran);
         Assert.False(fired);
+    }
+
+    // ── SelectedSheetIndex (@bind-SelectedSheetIndex) ──────────────────────
+
+    private static Workbook TwoSheetWorkbook()
+    {
+        var wb = new Workbook();
+        var alpha = wb.AddSheet("Alpha", 10, 10);
+        alpha.Cells["A1"].Value = "AlphaCell";
+        alpha.Selection.Select(CellRef.Parse("A1"));
+        var beta = wb.AddSheet("Beta", 10, 10);
+        beta.Cells["A1"].Value = "BetaCell";
+        beta.Selection.Select(CellRef.Parse("A1"));
+        return wb;
+    }
+
+    [Fact]
+    public void SelectedSheetIndex_DefaultsToFirstSheet()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
+
+        Assert.Equal(0, c.Instance.SelectedSheetIndex);
+        Assert.Contains("AlphaCell", c.Markup);
+    }
+
+    [Fact]
+    public void SelectedSheetIndex_Set_SelectsMatchingSheet()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
+
+        c.SetParametersAndRender(p => p.Add(x => x.SelectedSheetIndex, 1));
+
+        Assert.Equal(1, c.Instance.SelectedSheetIndex);
+        Assert.Contains("BetaCell", c.Markup);
+    }
+
+    [Fact]
+    public void SelectedSheetIndex_InitialValue_HonoredWhenWorkbookLoads()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, TwoSheetWorkbook());
+            p.Add(x => x.SelectedSheetIndex, 1);
+        });
+
+        Assert.Equal(1, c.Instance.SelectedSheetIndex);
+        Assert.Contains("BetaCell", c.Markup);
+    }
+
+    [Fact]
+    public void SelectedSheetIndex_OutOfRange_ClampsToLastSheet()
+    {
+        using var ctx = CreateContext();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, TwoSheetWorkbook()));
+
+        c.SetParametersAndRender(p => p.Add(x => x.SelectedSheetIndex, 99));
+
+        Assert.Contains("BetaCell", c.Markup);        // clamped to the last valid sheet
+        Assert.DoesNotContain("AlphaCell", c.Markup);
+    }
+
+    [Fact]
+    public void SelectedSheetIndex_AddSheet_FiresChangedWithNewIndex()
+    {
+        using var ctx = CreateContext();
+        var reported = new List<int>();
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, TwoSheetWorkbook());
+            p.Add(x => x.SelectedSheetIndexChanged, EventCallbackFactory.Create<int>(reported.Add));
+        });
+
+        c.Find(".rz-spreadsheet-add-sheet").Click();
+
+        Assert.Equal(2, reported[^1]); // the new third sheet becomes active and is reported back
     }
 
     private static class EventCallbackFactory

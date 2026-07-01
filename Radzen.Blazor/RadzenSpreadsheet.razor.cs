@@ -188,6 +188,22 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [Parameter]
     public bool ShowSheetTabs { get; set; } = true;
 
+    /// <summary>
+    /// The zero-based index of the active sheet. Supports two-way binding via
+    /// <c>@bind-SelectedSheetIndex</c>. Values outside the sheet range are clamped.
+    /// Setting it selects the matching sheet even when <see cref="ShowSheetTabs"/> is
+    /// <c>false</c>; loading a different <see cref="Workbook"/> resets it to the bound value
+    /// (or <c>0</c> when unbound).
+    /// </summary>
+    [Parameter]
+    public int SelectedSheetIndex { get; set; }
+
+    /// <summary>
+    /// Fired when the active sheet changes. Used by <c>@bind-SelectedSheetIndex</c>.
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> SelectedSheetIndexChanged { get; set; }
+
     /// <summary>Allows direct cell editing (type-to-edit, double-click, paste-into-cell, delete-key, autoaccept).</summary>
     [Parameter] public bool AllowEditing { get; set; } = true;
 
@@ -324,12 +340,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         var didWorkbookChange = parameters.DidParameterChange(nameof(Workbook), Workbook);
+        var didSheetIndexChange = parameters.DidParameterChange(nameof(SelectedSheetIndex), SelectedSheetIndex);
 
         await base.SetParametersAsync(parameters);
 
         if (didWorkbookChange)
         {
-            SetActiveWorkbook(Workbook);
+            SetActiveWorkbook(Workbook, SelectedSheetIndex);
+        }
+        else if (didSheetIndexChange)
+        {
+            SetActiveSheet(SelectedSheetIndex);
         }
     }
 
@@ -414,7 +435,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// <inheritdoc/>
     public async Task LoadWorkbookAsync(Workbook workbook)
     {
-        SetActiveWorkbook(workbook);
+        var previous = sheetIndex;
+        SetActiveWorkbook(workbook, 0);
 
         await CloseMenusAsync();
         cellMenuRow = cellMenuColumn = -1;
@@ -423,22 +445,39 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         StateHasChanged();
 
         await WorkbookChanged.InvokeAsync(workbook);
+        await NotifySelectedSheetIndexChangedAsync(previous);
     }
 
-    private void SetActiveWorkbook(Workbook? value)
+    private void SetActiveWorkbook(Workbook? value, int index)
     {
         workbook = value;
         workbookView = null;
-        SetActiveSheet(0);
+        SetActiveSheet(index);
     }
 
     private void SetActiveSheet(int index)
     {
-        sheetIndex = index;
+        var count = workbook?.Sheets.Count ?? 0;
+        sheetIndex = count == 0 ? 0 : Math.Clamp(index, 0, count - 1);
 
         if (Worksheet?.Selection.Cell == CellRef.Invalid)
         {
             Worksheet.Selection.Select(new CellRef(0, 0));
+        }
+    }
+
+    private async Task SelectSheetAsync(int index)
+    {
+        var previous = sheetIndex;
+        SetActiveSheet(index);
+        await NotifySelectedSheetIndexChangedAsync(previous);
+    }
+
+    private async Task NotifySelectedSheetIndexChangedAsync(int previous)
+    {
+        if (sheetIndex != previous)
+        {
+            await SelectedSheetIndexChanged.InvokeAsync(sheetIndex);
         }
     }
 
@@ -461,7 +500,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         await CloseMenusAsync();
 
-        SetActiveSheet(index);
+        await SelectSheetAsync(index);
     }
 
     private async Task OnAddSheetAsync()
@@ -475,7 +514,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         var name = GenerateSheetName();
         workbook.AddSheet(name, 100, 26);
-        SetActiveSheet(workbook.Sheets.Count - 1);
+        await SelectSheetAsync(workbook.Sheets.Count - 1);
     }
 
     private async Task OnSheetAction(RadzenSplitButtonItem? item, Worksheet sheet)
@@ -494,10 +533,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                 await OnRemoveSheetAsync(sheet);
                 break;
             case "move-left":
-                OnMoveSheetLeft(sheet);
+                await OnMoveSheetLeftAsync(sheet);
                 break;
             case "move-right":
-                OnMoveSheetRight(sheet);
+                await OnMoveSheetRightAsync(sheet);
                 break;
         }
     }
@@ -517,7 +556,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         // Re-activate even when the index stays the same: deleting the active, non-last sheet shifts a
         // different sheet into that index, which still needs its active cell ensured.
-        SetActiveSheet(
+        await SelectSheetAsync(
             sheetIndex >= workbook.Sheets.Count ? workbook.Sheets.Count - 1 :
             removedIndex < sheetIndex ? sheetIndex - 1 :
             sheetIndex);
@@ -545,7 +584,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private void OnMoveSheetLeft(Worksheet sheet)
+    private async Task OnMoveSheetLeftAsync(Worksheet sheet)
     {
         if (ReadOnly || workbook is null || workbook.Protection.LockStructure)
         {
@@ -556,6 +595,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (index > 0)
         {
+            var previous = sheetIndex;
             workbook.MoveSheet(index, index - 1);
 
             if (sheetIndex == index)
@@ -566,10 +606,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 sheetIndex++;
             }
+
+            await NotifySelectedSheetIndexChangedAsync(previous);
         }
     }
 
-    private void OnMoveSheetRight(Worksheet sheet)
+    private async Task OnMoveSheetRightAsync(Worksheet sheet)
     {
         if (ReadOnly || workbook is null || workbook.Protection.LockStructure)
         {
@@ -580,6 +622,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (index < workbook.Sheets.Count - 1)
         {
+            var previous = sheetIndex;
             workbook.MoveSheet(index, index + 1);
 
             if (sheetIndex == index)
@@ -590,6 +633,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 sheetIndex--;
             }
+
+            await NotifySelectedSheetIndexChangedAsync(previous);
         }
     }
 

@@ -1,10 +1,26 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
 
-<RadzenSpreadsheet Workbook=@workbook style="height: 600px" />
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-mr-2 rz-mb-0">Go to sheet:</RadzenText>
+        <RadzenSelectBar @bind-Value=@selectedSheetIndex TValue="int" Size="ButtonSize.Small">
+            <Items>
+                @for (var i = 0; i < workbook.Sheets.Count; i++)
+                {
+                    var index = i;
+                    <RadzenSelectBarItem Text=@workbook.Sheets[index].Name Value=@index />
+                }
+            </Items>
+        </RadzenSelectBar>
+    </RadzenStack>
+
+    <RadzenSpreadsheet @bind-SelectedSheetIndex=@selectedSheetIndex Workbook=@workbook style="height: 600px" />
+</RadzenStack>
 
 @code {
     Workbook workbook = new Workbook();
+    int selectedSheetIndex;
 
     protected override void OnInitialized()
     {
