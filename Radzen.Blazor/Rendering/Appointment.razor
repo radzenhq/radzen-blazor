@@ -9,7 +9,7 @@
          role="button" tabindex="0" aria-label="@Data?.Text"
          @onclick=@OnClick @onkeydown="OnKeyDown" @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave
          @attributes="@FilteredAdditionalAttributes">
-        <div class="rz-event-content" title=@Title @attributes=@Attributes>
+        <div title=@Title @attributes=@Attributes>
             @if (ChildContent != null)
             {
                 @ChildContent
@@ -76,6 +76,7 @@
     protected override void OnParametersSet()
     {
         Attributes = (Scheduler != null && Data != null) ? Scheduler.GetAppointmentAttributes(Data) : new Dictionary<string, object>();
+        Attributes["class"] = ClassList.Create("rz-event-content").Add(Attributes).ToString();
 
         var style = new List<string>();
 

@@ -73,6 +73,42 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void AppointmentRender_Class_MergesWith_DefaultEventContentClass()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.Services.AddScoped<DialogService>();
+            ctx.JSInterop.Setup<Rect>("Radzen.createResizable", _ => true)
+                .SetResult(new Rect { Left = 0, Top = 0, Width = 800, Height = 600 });
+
+            var monday = new DateTime(2024, 12, 2);
+            var appointments = new List<Appointment>
+            {
+                new() { Start = monday.AddHours(8), End = monday.AddHours(9), Text = "Meeting" },
+            };
+
+            var cut = ctx.RenderComponent<RadzenScheduler<Appointment>>(p =>
+            {
+                p.Add(x => x.Date, new DateTime(2024, 12, 9));
+                p.Add(x => x.Data, appointments);
+                p.Add(x => x.StartProperty, nameof(Appointment.Start));
+                p.Add(x => x.EndProperty, nameof(Appointment.End));
+                p.Add(x => x.TextProperty, nameof(Appointment.Text));
+                p.Add(x => x.SelectedIndex, 0);
+                p.Add(x => x.AppointmentRender, args => args.Attributes["class"] = "rz-background-color-success");
+                p.AddChildContent<RadzenMonthView>(v => v.Add(x => x.MaxAppointmentsInSlot, 3));
+            });
+
+            var content = cut.FindAll(".rz-event .rz-event-content")
+                .FirstOrDefault(el => (el.TextContent ?? "").Contains("Meeting"));
+            Assert.NotNull(content);
+
+            var cssClass = content!.GetAttribute("class") ?? "";
+            Assert.Contains("rz-event-content", cssClass);
+            Assert.Contains("rz-background-color-success", cssClass);
+        }
+
+        [Fact]
         public void MonthView_Localizes_ViewStrings_Using_Scheduler_UICulture()
         {
             using var ctx = new TestContext();
