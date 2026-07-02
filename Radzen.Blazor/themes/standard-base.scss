@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'variables';
 @import 'mixins';
 $base: true;
@@ -57,35 +58,35 @@ $rz-base-lighter: #f4f5f9 !default;
 $rz-base-dark: #707072 !default;
 $rz-base-darker: #262526 !default;
 
-$rz-primary-light: mix($rz-white, $rz-primary, 16%) !default;
+$rz-primary-light: color.mix($rz-white, $rz-primary, 16%) !default;
 $rz-primary-lighter: rgba($rz-primary, .16) !default;
-$rz-primary-dark: mix($rz-black, $rz-primary, 16%) !default;
-$rz-primary-darker: mix($rz-black, $rz-primary, 24%) !default;
+$rz-primary-dark: color.mix($rz-black, $rz-primary, 16%) !default;
+$rz-primary-darker: color.mix($rz-black, $rz-primary, 24%) !default;
 
-$rz-secondary-light: mix($rz-white, $rz-secondary, 16%) !default;
+$rz-secondary-light: color.mix($rz-white, $rz-secondary, 16%) !default;
 $rz-secondary-lighter: rgba($rz-secondary, .16) !default;
-$rz-secondary-dark: mix($rz-black, $rz-secondary, 16%) !default;
-$rz-secondary-darker: mix($rz-black, $rz-secondary, 24%) !default;
+$rz-secondary-dark: color.mix($rz-black, $rz-secondary, 16%) !default;
+$rz-secondary-darker: color.mix($rz-black, $rz-secondary, 24%) !default;
 
-$rz-info-light: mix($rz-white, $rz-info, 16%) !default;
+$rz-info-light: color.mix($rz-white, $rz-info, 16%) !default;
 $rz-info-lighter: rgba($rz-info, .16) !default;
-$rz-info-dark: mix($rz-black, $rz-info, 16%) !default;
-$rz-info-darker: mix($rz-black, $rz-info, 24%) !default;
+$rz-info-dark: color.mix($rz-black, $rz-info, 16%) !default;
+$rz-info-darker: color.mix($rz-black, $rz-info, 24%) !default;
 
-$rz-success-light: mix($rz-white, $rz-success, 16%) !default;
+$rz-success-light: color.mix($rz-white, $rz-success, 16%) !default;
 $rz-success-lighter: rgba($rz-success, .16) !default;
-$rz-success-dark: mix($rz-black, $rz-success, 16%) !default;
-$rz-success-darker: mix($rz-black, $rz-success, 24%) !default;
+$rz-success-dark: color.mix($rz-black, $rz-success, 16%) !default;
+$rz-success-darker: color.mix($rz-black, $rz-success, 24%) !default;
 
-$rz-warning-light: mix($rz-white, $rz-warning, 16%) !default;
+$rz-warning-light: color.mix($rz-white, $rz-warning, 16%) !default;
 $rz-warning-lighter: rgba($rz-warning, .16) !default;
-$rz-warning-dark: mix($rz-black, $rz-warning, 16%) !default;
-$rz-warning-darker: mix($rz-black, $rz-warning, 24%) !default;
+$rz-warning-dark: color.mix($rz-black, $rz-warning, 16%) !default;
+$rz-warning-darker: color.mix($rz-black, $rz-warning, 24%) !default;
 
-$rz-danger-light: mix($rz-white, $rz-danger, 16%) !default;
+$rz-danger-light: color.mix($rz-white, $rz-danger, 16%) !default;
 $rz-danger-lighter: rgba($rz-danger, .16) !default;
-$rz-danger-dark: mix($rz-black, $rz-danger, 16%) !default;
-$rz-danger-darker: mix($rz-black, $rz-danger, 24%) !default;
+$rz-danger-dark: color.mix($rz-black, $rz-danger, 16%) !default;
+$rz-danger-darker: color.mix($rz-black, $rz-danger, 24%) !default;
 
 // Theme Constants
 
@@ -173,26 +174,26 @@ $badge-border-radius: var(--rz-border-radius) !default;
 $badge-pill-border-radius: calc(4 * var(--rz-border-radius)) !default;
 
 // PanelMenu
-$panel-menu-item-border: 1px solid mix($rz-white, $rz-base-900, 8%) !default;
+$panel-menu-item-border: 1px solid color.mix($rz-white, $rz-base-900, 8%) !default;
 $panel-menu-item-color: $rz-white !default;
 $panel-menu-item-background-color: $rz-base-900 !default;
 $panel-menu-item-hover-color: inherit !default;
-$panel-menu-item-hover-background-color: mix($rz-white, $rz-base-900, 6%) !default;
+$panel-menu-item-hover-background-color: color.mix($rz-white, $rz-base-900, 6%) !default;
 $panel-menu-item-active-color: inherit !default;
-$panel-menu-item-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-item-active-background-color: color.mix($rz-white, $rz-base-900, 20%) !default;
 $panel-menu-item-active-indicator: $rz-primary !default;
 $panel-menu-item-2nd-level-color: inherit !default;
-$panel-menu-item-2nd-level-background-color: mix($rz-white, $rz-base-900, 8%) !default;
+$panel-menu-item-2nd-level-background-color: color.mix($rz-white, $rz-base-900, 8%) !default;
 $panel-menu-item-2nd-level-hover-color: inherit !default;
-$panel-menu-item-2nd-level-hover-background-color: mix($rz-white, $rz-base-900, 16%) !default;
+$panel-menu-item-2nd-level-hover-background-color: color.mix($rz-white, $rz-base-900, 16%) !default;
 $panel-menu-item-2nd-level-active-color: inherit !default;
-$panel-menu-item-2nd-level-active-background-color: mix($rz-white, $rz-base-900, 16%)  !default;
+$panel-menu-item-2nd-level-active-background-color: color.mix($rz-white, $rz-base-900, 16%)  !default;
 $panel-menu-item-3rd-level-color: inherit !default;
-$panel-menu-item-3rd-level-background-color: mix($rz-white, $rz-base-900, 12%) !default;
+$panel-menu-item-3rd-level-background-color: color.mix($rz-white, $rz-base-900, 12%) !default;
 $panel-menu-item-3rd-level-hover-color: inherit !default;
-$panel-menu-item-3rd-level-hover-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-item-3rd-level-hover-background-color: color.mix($rz-white, $rz-base-900, 20%) !default;
 $panel-menu-item-3rd-level-active-color: inherit !default;
-$panel-menu-item-3rd-level-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-item-3rd-level-active-background-color: color.mix($rz-white, $rz-base-900, 20%) !default;
 $panel-menu-icon-color: $panel-menu-item-color !default;
 $panel-menu-toggle-icon-opacity: 0.4 !default;
 
@@ -232,9 +233,9 @@ $grid-cell-focus-background-color: var(--rz-primary-lighter) !default;
 $grid-cell-focus-color: var(--rz-on-primary-lighter) !default;
 $grid-hover-background-color: var(--rz-primary-lighter) !default;
 $grid-hover-color: var(--rz-on-primary-lighter) !default;
-$grid-selected-background-color: lighten($rz-primary-lighter, 20%) !default;
+$grid-selected-background-color: color.adjust($rz-primary-lighter, $lightness: 20%) !default;
 $grid-selected-color: var(--rz-on-primary-lighter) !default;
-$grid-stripe-background-color: lighten($rz-base-100, 1%) !default;
+$grid-stripe-background-color: color.adjust($rz-base-100, $lightness: 1%) !default;
 $grid-header-cell-border-bottom: var(--rz-border-normal) !default;
 $grid-header-background-color: var(--rz-base-100) !default;
 $grid-header-font-size: 0.875rem !default;

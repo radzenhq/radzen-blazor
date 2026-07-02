@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 $button-base-background-color: var(--rz-primary) !default;
 $button-base-color: var(--rz-on-primary) !default;
 $button-background-size: auto !default;
@@ -29,7 +31,7 @@ $button-size-sm: 1.75rem !default;
 $button-size-md: 2.25rem !default;
 $button-size-lg: 3.25rem !default;
 
-$button-sizes: map-merge(
+$button-sizes: map.merge(
   (
     lg: (
       font-size: 1rem,
@@ -189,7 +191,7 @@ $button-sizes: map-merge(
   }
 }
 
-@each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $button in map.merge($severity-styles-map, $base-styles-map) {
   .rz-button.rz-#{$style} {
     @each $name, $value in $button {
       @if $style == 'dark' {
@@ -211,7 +213,7 @@ $button-sizes: map-merge(
   }
 }
 
-@each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $button in map.merge($severity-styles-map, $base-styles-map) {
   .rz-button.rz-variant-outlined.rz-#{$style} {
     @include outlined-shades($style, $button);
 
@@ -229,7 +231,7 @@ $button-sizes: map-merge(
   }
 }
 
-@each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $button in map.merge($severity-styles-map, $base-styles-map) {
   .rz-button.rz-variant-text.rz-#{$style} {
     @include text-color-shades($style, $button);
     box-shadow: none;
@@ -252,23 +254,23 @@ $button-sizes: map-merge(
 
 @each $size, $button in $button-sizes {
   %button-#{$size}, .rz-button-#{$size} {
-    padding: map-get($button, padding);
-    height: map-get($button, height);
-    line-height: map-get($button, line-height);
-    min-height: map-get($button, min-height);
-    min-width: map-get($button, min-width);
-    border-radius: map-get($button, border-radius);
-    font-size: map-get($button, font-size);
-    font-weight: map-get($button, font-weight);
-    letter-spacing: map-get($button, letter-spacing);
-    text-transform: map-get($button, text-transform);
+    padding: map.get($button, padding);
+    height: map.get($button, height);
+    line-height: map.get($button, line-height);
+    min-height: map.get($button, min-height);
+    min-width: map.get($button, min-width);
+    border-radius: map.get($button, border-radius);
+    font-size: map.get($button, font-size);
+    font-weight: map.get($button, font-weight);
+    letter-spacing: map.get($button, letter-spacing);
+    text-transform: map.get($button, text-transform);
 
-    & .rz-button-box { line-height: map-get($button, line-height); gap: map-get($button, gap);}
-    &.rz-button-icon-left { padding: map-get($button, text-with-icon-padding); }
-    &.rz-button-icon-only { padding: map-get($button, icon-only-padding); }
+    & .rz-button-box { line-height: map.get($button, line-height); gap: map.get($button, gap);}
+    &.rz-button-icon-left { padding: map.get($button, text-with-icon-padding); }
+    &.rz-button-icon-only { padding: map.get($button, icon-only-padding); }
 
     .rzi {
-      @each $name, $value in map-get($button, icon) {
+      @each $name, $value in map.get($button, icon) {
         #{$name}: #{$value};
       }
     }

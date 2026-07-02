@@ -1,3 +1,4 @@
+@use 'sass:map';
 // Flex-direction
 // Example .rz-flex-row
 $flex: row, row-reverse, column, column-reverse;
@@ -13,7 +14,7 @@ $rz-gap: 1rem !default;
 $rz-row-gap: $rz-gap !default;
 
 $rz-col-map: () !default;
-$rz-col-map: map-merge(
+$rz-col-map: map.merge(
   (
     1: calc((100% - 11 * var(--rz-gap)) / 12),
     2: calc(2 * ((100% - 11 * var(--rz-gap)) / 12) + 1 * var(--rz-gap)),
@@ -32,7 +33,7 @@ $rz-col-map: map-merge(
 );
 
 $rz-offset-map: () !default;
-$rz-offset-map: map-merge(
+$rz-offset-map: map.merge(
   (
     0: 0,
     1: calc(1 * ((100% - 11 * var(--rz-gap)) / 12) + 1 * var(--rz-gap)),

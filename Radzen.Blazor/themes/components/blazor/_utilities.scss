@@ -1,3 +1,4 @@
+@use 'sass:map';
 // Box Sizing
 
 [class^='rz-'],
@@ -29,7 +30,7 @@
 // Theme Colors
 
 $rz-theme-colors-map: () !default;
-$rz-theme-colors-map: map-merge(
+$rz-theme-colors-map: map.merge(
   (
     "white": $rz-white,
     "black": $rz-black,
@@ -159,7 +160,7 @@ $rz-theme-colors-map: map-merge(
 // Theme Constants
 
 $rz-theme-constants-map: () !default;
-$rz-theme-constants-map: map-merge(
+$rz-theme-constants-map: map.merge(
   (
     "border-width": $rz-border-width,
     "root-font-size": $rz-root-font-size,
@@ -184,7 +185,7 @@ $rz-text-disabled-color: var(--rz-base-500) !default;
 $rz-text-contrast-color: var(--rz-white) !default;
 
 $rz-text-map: () !default;
-$rz-text-map: map-merge(
+$rz-text-map: map.merge(
   (
     "text-title-color": $rz-text-title-color,
     "text-color": $rz-text-color,
@@ -213,7 +214,7 @@ $rz-link-focus-outline: var(--rz-outline-focus) !default;
 $rz-link-focus-outline-offset: var(--rz-outline-offset) !default;
 
 $rz-link-map: () !default;
-$rz-link-map: map-merge(
+$rz-link-map: map.merge(
   (
     "link-color": $rz-link-color,
     "link-text-decoration": $rz-link-text-decoration,
@@ -232,7 +233,7 @@ $rz-base-background-color: var(--rz-white) !default;
 // Base/Light/Dark Styles Map 
 
 $base-styles-map: () !default;
-$base-styles-map: map-merge(
+$base-styles-map: map.merge(
   (
     base: (
       background-color: var(--rz-base-200),
@@ -253,7 +254,7 @@ $base-styles-map: map-merge(
 // Severity Styles Map
 
 $severity-styles-map: () !default;
-$severity-styles-map: map-merge(
+$severity-styles-map: map.merge(
   (
     primary: (
       background-color: var(--rz-primary),
@@ -297,7 +298,7 @@ $rz-border-focus: var(--rz-border-width) solid var(--rz-base-400) !default;
 $rz-border-disabled: var(--rz-border-width) solid var(--rz-base-200) !default;
 
 $rz-state-border-map: () !default;
-$rz-state-border-map: map-merge(
+$rz-state-border-map: map.merge(
   (
     "border-normal": $rz-border-normal,
     "border-hover": $rz-border-hover,
@@ -322,7 +323,7 @@ $rz-border-radius-9: 2.25rem !default;
 $rz-border-radius-10: 2.5rem !default;
 
 $rz-border-radius-map: () !default;
-$rz-border-radius-map: map-merge(
+$rz-border-radius-map: map.merge(
   (
     "border-radius": $rz-border-radius,
     "border-radius-0": $rz-border-radius-0,
@@ -351,7 +352,7 @@ $rz-outline-normal: none !default;
 $rz-outline-focus: var(--rz-outline-width) solid var(--rz-outline-color) !default;
 
 $rz-state-outline-map: () !default;
-$rz-state-outline-map: map-merge(
+$rz-state-outline-map: map.merge(
   (
     "outline-normal": $rz-outline-normal,
     "outline-focus": $rz-outline-focus,
@@ -375,7 +376,7 @@ $rz-shadow-9: 0 0 12px 0 rgba(0, 0, 0, 0.04), 0px 8px 16px rgba(0, 0, 0, 0.04), 
 $rz-shadow-10: 0 0 12px 0 rgba(0, 0, 0, 0.04), 0px 9px 20px rgba(0, 0, 0, 0.04), 0px 22px 64px rgba(0, 0, 0, 0.20) !default;
 
 $rz-shadow-map: () !default;
-$rz-shadow-map: map-merge(
+$rz-shadow-map: map.merge(
   (
     "shadow-0": $rz-shadow-0,
     "shadow-1": $rz-shadow-1,
@@ -404,7 +405,7 @@ $rz-transition-all: all 0.1s linear !default;
 
 // Responsive breakpoints map
 $rz-breakpoints-map: () !default;
-$rz-breakpoints-map: map-merge(
+$rz-breakpoints-map: map.merge(
   (
     xs: 576px,
     sm: 768px,
@@ -419,7 +420,7 @@ $rz-breakpoints-map: map-merge(
 // Gutters
 $rz-gutter: 1rem;
 $rz-gutter-map: () !default;
-$rz-gutter-map: map-merge(
+$rz-gutter-map: map.merge(
   (
     0: 0,
     "05": ($rz-gutter * .125),

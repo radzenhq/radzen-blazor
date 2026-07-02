@@ -1,3 +1,4 @@
+@use 'sass:map';
 @mixin rz-color-css($property, $map) {
   @each $token,
   $value in $map {
@@ -118,14 +119,14 @@
 
 @mixin outlined-shades($style, $map, $border-prop: 'box-shadow') {
   $use-bc: $border-prop == 'border-color';
-  $bg: map-get($map, background-color);
+  $bg: map.get($map, background-color);
 
   @if $style == 'dark' {
     &.rz-shade-default { #{$border-prop}: rz-outlined-border-val($bg, $use-bc); color: #{$bg}; }
   }
   @else if $style == 'light' {
     @if $theme-dark == true {
-      $c: map-get($map, color);
+      $c: map.get($map, color);
       &.rz-shade-default { #{$border-prop}: rz-outlined-border-val($c, $use-bc); color: #{$c}; }
     }
     @else {
@@ -158,10 +159,10 @@
 }
 
 @mixin text-color-shades($style, $map) {
-  @if $style == 'dark' { color: #{map-get($map, background-color)}; }
+  @if $style == 'dark' { color: #{map.get($map, background-color)}; }
   @else if $style == 'light' {
-    @if $theme-dark == true { color: #{map-get($map, color)}; }
-    @else { color: #{map-get($map, background-color)}; }
+    @if $theme-dark == true { color: #{map.get($map, color)}; }
+    @else { color: #{map.get($map, background-color)}; }
   } @else if $style == 'base' {
     &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
     &.rz-shade-light { color: var(--rz-#{$style}-light); }

@@ -1,3 +1,4 @@
+@use 'sass:map';
 $rz-icon-font-family: 'Material Symbols' !default;
 $rz-icon-size: 1.25rem !default;
 $rz-icon-fill: 0 !default;
@@ -41,7 +42,7 @@ i.rzi {
   align-items: center;
 }
 
-@each $style, $rule in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $rule in map.merge($severity-styles-map, $base-styles-map) {
   .rzi-#{$style} {
     @each $name, $value in $rule {
       @if $name == 'background-color' {

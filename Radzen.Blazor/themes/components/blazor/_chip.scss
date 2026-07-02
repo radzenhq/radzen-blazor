@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 $chip-background-color: var(--rz-base-200) !default;
 $chip-color: var(--rz-text-color) !default;
 $chip-padding-block: 0.375rem !default;
@@ -117,7 +119,7 @@ $chip-list-gap: 0.5rem !default;
   }
 }
 
-@each $style, $map in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $map in map.merge($severity-styles-map, $base-styles-map) {
   .rz-chip-#{$style} {
     @each $name, $value in $map {
       @if $style == 'dark' {
@@ -136,7 +138,7 @@ $chip-list-gap: 0.5rem !default;
   }
 }
 
-@each $style, $map in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $map in map.merge($severity-styles-map, $base-styles-map) {
   .rz-variant-outlined.rz-chip-#{$style} {
     @include outlined-shades($style, $map, 'border-color');
 
@@ -154,7 +156,7 @@ $chip-list-gap: 0.5rem !default;
   }
 }
 
-@each $style, $map in map-merge($severity-styles-map, $base-styles-map) {
+@each $style, $map in map.merge($severity-styles-map, $base-styles-map) {
   .rz-variant-text.rz-chip-#{$style} {
     @include text-color-shades($style, $map);
     border-color: transparent;
