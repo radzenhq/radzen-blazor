@@ -203,5 +203,47 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
         }
+
+        [Fact]
+        public void TextArea_KeepsTypedValue_WhenUsedWithoutTwoWayBinding()
+        {
+            // Demo-style usage: no @bind-Value or ValueChanged. The user-typed value
+            // must survive the post-handler @bind:get/:set sync, otherwise the textarea
+            // clears itself on every blur.
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextArea>();
+
+            component.Find("textarea").Change("user-typed");
+
+            Assert.Equal("user-typed", component.Instance.Value);
+        }
+
+        [Fact]
+        public void TextArea_SyncsDomValue_WhenParentRejectsInput()
+        {
+            using var ctx = new TestContext();
+
+            var wrapper = ctx.RenderComponent<RadzenTextAreaRejectWrapper>();
+
+            wrapper.Find("textarea").Change("user-typed");
+
+            Assert.Equal("original", wrapper.FindComponent<RadzenTextArea>().Instance.Value);
+            Assert.Equal("original", wrapper.Find("textarea").GetAttribute("value"));
+        }
+
+        private sealed class RadzenTextAreaRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            public string HeldValue { get; private set; } = "original";
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenTextArea>(0);
+                builder.AddAttribute(1, nameof(RadzenTextArea.Value), HeldValue);
+                builder.AddAttribute(2, nameof(RadzenTextArea.ValueChanged),
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                builder.CloseComponent();
+            }
+        }
     }
 }

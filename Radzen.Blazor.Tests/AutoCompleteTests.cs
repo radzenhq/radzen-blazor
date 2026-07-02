@@ -280,5 +280,50 @@ namespace Radzen.Blazor.Tests
         {
             public IEnumerable CurrentView => View;
         }
+
+        [Fact]
+        public void AutoComplete_KeepsTypedValue_WhenUsedWithoutTwoWayBinding()
+        {
+            // Demo-style usage: no @bind-Value or ValueChanged. The user-typed value
+            // must survive the post-handler @bind:get/:set sync, otherwise the input
+            // clears itself on every blur.
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>();
+
+            component.Find("input").Change("user-typed");
+
+            Assert.Equal("user-typed", component.Instance.Value);
+            Assert.Equal("user-typed", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void AutoComplete_SyncsDomValue_WhenParentRejectsInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var wrapper = ctx.RenderComponent<RadzenAutoCompleteRejectWrapper>();
+
+            wrapper.Find("input").Change("user-typed");
+
+            Assert.Equal("original", wrapper.FindComponent<RadzenAutoComplete>().Instance.Value);
+            Assert.Equal("original", wrapper.Find("input").GetAttribute("value"));
+        }
+
+        private sealed class RadzenAutoCompleteRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            public string HeldValue { get; private set; } = "original";
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenAutoComplete>(0);
+                builder.AddAttribute(1, nameof(RadzenAutoComplete.Value), HeldValue);
+                builder.AddAttribute(2, nameof(RadzenAutoComplete.ValueChanged),
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                builder.CloseComponent();
+            }
+        }
     }
 }

@@ -83,25 +83,37 @@ namespace Radzen.Blazor
         public string? CharacterPattern { get; set; }
 
         /// <summary>
-        /// Handles the change event.
+        /// Handles the change-event bind:set binding of the underlying input element.
+        /// Reads the JS-formatted masked value when applicable and notifies listeners.
         /// </summary>
-        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+        /// <param name="value">The raw value reported by the change event.</param>
+        protected async System.Threading.Tasks.Task SetValue(string? value)
         {
-            ArgumentNullException.ThrowIfNull(args);
-
+            string? newValue;
             if (!Immediate && JSRuntime != null && !string.IsNullOrEmpty(Mask))
             {
-                Value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", Element);
+                newValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", Element);
             }
             else
             {
-                Value = $"{args.Value}";
+                newValue = value;
             }
 
-            await ValueChanged.InvokeAsync(Value);
+            // When ValueChanged is wired, leave _value alone — parameter re-flow handles
+            // both accepted updates (Value setter overwrites _value) and parent rejection
+            // (parameter unchanged → Blazor skips SetParametersAsync → _value stays at the
+            // bound value → @bind:get force-syncs the DOM back to it). When ValueChanged
+            // is NOT wired, no re-flow occurs, so _value must be updated locally or
+            // @bind:get would re-evaluate to the stale initial value and the framework
+            // would wipe the DOM on every blur.
+            if (!IsBound)
+            {
+                Value = newValue;
+            }
+
+            await ValueChanged.InvokeAsync(newValue);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-            await Change.InvokeAsync(Value);
+            await Change.InvokeAsync(newValue);
         }
 
         /// <summary>

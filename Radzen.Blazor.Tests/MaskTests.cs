@@ -261,5 +261,55 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
         }
+
+        [Fact]
+        public void Mask_KeepsTypedValue_WhenUsedWithoutTwoWayBinding()
+        {
+            // Demo-style usage: no @bind-Value or ValueChanged. The user-typed value
+            // must survive the post-handler @bind:get/:set sync, otherwise the input
+            // clears itself on every blur.
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenMask>();
+
+            component.Find("input").Change("user-typed");
+
+            Assert.Equal("user-typed", component.Instance.Value);
+            Assert.Equal("user-typed", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void Mask_SyncsDomValue_WhenParentRejectsInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            // Render through a wrapper that holds Value at a fixed string (parent rejects
+            // the user-typed text by simply not updating its variable). Verifies that
+            // when the bound Value parameter is re-rendered unchanged after the user
+            // typed something different, Blazor still syncs the DOM input back to the
+            // bound value — the @bind:get/:set contract.
+            var wrapper = ctx.RenderComponent<RadzenMaskWrapper>();
+
+            wrapper.Find("input").Change("user-typed");
+
+            Assert.Equal("fixed", wrapper.Instance.HeldValue);
+            Assert.Equal("fixed", wrapper.Find("input").GetAttribute("value"));
+        }
+
+        private sealed class RadzenMaskWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        {
+            public string HeldValue { get; private set; } = "fixed";
+
+            protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+            {
+                builder.OpenComponent<RadzenMask>(0);
+                builder.AddAttribute(1, nameof(RadzenMask.Value), HeldValue);
+                builder.AddAttribute(2, nameof(RadzenMask.ValueChanged),
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                builder.CloseComponent();
+            }
+        }
     }
 }

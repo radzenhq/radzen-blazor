@@ -97,16 +97,26 @@ namespace Radzen.Blazor
                 return;
             }
 
-            Value = newValue;
+            // When ValueChanged is wired, leave _value alone — parameter re-flow handles
+            // both accepted updates (Value setter overwrites _value) and parent rejection
+            // (parameter unchanged → Blazor skips SetParametersAsync → _value stays at the
+            // bound value → @bind:get force-syncs the DOM back to it). When ValueChanged
+            // is NOT wired, no re-flow occurs, so _value must be updated locally or
+            // @bind:get would re-evaluate to the stale initial value and the framework
+            // would wipe the DOM on every blur.
+            if (!IsBound)
+            {
+                Value = newValue;
+            }
 
-            await ValueChanged.InvokeAsync(Value);
+            await ValueChanged.InvokeAsync(newValue);
 
             if (FieldIdentifier.FieldName != null)
             {
                 EditContext?.NotifyFieldChanged(FieldIdentifier);
             }
 
-            await Change.InvokeAsync(Value);
+            await Change.InvokeAsync(newValue);
         }
 
         /// <summary>
