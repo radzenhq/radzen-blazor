@@ -2,7 +2,7 @@
 @inherits RadzenComponent
 @if (Visible)
 {
-    <li @attributes="Attributes" class="@GetItemCssClass()" style="@Style" @onclick="@OnClick" role="menuitem" tabindex="0" @onkeydown="OnKeyDown">
+    <li @attributes="Attributes" class="@GetItemCssClass()" style="@Style" @onclick="@OnClick" id="@GetItemId()" role="menuitem" tabindex="@GetItemTabIndex()">
         <div class="rz-navigation-item-wrapper">
             @if (Path != null)
             {

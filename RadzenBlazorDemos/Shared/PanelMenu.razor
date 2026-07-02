@@ -1,10 +1,12 @@
 @inject ExampleService ExampleService
+@inject NavigationManager NavigationManager
+@implements IDisposable
 
 <div style="padding: 1rem">
     <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
 </div>
 <div style="flex: 1; overflow: auto">
-    <RadzenPanelMenu Match="NavLinkMatch.Prefix">
+    <RadzenPanelMenu Match="NavLinkMatch.Prefix" RenderMode="PanelMenuRenderMode.Server">
         @foreach (var category in examples)
         {
             @if (category.Children != null)
@@ -41,6 +43,45 @@
     protected override void OnInitialized()
     {
         examples = ExampleService.Examples;
+        ExpandCurrent();
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    void OnLocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        ExpandCurrent();
+        InvokeAsync(StateHasChanged);
+    }
+
+    void ExpandCurrent()
+    {
+        var path = new Uri(NavigationManager.Uri).AbsolutePath.Trim('/');
+        ExpandPathTo(ExampleService.Examples, path);
+    }
+
+    bool ExpandPathTo(IEnumerable<Example> items, string path)
+    {
+        if (items == null)
+        {
+            return false;
+        }
+
+        var found = false;
+
+        foreach (var item in items)
+        {
+            var isMatch = !string.IsNullOrEmpty(item.Path) && item.Path.Trim('/') == path;
+            var childMatch = ExpandPathTo(item.Children, path);
+
+            if (childMatch)
+            {
+                item.Expanded = true;
+            }
+
+            found = found || isMatch || childMatch;
+        }
+
+        return found;
     }
 
     void FilterPanelMenu(ChangeEventArgs args)
@@ -48,5 +89,10 @@
         var term = args.Value.ToString();
 
         examples = string.IsNullOrEmpty(term) ? ExampleService.Examples : ExampleService.Filter(term);
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }

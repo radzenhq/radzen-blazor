@@ -71,6 +71,15 @@ namespace Radzen.Blazor
         public AccordionRenderMode RenderMode { get; set; } = AccordionRenderMode.Server;
 
         /// <summary>
+        /// Gets or sets the ARIA heading level applied to each accordion header.
+        /// The header button is wrapped in an element with <c>role="heading"</c> and this <c>aria-level</c>
+        /// so screen-reader users can navigate the accordion by heading, as required by the WAI-ARIA Accordion pattern.
+        /// </summary>
+        /// <value>The heading level (typically 1-6). Default is 3.</value>
+        [Parameter]
+        public int AriaLevel { get; set; } = 3;
+
+        /// <summary>
         /// Gets or sets the zero-based index of the currently expanded item.
         /// Use with @bind-SelectedIndex for two-way binding to programmatically control which item is expanded.
         /// In multiple expand mode, this represents the last expanded item.
@@ -337,7 +346,6 @@ namespace Radzen.Blazor
 
         IJSObjectReference? accordionJs;
         bool shouldRender = true;
-        bool renderModeNeedsInit;
 
         /// <inheritdoc />
         protected override bool ShouldRender()
@@ -350,9 +358,8 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if ((firstRender || renderModeNeedsInit) && RenderMode == AccordionRenderMode.Client && JSRuntime != null)
+            if (firstRender && accordionJs == null && JSRuntime != null)
             {
-                renderModeNeedsInit = false;
                 accordionJs = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "Radzen.createAccordion", Element, Multiple);
             }
@@ -411,14 +418,19 @@ namespace Radzen.Blazor
             shouldRender = true;
         }
 
+        bool preventKeyPress;
+
         async Task OnHeaderKeyDown(KeyboardEventArgs args, RadzenAccordionItem item)
         {
             var key = args.Code ?? args.Key;
 
             if (key != "ArrowDown" && key != "ArrowUp" && key != "Home" && key != "End")
             {
+                preventKeyPress = false;
                 return;
             }
+
+            preventKeyPress = true;
 
             var navigable = items.Where(i => i.Visible && !i.Disabled).ToList();
             var current = navigable.IndexOf(item);
@@ -457,20 +469,6 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(Multiple), Multiple) && accordionJs != null)
             {
                 await accordionJs.InvokeVoidAsync("setMultiple", parameters.GetValueOrDefault<bool>(nameof(Multiple)));
-            }
-
-            var renderModeChanged = parameters.DidParameterChange(nameof(RenderMode), RenderMode);
-            if (renderModeChanged)
-            {
-                var newRenderMode = parameters.GetValueOrDefault<AccordionRenderMode>(nameof(RenderMode));
-
-                if (newRenderMode == AccordionRenderMode.Server && accordionJs != null)
-                {
-                    try { await accordionJs.InvokeVoidAsync("dispose"); } catch { }
-                    accordionJs = null;
-                }
-
-                renderModeNeedsInit = newRenderMode == AccordionRenderMode.Client && accordionJs == null;
             }
 
             if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))

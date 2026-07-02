@@ -6,7 +6,8 @@
 @inherits DropDownBase<TValue>
 @if (Visible)
 {
-    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@OnKeyDown" id="@GetId()">
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@OnKeyDown" id="@GetId()"
+         role="listbox" aria-label="@ListboxAriaLabel" aria-multiselectable="@(Multiple ? "true" : "false")" aria-disabled="@(Disabled ? "true" : "false")" aria-activedescendant="@ActiveDescendantId">
         <div class="rz-helper-hidden-accessible">
             <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes=@InputAttributes />
         </div>
@@ -55,7 +56,7 @@
         @if (View != null)
         {
             <div class="rz-listbox-list-wrapper">
-                <ul @ref="list" class="rz-listbox-list" role="listbox" aria-multiselectable="@(Multiple ? "true" : "false")">
+                <ul @ref="list" id="@ListId" class="rz-listbox-list" role="presentation">
                     @RenderItems()
                 </ul>
                 @if (!View.Cast<object>().Any())

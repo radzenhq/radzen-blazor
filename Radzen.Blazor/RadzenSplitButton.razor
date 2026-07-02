@@ -4,7 +4,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-         tabindex="@(Disabled ? -1 : TabIndex)" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
+         tabindex="@(Disabled ? -1 : TabIndex)" role="button" aria-activedescendant="@ActiveDescendantId" aria-haspopup="menu" aria-controls="@PopupID" aria-expanded="@(IsOpen ? "true" : "false")" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
         <button aria-label="@(ButtonAriaLabel ?? Text)" tabindex="-1" disabled="@IsDisabled" class=@ButtonClass type="@((Enum.GetName(typeof(ButtonType), ButtonType) ?? ButtonType.ToString()).ToLower())" @onclick="@OnClick">
             <span class="rz-button-box">
             @if (ButtonContent != null)
@@ -43,12 +43,12 @@
             }
             </span>
         </button>
-        <button tabindex="-1" disabled="@IsDisabled" class=@PopupButtonClass type="button"
-                aria-label="@OpenAriaLabel" aria-haspopup="menu" aria-controls="@PopupID" aria-expanded="false">
+        <button tabindex="-1" disabled="@IsDisabled" class=@PopupButtonClass type="button" @onclick="@OnToggleClick"
+                aria-label="@OpenAriaLabel">
             <RadzenIcon Icon="@DropDownIcon" />
         </button>
         <div id="@PopupID" class="@PopupMenuClass">
-            <ul class="rz-menu-list" role="menu" aria-label="@OpenAriaLabel">
+            <ul class="rz-menu-list" role="menu" aria-orientation="vertical" aria-label="@OpenAriaLabel">
                 <CascadingValue Value=this>
                     @ChildContent
                 </CascadingValue>

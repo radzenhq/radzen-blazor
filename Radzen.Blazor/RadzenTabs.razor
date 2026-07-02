@@ -6,7 +6,9 @@
 {
     <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
          role="tablist"
-         aria-orientation="@(TabPosition == TabPosition.Left || TabPosition == TabPosition.Right ? "vertical" : "horizontal")"
+         aria-orientation="@(IsVertical ? "vertical" : "horizontal")"
+         aria-label="@AriaLabel"
+         aria-labelledby="@AriaLabelledBy"
          aria-activedescendant="@GetActiveDescendantId()"
          tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
         <ul role="presentation" class="rz-tabview-nav">
@@ -24,11 +26,18 @@
             }
             else
             {
-                @if (SelectedTab?.Visible == true)
+                for (var i = 0; i < tabs.Count; i++)
                 {
-                    <div @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown" class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{selectedIndex}")" aria-hidden="false" aria-labelledby="@($"{Id}-tabpanel-{selectedIndex}-label")">
-                        @SelectedTab.ChildContent
-                    </div>
+                    @if (tabs[i] == SelectedTab && SelectedTab?.Visible == true)
+                    {
+                        <div @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown" class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{i}")" aria-hidden="false" aria-labelledby="@($"{Id}-tabpanel-{i}-label")">
+                            @SelectedTab.ChildContent
+                        </div>
+                    }
+                    else if (tabs[i].Visible)
+                    {
+                        <div class="rz-tabview-panel" role="tabpanel" id="@($"{Id}-tabpanel-{i}")" tabindex="-1" style="display:none" aria-hidden="true" aria-labelledby="@($"{Id}-tabpanel-{i}-label")"></div>
+                    }
                 }
             }
         </div>

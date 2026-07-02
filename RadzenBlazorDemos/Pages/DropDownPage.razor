@@ -108,14 +108,21 @@
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DropDown." },
-        new KeyboardShortcut { Key = "Alt + DownArrow", Action = "Open DropDown popup." },
-        new KeyboardShortcut { Key = "DownArrow on closed popup", Action = "Select next DropDown item." },
-        new KeyboardShortcut { Key = "UpArrow on closed popup", Action = "Select previous DropDown item." },
-        new KeyboardShortcut { Key = "DownArrow in an opened popup", Action = "Focus next DropDown item." },
-        new KeyboardShortcut { Key = "UpArrow in an opened popup", Action = "Focus previous DropDown item." },
-        new KeyboardShortcut { Key = "Enter in an opened popup", Action = "Select the focused DropDown item and close the popup." },
-        new KeyboardShortcut { Key = "Esc or Alt + DownArrow in an opened popup", Action = "Close the DropDown popup." },
-        new KeyboardShortcut { Key = "Alphanumeric", Action = "Focus next DropDown item starting with typed key." }
+        new KeyboardShortcut { Key = "Alt + DownArrow", Action = "Open the DropDown popup." },
+        new KeyboardShortcut { Key = "Alt + UpArrow", Action = "Close the DropDown popup." },
+        new KeyboardShortcut { Key = "DownArrow / RightArrow on closed popup", Action = "Single selection: move to and select the next item. Multiple selection: move focus to the next item without changing the selection." },
+        new KeyboardShortcut { Key = "UpArrow / LeftArrow on closed popup", Action = "Single selection: move to and select the previous item. Multiple selection: move focus to the previous item without changing the selection." },
+        new KeyboardShortcut { Key = "DownArrow / RightArrow in an opened popup", Action = "Focus the next DropDown item." },
+        new KeyboardShortcut { Key = "UpArrow / LeftArrow in an opened popup", Action = "Focus the previous DropDown item." },
+        new KeyboardShortcut { Key = "Home in an opened popup", Action = "Focus first DropDown item." },
+        new KeyboardShortcut { Key = "End in an opened popup", Action = "Focus last DropDown item." },
+        new KeyboardShortcut { Key = "Enter in an opened popup", Action = "Single selection: select the focused item and close the popup. Multiple selection: toggle the focused item and keep the popup open." },
+        new KeyboardShortcut { Key = "Enter on closed popup", Action = "Open the popup." },
+        new KeyboardShortcut { Key = "Space in an opened popup", Action = "Select/toggle the focused item." },
+        new KeyboardShortcut { Key = "Space on closed popup", Action = "Open the popup." },
+        new KeyboardShortcut { Key = "Esc in an opened popup", Action = "Close the popup (focus returns to the DropDown)." },
+        new KeyboardShortcut { Key = "Tab", Action = "Close the popup if open and move focus to the next element." },
+        new KeyboardShortcut { Key = "Delete", Action = "Clear the selection when AllowClear is enabled." },
+        new KeyboardShortcut { Key = "Printable character", Action = "Focus the next item whose text starts with it (repeat to cycle)." }
     };
 }

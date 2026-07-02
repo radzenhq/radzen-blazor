@@ -112,6 +112,7 @@ namespace Radzen.Blazor
             {
                 menus.Remove(lastTooltip);
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", UniqueID);
+                await JSRuntime.InvokeVoidAsync("Radzen.restoreContextMenuFocus", UniqueID);
             }
 
             await InvokeAsync(() => { StateHasChanged(); });

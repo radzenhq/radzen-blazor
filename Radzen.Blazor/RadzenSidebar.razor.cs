@@ -133,6 +133,8 @@ namespace Radzen.Blazor
             return $"{style}{(Expanded ? ";transform:translateX(0px);" : ";width:0px;transform:translateX(-100%);")}";
         }
 
+        bool Collapsed => Layout != null ? expanded == false : !Expanded;
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenSidebar"/> is expanded.
         /// </summary>

@@ -127,15 +127,6 @@ namespace Radzen.Blazor
             }
         }
 
-        async Task OnKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
-            if (key == "Enter" || key == "Space")
-            {
-                await OnClick(new MouseEventArgs());
-            }
-        }
-
         RadzenProfileMenu? _parent;
         /// <summary>
         /// Gets or sets the parent.
@@ -162,6 +153,16 @@ namespace Radzen.Blazor
         internal string GetItemCssClass()
         {
             return $"{GetCssClass()} {(Parent?.IsFocused(this) == true ? "rz-state-focused" : "")}".Trim();
+        }
+
+        internal string GetItemId()
+        {
+            return $"{GetId()}";
+        }
+
+        internal string GetItemTabIndex()
+        {
+            return "-1";
         }
     }
 }

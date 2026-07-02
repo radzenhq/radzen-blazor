@@ -7,7 +7,7 @@
     <RadzenColumn Size="12" SizeLG="6" OffsetLG="3">
         <RadzenCard>
             <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories
-                ItemRender="@TreeItemRender">
+                ItemRender="@TreeItemRender" Expand="@OnExpand">
                 <RadzenTreeLevel TextProperty="@nameof(Category.CategoryName)" ChildrenProperty="Products" />
                 <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) />
             </RadzenTree>
@@ -64,9 +64,19 @@
         checkedValues = await Task.FromResult(firstCategory.Products.Where(p => p.ProductName.StartsWith("C")));
     }
 
+    bool firstCategoryExpanded;
+
+    void OnExpand(TreeExpandEventArgs args)
+    {
+        if (args.Value == firstCategory)
+        {
+            firstCategoryExpanded = true;
+        }
+    }
+
     void TreeItemRender(TreeItemRenderEventArgs args)
     {
-        if (args.Value == firstCategory && !args.Data.Cast<object>().Any())
+        if (args.Value == firstCategory && !firstCategoryExpanded && !args.Data.Cast<object>().Any())
         {
             args.Checked = null;
         }

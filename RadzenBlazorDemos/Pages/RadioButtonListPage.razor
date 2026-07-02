@@ -89,8 +89,11 @@
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a RadioButtonList item." },
-        new KeyboardShortcut { Key = "Shift + Tab", Action = "Navigate to a previous RadioButtonList item." },
-        new KeyboardShortcut { Key = "Space or Enter", Action = "Select a focused RadioButtonList item." }
+        new KeyboardShortcut { Key = "Tab", Action = "Move focus into the RadioButtonList." },
+        new KeyboardShortcut { Key = "Down or Right Arrow", Action = "Move focus to and select the next item." },
+        new KeyboardShortcut { Key = "Up or Left Arrow", Action = "Move focus to and select the previous item." },
+        new KeyboardShortcut { Key = "Home", Action = "Move focus to and select the first item." },
+        new KeyboardShortcut { Key = "End", Action = "Move focus to and select the last item." },
+        new KeyboardShortcut { Key = "Space or Enter", Action = "Select the focused item." }
     };
 }

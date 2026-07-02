@@ -4,15 +4,25 @@ $rz-expander-transition: .2s ease-in-out !default;
     display: grid;
     transition: grid-template-rows var(--rz-expander-transition);
 
-    .rz-expander-content {
+    > .rz-expander-content {
         overflow: hidden;
+        visibility: hidden;
+        transition: visibility var(--rz-expander-transition);
     }
 
     &.rz-state-expanded {
         grid-template-rows: 1fr;
+
+        > .rz-expander-content {
+            visibility: visible;
+        }
     }
 
     &.rz-state-collapsed {
         grid-template-rows: 0fr;
+
+        .rz-expander-content {
+            visibility: hidden;
+        }
     }
 }

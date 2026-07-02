@@ -92,8 +92,12 @@
     public List<KeyboardShortcut> shortcuts = new()
     {
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Tabs component." },
-        new KeyboardShortcut { Key = "RightArrow", Action = "Focus next Tab." },
-        new KeyboardShortcut { Key = "LeftArrow", Action = "Focus previous Tab." },
+        new KeyboardShortcut { Key = "RightArrow", Action = "Focus next Tab in a horizontal tab list, wrapping from the last Tab to the first and skipping disabled Tabs." },
+        new KeyboardShortcut { Key = "LeftArrow", Action = "Focus previous Tab in a horizontal tab list, wrapping from the first Tab to the last and skipping disabled Tabs." },
+        new KeyboardShortcut { Key = "DownArrow", Action = "Focus next Tab in a vertical tab list, wrapping from the last Tab to the first and skipping disabled Tabs." },
+        new KeyboardShortcut { Key = "UpArrow", Action = "Focus previous Tab in a vertical tab list, wrapping from the first Tab to the last and skipping disabled Tabs." },
+        new KeyboardShortcut { Key = "Home", Action = "Focus the first Tab." },
+        new KeyboardShortcut { Key = "End", Action = "Focus the last Tab." },
         new KeyboardShortcut { Key = "Space or Enter on a focused Tab", Action = "Select the Tab." }
     };
 }

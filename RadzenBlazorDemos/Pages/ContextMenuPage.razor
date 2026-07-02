@@ -42,3 +42,27 @@
 <RadzenExample ComponentName="ContextMenu" Example="ContextMenuHTMLElement">
     <ContextMenuHTMLElement />
 </RadzenExample>
+
+<RadzenText Anchor="contextmenu#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor ContextMenu component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Not handled by the menu; the menu is focused automatically when it opens." },
+        new KeyboardShortcut { Key = "UpArrow / DownArrow", Action = "Move between menu items, wrapping around at the ends." },
+        new KeyboardShortcut { Key = "RightArrow", Action = "Open the submenu of the focused item." },
+        new KeyboardShortcut { Key = "LeftArrow", Action = "Close the current submenu and return focus to its parent item." },
+        new KeyboardShortcut { Key = "Esc", Action = "Close the current submenu, or the whole menu when at the root level." },
+        new KeyboardShortcut { Key = "Home", Action = "Focus first item in the current menu." },
+        new KeyboardShortcut { Key = "End", Action = "Focus last item in the current menu." },
+        new KeyboardShortcut { Key = "Space or Enter", Action = "Activate the focused item or toggle its submenu." },
+        new KeyboardShortcut { Key = "A printable character", Action = "Focus the next item whose text starts with that character." }
+    };
+}

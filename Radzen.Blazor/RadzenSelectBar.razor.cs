@@ -142,6 +142,20 @@ namespace Radzen.Blazor
         public bool Multiple { get; set; }
 
         /// <summary>
+        /// Gets or sets the aria-label of the toolbar. Provides an accessible name for the select bar.
+        /// </summary>
+        /// <value>The aria-label.</value>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the aria-labelledby of the select bar. References the id of a visible element that labels the group.
+        /// </summary>
+        /// <value>The aria-labelledby.</value>
+        [Parameter]
+        public string? AriaLabelledBy { get; set; }
+
+        /// <summary>
         /// Gets or sets the items.
         /// </summary>
         /// <value>The items.</value>
@@ -222,7 +236,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            focusedIndex = allItems.IndexOf(item);
+            focusedIndex = NavigableItems.IndexOf(item);
 
             if (Multiple)
             {
@@ -268,46 +282,70 @@ namespace Radzen.Blazor
         int focusedIndex = -1;
         bool preventKeyPress = true;
         bool stopKeydownPropagation;
+
+        List<RadzenSelectBarItem> NavigableItems => allItems.Where(i => i.Visible).ToList();
+
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            var item = allItems.ElementAtOrDefault(focusedIndex) ?? allItems.FirstOrDefault();
+            var navigableItems = NavigableItems;
 
-            if (item == null)
+            if (navigableItems.Count == 0)
             {
                 return;
             }
 
-            if (key == "ArrowLeft" || key == "ArrowRight")
+            if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                var direction = key == "ArrowLeft" ? -1 : 1;
+                var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
 
-                focusedIndex = Math.Clamp(focusedIndex + direction, 0, allItems.FindLastIndex(t => t.Visible && !t.Disabled));
+                var start = focusedIndex < 0 ? 0 : focusedIndex;
+                var next = start + direction;
 
-                while (allItems.ElementAtOrDefault(focusedIndex)?.Disabled == true)
+                while (next >= 0 && next < navigableItems.Count && navigableItems[next].Disabled)
                 {
-                    focusedIndex = focusedIndex + direction;
-                }               
+                    next += direction;
+                }
+
+                if (next >= 0 && next < navigableItems.Count)
+                {
+                    focusedIndex = next;
+                }
             }
             else if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                focusedIndex = key == "Home" ? 0 : allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
+                if (key == "Home")
+                {
+                    var index = navigableItems.FindIndex(t => !t.Disabled);
+                    if (index >= 0)
+                    {
+                        focusedIndex = index;
+                    }
+                }
+                else
+                {
+                    var index = navigableItems.FindLastIndex(t => !t.Disabled);
+                    if (index >= 0)
+                    {
+                        focusedIndex = index;
+                    }
+                }
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                if (focusedIndex >= 0 && focusedIndex < allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
+                if (focusedIndex >= 0 && focusedIndex < navigableItems.Count)
                 {
-                    await SelectItem(allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex]);
+                    await SelectItem(navigableItems[focusedIndex]);
                 }
             }
             else
@@ -317,24 +355,38 @@ namespace Radzen.Blazor
             }
         }
 
-        bool HasInvisibleBefore(RadzenSelectBarItem item)
-        {
-            return allItems.Take(allItems.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
-        }
-
         bool IsFocused(RadzenSelectBarItem item)
         {
-            return allItems.ToList().IndexOf(item) == focusedIndex;
+            return NavigableItems.IndexOf(item) == focusedIndex;
+        }
+
+        string? ActiveDescendantId
+        {
+            get
+            {
+                var navigableItems = NavigableItems;
+                return focused && focusedIndex >= 0 && focusedIndex < navigableItems.Count
+                    ? navigableItems[focusedIndex].GetItemId()
+                    : null;
+            }
         }
 
         void OnFocus()
         {
-            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+            if (focusedIndex == -1)
+            {
+                var navigableItems = NavigableItems;
+                var index = navigableItems.FindIndex(t => !t.Disabled);
+                focusedIndex = index >= 0 ? index : 0;
+            }
+
             focused = true;
+            StateHasChanged();
         }
         void OnBlur()
         {
             focused = false;
+            StateHasChanged();
         }
     }
 }

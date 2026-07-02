@@ -151,15 +151,23 @@
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DropDownDataGrid." },
+        new KeyboardShortcut { Key = "Tab", Action = "Close the popup and move focus to the next element." },
         new KeyboardShortcut { Key = "Alt + DownArrow", Action = "Open DropDownDataGrid popup." },
-        new KeyboardShortcut { Key = "DownArrow on closed popup", Action = "Select next DropDownDataGrid item." },
-        new KeyboardShortcut { Key = "UpArrow on closed popup", Action = "Select previous DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "DownArrow on closed popup", Action = "Move active row to the next DropDownDataGrid item; for single (non-Multiple) select it also commits the selection." },
+        new KeyboardShortcut { Key = "UpArrow on closed popup", Action = "Move active row to the previous DropDownDataGrid item; for single (non-Multiple) select it also commits the selection." },
         new KeyboardShortcut { Key = "DownArrow in an opened popup", Action = "Focus next DropDownDataGrid item." },
         new KeyboardShortcut { Key = "UpArrow in an opened popup", Action = "Focus previous DropDownDataGrid item." },
-        new KeyboardShortcut { Key = "LeftArrow in an opened popup", Action = "Goes to previous DropDownDataGrid page." },
-        new KeyboardShortcut { Key = "RightArrow in an opened popup", Action = "Goes to next DropDownDataGrid page." },
+        new KeyboardShortcut { Key = "Home", Action = "Move active row to the first DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "End", Action = "Move active row to the last DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "Ctrl + Home", Action = "Move active row to the first DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "Ctrl + End", Action = "Move active row to the last DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "PageDown", Action = "Move active row forward by a page (PageSize rows)." },
+        new KeyboardShortcut { Key = "PageUp", Action = "Move active row back by a page (PageSize rows)." },
+        new KeyboardShortcut { Key = "LeftArrow", Action = "Goes to the previous DropDownDataGrid page (only when the grid is not virtualized)." },
+        new KeyboardShortcut { Key = "RightArrow", Action = "Goes to the next DropDownDataGrid page (only when the grid is not virtualized)." },
+        new KeyboardShortcut { Key = "Enter on a closed popup", Action = "Open the DropDownDataGrid popup." },
         new KeyboardShortcut { Key = "Enter in an opened popup", Action = "Select the focused DropDownDataGrid item and close the popup." },
-        new KeyboardShortcut { Key = "Esc or Alt + DownArrow in an opened popup", Action = "Close the DropDownDataGrid popup." }
+        new KeyboardShortcut { Key = "Delete", Action = "Clear the current single selection (when AllowClear is set)." },
+        new KeyboardShortcut { Key = "Esc in an opened popup", Action = "Close the popup (focus returns to the DropDownDataGrid)." }
     };
 }

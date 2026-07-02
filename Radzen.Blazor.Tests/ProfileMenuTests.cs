@@ -239,5 +239,220 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@"aria-haspopup=""menu""", component.Markup);
         }
+
+        [Fact]
+        public void ProfileMenu_Toggle_HasRoleMenu_OnPopup()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Profile");
+                });
+            });
+
+            var menu = component.Find("ul.rz-navigation-menu");
+
+            Assert.Equal("menu", menu.GetAttribute("role"));
+        }
+
+        [Fact]
+        public void ProfileMenu_Trigger_HasAriaHaspopupAndExpanded()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>();
+
+            var toggle = component.Find("div.rz-navigation-item-wrapper");
+
+            Assert.Equal("menu", toggle.GetAttribute("aria-haspopup"));
+            Assert.Equal("false", toggle.GetAttribute("aria-expanded"));
+
+            component.InvokeAsync(() => component.Instance.Toggle(new MouseEventArgs()));
+
+            Assert.Equal("true", component.Find("div.rz-navigation-item-wrapper").GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public void ProfileMenu_OuterList_IsPresentation_NotMenu()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>();
+
+            var root = component.Find("ul.rz-profile-menu");
+
+            Assert.Equal("presentation", root.GetAttribute("role"));
+        }
+
+        [Fact]
+        public void ProfileMenu_Item_HasRoleMenuItem()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Profile");
+                });
+            });
+
+            var item = component.Find("li[role=menuitem]");
+
+            Assert.NotNull(item);
+        }
+
+        [Fact]
+        public void ProfileMenu_ArrowDown_ExposesActiveDescendant()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Profile");
+                });
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Logout");
+                });
+            });
+
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+
+            var activeId = component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant");
+
+            Assert.False(string.IsNullOrEmpty(activeId));
+
+            var activeItem = component.Find($"li[id=\"{activeId}\"]");
+            Assert.Equal("menuitem", activeItem.GetAttribute("role"));
+        }
+
+        [Fact]
+        public void ProfileMenu_ActiveDescendant_FollowsActiveItem()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Profile");
+                });
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Logout");
+                });
+            });
+
+            var items = component.FindAll("li[role=menuitem]");
+            Assert.All(items, item => Assert.Equal("-1", item.GetAttribute("tabindex")));
+
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+
+            Assert.All(component.FindAll("li[role=menuitem]"), item => Assert.Equal("-1", item.GetAttribute("tabindex")));
+
+            var activeId = toggle.GetAttribute("aria-activedescendant");
+            Assert.False(string.IsNullOrEmpty(activeId));
+
+            var focusedItems = component.FindAll("li[role=menuitem].rz-state-focused");
+            Assert.Single(focusedItems);
+            Assert.Equal(activeId, focusedItems[0].GetAttribute("id"));
+        }
+
+        [Fact]
+        public void ProfileMenu_End_ActivatesLastItem()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Profile");
+                });
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Logout");
+                });
+            });
+
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "End" });
+
+            Assert.Equal(1, component.Instance.focusedIndex);
+
+            var activeId = component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant");
+            var lastItem = component.FindAll("li[role=menuitem]")[1];
+
+            Assert.Equal(lastItem.Id, activeId);
+        }
+
+        [Fact]
+        public void ProfileMenu_Home_ActivatesFirstItem()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Profile");
+                });
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Logout");
+                });
+            });
+
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "End" });
+            toggle.KeyDown(new KeyboardEventArgs { Code = "Home" });
+
+            Assert.Equal(0, component.Instance.focusedIndex);
+        }
+
+        [Fact]
+        public void ProfileMenu_Escape_ClosesAndClearsActiveDescendant()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenProfileMenu>(parameters =>
+            {
+                parameters.AddChildContent<RadzenProfileMenuItem>(itemParameters =>
+                {
+                    itemParameters.Add(p => p.Text, "Profile");
+                });
+            });
+
+            var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
+            toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+
+            Assert.True(component.Instance.focusedIndex >= 0);
+
+            toggle.KeyDown(new KeyboardEventArgs { Code = "Escape" });
+
+            Assert.Equal(-1, component.Instance.focusedIndex);
+
+            Assert.True(string.IsNullOrEmpty(component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant")));
+
+            var menu = component.Find("ul.rz-navigation-menu");
+            Assert.Equal("true", menu.GetAttribute("aria-hidden"));
+        }
     }
 }

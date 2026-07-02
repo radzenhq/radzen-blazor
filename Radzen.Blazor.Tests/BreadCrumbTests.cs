@@ -149,5 +149,66 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(">Current Page</", component.Markup);
             Assert.DoesNotContain("<a href", component.Markup);
         }
+
+        [Fact]
+        public void BreadCrumb_Renders_NavigationLandmark_WithDefaultAriaLabel()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb>();
+
+            Assert.Contains("<nav", component.Markup);
+            Assert.Contains("aria-label=\"breadcrumb\"", component.Markup);
+        }
+
+        [Fact]
+        public void BreadCrumb_Renders_CustomAriaLabel()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(p => p.AriaLabel, "You are here");
+            });
+
+            Assert.Contains("aria-label=\"You are here\"", component.Markup);
+        }
+
+        [Fact]
+        public void BreadCrumb_Item_WithoutPath_Renders_AriaCurrentPage()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(c => c.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenBreadCrumbItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Current Page");
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.Contains("aria-current=\"page\"", component.Markup);
+        }
+
+        [Fact]
+        public void BreadCrumb_Item_WithPath_DoesNotRender_AriaCurrentPage()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(c => c.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenBreadCrumbItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Home");
+                    builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Path), "/");
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.DoesNotContain("aria-current", component.Markup);
+        }
     }
 }

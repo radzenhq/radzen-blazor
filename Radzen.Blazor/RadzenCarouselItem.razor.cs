@@ -65,5 +65,12 @@ namespace Radzen.Blazor
 
         int itemIndex;
         internal ElementReference element;
+
+        internal bool IsActive => Carousel == null || Carousel.IsItemActive(Carousel.items.IndexOf(this));
+
+        internal void Refresh()
+        {
+            StateHasChanged();
+        }
     }
 }

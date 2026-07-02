@@ -518,6 +518,12 @@ namespace Radzen.Blazor
         int count;
 
         /// <summary>
+        /// Gets the identifier of the currently active (keyboard highlighted) grid row, or null when none is active.
+        /// </summary>
+        /// <returns>The active row identifier or null.</returns>
+        internal string? ActiveDescendantId => selectedIndex >= 0 && grid != null ? $"{grid.GridId()}-active-item" : null;
+
+        /// <summary>
         /// Gets or sets the number of maximum selected labels.
         /// </summary>
         /// <value>The maximum selected labels.</value>
@@ -554,6 +560,11 @@ namespace Radzen.Blazor
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             isFirstRender = firstRender;
+
+            if (grid != null)
+            {
+                grid.HasActiveDescendant ??= () => selectedIndex >= 0;
+            }
 
             if (firstRender)
             {
@@ -956,6 +967,67 @@ namespace Radzen.Blazor
                     //
                 }
             }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeydown = true;
+
+                try
+                {
+                    var newSelectedIndex = key == "Home" ? 0 : items.Count - 1;
+                    var shouldChange = newSelectedIndex != selectedIndex && newSelectedIndex >= 0;
+                    if (shouldChange && JSRuntime != null)
+                    {
+                        selectedIndex = newSelectedIndex;
+                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", gridInstance.GridId(), key == "Home" ? "ArrowDown" : "ArrowUp", key == "Home" ? selectedIndex - 1 : selectedIndex + 1, null);
+                        await gridInstance.OnRowSelect(items[selectedIndex], false);
+                    }
+
+                    if (!Multiple && JSRuntime != null)
+                    {
+                        var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+                        if (shouldChange && (!popupOpened || gridInstance.IsVirtualizationAllowed()))
+                        {
+                            await OnSelectItem(items[selectedIndex], true);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+            else if (key == "PageUp" || key == "PageDown")
+            {
+                preventKeydown = true;
+
+                try
+                {
+                    var pageStep = PageSize > 0 ? PageSize : 1;
+                    var startIndex = selectedIndex >= 0 ? selectedIndex : (key == "PageDown" ? -1 : items.Count);
+                    var newSelectedIndex = Math.Clamp(startIndex + (key == "PageUp" ? -pageStep : pageStep), 0, items.Count - 1);
+                    var shouldChange = newSelectedIndex != selectedIndex && newSelectedIndex >= 0;
+                    if (shouldChange && JSRuntime != null)
+                    {
+                        var previousIndex = selectedIndex;
+                        selectedIndex = newSelectedIndex;
+                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", gridInstance.GridId(), key == "PageUp" ? "ArrowUp" : "ArrowDown", previousIndex, null);
+                        await gridInstance.OnRowSelect(items[selectedIndex], false);
+                    }
+
+                    if (!Multiple && JSRuntime != null)
+                    {
+                        var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+                        if (shouldChange && (!popupOpened || gridInstance.IsVirtualizationAllowed()))
+                        {
+                            await OnSelectItem(items[selectedIndex], true);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
             else if ((key == "ArrowLeft" || key == "ArrowRight") && !gridInstance.IsVirtualizationAllowed())
             {
                 if (key == "ArrowLeft")
@@ -1005,6 +1077,7 @@ namespace Radzen.Blazor
             {
                 preventKeydown = false;
                 await ClosePopup(key);
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
             }
             else if (key == "Tab")
             {
@@ -1066,6 +1139,7 @@ namespace Radzen.Blazor
             if (key == "Escape" && JSRuntime != null)
             {
                 await ClosePopup(key);
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
             }
         }
 

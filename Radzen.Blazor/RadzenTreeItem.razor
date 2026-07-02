@@ -4,17 +4,21 @@
 @{var itemArgs = Tree?.ItemAttributes(this); }
 <li class="rz-treenode" @attributes="@(itemArgs?.Item1.Attributes.Any() == true ? itemArgs.Item1.Attributes : Attributes)" 
     @oncontextmenu="OnContextMenu" @oncontextmenu:preventDefault="@(Tree?.ItemContextMenu.HasDelegate ?? false)" @oncontextmenu:stopPropagation>
-    <div class=@ContentClass role="treeitem" tabindex="0"
-         aria-selected="@(selected.ToString().ToLowerInvariant())"
+    <div id="@ElementId" class=@ContentClass role="treeitem" tabindex="-1"
+         aria-level="@Level"
+         aria-setsize="@SetSize"
+         aria-posinset="@PosInSet"
+         aria-selected="@(Tree?.AllowCheckBoxes == true ? null : selected.ToString().ToLowerInvariant())"
+         aria-checked="@(Tree?.AllowCheckBoxes == true ? IsChecked() switch { null => "mixed", true => "true", _ => "false" } : null)"
          aria-expanded="@(ChildContent != null || HasChildren ? clientExpanded.ToString().ToLowerInvariant() : null)"
-         @onclick="@Select" @onkeydown="OnKeyDown">
+         @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {
-            <span class=@IconClass role="button" tabindex="-1" aria-label="@Text" @onclick="@Toggle" @onclick:stopPropagation @onkeydown="OnToggleKeyDown"></span>
+            <span class=@IconClass role="button" tabindex="-1" aria-label="@Text" @onclick="@Toggle" @onclick:stopPropagation></span>
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
-            <RadzenCheckBox TabIndex=-1 Name="@($"{GetHashCode()}")" TValue="bool?" Disabled="@(!Checkable)" Value="@(itemArgs?.Item1.CheckedSet() == true ? itemArgs.Item1.Checked : IsChecked())" Change="@CheckedChange" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Tree?.SelectItemAriaLabel ?? "" }})" />
+            <RadzenCheckBox TabIndex=-1 Name="@($"{GetHashCode()}")" TValue="bool?" Disabled="@(!Checkable)" Value="@(itemArgs?.Item1.CheckedSet() == true ? itemArgs.Item1.Checked : IsChecked())" Change="@OnCheckBoxChange" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Tree?.SelectItemAriaLabel ?? "" }})" />
         }
         @if (Template != null)
         {
@@ -28,7 +32,7 @@
     {
     <CascadingValue Value=this>
     <Expander Expanded=@clientExpanded>
-    <ul class="rz-treenode-children" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
+    <ul class="rz-treenode-children" role="group" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
         @ChildContent
     </ul>
     </Expander>

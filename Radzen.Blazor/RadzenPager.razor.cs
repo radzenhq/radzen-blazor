@@ -550,6 +550,38 @@ namespace Radzen.Blazor
         bool stopKeydownPropagation;
         int focusedIndex = -3;
 
+        string? ActiveDescendantId
+        {
+            get
+            {
+                if (focusedIndex == -3)
+                {
+                    return null;
+                }
+
+                var numberOfDisplayedPages = Math.Min(endPage + 1, PageNumbersCount);
+
+                if (focusedIndex == -2)
+                {
+                    return $"{GetId()}fp";
+                }
+                if (focusedIndex == -1)
+                {
+                    return $"{GetId()}pp";
+                }
+                if (focusedIndex == numberOfDisplayedPages)
+                {
+                    return $"{GetId()}np";
+                }
+                if (focusedIndex == numberOfDisplayedPages + 1)
+                {
+                    return $"{GetId()}lp";
+                }
+
+                return $"{GetId()}{startPage + focusedIndex}p";
+            }
+        }
+
         /// <summary>
         /// Handles the key down event.
         /// </summary>

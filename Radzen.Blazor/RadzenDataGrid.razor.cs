@@ -598,8 +598,15 @@ namespace Radzen.Blazor
         int focusedIndex = -1;
         int focusedCellIndex;
 
+        internal Func<bool>? HasActiveDescendant { get; set; }
+
         internal string? GetActiveDescendantId()
         {
+            if (HasActiveDescendant != null && !HasActiveDescendant())
+            {
+                return null;
+            }
+
             return $"{GetId()}-active-item";
         }
 
@@ -607,6 +614,14 @@ namespace Radzen.Blazor
         {
             return GetId();
         }
+
+        /// <summary>
+        /// Gets or sets the tabindex applied to the grid element. Set to <c>0</c> by default so the grid is a tab stop.
+        /// Embedding components can set it to <c>-1</c> to remove the grid from the tab order.
+        /// </summary>
+        /// <value>The tabindex of the grid element.</value>
+        [Parameter]
+        public int TabIndex { get; set; }
 
         async Task FocusRow(string key)
         {
@@ -2754,6 +2769,16 @@ namespace Radzen.Blazor
             var isInEditMode = IsRowInEditMode(item) ? "rz-datatable-edit" : "";
 
             return (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple) && selectedItems.Keys.Any(i => ItemEquals(i, item)) ? $"rz-state-highlight rz-data-row {isInEditMode} " : $"rz-data-row {isInEditMode} ";
+        }
+
+        internal string? RowAriaSelected(TItem item, int index)
+        {
+            if (!(RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple))
+            {
+                return null;
+            }
+
+            return selectedItems.Keys.Any(i => ItemEquals(i, item)) ? "true" : "false";
         }
 
         internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)

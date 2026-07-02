@@ -19,6 +19,8 @@ namespace Radzen.Blazor
             .AddDisabled(Disabled)
             .ToString();
 
+        internal string? GetItemId() => GetId();
+
         /// <summary>
         /// Gets or sets the target.
         /// </summary>
@@ -166,6 +168,10 @@ namespace Radzen.Blazor
             }
         }
 
+        string ExpandableClass => ChildContent != null && Parent?.RenderMode == PanelMenuRenderMode.Server ? " rz-navigation-item-expandable" : string.Empty;
+
+        bool RenderSubmenu => ChildContent != null && (Parent?.RenderMode != PanelMenuRenderMode.Server || expanded);
+
         string ToggleClass => ClassList.Create("notranslate rzi rz-navigation-item-icon-children")
                             .Add("rz-state-expanded", expanded)
                             .Add("rz-state-collapsed", !expanded)
@@ -214,6 +220,11 @@ namespace Radzen.Blazor
             {
                 items.Add(item);
             }
+        }
+
+        internal void RemoveItem(RadzenPanelMenuItem item)
+        {
+            items.Remove(item);
         }
 
         void EnsureVisible()
@@ -464,7 +475,11 @@ namespace Radzen.Blazor
                 NavigationManager.LocationChanged -= OnLocationChanged;
             }
 
-            if (Parent != null)
+            if (ParentItem != null)
+            {
+                ParentItem.RemoveItem(this);
+            }
+            else if (Parent != null)
             {
                 Parent.RemoveItem(this);
             }

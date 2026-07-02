@@ -128,6 +128,39 @@ namespace Radzen.Blazor
 
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
+        internal string ElementId => $"treeitem-{GetHashCode()}";
+
+        internal int Level
+        {
+            get
+            {
+                var level = 1;
+                var parent = ParentItem;
+
+                while (parent != null)
+                {
+                    level++;
+                    parent = parent.ParentItem;
+                }
+
+                return level;
+            }
+        }
+
+        List<RadzenTreeItem> Siblings => ParentItem?.items ?? Tree?.items ?? new List<RadzenTreeItem>();
+
+        internal int SetSize => Siblings.Count;
+
+        internal int PosInSet
+        {
+            get
+            {
+                var index = Siblings.IndexOf(this);
+
+                return index >= 0 ? index + 1 : 1;
+            }
+        }
+
         /// <summary>
         /// Toggles the checked state of the tree node in response to a mouse event, if checkboxes are enabled and the
         /// node is checkable.
@@ -178,6 +211,11 @@ namespace Radzen.Blazor
         }
 
         bool clientExpanded;
+
+        internal bool IsExpanded => clientExpanded;
+
+        internal bool IsExpandable => ChildContent != null || HasChildren;
+
         async Task Toggle()
         {
             if (expanded && Tree?.SingleExpand != true)
@@ -274,24 +312,6 @@ namespace Radzen.Blazor
         {
             selected = true;
             Tree?.SelectItem(this);
-        }
-
-        void OnKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
-            if (key == "Enter" || key == "Space")
-            {
-                Select();
-            }
-        }
-
-        async Task OnToggleKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code != null ? args.Code : args.Key;
-            if (key == "Enter" || key == "Space")
-            {
-                await Toggle();
-            }
         }
 
         internal void Unselect()
@@ -423,6 +443,11 @@ namespace Radzen.Blazor
                     await UpdateCheckedValuesWithParents(value);
                 }
             }
+        }
+
+        internal async Task OnCheckBoxChange(bool? value)
+        {
+            await CheckedChange(!(IsChecked() ?? true));
         }
 
         internal bool? IsChecked()

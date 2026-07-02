@@ -67,6 +67,14 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Flyout { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this menu is rendered as a context menu popup.
+        /// When enabled, the root element uses role="menu" with vertical orientation instead of a horizontal menubar.
+        /// </summary>
+        /// <value><c>true</c> to render as a vertical context menu popup; otherwise <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool IsContextMenu { get; set; }
+
         private bool IsOpen { get; set; }
 
         /// <inheritdoc />
@@ -122,6 +130,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
+        /// <summary>
+        /// Gets or sets a callback invoked when the menu requests to be dismissed, such as pressing Escape at the root of a context menu.
+        /// </summary>
+        /// <value>The close callback.</value>
+        [Parameter]
+        public EventCallback Close { get; set; }
+
         private string? ariaLabel;
 
         /// <summary>
@@ -147,18 +162,32 @@ namespace Radzen.Blazor
                 currentItems = items.Where(i => i.Visible && !i.Disabled).ToList();
             }
 
-            if (key == "ArrowUp" || key == "ArrowDown")
+            if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                if (subMenuOpen)
+                if (currentItems.Count > 0)
                 {
-                    focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
+                    focusedIndex = key == "Home" ? 0 : currentItems.Count - 1;
+                }
+            }
+            else if (key == "ArrowUp" || key == "ArrowDown")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                if (subMenuOpen || IsContextMenu)
+                {
+                    if (currentItems.Count > 0)
+                    {
+                        var start = Math.Clamp(focusedIndex, 0, currentItems.Count - 1);
+                        focusedIndex = (start + (key == "ArrowUp" ? -1 : 1) + currentItems.Count) % currentItems.Count;
+                    }
                 }
                 else
                 {
-                    if (key == "ArrowDown" && currentItems.Count > 0)
+                    if (currentItems.Count > 0)
                     {
                         focusedIndex = Math.Clamp(focusedIndex, 0, currentItems.Count - 1);
 
@@ -167,7 +196,7 @@ namespace Radzen.Blazor
                         if (item.items.Count > 0)
                         {
                             currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
-                            focusedIndex = -1;
+                            focusedIndex = key == "ArrowUp" ? currentItems.Count - 1 : 0;
                             subMenuOpen = true;
                             await item.Open();
                         }
@@ -179,8 +208,36 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                // Flyout mode: ArrowRight opens nested submenu, ArrowLeft closes it
-                if (Flyout && subMenuOpen)
+                if (IsContextMenu)
+                {
+                    if (key == "ArrowRight" && focusedIndex >= 0 && focusedIndex < currentItems.Count)
+                    {
+                        var item = currentItems[focusedIndex];
+                        if (item.items.Count > 0)
+                        {
+                            currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
+                            focusedIndex = 0;
+                            subMenuOpen = true;
+                            await item.Open();
+                        }
+                    }
+                    else if (key == "ArrowLeft" && subMenuOpen)
+                    {
+                        var firstItem = currentItems.FirstOrDefault();
+                        var parentItem = firstItem?.ParentItem;
+                        if (parentItem != null)
+                        {
+                            currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent?.items ?? new List<RadzenMenuItem>()).Where(i => i.Visible && !i.Disabled).ToList();
+                            focusedIndex = currentItems.IndexOf(parentItem);
+                            subMenuOpen = parentItem.ParentItem != null;
+                            await parentItem.Close();
+                        }
+                    }
+
+                    return;
+                }
+
+                if (subMenuOpen)
                 {
                     if (key == "ArrowRight" && focusedIndex >= 0 && focusedIndex < currentItems.Count)
                     {
@@ -235,7 +292,7 @@ namespace Radzen.Blazor
                     if (item.items.Count > 0)
                     {
                         currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
-                        focusedIndex = -1;
+                        focusedIndex = 0;
                         subMenuOpen = true;
                         await item.Toggle();
                     }
@@ -253,7 +310,7 @@ namespace Radzen.Blazor
                     if (item.items.Count > 0)
                     {
                         currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
-                        focusedIndex = -1;
+                        focusedIndex = 0;
                         subMenuOpen = true;
                         await item.Toggle();
                     }
@@ -283,8 +340,31 @@ namespace Radzen.Blazor
                     {
                         currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent?.items ?? new List<RadzenMenuItem>()).Where(i => i.Visible && !i.Disabled).ToList();
                         focusedIndex = currentItems.IndexOf(parentItem);
-                        subMenuOpen = false;
+                        subMenuOpen = parentItem.ParentItem != null;
                         await parentItem.Close();
+                    }
+                }
+                else if (IsContextMenu && Close.HasDelegate)
+                {
+                    await Close.InvokeAsync();
+                }
+            }
+            else if (args.Key != null && args.Key.Length == 1 && !char.IsControl(args.Key[0]) && currentItems.Count > 0)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                var search = args.Key;
+
+                for (var offset = 1; offset <= currentItems.Count; offset++)
+                {
+                    var index = (focusedIndex + offset) % currentItems.Count;
+                    var text = currentItems[index].Text;
+
+                    if (text != null && text.StartsWith(search, StringComparison.OrdinalIgnoreCase))
+                    {
+                        focusedIndex = index;
+                        break;
                     }
                 }
             }
@@ -299,6 +379,10 @@ namespace Radzen.Blazor
         {
             return focusedIndex != -1 && currentItems.IndexOf(item) == focusedIndex;
         }
+
+        internal RadzenMenuItem? ActiveItem => focusedIndex >= 0 && focusedIndex < currentItems.Count ? currentItems[focusedIndex] : null;
+
+        string? ActiveDescendantId => ActiveItem?.GetMenuItemId();
 
         List<RadzenMenuItem> currentItems = new();
 
@@ -355,6 +439,11 @@ namespace Radzen.Blazor
 
         void OnFocus()
         {
+            if (currentItems.Count == 0)
+            {
+                currentItems = items.Where(i => i.Visible && !i.Disabled).ToList();
+            }
+
             focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
         }
     }

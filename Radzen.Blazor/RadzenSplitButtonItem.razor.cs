@@ -82,21 +82,6 @@ namespace Radzen.Blazor
             }
         }
 
-        async Task OnKeyDown(KeyboardEventArgs args)
-        {
-            ArgumentNullException.ThrowIfNull(args);
-            if (Disabled)
-            {
-                return;
-            }
-
-            var key = args.Code != null ? args.Code : args.Key;
-            if (key == "Enter" || key == "Space")
-            {
-                await OnClick(new MouseEventArgs());
-            }
-        }
-
         string ItemClass => ClassList.Create("rz-menuitem")
                                      .AddDisabled(Disabled)
                                      .Add("rz-state-highlight", SplitButton?.IsFocused(this) == true)

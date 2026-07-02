@@ -79,6 +79,43 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDown_NonFilterable_TabWhenOpen_DoesNotInvokeFocusNext()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDropDown<string>>(p =>
+            {
+                p.Add(x => x.Data, new[] { "one", "two" });
+            });
+
+            var combo = component.Find("[role='combobox']");
+
+            combo.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" });
+            combo.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab" });
+
+            var focusNextCalls = ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.focusNext");
+            Assert.Equal(0, focusNextCalls);
+        }
+
+        [Fact]
+        public void DropDown_NonFilterable_TabAfterArrow_DoesNotInvokeFocusNext()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx);
+
+            var combo = component.Find("[role='combobox']");
+
+            combo.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+            combo.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Tab" });
+
+            var focusNextCalls = ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.focusNext");
+            Assert.Equal(0, focusNextCalls);
+        }
+
+        [Fact]
         public void DropDown_AppliesSelectionStyleForIntValue()
         {
             using var ctx = new TestContext();
@@ -866,6 +903,26 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("listbox", filterInput.GetAttribute("aria-haspopup"));
             Assert.NotNull(filterInput.GetAttribute("aria-expanded"));
             Assert.Equal("list", filterInput.GetAttribute("aria-autocomplete"));
+        }
+
+        [Fact]
+        public void DropDown_NoFilter_Combobox_ControlsListbox()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.AllowFiltering, false);
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            Assert.Empty(component.FindAll("input.rz-dropdown-filter"));
+
+            var combobox = component.Find("div[role='combobox']");
+            var listbox = component.Find("ul[role='listbox']");
+
+            Assert.Equal(listbox.Id, combobox.GetAttribute("aria-controls"));
         }
 
         [Fact]

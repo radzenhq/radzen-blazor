@@ -3,11 +3,11 @@
 <CascadingValue Value="@Template">
 @if (Visible)
 {
-  <div class="@GetCssClass()" style="@Style" @attributes="@Attributes" id="@GetId()">
+  <nav class="@GetCssClass()" style="@Style" @attributes="@Attributes" id="@GetId()" aria-label="@AriaLabel">
     @if (ChildContent != null)
     {
         @ChildContent
     }
-  </div>
+  </nav>
 }
 </CascadingValue>

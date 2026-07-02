@@ -710,10 +710,23 @@ window.Radzen = {
         items.expanders[index].setAttribute('aria-hidden', expanded ? 'false' : 'true');
     }
 
+    function onKeyDown(e) {
+        var key = e.code || e.key;
+        if (key !== 'ArrowUp' && key !== 'ArrowDown' && key !== 'Home' && key !== 'End') {
+            return;
+        }
+        var target = e.target;
+        if (target && target.closest && target.closest('.rz-accordion-header')) {
+            e.preventDefault();
+        }
+    }
+
+    el.addEventListener('keydown', onKeyDown);
+
     return {
         toggle: function (index, expanded) { toggleItem(index, expanded); },
         setMultiple: function (value) { multiple = value; },
-        dispose: function () { }
+        dispose: function () { el.removeEventListener('keydown', onKeyDown); }
     };
   },
   loadGoogleMaps: function (defaultView, apiKey, resolve, reject, language) {
@@ -1211,13 +1224,37 @@ window.Radzen = {
         el.scrollIntoView();
     }
   },
+  scrollIntoViewIfNeededById: function (id) {
+    var el = document.getElementById(id);
+    if (el) {
+        Radzen.scrollIntoViewIfNeeded(el);
+    }
+  },
+  focusPanelMenuItem: function (menu, activeId) {
+    if (!menu) return;
+    var focused = menu.querySelectorAll('.rz-navigation-item.rz-state-focused');
+    for (var i = 0; i < focused.length; i++) {
+        focused[i].classList.remove('rz-state-focused');
+    }
+    if (activeId) {
+        menu.setAttribute('aria-activedescendant', activeId);
+        var el = document.getElementById(activeId);
+        if (el) {
+            el.classList.add('rz-state-focused');
+            Radzen.scrollIntoViewIfNeeded(el);
+        }
+    } else {
+        menu.removeAttribute('aria-activedescendant');
+    }
+  },
   updateActiveDescendant: function (ul, li, index) {
     if (!ul) return;
     // The popup is appended to document.body when opened, so ul.closest('[role="combobox"]')
     // fails once the dropdown is open. Fall back to a reverse lookup via aria-controls.
     // There can be more than one combobox referencing the same listbox (the trigger and a
-    // filter input inside the popup), so update them all so screen readers announce the
-    // active option regardless of which element currently has focus.
+    // filter input inside the popup). aria-activedescendant must be set only on the element
+    // that currently has DOM focus (the filter input while filtering, otherwise the trigger),
+    // so a non-focused combobox never carries a stale active-descendant.
     var comboboxes = [];
     var ancestor = ul.closest('[role="combobox"]');
     if (ancestor) {
@@ -1234,20 +1271,34 @@ window.Radzen = {
         }
       }
     }
-    if (li) {
+
+    var focused = null;
+    for (var f = 0; f < comboboxes.length; f++) {
+      if (comboboxes[f] === document.activeElement) {
+        focused = comboboxes[f];
+        break;
+      }
+    }
+    if (!focused && comboboxes.length) {
+      focused = comboboxes[0];
+    }
+
+    for (var c = 0; c < comboboxes.length; c++) {
+      if (comboboxes[c] !== focused) {
+        comboboxes[c].removeAttribute('aria-activedescendant');
+      }
+    }
+
+    if (li && focused) {
       var itemId = ul.id + '-' + index;
       li.id = itemId;
-      for (var j = 0; j < comboboxes.length; j++) {
-        comboboxes[j].setAttribute('aria-activedescendant', itemId);
-      }
-    } else {
-      for (var k = 0; k < comboboxes.length; k++) {
-        comboboxes[k].removeAttribute('aria-activedescendant');
-      }
+      focused.setAttribute('aria-activedescendant', itemId);
+    } else if (focused) {
+      focused.removeAttribute('aria-activedescendant');
     }
   },
   selectListItem: function (input, ul, index) {
-    if (!input || !ul) return;
+    if (!ul) return;
 
     var childNodes = ul.getElementsByTagName('LI');
 
@@ -1272,7 +1323,7 @@ window.Radzen = {
     }
   },
   focusListItem: function (input, ul, isDown, startIndex) {
-    if (!input || !ul) return;
+    if (!ul) return;
     var childNodes = ul.getElementsByTagName('LI');
 
     if (!childNodes || childNodes.length == 0) return;
@@ -1473,9 +1524,23 @@ window.Radzen = {
     var activeId = gridId + '-active-item';
     var setActiveDescendant = function (el) {
         var prev = document.getElementById(activeId);
-        if (prev && prev !== el) { prev.removeAttribute('id'); }
+        if (prev && prev !== el) {
+            prev.removeAttribute('id');
+            if (prev.hasAttribute('data-rz-active-selected')) {
+                prev.removeAttribute('data-rz-active-selected');
+                if (prev.hasAttribute('aria-selected')) {
+                    prev.setAttribute('aria-selected', 'false');
+                }
+            }
+        }
         if (el && el.id !== activeId) { el.id = activeId; }
-        if (el) { grid.setAttribute('aria-activedescendant', activeId); }
+        if (el) {
+            grid.setAttribute('aria-activedescendant', activeId);
+            if (el.tagName === 'TR' && el.hasAttribute('aria-selected')) {
+                el.setAttribute('aria-selected', 'true');
+                el.setAttribute('data-rz-active-selected', '');
+            }
+        }
     };
 
     if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && cellIndex != null && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
@@ -1802,9 +1867,14 @@ window.Radzen = {
   openContextMenu: function (x,y,id, instance, callback) {
     Radzen.closePopup(id);
 
+    var invoker = document.activeElement;
+    if (invoker && invoker !== document.body) {
+        Radzen[id + 'contextMenuInvoker'] = invoker;
+    }
+
     Radzen.openPopup(null, id, false, null, x, y, instance, callback);
 
-    setTimeout(function () {
+    requestAnimationFrame(function () {
         var popup = document.getElementById(id);
         if (popup) {
             var menu = popup.querySelector('.rz-menu');
@@ -1812,7 +1882,14 @@ window.Radzen = {
                 menu.focus();
             }
         }
-    }, 500);
+    });
+  },
+  restoreContextMenuFocus: function (id) {
+    var invoker = Radzen[id + 'contextMenuInvoker'];
+    Radzen[id + 'contextMenuInvoker'] = null;
+    if (invoker && document.body.contains(invoker) && typeof invoker.focus === 'function') {
+        invoker.focus();
+    }
   },
   openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback, clientX, clientY) {
     Radzen.closeTooltip(id);
@@ -2274,6 +2351,10 @@ window.Radzen = {
     }
     popup.__escapeHandler = function (e) {
         if (e.key === 'Escape' || e.key === 'Esc') {
+            var menu = popup.querySelector('.rz-menu[role="menu"]');
+            if (menu && menu.querySelector('.rz-navigation-item-active')) {
+                return;
+            }
             Radzen.closePopup(id, instance, callback, e);
         }
         if (e.key === 'Tab' && parent && (popup.classList.contains('rz-dropdown-panel') || popup.classList.contains('rz-multiselect-panel'))) {
@@ -2568,6 +2649,12 @@ window.Radzen = {
       };
   },
   openDialog: function (options, dialogService, dialog) {
+    if (!Radzen.dialogInvokerElement) {
+        var invoker = document.activeElement;
+        if (invoker && invoker !== document.body && !invoker.closest('.rz-dialog-content')) {
+            Radzen.dialogInvokerElement = invoker;
+        }
+    }
     if (Radzen.closeAllPopups) {
         Radzen.closeAllPopups();
     }
@@ -2674,6 +2761,14 @@ window.Radzen = {
     if (dialogs.length <= 1) {
         document.removeEventListener('keydown', Radzen.closePopupOrDialog);
         delete Radzen.dialogService;
+        Radzen.restoreDialogInvokerFocus();
+    }
+  },
+  restoreDialogInvokerFocus: function () {
+    var invoker = Radzen.dialogInvokerElement;
+    Radzen.dialogInvokerElement = null;
+    if (invoker && typeof invoker.focus === 'function' && document.body.contains(invoker)) {
+        invoker.focus();
     }
   },
   disableKeydown: function (e) {
@@ -2879,12 +2974,58 @@ window.Radzen = {
 
     return readAsDataURL(fileInput);
   },
+  closeMenuItem: function (item) {
+    if (!item || !item.classList || !item.classList.contains('rz-navigation-item-active')) {
+      return;
+    }
+
+    item.classList.remove('rz-navigation-item-active');
+
+    var wrapper = item.querySelector('.rz-navigation-item-wrapper');
+    if (wrapper) {
+      wrapper.classList.remove('rz-navigation-item-wrapper-active');
+    }
+
+    var children = item.querySelector('.rz-navigation-menu');
+    if (children) {
+      item.setAttribute('aria-expanded', false);
+      children.onanimationend = function () {
+        children.style.display = 'none';
+        children.style.insetInlineStart = '';
+        children.onanimationend = null;
+      };
+      children.classList.remove('rz-open');
+      children.classList.add('rz-close');
+
+      children.querySelectorAll('.rz-navigation-item-active').forEach(function (nested) {
+        Radzen.closeMenuItem(nested);
+      });
+    }
+
+    var icon = item.querySelector('.rz-navigation-item-icon-children');
+    if (icon) {
+      icon.classList.remove('rz-state-expanded');
+      icon.classList.add('rz-state-collapsed');
+    }
+  },
   toggleMenuItem: function (target, event, defaultActive, clickToOpen) {
+    if (!target) return;
+
     var item = target.closest('.rz-navigation-item');
+
+    if (!item) return;
 
     var active = defaultActive != undefined ? defaultActive : !item.classList.contains('rz-navigation-item-active');
 
     function toggle(active) {
+      if (active && item.parentElement) {
+        Array.prototype.forEach.call(item.parentElement.children, function (sibling) {
+          if (sibling !== item) {
+            Radzen.closeMenuItem(sibling);
+          }
+        });
+      }
+
       item.classList.toggle('rz-navigation-item-active', active);
 
       target.classList.toggle('rz-navigation-item-wrapper-active', active);
@@ -5239,6 +5380,7 @@ window.Radzen = {
         var el = document.getElementById(id);
         var pane = document.getElementById(paneId);
         var paneNext = document.getElementById(paneNextId);
+        var separator = pane ? document.getElementById(pane.id + '-resize') : null;
         var paneLength;
         var paneNextLength;
         var panePerc;
@@ -5357,6 +5499,16 @@ window.Radzen = {
                     pane.style.flexBasis = newPerc + '%';
                     if (paneNext)
                         paneNext.style.flexBasis = (spacePerc - newPerc) + '%';
+
+                    if (separator) {
+                        var valueMin = parseFloat(separator.getAttribute('aria-valuemin')) || 0;
+                        var valueMax = parseFloat(separator.getAttribute('aria-valuemax'));
+                        if (!isFinite(valueMax)) valueMax = 100;
+                        var valueNow = Math.round(newPerc);
+                        if (valueNow < valueMin) valueNow = valueMin;
+                        if (valueNow > valueMax) valueNow = valueMax;
+                        separator.setAttribute('aria-valuenow', valueNow);
+                    }
                 }
             },
             touchMoveHandler: function(e) {
@@ -5379,7 +5531,9 @@ window.Radzen = {
         var el = document.getElementById(id);
         if (el && Radzen[el]) {
             Radzen[el].mouseMoveHandler(e);
-            Radzen[el].mouseUpHandler(e);
+            if (Radzen[el]) {
+                Radzen[el].mouseUpHandler(e);
+            }
         }
     },
     openWaiting: function() {

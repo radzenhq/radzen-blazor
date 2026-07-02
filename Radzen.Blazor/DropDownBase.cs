@@ -39,6 +39,8 @@ namespace Radzen
         List<object>? virtualItems;
         int virtualStartIndex;
 
+        internal int VirtualStartIndex => virtualStartIndex;
+
         [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private async ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<object>> LoadItems(Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
         {
@@ -817,6 +819,43 @@ namespace Radzen
                     //
                 }
             }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeydown = true;
+
+                try
+                {
+                    if (JSRuntime != null)
+                    {
+                        if (useVirtualization)
+                        {
+                            selectedIndex = key == "Home" ? 0 : virtualTotalCount - 1;
+
+                            await JSRuntime.InvokeVoidAsync("Radzen.focusVirtualListItem", list, selectedIndex, virtualTotalCount);
+                        }
+                        else
+                        {
+                            selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "Home", key == "Home" ? -1 : items.Count);
+                        }
+
+                        var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+                        if (!Multiple && !popupOpened && shouldSelectOnChange != false)
+                        {
+                            object? selectedItemToChange = useVirtualization
+                                ? View?.Cast<object>().AsQueryable().Skip(selectedIndex).FirstOrDefault()
+                                : items.ElementAtOrDefault(selectedIndex);
+                            if (selectedItemToChange != null)
+                            {
+                                await OnSelectItem(selectedItemToChange, true);
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
             else if (key == "Enter" || key == "NumpadEnter" || (key == "Space" && !isFilter))
             {
                 preventKeydown = true;
@@ -860,7 +899,7 @@ namespace Radzen
 
                     if (!popupOpened)
                     {
-                        if (key != "Space")
+                        if (key != "Space" || !isFilter)
                         {
                             await OpenPopup(key, isFilter);
                         }
@@ -879,6 +918,12 @@ namespace Radzen
                 preventKeydown = true;
 
                 await OpenPopup(key, isFilter);
+            }
+            else if (args.AltKey && key == "ArrowUp")
+            {
+                preventKeydown = true;
+
+                await ClosePopup(key);
             }
             else if (key == "Escape" || key == "Tab")
             {
@@ -1054,6 +1099,7 @@ namespace Radzen
 
             if (JSRuntime != null)
             {
+                await JSRuntime.InvokeVoidAsync("Radzen.updateActiveDescendant", list, null, -1);
                 await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
             }
             await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));

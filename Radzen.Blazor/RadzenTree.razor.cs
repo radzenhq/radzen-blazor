@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -53,6 +54,18 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string? SelectItemAriaLabel { get; set; } = "Select item";
+
+        /// <summary>
+        /// Gets or sets the accessible name of the tree, exposed via the <c>aria-label</c> attribute on the <c>role="tree"</c> container.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the id of the element that labels the tree, exposed via the <c>aria-labelledby</c> attribute on the <c>role="tree"</c> container.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabelledBy { get; set; }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
@@ -236,7 +249,14 @@ namespace Radzen.Blazor
         {
             if (items.IndexOf(item) == -1)
             {
+                var wasEmpty = items.Count == 0;
+
                 items.Add(item);
+
+                if (wasEmpty)
+                {
+                    InvokeAsync(StateHasChanged);
+                }
             }
         }
 
@@ -518,7 +538,7 @@ namespace Radzen.Blazor
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, CurrentItems.Count - 1);
             }
-            else if (key == "ArrowLeft" || key == "ArrowRight")
+            else if (key == "ArrowRight")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
@@ -527,13 +547,73 @@ namespace Radzen.Blazor
                 {
                     var item = CurrentItems[focusedIndex];
 
-                    if (item.ChildContent != null || item.HasChildren)
+                    if (item.IsExpandable)
                     {
-                        await item.ExpandCollapse(key == "ArrowRight");
+                        if (!item.IsExpanded)
+                        {
+                            await item.ExpandCollapse(true);
+                        }
+                        else if (item.items.Count > 0)
+                        {
+                            var childIndex = CurrentItems.IndexOf(item.items[0]);
+
+                            if (childIndex >= 0)
+                            {
+                                focusedIndex = childIndex;
+                            }
+                        }
                     }
                 }
             }
-            else if (key == "Enter" || key == "Space")
+            else if (key == "ArrowLeft")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+                {
+                    var item = CurrentItems[focusedIndex];
+
+                    if (item.IsExpandable && item.IsExpanded)
+                    {
+                        await item.ExpandCollapse(false);
+                    }
+                    else if (item.ParentItem != null)
+                    {
+                        var parentIndex = CurrentItems.IndexOf(item.ParentItem);
+
+                        if (parentIndex >= 0)
+                        {
+                            focusedIndex = parentIndex;
+                        }
+                    }
+                }
+            }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                focusedIndex = key == "Home" ? 0 : CurrentItems.Count - 1;
+            }
+            else if (key == "Enter")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+                {
+                    var item = CurrentItems[focusedIndex];
+
+                    await SelectItem(item);
+
+                    if (item.IsExpandable)
+                    {
+                        await item.ExpandCollapse(!item.IsExpanded);
+                    }
+                }
+            }
+            else if (key == "Space")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
@@ -548,16 +628,89 @@ namespace Radzen.Blazor
                     }
                 }
             }
+            else if (args.Key != null && args.Key.Length == 1 && !char.IsControl(args.Key[0]) && !args.CtrlKey && !args.AltKey && !args.MetaKey)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                TypeAhead(args.Key);
+            }
             else
             {
                 preventKeyPress = false;
                 stopKeydownPropagation = false;
+            }
+
+            if (preventKeyPress && JSRuntime != null && focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+            {
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeededById", CurrentItems[focusedIndex].ElementId);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        string typeAheadBuffer = string.Empty;
+        DateTime lastTypeAhead = DateTime.MinValue;
+
+        void TypeAhead(string character)
+        {
+            var now = DateTime.UtcNow;
+
+            if ((now - lastTypeAhead).TotalMilliseconds > 500)
+            {
+                typeAheadBuffer = string.Empty;
+            }
+
+            lastTypeAhead = now;
+            typeAheadBuffer += character;
+
+            if (CurrentItems.Count == 0)
+            {
+                return;
+            }
+
+            var start = focusedIndex >= 0 ? focusedIndex : 0;
+
+            var search = typeAheadBuffer;
+
+            if (typeAheadBuffer.Length > 1 && typeAheadBuffer.All(c => c == typeAheadBuffer[0]))
+            {
+                search = typeAheadBuffer[0].ToString();
+            }
+
+            for (var offset = 1; offset <= CurrentItems.Count; offset++)
+            {
+                var index = (start + offset) % CurrentItems.Count;
+                var text = CurrentItems[index].Text;
+
+                if (!string.IsNullOrEmpty(text) && text.StartsWith(search, StringComparison.OrdinalIgnoreCase))
+                {
+                    focusedIndex = index;
+                    break;
+                }
             }
         }
 
         internal bool IsFocused(RadzenTreeItem item)
         {
             return CurrentItems.IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        internal string? ActiveDescendantId
+        {
+            get
+            {
+                if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
+                {
+                    return CurrentItems[focusedIndex].ElementId;
+                }
+
+                return null;
+            }
         }
 
         internal void InsertInCurrentItems(int index, RadzenTreeItem item)
@@ -602,7 +755,17 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnInitialized()
         {
-            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+            if (focusedIndex == -1)
+            {
+                var selectedIndex = SelectedItem != null ? CurrentItems.IndexOf(SelectedItem) : -1;
+
+                if (selectedIndex < 0 && Value != null)
+                {
+                    selectedIndex = CurrentItems.FindIndex(i => object.Equals(i.Value, Value));
+                }
+
+                focusedIndex = selectedIndex >= 0 ? selectedIndex : 0;
+            }
 
             base.OnInitialized();
         }

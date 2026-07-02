@@ -26,10 +26,14 @@
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Menu." },
         new KeyboardShortcut { Key = "RightArrow", Action = "Focus next top Menu item." },
         new KeyboardShortcut { Key = "LeftArrow", Action = "Focus previous top Menu item." },
-        new KeyboardShortcut { Key = "DownArrow", Action = "Focus next child Menu item." },
-        new KeyboardShortcut { Key = "UpArrow", Action = "Focus previous child Menu item." },
-        new KeyboardShortcut { Key = "Space or Enter on an expandable Menu item", Action = "Expand the Menu item." },
-        new KeyboardShortcut { Key = "Esc on an expandable Menu item", Action = "Collapse the Menu item." },
-        new KeyboardShortcut { Key = "Space or Enter on a non-expandable Menu item", Action = "Navigate." }
+        new KeyboardShortcut { Key = "DownArrow", Action = "On a top-level item with a submenu, open it and focus its first item; within a submenu, focus the next item, wrapping from the last item to the first." },
+        new KeyboardShortcut { Key = "UpArrow", Action = "On a top-level item with a submenu, open it and focus its last item; within a submenu, focus the previous item, wrapping from the first item to the last." },
+        new KeyboardShortcut { Key = "RightArrow / LeftArrow", Action = "Open / close nested submenus in context and flyout menus." },
+        new KeyboardShortcut { Key = "Home", Action = "Focus first item in the current menu." },
+        new KeyboardShortcut { Key = "End", Action = "Focus last item in the current menu." },
+        new KeyboardShortcut { Key = "Space or Enter on an expandable Menu item", Action = "Expand the Menu item and focus its first item." },
+        new KeyboardShortcut { Key = "Esc", Action = "Close the current open submenu and return focus to its parent menu item." },
+        new KeyboardShortcut { Key = "Space or Enter on a non-expandable Menu item", Action = "Navigate." },
+        new KeyboardShortcut { Key = "A printable character", Action = "Focus the next item whose text starts with that character." }
     };
 }

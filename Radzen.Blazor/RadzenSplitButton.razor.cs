@@ -199,14 +199,38 @@ namespace Radzen.Blazor
                 {
                     if (AlwaysOpenPopup)
                     {
+                        IsOpen = !IsOpen;
+
+                        if (IsOpen && focusedIndex == -1 && items.Count > 0)
+                        {
+                            focusedIndex = 0;
+                        }
+
                         await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
                     }
                     else
                     {
+                        IsOpen = false;
+
                         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                         await Click.InvokeAsync(null);
                     }
                 }
+            }
+        }
+
+        void OnToggleClick()
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            IsOpen = !IsOpen;
+
+            if (IsOpen && focusedIndex == -1 && items.Count > 0)
+            {
+                focusedIndex = 0;
             }
         }
 
@@ -215,6 +239,8 @@ namespace Radzen.Blazor
         /// </summary>
         public void Close()
         {
+            IsOpen = false;
+
             if (JSRuntime != null)
             {
                 JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
@@ -309,20 +335,63 @@ namespace Radzen.Blazor
         internal int focusedIndex = -1;
         bool preventKeyPress = true;
         bool stopKeydownPropagation;
+
+        async Task Open(int index)
+        {
+            focusedIndex = items.Count > 0 ? Math.Clamp(index, 0, items.Count - 1) : -1;
+
+            IsOpen = true;
+
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+            }
+        }
+
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (args.AltKey && key == "ArrowDown")
+            if (!IsOpen)
+            {
+                if (key == "Enter" || key == "Space" || key == "NumpadEnter")
+                {
+                    preventKeyPress = true;
+                    stopKeydownPropagation = true;
+
+                    await OnClick(new MouseEventArgs());
+                }
+                else if (key == "ArrowDown" && items.Count > 0)
+                {
+                    preventKeyPress = true;
+                    stopKeydownPropagation = true;
+
+                    await Open(0);
+                }
+                else if (key == "ArrowUp" && items.Count > 0)
+                {
+                    preventKeyPress = true;
+                    stopKeydownPropagation = true;
+
+                    await Open(items.Count - 1);
+                }
+                else
+                {
+                    preventKeyPress = false;
+                    stopKeydownPropagation = false;
+                }
+
+                return;
+            }
+
+            if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
-
-                if (JSRuntime != null)
+                if (items.Count > 0)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+                    focusedIndex = key == "Home" ? 0 : items.Count - 1;
                 }
             }
             else if (key == "ArrowUp" || key == "ArrowDown")
@@ -332,7 +401,7 @@ namespace Radzen.Blazor
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count - 1);
             }
-            else if (key == "Space" || key == "Enter")
+            else if (key == "Space" || key == "Enter" || key == "NumpadEnter")
             {
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
@@ -352,6 +421,18 @@ namespace Radzen.Blazor
                 stopKeydownPropagation = true;
 
                 Close();
+
+                if (JSRuntime != null)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId());
+                }
+            }
+            else if (args.Key != null && args.Key.Length == 1 && !args.AltKey && !args.CtrlKey && !args.MetaKey && !char.IsControl(args.Key[0]))
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                TypeAhead(args.Key);
             }
             else
             {
@@ -360,9 +441,52 @@ namespace Radzen.Blazor
             }
         }
 
+        void TypeAhead(string character)
+        {
+            if (items.Count == 0)
+            {
+                return;
+            }
+
+            var start = focusedIndex < 0 ? 0 : (focusedIndex + 1) % items.Count;
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                var index = (start + i) % items.Count;
+                var item = items[index];
+
+                if (!item.Disabled && !string.IsNullOrEmpty(item.Text) && item.Text.StartsWith(character, StringComparison.OrdinalIgnoreCase))
+                {
+                    focusedIndex = index;
+                    return;
+                }
+            }
+        }
+
         internal bool IsFocused(RadzenSplitButtonItem item)
         {
             return items?.IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        internal bool IsOpen { get; private set; }
+
+        internal string ItemId(RadzenSplitButtonItem item)
+        {
+            var index = items?.IndexOf(item) ?? -1;
+            return $"{GetId()}-item-{index}";
+        }
+
+        internal string? ActiveDescendantId
+        {
+            get
+            {
+                if (IsOpen && focusedIndex >= 0 && focusedIndex < items.Count)
+                {
+                    return $"{GetId()}-item-{focusedIndex}";
+                }
+
+                return null;
+            }
         }
 
         List<RadzenSplitButtonItem> items = new List<RadzenSplitButtonItem>();

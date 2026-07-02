@@ -2,10 +2,10 @@
 @inherits RadzenComponent
 @if (Visible)
 {
-    <NavLink style="@Style" href="@GetPath()" @attributes="Attributes" class="@GetCssClass()" target="@GetTarget()" id="@GetId()" Match="@Match" >
+    <NavLink style="@Style" href="@GetPath()" @attributes="Attributes" class="@GetCssClass()" target="@GetTarget()" id="@GetId()" Match="@Match" aria-disabled="@GetAriaDisabled()" tabindex="@GetTabIndex()" >
         @if (!string.IsNullOrEmpty(Icon))
         {
-            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)" aria-hidden="true">@Icon</i>
         }
         @if (!string.IsNullOrEmpty(Image))
         {

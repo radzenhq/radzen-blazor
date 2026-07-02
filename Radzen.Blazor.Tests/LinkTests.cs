@@ -47,7 +47,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
 
-            Assert.Contains(@$"<i class=""notranslate rzi"">{icon}</i>", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rzi"" aria-hidden=""true"">{icon}</i>", component.Markup);
         }
 
         [Fact]
@@ -90,6 +90,56 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("class=\"rz-link rz-link-disabled active\"", component.Markup);
 
             Assert.DoesNotContain("href=", component.Markup);
+        }
+
+        [Fact]
+        public void Link_Disabled_SetsAriaDisabled()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenLink>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Path, "/home");
+                parameters.Add(p => p.Disabled, true);
+            });
+
+            var anchor = component.Find("a");
+
+            Assert.Equal("true", anchor.GetAttribute("aria-disabled"));
+            Assert.Equal("-1", anchor.GetAttribute("tabindex"));
+            Assert.False(anchor.HasAttribute("href"));
+        }
+
+        [Fact]
+        public void Link_Enabled_DoesNotSetAriaDisabled()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenLink>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Path, "/home"));
+
+            var anchor = component.Find("a");
+
+            Assert.False(anchor.HasAttribute("aria-disabled"));
+            Assert.False(anchor.HasAttribute("tabindex"));
+            Assert.True(anchor.HasAttribute("href"));
+        }
+
+        [Fact]
+        public void Link_Icon_IsAriaHidden()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenLink>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, "home"));
+
+            var icon = component.Find("i.rzi");
+
+            Assert.Equal("true", icon.GetAttribute("aria-hidden"));
         }
 
         [Fact]
