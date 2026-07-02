@@ -2052,7 +2052,7 @@ window.Radzen = {
     if (parent.getAttribute && parent.getAttribute('aria-controls') === id) {
       control = parent;
     } else if (parent.querySelector) {
-      control = parent.querySelector('[aria-controls="' + id + '"]');
+      control = parent.querySelector('[aria-controls="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]');
     }
     if (!control && parent.getAttribute && parent.getAttribute('role') === 'combobox') {
       control = parent;
