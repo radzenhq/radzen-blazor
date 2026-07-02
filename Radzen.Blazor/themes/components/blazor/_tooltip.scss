@@ -13,6 +13,10 @@ $tooltip-font-size: var(--rz-body-font-size) !default;
   left: 0;
 }
 
+.rz-tooltip:has(.rz-chart-tooltip) {
+  pointer-events: none;
+}
+
 .rz-tooltip-content {
   background: var(--rz-tooltip-background-color);
   color: var(--rz-tooltip-color);
