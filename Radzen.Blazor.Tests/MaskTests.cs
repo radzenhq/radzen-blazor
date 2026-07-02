@@ -269,6 +269,7 @@ namespace Radzen.Blazor.Tests
             // must survive the post-handler @bind:get/:set sync, otherwise the input
             // clears itself on every blur.
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenMask>();
 
@@ -282,6 +283,7 @@ namespace Radzen.Blazor.Tests
         public void Mask_SyncsDomValue_WhenParentRejectsInput()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             // Render through a wrapper that holds Value at a fixed string (parent rejects
             // the user-typed text by simply not updating its variable). Verifies that
@@ -289,14 +291,8 @@ namespace Radzen.Blazor.Tests
             // typed something different, Blazor still syncs the DOM input back to the
             // bound value — the @bind:get/:set contract.
             var wrapper = ctx.RenderComponent<RadzenMaskWrapper>();
-            int beforeCount = wrapper.RenderCount;
 
             wrapper.Find("input").Change("user-typed");
-
-            int afterCount = wrapper.RenderCount;
-            System.Console.Error.WriteLine($"Wrapper render count: {beforeCount} -> {afterCount}");
-            System.Console.Error.WriteLine($"Wrapper HeldValue: {wrapper.Instance.HeldValue}");
-            System.Console.Error.WriteLine("Markup AFTER change:  " + wrapper.Markup);
 
             Assert.Equal("fixed", wrapper.Instance.HeldValue);
             Assert.Equal("fixed", wrapper.Find("input").GetAttribute("value"));

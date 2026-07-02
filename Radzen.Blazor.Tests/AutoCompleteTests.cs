@@ -288,6 +288,7 @@ namespace Radzen.Blazor.Tests
             // must survive the post-handler @bind:get/:set sync, otherwise the input
             // clears itself on every blur.
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenAutoComplete>();
 
@@ -301,6 +302,7 @@ namespace Radzen.Blazor.Tests
         public void AutoComplete_SyncsDomValue_WhenParentRejectsInput()
         {
             using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var wrapper = ctx.RenderComponent<RadzenAutoCompleteRejectWrapper>();
 
