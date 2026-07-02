@@ -805,6 +805,19 @@ namespace Radzen.Blazor
 
         RadzenDropDownDataGrid<object>? columnPickerGrid;
 
+        IEnumerable<object> SelectedPickableColumns => selectedColumns as IEnumerable<object> ?? Enumerable.Empty<object>();
+
+        bool? AllColumnsPickerState => !SelectedPickableColumns.Any()
+            ? false
+            : SelectedPickableColumns.Count() >= allPickableColumns.Count ? true : (bool?)null;
+
+        async Task ToggleAllColumnsPicker()
+        {
+            var allSelected = SelectedPickableColumns.Count() >= allPickableColumns.Count;
+            selectedColumns = allSelected ? new List<object>() : allPickableColumns.Cast<object>().ToList();
+            await ToggleColumns();
+        }
+
         /// <summary>
         /// Gets or sets the columns.
         /// </summary>
