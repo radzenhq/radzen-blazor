@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 
 namespace Radzen.Blazor
 {
@@ -51,6 +52,39 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return "rz-breadcrumb";
+        }
+
+        readonly List<RadzenBreadCrumbItem> items = new List<RadzenBreadCrumbItem>();
+
+        internal void AddItem(RadzenBreadCrumbItem item)
+        {
+            if (!items.Contains(item))
+            {
+                var previousLast = items.Count > 0 ? items[items.Count - 1] : null;
+
+                items.Add(item);
+
+                previousLast?.Refresh();
+            }
+        }
+
+        internal void RemoveItem(RadzenBreadCrumbItem item)
+        {
+            if (items.Remove(item) && !disposed && items.Count > 0)
+            {
+                try
+                {
+                    items[items.Count - 1].Refresh();
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        internal bool IsLastItem(RadzenBreadCrumbItem item)
+        {
+            return items.Count > 0 && items[items.Count - 1] == item;
         }
     }
 

@@ -201,13 +201,20 @@
     public List<KeyboardShortcut> shortcuts = new()
     {
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DatePicker component." },
+        new KeyboardShortcut { Key = "Alt + DownArrow", Action = "Open the calendar popup." },
         new KeyboardShortcut { Key = "Tab on open popup", Action = "Navigate forward across available picker components." },
         new KeyboardShortcut { Key = "Shift + Tab on open popup", Action = "Navigate backward across available picker components." },
-        new KeyboardShortcut { Key = "RightArrow on open popup", Action = "Select next day." },
-        new KeyboardShortcut { Key = "LeftArrow on open popup", Action = "Select previous day." },
-        new KeyboardShortcut { Key = "UpArrow on open popup", Action = "Select same day from previous week." },
-        new KeyboardShortcut { Key = "DownArrow on open popup", Action = "Select same day from next week." },
-        new KeyboardShortcut { Key = "Enter in an opened popup", Action = "Select the focused day and close the popup." },
+        new KeyboardShortcut { Key = "RightArrow on open popup", Action = "Move focus to the next day." },
+        new KeyboardShortcut { Key = "LeftArrow on open popup", Action = "Move focus to the previous day." },
+        new KeyboardShortcut { Key = "UpArrow on open popup", Action = "Move focus to the same day of the previous week." },
+        new KeyboardShortcut { Key = "DownArrow on open popup", Action = "Move focus to the same day of the next week." },
+        new KeyboardShortcut { Key = "Home on open popup", Action = "Move focus to the first day of the week." },
+        new KeyboardShortcut { Key = "End on open popup", Action = "Move focus to the last day of the week." },
+        new KeyboardShortcut { Key = "PageUp on open popup", Action = "Move focus to the same day of the previous month." },
+        new KeyboardShortcut { Key = "PageDown on open popup", Action = "Move focus to the same day of the next month." },
+        new KeyboardShortcut { Key = "Shift + PageUp on open popup", Action = "Move focus to the same day of the previous year." },
+        new KeyboardShortcut { Key = "Shift + PageDown on open popup", Action = "Move focus to the same day of the next year." },
+        new KeyboardShortcut { Key = "Enter or Space in an opened popup", Action = "Select the focused day and close the popup." },
         new KeyboardShortcut { Key = "Esc in an opened popup", Action = "Close the popup." }
     };
 }

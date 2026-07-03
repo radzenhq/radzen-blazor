@@ -129,6 +129,8 @@ namespace Radzen.Blazor
         [Parameter]
         public string? AriaLabelledBy { get; set; }
 
+        internal ElementReference tablistElement;
+
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
         internal List<RadzenTabsItem> NavigableTabs()
@@ -255,7 +257,7 @@ namespace Radzen.Blazor
 
                     try
                     {
-                        await Element.FocusAsync(preventScroll: true);
+                        await tablistElement.FocusAsync(preventScroll: true);
                     }
                     catch (JSDisconnectedException)
                     {
@@ -409,7 +411,7 @@ namespace Radzen.Blazor
 
                 try
                 {
-                    await Element.FocusAsync(preventScroll: true);
+                    await tablistElement.FocusAsync(preventScroll: true);
                 }
                 catch (JSDisconnectedException)
                 {

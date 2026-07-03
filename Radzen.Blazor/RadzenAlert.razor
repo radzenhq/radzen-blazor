@@ -26,7 +26,7 @@
         </div>
         @if (AllowClose)
         {
-            <RadzenButton Click=@OnClose Icon="close" Variant="Variant.Text" ButtonStyle="@GetCloseButtonStyle()" Shade="@GetCloseButtonShade()" Size="@GetCloseButtonSize()" />
+            <RadzenButton Click=@OnClose Icon="close" aria-label="@CloseAriaLabel" Variant="Variant.Text" ButtonStyle="@GetCloseButtonStyle()" Shade="@GetCloseButtonShade()" Size="@GetCloseButtonSize()" />
         }
     </div>
 }

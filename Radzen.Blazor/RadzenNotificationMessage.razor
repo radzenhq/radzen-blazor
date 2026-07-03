@@ -12,11 +12,10 @@
         { "role", "button" },
         { "tabindex", "0" }
     } : null;
-    <div aria-live="polite" class="rz-notification-item-wrapper rz-open @classes.Item1" style="@(clickable ? "cursor: pointer;" : "") @Style"
-         @attributes="wrapperAttributes" @onclick="NotificationClicked" @onkeydown="OnKeyDown">
+    <div role="@(Message?.Severity == NotificationSeverity.Error ? "alert" : null)" class="rz-notification-item-wrapper rz-open @classes.Item1" style="@(clickable ? "cursor: pointer;" : "") @Style">
         <div class="rz-notification-item">
-            <div class="rz-notification-message-wrapper">
-                <span class="notranslate rzi rz-notification-icon @classes.Item2"></span>
+            <div class="rz-notification-message-wrapper" @attributes="wrapperAttributes" @onclick="NotificationClicked" @onkeydown="OnKeyDown">
+                <span class="notranslate rzi rz-notification-icon @classes.Item2" aria-hidden="true"></span>
                 <div class="rz-notification-message">
                     <div class="rz-notification-title">@if (Message?.SummaryContent != null && Service != null) { @Message.SummaryContent(Service) } else { @Message?.Summary }</div>
                     <div class="rz-notification-content">@if (Message?.DetailContent != null && Service != null) { @Message.DetailContent(Service) } else { @Message?.Detail }</div>

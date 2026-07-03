@@ -3444,7 +3444,7 @@ namespace Radzen.Blazor.Tests
             var wrapper = component.Find("div.rz-data-grid");
             Assert.Equal("grid", wrapper.GetAttribute("role"));
             Assert.Equal("0", wrapper.GetAttribute("tabindex"));
-            Assert.False(string.IsNullOrEmpty(wrapper.GetAttribute("aria-activedescendant")));
+            Assert.True(string.IsNullOrEmpty(wrapper.GetAttribute("aria-activedescendant")));
         }
 
         [Fact]
@@ -3467,7 +3467,7 @@ namespace Radzen.Blazor.Tests
 
             var instance = component.Instance;
 
-            Assert.False(string.IsNullOrEmpty(instance.GetActiveDescendantId()));
+            Assert.Null(instance.GetActiveDescendantId());
 
             instance.HasActiveDescendant = () => false;
             Assert.Null(instance.GetActiveDescendantId());
@@ -4083,7 +4083,7 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain("2 columns showing", label.TextContent);
             Assert.Equal("Name", label.TextContent.Trim());
 
-            Assert.Equal("none", component.Find(".rz-column-picker th.rz-sortable-column").GetAttribute("aria-sort"));
+            Assert.Null(component.Find(".rz-column-picker th.rz-sortable-column").GetAttribute("aria-sort"));
             component.Find(".rz-column-picker th.rz-sortable-column > div").Click();
             Assert.Equal("ascending", component.Find(".rz-column-picker th.rz-sortable-column").GetAttribute("aria-sort"));
         }

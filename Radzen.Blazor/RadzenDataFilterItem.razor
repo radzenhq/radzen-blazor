@@ -29,6 +29,7 @@ else if (Filter != null)
 {
     <RadzenDropDown @bind-Value="@Filter.Property" Data="@(DataFilter?.properties)" TextProperty="Title" ValueProperty="Property" TValue="string"
                     DisabledProperty="@(DataFilter?.UniqueFilters == true ? nameof(property.IsSelected) : null)"
+                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", $"{DataFilter?.PropertyAriaLabel} {property?.Title ?? property?.Property}".Trim() }})"
                     Change="@OnPropertyChange" AllowFiltering="@(DataFilter?.AllowColumnFiltering ?? false)" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" class="rz-datafilter-property">
         <Template>
             @{
@@ -40,6 +41,7 @@ else if (Filter != null)
     if (property != null)
     {
         <RadzenDropDown @onclick:preventDefault="true" Data="@(property.GetFilterOperators().Select(t => new DropDownItem<FilterOperator> { Text = property.GetFilterOperatorText(t), Value = t }))"
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", $"{DataFilter?.FilterOperatorAriaLabel} {(Filter.FilterOperator != null ? property.GetFilterOperatorText(Filter.FilterOperator.Value) : "")}".Trim() }})"
                 TextProperty="Text" ValueProperty="Value" TValue="FilterOperator?" @bind-Value="@Filter.FilterOperator" Change="@OnOperatorChange" class="rz-datafilter-operator" />
         @if (property.FilterTemplate != null)
         {
@@ -50,6 +52,7 @@ else if (Filter != null)
         else if (PropertyAccess.IsNullableEnum(property.FilterPropertyType) || PropertyAccess.IsEnum(property.FilterPropertyType))
         {
             <RadzenDropDown Disabled="@IsOperatorNullOrEmpty()" AllowClear="false" AllowFiltering="false" TValue="@object" class="rz-datafilter-editor"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", $"{DataFilter?.FilterValueAriaLabel} {Filter.FilterValue}".Trim() }})"
                             @bind-Value=@Filter.FilterValue Multiple="false" Placeholder="@(DataFilter?.EnumFilterSelectText ?? "")" TextProperty="Text" ValueProperty="Value"
                             Data=@EnumExtensions.EnumAsKeyValuePair(property.FilterPropertyType != null ? (Nullable.GetUnderlyingType(property.FilterPropertyType!)! ?? property.FilterPropertyType) : typeof(object)) Change=@(args => { _ = InvokeAsync(ApplyFilter); }) />
         }
@@ -60,15 +63,17 @@ else if (Filter != null)
         else if (PropertyAccess.IsDate(property.FilterPropertyType))
         {
             <RadzenDatePicker Disabled="@IsOperatorNullOrEmpty()" @bind-Value=@Filter.FilterValue TValue="@object" ShowTime="true" class="rz-datafilter-editor"
+                              InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", $"{DataFilter?.FilterValueAriaLabel} {Filter.FilterValue}".Trim() }})"
                               ShowTimeOkButton="true" DateFormat="@getFilterDateFormat()" Change=@(args => InvokeAsync(ApplyFilter)) />
         }
         else if (property.FilterPropertyType == typeof(bool) || property.FilterPropertyType == typeof(bool?))
         {
-            <RadzenCheckBox Disabled="@IsOperatorNullOrEmpty()" TriState="true" TValue="@object" @bind-Value=@Filter.FilterValue Change=@(args => InvokeAsync(ApplyFilter)) class="rz-datafilter-check" />
+            <RadzenCheckBox Disabled="@IsOperatorNullOrEmpty()" TriState="true" TValue="@object" @bind-Value=@Filter.FilterValue Change=@(args => InvokeAsync(ApplyFilter)) class="rz-datafilter-check"
+                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", $"{DataFilter?.FilterValueAriaLabel} {Filter.FilterValue}".Trim() }})" />
         }
         else
         {
-            <RadzenTextBox Disabled="@IsOperatorNullOrEmpty()" class="rz-datafilter-editor" Value="@($"{Filter.FilterValue}")" Change=@(args => { Filter.FilterValue = args; InvokeAsync(ApplyFilter); }) />
+            <RadzenTextBox Disabled="@IsOperatorNullOrEmpty()" class="rz-datafilter-editor" aria-label="@($"{DataFilter?.FilterValueAriaLabel} {Filter.FilterValue}".Trim())" Value="@($"{Filter.FilterValue}")" Change=@(args => { Filter.FilterValue = args; InvokeAsync(ApplyFilter); }) />
         }
 
         <RadzenButton title="@(DataFilter?.RemoveFilterText ?? "")" class="rz-datafilter-item-clear" Icon="clear" Click="@RemoveFilter" Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark"/>
@@ -355,6 +360,8 @@ else if (Filter != null)
                     }
                 }
             }
+
+            builder.AddAttribute(5, "InputAttributes", new Dictionary<string, object>() { { "aria-label", $"{DataFilter?.FilterValueAriaLabel} {Filter?.FilterValue}".Trim() } });
 
             builder.CloseComponent();
         };

@@ -4,14 +4,14 @@
 <CascadingValue Value=this>
 @if (Visible)
 {
-    <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
-         role="tablist"
-         aria-orientation="@(IsVertical ? "vertical" : "horizontal")"
-         aria-label="@AriaLabel"
-         aria-labelledby="@AriaLabelledBy"
-         aria-activedescendant="@GetActiveDescendantId()"
-         tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
-        <ul role="presentation" class="rz-tabview-nav">
+    <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
+        <ul @ref=@tablistElement class="rz-tabview-nav"
+            role="tablist"
+            aria-orientation="@(IsVertical ? "vertical" : "horizontal")"
+            aria-label="@AriaLabel"
+            aria-labelledby="@AriaLabelledBy"
+            aria-activedescendant="@GetActiveDescendantId()"
+            tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
             @Tabs
         </ul>
         <div class="rz-tabview-panels">

@@ -9,7 +9,7 @@
         role="tree" aria-multiselectable="@(AllowCheckBoxes ? "true" : null)"
         aria-label="@AriaLabel" aria-labelledby="@AriaLabelledBy" aria-activedescendant="@ActiveDescendantId"
         tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
-    <ul class="rz-tree-container">
+    <ul class="rz-tree-container" role="presentation">
         <CascadingValue Value=this>
             @ChildContent
         </CascadingValue>

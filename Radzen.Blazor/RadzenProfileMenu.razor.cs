@@ -41,6 +41,25 @@ namespace Radzen.Blazor
                 _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "Radzen.createProfileMenu", Element);
             }
+
+            if (shouldFocusMenu)
+            {
+                shouldFocusMenu = false;
+
+                try
+                {
+                    await menuElement.FocusAsync(preventScroll: true);
+                }
+                catch (InvalidOperationException)
+                {
+                }
+                catch (JSDisconnectedException)
+                {
+                }
+                catch (JSException)
+                {
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -134,6 +153,8 @@ namespace Radzen.Blazor
 
         internal int focusedIndex = -1;
 
+        bool shouldFocusMenu;
+
         bool preventKeyPress = true;
         bool stopKeydownPropagation;
         async Task OnKeyPress(KeyboardEventArgs args)
@@ -150,6 +171,8 @@ namespace Radzen.Blazor
                     await Toggle(new MouseEventArgs());
 
                     focusedIndex = key == "ArrowUp" ? items.Count - 1 : 0;
+
+                    shouldFocusMenu = true;
                 }
                 else if (items.Count > 0)
                 {
@@ -165,6 +188,8 @@ namespace Radzen.Blazor
                 if (Collapsed)
                 {
                     await Toggle(new MouseEventArgs());
+
+                    shouldFocusMenu = true;
                 }
 
                 focusedIndex = key == "Home" ? 0 : items.Count - 1;
@@ -194,6 +219,8 @@ namespace Radzen.Blazor
                     if (!Collapsed)
                     {
                         focusedIndex = focusedIndex != -1 ? focusedIndex : 0;
+
+                        shouldFocusMenu = true;
                     }
                 }
             }

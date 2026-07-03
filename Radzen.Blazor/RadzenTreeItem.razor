@@ -2,7 +2,7 @@
 @using Radzen.Blazor.Rendering
 @implements IDisposable
 @{var itemArgs = Tree?.ItemAttributes(this); }
-<li class="rz-treenode" @attributes="@(itemArgs?.Item1.Attributes.Any() == true ? itemArgs.Item1.Attributes : Attributes)" 
+<li class="rz-treenode" role="presentation" @attributes="@(itemArgs?.Item1.Attributes.Any() == true ? itemArgs.Item1.Attributes : Attributes)"
     @oncontextmenu="OnContextMenu" @oncontextmenu:preventDefault="@(Tree?.ItemContextMenu.HasDelegate ?? false)" @oncontextmenu:stopPropagation>
     <div id="@ElementId" class=@ContentClass role="treeitem" tabindex="-1"
          aria-level="@Level"
@@ -14,7 +14,7 @@
          @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {
-            <span class=@IconClass role="button" tabindex="-1" aria-label="@Text" @onclick="@Toggle" @onclick:stopPropagation></span>
+            <span class=@IconClass aria-hidden="true" @onclick="@Toggle" @onclick:stopPropagation></span>
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
@@ -31,7 +31,7 @@
     @if (ChildContent != null && expanded)
     {
     <CascadingValue Value=this>
-    <Expander Expanded=@clientExpanded>
+    <Expander Expanded=@clientExpanded Role="presentation">
     <ul class="rz-treenode-children" role="group" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
         @ChildContent
     </ul>

@@ -3,20 +3,20 @@
 @inherits FormComponent<int>
 @if (Visible)
 {
-    <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+    <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()" role="radiogroup" aria-label="@AriaLabel" aria-readonly="@(ReadOnly ? "true" : null)">
         @if (!ReadOnly)
         {
             <button type="button" id="@(GetId() + "cl")" aria-label="@ClearAriaLabel" @onclick="@(args => SetValue(0))" class="rz-rating-cancel"
-                tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-                @onkeypress="@(args => OnKeyPress(args, SetValue(0)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
+                tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
                 <span class="notranslate rz-rating-icon rzi rzi-ban"></span>
             </button>
         }
         @foreach (var index in Enumerable.Range(1, Stars))
         {
-            <button type="button" id="@(GetId() + index.ToString() + "r")" aria-label="@RateAriaLabel" @onclick="@(args => SetValue(index))"
-                tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-               @onkeypress="@(args => OnKeyPress(args, SetValue(index)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
+            <button type="button" id="@(GetId() + index.ToString() + "r")" role="radio" aria-checked="@(index == Value ? "true" : "false")"
+                aria-posinset="@index" aria-setsize="@Stars" aria-label="@($"{RateAriaLabel} {index}")" @onclick="@(args => SetValue(index))"
+                tabindex="@(Disabled ? "-1" : index == FocusableStar ? $"{TabIndex}" : "-1")"
+                @onkeydown="@(args => OnKeyDown(args, index))" @onkeydown:preventDefault=preventKeyDown @onkeydown:stopPropagation=preventKeyDown>
                 <span class="notranslate rz-rating-icon rzi @(index <= Value ? "rzi-star": "rzi-star-o")"></span>
             </button>
         }

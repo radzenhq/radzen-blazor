@@ -3,7 +3,7 @@
 
 @inherits DbContextPage
 
-<h3>Default Empty Text</h3>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3">Default Empty Text</RadzenText>
 <RadzenPickList @bind-Source="@emptySource" @bind-Target="@emptyTarget" Style="height:300px; width:100%;"
     TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)">
     <SourceHeader>
@@ -14,7 +14,7 @@
     </TargetHeader>
 </RadzenPickList>
 
-<h3 class="rz-mt-6">Custom Empty Text</h3>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3" class="rz-mt-6">Custom Empty Text</RadzenText>
 <RadzenPickList @bind-Source="@emptySource2" @bind-Target="@emptyTarget2" Style="height:300px; width:100%;"
     TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)"
     SourceEmptyText="No available customers" TargetEmptyText="No selected customers">
@@ -26,7 +26,7 @@
     </TargetHeader>
 </RadzenPickList>
 
-<h3 class="rz-mt-6">Custom Empty Template</h3>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3" class="rz-mt-6">Custom Empty Template</RadzenText>
 <RadzenPickList @bind-Source="@emptySource3" @bind-Target="@emptyTarget3" Style="height:300px; width:100%;"
     TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)">
     <SourceHeader>
@@ -43,7 +43,7 @@
     </TargetEmptyTemplate>
 </RadzenPickList>
 
-<h3 class="rz-mt-6">Empty Text with Data</h3>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3" class="rz-mt-6">Empty Text with Data</RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
     Move all items to see the empty message appear.
 </RadzenText>

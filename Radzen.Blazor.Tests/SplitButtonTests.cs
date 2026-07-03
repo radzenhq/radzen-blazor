@@ -1,4 +1,4 @@
-using Bunit;
+﻿using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Xunit;
@@ -32,34 +32,34 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void SplitButton_Renders_Wrapper_AriaHasPopupAndExpanded()
+        public void SplitButton_Renders_ToggleButton_AriaHasPopupAndExpanded()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
 
-            var wrapper = component.Find("div.rz-splitbutton");
+            var toggle = component.Find("button.rz-splitbutton-menubutton");
 
-            Assert.Equal("menu", wrapper.GetAttribute("aria-haspopup"));
-            Assert.Equal("false", wrapper.GetAttribute("aria-expanded"));
+            Assert.Equal("menu", toggle.GetAttribute("aria-haspopup"));
+            Assert.Equal("false", toggle.GetAttribute("aria-expanded"));
         }
 
         [Fact]
-        public void SplitButton_AltArrowDown_OpensMenu_SetsAriaExpandedAndActiveDescendant()
+        public void SplitButton_ArrowDown_OpensMenu_SetsAriaExpandedAndActiveDescendant()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = RenderWithItems(ctx);
 
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown", AltKey = true });
+            component.Find("button.rz-splitbutton-menubutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
 
-            var wrapper = component.Find("div.rz-splitbutton");
+            var toggle = component.Find("button.rz-splitbutton-menubutton");
 
-            Assert.Equal("true", wrapper.GetAttribute("aria-expanded"));
+            Assert.Equal("true", toggle.GetAttribute("aria-expanded"));
 
-            var activeDescendant = wrapper.GetAttribute("aria-activedescendant");
+            var activeDescendant = component.Find(@"ul[role=""menu""]").GetAttribute("aria-activedescendant");
             Assert.False(string.IsNullOrEmpty(activeDescendant));
 
             var firstItem = component.FindAll(@"li[role=""menuitem""]")[0];
@@ -74,12 +74,11 @@ namespace Radzen.Blazor.Tests
 
             var component = RenderWithItems(ctx);
 
-            var wrapper = component.Find("div.rz-splitbutton");
-            wrapper.KeyDown(new KeyboardEventArgs { Code = "ArrowDown", AltKey = true });
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            component.Find("button.rz-splitbutton-menubutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            component.Find(@"ul[role=""menu""]").KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
 
             var items = component.FindAll(@"li[role=""menuitem""]");
-            var activeDescendant = component.Find("div.rz-splitbutton").GetAttribute("aria-activedescendant");
+            var activeDescendant = component.Find(@"ul[role=""menu""]").GetAttribute("aria-activedescendant");
 
             Assert.Equal(items[1].Id, activeDescendant);
             Assert.Equal("-1", items[0].GetAttribute("tabindex"));
@@ -94,11 +93,11 @@ namespace Radzen.Blazor.Tests
 
             var component = RenderWithItems(ctx);
 
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown", AltKey = true });
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "End" });
+            component.Find("button.rz-splitbutton-menubutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            component.Find(@"ul[role=""menu""]").KeyDown(new KeyboardEventArgs { Code = "End" });
 
             var items = component.FindAll(@"li[role=""menuitem""]");
-            var activeDescendant = component.Find("div.rz-splitbutton").GetAttribute("aria-activedescendant");
+            var activeDescendant = component.Find(@"ul[role=""menu""]").GetAttribute("aria-activedescendant");
 
             Assert.Equal(items[items.Count - 1].Id, activeDescendant);
         }
@@ -111,14 +110,30 @@ namespace Radzen.Blazor.Tests
 
             var component = RenderWithItems(ctx);
 
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown", AltKey = true });
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "End" });
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "Home" });
+            component.Find("button.rz-splitbutton-menubutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            component.Find(@"ul[role=""menu""]").KeyDown(new KeyboardEventArgs { Code = "End" });
+            component.Find(@"ul[role=""menu""]").KeyDown(new KeyboardEventArgs { Code = "Home" });
 
             var items = component.FindAll(@"li[role=""menuitem""]");
-            var activeDescendant = component.Find("div.rz-splitbutton").GetAttribute("aria-activedescendant");
+            var activeDescendant = component.Find(@"ul[role=""menu""]").GetAttribute("aria-activedescendant");
 
             Assert.Equal(items[0].Id, activeDescendant);
+        }
+
+        [Fact]
+        public void SplitButton_ArrowUp_OpensMenu_FocusesLastItem()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = RenderWithItems(ctx);
+
+            component.Find("button.rz-splitbutton-menubutton").KeyDown(new KeyboardEventArgs { Code = "ArrowUp" });
+
+            var items = component.FindAll(@"li[role=""menuitem""]");
+            var activeDescendant = component.Find(@"ul[role=""menu""]").GetAttribute("aria-activedescendant");
+
+            Assert.Equal(items[items.Count - 1].Id, activeDescendant);
         }
 
         [Fact]
@@ -129,13 +144,13 @@ namespace Radzen.Blazor.Tests
 
             var component = RenderWithItems(ctx);
 
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown", AltKey = true });
-            Assert.Equal("true", component.Find("div.rz-splitbutton").GetAttribute("aria-expanded"));
+            component.Find("button.rz-splitbutton-menubutton").KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
+            Assert.Equal("true", component.Find("button.rz-splitbutton-menubutton").GetAttribute("aria-expanded"));
 
-            component.Find("div.rz-splitbutton").KeyDown(new KeyboardEventArgs { Code = "Escape" });
+            component.Find(@"ul[role=""menu""]").KeyDown(new KeyboardEventArgs { Code = "Escape" });
 
-            Assert.Equal("false", component.Find("div.rz-splitbutton").GetAttribute("aria-expanded"));
-            Assert.Null(component.Find("div.rz-splitbutton").GetAttribute("aria-activedescendant"));
+            Assert.Equal("false", component.Find("button.rz-splitbutton-menubutton").GetAttribute("aria-expanded"));
+            Assert.Null(component.Find(@"ul[role=""menu""]").GetAttribute("aria-activedescendant"));
         }
 
         [Fact]
@@ -180,7 +195,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
 
-            Assert.Contains(@$"<i class=""notranslate rz-button-icon-left rzi"">{icon}</i>", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rz-button-icon-left rzi"" aria-hidden=""true"">{icon}</i>", component.Markup);
         }
 
         [Fact]
@@ -199,7 +214,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Icon, icon);
             });
 
-            Assert.Contains(@$"<i class=""notranslate rz-button-icon-left rzi"">{icon}</i>", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rz-button-icon-left rzi"" aria-hidden=""true"">{icon}</i>", component.Markup);
             Assert.Contains(@$"<span class=""rz-button-text"">{text}</span>", component.Markup);
         }
 

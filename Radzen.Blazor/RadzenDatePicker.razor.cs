@@ -764,7 +764,9 @@ namespace Radzen.Blazor
 
                 try
                 {
-                    var newDate = Culture.Calendar.AddMonths(FocusedDate, key == "PageUp" ? -1 : 1);
+                    var newDate = args.ShiftKey
+                        ? Culture.Calendar.AddYears(FocusedDate, key == "PageUp" ? -1 : 1)
+                        : Culture.Calendar.AddMonths(FocusedDate, key == "PageUp" ? -1 : 1);
                     FocusedDate = newDate;
                     CurrentDate = newDate;
                     shouldFocusDay = true;

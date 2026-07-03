@@ -193,7 +193,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void BreadCrumb_Item_WithPath_DoesNotRender_AriaCurrentPage()
+        public void BreadCrumb_NonLastItem_WithPath_DoesNotRender_AriaCurrentPage()
         {
             using var ctx = new TestContext();
 
@@ -205,10 +205,69 @@ namespace Radzen.Blazor.Tests
                     builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Home");
                     builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Path), "/");
                     builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenBreadCrumbItem>(3);
+                    builder.AddAttribute(4, nameof(RadzenBreadCrumbItem.Text), "Products");
+                    builder.AddAttribute(5, nameof(RadzenBreadCrumbItem.Path), "/products");
+                    builder.CloseComponent();
                 });
             });
 
-            Assert.DoesNotContain("aria-current", component.Markup);
+            var items = component.FindAll("li.rz-breadcrumb-item");
+
+            Assert.Equal(2, items.Count);
+            Assert.Null(items[0].GetAttribute("aria-current"));
+        }
+
+        [Fact]
+        public void BreadCrumb_LastItem_WithPath_Renders_AriaCurrentPage()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(c => c.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenBreadCrumbItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Home");
+                    builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Path), "/");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenBreadCrumbItem>(3);
+                    builder.AddAttribute(4, nameof(RadzenBreadCrumbItem.Text), "Products");
+                    builder.AddAttribute(5, nameof(RadzenBreadCrumbItem.Path), "/products");
+                    builder.CloseComponent();
+                });
+            });
+
+            var items = component.FindAll("li.rz-breadcrumb-item");
+
+            Assert.Equal("page", items[1].GetAttribute("aria-current"));
+        }
+
+        [Fact]
+        public void BreadCrumb_Renders_OrderedList_WithListItems()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenBreadCrumb>(parameters =>
+            {
+                parameters.Add(c => c.ChildContent, builder =>
+                {
+                    builder.OpenComponent<RadzenBreadCrumbItem>(0);
+                    builder.AddAttribute(1, nameof(RadzenBreadCrumbItem.Text), "Home");
+                    builder.AddAttribute(2, nameof(RadzenBreadCrumbItem.Path), "/");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenBreadCrumbItem>(3);
+                    builder.AddAttribute(4, nameof(RadzenBreadCrumbItem.Text), "Products");
+                    builder.CloseComponent();
+                });
+            });
+
+            var list = component.Find("nav > ol.rz-breadcrumb-list");
+
+            Assert.Equal(2, list.QuerySelectorAll("li.rz-breadcrumb-item").Length);
         }
     }
 }

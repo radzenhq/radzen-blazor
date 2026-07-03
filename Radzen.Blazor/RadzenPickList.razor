@@ -10,7 +10,9 @@
             <RadzenStack class="rz-picklist-source-wrapper">
                 @if (ShowHeader && SourceHeader != null)
                 {
-                    @SourceHeader
+                    <div id="@(GetId() + "-source-header")">
+                        @SourceHeader
+                    </div>
                 }
                 <CascadingValue Value="@((EditContext?)null)" IsFixed=true>
                     <RadzenListBox @ref=sourceListBox Value=@selectedSourceItems ValueChanged="@(EventCallback.Factory.Create<object>(this, OnSelectedSourceItemsChanged))" Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
@@ -20,23 +22,27 @@
                         Disabled=@(Disabled || Source == null || (Source != null && !Source.Any()))
                         EmptyText="@(SourceEmptyText ?? EmptyText)" EmptyTemplate="@(SourceEmptyTemplate ?? EmptyTemplate)"
                         AllowVirtualization="@AllowVirtualization"
+                        aria-label="@(ShowHeader && SourceHeader != null ? null : SourceAriaLabel)"
+                        aria-labelledby="@(ShowHeader && SourceHeader != null ? GetId() + "-source-header" : null)"
                     />
                 </CascadingValue>
             </RadzenStack>
             <RadzenStack Orientation="@(Orientation == Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical)" JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap" class="rz-picklist-buttons">
-                <RadzenButton Icon="@SelectedSourceToTargetIcon" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(Disabled || selectedSourceItems == null || (Multiple && (selectedSourceItems as IEnumerable)?.Cast<object>().Any() != true))
+                <RadzenButton Icon="@SelectedSourceToTargetIcon" title="@SelectedSourceToTargetTitle" aria-label="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(Disabled || selectedSourceItems == null || (Multiple && (selectedSourceItems as IEnumerable)?.Cast<object>().Any() != true))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
-                <RadzenButton Icon="@SelectedTargetToSourceIcon" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(Disabled || selectedTargetItems == null || (Multiple && (selectedTargetItems as IEnumerable)?.Cast<object>().Any() != true))
+                <RadzenButton Icon="@SelectedTargetToSourceIcon" title="@SelectedTargetToSourceTitle" aria-label="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(Disabled || selectedTargetItems == null || (Multiple && (selectedTargetItems as IEnumerable)?.Cast<object>().Any() != true))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
-                <RadzenButton Icon="@SourceToTargetIcon" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Disabled || source == null || (source != null && !source.Any()))
+                <RadzenButton Icon="@SourceToTargetIcon" title="@SourceToTargetTitle" aria-label="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Disabled || source == null || (source != null && !source.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" Visible=@(AllowMoveAll && AllowMoveAllSourceToTarget) />
-                <RadzenButton Icon="@TargetToSourceIcon" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Disabled || target == null|| (target != null && !target.Any()))
+                <RadzenButton Icon="@TargetToSourceIcon" title="@TargetToSourceTitle" aria-label="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Disabled || target == null|| (target != null && !target.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" Visible=@(AllowMoveAll && AllowMoveAllTargetToSource)/>
             </RadzenStack>
             <RadzenStack class="rz-picklist-target-wrapper">
                 @if (ShowHeader && TargetHeader != null)
                 {
-                    @TargetHeader
+                    <div id="@(GetId() + "-target-header")">
+                        @TargetHeader
+                    </div>
                 }
                 <CascadingValue Value="@((EditContext?)null)" IsFixed=true>
                     <RadzenListBox @ref=targetListBox Value=@selectedTargetItems ValueChanged="@(EventCallback.Factory.Create<object>(this, OnSelectedTargetItemsChanged))" Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
@@ -46,6 +52,8 @@
                         Disabled=@(Disabled || Target == null|| (Target != null && !Target.Any()))
                         EmptyText="@(TargetEmptyText ?? EmptyText)" EmptyTemplate="@(TargetEmptyTemplate ?? EmptyTemplate)"
                         AllowVirtualization="@AllowVirtualization"
+                        aria-label="@(ShowHeader && TargetHeader != null ? null : TargetAriaLabel)"
+                        aria-labelledby="@(ShowHeader && TargetHeader != null ? GetId() + "-target-header" : null)"
                     />
                 </CascadingValue>
             </RadzenStack>

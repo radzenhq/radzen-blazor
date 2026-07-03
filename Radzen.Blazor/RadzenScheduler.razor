@@ -20,18 +20,18 @@
                 <div class="rz-scheduler-nav-prev-next">
                     @if (ShowNavigationButtons)
                     {
-                    <button type="button" tabindex="0" class="rz-button rz-prev" @onclick=@OnPrev title="@PrevText"><RadzenIcon Icon="chevron_left" /></button>
-                    <button type="button" tabindex="0" class="rz-button rz-next" @onclick=@OnNext title="@NextText"><RadzenIcon Icon="chevron_right" /></button>
+                    <button type="button" tabindex="0" class="rz-button rz-prev" @onclick=@OnPrev title="@PrevText" aria-label="@PrevText"><RadzenIcon Icon="chevron_left" /></button>
+                    <button type="button" tabindex="0" class="rz-button rz-next" @onclick=@OnNext title="@NextText" aria-label="@NextText"><RadzenIcon Icon="chevron_right" /></button>
                     }
                     @if (ShowTodayButton)
                     {
-                    <button type="button" tabindex="0" class="rz-button rz-today" @onclick=@OnToday title="@TodayText">@TodayText</button>
+                    <button type="button" tabindex="0" class="rz-button rz-today" @onclick=@OnToday title="@TodayText" aria-label="@TodayText">@TodayText</button>
                     }
                 </div>
                 }
                 @if (ShowDateTitle)
                 {
-                <div class="rz-scheduler-nav-title">@SelectedView?.Title</div>
+                <div class="rz-scheduler-nav-title" aria-live="polite">@SelectedView?.Title</div>
                 }
                 <div class="rz-scheduler-nav-views">
                     @if (NavigationTemplate != null)
@@ -42,7 +42,7 @@
                     {
                         @foreach (var view in Views)
                         {
-                            <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text class="@($"{(IsSelected(view) ? " rz-state-active" : "")}")" />
+                            <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text aria-pressed="@(IsSelected(view) ? "true" : "false")" class="@($"{(IsSelected(view) ? " rz-state-active" : "")}")" />
                         }
                     }
                 </div>

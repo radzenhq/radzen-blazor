@@ -19,7 +19,7 @@
         <RadzenStack class="rz-p-0 playground" Orientation="Orientation.Vertical" Gap="0" Style="height: 100%;">
             <RadzenRow Gap="0.5rem" RowGap="0" class="rz-p-2 rz-ps-lg-4 rz-border-bottom" AlignItems="AlignItems.Center" Style="min-height: 48px;">
                 <RadzenColumn>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0" >
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-m-0" >
                         Source Code
                     </RadzenText>
                 </RadzenColumn>
@@ -32,8 +32,8 @@
                 <RadzenColumn Size="12">
                     <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.Small" class="rz-mb-2">@error</RadzenAlert>
                     <RadzenAlert Visible=@(saveSuccess) AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.Small" class="rz-mb-2">
-                        <RadzenText TextStyle="TextStyle.Subtitle1">Snippet saved! Share this URL:</RadzenText>
-                        <RadzenText TextStyle="TextStyle.Subtitle2">@currentUrl</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Snippet saved! Share this URL:</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P">@currentUrl</RadzenText>
                         <RadzenButton Click="CopyUrl" Text="Copy" Icon="content_copy" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Variant="Variant.Flat" />
                     </RadzenAlert>
                 </RadzenColumn>
@@ -48,7 +48,7 @@
         <RadzenStack class="rz-p-0 playground" Orientation="Orientation.Vertical" Gap="0" Style="height: 100%;">
             <RadzenRow Gap="0.5rem" RowGap="0" class="rz-p-2 rz-ps-lg-4 rz-border-bottom" AlignItems="AlignItems.Center"  Style="min-height: 48px;">
                 <RadzenColumn>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0" >
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-m-0" >
                         Preview
                     </RadzenText>
                 </RadzenColumn>

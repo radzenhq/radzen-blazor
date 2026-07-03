@@ -77,6 +77,10 @@
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DataGrid." },
         new KeyboardShortcut { Key = "DownArrow", Action = "Focus next DataGrid item." },
         new KeyboardShortcut { Key = "UpArrow", Action = "Focus previous DataGrid item." },
+        new KeyboardShortcut { Key = "Home", Action = "Focus first DataGrid item on the current page." },
+        new KeyboardShortcut { Key = "End", Action = "Focus last DataGrid item on the current page." },
+        new KeyboardShortcut { Key = "PageDown", Action = "Move focus down by a page of DataGrid items." },
+        new KeyboardShortcut { Key = "PageUp", Action = "Move focus up by a page of DataGrid items." },
         new KeyboardShortcut { Key = "Enter or Space", Action = "Select the focused DataGrid item." },
         new KeyboardShortcut { Key = "Shift + Enter or Space", Action = "Select/deselect multiple DataGrid items." },
         new KeyboardShortcut { Key = "LeftArrow when header row is focused", Action = "Focus previous DataGrid header cell." },
@@ -89,8 +93,10 @@
         new KeyboardShortcut { Key = "Shift + Tab in an opened DataGrid column filter popup", Action = "Navigate backward across available filter options." },
         new KeyboardShortcut { Key = "Esc in an opened DataGrid column filter popup", Action = "Close the DataGrid column filter popup." },
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DataGrid pager." },
-        new KeyboardShortcut { Key = "LeftArrow on focused pager", Action = "Focus previous DataGrid pager page." },
-        new KeyboardShortcut { Key = "RightArrow on focused pager", Action = "Focus next DataGrid pager page." },
-        new KeyboardShortcut { Key = "Enter or Space on focused pager", Action = "Go to the focused DataGrid pager page." }
+        new KeyboardShortcut { Key = "LeftArrow on focused pager", Action = "Focus previous DataGrid pager button." },
+        new KeyboardShortcut { Key = "RightArrow on focused pager", Action = "Focus next DataGrid pager button." },
+        new KeyboardShortcut { Key = "Home on focused pager", Action = "Focus first DataGrid pager button." },
+        new KeyboardShortcut { Key = "End on focused pager", Action = "Focus last DataGrid pager button." },
+        new KeyboardShortcut { Key = "Enter or Space on focused pager", Action = "Activate the focused DataGrid pager button." }
     };
 }

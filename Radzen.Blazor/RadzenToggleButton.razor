@@ -31,7 +31,7 @@
                 {
                     @if (!string.IsNullOrEmpty(GetIcon()))
                     {
-                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@GetIcon()</i>
+                        <i class="notranslate rz-button-icon-left rzi" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@GetIcon()</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {

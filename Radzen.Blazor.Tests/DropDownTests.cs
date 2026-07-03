@@ -975,6 +975,106 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDown_Multiple_AriaLabel_ReflectsSelectedItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[]
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+                new DataItem { Text = "Item 3", Id = 3 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, new List<int> { 1, 3 });
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+
+            Assert.Equal("Item 1,Item 3", combobox.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void DropDown_Multiple_AriaLabel_ShowsCount_WhenAboveMaxSelectedLabels()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[]
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+                new DataItem { Text = "Item 3", Id = 3 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.MaxSelectedLabels, 2);
+                parameters.Add(p => p.Value, new List<int> { 1, 2, 3 });
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+
+            Assert.Equal($"3 {component.Instance.SelectedItemsText}", combobox.GetAttribute("aria-label"));
+        }
+
+        [Fact]
+        public void DropDown_Chips_RemoveButtons_AreNotTabbable()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[]
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, true);
+                parameters.Add(p => p.Value, new List<int> { 1, 2 });
+            });
+
+            var buttons = component.FindAll(".rz-chip button");
+
+            Assert.NotEmpty(buttons);
+            Assert.All(buttons, b => Assert.Equal("-1", b.GetAttribute("tabindex")));
+        }
+
+        [Fact]
+        public void DropDown_HiddenHelperInput_IsHiddenFromAccessibilityTree()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var hiddenInput = component.Find(".rz-helper-hidden-accessible input");
+
+            Assert.Equal("true", hiddenInput.GetAttribute("aria-hidden"));
+            Assert.Equal("-1", hiddenInput.GetAttribute("tabindex"));
+        }
+
+        [Fact]
         public void DropDown_WithoutConsumerAriaLabel_FallsBackToComputedAriaLabel()
         {
             using var ctx = new TestContext();

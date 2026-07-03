@@ -2,7 +2,7 @@
 
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">Language</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-mb-0">Language</RadzenText>
         <RadzenSelectBar @bind-Value="@culture" Data="@cultures" TextProperty="Name" ValueProperty="Culture" Size="ButtonSize.Small" />
     </RadzenStack>
 
@@ -22,11 +22,11 @@
 
         <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Start">
             <RadzenStack Gap="0.5rem">
-                <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">DatePicker</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-mb-0">DatePicker</RadzenText>
                 <RadzenDatePicker @bind-Value="@date" Inline="true" ShowTime="true" />
             </RadzenStack>
             <RadzenStack Gap="0.5rem">
-                <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">Login</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-mb-0">Login</RadzenText>
                 <RadzenTemplateForm Data=@("Localization")>
                     <RadzenLogin AllowRegister="true" AllowResetPassword="true" AllowRememberMe="true" />
                 </RadzenTemplateForm>

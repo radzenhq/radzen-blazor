@@ -2,18 +2,16 @@
 
 @if (DataList != null && !DataList.WrapItems)
 {
-    <ul class="rz-datalist-data">
-        <li>
-            @if (DataList.Template != null)
-            {
-                @DataList.Template(Item!)
-            }
-            else
-            {
-                <span>Template</span>
-            }
-        </li>
-    </ul>
+    <li>
+        @if (DataList.Template != null)
+        {
+            @DataList.Template(Item!)
+        }
+        else
+        {
+            <span>Template</span>
+        }
+    </li>
 }
 else
 {

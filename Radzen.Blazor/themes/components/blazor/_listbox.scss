@@ -53,6 +53,10 @@ $listbox-header-icon-margin: 0 !default;
 .rz-listbox-list {
   margin: 0;
   padding: 0;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .rz-listbox-item {

@@ -2,7 +2,7 @@
 @implements IDisposable
 @inject IJSRuntime JSRuntime
 
-<li @ref="element" @attributes=@Attributes class=@Class style=@ItemStyle tabindex="@(IsActive ? "0" : "-1")" inert="@(!IsActive)">
+<li @ref="element" role="group" aria-roledescription="slide" aria-label="@(Carousel?.GetSlideAriaLabel(this))" @attributes=@Attributes class=@Class style=@ItemStyle tabindex="@(IsActive ? "0" : "-1")" inert="@(!IsActive)">
     @ChildContent
     <div class="rz-carousel-snapper"></div>
 </li>

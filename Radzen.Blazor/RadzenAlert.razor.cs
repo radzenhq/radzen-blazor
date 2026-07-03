@@ -126,6 +126,15 @@ namespace Radzen.Blazor
         [Parameter]
         public AlertSize Size { get; set; } = AlertSize.Medium;
 
+        private string? closeAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria-label of the close button.
+        /// </summary>
+        /// <value>The close button aria-label.</value>
+        [Parameter]
+        public string CloseAriaLabel { get => closeAriaLabel ?? Localize(nameof(RadzenStrings.Alert_CloseAriaLabel)); set => closeAriaLabel = value; }
+
         ButtonSize GetCloseButtonSize()
         {
             return Size == AlertSize.ExtraSmall ? ButtonSize.ExtraSmall : ButtonSize.Small;

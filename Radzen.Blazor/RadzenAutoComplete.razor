@@ -46,7 +46,7 @@
                             hasItems = true;
                             itemIndex++;
                             <li role="option" id="@ItemId(itemIndex)" class="rz-autocomplete-list-item" tabindex="-1"
-                                aria-selected="@(object.Equals(item, SelectedItem) ? "true" : "false")"
+                                aria-selected="@(selectedIndex >= 0 ? (itemIndex == selectedIndex ? "true" : "false") : (object.Equals(item, SelectedItem) ? "true" : "false"))"
                                 @onclick="@(() => OnSelectItem(item))" onmousedown="Radzen.activeElement = null">
                                 <span>
                                     @if (Template != null)

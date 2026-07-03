@@ -16,7 +16,7 @@ namespace Radzen.Blazor
     /// RadzenCarousel displays one item at a time with automatic or manual advancement and various navigation options.
     /// Perfect for image galleries, product showcases, hero sections, or any content that benefits from sequential presentation.
     /// Features automatic advancement with configurable interval, Previous/Next buttons with customizable icons and text, dot indicators or page numbers for direct item selection,
-    /// infinite loop for continuous cycling from last to first item, keyboard control (Arrow keys for navigation, Page Up/Down for first/last), swipe gestures on touch devices,
+    /// infinite loop for continuous cycling from last to first item, keyboard control (Left/Right Arrow keys for navigation), swipe gestures on touch devices,
     /// and customization of button styles, pager position (top/bottom/overlay), and navigation visibility.
     /// Items are defined using RadzenCarouselItem components. Each item can contain images, text, or complex layouts. Use Auto property to enable automatic cycling, and Interval to control slide duration.
     /// </summary>
@@ -98,7 +98,14 @@ namespace Radzen.Blazor
         {
             if (Auto)
             {
-                await Reset();
+                if (hovered || focused)
+                {
+                    Stop();
+                }
+                else
+                {
+                    await Reset();
+                }
             }
 
             await GoTo(index);
@@ -227,6 +234,106 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string PagerButtonAriaLabelFormat { get => pagerButtonAriaLabelFormat ?? Localize(nameof(RadzenStrings.Carousel_PagerButtonAriaLabelFormat)); set => pagerButtonAriaLabelFormat = value; }
+
+        private string? prevAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria-label of the previous button.
+        /// </summary>
+        [Parameter]
+        public string PrevAriaLabel { get => prevAriaLabel ?? Localize(nameof(RadzenStrings.Carousel_PrevAriaLabel)); set => prevAriaLabel = value; }
+
+        private string? nextAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria-label of the next button.
+        /// </summary>
+        [Parameter]
+        public string NextAriaLabel { get => nextAriaLabel ?? Localize(nameof(RadzenStrings.Carousel_NextAriaLabel)); set => nextAriaLabel = value; }
+
+        private string? slideAriaLabelFormat;
+
+        /// <summary>
+        /// Gets or sets the slide aria-label format. Use {0} for the 1-based slide index and {1} for the total slide count.
+        /// </summary>
+        [Parameter]
+        public string SlideAriaLabelFormat { get => slideAriaLabelFormat ?? Localize(nameof(RadzenStrings.Carousel_SlideAriaLabelFormat)); set => slideAriaLabelFormat = value; }
+
+        /// <summary>
+        /// Gets or sets the aria-label of the carousel container.
+        /// </summary>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        internal string GetSlideAriaLabel(RadzenCarouselItem item)
+        {
+            return string.Format(System.Globalization.CultureInfo.CurrentCulture, SlideAriaLabelFormat, items.IndexOf(item) + 1, items.Count);
+        }
+
+        bool hovered;
+        bool focused;
+        bool preventKeyPress;
+
+        void UpdateAutoCycle()
+        {
+            if (!Auto)
+            {
+                return;
+            }
+
+            if (hovered || focused)
+            {
+                Stop();
+            }
+            else
+            {
+                Start();
+            }
+        }
+
+        void OnCarouselMouseEnter()
+        {
+            hovered = true;
+            UpdateAutoCycle();
+        }
+
+        void OnCarouselMouseLeave()
+        {
+            hovered = false;
+            UpdateAutoCycle();
+        }
+
+        void OnCarouselFocusIn()
+        {
+            focused = true;
+            UpdateAutoCycle();
+        }
+
+        void OnCarouselFocusOut()
+        {
+            focused = false;
+            UpdateAutoCycle();
+        }
+
+        async Task OnCarouselKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (key == "ArrowLeft")
+            {
+                preventKeyPress = true;
+                await Prev();
+            }
+            else if (key == "ArrowRight")
+            {
+                preventKeyPress = true;
+                await Next();
+            }
+            else
+            {
+                preventKeyPress = false;
+            }
+        }
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)

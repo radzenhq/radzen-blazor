@@ -69,8 +69,10 @@
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Rating item." },
-        new KeyboardShortcut { Key = "Shift + Tab", Action = "Navigate to a previous Rating item." },
-        new KeyboardShortcut { Key = "Space or Enter", Action = "Select a focused Rating item." }
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to the clear button or the selected Rating star." },
+        new KeyboardShortcut { Key = "Shift + Tab", Action = "Navigate to the previous focusable element." },
+        new KeyboardShortcut { Key = "RightArrow or UpArrow", Action = "Select and focus the next Rating star." },
+        new KeyboardShortcut { Key = "LeftArrow or DownArrow", Action = "Select and focus the previous Rating star." },
+        new KeyboardShortcut { Key = "Space or Enter", Action = "Select the focused Rating star or clear the value when the clear button is focused." }
     };
 }

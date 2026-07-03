@@ -1,8 +1,8 @@
-﻿@inherits RadzenComponent
+@inherits RadzenComponent
 
 @if (Visible)
 {
-    <div class="@GetCssClass()" id="@GetId()" style="@Style" @attributes="@Attributes">
+    <li class="@GetCssClass()" id="@GetId()" style="@Style" @attributes="@Attributes" aria-current="@ItemAriaCurrent">
         @if (ChildContent != null)
         {
             @ChildContent
@@ -32,5 +32,5 @@
                 <span class="rz-label" aria-current="page">@Text</span>
             }
         }
-    </div>
+    </li>
 }

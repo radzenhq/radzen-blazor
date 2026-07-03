@@ -4,8 +4,17 @@
     align-items: center;
 }
 
+.rz-breadcrumb-list {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .rz-breadcrumb-item + .rz-breadcrumb-item::before {
-    content: '»';
+    content: '»' / '';
     display: inline-block;
     padding-inline-start: 0.5rem;
     padding-inline-end: 0.5rem;

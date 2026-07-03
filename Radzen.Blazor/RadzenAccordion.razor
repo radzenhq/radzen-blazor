@@ -23,7 +23,7 @@
                 role="heading" aria-level="@AriaLevel">
             <button type="button" @ref="@item.HeaderElement" @onclick="@((args) => SelectItem(item))"
                     @onkeydown="@(args => OnHeaderKeyDown(args, item))" @onkeydown:preventDefault="preventKeyPress" disabled="@item.Disabled"
-                    aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)"
+                    aria-label="@(string.IsNullOrEmpty(item.Text) ? ItemAriaLabel(i, item) : null)" title="@(string.IsNullOrEmpty(item.Text) ? ItemTitle(i, item) : null)"
                     id="@accordionId" aria-controls="@($"{accordionId}-content")" aria-expanded="@(item.GetSelected() ? "true" : "false")">
                 <span class="@ToggleIconClass(item)">keyboard_arrow_down</span>
                 @if (!string.IsNullOrEmpty(item.Icon))

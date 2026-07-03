@@ -119,14 +119,15 @@
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate to the SplitButton." },
-        new KeyboardShortcut { Key = "Space or Enter", Action = "Trigger the main SplitButton action (or, when AlwaysOpenPopup is enabled, open the popup and focus the first item)." },
-        new KeyboardShortcut { Key = "DownArrow on closed popup", Action = "Open the popup and focus the first item." },
-        new KeyboardShortcut { Key = "UpArrow on closed popup", Action = "Open the popup and focus the last item." },
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to the main SplitButton action button or the menu toggle button." },
+        new KeyboardShortcut { Key = "Space or Enter on the action button", Action = "Trigger the main SplitButton action (or, when AlwaysOpenPopup is enabled, open the popup and focus the first item)." },
+        new KeyboardShortcut { Key = "Space or Enter on the menu toggle button", Action = "Open the popup and focus the first item." },
+        new KeyboardShortcut { Key = "DownArrow on the menu toggle button", Action = "Open the popup and focus the first item." },
+        new KeyboardShortcut { Key = "UpArrow on the menu toggle button", Action = "Open the popup and focus the last item." },
         new KeyboardShortcut { Key = "DownArrow or UpArrow in an opened popup", Action = "Focus next or previous SplitButton item." },
         new KeyboardShortcut { Key = "Home or End in an opened popup", Action = "Focus first or last SplitButton item." },
-        new KeyboardShortcut { Key = "Space or Enter in an opened popup", Action = "Activate the focused SplitButton item and close the popup, or trigger the main action if no item is focused." },
-        new KeyboardShortcut { Key = "Escape", Action = "Close the SplitButton popup." },
+        new KeyboardShortcut { Key = "Space or Enter in an opened popup", Action = "Activate the focused SplitButton item and close the popup." },
+        new KeyboardShortcut { Key = "Escape", Action = "Close the SplitButton popup and return focus to the menu toggle button." },
         new KeyboardShortcut { Key = "Alphanumeric in an opened popup", Action = "Focus next SplitButton item starting with typed key." }
     };
 }

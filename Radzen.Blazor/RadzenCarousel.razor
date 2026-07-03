@@ -4,26 +4,30 @@
 <CascadingValue Value=this>
 @if (Visible)
 {
-    <section @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0">
+    <section @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0"
+             aria-roledescription="carousel" aria-label="@AriaLabel"
+             @onmouseenter="@OnCarouselMouseEnter" @onmouseleave="@OnCarouselMouseLeave"
+             @onfocusin="@OnCarouselFocusIn" @onfocusout="@OnCarouselFocusOut"
+             @onkeydown="@OnCarouselKeyDown" @onkeydown:preventDefault=preventKeyPress>
         @if(AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
         {
-        <RadzenStack class="rz-carousel-pager rz-carousel-pager-top" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" role="list">
+        <RadzenStack class="rz-carousel-pager rz-carousel-pager-top" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
             @for (var p = 0; p < PageCount; p++)
             {
                 var pageIndex = p;
                 var itemIndex = pageIndex * ItemsPerPage;
-                <button type="button" role="listitem" @onclick="@(args => Navigate(itemIndex))" class="rz-carousel-pager-button @(pageIndex == ActivePage ? "rz-state-active" : "")" aria-label="@string.Format(PagerButtonAriaLabelFormat, pageIndex + 1)"></button>
+                <button type="button" @onclick="@(args => Navigate(itemIndex))" class="rz-carousel-pager-button @(pageIndex == ActivePage ? "rz-state-active" : "")" aria-label="@string.Format(PagerButtonAriaLabelFormat, pageIndex + 1)" aria-current="@(pageIndex == ActivePage ? "true" : null)"></button>
             }
         </RadzenStack>
         }
         @if(AllowNavigation)
         {
         <RadzenButton class="rz-carousel-prev" Icon="@PrevIcon" Text="@PrevText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
-            Click=@Prev />
+            aria-label="@(string.IsNullOrEmpty(PrevText) ? PrevAriaLabel : null)" Click=@Prev />
         <RadzenButton class="rz-carousel-next" Icon="@NextIcon" Text="@NextText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
-            Click=@Next/>
+            aria-label="@(string.IsNullOrEmpty(NextText) ? NextAriaLabel : null)" Click=@Next/>
         }
-        <ul @ref="itemsElement" class="rz-carousel-items @(AllowScroll ? "" : "rz-carousel-no-scroll")"
+        <ul @ref="itemsElement" role="presentation" class="rz-carousel-items @(AllowScroll ? "" : "rz-carousel-no-scroll")"
                  @ontouchstart="OnTouchStart"
                  @ontouchend="OnTouchEnd"
                  @ontouchcancel="OnTouchCancel">
@@ -31,12 +35,12 @@
         </ul>
         @if(AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
-        <RadzenStack class="rz-carousel-pager rz-carousel-pager-bottom" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap" role="list">
+        <RadzenStack class="rz-carousel-pager rz-carousel-pager-bottom" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
             @for (var p = 0; p < PageCount; p++)
             {
                 var pageIndex = p;
                 var itemIndex = pageIndex * ItemsPerPage;
-                <button type="button" role="listitem" @onclick="@(args => Navigate(itemIndex))" class="rz-carousel-pager-button @(pageIndex == ActivePage ? "rz-state-active" : "")" aria-label="@string.Format(PagerButtonAriaLabelFormat, pageIndex + 1)"></button>
+                <button type="button" @onclick="@(args => Navigate(itemIndex))" class="rz-carousel-pager-button @(pageIndex == ActivePage ? "rz-state-active" : "")" aria-label="@string.Format(PagerButtonAriaLabelFormat, pageIndex + 1)" aria-current="@(pageIndex == ActivePage ? "true" : null)"></button>
             }
         </RadzenStack>
         }

@@ -13,7 +13,9 @@
     var visibleColumns = columns.Where(c => c.GetVisible()).ToList();
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()"
-        role="grid"
+        role="@(LoadChildData.HasDelegate ? "treegrid" : "grid")"
+        aria-multiselectable="@(SelectionMode == DataGridSelectionMode.Multiple ? "true" : null)"
+        aria-rowcount="@GridAriaRowCount()"
         aria-activedescendant="@GetActiveDescendantId()"
         @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="stopKeydownPropagation" tabindex="@TabIndex"
         @onblur=@OnBlur @oncontextmenu=OnContextMenu @oncontextmenu:preventDefault="@this.ContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.ContextMenu.HasDelegate">
@@ -672,6 +674,7 @@
                     {
                         <span class="rz-cell-toggle">
                             <button type="button" tabindex="-1" id="@(GetId() + "exp")" aria-label="@ExpandChildItemAriaLabel"
+                                    aria-expanded="@(this.IsRowExpanded(Item) ? "true" : "false")"
                                     class="rz-button rz-button-sm rz-button-icon-only rz-variant-text rz-base rz-shade-default"
                                     style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))"
                                     @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation="true">

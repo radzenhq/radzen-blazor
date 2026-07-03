@@ -17,14 +17,14 @@
         <RadzenRow>
             <RadzenColumn Size="12" SizeLG="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Memory Statistics</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Memory Statistics</RadzenText>
                     <RadzenRow>
                         <RadzenColumn Size="6">
-                            <RadzenText TextStyle="TextStyle.H4">@activeSessionsCount</RadzenText>
+                            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.P">@activeSessionsCount</RadzenText>
                             <RadzenText TextStyle="TextStyle.Caption">Active Sessions</RadzenText>
                         </RadzenColumn>
                         <RadzenColumn Size="6">
-                            <RadzenText TextStyle="TextStyle.H4">@totalMessagesCount</RadzenText>
+                            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.P">@totalMessagesCount</RadzenText>
                             <RadzenText TextStyle="TextStyle.Caption">Total Messages</RadzenText>
                         </RadzenColumn>
                     </RadzenRow>
@@ -32,7 +32,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Session Management</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Session Management</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical">
                         <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap">
                             <RadzenButton Text="New Session" Icon="add" ButtonStyle="ButtonStyle.Primary" Click="@OnNewSession" Variant="Variant.Flat" />
@@ -48,7 +48,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Session History</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Session History</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical">
                         <RadzenDropDown TValue="string" Data="@sessionIds" @bind-Value="@selectedSessionId" Placeholder="Select a session to load" Style="width: 100%;" />
                         <RadzenButton Text="Load Selected Session" Icon="folder_open" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat"
@@ -60,10 +60,10 @@
     </RadzenColumn>
     <RadzenColumn Size="12">
         <RadzenCard Variant="Variant.Outlined">
-            <RadzenText TextStyle="TextStyle.Subtitle1">Memory Features</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Memory Features</RadzenText>
             <RadzenRow>
                 <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenText TextStyle="TextStyle.H6">Conversation Memory</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Conversation Memory</RadzenText>
                     <ul>
                         <li>The AI remembers all previous messages in the conversation</li>
                         <li>Context is maintained across multiple questions</li>
@@ -72,7 +72,7 @@
                     </ul>
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenText TextStyle="TextStyle.H6">Session Management</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Session Management</RadzenText>
                     <ul>
                         <li>Create new sessions for different conversations</li>
                         <li>Switch between different conversation contexts</li>

@@ -11,7 +11,7 @@
     <div style="width: 50%; padding: 16px; text-align: center;">
     @if (!string.IsNullOrEmpty(Path.GetExtension(selectedFile)))
     {
-        <h4>Preview</h4>
+        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Preview</RadzenText>
         <RadzenImage Path=@(selectedFile) style="max-width: 100%" AlternateText="Selected image file preview" />
     }
     </div>

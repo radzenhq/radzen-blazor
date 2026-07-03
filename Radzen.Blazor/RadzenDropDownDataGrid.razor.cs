@@ -523,6 +523,33 @@ namespace Radzen.Blazor
         /// <returns>The active row identifier or null.</returns>
         internal string? ActiveDescendantId => selectedIndex >= 0 && grid != null ? $"{grid.GridId()}-active-item" : null;
 
+        internal string GridID => $"{PopupID}-grid";
+
+        internal string? SelectedAriaLabel
+        {
+            get
+            {
+                if (!Multiple)
+                {
+                    return internalValue != null ? $"{PropertyAccess.GetItemOrValueFromProperty(internalValue, TextProperty)}" : EmptyAriaLabel;
+                }
+
+                var itemsToUse = SelectedValue is IEnumerable && SelectedValue is not string ? ((IEnumerable)SelectedValue).Cast<object>().ToHashSet() : selectedItems;
+
+                if (itemsToUse.Count == 0)
+                {
+                    return EmptyAriaLabel;
+                }
+
+                if (itemsToUse.Count < MaxSelectedLabels)
+                {
+                    return string.Join(Separator, itemsToUse.Select(i => $"{PropertyAccess.GetItemOrValueFromProperty(i, TextProperty)}"));
+                }
+
+                return $"{itemsToUse.Count} {SelectedItemsText}";
+            }
+        }
+
         /// <summary>
         /// Gets or sets the number of maximum selected labels.
         /// </summary>
@@ -1098,6 +1125,12 @@ namespace Radzen.Blazor
                 {
                     selectedIndex = -1;
                     await OnSelectItem(null, true);
+                }
+
+                if (Multiple && !isFilter && (selectedItems.Count > 0 || SelectedValue is IEnumerable && SelectedValue is not string))
+                {
+                    selectedIndex = -1;
+                    await Clear();
                 }
 
                 if (AllowFiltering && isFilter)

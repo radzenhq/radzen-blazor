@@ -941,6 +941,12 @@ namespace Radzen
                     await OnSelectItem(null, true);
                 }
 
+                if (Multiple && !isFilter && selectedItems.Count > 0)
+                {
+                    selectedIndex = -1;
+                    await ClearAll();
+                }
+
                 if (AllowFiltering && isFilter)
                 {
                     Debounce(DebounceFilter, FilterDelay);

@@ -338,6 +338,33 @@ namespace Radzen.Blazor
         [Parameter]
         public string CustomText { get => customText ?? Localize(nameof(RadzenStrings.DataFilter_CustomText)); set => customText = value; }
 
+        private string? propertyAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria-label of the filter property dropdown.
+        /// </summary>
+        /// <value>The aria-label of the filter property dropdown.</value>
+        [Parameter]
+        public string PropertyAriaLabel { get => propertyAriaLabel ?? Localize(nameof(RadzenStrings.DataFilter_PropertyAriaLabel)); set => propertyAriaLabel = value; }
+
+        private string? filterOperatorAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria-label of the filter operator dropdown.
+        /// </summary>
+        /// <value>The aria-label of the filter operator dropdown.</value>
+        [Parameter]
+        public string FilterOperatorAriaLabel { get => filterOperatorAriaLabel ?? Localize(nameof(RadzenStrings.DataFilter_FilterOperatorAriaLabel)); set => filterOperatorAriaLabel = value; }
+
+        private string? filterValueAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria-label of the filter value editor.
+        /// </summary>
+        /// <value>The aria-label of the filter value editor.</value>
+        [Parameter]
+        public string FilterValueAriaLabel { get => filterValueAriaLabel ?? Localize(nameof(RadzenStrings.DataFilter_FilterValueAriaLabel)); set => filterValueAriaLabel = value; }
+
         /// <summary>
         /// Gets or sets a value indicating whether the columns can be filtered.
         /// </summary>

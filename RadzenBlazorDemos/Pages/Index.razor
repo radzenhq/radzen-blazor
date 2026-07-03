@@ -38,7 +38,7 @@
                 <RadzenColumn Size="8" SizeSM="5">
                   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@(() => demoSidebarExpanded = !demoSidebarExpanded)" />
-                    <RadzenText TextStyle="TextStyle.H6" class="rz-m-0" Style="color: inherit;">My Dashboard</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" class="rz-m-0" Style="color: inherit;">My Dashboard</RadzenText>
                   </RadzenStack>
                 </RadzenColumn>
                 <RadzenColumn Size="4" SizeSM="7">
@@ -91,7 +91,7 @@
                       <RadzenStack JustifyContent="JustifyContent.SpaceBetween" class="rz-h-100" Gap="0.5rem;">
                         <RadzenText TextStyle="TextStyle.Overline">Overdue</RadzenText>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
-                          <RadzenText TextStyle="TextStyle.DisplayH3" Style="line-height: 0.9; color: var(--rz-series-3)">@overdueTasks</RadzenText>
+                          <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" Style="line-height: 0.9; color: var(--rz-series-3)">@overdueTasks</RadzenText>
                           <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                             <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-series-3)">need attention</RadzenText>
                           </RadzenStack>
@@ -104,7 +104,7 @@
                       <RadzenStack JustifyContent="JustifyContent.SpaceBetween" class="rz-h-100" Gap="0.5rem;">
                         <RadzenText TextStyle="TextStyle.Overline">Completed Today</RadzenText>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
-                          <RadzenText TextStyle="TextStyle.DisplayH3" Style="line-height: 0.9; color: var(--rz-series-1">@tasksCompletedToday</RadzenText>
+                          <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" Style="line-height: 0.9; color: var(--rz-series-1">@tasksCompletedToday</RadzenText>
                           <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                             <RadzenIcon Icon="trending_up" Style="color: var(--rz-series-1)" />
                             <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-series-1)">+3 from yesterday</RadzenText>
@@ -118,7 +118,7 @@
                       <RadzenStack JustifyContent="JustifyContent.SpaceBetween" class="rz-h-100" Gap="0.5rem;">
                         <RadzenText TextStyle="TextStyle.Overline">In Progress</RadzenText>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
-                          <RadzenText TextStyle="TextStyle.DisplayH3" Style="line-height: 0.9; color: var(--rz-series-2)">@tasksInProgress</RadzenText>
+                          <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" Style="line-height: 0.9; color: var(--rz-series-2)">@tasksInProgress</RadzenText>
                           <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                             <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-series-2)">active tasks</RadzenText>
                           </RadzenStack>
@@ -131,7 +131,7 @@
                       <RadzenStack JustifyContent="JustifyContent.SpaceBetween" class="rz-h-100" Gap="0.5rem;">
                         <RadzenText TextStyle="TextStyle.Overline">Upcoming Deadlines</RadzenText>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
-                          <RadzenText TextStyle="TextStyle.DisplayH3" Style="line-height: 0.9;">@upcomingDeadlines</RadzenText>
+                          <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.P" Style="line-height: 0.9;">@upcomingDeadlines</RadzenText>
                           <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                             <RadzenText TextStyle="TextStyle.Body2">next 7 days</RadzenText>
                           </RadzenStack>
@@ -274,7 +274,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="speed" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Built in C#/Razor" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Built in C#/Razor" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Implemented in C#/Razor with no wrappers around external JavaScript libraries or frameworks." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -283,7 +283,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="extension" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Open and flexible" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Open and flexible" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Open source under the MIT license and easy to extend. No vendor lock-in." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -292,7 +292,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="devices_other" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Responsive layouts" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600"  />
+                  <RadzenText Text="Responsive layouts" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600"  />
                   <RadzenText Text="Adjusts automatically to any screen size or device." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -301,7 +301,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="accessibility_new" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Accessibility" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Accessibility" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Includes ARIA support and full keyboard navigation." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -310,7 +310,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="sync_alt" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="RTL" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="RTL" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Supports right-to-left layouts for multilingual apps." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -319,7 +319,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="verified" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Consistent quality" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Consistent quality" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Actively maintained and tested by the Radzen team." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -344,7 +344,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="palette" class="rz-color-series-1 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Premium Themes & Swatches" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Premium Themes & Swatches" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Ensure a consistent, polished look that matches your brand and supports accessibility." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -353,7 +353,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="brush" class="rz-color-series-1 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Theme Editor" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Theme Editor" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Customize colors, typography, and component properties visually. No manual CSS required." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -362,7 +362,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="widgets" class="rz-color-series-1 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Reusable UI Blocks" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600"  />
+                  <RadzenText Text="Reusable UI Blocks" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600"  />
                   <RadzenText Text="Assemble pages quickly from ready-made layouts, forms, and dashboards." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -371,7 +371,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="dashboard_customize" class="rz-color-series-1 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Complete App Templates" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Complete App Templates" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Start faster with project templates that cover common business scenarios." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -380,7 +380,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="format_shapes" class="rz-color-series-2 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Visual Design-Time Experience" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Visual Design-Time Experience" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Design pages visually in your Visual Studio or the standalone Radzen Blazor Studio IDE." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -389,7 +389,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="assistant" class="rz-color-series-2 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Page & Layout Wizards" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Page & Layout Wizards" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Use guided wizards to build new pages and layouts quickly and consistently." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -398,7 +398,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="dns" class="rz-color-series-2 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="CRUD" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="CRUD" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Generate create, read, update, and delete pages from your data sources in minutes." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -407,7 +407,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="filter_alt" class="rz-color-series-2 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Query Builder" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Query Builder" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Sort and Filter your data when you bind it to components." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -416,7 +416,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="schema" class="rz-color-series-3 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Visual Method Editor" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Visual Method Editor" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Define and edit custom logic visually with a clean, intuitive interface." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -425,7 +425,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="bug_report" class="rz-color-series-3 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Debugging" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Debugging" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Run, test, and debug your applications without leaving the environment." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -434,7 +434,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="support" class="rz-color-series-3 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Dedicated Support" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Dedicated Support" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Get direct help from the Radzen team. Expert guidance when you need it most." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -443,7 +443,7 @@
               <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
                 <RadzenStack Gap="0.5rem">
                   <RadzenIcon Icon="auto_fix_high" class="rz-color-series-3 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
-                  <RadzenText Text="Priority Fixes & Feature Requests" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Priority Fixes & Feature Requests" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="TagName.P" Style="--rz-text-h6-font-weight: 600" />
                   <RadzenText Text="Subscribers receive priority handling for bug fixes and new feature requests." TextStyle="Radzen.Blazor.TextStyle.Body2" />
                 </RadzenStack>
               </RadzenCard>
@@ -467,7 +467,7 @@
                         </RadzenText>
                         <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
                           <RadzenStack Gap="0">
-                            <RadzenText Text="Miguel Reis" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-secondary-color" />
+                            <RadzenText Text="Miguel Reis" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" TagName="TagName.P" class="rz-m-0 rz-text-secondary-color" />
                             <RadzenText Text="R & D Project Manager at SIER Group" class="rz-m-0 rz-text-tertiary-color" />
                           </RadzenStack>
                         </RadzenStack>
@@ -488,7 +488,7 @@
                         </RadzenText>
                         <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
                           <RadzenStack Gap="0">
-                            <RadzenText Text="Carlos Carminati" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-secondary-color" />
+                            <RadzenText Text="Carlos Carminati" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" TagName="TagName.P" class="rz-m-0 rz-text-secondary-color" />
                             <RadzenText Text="Solution Architect at Mine IT" class="rz-m-0 rz-text-tertiary-color" />
                           </RadzenStack>
                         </RadzenStack>
@@ -509,7 +509,7 @@
                         </RadzenText>
                         <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
                           <RadzenStack Gap="0">
-                            <RadzenText Text="Maximilian Rogl" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-secondary-color" />
+                            <RadzenText Text="Maximilian Rogl" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" TagName="TagName.P" class="rz-m-0 rz-text-secondary-color" />
                             <RadzenText Text="Chief Product Owner at adventics GmbH" class="rz-m-0 rz-text-tertiary-color" />
                           </RadzenStack>
                         </RadzenStack>
