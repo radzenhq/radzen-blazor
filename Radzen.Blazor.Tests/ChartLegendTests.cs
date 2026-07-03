@@ -119,5 +119,24 @@ namespace Radzen.Blazor.Tests
             Assert.True(MarginTopOf(many.Markup) > MarginTopOf(single.Markup),
                 "A top legend with many wrapping series must reserve more vertical space than a single row.");
         }
+
+        [Fact]
+        public async Task LegendItem_LineSwatch_UsesCustomSeriesStroke()
+        {
+            using var ctx = CreateChartContext();
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenLegend>()
+                .AddChildContent<RadzenLineSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Stroke, "#6366f1")
+                    .Add(x => x.Data, SampleData)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            var line = chart.Find("line.rz-legend-item-line");
+            Assert.Equal("#6366f1", line.GetAttribute("stroke"));
+        }
     }
 }

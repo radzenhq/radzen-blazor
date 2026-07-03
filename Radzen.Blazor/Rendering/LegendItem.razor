@@ -5,7 +5,7 @@
         <g class="rz-series-@Index @Class">
             @if (ShowLine)
             {
-                <line class="rz-legend-item-line" x1="0" y1="@MarkerSize.ToInvariantString()" x2="@((MarkerSize * 2).ToInvariantString())" y2="@MarkerSize.ToInvariantString()" stroke-width="2" stroke-linecap="round"></line>
+                <line class="rz-legend-item-line" x1="0" y1="@MarkerSize.ToInvariantString()" x2="@((MarkerSize * 2).ToInvariantString())" y2="@MarkerSize.ToInvariantString()" stroke="@Color" stroke-width="2" stroke-linecap="round"></line>
                 <Marker X="@MarkerSize" Y="@MarkerSize" Type="@(MarkerType == MarkerType.None ? MarkerType.Circle : MarkerType)" Fill="@Color" Size="@(MarkerSize * 0.6)" />
             }
             else
