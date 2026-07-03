@@ -18,10 +18,12 @@
             return _ => { };
         }
 
-        var value = ComposeValue(categoryScale);
-        var category = ComposeCategory(valueScale);
-        var ticks = chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance);
-        var x0 = chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+        var vs = chart.GetInvertedValueScale(ValueAxisName);
+        var va = chart.GetValueAxis(ValueAxisName);
+        var value = ComposeValue(vs);
+        var category = ComposeCategory(chart.ValueScale);
+        var ticks = vs.Ticks(va.TickDistance);
+        var x0 = vs.Scale(Math.Max(0, ticks.Start));
         var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
         var barSeries = VisibleBarSeries;

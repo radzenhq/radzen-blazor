@@ -1,6 +1,40 @@
 
 @inherits RadzenChartComponentBase
-@if (YAxis?.Visible == true)
+@if (YAxis?.Visible == true && renderHorizontal)
+{
+    <g class="rz-axis rz-value-axis rz-value-axis-top">
+    <Line class="rz-line" X1="@Math.Min(x1, x2)" Y1="@axisY" X2="@Math.Max(x1, x2)" Y2="@axisY" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
+    @foreach (var idx in tickValues)
+    {
+        var value = scale?.Value(idx);
+        var x = scale?.Scale(idx) ?? 0;
+        var text = value != null && YAxis != null && scale != null ? YAxis.Format(scale, value) : "";
+
+        if (YAxis?.Ticks?.Template != null)
+        {
+            var context = new TickTemplateContext { Text = text, Value = value, X = x, Y = axisY };
+
+            <CategoryAxisTick X="@x" Y="@axisY" Text="@text" Stroke="@(YAxis.Ticks.Stroke ?? YAxis.Stroke)" StrokeWidth="@YAxis.Ticks.StrokeWidth" LineType="@YAxis.Ticks.LineType" TopSide="true">
+                @YAxis.Ticks.Template(context)
+            </CategoryAxisTick>
+        }
+        else if (!String.IsNullOrEmpty(text))
+        {
+            <CategoryAxisTick X="@x" Y="@axisY" Text="@text" Stroke="@(YAxis?.Ticks?.Stroke ?? YAxis?.Stroke)" StrokeWidth="@(YAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(YAxis?.Ticks?.LineType ?? LineType.Solid)" TopSide="true" />
+        }
+
+        if (YAxis?.GridLines?.Visible == true && idx > start)
+        {
+            <Line class="rz-grid-line" X1="@x" Y1="@Math.Min(gridY1, gridY2)" X2="@x" Y2="@Math.Max(gridY1, gridY2)" Stroke="@(YAxis.GridLines.Stroke)" StrokeWidth="@(YAxis.GridLines.StrokeWidth)" LineType="@(YAxis.GridLines.LineType)" />
+        }
+    }
+    @if (!String.IsNullOrEmpty(YAxis?.Title?.Text))
+    {
+        <CategoryAxisTitle X="@(Math.Abs(x2 - x1) / 2)" Y="@(axisY - horizontalSize + (YAxis?.Title?.Size ?? 0))" Text="@(YAxis?.Title?.Text ?? "")" />
+    }
+    </g>
+}
+else if (YAxis?.Visible == true)
 {
     <g class="rz-axis rz-value-axis @(RenderAsRightSide ? "rz-value-axis-right" : "")">
     <Line class="rz-line" X1="@axisX" Y1="@Math.Min(y1, y2)" X2="@axisX" Y2="@Math.Max(y1, y2)" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
@@ -57,12 +91,17 @@
     double y1;
     double y2;
     double axisX;
+    double axisY;
     double gridX1;
     double gridX2;
+    double gridY1;
+    double gridY2;
     double titleX;
+    double horizontalSize;
     ScaleBase? scale;
     bool isLogarithmic;
     bool isFlippedToRight;
+    bool renderHorizontal;
     private AxisBase? XAxis { get; set; }
     private AxisBase? YAxis { get; set; }
 
@@ -70,6 +109,39 @@
     {
         if (Chart == null)
         {
+            return;
+        }
+
+        renderHorizontal = IsRightSide && Chart.ShouldInvertAxes();
+
+        if (renderHorizontal)
+        {
+            var axis = Chart.GetValueAxis(AxisName);
+            YAxis = axis;
+            scale = Chart.GetValueScale(AxisName);
+
+            var horizontalTicks = scale.Ticks(axis.TickDistance);
+            start = horizontalTicks.Start;
+            end = horizontalTicks.End;
+            step = horizontalTicks.Step;
+            tickValues = scale.TickValues(axis.TickDistance).ToList();
+
+            x1 = scale.Scale(start);
+            x2 = scale.Scale(end);
+
+            var verticalTicks = Chart.ValueScale.Ticks(Chart.CategoryAxis.TickDistance);
+            gridY1 = Chart.ValueScale.Scale(verticalTicks.Start);
+            gridY2 = Chart.ValueScale.Scale(verticalTicks.End);
+
+            axisY = 0;
+            foreach (var entry in Chart.AdditionalValueAxes)
+            {
+                if (entry.Key == AxisName) break;
+                axisY -= entry.Value.MeasureHorizontal(Chart.GetValueScale(entry.Key));
+            }
+
+            horizontalSize = axis.MeasureHorizontal(scale);
+
             return;
         }
 

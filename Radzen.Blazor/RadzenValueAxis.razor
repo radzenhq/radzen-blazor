@@ -35,6 +35,16 @@
         return AxisMeasurer.YAxis(scale, this, Title);
     }
 
+    internal double MeasureHorizontal(ScaleBase scale)
+    {
+        if (Visible == false)
+        {
+            return 0;
+        }
+
+        return AxisMeasurer.XAxis(scale, this, Title);
+    }
+
     internal override double Size
     {
         get

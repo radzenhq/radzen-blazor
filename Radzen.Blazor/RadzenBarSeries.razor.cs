@@ -218,7 +218,7 @@ namespace Radzen.Blazor
                 return 0;
             }
 
-            var value = chart.CategoryScale.Compose(Value);
+            var value = chart.GetInvertedValueScale(ValueAxisName).Compose(Value);
             var x = value(item);
 
             return x;
@@ -233,7 +233,8 @@ namespace Radzen.Blazor
                 return string.Empty;
             }
 
-            return chart.ValueAxis.Format(chart.CategoryScale, chart.CategoryScale.Value(Value(item)));
+            var scale = chart.GetInvertedValueScale(ValueAxisName);
+            return chart.GetValueAxis(ValueAxisName).Format(scale, scale.Value(Value(item)));
         }
 
         /// <inheritdoc />
@@ -258,10 +259,11 @@ namespace Radzen.Blazor
                 return (default!, new Point());
             }
 
-            var value = ComposeValue(chart.CategoryScale);
+            var vs = chart.GetInvertedValueScale(ValueAxisName);
+            var value = ComposeValue(vs);
             var category = ComposeCategory(chart.ValueScale);
-            var ticks = chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance);
-            var x0 = chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+            var ticks = vs.Ticks(chart.GetValueAxis(ValueAxisName).TickDistance);
+            var x0 = vs.Scale(Math.Max(0, ticks.Start));
 
             var barSeries = VisibleBarSeries;
             var index = barSeries.IndexOf(this);
@@ -336,8 +338,9 @@ namespace Radzen.Blazor
             {
                 const double gap = 8;
                 const double verticalGap = 16;
-                var ticks = chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance);
-                var x0 = chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+                var vs = chart.GetInvertedValueScale(ValueAxisName);
+                var ticks = vs.Ticks(chart.GetValueAxis(ValueAxisName).TickDistance);
+                var x0 = vs.Scale(Math.Max(0, ticks.Start));
 
                 foreach (var d in Data)
                 {
@@ -361,7 +364,7 @@ namespace Radzen.Blazor
                         Anchor = new Point() { X = end, Y = anchorY },
                         Value = value,
                         TextAnchor = textAnchor,
-                        Text = chart.ValueAxis.Format(chart.CategoryScale, value)
+                        Text = chart.GetValueAxis(ValueAxisName).Format(vs, value)
                     });
                 }
             }

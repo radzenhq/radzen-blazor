@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 
@@ -475,6 +476,17 @@ namespace Radzen.Blazor
 
             return AdditionalValueAxes.TryGetValue(name, out var axis) ? axis : ValueAxis;
         }
+
+        internal ScaleBase GetInvertedValueScale(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return CategoryScale;
+            }
+
+            return AdditionalValueScales.TryGetValue(name, out var scale) ? scale : CategoryScale;
+        }
+
         internal void AddSeries(IChartSeries series)
         {
             if (!Series.Contains(series))
@@ -557,6 +569,8 @@ namespace Radzen.Blazor
                 visibleSeries.Add(invisibleSeries.Last());
             }
 
+            var invertAxes = ShouldInvertAxes();
+
             // Partition series: primary axis vs named axes
             var primarySeries = new List<IChartSeries>();
             var namedAxisSeries = new Dictionary<string, List<IChartSeries>>();
@@ -579,16 +593,30 @@ namespace Radzen.Blazor
                 }
             }
 
-            // All series contribute to category scale
+            // All series contribute to the shared category scale (bar-family series swap their transforms when axes are inverted)
             foreach (var series in visibleSeries)
             {
-                CategoryScale = series.TransformCategoryScale(CategoryScale);
+                if (invertAxes)
+                {
+                    ValueScale = series.TransformValueScale(ValueScale);
+                }
+                else
+                {
+                    CategoryScale = series.TransformCategoryScale(CategoryScale);
+                }
             }
 
             // Primary series contribute to primary value scale
             foreach (var series in primarySeries)
             {
-                ValueScale = series.TransformValueScale(ValueScale);
+                if (invertAxes)
+                {
+                    CategoryScale = series.TransformCategoryScale(CategoryScale);
+                }
+                else
+                {
+                    ValueScale = series.TransformValueScale(ValueScale);
+                }
             }
 
             // Named-axis series contribute to their own scales
@@ -630,7 +658,7 @@ namespace Radzen.Blazor
 
                 foreach (var series in entry.Value)
                 {
-                    additionalScale = series.TransformValueScale(additionalScale);
+                    additionalScale = invertAxes ? series.TransformCategoryScale(additionalScale) : series.TransformValueScale(additionalScale);
                 }
 
                 AdditionalValueScales[axisName] = additionalScale;
@@ -648,7 +676,7 @@ namespace Radzen.Blazor
             AxisBase xAxis = CategoryAxis;
             AxisBase yAxis = ValueAxis;
 
-            if (ShouldInvertAxes())
+            if (invertAxes)
             {
                 xAxis = ValueAxis;
                 yAxis = CategoryAxis;
@@ -699,20 +727,29 @@ namespace Radzen.Blazor
             var valueAxisSize = ValueAxis.Measure(this);
             var categoryAxisSize = CategoryAxis.Measure(this);
 
-            // Measure additional axes for right margin
+            // Measure additional axes for the right margin (top margin when axes are inverted)
             double additionalAxesWidth = 0;
+            double additionalAxesHeight = 0;
             foreach (var entry in AdditionalValueAxes)
             {
-                additionalAxesWidth += entry.Value.Measure(this, GetValueScale(entry.Key));
+                if (invertAxes)
+                {
+                    additionalAxesHeight += entry.Value.MeasureHorizontal(GetValueScale(entry.Key));
+                }
+                else
+                {
+                    additionalAxesWidth += entry.Value.Measure(this, GetValueScale(entry.Key));
+                }
             }
 
             if (!ShouldRenderAxes())
             {
                 valueAxisSize = categoryAxisSize = 0;
                 additionalAxesWidth = 0;
+                additionalAxesHeight = 0;
             }
 
-            MarginTop = 32;
+            MarginTop = 32 + additionalAxesHeight;
 
             if (IsRTL)
             {
@@ -746,7 +783,7 @@ namespace Radzen.Blazor
                 {
                     if (legendPosition == LegendPosition.Top)
                     {
-                        MarginTop = legendSize + 16;
+                        MarginTop = legendSize + 16 + additionalAxesHeight;
                     }
                     else
                     {
@@ -816,11 +853,23 @@ namespace Radzen.Blazor
             foreach (var entry in AdditionalValueScales)
             {
                 var axis = GetValueAxis(entry.Key);
-                entry.Value.Output = new ScaleRange
+                if (invertAxes)
                 {
-                    Start = axis.Inverted ? valueEnd : valueStart,
-                    End = axis.Inverted ? valueStart : valueEnd
-                };
+                    var reversed = axis.Inverted != IsRTL;
+                    entry.Value.Output = new ScaleRange
+                    {
+                        Start = reversed ? categoryEnd : categoryStart,
+                        End = reversed ? categoryStart : categoryEnd
+                    };
+                }
+                else
+                {
+                    entry.Value.Output = new ScaleRange
+                    {
+                        Start = axis.Inverted ? valueEnd : valueStart,
+                        End = axis.Inverted ? valueStart : valueEnd
+                    };
+                }
                 entry.Value.Fit(axis.TickDistance);
             }
 
@@ -857,6 +906,20 @@ namespace Radzen.Blazor
                     Start = catReversed ? ce : cs,
                     End = catReversed ? cs : ce
                 };
+
+                if (ShouldInvertAxes())
+                {
+                    foreach (var entry in AdditionalValueScales)
+                    {
+                        var axis = GetValueAxis(entry.Key);
+                        var reversed = axis.Inverted != IsRTL;
+                        entry.Value.Output = new ScaleRange
+                        {
+                            Start = reversed ? ce : cs,
+                            End = reversed ? cs : ce
+                        };
+                    }
+                }
             }
 
             if (height != Height)
@@ -873,14 +936,17 @@ namespace Radzen.Blazor
                     End = valReversed ? vs : ve
                 };
 
-                foreach (var entry in AdditionalValueScales)
+                if (!ShouldInvertAxes())
                 {
-                    var axis = GetValueAxis(entry.Key);
-                    entry.Value.Output = new ScaleRange
+                    foreach (var entry in AdditionalValueScales)
                     {
-                        Start = axis.Inverted ? ve : vs,
-                        End = axis.Inverted ? vs : ve
-                    };
+                        var axis = GetValueAxis(entry.Key);
+                        entry.Value.Output = new ScaleRange
+                        {
+                            Start = axis.Inverted ? ve : vs,
+                            End = axis.Inverted ? vs : ve
+                        };
+                    }
                 }
             }
 
@@ -1615,15 +1681,46 @@ namespace Radzen.Blazor
         /// The plot area and axes are included; legends and tooltips are HTML overlays and are not included.
         /// </summary>
         /// <param name="fileName">The download file name. Default is <c>chart.png</c>.</param>
-        public async Task ToPng(string fileName = "chart.png")
+        /// <param name="width">The PNG width in pixels. When omitted the rendered size scaled by the device pixel ratio is used.</param>
+        /// <param name="height">The PNG height in pixels. When omitted it is derived from <paramref name="width"/> preserving the aspect ratio.</param>
+        public async Task ToPng(string fileName = "chart.png", int? width = null, int? height = null)
         {
             ArgumentNullException.ThrowIfNull(fileName);
 
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
                 var svg = await ToSvg();
-                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName);
+                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName, width, height);
             }
+        }
+
+        /// <summary>
+        /// Renders the chart as a PNG image and returns the image data.
+        /// The plot area and axes are included; legends and tooltips are HTML overlays and are not included.
+        /// Use this to store the chart in a database, embed it in documents, or send it to an API instead of downloading it.
+        /// </summary>
+        /// <param name="width">The PNG width in pixels. When <c>null</c> the rendered size scaled by the device pixel ratio is used.</param>
+        /// <param name="height">The PNG height in pixels. When <c>null</c> it is derived from <paramref name="width"/> preserving the aspect ratio.</param>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the PNG image data.
+        /// </returns>
+        public async Task<byte[]> ToPng(int? width, int? height = null)
+        {
+            if (IsJSRuntimeAvailable && JSRuntime != null)
+            {
+                var svg = await ToSvg();
+
+                if (!string.IsNullOrEmpty(svg))
+                {
+                    await using var png = await JSRuntime.InvokeAsync<IJSStreamReference>("Radzen.svgToPng", svg, width, height);
+                    using var stream = await png.OpenReadStreamAsync(maxAllowedSize: 32 * 1024 * 1024);
+                    using var memoryStream = new MemoryStream();
+                    await stream.CopyToAsync(memoryStream);
+                    return memoryStream.ToArray();
+                }
+            }
+
+            return Array.Empty<byte>();
         }
 
         /// <inheritdoc />
@@ -1882,7 +1979,7 @@ namespace Radzen.Blazor
 
                 var categoryCrosshair = CategoryAxis?.Crosshair;
                 var hoveredValueAxis = GetValueAxis((HoveredSeries as IChartValueAxisSeries)?.ValueAxisName);
-                var hoveredValueScale = GetValueScale((HoveredSeries as IChartValueAxisSeries)?.ValueAxisName);
+                var hoveredValueScale = ShouldInvertAxes() ? ValueScale : GetValueScale((HoveredSeries as IChartValueAxisSeries)?.ValueAxisName);
                 var valueCrosshair = hoveredValueAxis?.Crosshair;
 
                 var snapX = categoryCrosshair?.Snap ?? true;

@@ -788,9 +788,10 @@ namespace Radzen.Blazor
                 var vs = chart.GetValueScale(ValueAxisName);
                 if (chart.ShouldInvertAxes())
                 {
-                    var categoryAccessor = Category(vs);
-                    X = e => chart.CategoryScale.Scale(Value(e));
-                    Y = e => vs.Scale(categoryAccessor(e));
+                    var invertedValueScale = chart.GetInvertedValueScale(ValueAxisName);
+                    var categoryAccessor = Category(chart.ValueScale);
+                    X = e => invertedValueScale.Scale(Value(e));
+                    Y = e => chart.ValueScale.Scale(categoryAccessor(e));
                 }
                 else
                 {
@@ -833,11 +834,12 @@ namespace Radzen.Blazor
             var vs = chart.GetValueScale(ValueAxisName);
             if (chart.ShouldInvertAxes())
             {
-                var categoryAccessor = Category(vs);
+                var invertedValueScale = chart.GetInvertedValueScale(ValueAxisName);
+                var categoryAccessor = Category(chart.ValueScale);
                 foreach (var item in Items)
                 {
-                    var px = chart.CategoryScale.Scale(Value(item));
-                    var py = vs.Scale(categoryAccessor(item));
+                    var px = invertedValueScale.Scale(Value(item));
+                    var py = chart.ValueScale.Scale(categoryAccessor(item));
                     result.Add(new Point { X = px, Y = py });
                 }
             }
