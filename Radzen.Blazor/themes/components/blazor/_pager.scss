@@ -35,17 +35,15 @@ $pager-button-size: "%button-md" !default;
   gap: var(--rz-pager-gap);
   flex-wrap: wrap;
 
-  &:focus {
-    outline: var(--rz-outline-normal);
-  }
+  .rz-pager-element,
+  .rz-pager-page {
+    &:focus {
+      outline: var(--rz-outline-normal);
+    }
 
-  &:focus-visible {
-    .rz-pager-element,
-    .rz-pager-page {
-      &.rz-state-focused {
-        outline: var(--rz-outline-focus);
-        outline-offset: var(--rz-outline-offset);
-      }
+    &:focus-visible {
+      outline: var(--rz-outline-focus);
+      outline-offset: var(--rz-outline-offset);
     }
   }
 

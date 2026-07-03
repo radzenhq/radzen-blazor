@@ -9,15 +9,6 @@ $splitbutton-sizes: xs, sm, md, lg;
   display: inline-flex;
   border-radius: var(--rz-button-border-radius);
 
-  &:focus {
-    outline: var(--rz-outline-normal);
-  }
-
-  &:focus-visible {
-    outline: var(--rz-button-focus-outline);
-    outline-offset: var(--rz-button-focus-outline-offset);
-  }
-
   .rz-button-icon-only {
     .rz-button-text {
       display: none;
@@ -50,6 +41,10 @@ $splitbutton-sizes: xs, sm, md, lg;
   list-style: none;
   padding: 0;
   margin: 0;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .rz-menuitem {

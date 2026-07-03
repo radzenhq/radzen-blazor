@@ -48,6 +48,10 @@ ul.rz-profile-menu {
     }
   }
 
+  .rz-navigation-menu:focus {
+    outline: none;
+  }
+
   .rz-navigation-item-icon-children {
     color: var(--rz-profile-menu-toggle-button-color);
 
