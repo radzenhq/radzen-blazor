@@ -45,7 +45,7 @@
                 </div>
                 @if (options?.ShowClose == true)
                 {
-                    <button type="button" @onclick=@Close @onkeydown="@OnKeyPress" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex="@(options?.CloseTabIndex ?? 0)" aria-label="@options?.CloseAriaLabel">
+                    <button type="button" @onclick=@Close @onkeydown="@OnKeyPress" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex="@(options?.CloseTabIndex ?? 0)" aria-label="@(options?.CloseAriaLabel ?? CloseAriaLabel)">
                         <span class="notranslate rzi rzi-times"></span>
                     </button>
                 }

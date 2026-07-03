@@ -54,17 +54,21 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AllowReload { get; set; }
 
+        private string? reloadTitle;
+
         /// <summary>
         /// Gets or sets the pager's reload button's title attribute.
         /// </summary>
         [Parameter]
-        public string ReloadTitle { get; set; } = "Reload";
+        public string ReloadTitle { get => reloadTitle ?? Localize(nameof(RadzenStrings.Pager_ReloadTitle)); set => reloadTitle = value; }
+
+        private string? reloadAriaLabel;
 
         /// <summary>
         /// Gets or sets the pager's reload button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string ReloadAriaLabel { get; set; } = "Reload current page.";
+        public string ReloadAriaLabel { get => reloadAriaLabel ?? Localize(nameof(RadzenStrings.Pager_ReloadAriaLabel)); set => reloadAriaLabel = value; }
 
         /// <summary>
         /// Gets or sets the reload callback.

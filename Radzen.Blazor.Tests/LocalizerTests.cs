@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
@@ -153,6 +154,51 @@ public class LocalizerTests
         // German translation of DataGrid_GroupPanelText must appear via the cascade + satellite resource.
         Assert.Contains("Ziehen Sie eine Spaltenüberschrift", component.Markup);
         Assert.DoesNotContain("Drag a column header here", component.Markup);
+    }
+
+    [Fact]
+    public void Localizer_Resolves_New_Component_Keys()
+    {
+        var localizer = Localizer.Default;
+
+        Assert.Equal("Reload", localizer.Get(nameof(RadzenStrings.Pager_ReloadTitle), CultureInfo.InvariantCulture));
+        Assert.Equal("Toggle", localizer.Get(nameof(RadzenStrings.DataGrid_FilterToggleAriaLabel), CultureInfo.InvariantCulture));
+        Assert.Equal("Close", localizer.Get(nameof(RadzenStrings.Notification_CloseAriaLabel), CultureInfo.InvariantCulture));
+        Assert.Equal("Close dialog", localizer.Get(nameof(RadzenStrings.Dialog_CloseAriaLabel), CultureInfo.InvariantCulture));
+        Assert.Equal("Insert table", localizer.Get(nameof(RadzenStrings.HtmlEditorTable_DialogTitle), CultureInfo.InvariantCulture));
+        Assert.Equal("Tabelle einfügen", localizer.Get(nameof(RadzenStrings.HtmlEditorTable_DialogTitle), new CultureInfo("de")));
+        Assert.Equal("Überschrift 1", localizer.Get(nameof(RadzenStrings.HtmlEditorFormatBlock_Heading1Text), new CultureInfo("de")));
+        Assert.Equal("再読み込み", localizer.Get(nameof(RadzenStrings.Pager_ReloadTitle), new CultureInfo("ja")));
+    }
+
+    [Fact]
+    public void DataGrid_Pager_Uses_DefaultUICulture_Cascade_For_Localized_Strings()
+    {
+        using var ctx = new TestContext();
+        ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+        ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+        ctx.Services.AddRadzenComponents();
+
+        var component = ctx.RenderComponent<CascadingValue<CultureInfo>>(parameters => parameters
+            .Add(p => p.Name, nameof(RadzenComponent.DefaultUICulture))
+            .Add(p => p.Value, new CultureInfo("de"))
+            .AddChildContent<RadzenDataGrid<dynamic>>(grid => grid
+                .Add(g => g.Data, (IEnumerable<dynamic>)Enumerable.Range(0, 3).Select(i => new { Id = i }))
+                .Add(g => g.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "Id");
+                    builder.CloseComponent();
+                })
+                .Add(g => g.AllowPaging, true)
+                .Add(g => g.PageSize, 1)
+                .Add(g => g.ShowPagingSummary, true)));
+
+        Assert.Contains("Erste Seite", component.Markup);
+        Assert.Contains("Seite 1 von 3 (3 Elemente)", component.Markup);
+        Assert.DoesNotContain("First page", component.Markup);
+        Assert.DoesNotContain("Page 1 of 3", component.Markup);
     }
 
     private class TestLocalizer : ILocalizer

@@ -260,18 +260,18 @@ namespace Radzen.Blazor
 
             var items = new List<ContextMenuItem>
             {
-                new ContextMenuItem { Text = TableStrings.CopyCells, Value = "copyCells", Icon = "content_copy" },
-                new ContextMenuItem { Text = TableStrings.PasteCells, Value = "pasteCells", Icon = "content_paste" },
-                new ContextMenuItem { Text = TableStrings.InsertRowAbove, Value = "addRowBefore", Icon = "north" },
-                new ContextMenuItem { Text = TableStrings.InsertRowBelow, Value = "addRowAfter", Icon = "south" },
-                new ContextMenuItem { Text = TableStrings.InsertColumnLeft, Value = "addColumnBefore", Icon = "west" },
-                new ContextMenuItem { Text = TableStrings.InsertColumnRight, Value = "addColumnAfter", Icon = "east" },
-                new ContextMenuItem { Text = TableStrings.DeleteRow, Value = "deleteRow", Icon = "horizontal_rule" },
-                new ContextMenuItem { Text = TableStrings.DeleteColumn, Value = "deleteColumn", Icon = "vertical_align_center" },
-                new ContextMenuItem { Text = TableStrings.MergeRight, Value = "mergeCellRight", Icon = "merge_type", Disabled = !TableSelection.CanMergeRight },
-                new ContextMenuItem { Text = TableStrings.MergeDown, Value = "mergeCellDown", Icon = "merge", Disabled = !TableSelection.CanMergeDown },
-                new ContextMenuItem { Text = TableStrings.SplitCell, Value = "splitCell", Icon = "call_split", Disabled = !TableSelection.CanSplit },
-                new ContextMenuItem { Text = TableStrings.DeleteTable, Value = "deleteTable", Icon = "delete", IconColor = "var(--rz-danger)", Disabled = !TableSelection.InTable }
+                new ContextMenuItem { Text = TableStrings.CopyCells ?? Localize(nameof(RadzenStrings.HtmlEditorTable_CopyCells)), Value = "copyCells", Icon = "content_copy" },
+                new ContextMenuItem { Text = TableStrings.PasteCells ?? Localize(nameof(RadzenStrings.HtmlEditorTable_PasteCells)), Value = "pasteCells", Icon = "content_paste" },
+                new ContextMenuItem { Text = TableStrings.InsertRowAbove ?? Localize(nameof(RadzenStrings.HtmlEditorTable_InsertRowAbove)), Value = "addRowBefore", Icon = "north" },
+                new ContextMenuItem { Text = TableStrings.InsertRowBelow ?? Localize(nameof(RadzenStrings.HtmlEditorTable_InsertRowBelow)), Value = "addRowAfter", Icon = "south" },
+                new ContextMenuItem { Text = TableStrings.InsertColumnLeft ?? Localize(nameof(RadzenStrings.HtmlEditorTable_InsertColumnLeft)), Value = "addColumnBefore", Icon = "west" },
+                new ContextMenuItem { Text = TableStrings.InsertColumnRight ?? Localize(nameof(RadzenStrings.HtmlEditorTable_InsertColumnRight)), Value = "addColumnAfter", Icon = "east" },
+                new ContextMenuItem { Text = TableStrings.DeleteRow ?? Localize(nameof(RadzenStrings.HtmlEditorTable_DeleteRow)), Value = "deleteRow", Icon = "horizontal_rule" },
+                new ContextMenuItem { Text = TableStrings.DeleteColumn ?? Localize(nameof(RadzenStrings.HtmlEditorTable_DeleteColumn)), Value = "deleteColumn", Icon = "vertical_align_center" },
+                new ContextMenuItem { Text = TableStrings.MergeRight ?? Localize(nameof(RadzenStrings.HtmlEditorTable_MergeRight)), Value = "mergeCellRight", Icon = "merge_type", Disabled = !TableSelection.CanMergeRight },
+                new ContextMenuItem { Text = TableStrings.MergeDown ?? Localize(nameof(RadzenStrings.HtmlEditorTable_MergeDown)), Value = "mergeCellDown", Icon = "merge", Disabled = !TableSelection.CanMergeDown },
+                new ContextMenuItem { Text = TableStrings.SplitCell ?? Localize(nameof(RadzenStrings.HtmlEditorTable_SplitCell)), Value = "splitCell", Icon = "call_split", Disabled = !TableSelection.CanSplit },
+                new ContextMenuItem { Text = TableStrings.DeleteTable ?? Localize(nameof(RadzenStrings.HtmlEditorTable_DeleteTable)), Value = "deleteTable", Icon = "delete", IconColor = "var(--rz-danger)", Disabled = !TableSelection.InTable }
             };
 
             var args = new MouseEventArgs { ClientX = clientX, ClientY = clientY, Button = 2, Type = "contextmenu" };
@@ -427,13 +427,13 @@ namespace Radzen.Blazor
             }
 
             value ??= new HtmlEditorTableCommandArgs();
-            value.DefaultColumnHeader ??= TableStrings.DefaultColumnHeader;
+            value.DefaultColumnHeader ??= TableStrings.DefaultColumnHeader ?? Localize(nameof(RadzenStrings.HtmlEditorTable_DefaultColumnHeader));
 
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.execTableCommand", ContentEditable, name, value);
 
             if (State?.Success == false && !string.IsNullOrEmpty(State.Message))
             {
-                NotificationService?.Notify(NotificationSeverity.Warning, TableStrings.ActionBlocked, GetTableCommandMessage(State.Message), 4000);
+                NotificationService?.Notify(NotificationSeverity.Warning, TableStrings.ActionBlocked ?? Localize(nameof(RadzenStrings.HtmlEditorTable_ActionBlocked)), GetTableCommandMessage(State.Message), 4000);
                 await UpdateTableSelectionAsync();
                 StateHasChanged();
                 return;
@@ -482,10 +482,10 @@ namespace Radzen.Blazor
         {
             return message switch
             {
-                "table.action.requiresTable" => TableStrings.ActionRequiresTable,
-                "table.copy.invalidSelection" => TableStrings.CopyInvalidSelection,
-                "table.paste.blocked" => TableStrings.PasteBlocked,
-                "table.merge.invalidSelection" => TableStrings.MergeInvalidSelection,
+                "table.action.requiresTable" => TableStrings.ActionRequiresTable ?? Localize(nameof(RadzenStrings.HtmlEditorTable_ActionRequiresTable)),
+                "table.copy.invalidSelection" => TableStrings.CopyInvalidSelection ?? Localize(nameof(RadzenStrings.HtmlEditorTable_CopyInvalidSelection)),
+                "table.paste.blocked" => TableStrings.PasteBlocked ?? Localize(nameof(RadzenStrings.HtmlEditorTable_PasteBlocked)),
+                "table.merge.invalidSelection" => TableStrings.MergeInvalidSelection ?? Localize(nameof(RadzenStrings.HtmlEditorTable_MergeInvalidSelection)),
                 _ => message
             };
         }

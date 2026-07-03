@@ -153,10 +153,10 @@ namespace Radzen
         public RenderFragment<NotificationService>? SummaryContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the close button aria-label.
+        /// Gets or sets the close button aria-label. When not set a localized default is used.
         /// </summary>
         /// <value>The close button aria-label.</value>
-        public string CloseAriaLabel { get; set; } = "Close";
+        public string? CloseAriaLabel { get; set; }
 
 
         #region Implementation of IEquatable<NotificationMessage> and operators overloading

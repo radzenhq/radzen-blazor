@@ -396,26 +396,32 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<Radzen.DataGridLoadChildDataEventArgs<TItem>> LoadChildData { get; set; }
 
+        private string? expandChildItemAriaLabel;
+
         /// <summary>
         /// Gets or sets the expand child item aria label text.
         /// </summary>
         /// <value>The expand child item aria label text.</value>
         [Parameter]
-        public string? ExpandChildItemAriaLabel { get; set; } = "Expand child item";
+        public string? ExpandChildItemAriaLabel { get => expandChildItemAriaLabel ?? Localize(nameof(RadzenStrings.DataGrid_ExpandChildItemAriaLabel)); set => expandChildItemAriaLabel = value; }
+
+        private string? expandGroupAriaLabel;
 
         /// <summary>
         /// Gets or sets the expand group aria label text.
         /// </summary>
         /// <value>The expand group aria label text.</value>
         [Parameter]
-        public string? ExpandGroupAriaLabel { get; set; } = "Expand group";
+        public string? ExpandGroupAriaLabel { get => expandGroupAriaLabel ?? Localize(nameof(RadzenStrings.DataGrid_ExpandGroupAriaLabel)); set => expandGroupAriaLabel = value; }
+
+        private string? filterToggleAriaLabel;
 
         /// <summary>
         /// Gets or sets the date simple filter toggle aria label text.
         /// </summary>
         /// <value>The date simple filter toggle aria label text.</value>
         [Parameter]
-        public string? FilterToggleAriaLabel { get; set; } = "Toggle";
+        public string? FilterToggleAriaLabel { get => filterToggleAriaLabel ?? Localize(nameof(RadzenStrings.DataGrid_FilterToggleAriaLabel)); set => filterToggleAriaLabel = value; }
 
         /// <summary>
         /// Gets or sets a value indicating whether DataGrid data cells will follow the header cells structure in composite columns.

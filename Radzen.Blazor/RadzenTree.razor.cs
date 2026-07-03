@@ -53,7 +53,9 @@ namespace Radzen.Blazor
         /// Gets or sets the open button aria-label attribute.
         /// </summary>
         [Parameter]
-        public string? SelectItemAriaLabel { get; set; } = "Select item";
+        public string? SelectItemAriaLabel { get => selectItemAriaLabel ?? Localize(nameof(RadzenStrings.Tree_SelectItemAriaLabel)); set => selectItemAriaLabel = value; }
+
+        private string? selectItemAriaLabel;
 
         /// <summary>
         /// Gets or sets the accessible name of the tree, exposed via the <c>aria-label</c> attribute on the <c>role="tree"</c> container.

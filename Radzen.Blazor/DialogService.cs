@@ -812,12 +812,12 @@ namespace Radzen
             }
         }
 
-        private string closeAriaLabel = "Close dialog";
+        private string? closeAriaLabel;
         /// <summary>
-        /// Gets or sets the close button aria-label text.
+        /// Gets or sets the close button aria-label text. When not set a localized default is used.
         /// </summary>
         /// <value>The close button aria-label text.</value>
-        public string CloseAriaLabel
+        public string? CloseAriaLabel
         {
             get => closeAriaLabel;
             set

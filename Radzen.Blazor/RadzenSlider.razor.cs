@@ -242,23 +242,29 @@ namespace Radzen.Blazor
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
+        private string? handleLabel;
+
         /// <summary>
         /// Gets or sets the accessible name (aria-label) for the handle of a single-value slider.
         /// </summary>
         [Parameter]
-        public string HandleLabel { get; set; } = "Value";
+        public string HandleLabel { get => handleLabel ?? Localize(nameof(RadzenStrings.Slider_HandleLabel)); set => handleLabel = value; }
+
+        private string? minHandleLabel;
 
         /// <summary>
         /// Gets or sets the accessible name (aria-label) for the minimum handle of a range slider.
         /// </summary>
         [Parameter]
-        public string MinHandleLabel { get; set; } = "Minimum";
+        public string MinHandleLabel { get => minHandleLabel ?? Localize(nameof(RadzenStrings.Slider_MinHandleLabel)); set => minHandleLabel = value; }
+
+        private string? maxHandleLabel;
 
         /// <summary>
         /// Gets or sets the accessible name (aria-label) for the maximum handle of a range slider.
         /// </summary>
         [Parameter]
-        public string MaxHandleLabel { get; set; } = "Maximum";
+        public string MaxHandleLabel { get => maxHandleLabel ?? Localize(nameof(RadzenStrings.Slider_MaxHandleLabel)); set => maxHandleLabel = value; }
 
         string OrientationAttribute => Orientation == Orientation.Vertical ? "vertical" : "horizontal";
 

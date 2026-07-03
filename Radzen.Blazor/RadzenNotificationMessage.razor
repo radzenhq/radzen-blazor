@@ -21,7 +21,7 @@
                     <div class="rz-notification-content">@if (Message?.DetailContent != null && Service != null) { @Message.DetailContent(Service) } else { @Message?.Detail }</div>
                 </div>
             </div>
-            <button type="button" class="notranslate rzi rz-notification-close" aria-label="@(Message?.CloseAriaLabel ?? "Close")" @onclick="@Close" @onclick:stopPropagation="true"></button>
+            <button type="button" class="notranslate rzi rz-notification-close" aria-label="@(Message?.CloseAriaLabel ?? CloseAriaLabel)" @onclick="@Close" @onclick:stopPropagation="true"></button>
         </div>
         <RadzenProgressBar ShowValue="false" Visible=@(Message?.Duration != null && Message.ShowProgress)
         Value=@progress Max="@(Message?.Duration ?? 0)" ProgressBarStyle=@GetProgressBarStyle() />
@@ -73,6 +73,12 @@
     }
 
     [Inject] private NotificationService? Service { get; set; }
+
+    [Inject] private IServiceProvider Services { get; set; } = default!;
+
+    Localizer? localizer;
+    Localizer Localizer => localizer ??= Services.GetService(typeof(Localizer)) as Localizer ?? Localizer.Default;
+    string CloseAriaLabel => Localizer.Get(nameof(RadzenStrings.Notification_CloseAriaLabel), System.Globalization.CultureInfo.CurrentUICulture);
 
     public bool Visible { get; set; } = true;
 

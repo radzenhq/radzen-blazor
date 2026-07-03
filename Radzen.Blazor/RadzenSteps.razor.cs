@@ -398,7 +398,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The tab list aria-label. Default is <c>"Steps"</c>.</value>
         [Parameter]
-        public string TabListAriaLabel { get; set; } = "Steps";
+        public string TabListAriaLabel { get => tabListAriaLabel ?? Localize(nameof(RadzenStrings.Steps_TabListAriaLabel)); set => tabListAriaLabel = value; }
+
+        private string? tabListAriaLabel;
 
         /// <summary>
         /// The collection of steps.

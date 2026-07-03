@@ -42,7 +42,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string? ImageAlternateText { get; set; } = "image";
+        public string? ImageAlternateText { get => imageAlternateText ?? Localize(nameof(RadzenStrings.SelectBarItem_ImageAlternateText)); set => imageAlternateText = value; }
+
+        private string? imageAlternateText;
 
         /// <summary>
         /// Gets or sets the image style.

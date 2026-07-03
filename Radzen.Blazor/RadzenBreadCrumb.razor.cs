@@ -46,7 +46,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The navigation landmark label. Defaults to <c>"breadcrumb"</c>.</value>
         [Parameter]
-        public string AriaLabel { get; set; } = "breadcrumb";
+        public string AriaLabel { get => ariaLabel ?? Localize(nameof(RadzenStrings.BreadCrumb_AriaLabel)); set => ariaLabel = value; }
+
+        private string? ariaLabel;
 
         /// <inheritdoc/>
         protected override string GetComponentCssClass()
