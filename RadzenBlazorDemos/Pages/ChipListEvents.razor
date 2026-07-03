@@ -11,7 +11,7 @@
                     Change="@OnChange"
                     ChipRemoved="@OnChipRemoved" />
     <RadzenCard Variant="Variant.Outlined" class="rz-p-4">
-        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-2">Event log</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-mb-2">Event log</RadzenText>
         @if (events.Count == 0)
         {
             <RadzenText TextStyle="TextStyle.Body2" class="rz-text-secondary-color">No events yet.</RadzenText>

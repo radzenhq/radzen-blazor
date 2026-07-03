@@ -23,6 +23,9 @@
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
     You can use <code>TextStyle</code> together with <code>TagName</code> to apply different styling while keeping the code semantically correct.
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <code>TextStyle</code> controls only the visual style of the text, while <code>TagName</code> controls the HTML element that is rendered. Set <code>TagName</code> so that the document keeps a correct heading hierarchy as required by WCAG 1.3.1.
+</RadzenText>
 <RadzenExample Example="TextTagName">
     <TextTagName />
 </RadzenExample>
@@ -81,8 +84,8 @@
         <RadzenText Anchor="typography#video-radzen-text" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
             How Typography Works in Radzen Blazor Studio
         </RadzenText>
-        <RadzenText TextStyle="TextStyle.Subtitle1">
-            Take full control of text styling in your Blazor applications using Radzen Blazor Studio. 
+        <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">
+            Take full control of text styling in your Blazor applications using Radzen Blazor Studio.
         </RadzenText>
     <RadzenCard Variant="Variant.Outlined" class="rz-p-7">
         <div class="embed-container">

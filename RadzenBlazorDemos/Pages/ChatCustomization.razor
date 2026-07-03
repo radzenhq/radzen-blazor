@@ -21,7 +21,7 @@
         <RadzenRow>
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Display Options</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Display Options</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
                             <RadzenCheckBox @bind-Value="@showUsers" TValue="bool" Name="showUsers" />
@@ -47,7 +47,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Text Customization</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Text Customization</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
                         <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
                             <RadzenLabel Text="Placeholder Text" />
@@ -78,10 +78,10 @@
     </RadzenColumn>
     <RadzenColumn Size="12">
         <RadzenCard Variant="Variant.Outlined">
-            <RadzenText TextStyle="TextStyle.Subtitle1">Customization Features</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Customization Features</RadzenText>
             <RadzenRow>
                 <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenText TextStyle="TextStyle.H6">Display Controls</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Display Controls</RadzenText>
                     <ul>
                         <li><code>ShowUsers</code> - Toggle participant avatars in header</li>
                         <li><code>ShowUserNames</code> - Show/hide names above messages</li>
@@ -90,7 +90,7 @@
                     </ul>
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenText TextStyle="TextStyle.H6">Text Customization</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Text Customization</RadzenText>
                     <ul>
                         <li><code>Placeholder</code> - Customize input field placeholder</li>
                         <li><code>EmptyMessage</code> - Set message when chat is empty</li>

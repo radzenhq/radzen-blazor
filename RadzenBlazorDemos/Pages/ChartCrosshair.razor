@@ -4,7 +4,7 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="2rem">
             <RadzenStack Gap="0.5rem">
-                <RadzenText TextStyle="TextStyle.Subtitle2">Category axis crosshair</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P">Category axis crosshair</RadzenText>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                     <RadzenCheckBox @bind-Value="@categoryVisible" Name="categoryVisible" />
                     <RadzenLabel Text="Visible" Component="categoryVisible" />
@@ -32,7 +32,7 @@
             </RadzenStack>
 
             <RadzenStack Gap="0.5rem">
-                <RadzenText TextStyle="TextStyle.Subtitle2">Value axis crosshair</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P">Value axis crosshair</RadzenText>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                     <RadzenCheckBox @bind-Value="@valueVisible" Name="valueVisible" />
                     <RadzenLabel Text="Visible" Component="valueVisible" />

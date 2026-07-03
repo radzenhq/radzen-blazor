@@ -3,7 +3,7 @@
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-            <RadzenText TextStyle="TextStyle.Subtitle2" Style="margin: 0;">Selected: @GetDateLabel(start) — @GetDateLabel(end)</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" Style="margin: 0;">Selected: @GetDateLabel(start) — @GetDateLabel(end)</RadzenText>
             <RadzenButton Text="Full Year" Click="@(() => { start = 0; end = 1; })" Variant="Variant.Outlined" Size="ButtonSize.Small" />
             <RadzenButton Text="Q1" Click="@(() => { start = 0; end = 0.25; })" Variant="Variant.Outlined" Size="ButtonSize.Small" />
             <RadzenButton Text="Q2" Click="@(() => { start = 0.25; end = 0.5; })" Variant="Variant.Outlined" Size="ButtonSize.Small" />

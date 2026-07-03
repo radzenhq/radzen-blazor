@@ -17,7 +17,7 @@
         <RadzenRow>
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">AI Configuration</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">AI Configuration</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
                             <RadzenLabel Style="white-space: nowrap;">Model:</RadzenLabel>
@@ -50,7 +50,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Current Configuration</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Current Configuration</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
                         <RadzenText TextStyle="TextStyle.Body2">
                             <strong>Model:</strong> @selectedModel
@@ -63,7 +63,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Available Models</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Available Models</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical">
                         @foreach (var model in availableModels)
                         {

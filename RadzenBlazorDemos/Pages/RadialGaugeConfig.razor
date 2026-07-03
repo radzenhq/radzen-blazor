@@ -21,7 +21,7 @@
             <RadzenRadialGaugeScalePointer Value=@value Length="0.6" ShowValue=@showValue>
                 <Template Context="pointer">
                     <RadzenStack AlignItems="AlignItems.Center" Gap="0" class="rz-mt-4">
-                        <RadzenText TextStyle="TextStyle.H5" class="rz-m-0"><strong>@pointer.Value</strong></RadzenText>
+                        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.P" class="rz-m-0"><strong>@pointer.Value</strong></RadzenText>
                         <RadzenText TextStyle="TextStyle.Caption">km/h</RadzenText>
                     </RadzenStack>
                 </Template>

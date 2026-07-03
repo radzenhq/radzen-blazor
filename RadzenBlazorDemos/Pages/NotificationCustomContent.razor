@@ -12,7 +12,7 @@
         {
                 Severity = NotificationSeverity.Warning,
                 Duration = 40000,
-                SummaryContent = ns =>@<RadzenText TextStyle="TextStyle.H6">Custom summary: <br /> @DateTime.Now</RadzenText>,
+                SummaryContent = ns =>@<RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Custom summary: <br /> @DateTime.Now</RadzenText>,
                 DetailContent = ns => @<RadzenButton Text="Clear" Click="@(args => ns.Messages.Clear())" />
         });
     }

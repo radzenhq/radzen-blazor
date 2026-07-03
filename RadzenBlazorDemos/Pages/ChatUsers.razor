@@ -21,7 +21,7 @@
         <RadzenRow>
             <RadzenColumn Size="12" SizeLG="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">User Management</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">User Management</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
                         <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
                             <RadzenButton Text="Add User" Icon="person_add" ButtonStyle="ButtonStyle.Primary" Click="@OnAddUser" Variant="Variant.Flat" />
@@ -37,7 +37,7 @@
             </RadzenColumn>
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Outlined">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">User List</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">User List</RadzenText>
                     <RadzenStack Orientation="Orientation.Vertical">
                         @foreach (var participant in users)
                         {
@@ -61,10 +61,10 @@
     </RadzenColumn>
     <RadzenColumn Size="12">
         <RadzenCard Variant="Variant.Outlined">
-            <RadzenText TextStyle="TextStyle.Subtitle1">Multi-User Features</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">Multi-User Features</RadzenText>
             <RadzenRow>
                 <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenText TextStyle="TextStyle.H6">User Management</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">User Management</RadzenText>
                     <ul>
                         <li>Add and remove users dynamically</li>
                         <li>Each participant has a unique identity and avatar</li>
@@ -73,7 +73,7 @@
                     </ul>
                 </RadzenColumn>
                 <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenText TextStyle="TextStyle.H6">Message Features</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Message Features</RadzenText>
                     <ul>
                         <li>Messages are aligned based on sender (user vs users)</li>
                         <li>User names shown above messages</li>

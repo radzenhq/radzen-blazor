@@ -10,7 +10,7 @@
 
     <RadzenRow>
         <RadzenColumn Size="12">
-            <h4>Auto-size stacked column series</h4>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Auto-size stacked column series</RadzenText>
             <RadzenChart Animate="true">
                 <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
@@ -27,7 +27,7 @@
         </RadzenColumn>
 
         <RadzenColumn Size="12">
-            <h4>Custom size stacked column series</h4>
+            <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Custom size stacked column series</RadzenText>
             <RadzenChart Animate="true">
                 <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
                 <RadzenStackedColumnSeries FillMode="FillMode.Gradient" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue" />

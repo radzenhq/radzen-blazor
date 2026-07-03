@@ -16,7 +16,7 @@
         <RadzenTileLayoutItem @key=@tile.Id Title=@tile.Title Icon=@tile.Icon
                               @bind-Col=@tile.Col @bind-Row=@tile.Row
                               @bind-ColSpan=@tile.ColSpan @bind-RowSpan=@tile.RowSpan>
-            <RadzenText TextStyle="TextStyle.DisplayH4" class="rz-m-0">@tile.Value</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.P" class="rz-m-0">@tile.Value</RadzenText>
             <RadzenText TextStyle="TextStyle.Caption">@tile.Col,@tile.Row · @tile.ColSpan×@tile.RowSpan</RadzenText>
         </RadzenTileLayoutItem>
     }

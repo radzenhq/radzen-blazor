@@ -4,7 +4,7 @@
     @if (isMobile)
     {
         <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
-            <RadzenText TextStyle="TextStyle.H6">Mobile Navigation</RadzenText>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Mobile Navigation</RadzenText>
             <RadzenButton Text="Home" Icon="home" Style="width: 100%" />
             <RadzenButton Text="Products" Icon="shopping_cart" Style="width: 100%" />
             <RadzenButton Text="About" Icon="info" Style="width: 100%" />
@@ -14,7 +14,7 @@
     else
     {
         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center">
-            <RadzenText TextStyle="TextStyle.H6">Desktop Navigation:</RadzenText>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">Desktop Navigation:</RadzenText>
             <RadzenButton Text="Home" Icon="home" />
             <RadzenButton Text="Products" Icon="shopping_cart" />
             <RadzenButton Text="About" Icon="info" />

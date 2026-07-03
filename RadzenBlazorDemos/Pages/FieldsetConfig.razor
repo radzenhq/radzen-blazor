@@ -33,7 +33,7 @@
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                             <RadzenStack Gap="0.25rem">
-                                <h4 class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
+                                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.P" class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
                                 <div>@order.ShipAddress</div>
                                 <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
                             </RadzenStack>
