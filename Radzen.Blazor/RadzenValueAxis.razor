@@ -3,7 +3,7 @@
 
 @inherits AxisBase
 <CascadingValue Value="@this">
-  @ChildContent
+    @ChildContent
 </CascadingValue>
 @code {
     [Parameter]
@@ -21,7 +21,7 @@
         }
         else
         {
-            return AxisMeasurer.YAxis(chart.ValueScale, chart.ValueAxis, Title);
+            return AxisMeasurer.YAxis(chart.ValueScale, this, Title);
         }
     }
 

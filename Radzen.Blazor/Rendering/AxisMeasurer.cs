@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Components;
 using System;
-using System.ComponentModel;
 
 namespace Radzen.Blazor.Rendering
 {
@@ -21,6 +19,12 @@ namespace Radzen.Blazor.Rendering
             ArgumentNullException.ThrowIfNull(scale);
             ArgumentNullException.ThrowIfNull(axis);
             ArgumentNullException.ThrowIfNull(title);
+
+            //We can use the axis width if it is set, otherwise we need to calculate the width based on the ticks and title
+            if (axis.Width.HasValue)
+            {
+                return axis.Width.Value;
+            }
 
             var ticks = scale.Ticks(axis.TickDistance);
 
