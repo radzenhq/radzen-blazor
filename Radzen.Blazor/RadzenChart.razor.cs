@@ -187,7 +187,7 @@ namespace Radzen.Blazor
 
                 if (queryX >= 0 && queryX <= plotWidth && queryY >= 0 && queryY <= plotHeight)
                 {
-                    categoryValue = (double)Convert.ChangeType(PixelToValue(CategoryScale, queryX), typeof(double), CultureInfo.InvariantCulture);
+                    categoryValue = PixelToValue(CategoryScale, queryX);
                 }
             }
 
@@ -1915,11 +1915,14 @@ namespace Radzen.Blazor
 
                     if (categoryCrosshair.Label && CategoryAxis != null)
                     {
-                        var raw = PixelToValue(CategoryScale, lineX);
-                        var text = CategoryAxis.Format(CategoryScale, raw);
-                        RenderAxisCrosshairLabel(builder, 4, text,
-                            anchorX: lineX, anchorY: plotHeight,
-                            placement: AxisCrosshairLabelPlacement.Bottom);
+                        var value = CategoryScale.Value(PixelToValue(CategoryScale, lineX));
+                        if (value != null)
+                        {
+                            var text = CategoryAxis.Format(CategoryScale, value);
+                            RenderAxisCrosshairLabel(builder, 4, text,
+                                anchorX: lineX, anchorY: plotHeight,
+                                placement: AxisCrosshairLabelPlacement.Bottom);
+                        }
                     }
                 }
 
@@ -1930,23 +1933,22 @@ namespace Radzen.Blazor
 
                     if (valueCrosshair.Label)
                     {
-                        var raw = PixelToValue(hoveredValueScale, lineY);
-                        var text = hoveredValueAxis.Format(hoveredValueScale, raw);
-                        RenderAxisCrosshairLabel(builder, 6, text,
-                            anchorX: 0, anchorY: lineY,
-                            placement: AxisCrosshairLabelPlacement.Left);
+                        var value = hoveredValueScale.Value(PixelToValue(hoveredValueScale, lineY));
+                        if (value != null)
+                        {
+                            var text = hoveredValueAxis.Format(hoveredValueScale, value);
+                            RenderAxisCrosshairLabel(builder, 6, text,
+                                anchorX: 0, anchorY: lineY,
+                                placement: AxisCrosshairLabelPlacement.Left);
+                        }
                     }
                 }
 
                 builder.CloseElement();
             };
         }
-
-        // Inverse of ScaleBase.Scale(value, padding: true) for plot-local pixel -> input value.
-        // The padded variant is what the chart uses everywhere (ComposeCategory/ComposeValue, TooltipX/Y),
-        // so this matches the actual rendered position of data points and gridlines. Handles linear and
-        // logarithmic scales. Categorical-string axes use a numeric index; the label shows the index.
-        private static object PixelToValue(ScaleBase scale, double plotLocalPixel)
+        
+        private static double PixelToValue(ScaleBase scale, double plotLocalPixel)
         {
             var outputDelta = scale.Output.End - scale.Output.Start;
             var size = Math.Abs(outputDelta);

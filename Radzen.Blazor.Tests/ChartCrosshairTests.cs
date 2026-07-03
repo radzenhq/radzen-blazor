@@ -216,5 +216,80 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("rz-chart-axis-crosshair-label", chart.Markup);
             Assert.Contains(" GW", chart.Find("g.rz-chart-axis-crosshair-label").InnerHtml);
         }
+
+        class DateDataItem
+        {
+            public System.DateTime Date { get; set; }
+            public double Value { get; set; }
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task Crosshair_CategoryLabel_FormatsDateAxisValue()
+        {
+            using var ctx = CreateChartContext();
+
+            var data = new[]
+            {
+                new DateDataItem { Date = new System.DateTime(2025, 1, 6), Value = 10 },
+                new DateDataItem { Date = new System.DateTime(2025, 2, 3), Value = 20 },
+                new DateDataItem { Date = new System.DateTime(2025, 3, 3), Value = 15 },
+                new DateDataItem { Date = new System.DateTime(2025, 4, 7), Value = 25 },
+            };
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenCategoryAxis>(axis => axis
+                    .Add(a => a.FormatString, "{0:MMM d}")
+                    .AddChildContent<RadzenAxisCrosshair>(c => c
+                        .Add(x => x.Visible, true)
+                        .Add(x => x.Label, true)))
+                .AddChildContent<RadzenLineSeries<DateDataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DateDataItem.Date))
+                    .Add(x => x.ValueProperty, nameof(DateDataItem.Value))
+                    .Add(x => x.Data, data)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+            await chart.InvokeAsync(() => chart.Instance.MouseMove(200, 100));
+
+            // The label must format the resolved DateTime, not the raw axis number - formatting a
+            // number with a date FormatString emits the specifiers ("MMM d") literally.
+            var label = chart.Find("g.rz-chart-axis-crosshair-label").InnerHtml;
+            Assert.DoesNotContain("MMM", label);
+            Assert.Matches("Jan|Feb|Mar|Apr", label);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task Crosshair_CategoryLabel_OrdinalEdge_DoesNotInvokeFormatterWithNull()
+        {
+            using var ctx = CreateChartContext();
+
+            // Even category count + unsnapped hover in the axis padding strip resolves to the
+            // out-of-range index (count - 0.5 rounds up), where the ordinal scale has no value.
+            // The label must be skipped - a user Formatter must not receive null.
+            var data = new[]
+            {
+                new DataItem { Category = "A", Value = 10 },
+                new DataItem { Category = "B", Value = 20 },
+                new DataItem { Category = "C", Value = 15 },
+                new DataItem { Category = "D", Value = 25 },
+            };
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenCategoryAxis>(axis => axis
+                    .Add(a => a.Padding, 50)
+                    .Add(a => a.Formatter, value => value.ToString())
+                    .AddChildContent<RadzenAxisCrosshair>(c => c
+                        .Add(x => x.Visible, true)
+                        .Add(x => x.Label, true)
+                        .Add(x => x.Snap, false)))
+                .AddChildContent<RadzenLineSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.Data, data)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+            await chart.InvokeAsync(() => chart.Instance.MouseMove(310, 100));
+
+            Assert.Contains("rz-chart-crosshair", chart.Markup);
+        }
     }
 }
