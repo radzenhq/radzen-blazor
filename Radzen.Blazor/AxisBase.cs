@@ -84,6 +84,7 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the width of the axis in pixels. If not set, the width is calculated automatically based on the axis content.
+        /// The parameter only has effect for vertically rendered value axes. It is ignored on the category axis in normal charts and on value axes in inverted (bar) charts
         /// </summary>
         [Parameter]
         public int? Width { get; set; }
@@ -171,7 +172,8 @@ namespace Radzen.Blazor
                    DidParameterChange(parameters, nameof(CrossesAt), CrossesAt) ||
                    DidParameterChange(parameters, nameof(Logarithmic), Logarithmic) ||
                    DidParameterChange(parameters, nameof(LogarithmicBase), LogarithmicBase) ||
-                   DidParameterChange(parameters, nameof(Step), Step);
+                   DidParameterChange(parameters, nameof(Step), Step) ||
+                   DidParameterChange(parameters, nameof(Width), Width);
         }
 
         internal string Format(ScaleBase scale, double idx)

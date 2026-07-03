@@ -20,9 +20,9 @@ namespace Radzen.Blazor.Rendering
             ArgumentNullException.ThrowIfNull(axis);
             ArgumentNullException.ThrowIfNull(title);
 
-            //We can use the axis width if it is set, otherwise we need to calculate the width based on the ticks and title
             if (axis.Width.HasValue)
             {
+                ArgumentOutOfRangeException.ThrowIfLessThan(axis.Width.Value, 24);
                 return axis.Width.Value;
             }
 
