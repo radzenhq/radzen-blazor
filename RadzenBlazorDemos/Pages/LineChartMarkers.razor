@@ -1,0 +1,49 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenChart>
+        <RadzenLineSeries Data="@plan" CategoryProperty="Month" ValueProperty="Value" Title="Plan">
+            <RadzenMarkers MarkerType="MarkerType.Square" Size="8" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Data="@actual" CategoryProperty="Month" ValueProperty="Value" Title="Actual">
+            <RadzenMarkers MarkerType="MarkerType.Circle" Size="8" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Data="@forecast" CategoryProperty="Month" ValueProperty="Value" Title="Forecast">
+            <RadzenMarkers MarkerType="MarkerType.Triangle" Size="8" />
+        </RadzenLineSeries>
+        <RadzenLegend Position="LegendPosition.Bottom" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Month { get; set; }
+        public double Value { get; set; }
+    }
+
+    DataItem[] plan = new DataItem[]
+    {
+        new DataItem { Month = "Jan", Value = 200 },
+        new DataItem { Month = "Feb", Value = 220 },
+        new DataItem { Month = "Mar", Value = 240 },
+        new DataItem { Month = "Apr", Value = 260 },
+        new DataItem { Month = "May", Value = 280 },
+    };
+
+    DataItem[] actual = new DataItem[]
+    {
+        new DataItem { Month = "Jan", Value = 234 },
+        new DataItem { Month = "Feb", Value = 269 },
+        new DataItem { Month = "Mar", Value = 233 },
+        new DataItem { Month = "Apr", Value = 244 },
+        new DataItem { Month = "May", Value = 214 },
+    };
+
+    DataItem[] forecast = new DataItem[]
+    {
+        new DataItem { Month = "Jan", Value = 180 },
+        new DataItem { Month = "Feb", Value = 210 },
+        new DataItem { Month = "Mar", Value = 250 },
+        new DataItem { Month = "Apr", Value = 290 },
+        new DataItem { Month = "May", Value = 320 },
+    };
+}

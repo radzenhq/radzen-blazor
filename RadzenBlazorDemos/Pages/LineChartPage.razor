@@ -7,6 +7,92 @@
     A line chart connects data points with straight segments, making it the clearest way to show a trend over time or any ordered sequence.
 </RadzenText>
 
-<RadzenExample ComponentName="Chart" Example="LineChartConfig" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+<RadzenText Anchor="line-chart#overview" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Overview
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    A full year of weekly revenue across two business lines - real seasonality with a summer slowdown and a Black Friday spike - drawn with smooth lines, a shared tooltip with an axis crosshair and a currency-formatted value axis.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartOverview" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <LineChartOverview />
+</RadzenExample>
+
+<RadzenText Anchor="line-chart#basic" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Basic line
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Bind a collection and set <code>CategoryProperty</code> and <code>ValueProperty</code>. Each point is connected with a straight segment in order.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartBasic">
+    <LineChartBasic />
+</RadzenExample>
+
+<RadzenText Anchor="line-chart#markers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Markers
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Add <code>RadzenMarkers</code> to mark each data point. Set <code>MarkerType</code> to <code>Circle</code>, <code>Square</code>, <code>Triangle</code> or <code>Diamond</code> and tune the <code>Size</code>.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartMarkers">
+    <LineChartMarkers />
+</RadzenExample>
+
+<RadzenText Anchor="line-chart#multiple-series" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Multiple series
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Add more than one <code>RadzenLineSeries</code> to compare trends side by side, and place a <code>RadzenLegend</code> to tell them apart.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartMultipleSeries">
+    <LineChartMultipleSeries />
+</RadzenExample>
+
+<RadzenText Anchor="line-chart#line-styles" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Line styles
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>LineType</code> to <code>Solid</code>, <code>Dashed</code> or <code>Dotted</code> and adjust <code>StrokeWidth</code> to distinguish actual, target and forecast lines.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartLineStyles">
+    <LineChartLineStyles />
+</RadzenExample>
+
+<RadzenText Anchor="line-chart#data-labels" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Data labels
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Add <code>RadzenSeriesDataLabels</code> to print values next to each point. Use a <code>Formatter</code> to format them and <code>Step</code> to label every Nth point.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartDataLabels">
+    <LineChartDataLabels />
+</RadzenExample>
+
+<RadzenText Anchor="line-chart#custom-colors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom colors
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set the <code>Stroke</code> of each series (and the marker <code>Fill</code>) to apply your own palette instead of the theme colors.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartCustomColors">
+    <LineChartCustomColors />
+</RadzenExample>
+
+<RadzenText Anchor="line-chart#tooltip-crosshair" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Tooltip and crosshair
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>RadzenChartTooltipOptions</code> <code>Shared</code> to show every series at the hovered category, add a <code>RadzenAxisCrosshair</code> for an aligned guide and <code>RadzenGridLines</code> for easier reading.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartTooltipCrosshair">
+    <LineChartTooltipCrosshair />
+</RadzenExample>
+
+<RadzenText Anchor="line-chart#config" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Interactive configuration
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-4">
+    Combine the settings above and see how they interact - smooth lines, markers, data labels, shared tooltip and tick placement.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="LineChartConfig">
     <LineChartConfig />
 </RadzenExample>

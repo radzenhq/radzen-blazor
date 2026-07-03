@@ -1,0 +1,25 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenChart>
+        <RadzenLineSeries Data="@revenue" CategoryProperty="Month" ValueProperty="Revenue" Title="Revenue" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Month { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    DataItem[] revenue = new DataItem[]
+    {
+        new DataItem { Month = "Jan", Revenue = 234 },
+        new DataItem { Month = "Feb", Revenue = 269 },
+        new DataItem { Month = "Mar", Revenue = 233 },
+        new DataItem { Month = "Apr", Revenue = 244 },
+        new DataItem { Month = "May", Revenue = 214 },
+        new DataItem { Month = "Jun", Revenue = 253 },
+        new DataItem { Month = "Jul", Revenue = 274 },
+        new DataItem { Month = "Aug", Revenue = 284 },
+    };
+}

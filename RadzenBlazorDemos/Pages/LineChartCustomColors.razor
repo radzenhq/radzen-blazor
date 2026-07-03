@@ -1,0 +1,52 @@
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenChart>
+        <RadzenLineSeries Data="@northData" CategoryProperty="Month" ValueProperty="Revenue" Title="North" Stroke="#6366f1" StrokeWidth="3">
+            <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#6366f1" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Data="@southData" CategoryProperty="Month" ValueProperty="Revenue" Title="South" Stroke="#14b8a6" StrokeWidth="3">
+            <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#14b8a6" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Data="@westData" CategoryProperty="Month" ValueProperty="Revenue" Title="West" Stroke="#f59e0b" StrokeWidth="3">
+            <RadzenMarkers MarkerType="MarkerType.Circle" Fill="#f59e0b" />
+        </RadzenLineSeries>
+        <RadzenLegend Position="LegendPosition.Bottom" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Month { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    DataItem[] northData = new DataItem[]
+    {
+        new DataItem { Month = "Jan", Revenue = 234 },
+        new DataItem { Month = "Feb", Revenue = 269 },
+        new DataItem { Month = "Mar", Revenue = 233 },
+        new DataItem { Month = "Apr", Revenue = 244 },
+        new DataItem { Month = "May", Revenue = 214 },
+        new DataItem { Month = "Jun", Revenue = 253 },
+    };
+
+    DataItem[] southData = new DataItem[]
+    {
+        new DataItem { Month = "Jan", Revenue = 180 },
+        new DataItem { Month = "Feb", Revenue = 205 },
+        new DataItem { Month = "Mar", Revenue = 198 },
+        new DataItem { Month = "Apr", Revenue = 232 },
+        new DataItem { Month = "May", Revenue = 254 },
+        new DataItem { Month = "Jun", Revenue = 268 },
+    };
+
+    DataItem[] westData = new DataItem[]
+    {
+        new DataItem { Month = "Jan", Revenue = 145 },
+        new DataItem { Month = "Feb", Revenue = 162 },
+        new DataItem { Month = "Mar", Revenue = 184 },
+        new DataItem { Month = "Apr", Revenue = 176 },
+        new DataItem { Month = "May", Revenue = 199 },
+        new DataItem { Month = "Jun", Revenue = 221 },
+    };
+}

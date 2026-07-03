@@ -1,0 +1,34 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenChart>
+        <RadzenLineSeries Data="@revenue" CategoryProperty="Month" ValueProperty="Revenue" Title="Revenue">
+            <RadzenMarkers MarkerType="MarkerType.Circle" />
+            <RadzenSeriesDataLabels Formatter="@FormatAsUSD" />
+        </RadzenLineSeries>
+        <RadzenValueAxis Formatter="@FormatAsUSD" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Month { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue = new DataItem[]
+    {
+        new DataItem { Month = "Jan", Revenue = 234000 },
+        new DataItem { Month = "Feb", Revenue = 269000 },
+        new DataItem { Month = "Mar", Revenue = 233000 },
+        new DataItem { Month = "Apr", Revenue = 244000 },
+        new DataItem { Month = "May", Revenue = 214000 },
+        new DataItem { Month = "Jun", Revenue = 253000 },
+    };
+}

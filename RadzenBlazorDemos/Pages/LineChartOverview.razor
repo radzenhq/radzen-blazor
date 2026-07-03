@@ -1,0 +1,70 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenChart Animate="true" Style="height: 420px;">
+        <RadzenChartTooltipOptions Shared="true" />
+        <RadzenLineSeries Smooth="true" Data="@subscriptionRevenue" CategoryProperty="Week" ValueProperty="Revenue" Title="Subscriptions" StrokeWidth="3" />
+        <RadzenLineSeries Smooth="true" Data="@marketplaceRevenue" CategoryProperty="Week" ValueProperty="Revenue" Title="Marketplace" StrokeWidth="3" />
+        <RadzenCategoryAxis Step="@(TimeSpan.FromDays(28))" FormatString="{0:MMM d}">
+            <RadzenAxisCrosshair Visible="true" Label="true" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
+            <RadzenAxisTitle Text="Weekly net revenue" />
+        </RadzenValueAxis>
+        <RadzenLegend Position="LegendPosition.Bottom" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public DateTime Week { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    // First Monday of 2025; one point per week for the full year.
+    static readonly DateTime seasonStart = new DateTime(2025, 1, 6);
+
+    static IEnumerable<DataItem> Weekly(double[] values) =>
+        values.Select((revenue, week) => new DataItem { Week = seasonStart.AddDays(7 * week), Revenue = revenue });
+
+    // 52 weekly figures: post-holiday dip, spring ramp, summer slowdown,
+    // autumn recovery and a Black Friday / Cyber Monday spike before year end.
+    IEnumerable<DataItem> subscriptionRevenue = Weekly(new double[]
+    {
+        182400, 176900, 188300, 195600,                 // Jan
+        201200, 208700, 199400, 214300,                 // Feb
+        221800, 217500, 229100, 235400, 241900,         // Mar
+        238600, 246200, 252800, 248100,                 // Apr
+        257300, 263900, 259200, 268400, 274100,         // May
+        269700, 261300, 255800, 248900,                 // Jun
+        242100, 238600, 246300, 251700,                 // Jul
+        244900, 239200, 250600, 258300, 264800,         // Aug
+        273400, 281900, 289300, 284600,                 // Sep
+        296200, 304700, 312300, 308900,                 // Oct
+        318400, 327800, 358200, 372600,                 // Nov - Black Friday surge
+        389300, 364700, 351200, 338900, 324600,         // Dec - holiday peak then wind-down
+    });
+
+    IEnumerable<DataItem> marketplaceRevenue = Weekly(new double[]
+    {
+        58300, 52100, 61800, 66400,                     // Jan
+        71200, 68900, 74600, 82300,                     // Feb
+        79100, 86700, 91200, 84800, 93500,              // Mar
+        88200, 96400, 102800, 95300,                    // Apr
+        104700, 111200, 98600, 113800, 121400,          // May
+        109300, 102700, 96200, 89800,                   // Jun
+        84600, 91300, 98700, 87400,                     // Jul
+        93200, 101800, 96400, 108300, 114900,           // Aug
+        107600, 119200, 126800, 118400,                 // Sep
+        131300, 142700, 138200, 149600,                 // Oct
+        156800, 168300, 224700, 261400,                 // Nov - Cyber Week spike
+        198600, 172300, 158900, 144700, 131200,         // Dec
+    });
+}

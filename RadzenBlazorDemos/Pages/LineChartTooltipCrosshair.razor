@@ -1,0 +1,55 @@
+@using System.Globalization
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenChart>
+        <RadzenChartTooltipOptions Shared="true" />
+        <RadzenLineSeries Data="@revenue2024" CategoryProperty="Date" ValueProperty="Revenue" Title="2024">
+            <RadzenMarkers MarkerType="MarkerType.Circle" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Data="@revenue2023" CategoryProperty="Date" ValueProperty="Revenue" Title="2023">
+            <RadzenMarkers MarkerType="MarkerType.Circle" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis>
+            <RadzenAxisCrosshair Visible="true" Snap="true" Label="true" />
+        </RadzenCategoryAxis>
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" LineType="LineType.Dashed" />
+        </RadzenValueAxis>
+        <RadzenLegend Position="LegendPosition.Bottom" />
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+    class DataItem
+    {
+        public string Date { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue2023 = new DataItem[] {
+        new DataItem { Date = "Jan", Revenue = 234000 },
+        new DataItem { Date = "Feb", Revenue = 269000 },
+        new DataItem { Date = "Mar", Revenue = 233000 },
+        new DataItem { Date = "Apr", Revenue = 244000 },
+        new DataItem { Date = "May", Revenue = 214000 },
+        new DataItem { Date = "Jun", Revenue = 253000 },
+        new DataItem { Date = "Jul", Revenue = 274000 },
+        new DataItem { Date = "Aug", Revenue = 284000 },
+    };
+
+    DataItem[] revenue2024 = new DataItem[] {
+        new DataItem { Date = "Jan", Revenue = 334000 },
+        new DataItem { Date = "Feb", Revenue = 369000 },
+        new DataItem { Date = "Mar", Revenue = 333000 },
+        new DataItem { Date = "Apr", Revenue = 344000 },
+        new DataItem { Date = "May", Revenue = 314000 },
+        new DataItem { Date = "Jun", Revenue = 353000 },
+        new DataItem { Date = "Jul", Revenue = 374000 },
+        new DataItem { Date = "Aug", Revenue = 384000 },
+    };
+}

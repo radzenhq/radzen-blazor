@@ -1516,10 +1516,12 @@ namespace RadzenBlazorDemos
                     Children = new [] {
                         new Example
                         {
+                            Toc = [ new () { Text = "Overview", Anchor = "#overview" }, new () { Text = "Basic line", Anchor = "#basic" }, new () { Text = "Markers", Anchor = "#markers" }, new () { Text = "Multiple series", Anchor = "#multiple-series" }, new () { Text = "Line styles", Anchor = "#line-styles" }, new () { Text = "Data labels", Anchor = "#data-labels" }, new () { Text = "Custom colors", Anchor = "#custom-colors" }, new () { Text = "Tooltip and crosshair", Anchor = "#tooltip-crosshair" }, new () { Text = "Interactive configuration", Anchor = "#config" } ],
                             Name = "Line Chart",
                             Path = "line-chart",
                             Description = "Show a trend over time with a Blazor line chart - the clearest way to follow how a value changes. Free and open source.",
                             Tags = new [] { "chart", "graph", "line" },
+                            Updated = true,
                             Related = new [] { "area-chart", "spline-chart", "step-line-chart", "column-chart" },
                             Faq = new []
                             {
