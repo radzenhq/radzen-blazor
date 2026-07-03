@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -139,5 +140,46 @@ public class ChartTests
 
         chart.SetParametersAndRender(parameters => parameters.Add(p => p.AllowZoom, false));
         Assert.Equal("false", chart.Find("[data-allow-zoom]").GetAttribute("data-allow-zoom"));
+    }
+
+    [Fact]
+    public async Task Chart_ToPng_ReturnsPngData()
+    {
+        using var ctx = CreateChartContext();
+        ctx.JSInterop.Setup<string>("Radzen.chartToSvg", _ => true).SetResult("<svg></svg>");
+
+        var data = new byte[] { 137, 80, 78, 71 };
+        ctx.JSInterop.Setup<IJSStreamReference>("Radzen.svgToPng", _ => true).SetResult(new TestJSStreamReference(data));
+
+        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+            .AddChildContent<RadzenColumnSeries<MultiAxisItem>>(series => series
+                .Add(p => p.CategoryProperty, nameof(MultiAxisItem.Month))
+                .Add(p => p.ValueProperty, nameof(MultiAxisItem.Revenue))
+                .Add(p => p.Data, TallBarData)));
+
+        var result = await chart.Instance.ToPng(800, 600);
+
+        Assert.Equal(data, result);
+    }
+
+    [Fact]
+    public async Task Chart_ToPng_PassesSizeToInterop()
+    {
+        using var ctx = CreateChartContext();
+        ctx.JSInterop.Setup<string>("Radzen.chartToSvg", _ => true).SetResult("<svg></svg>");
+
+        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+            .AddChildContent<RadzenColumnSeries<MultiAxisItem>>(series => series
+                .Add(p => p.CategoryProperty, nameof(MultiAxisItem.Month))
+                .Add(p => p.ValueProperty, nameof(MultiAxisItem.Revenue))
+                .Add(p => p.Data, TallBarData)));
+
+        await chart.Instance.ToPng("chart.png", 800, 600);
+
+        var invocation = ctx.JSInterop.VerifyInvoke("Radzen.downloadSvgAsPng");
+        Assert.Equal("<svg></svg>", invocation.Arguments[0]);
+        Assert.Equal("chart.png", invocation.Arguments[1]);
+        Assert.Equal(800, invocation.Arguments[2]);
+        Assert.Equal(600, invocation.Arguments[3]);
     }
 }

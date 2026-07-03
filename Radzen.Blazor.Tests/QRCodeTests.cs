@@ -1,4 +1,6 @@
 using Bunit;
+using Microsoft.JSInterop;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -201,6 +203,47 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains(@"class=""rz-qrcode""", component.Markup);
+        }
+
+        [Fact]
+        public async Task QRCode_ToPng_ReturnsPngData()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Setup<string>("Radzen.outerHTML", _ => true).SetResult("<svg></svg>");
+
+            var data = new byte[] { 137, 80, 78, 71 };
+            ctx.JSInterop.Setup<IJSStreamReference>("Radzen.svgToPng", _ => true).SetResult(new TestJSStreamReference(data));
+
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            {
+                p.Add(x => x.Value, "AB");
+            });
+
+            var result = await component.Instance.ToPng(256, 256);
+
+            Assert.Equal(data, result);
+        }
+
+        [Fact]
+        public async Task QRCode_ToPng_PassesSizeToInterop()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Setup<string>("Radzen.outerHTML", _ => true).SetResult("<svg></svg>");
+
+            var component = ctx.RenderComponent<RadzenQRCode>(p =>
+            {
+                p.Add(x => x.Value, "AB");
+            });
+
+            await component.Instance.ToPng("code.png", 512, 512);
+
+            var invocation = ctx.JSInterop.VerifyInvoke("Radzen.downloadSvgAsPng");
+            Assert.Equal("<svg></svg>", invocation.Arguments[0]);
+            Assert.Equal("code.png", invocation.Arguments[1]);
+            Assert.Equal(512, invocation.Arguments[2]);
+            Assert.Equal(512, invocation.Arguments[3]);
         }
     }
 }

@@ -3546,8 +3546,8 @@ window.Radzen = {
 
     return new XMLSerializer().serializeToString(clone);
   },
-  downloadSvgAsPng: async function (svg, fileName) {
-    if (!svg) return;
+  svgToPng: async function (svg, width, height) {
+    if (!svg) return null;
 
     var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     var img = new Image();
@@ -3557,12 +3557,17 @@ window.Radzen = {
       img.src = svgUrl;
     });
 
-    var width = img.naturalWidth || img.width;
-    var height = img.naturalHeight || img.height;
-    var scale = Math.max(2, window.devicePixelRatio || 1);
+    var naturalWidth = img.naturalWidth || img.width;
+    var naturalHeight = img.naturalHeight || img.height;
     var canvas = document.createElement('canvas');
-    canvas.width = Math.round(width * scale);
-    canvas.height = Math.round(height * scale);
+    if (width > 0 || height > 0) {
+      canvas.width = Math.round(width > 0 ? width : height * naturalWidth / naturalHeight);
+      canvas.height = Math.round(height > 0 ? height : width * naturalHeight / naturalWidth);
+    } else {
+      var scale = Math.max(2, window.devicePixelRatio || 1);
+      canvas.width = Math.round(naturalWidth * scale);
+      canvas.height = Math.round(naturalHeight * scale);
+    }
     var ctx = canvas.getContext('2d');
     var background = getComputedStyle(document.body).backgroundColor;
     if (background && background !== 'rgba(0, 0, 0, 0)') {
@@ -3571,13 +3576,15 @@ window.Radzen = {
     }
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    var self = this;
-    await new Promise(function (resolve) {
-      canvas.toBlob(function (blob) {
-        self.downloadFile(fileName, blob, 'image/png');
-        resolve();
-      }, 'image/png');
+    return await new Promise(function (resolve) {
+      canvas.toBlob(resolve, 'image/png');
     });
+  },
+  downloadSvgAsPng: async function (svg, fileName, width, height) {
+    var blob = await this.svgToPng(svg, width, height);
+    if (blob) {
+      this.downloadFile(fileName, blob, 'image/png');
+    }
   },
   createChart: function (ref, instance, mouseMoveInterval) {
     var inside = false;

@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -214,13 +215,43 @@ namespace Radzen.Blazor
         /// Renders the QR code as a PNG image and downloads it in the browser.
         /// </summary>
         /// <param name="fileName">The download file name. Default is <c>qrcode.png</c>.</param>
-        public async Task ToPng(string fileName = "qrcode.png")
+        /// <param name="width">The PNG width in pixels. When omitted the rendered size scaled by the device pixel ratio is used.</param>
+        /// <param name="height">The PNG height in pixels. When omitted it is derived from <paramref name="width"/> preserving the aspect ratio.</param>
+        public async Task ToPng(string fileName = "qrcode.png", int? width = null, int? height = null)
         {
             if (JSRuntime != null)
             {
                 var svg = await ToSvg();
-                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName);
+                await JSRuntime.InvokeVoidAsync("Radzen.downloadSvgAsPng", svg, fileName, width, height);
             }
+        }
+
+        /// <summary>
+        /// Renders the QR code as a PNG image and returns the image data.
+        /// Use this to store the QR code in a database, embed it in documents, or send it to an API instead of downloading it.
+        /// </summary>
+        /// <param name="width">The PNG width in pixels. When <c>null</c> the rendered size scaled by the device pixel ratio is used.</param>
+        /// <param name="height">The PNG height in pixels. When <c>null</c> it is derived from <paramref name="width"/> preserving the aspect ratio.</param>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the PNG image data.
+        /// </returns>
+        public async Task<byte[]> ToPng(int? width, int? height = null)
+        {
+            if (JSRuntime != null)
+            {
+                var svg = await ToSvg();
+
+                if (!string.IsNullOrEmpty(svg))
+                {
+                    await using var png = await JSRuntime.InvokeAsync<IJSStreamReference>("Radzen.svgToPng", svg, width, height);
+                    using var stream = await png.OpenReadStreamAsync(maxAllowedSize: 32 * 1024 * 1024);
+                    using var memoryStream = new MemoryStream();
+                    await stream.CopyToAsync(memoryStream);
+                    return memoryStream.ToArray();
+                }
+            }
+
+            return Array.Empty<byte>();
         }
     }
 }
