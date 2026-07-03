@@ -234,6 +234,7 @@
             builder.CloseComponent(); // Close CascadingValue
         });
         isSideDialogOpen = true;
+        sideDialogJsOpened = false;
         StateHasChanged();
     }
 
@@ -247,6 +248,8 @@
 
     private bool sideDialogClosing = false;
 
+    private bool sideDialogJsOpened = false;
+
     private async Task OnSideCloseAsync()
     {
         sideDialogClosing = true;
@@ -257,8 +260,17 @@
 
         isSideDialogOpen = false;
         sideDialogClosing = false;
+        sideDialogJsOpened = false;
 
         StateHasChanged();
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.closeSideDialog");
+        }
+        catch (Exception ex) when (ex is JSDisconnectedException || ex is OperationCanceledException || ex is JSException)
+        {
+        }
 
         Service?.OnSideCloseComplete();
     }
@@ -313,7 +325,11 @@
 
         if (isSideDialogOpen)
         {
-            await JSRuntime.InvokeAsync<string>("Radzen.openSideDialog", sideDialogOptions);
+            if (!sideDialogJsOpened)
+            {
+                sideDialogJsOpened = true;
+                await JSRuntime.InvokeAsync<string>("Radzen.openSideDialog", sideDialogOptions, Service?.Reference);
+            }
 
             if (sideDialogOptions is { Resizable: true } && resizeBarElement.HasValue)
             {

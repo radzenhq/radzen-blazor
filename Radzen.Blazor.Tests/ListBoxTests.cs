@@ -271,7 +271,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Data, new List<string> { "Apple", "Banana" });
             });
 
-            var listbox = component.Find("div[role=\"listbox\"]");
+            var listbox = component.Find("ul[role=\"listbox\"]");
 
             Assert.NotNull(listbox.GetAttribute("tabindex"));
             Assert.Equal("false", listbox.GetAttribute("aria-multiselectable"));
@@ -289,7 +289,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.EmptyAriaLabel, "Fruits");
             });
 
-            var listbox = component.Find("div[role=\"listbox\"]");
+            var listbox = component.Find("ul[role=\"listbox\"]");
 
             Assert.Equal("Fruits", listbox.GetAttribute("aria-label"));
         }
@@ -306,7 +306,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Data, new List<string> { "Apple", "Banana" });
             });
 
-            var listbox = component.Find("div[role=\"listbox\"]");
+            var listbox = component.Find("ul[role=\"listbox\"]");
 
             Assert.Equal("true", listbox.GetAttribute("aria-multiselectable"));
         }
@@ -366,13 +366,13 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Data, new List<string> { "Apple", "Banana", "Cherry" });
             });
 
-            var listbox = component.Find("div[role=\"listbox\"]");
+            var listbox = component.Find("ul[role=\"listbox\"]");
 
             Assert.True(string.IsNullOrEmpty(listbox.GetAttribute("aria-activedescendant")));
 
             listbox.KeyDown(new KeyboardEventArgs { Key = "ArrowDown" });
 
-            listbox = component.Find("div[role=\"listbox\"]");
+            listbox = component.Find("ul[role=\"listbox\"]");
             var active = listbox.GetAttribute("aria-activedescendant");
 
             Assert.False(string.IsNullOrEmpty(active));

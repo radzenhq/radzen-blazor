@@ -29,6 +29,12 @@ public partial class Expander : ComponentBase
     public string CssClass { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the ARIA role rendered on the expander element.
+    /// </summary>
+    [Parameter]
+    public string Role { get; set; } = "region";
+
+    /// <summary>
     /// Determines whether the content is visible.
     /// </summary>
     [Parameter]

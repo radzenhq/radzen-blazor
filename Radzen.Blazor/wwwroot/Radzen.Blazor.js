@@ -1506,6 +1506,25 @@ window.Radzen = {
         table.nextSelectedIndex = rows.length - 1;
     } else if (isVirtual && (key == 'PageUp' || key == 'Home')) {
         table.nextSelectedIndex = 1;
+    } else if (!isVirtual && (key == 'PageDown' || key == 'PageUp' || key == 'Home' || key == 'End')) {
+        var firstDataIndex = thead && thead.rows && thead.rows.length && cellIndex != null ? thead.rows.length : 1;
+        if (firstDataIndex > rows.length - 1) {
+            firstDataIndex = rows.length - 1;
+        }
+        if (key == 'Home') {
+            table.nextSelectedIndex = firstDataIndex;
+        } else if (key == 'End') {
+            table.nextSelectedIndex = rows.length - 1;
+        } else {
+            var pageFactor = 10;
+            table.nextSelectedIndex = table.nextSelectedIndex + (key == 'PageDown' ? pageFactor : -pageFactor);
+            if (table.nextSelectedIndex > rows.length - 1) {
+                table.nextSelectedIndex = rows.length - 1;
+            }
+            if (table.nextSelectedIndex < firstDataIndex) {
+                table.nextSelectedIndex = firstDataIndex;
+            }
+        }
     }
 
     if (isVirtual && (key == 'ArrowDown' || key == 'ArrowUp')) {
@@ -1526,20 +1545,10 @@ window.Radzen = {
         var prev = document.getElementById(activeId);
         if (prev && prev !== el) {
             prev.removeAttribute('id');
-            if (prev.hasAttribute('data-rz-active-selected')) {
-                prev.removeAttribute('data-rz-active-selected');
-                if (prev.hasAttribute('aria-selected')) {
-                    prev.setAttribute('aria-selected', 'false');
-                }
-            }
         }
         if (el && el.id !== activeId) { el.id = activeId; }
         if (el) {
             grid.setAttribute('aria-activedescendant', activeId);
-            if (el.tagName === 'TR' && el.hasAttribute('aria-selected')) {
-                el.setAttribute('aria-selected', 'true');
-                el.setAttribute('data-rz-active-selected', '');
-            }
         }
     };
 
@@ -1565,7 +1574,7 @@ window.Radzen = {
             }
             setActiveDescendant(cell);
         }
-    } else if (key == 'ArrowDown' || key == 'ArrowUp') {
+    } else if (key == 'ArrowDown' || key == 'ArrowUp' || (!isVirtual && (key == 'PageDown' || key == 'PageUp' || key == 'Home' || key == 'End'))) {
         var highlighted = table.querySelectorAll('.rz-state-focused');
         if (highlighted.length) {
             for (var i = 0; i < highlighted.length; i++) {
@@ -2567,7 +2576,25 @@ window.Radzen = {
           first.focus();
       }
   },
-  openSideDialog: function (options) {
+  openSideDialog: function (options, dialogService) {
+      if (dialogService) {
+          Radzen.sideDialogService = dialogService;
+      }
+      if (!Radzen.sideDialogInvokerElement) {
+          var invoker = document.activeElement;
+          if (invoker && invoker !== document.body && !invoker.closest('.rz-dialog-side')) {
+              Radzen.sideDialogInvokerElement = invoker;
+          }
+      }
+      var sideDialog = document.querySelector('.rz-dialog-side');
+      if (sideDialog) {
+          sideDialog.removeEventListener('keydown', Radzen.focusTrap);
+          if (options.showMask) {
+              sideDialog.addEventListener('keydown', Radzen.focusTrap);
+          }
+          sideDialog.removeEventListener('keydown', Radzen.closeSideDialogOnEsc);
+          sideDialog.addEventListener('keydown', Radzen.closeSideDialogOnEsc);
+      }
       setTimeout(function () {
           if (options.autoFocusFirstElement) {
               var dialogs = document.querySelectorAll('.rz-dialog-side-content');
@@ -2576,6 +2603,29 @@ window.Radzen = {
               Radzen.focusFirstFocusableElement(lastDialog);
           }
       }, 500);
+  },
+  closeSideDialog: function () {
+      delete Radzen.sideDialogService;
+      var invoker = Radzen.sideDialogInvokerElement;
+      Radzen.sideDialogInvokerElement = null;
+      if (invoker && typeof invoker.focus === 'function' && document.body.contains(invoker)) {
+          invoker.focus();
+      }
+  },
+  closeSideDialogOnEsc: function (e) {
+      e = e || window.event;
+      var isEscape = "key" in e ? (e.key === "Escape" || e.key === "Esc") : (e.keyCode === 27);
+      if (isEscape && Radzen.sideDialogService) {
+          var popups = document.querySelectorAll('.rz-popup,.rz-overlaypanel');
+          for (var i = 0; i < popups.length; i++) {
+              if (popups[i].style.display != 'none') {
+                  return;
+              }
+          }
+          try {
+              Radzen.sideDialogService.invokeMethodAsync('DialogService.TryCloseSide', null);
+          } catch (ex) { }
+      }
   },
   createSideDialogResizer: function(handle, sideDialog, options) {
       const normalizeDir = (value) => {
@@ -2666,6 +2716,15 @@ window.Radzen = {
       document.body.classList.add('no-scroll');
     }
 
+    var currentDialogs = document.querySelectorAll('.rz-dialog-content');
+    var currentDialog = currentDialogs.length ? currentDialogs[currentDialogs.length - 1] : null;
+    if (currentDialog) {
+        currentDialog.options = options;
+        var dialogRoot = currentDialog.closest('.rz-dialog') || currentDialog;
+        dialogRoot.removeEventListener('keydown', Radzen.focusTrap);
+        dialogRoot.addEventListener('keydown', Radzen.focusTrap);
+    }
+
     setTimeout(function () {
         var dialogs = document.querySelectorAll('.rz-dialog-content');
         if (dialogs.length == 0) return;
@@ -2673,8 +2732,6 @@ window.Radzen = {
 
         if (lastDialog) {
             lastDialog.options = options;
-            lastDialog.removeEventListener('keydown', Radzen.focusTrap);
-            lastDialog.addEventListener('keydown', Radzen.focusTrap);
 
             if (options.resizable) {
                 dialog.offsetWidth = lastDialog.parentElement.offsetWidth;
@@ -5806,13 +5863,21 @@ Radzen.chatScrollAfterRender = function(selector, delay) {
     if (container) container.scrollTop = container.scrollHeight;
   }, delay || 100);
 };
-Radzen.createAutoComplete = function(el, popupId, openOnFocus) {
+Radzen.createAutoComplete = function(el, popupId, openOnFocus, instance, openCallback, closeCallback) {
   if (!el) return null;
   var input = el.querySelector('input.rz-autocomplete-input, textarea.rz-autocomplete-input');
   var list = el.querySelector('.rz-autocomplete-list');
   if (!input) return null;
-  function onInput() { Radzen.openPopup(input.parentNode, popupId, true); }
-  function onFocus() { Radzen.openPopup(input.parentNode, popupId, true); }
+  function open() {
+    var popup = document.getElementById(popupId);
+    var wasOpen = popup && popup.style.display == 'block';
+    Radzen.openPopup(input.parentNode, popupId, true, null, null, null, instance, closeCallback);
+    if (!wasOpen && instance && openCallback) {
+      try { suppressDisposed(instance.invokeMethodAsync(openCallback)); } catch { }
+    }
+  }
+  function onInput() { open(); }
+  function onFocus() { open(); }
   function clearActive() { Radzen.activeElement = null; }
   input.addEventListener('input', onInput);
   input.addEventListener('blur', clearActive);

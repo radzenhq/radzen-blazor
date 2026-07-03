@@ -43,9 +43,11 @@
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {
-        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Pager component." },
-        new KeyboardShortcut { Key = "LeftArrow", Action = "Focus previous Pager page." },
-        new KeyboardShortcut { Key = "RightArrow", Action = "Focus next Pager page." },
-        new KeyboardShortcut { Key = "Enter or Space", Action = "Go to the focused Pager page." }
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to the active Pager button." },
+        new KeyboardShortcut { Key = "LeftArrow", Action = "Focus previous Pager button." },
+        new KeyboardShortcut { Key = "RightArrow", Action = "Focus next Pager button." },
+        new KeyboardShortcut { Key = "Home", Action = "Focus first Pager button." },
+        new KeyboardShortcut { Key = "End", Action = "Focus last Pager button." },
+        new KeyboardShortcut { Key = "Enter or Space", Action = "Activate the focused Pager button." }
     };
 }

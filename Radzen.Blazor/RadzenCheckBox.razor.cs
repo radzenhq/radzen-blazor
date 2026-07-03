@@ -38,6 +38,13 @@ namespace Radzen.Blazor
         public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
+        /// Gets or sets the aria-label attribute of the checkbox.
+        /// </summary>
+        /// <value>The aria-label attribute.</value>
+        [Parameter]
+        public string? AriaLabel { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the checkbox supports three states: checked (true), unchecked (false), and indeterminate (null).
         /// When enabled, clicking cycles through all three states. Use with nullable boolean (<c>bool?</c>) values.
         /// </summary>

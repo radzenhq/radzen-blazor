@@ -8,7 +8,7 @@
         @onfocus=@OnFocus>
         @if (Responsive)
         {
-        <li class="rz-menu-toggle-item">
+        <li class="rz-menu-toggle-item" role="none">
             <button type="button" aria-label=@ToggleAriaLabel class="rz-menu-toggle" @onclick=@OnToggle
                     aria-haspopup="menu" aria-expanded="@IsOpen.ToString().ToLowerInvariant()" aria-controls="@GetId()">
                 @if (IsOpen)

@@ -330,7 +330,7 @@ namespace Radzen.Blazor.Tests
             var toggle = component.Find("div.rz-navigation-item-wrapper[role=button]");
             toggle.KeyDown(new KeyboardEventArgs { Code = "ArrowDown" });
 
-            var activeId = component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant");
+            var activeId = component.Find("ul.rz-navigation-menu").GetAttribute("aria-activedescendant");
 
             Assert.False(string.IsNullOrEmpty(activeId));
 
@@ -364,7 +364,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.All(component.FindAll("li[role=menuitem]"), item => Assert.Equal("-1", item.GetAttribute("tabindex")));
 
-            var activeId = toggle.GetAttribute("aria-activedescendant");
+            var activeId = component.Find("ul.rz-navigation-menu").GetAttribute("aria-activedescendant");
             Assert.False(string.IsNullOrEmpty(activeId));
 
             var focusedItems = component.FindAll("li[role=menuitem].rz-state-focused");
@@ -395,7 +395,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(1, component.Instance.focusedIndex);
 
-            var activeId = component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant");
+            var activeId = component.Find("ul.rz-navigation-menu").GetAttribute("aria-activedescendant");
             var lastItem = component.FindAll("li[role=menuitem]")[1];
 
             Assert.Equal(lastItem.Id, activeId);
@@ -449,7 +449,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(-1, component.Instance.focusedIndex);
 
-            Assert.True(string.IsNullOrEmpty(component.Find("div.rz-navigation-item-wrapper[role=button]").GetAttribute("aria-activedescendant")));
+            Assert.True(string.IsNullOrEmpty(component.Find("ul.rz-navigation-menu").GetAttribute("aria-activedescendant")));
 
             var menu = component.Find("ul.rz-navigation-menu");
             Assert.Equal("true", menu.GetAttribute("aria-hidden"));

@@ -188,6 +188,24 @@ namespace Radzen.Blazor
         [Parameter]
         public string EmptyText { get => emptyText ?? Localize(nameof(RadzenStrings.PickList_EmptyText)); set => emptyText = value; }
 
+        private string? sourceAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria-label of the source list. Ignored when <see cref="SourceHeader"/> is rendered - the source list is labelled by the header instead.
+        /// </summary>
+        /// <value>The source list aria-label.</value>
+        [Parameter]
+        public string SourceAriaLabel { get => sourceAriaLabel ?? Localize(nameof(RadzenStrings.PickList_SourceAriaLabel)); set => sourceAriaLabel = value; }
+
+        private string? targetAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria-label of the target list. Ignored when <see cref="TargetHeader"/> is rendered - the target list is labelled by the header instead.
+        /// </summary>
+        /// <value>The target list aria-label.</value>
+        [Parameter]
+        public string TargetAriaLabel { get => targetAriaLabel ?? Localize(nameof(RadzenStrings.PickList_TargetAriaLabel)); set => targetAriaLabel = value; }
+
         /// <summary>
         /// Gets or sets the empty text shown when the source list has no items. Overrides <see cref="EmptyText"/>.
         /// </summary>

@@ -7,7 +7,7 @@
 {
     <div @ref=@Element style=@Style @onclick=@Toggle @attributes=@Attributes class=@GetCssClass() id=@GetId()
          role="button" aria-haspopup="dialog" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@($"{GetId()}-popup")" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
-         tabindex="@(Disabled ? -1 : TabIndex)" @onkeypress="@(args => OnKeyPress(args, Toggle()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation="stopKeypressPropagation">
+         tabindex="@(Disabled ? -1 : TabIndex)" @onkeydown="@OnTriggerKeyDown" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeypressPropagation">
         @if (Icon != null)
         {
             <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
@@ -23,7 +23,9 @@
             @if (ShowHSV)
             {
                 <Draggable class="rz-saturation-picker rz-colorpicker-section" style=@($"background-color: hsl({(HueHandleLeft * 360).ToInvariantString()}, 100%, 50%)") Drag=@OnSaturationMove
-                           id=@(GetId() + "hsl" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnHslKeyPress(args))">
+                           id=@(GetId() + "hsl" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnHslKeyPress(args))"
+                           role="slider" aria-roledescription="2D slider" aria-label="@SaturationAriaLabel"
+                           aria-valuemin="0" aria-valuemax="100" aria-valuenow="@SaturationPercent" aria-valuetext="@SaturationValueText">
                     <div class="rz-saturation-white">
                         <div class="rz-saturation-black"></div>
                         <div class="rz-saturation-handle" style=@($"top: {(SaturationHandleTop * 100).ToInvariantString()}%; left: {(SaturationHandleLeft * 100).ToInvariantString()}%")></div>
@@ -31,12 +33,16 @@
                 </Draggable>
                 <div class="rz-colorpicker-preview-area rz-colorpicker-section">
                     <div class="rz-hue-and-alpha">
-                        <Draggable class="rz-hue-picker" Drag=@OnHueMove 
-                            id=@(GetId() + "hue" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnHueKeyPress(args))">
+                        <Draggable class="rz-hue-picker" Drag=@OnHueMove
+                            id=@(GetId() + "hue" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnHueKeyPress(args))"
+                            role="slider" aria-orientation="horizontal" aria-label="@HueAriaLabel"
+                            aria-valuemin="0" aria-valuemax="360" aria-valuenow="@HuePercent">
                             <div class="rz-hue-handle" style=@($"top: 0; left: {(HueHandleLeft * 100).ToInvariantString()}%")></div>
                         </Draggable>
                         <Draggable style=@($"background-image: linear-gradient(to right, {AlphaGradientStart} 0%, {AlphaGradientEnd} 100%)") class="rz-alpha-picker" Drag=@OnAlphaMove
-                            id=@(GetId() + "alpha" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnAlphaKeyPress(args))">
+                            id=@(GetId() + "alpha" ) tabindex="@(Disabled ? -1 : 0)" @onkeydown="@(args => OnAlphaKeyPress(args))"
+                            role="slider" aria-orientation="horizontal" aria-label="@AlphaAriaLabel"
+                            aria-valuemin="0" aria-valuemax="100" aria-valuenow="@Alpha">
                             <div class="rz-alpha-handle" style=@($"top: 0; left: {(AlphaHandleLeft * 100).ToInvariantString()}%")></div>
                         </Draggable>
                     </div>

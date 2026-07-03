@@ -160,6 +160,7 @@ namespace Radzen.Blazor
 
         string? customSearchText;
         int selectedIndex = -1;
+        bool popupOpened;
 
         /// <summary>
         /// Handles the FilterKeyPress event.
@@ -195,19 +196,16 @@ namespace Radzen.Blazor
                     selectedIndex = -1;
                 }
 
-                if (key == "Tab" && JSRuntime != null)
+                if (key == "Tab")
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                    await ClosePopup();
                 }
             }
             else if (key == "Escape")
             {
                 selectedIndex = -1;
 
-                if (JSRuntime != null)
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-                }
+                await ClosePopup();
             }
             else
             {
@@ -230,7 +228,8 @@ namespace Radzen.Blazor
             
             if (value.Length < MinLength && !OpenOnFocus)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                await ClosePopup();
+                await InvokeAsync(() => { StateHasChanged(); });
                 return;
             }
 
@@ -260,14 +259,48 @@ namespace Radzen.Blazor
 
         private string? ActiveDescendantId => selectedIndex >= 0 ? ItemId(selectedIndex) : null;
 
-        private bool IsPopupOpen => OpenOnFocus || (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(customSearchText));
+        private bool IsPopupOpen => popupOpened;
 
-        private async Task OnSelectItem(object item)
+        /// <summary>
+        /// Invoked from client-side code when the suggestion popup opens.
+        /// </summary>
+        [JSInvokable]
+        public async Task OnPopupOpen()
         {
+            if (!popupOpened)
+            {
+                popupOpened = true;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        /// <summary>
+        /// Invoked from client-side code when the suggestion popup closes.
+        /// </summary>
+        [JSInvokable]
+        public async Task OnPopupClose()
+        {
+            if (popupOpened || selectedIndex != -1)
+            {
+                popupOpened = false;
+                selectedIndex = -1;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        private async Task ClosePopup()
+        {
+            popupOpened = false;
+
             if (JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
+        }
+
+        private async Task OnSelectItem(object item)
+        {
+            await ClosePopup();
 
             await SelectItem(item);
         }
@@ -421,7 +454,7 @@ namespace Radzen.Blazor
                 }
 
                 _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "Radzen.createAutoComplete", Element, PopupID, OpenOnFocus);
+                    "Radzen.createAutoComplete", Element, PopupID, OpenOnFocus, Reference, nameof(OnPopupOpen), nameof(OnPopupClose));
             }
         }
 
@@ -459,6 +492,8 @@ namespace Radzen.Blazor
 
             if (shouldClose && !firstRender && JSRuntime != null)
             {
+                popupOpened = false;
+                selectedIndex = -1;
                 await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
             }
         }

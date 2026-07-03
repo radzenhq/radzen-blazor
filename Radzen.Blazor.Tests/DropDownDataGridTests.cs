@@ -119,9 +119,11 @@ namespace Radzen.Blazor.Tests
             });
 
             var searchInput = component.Find("input.rz-lookup-search-input");
+            var grid = component.Find("div[role='grid']");
 
             Assert.Equal("combobox", searchInput.GetAttribute("role"));
-            Assert.NotNull(searchInput.GetAttribute("aria-controls"));
+            Assert.Equal(grid.Id, searchInput.GetAttribute("aria-controls"));
+            Assert.Equal("grid", searchInput.GetAttribute("aria-haspopup"));
             Assert.Equal("list", searchInput.GetAttribute("aria-autocomplete"));
             Assert.NotNull(searchInput.GetAttribute("aria-expanded"));
         }

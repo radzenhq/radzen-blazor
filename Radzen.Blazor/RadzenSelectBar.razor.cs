@@ -304,16 +304,26 @@ namespace Radzen.Blazor
                 var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
 
                 var start = focusedIndex < 0 ? 0 : focusedIndex;
-                var next = start + direction;
+                var next = start;
 
-                while (next >= 0 && next < navigableItems.Count && navigableItems[next].Disabled)
+                for (var step = 0; step < navigableItems.Count; step++)
                 {
-                    next += direction;
+                    next = (next + direction + navigableItems.Count) % navigableItems.Count;
+
+                    if (!navigableItems[next].Disabled)
+                    {
+                        break;
+                    }
                 }
 
-                if (next >= 0 && next < navigableItems.Count)
+                if (!navigableItems[next].Disabled)
                 {
                     focusedIndex = next;
+
+                    if (!Multiple && !IsSelected(navigableItems[focusedIndex]))
+                    {
+                        await SelectItem(navigableItems[focusedIndex]);
+                    }
                 }
             }
             else if (key == "Home" || key == "End")
@@ -336,6 +346,11 @@ namespace Radzen.Blazor
                     {
                         focusedIndex = index;
                     }
+                }
+
+                if (!Multiple && focusedIndex >= 0 && focusedIndex < navigableItems.Count && !navigableItems[focusedIndex].Disabled && !IsSelected(navigableItems[focusedIndex]))
+                {
+                    await SelectItem(navigableItems[focusedIndex]);
                 }
             }
             else if (key == "Space" || key == "Enter")

@@ -1,13 +1,17 @@
-﻿@inherits RadzenComponentWithChildren
+@inherits RadzenComponentWithChildren
 
 <CascadingValue Value="@Template">
 @if (Visible)
 {
   <nav class="@GetCssClass()" style="@Style" @attributes="@Attributes" id="@GetId()" aria-label="@AriaLabel">
-    @if (ChildContent != null)
-    {
-        @ChildContent
-    }
+    <ol class="rz-breadcrumb-list">
+      <CascadingValue Value="this">
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+      </CascadingValue>
+    </ol>
   </nav>
 }
 </CascadingValue>

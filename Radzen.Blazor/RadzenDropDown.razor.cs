@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
@@ -285,6 +286,29 @@ namespace Radzen.Blazor
         /// <value>The select all text.</value>
         [Parameter]
         public string SelectAllText { get; set; } = string.Empty;
+
+        internal string? SelectedAriaLabel
+        {
+            get
+            {
+                if (!Multiple)
+                {
+                    return selectedItem != null ? $"{GetItemOrValueFromProperty(selectedItem, TextProperty ?? string.Empty)}" : EmptyAriaLabel;
+                }
+
+                if (selectedItems.Count == 0)
+                {
+                    return EmptyAriaLabel;
+                }
+
+                if (selectedItems.Count < MaxSelectedLabels)
+                {
+                    return string.Join(Separator, selectedItems.Select(i => $"{GetItemOrValueFromProperty(i, TextProperty ?? string.Empty)}"));
+                }
+
+                return $"{selectedItems.Count} {SelectedItemsText}";
+            }
+        }
 
         /// <summary>
         /// Callback for when a dropdown is opened.

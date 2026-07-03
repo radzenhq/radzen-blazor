@@ -110,10 +110,12 @@
     public List<KeyboardShortcut> shortcuts = new()
     {
         new KeyboardShortcut { Key = "Tab", Action = "Navigate to a ListBox component." },
-        new KeyboardShortcut { Key = "Space or Enter", Action = "Select the focused ListBox item." },
-        new KeyboardShortcut { Key = "DownArrow", Action = "Focus the next ListBox item." },
-        new KeyboardShortcut { Key = "UpArrow", Action = "Focus the previous ListBox item." },
-        new KeyboardShortcut { Key = "Enter", Action = "Select the focused ListBox item." },
+        new KeyboardShortcut { Key = "Space or Enter", Action = "Select the focused ListBox item. In multiple selection mode the selection of the focused item is toggled." },
+        new KeyboardShortcut { Key = "DownArrow / RightArrow", Action = "Focus the next ListBox item. In single selection mode the item is also selected." },
+        new KeyboardShortcut { Key = "UpArrow / LeftArrow", Action = "Focus the previous ListBox item. In single selection mode the item is also selected." },
+        new KeyboardShortcut { Key = "Home", Action = "Focus the first ListBox item. In single selection mode the item is also selected." },
+        new KeyboardShortcut { Key = "End", Action = "Focus the last ListBox item. In single selection mode the item is also selected." },
+        new KeyboardShortcut { Key = "Delete", Action = "Clear the selection when AllowClear is enabled. In multiple selection mode all selected items are cleared." },
         new KeyboardShortcut { Key = "Alphanumeric", Action = "Focus next ListBox item starting with typed key." }
     };
 }

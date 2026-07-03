@@ -374,6 +374,85 @@ namespace Radzen.Blazor.Tests
             Assert.False(input.HasAttribute("aria-activedescendant"));
         }
 
+        [Fact]
+        public async Task AutoComplete_AriaExpanded_TracksPopupState()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple", "Banana", "Cherry" };
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true);
+            });
+
+            var input = component.Find("input[role=\"combobox\"]");
+
+            Assert.Equal("false", input.GetAttribute("aria-expanded"));
+
+            await component.InvokeAsync(() => component.Instance.OnPopupOpen());
+
+            input = component.Find("input[role=\"combobox\"]");
+            Assert.Equal("true", input.GetAttribute("aria-expanded"));
+
+            await component.InvokeAsync(() => component.Instance.OnPopupClose());
+
+            input = component.Find("input[role=\"combobox\"]");
+            Assert.Equal("false", input.GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public async Task AutoComplete_AriaExpanded_IsFalse_AfterEscape()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple", "Banana", "Cherry" };
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true);
+            });
+
+            await component.InvokeAsync(() => component.Instance.OnPopupOpen());
+
+            var input = component.Find("input[role=\"combobox\"]");
+            Assert.Equal("true", input.GetAttribute("aria-expanded"));
+
+            input.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Escape" });
+
+            input = component.Find("input[role=\"combobox\"]");
+            Assert.Equal("false", input.GetAttribute("aria-expanded"));
+        }
+
+        [Fact]
+        public void AutoComplete_Sets_AriaSelected_OnHighlightedOption()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.Setup<int>("Radzen.focusListItem", _ => true).SetResult(1);
+            var data = new List<string> { "Apple", "Banana", "Cherry" };
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.OpenOnFocus, true);
+            });
+
+            var input = component.Find("input[role=\"combobox\"]");
+            input.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowDown" });
+
+            var options = component.FindAll("li[role=\"option\"]");
+
+            Assert.Equal("false", options[0].GetAttribute("aria-selected"));
+            Assert.Equal("true", options[1].GetAttribute("aria-selected"));
+            Assert.Equal("false", options[2].GetAttribute("aria-selected"));
+        }
+
         private sealed class AutoCompleteWithAccessibleView : RadzenAutoComplete
         {
             public IEnumerable CurrentView => View;

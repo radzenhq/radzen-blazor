@@ -530,6 +530,17 @@ namespace Radzen
             return await TryCloseAsync(result);
         }
 
+        /// <summary>
+        /// Attempts to close the side dialog. Called from JavaScript ESC handler.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <returns><c>true</c> if the side dialog was closed; <c>false</c> if closing was prevented.</returns>
+        [JSInvokable("DialogService.TryCloseSide")]
+        public virtual async Task<bool> TryCloseSideFromJs(dynamic? result = null)
+        {
+            return await TryCloseSideAsync(result);
+        }
+
         /// <inheritdoc />
         public void Dispose()
         {
@@ -557,6 +568,7 @@ namespace Radzen
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm";
             options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+            options.Role = "alertdialog";
 
             return await OpenAsync(title, ds =>
             {
@@ -606,6 +618,7 @@ namespace Radzen
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm";
             options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+            options.Role = "alertdialog";
 
             return await OpenAsync(title, ds =>
             {
@@ -654,6 +667,7 @@ namespace Radzen
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
             options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+            options.Role = "alertdialog";
             options.ContentCssClass = !String.IsNullOrEmpty(options.ContentCssClass) ? $"rz-dialog-content {options.ContentCssClass}" : "rz-dialog-content";
 
             return await OpenAsync(title, ds =>
@@ -697,6 +711,7 @@ namespace Radzen
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
             options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+            options.Role = "alertdialog";
             options.ContentCssClass = !String.IsNullOrEmpty(options.ContentCssClass) ? $"rz-dialog-content {options.ContentCssClass}" : "rz-dialog-content";
 
             return await OpenAsync(title, ds =>
@@ -1074,7 +1089,7 @@ namespace Radzen
             }
         }
 
-        private bool autoFocusFirstElement;
+        private bool autoFocusFirstElement = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether to focus the first focusable HTML element. Set to <c>true</c> by default.
@@ -1370,6 +1385,8 @@ namespace Radzen
                 }
             }
         }
+
+        internal string Role { get; set; } = "dialog";
 
         private bool closeDialogOnEsc = true;
 

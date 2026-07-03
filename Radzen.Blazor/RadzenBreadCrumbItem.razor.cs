@@ -14,6 +14,12 @@ namespace Radzen.Blazor
         public RenderFragment<RadzenBreadCrumbItem>? Template { get; set; }
 
         /// <summary>
+        /// The <see cref="RadzenBreadCrumb"/> component this item belongs to. Set via cascading value.
+        /// </summary>
+        [CascadingParameter]
+        public RadzenBreadCrumb? BreadCrumb { get; set; }
+
+        /// <summary>
         /// The Displayed Text
         /// </summary>
         [Parameter]
@@ -49,6 +55,31 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return "rz-breadcrumb-item";
+        }
+
+        string? ItemAriaCurrent => ChildContent == null && Template == null && string.IsNullOrWhiteSpace(Path)
+            ? null
+            : BreadCrumb?.IsLastItem(this) == true ? "page" : null;
+
+        internal void Refresh()
+        {
+            StateHasChanged();
+        }
+
+        /// <inheritdoc/>
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+
+            BreadCrumb?.AddItem(this);
+        }
+
+        /// <inheritdoc/>
+        public override void Dispose()
+        {
+            BreadCrumb?.RemoveItem(this);
+
+            base.Dispose();
         }
     }
 }

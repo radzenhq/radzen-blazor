@@ -130,10 +130,10 @@
     public List<KeyboardShortcut> shortcuts = new()
     {
         new KeyboardShortcut { Key = "Tab", Action = "Move focus into the SelectBar." },
-        new KeyboardShortcut { Key = "Left or Up Arrow", Action = "Move focus to the previous item." },
-        new KeyboardShortcut { Key = "Right or Down Arrow", Action = "Move focus to the next item." },
-        new KeyboardShortcut { Key = "Home", Action = "Move focus to the first item." },
-        new KeyboardShortcut { Key = "End", Action = "Move focus to the last item." },
+        new KeyboardShortcut { Key = "Left or Up Arrow", Action = "Move focus to the previous item, wrapping from the first to the last item. In single selection mode the newly focused item is also selected." },
+        new KeyboardShortcut { Key = "Right or Down Arrow", Action = "Move focus to the next item, wrapping from the last to the first item. In single selection mode the newly focused item is also selected." },
+        new KeyboardShortcut { Key = "Home", Action = "Move focus to the first item. In single selection mode the item is also selected." },
+        new KeyboardShortcut { Key = "End", Action = "Move focus to the last item. In single selection mode the item is also selected." },
         new KeyboardShortcut { Key = "Space or Enter", Action = "Select the focused SelectBar item." },
         new KeyboardShortcut { Key = "Space or Enter with multiple selection enabled", Action = "Toggle selection of the focused SelectBar item." }
     };

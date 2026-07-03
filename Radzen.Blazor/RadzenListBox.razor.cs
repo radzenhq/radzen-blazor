@@ -125,15 +125,20 @@ namespace Radzen.Blazor
         internal string? ActiveDescendantId => selectedIndex >= 0 ? GetItemId(selectedIndex) : null;
 
         /// <summary>
-        /// Gets the accessible name applied to the listbox, falling back to the empty selection label
-        /// unless the consumer supplies an explicit aria-label or aria-labelledby attribute.
+        /// Gets the accessible name applied to the listbox. Uses the consumer supplied aria-label attribute when present,
+        /// falls back to the empty selection label unless the consumer supplies an aria-labelledby attribute.
         /// </summary>
-        /// <returns>The accessible name or null when one is supplied via attributes.</returns>
+        /// <returns>The accessible name or null when aria-labelledby is supplied via attributes.</returns>
         internal string? ListboxAriaLabel
         {
             get
             {
-                if (Attributes != null && (Attributes.ContainsKey("aria-label") || Attributes.ContainsKey("aria-labelledby")))
+                if (Attributes != null && Attributes.TryGetValue("aria-label", out var ariaLabel))
+                {
+                    return Convert.ToString(ariaLabel, Culture);
+                }
+
+                if (Attributes != null && Attributes.ContainsKey("aria-labelledby"))
                 {
                     return null;
                 }
@@ -141,6 +146,12 @@ namespace Radzen.Blazor
                 return EmptyAriaLabel;
             }
         }
+
+        /// <summary>
+        /// Gets the consumer supplied aria-labelledby attribute value applied to the listbox, or null when not supplied.
+        /// </summary>
+        /// <returns>The labelling element identifier or null.</returns>
+        internal string? ListboxAriaLabelledBy => Attributes != null && Attributes.TryGetValue("aria-labelledby", out var ariaLabelledBy) ? Convert.ToString(ariaLabelledBy, Culture) : null;
 
         /// <summary>
         /// Handles the key down event.

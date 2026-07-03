@@ -5,7 +5,6 @@
 {
     <li @ref=@Element style=@Style @attributes=@Attributes class="@(GetCssClass() + ExpandableClass)" id=@GetId()
         role="menuitem" tabindex="-1" aria-disabled="@(Disabled ? "true" : "false")"
-        aria-haspopup="@(ChildContent != null ? "menu" : null)"
         aria-controls="@(RenderSubmenu ? $"{GetId()}-submenu" : null)"
         aria-expanded="@(ChildContent != null ? expanded.ToString().ToLowerInvariant() : null)"
         @onclick=@(this.AsNonRenderingEventHandler<MouseEventArgs>(OnClick)) @onclick:stopPropagation @onkeydown="OnKeyDown">
@@ -38,9 +37,7 @@
             else
             {
                 <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")"
-                     role="button" tabindex="-1" aria-expanded="@expanded.ToString().ToLowerInvariant()"
-                     aria-controls="@(RenderSubmenu ? $"{GetId()}-submenu" : null)"
-                     aria-haspopup="@(ChildContent != null ? "menu" : null)"
+                     tabindex="-1"
                      @onclick="@Toggle" @onkeydown="OnToggleKeyDown">
                     @if (!string.IsNullOrEmpty(Icon) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {

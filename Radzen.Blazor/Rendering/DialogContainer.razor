@@ -23,7 +23,7 @@
             ariaAttributes["aria-modal"] = "true";
         }
     }
-    <div @ref="dialog" class=@Class role="dialog" style=@Style @attributes="ariaAttributes">
+    <div @ref="dialog" class=@Class role="@(options?.Role ?? "dialog")" style=@Style @attributes="ariaAttributes">
         @if (showTitle)
         {
             <div class="rz-dialog-titlebar">

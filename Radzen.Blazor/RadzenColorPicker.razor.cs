@@ -126,6 +126,43 @@ namespace Radzen.Blazor
         [Parameter]
         public string AlphaText { get => alphaText ?? Localize(nameof(RadzenStrings.ColorPicker_AlphaText)); set => alphaText = value; }
 
+        private string? hueAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria label text of the hue slider.
+        /// </summary>
+        /// <value>The aria label text of the hue slider.</value>
+        [Parameter]
+        public string HueAriaLabel { get => hueAriaLabel ?? Localize(nameof(RadzenStrings.ColorPicker_HueAriaLabel)); set => hueAriaLabel = value; }
+
+        private string? alphaAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria label text of the alpha slider.
+        /// </summary>
+        /// <value>The aria label text of the alpha slider.</value>
+        [Parameter]
+        public string AlphaAriaLabel { get => alphaAriaLabel ?? Localize(nameof(RadzenStrings.ColorPicker_AlphaAriaLabel)); set => alphaAriaLabel = value; }
+
+        private string? saturationAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the aria label text of the saturation and brightness area.
+        /// </summary>
+        /// <value>The aria label text of the saturation and brightness area.</value>
+        [Parameter]
+        public string SaturationAriaLabel { get => saturationAriaLabel ?? Localize(nameof(RadzenStrings.ColorPicker_SaturationAriaLabel)); set => saturationAriaLabel = value; }
+
+        private string? saturationValueTextFormat;
+
+        /// <summary>
+        /// Gets or sets the format string used to build the aria-valuetext of the saturation and brightness area.
+        /// The first argument is the saturation percent and the second one is the brightness percent.
+        /// </summary>
+        /// <value>The aria-valuetext format string of the saturation and brightness area.</value>
+        [Parameter]
+        public string SaturationValueTextFormat { get => saturationValueTextFormat ?? Localize(nameof(RadzenStrings.ColorPicker_SaturationValueTextFormat)); set => saturationValueTextFormat = value; }
+
         private string? buttonText;
 
         /// <summary>
@@ -174,6 +211,14 @@ namespace Radzen.Blazor
                 return String.Empty;
             }
         }
+
+        double HuePercent => Math.Round(HueHandleLeft * 360);
+
+        double SaturationPercent => Math.Round(SaturationHandleLeft * 100);
+
+        double BrightnessPercent => Math.Round((1 - SaturationHandleTop) * 100);
+
+        string SaturationValueText => string.Format(System.Globalization.CultureInfo.CurrentCulture, SaturationValueTextFormat, SaturationPercent, BrightnessPercent);
 
         double Red
         {
@@ -632,16 +677,16 @@ namespace Radzen.Blazor
 
         bool preventKeyPress;
         bool stopKeypressPropagation;
-        async Task OnKeyPress(KeyboardEventArgs args, Task task)
+        async Task OnTriggerKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "Space" || key == "Enter")
+            if (key == "Space" || key == "Enter" || key == "NumpadEnter")
             {
                 preventKeyPress = true;
                 stopKeypressPropagation = true;
 
-                await task;
+                await Toggle();
             }
             else if (key == "Escape")
             {

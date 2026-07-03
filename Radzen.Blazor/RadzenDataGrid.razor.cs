@@ -177,6 +177,8 @@ namespace Radzen.Blazor
 
         List<TItem> virtualDataItems = new List<TItem>();
 
+        int virtualItemsStartIndex;
+
         /// <summary>
         /// Clears the internal data cache and refreshes the DataGrid, reloading data from the source.
         /// When virtualization is enabled, this method refreshes the Virtualize component. Otherwise, it triggers a standard reload.
@@ -233,6 +235,8 @@ namespace Radzen.Blazor
             var totalItemsCount = (LoadData.HasDelegate ? Count : view.Count()) + itemsToInsert.Count;
 
             virtualDataItems = (LoadData.HasDelegate ? (itemsToInsert.Count > 0 ? itemsToInsert.ToList().Concat(Data ?? Enumerable.Empty<TItem>()) : Data) : itemsToInsert.Count > 0 ? itemsToInsert.ToList().Concat(view.Skip(request.StartIndex).Take(top)) : view.Skip(request.StartIndex).Take(top))?.ToList() ?? new List<TItem>();
+
+            virtualItemsStartIndex = request.StartIndex;
 
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
         }
@@ -600,14 +604,16 @@ namespace Radzen.Blazor
 
         internal Func<bool>? HasActiveDescendant { get; set; }
 
+        bool hasActiveRow;
+
         internal string? GetActiveDescendantId()
         {
-            if (HasActiveDescendant != null && !HasActiveDescendant())
+            if (HasActiveDescendant != null)
             {
-                return null;
+                return HasActiveDescendant() ? $"{GetId()}-active-item" : null;
             }
 
-            return $"{GetId()}-active-item";
+            return hasActiveRow ? $"{GetId()}-active-item" : null;
         }
 
         internal string? GridId()
@@ -632,6 +638,7 @@ namespace Radzen.Blazor
                     var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", UniqueID, key, focusedIndex, focusedCellIndex, IsVirtualizationAllowed());
                     focusedIndex = result[0];
                     focusedCellIndex = result[1];
+                    hasActiveRow = true;
                 }
             }
             catch (Exception)
@@ -709,7 +716,7 @@ namespace Radzen.Blazor
 
                 await FocusRow(key);
             }
-            else if (IsVirtualizationAllowed() && (key == "PageUp" || key == "PageDown" || key == "Home" || key == "End"))
+            else if (key == "PageUp" || key == "PageDown" || key == "Home" || key == "End")
             {
                 preventKeyDown = true;
                 stopKeydownPropagation = true;
@@ -2779,6 +2786,36 @@ namespace Radzen.Blazor
             }
 
             return selectedItems.Keys.Any(i => ItemEquals(i, item)) ? "true" : "false";
+        }
+
+        int HeaderRowCount()
+        {
+            return (ShowHeader ? deepestChildColumnLevel + 1 : 0) + (FilterRowActive ? 1 : 0);
+        }
+
+        internal string? GridAriaRowCount()
+        {
+            return IsVirtualizationAllowed() && Groups.Count == 0 ? (Count + HeaderRowCount()).ToString(CultureInfo.InvariantCulture) : null;
+        }
+
+        internal string? RowAriaRowIndex(int index)
+        {
+            return IsVirtualizationAllowed() && Groups.Count == 0 ? (virtualItemsStartIndex + index + HeaderRowCount() + 1).ToString(CultureInfo.InvariantCulture) : null;
+        }
+
+        internal string? RowAriaLevel(TItem item)
+        {
+            if (!LoadChildData.HasDelegate)
+            {
+                return null;
+            }
+
+            var child = childData.Count > 0 ? childData.Where(c => c.Value?.Data?.Contains(item) == true).FirstOrDefault() :
+                default(KeyValuePair<TItem, DataGridChildData<TItem>>);
+
+            var level = !object.Equals(child, default(KeyValuePair<TItem, DataGridChildData<TItem>>)) ? child.Value.Level : 0;
+
+            return (level + 1).ToString(CultureInfo.InvariantCulture);
         }
 
         internal Tuple<Radzen.RowRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> RowAttributes(TItem item, int index)

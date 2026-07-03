@@ -6,10 +6,10 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onkeypress=@OnKeyPress @onkeypress:preventDefault @onclick=@Toggle @onclick:preventDefault style="@Style"
-         role="checkbox" aria-checked="@CheckBoxAriaChecked" aria-disabled="@(Disabled || ReadOnly ? "true" : "false")"
+         role="checkbox" aria-checked="@CheckBoxAriaChecked" aria-label="@AriaLabel" aria-disabled="@(Disabled || ReadOnly ? "true" : "false")"
          tabindex="@(Disabled || ReadOnly ? "-1" : $"{TabIndex}")" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
-            <input type="checkbox" @onchange=@Toggle value=@CheckBoxValue name=@Name id=@Name checked=@CheckBoxChecked aria-checked="@((Value as bool? == true).ToString().ToLowerInvariant())" @attributes="InputAttributes"
+            <input type="checkbox" @onchange=@Toggle value=@CheckBoxValue name=@Name id=@Name checked=@CheckBoxChecked aria-hidden="true" @attributes="InputAttributes"
                 tabindex="-1" readonly="@ReadOnly">
         </div>
         <div class=@BoxClass>

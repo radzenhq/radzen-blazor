@@ -139,7 +139,7 @@ namespace Radzen.Blazor
                 {
                     builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
                     builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<TItem>(LoadItems));
-                    
+
                     builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
                     {
                         return (RenderFragment)((b) =>
@@ -147,6 +147,11 @@ namespace Radzen.Blazor
                             DrawRow(b, context);
                         });
                     }));
+
+                    if (!WrapItems)
+                    {
+                        builder.AddAttribute(3, "SpacerElement", "li");
+                    }
 
                     builder.AddComponentReferenceCapture(4, c => { virtualize = (Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>)c; });
 

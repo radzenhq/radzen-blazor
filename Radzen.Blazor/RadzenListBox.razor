@@ -6,10 +6,9 @@
 @inherits DropDownBase<TValue>
 @if (Visible)
 {
-    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@OnKeyDown" id="@GetId()"
-         role="listbox" aria-label="@ListboxAriaLabel" aria-multiselectable="@(Multiple ? "true" : "false")" aria-disabled="@(Disabled ? "true" : "false")" aria-activedescendant="@ActiveDescendantId">
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" @onkeydown="@OnKeyDown" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
-            <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes=@InputAttributes />
+            <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" tabindex="-1" aria-hidden="true" aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes=@InputAttributes />
         </div>
         @if (View != null && (AllowFiltering || (Multiple && AllowSelectAll) || HeaderTemplate != null))
         {
@@ -44,7 +43,7 @@
                 @if (AllowFiltering)
                 {
                     <div class="rz-listbox-filter-container">
-                        <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@(Placeholder ?? string.Empty)"
+                        <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" type="text" placeholder="@(Placeholder ?? string.Empty)"
                                @onchange="@OnFilter" @onkeydown="@OnFilterKeyDown" value="@(searchText ?? string.Empty)" @onkeydown:stopPropagation="stopKeydownPropagation"
                                @oninput="@OnFilterInput" aria-label="@SearchAriaLabel" />
                         <span class="notranslate rz-listbox-filter-icon rzi rzi-search"></span>
@@ -56,7 +55,9 @@
         @if (View != null)
         {
             <div class="rz-listbox-list-wrapper">
-                <ul @ref="list" id="@ListId" class="rz-listbox-list" role="presentation">
+                <ul @ref="list" id="@ListId" class="rz-listbox-list" role="listbox" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+                    aria-label="@ListboxAriaLabel" aria-labelledby="@ListboxAriaLabelledBy" aria-multiselectable="@(Multiple ? "true" : "false")"
+                    aria-disabled="@(Disabled ? "true" : "false")" aria-activedescendant="@ActiveDescendantId">
                     @RenderItems()
                 </ul>
                 @if (!View.Cast<object>().Any())

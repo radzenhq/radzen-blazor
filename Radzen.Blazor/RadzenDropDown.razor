@@ -8,12 +8,12 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" aria-label="@(!Multiple && selectedItem != null ? GetItemOrValueFromProperty(selectedItem, TextProperty ?? string.Empty) : EmptyAriaLabel)" @attributes="Attributes" class="@GetCssClass()"
+    <div @ref="@Element" aria-label="@SelectedAriaLabel" @attributes="Attributes" class="@GetCssClass()"
          role="combobox" aria-haspopup="listbox" aria-autocomplete="@(AllowFiltering ? "list" : "none")" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@ListId" aria-activedescendant="@ActiveDescendantId" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
          @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown" id="@GetId()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         <div class="rz-helper-hidden-accessible">
-            <input disabled="@Disabled" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
+            <input disabled="@Disabled" aria-haspopup="listbox" aria-hidden="true" readonly="" type="text" tabindex="-1"
                    name="@Name" value="@(internalValue != null ? internalValue : "")" id="@Name"
                    aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes="InputAttributes"/>
         </div>
@@ -59,7 +59,7 @@
                                 @GetItemOrValueFromProperty(item, TextProperty ?? string.Empty)
                             }
                         </span>
-                        <button tabindex="0"
+                        <button tabindex="-1"
                                 title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))"
                                 aria-label="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))"
                                 type=button class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-default rz-button-icon-only @(Disabled ?"rz-state-disabled":"")"

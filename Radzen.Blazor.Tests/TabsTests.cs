@@ -108,24 +108,26 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Tabs_Wrapper_IsFocusTarget_WithRoleTablist()
-        {
-            using var ctx = new TestContext();
-            var component = ctx.RenderComponent<RadzenTabs>();
-
-            var wrapper = component.Find("div.rz-tabview");
-            Assert.Equal("tablist", wrapper.GetAttribute("role"));
-            Assert.Equal("0", wrapper.GetAttribute("tabindex"));
-        }
-
-        [Fact]
-        public void Tabs_InnerNav_HasRolePresentation_ToAvoidDuplicateTablist()
+        public void Tabs_Nav_IsFocusTarget_WithRoleTablist()
         {
             using var ctx = new TestContext();
             var component = ctx.RenderComponent<RadzenTabs>();
 
             var nav = component.Find("ul.rz-tabview-nav");
-            Assert.NotEqual("tablist", nav.GetAttribute("role"));
+            Assert.Equal("tablist", nav.GetAttribute("role"));
+            Assert.Equal("0", nav.GetAttribute("tabindex"));
+        }
+
+        [Fact]
+        public void Tabs_Wrapper_HasNoRole_ToAvoidTablistOwningPanels()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenTabs>();
+
+            var wrapper = component.Find("div.rz-tabview");
+            Assert.Null(wrapper.GetAttribute("role"));
+            Assert.Null(wrapper.GetAttribute("tabindex"));
+            Assert.Null(wrapper.GetAttribute("aria-activedescendant"));
         }
 
         static RenderFragment TabsFragment(params string[] titles) => builder =>
@@ -147,7 +149,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             var active = wrapper.GetAttribute("aria-activedescendant");
             Assert.False(string.IsNullOrEmpty(active));
 
@@ -307,7 +309,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("First-Content", component.Markup);
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             // Simulate non-navigation keystrokes (e.g. a barcode scanner) on the focused tablist.
             // Pre-fix: the second keypress latched shouldRender = false, blocking all later renders.
             wrapper.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA" });
@@ -334,7 +336,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             Assert.Equal(expected, wrapper.GetAttribute("aria-orientation"));
         }
 
@@ -345,7 +347,7 @@ namespace Radzen.Blazor.Tests
 
         static string ActiveDescendantText(IRenderedComponent<RadzenTabs> component)
         {
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             var active = wrapper.GetAttribute("aria-activedescendant");
             return component.Find($"[id='{active}']").TextContent;
         }
@@ -360,7 +362,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowDown", Code = "ArrowDown" });
 
             Assert.Equal("Two", ActiveDescendantText(component));
@@ -376,7 +378,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowUp", Code = "ArrowUp" });
 
             Assert.Equal("Two", ActiveDescendantText(component));
@@ -392,7 +394,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowRight", Code = "ArrowRight" });
             Assert.Equal("Two", ActiveDescendantText(component));
 
@@ -410,7 +412,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowRight", Code = "ArrowRight" });
 
             Assert.Equal("Two", ActiveDescendantText(component));
@@ -426,7 +428,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowDown", Code = "ArrowDown" });
             Assert.Equal("Two", ActiveDescendantText(component));
 
@@ -444,7 +446,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
 
             wrapper.KeyDown(new KeyboardEventArgs { Key = "End", Code = "End" });
             Assert.Equal("Three", ActiveDescendantText(component));
@@ -465,7 +467,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragmentWithContent(("One", "One-Content"), ("Two", "Two-Content"), ("Three", "Three-Content")))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowDown", Code = "ArrowDown" });
             wrapper.KeyDown(new KeyboardEventArgs { Key = "Enter", Code = "Enter" });
 
@@ -482,7 +484,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             Assert.Equal("Sections", wrapper.GetAttribute("aria-label"));
         }
 
@@ -495,7 +497,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             Assert.Equal("heading-id", wrapper.GetAttribute("aria-labelledby"));
         }
 
@@ -522,7 +524,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowRight", Code = "ArrowRight" });
 
             Assert.Equal("One", ActiveDescendantText(component));
@@ -538,7 +540,7 @@ namespace Radzen.Blazor.Tests
                 .Add(p => p.Tabs, TabsFragment("One", "Two", "Three"))
             );
 
-            var wrapper = component.Find("div.rz-tabview");
+            var wrapper = component.Find("ul.rz-tabview-nav");
             wrapper.KeyDown(new KeyboardEventArgs { Key = "ArrowLeft", Code = "ArrowLeft" });
 
             Assert.Equal("Three", ActiveDescendantText(component));

@@ -22,7 +22,7 @@
             var index = i;
             @if (step.Visible)
             {
-                    <li class="@step.GetItemCssClass()" @attributes="step.Attributes" style="@step.Style">
+                    <li class="@step.GetItemCssClass()" role="presentation" @attributes="step.Attributes" style="@step.Style">
                     <button type="button" role="tab" id="@(GetId() + i.ToString() + "s")" title="@step.Title" aria-label="@step.AriaLabel"
                        aria-selected="@(IsSelected(i, step) ? "true" : "false")"
                        aria-controls="@($"{GetId()}-panel-{i}")"

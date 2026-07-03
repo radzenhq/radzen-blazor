@@ -299,8 +299,12 @@ namespace Radzen.Blazor {
         public static string AIChat_EmptyMessage { get { return ResourceManager.GetString("AIChat_EmptyMessage", resourceCulture); } }
         public static string AIChat_UserAvatarText { get { return ResourceManager.GetString("AIChat_UserAvatarText", resourceCulture); } }
         public static string AIChat_AssistantAvatarText { get { return ResourceManager.GetString("AIChat_AssistantAvatarText", resourceCulture); } }
+        public static string Alert_CloseAriaLabel { get { return ResourceManager.GetString("Alert_CloseAriaLabel", resourceCulture); } }
         public static string Button_ImageAlternateText { get { return ResourceManager.GetString("Button_ImageAlternateText", resourceCulture); } }
         public static string Carousel_PagerButtonAriaLabelFormat { get { return ResourceManager.GetString("Carousel_PagerButtonAriaLabelFormat", resourceCulture); } }
+        public static string Carousel_PrevAriaLabel { get { return ResourceManager.GetString("Carousel_PrevAriaLabel", resourceCulture); } }
+        public static string Carousel_NextAriaLabel { get { return ResourceManager.GetString("Carousel_NextAriaLabel", resourceCulture); } }
+        public static string Carousel_SlideAriaLabelFormat { get { return ResourceManager.GetString("Carousel_SlideAriaLabelFormat", resourceCulture); } }
         public static string Chat_Placeholder { get { return ResourceManager.GetString("Chat_Placeholder", resourceCulture); } }
         public static string Chat_EmptyMessage { get { return ResourceManager.GetString("Chat_EmptyMessage", resourceCulture); } }
         public static string Chat_NewMessagesText { get { return ResourceManager.GetString("Chat_NewMessagesText", resourceCulture); } }
@@ -314,6 +318,10 @@ namespace Radzen.Blazor {
         public static string ColorPicker_BlueText { get { return ResourceManager.GetString("ColorPicker_BlueText", resourceCulture); } }
         public static string ColorPicker_AlphaText { get { return ResourceManager.GetString("ColorPicker_AlphaText", resourceCulture); } }
         public static string ColorPicker_ButtonText { get { return ResourceManager.GetString("ColorPicker_ButtonText", resourceCulture); } }
+        public static string ColorPicker_HueAriaLabel { get { return ResourceManager.GetString("ColorPicker_HueAriaLabel", resourceCulture); } }
+        public static string ColorPicker_AlphaAriaLabel { get { return ResourceManager.GetString("ColorPicker_AlphaAriaLabel", resourceCulture); } }
+        public static string ColorPicker_SaturationAriaLabel { get { return ResourceManager.GetString("ColorPicker_SaturationAriaLabel", resourceCulture); } }
+        public static string ColorPicker_SaturationValueTextFormat { get { return ResourceManager.GetString("ColorPicker_SaturationValueTextFormat", resourceCulture); } }
         public static string DataAnnotationValidator_MessageSeparator { get { return ResourceManager.GetString("DataAnnotationValidator_MessageSeparator", resourceCulture); } }
         public static string DataFilter_FilterText { get { return ResourceManager.GetString("DataFilter_FilterText", resourceCulture); } }
         public static string DataFilter_EnumFilterSelectText { get { return ResourceManager.GetString("DataFilter_EnumFilterSelectText", resourceCulture); } }
@@ -341,6 +349,9 @@ namespace Radzen.Blazor {
         public static string DataFilter_IsEmptyText { get { return ResourceManager.GetString("DataFilter_IsEmptyText", resourceCulture); } }
         public static string DataFilter_IsNotEmptyText { get { return ResourceManager.GetString("DataFilter_IsNotEmptyText", resourceCulture); } }
         public static string DataFilter_CustomText { get { return ResourceManager.GetString("DataFilter_CustomText", resourceCulture); } }
+        public static string DataFilter_PropertyAriaLabel { get { return ResourceManager.GetString("DataFilter_PropertyAriaLabel", resourceCulture); } }
+        public static string DataFilter_FilterOperatorAriaLabel { get { return ResourceManager.GetString("DataFilter_FilterOperatorAriaLabel", resourceCulture); } }
+        public static string DataFilter_FilterValueAriaLabel { get { return ResourceManager.GetString("DataFilter_FilterValueAriaLabel", resourceCulture); } }
         public static string DataGrid_FilterText { get { return ResourceManager.GetString("DataGrid_FilterText", resourceCulture); } }
         public static string DataGrid_EnumFilterSelectText { get { return ResourceManager.GetString("DataGrid_EnumFilterSelectText", resourceCulture); } }
         public static string DataGrid_EnumNullFilterText { get { return ResourceManager.GetString("DataGrid_EnumNullFilterText", resourceCulture); } }
@@ -519,6 +530,8 @@ namespace Radzen.Blazor {
         public static string PickList_SelectedSourceToTargetTitle { get { return ResourceManager.GetString("PickList_SelectedSourceToTargetTitle", resourceCulture); } }
         public static string PickList_TargetToSourceTitle { get { return ResourceManager.GetString("PickList_TargetToSourceTitle", resourceCulture); } }
         public static string PickList_SelectedTargetToSourceTitle { get { return ResourceManager.GetString("PickList_SelectedTargetToSourceTitle", resourceCulture); } }
+        public static string PickList_SourceAriaLabel { get { return ResourceManager.GetString("PickList_SourceAriaLabel", resourceCulture); } }
+        public static string PickList_TargetAriaLabel { get { return ResourceManager.GetString("PickList_TargetAriaLabel", resourceCulture); } }
         public static string PivotDataGrid_EmptyText { get { return ResourceManager.GetString("PivotDataGrid_EmptyText", resourceCulture); } }
         public static string PivotDataGrid_FieldsPickerHeaderText { get { return ResourceManager.GetString("PivotDataGrid_FieldsPickerHeaderText", resourceCulture); } }
         public static string PivotDataGrid_RowsText { get { return ResourceManager.GetString("PivotDataGrid_RowsText", resourceCulture); } }
@@ -555,6 +568,7 @@ namespace Radzen.Blazor {
         public static string PivotDataGrid_CustomText { get { return ResourceManager.GetString("PivotDataGrid_CustomText", resourceCulture); } }
         public static string ProfileMenu_ToggleAriaLabel { get { return ResourceManager.GetString("ProfileMenu_ToggleAriaLabel", resourceCulture); } }
         public static string ProfileMenuItem_ImageAlternateText { get { return ResourceManager.GetString("ProfileMenuItem_ImageAlternateText", resourceCulture); } }
+        public static string Rating_AriaLabel { get { return ResourceManager.GetString("Rating_AriaLabel", resourceCulture); } }
         public static string Rating_ClearAriaLabel { get { return ResourceManager.GetString("Rating_ClearAriaLabel", resourceCulture); } }
         public static string Rating_RateAriaLabel { get { return ResourceManager.GetString("Rating_RateAriaLabel", resourceCulture); } }
         public static string SankeyDiagram_ValueText { get { return ResourceManager.GetString("SankeyDiagram_ValueText", resourceCulture); } }
@@ -564,6 +578,8 @@ namespace Radzen.Blazor {
         public static string Scheduler_TodayText { get { return ResourceManager.GetString("Scheduler_TodayText", resourceCulture); } }
         public static string Scheduler_NextText { get { return ResourceManager.GetString("Scheduler_NextText", resourceCulture); } }
         public static string Scheduler_PrevText { get { return ResourceManager.GetString("Scheduler_PrevText", resourceCulture); } }
+        public static string SecurityCode_AriaLabel { get { return ResourceManager.GetString("SecurityCode_AriaLabel", resourceCulture); } }
+        public static string SecurityCode_InputAriaLabelFormat { get { return ResourceManager.GetString("SecurityCode_InputAriaLabelFormat", resourceCulture); } }
         public static string SidebarToggle_ToggleAriaLabel { get { return ResourceManager.GetString("SidebarToggle_ToggleAriaLabel", resourceCulture); } }
         public static string SignaturePad_ClearAriaLabel { get { return ResourceManager.GetString("SignaturePad_ClearAriaLabel", resourceCulture); } }
         public static string SpeechToTextButton_Title { get { return ResourceManager.GetString("SpeechToTextButton_Title", resourceCulture); } }

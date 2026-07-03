@@ -207,6 +207,11 @@ namespace Radzen.Blazor
                         }
 
                         await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+
+                        if (IsOpen)
+                        {
+                            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", MenuId);
+                        }
                     }
                     else
                     {
@@ -219,7 +224,7 @@ namespace Radzen.Blazor
             }
         }
 
-        void OnToggleClick()
+        async Task OnToggleClick()
         {
             if (Disabled)
             {
@@ -228,9 +233,17 @@ namespace Radzen.Blazor
 
             IsOpen = !IsOpen;
 
-            if (IsOpen && focusedIndex == -1 && items.Count > 0)
+            if (IsOpen)
             {
-                focusedIndex = 0;
+                if (focusedIndex == -1 && items.Count > 0)
+                {
+                    focusedIndex = 0;
+                }
+
+                if (JSRuntime != null)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", MenuId);
+                }
             }
         }
 
@@ -258,6 +271,10 @@ namespace Radzen.Blazor
                 return $"popup{GetId()}";
             }
         }
+
+        private string MenuId => $"{GetId()}-menu";
+
+        private string ToggleButtonId => $"{GetId()}-toggle";
 
         string ButtonClass => ClassList.Create("rz-button")
                                        .AddButtonSize(Size)
@@ -333,7 +350,7 @@ namespace Radzen.Blazor
         }
 
         internal int focusedIndex = -1;
-        bool preventKeyPress = true;
+        bool preventKeyPress;
         bool stopKeydownPropagation;
 
         async Task Open(int index)
@@ -345,41 +362,53 @@ namespace Radzen.Blazor
             if (JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", MenuId);
             }
         }
 
-        async Task OnKeyPress(KeyboardEventArgs args)
+        async Task OnToggleKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            if (!IsOpen && (key == "ArrowDown" || key == "ArrowUp") && items.Count > 0)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                await Open(key == "ArrowDown" ? 0 : items.Count - 1);
+            }
+            else if (IsOpen && key == "Escape")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                await CloseAndFocusToggle();
+            }
+            else
+            {
+                preventKeyPress = false;
+                stopKeydownPropagation = false;
+            }
+        }
+
+        async Task CloseAndFocusToggle()
+        {
+            Close();
+
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", ToggleButtonId);
+            }
+        }
+
+        async Task OnMenuKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
             if (!IsOpen)
             {
-                if (key == "Enter" || key == "Space" || key == "NumpadEnter")
-                {
-                    preventKeyPress = true;
-                    stopKeydownPropagation = true;
-
-                    await OnClick(new MouseEventArgs());
-                }
-                else if (key == "ArrowDown" && items.Count > 0)
-                {
-                    preventKeyPress = true;
-                    stopKeydownPropagation = true;
-
-                    await Open(0);
-                }
-                else if (key == "ArrowUp" && items.Count > 0)
-                {
-                    preventKeyPress = true;
-                    stopKeydownPropagation = true;
-
-                    await Open(items.Count - 1);
-                }
-                else
-                {
-                    preventKeyPress = false;
-                    stopKeydownPropagation = false;
-                }
+                preventKeyPress = false;
+                stopKeydownPropagation = false;
 
                 return;
             }
@@ -410,9 +439,10 @@ namespace Radzen.Blazor
                 {
                     await items[focusedIndex].OnClick(new MouseEventArgs());
                 }
-                else
+
+                if (JSRuntime != null)
                 {
-                    await OnClick(new MouseEventArgs());
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", ToggleButtonId);
                 }
             }
             else if (key == "Escape")
@@ -420,12 +450,7 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                Close();
-
-                if (JSRuntime != null)
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId());
-                }
+                await CloseAndFocusToggle();
             }
             else if (args.Key != null && args.Key.Length == 1 && !args.AltKey && !args.CtrlKey && !args.MetaKey && !char.IsControl(args.Key[0]))
             {
