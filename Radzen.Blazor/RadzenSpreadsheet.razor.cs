@@ -1762,7 +1762,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (Worksheet is not null && Worksheet.IsCellEditable(Worksheet.Selection.Cell))
         {
-            await ExecuteAsync(new PasteCommand(clipboard, Worksheet, Worksheet.Selection.Cell, text));
+            await ExecuteAsync(new PasteCommand(clipboard, Worksheet, Worksheet.Selection.Range, text));
         }
     }
 
@@ -2094,14 +2094,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             text = await jsRef.InvokeAsync<string?>("readClipboardText");
         }
 
-        if (!string.IsNullOrEmpty(text))
-        {
-            await ExecuteAsync(new PasteCommand(clipboard, Worksheet, Worksheet.Selection.Cell, text));
-        }
-        else
-        {
-            await ExecuteAsync(new PasteCommand(clipboard, Worksheet, Worksheet.Selection.Cell, null));
-        }
+        await ExecuteAsync(new PasteCommand(clipboard, Worksheet, Worksheet.Selection.Range, text));
     }
 
     private IJSObjectReference? jsRef;
