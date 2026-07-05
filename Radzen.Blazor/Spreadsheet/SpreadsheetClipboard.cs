@@ -35,26 +35,45 @@ class SpreadsheetClipboard
         csv = sheet.GetDelimitedString(range.Value);
     }
 
-    public void Paste(Worksheet targetSheet, CellRef destinationStart)
+    public void Paste(Worksheet targetSheet, RangeRef destination)
     {
         if (range.HasValue && sheet is not null)
         {
             var adjustment = operation == ClipboardOperation.Copy ? FormulaAdjustment.AdjustRelative : FormulaAdjustment.Preserve;
-            targetSheet.PasteRange(sheet, range.Value, destinationStart, adjustment);
+            var source = range.Value;
+
+            if (operation == ClipboardOperation.Copy &&
+                !destination.Collapsed &&
+                destination.Rows % source.Rows == 0 &&
+                destination.Columns % source.Columns == 0)
+            {
+                for (var r = 0; r < destination.Rows; r += source.Rows)
+                {
+                    for (var c = 0; c < destination.Columns; c += source.Columns)
+                    {
+                        var tileStart = new CellRef(destination.Start.Row + r, destination.Start.Column + c);
+                        targetSheet.PasteRange(sheet, source, tileStart, adjustment);
+                    }
+                }
+            }
+            else
+            {
+                targetSheet.PasteRange(sheet, source, destination.Start, adjustment);
+            }
 
             if (operation == ClipboardOperation.Move)
             {
-                Clear(sheet, range.Value);
+                Clear(sheet, source);
                 ClearInternal();
             }
         }
     }
 
-    public bool TryPaste(Worksheet targetSheet, CellRef destinationStart, string pastedText)
+    public bool TryPaste(Worksheet targetSheet, RangeRef destination, string pastedText)
     {
         if (range.HasValue && sheet is not null && !string.IsNullOrEmpty(csv) && pastedText == csv)
         {
-            Paste(targetSheet, destinationStart);
+            Paste(targetSheet, destination);
             return true;
         }
 
@@ -63,20 +82,29 @@ class SpreadsheetClipboard
         return false;
     }
 
-    public void Paste(Worksheet targetSheet, CellRef destinationStart, string pastedText)
+    public void Paste(Worksheet targetSheet, RangeRef destination, string pastedText)
     {
-        if (!TryPaste(targetSheet, destinationStart, pastedText))
+        if (!TryPaste(targetSheet, destination, pastedText))
         {
-            targetSheet.InsertDelimitedString(destinationStart, pastedText);
+            targetSheet.InsertDelimitedString(destination.Start, pastedText);
         }
     }
 
-    public RangeRef GetPasteRange(Worksheet targetSheet, CellRef destinationStart, string? pastedText)
+    public RangeRef GetPasteRange(Worksheet targetSheet, RangeRef destination, string? pastedText)
     {
         if (range.HasValue && sheet is not null && !string.IsNullOrEmpty(csv) && (pastedText is null || pastedText == csv))
         {
             var source = range.Value;
-            return new RangeRef(destinationStart, new CellRef(destinationStart.Row + source.Rows - 1, destinationStart.Column + source.Columns - 1));
+            
+            if (operation == ClipboardOperation.Copy &&
+                !destination.Collapsed &&
+                destination.Rows % source.Rows == 0 &&
+                destination.Columns % source.Columns == 0)
+            {
+                return destination;
+            }
+
+            return new RangeRef(destination.Start, new CellRef(destination.Start.Row + source.Rows - 1, destination.Start.Column + source.Columns - 1));
         }
 
         if (string.IsNullOrEmpty(pastedText))
@@ -85,21 +113,21 @@ class SpreadsheetClipboard
         }
 
         var lines = pastedText.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-        var rowCount = Math.Min(lines.Length, targetSheet.RowCount - destinationStart.Row);
+        var rowCount = Math.Min(lines.Length, targetSheet.RowCount - destination.Start.Row);
 
         var columnCount = 0;
         foreach (var line in lines)
         {
             columnCount = Math.Max(columnCount, line.Split('\t').Length);
         }
-        columnCount = Math.Min(columnCount, targetSheet.ColumnCount - destinationStart.Column);
+        columnCount = Math.Min(columnCount, targetSheet.ColumnCount - destination.Start.Column);
 
         if (rowCount <= 0 || columnCount <= 0)
         {
             return RangeRef.Invalid;
         }
 
-        return new RangeRef(destinationStart, new CellRef(destinationStart.Row + rowCount - 1, destinationStart.Column + columnCount - 1));
+        return new RangeRef(destination.Start, new CellRef(destination.Start.Row + rowCount - 1, destination.Start.Column + columnCount - 1));
     }
 
     // Cross-sheet moves are not covered: per-sheet undo stacks can't snapshot a source on another sheet.

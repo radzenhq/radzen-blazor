@@ -39,7 +39,7 @@ public class SpreadsheetClipboardTests
         sheet.Selection.Select(CellRef.Parse("A1"));
         var clipboard = new SpreadsheetClipboard();
         clipboard.Cut(sheet);
-        clipboard.Paste(sheet, CellRef.Parse("B2"));
+        clipboard.Paste(sheet, RangeRef.Parse("B2"));
         Assert.Equal("=A1", sheet.Cells[1, 1].Formula); // not adjusted
         Assert.Null(sheet.Cells[0, 0].Formula);          // source cleared
         Assert.Null(sheet.Cells[0, 0].Value);
