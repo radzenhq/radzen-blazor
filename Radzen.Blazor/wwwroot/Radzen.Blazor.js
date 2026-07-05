@@ -6250,7 +6250,8 @@ class Spreadsheet {
         context.font = `${item.italic ? 'italic ' : ''}${item.bold ? 'bold ' : ''}${size} ${family}`;
       }
       const width = context.measureText(item.text).width;
-      return Number.isFinite(width) ? Math.ceil(width + padding) : 0;
+      // 3% over-fit absorbs metric differences between canvas and other renderers (e.g. Excel after export).
+      return Number.isFinite(width) ? Math.ceil(width * 1.03 + padding) : 0;
     });
   }
 
