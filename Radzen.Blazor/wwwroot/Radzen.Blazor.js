@@ -6210,14 +6210,25 @@ class Spreadsheet {
     }
   }
 
-  onDoubleClick = (e) => {
-    if (e.target.matches('.rz-spreadsheet-cell')) {
-      const cell = e.target;
-      const row = +cell.dataset.row;
-      const column = +cell.dataset.column;
-      this.dotNetRef.invokeMethodAsync('OnCellDoubleClickAsync', { row, column, pointer: this.toEventArgs(e) });
+    onDoubleClick = (e) => {
+        if (e.target.matches('.rz-spreadsheet-cell')) {
+            const cell = e.target;
+            const row = +cell.dataset.row;
+            const column = +cell.dataset.column;
+            this.dotNetRef.invokeMethodAsync('OnCellDoubleClickAsync', { row, column, pointer: this.toEventArgs(e) });
+        } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const column = +e.target.dataset.column;
+
+            this.dotNetRef.invokeMethodAsync('OnColumnResizeDoubleClickAsync', {
+                row: 0,
+                column: column,
+                pointer: this.toEventArgs(e)
+            });
+        }
     }
-  }
 
   onColumnPointerUp = (e) => {
     removeEventListener('pointermove', this.onColumnPointerMove);
@@ -6600,9 +6611,6 @@ class SheetEditor {
     document.removeEventListener('selectionchange', this.onSelectionChange);
   }
 }
-
-
-
 
 Radzen.createSheetEditor = (element, value, autoFocus, dotNetRef) => new SheetEditor(element, value, autoFocus, dotNetRef);
 Radzen.createSpreadsheet = (element, dotNetRef, shortcuts) => new Spreadsheet(element, dotNetRef, shortcuts);
