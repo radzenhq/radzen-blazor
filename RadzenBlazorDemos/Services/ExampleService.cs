@@ -74,7 +74,7 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             Name = "IQueryable",
-                            Title = "Blazor DataGrid - IQueryable Data Source | Free UI Components by Radzen",
+                            Title = "Bind a Blazor DataGrid to IQueryable and Entity Framework | Free UI Components by Radzen",
                             Description = "Use RadzenDataGrid to display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.",
                             Path = "datagrid-iqueryable",
                             Tags = new [] { "datatable", "datagridview", "dataview", "grid", "table" }
@@ -89,7 +89,7 @@ namespace RadzenBlazorDemos
                                 new FaqItem { Question = "When should I use the LoadData event?", Answer = "Use LoadData when the data comes from a web API or any source you query yourself - the grid passes you the current page, sort, and filter, and you return that page plus the total count." },
                                 new FaqItem { Question = "How is IQueryable binding different from LoadData?", Answer = "With IQueryable, such as Entity Framework, the grid builds and runs the query for you. With LoadData you run the query yourself and return the page, which suits REST APIs and custom back ends." }
                             },
-                            Title = "Blazor DataGrid - LoadData Event | Free UI Components by Radzen",
+                            Title = "Load Blazor DataGrid Data on Demand (LoadData Event) | Free UI Components by Radzen",
                             Description = "Blazor Data Grid custom data-binding via the LoadData event.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "custom" }
                         },
@@ -102,7 +102,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I bind a DataGrid to OData?", Answer = "Point the grid at the OData endpoint; it turns paging, sorting, and filtering into $skip, $top, $orderby, and $filter so the server returns only the rows in view." }
                             },
-                            Title = "Blazor DataGrid - OData Service | Free UI Components by Radzen",
+                            Title = "Bind a Blazor DataGrid to an OData Service | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports data-binding to OData.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "odata", "service", "rest" }
                         },
@@ -115,7 +115,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "Can the DataGrid display data without a C# model?", Answer = "Yes. Bind to dynamic rows such as dictionaries or ExpandoObject and declare columns at runtime by property name." }
                             },
-                            Title = "Blazor DataGrid - Dynamic Data | Free UI Components by Radzen",
+                            Title = "Bind a Blazor DataGrid to Dynamic Data | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports dynamic data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "dynamic" }
                         },
@@ -128,7 +128,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I bind a DataGrid to a DataTable?", Answer = "Bind the grid to the DataTable and map each column by field name; sorting, filtering, and paging work as usual." }
                             },
-                            Title = "Blazor DataGrid - DataTable Data | Free UI Components by Radzen",
+                            Title = "Display a DataTable in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports DataTable sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "datatable" }
                         },
@@ -141,7 +141,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I refresh the DataGrid with real-time data?", Answer = "Update the bound collection as data arrives and call the grid's Reload to re-render the current page." }
                             },
-                            Title = "Blazor DataGrid - Real-time Data | Free UI Components by Radzen",
+                            Title = "Real-Time Updates in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Blazor Data Grid with real-time data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "real-time" }
                         },
@@ -154,7 +154,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "Can the DataGrid show a crosstab or pivot layout?", Answer = "Yes - project each cross dimension into its own column and define those columns; for a full pivot UI with row and column groups, use the PivotDataGrid." }
                             },
-                            Title = "Blazor DataGrid - Crosstab Data | Free UI Components by Radzen",
+                            Title = "Crosstab (Pivot) Data in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Blazor Data Grid supports crosstab data sources.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "crosstab", "rows", "columns" }
                         },
@@ -168,7 +168,7 @@ namespace RadzenBlazorDemos
                                 new FaqItem { Question = "How do I make the DataGrid fast with large datasets?", Answer = "Enable virtualization or server-side paging via IQueryable or LoadData so only the visible rows render, and keep cell templates simple." },
                                 new FaqItem { Question = "How many rows can the DataGrid handle?", Answer = "With virtualization or server-side paging it stays responsive on very large sets, since it only renders and fetches the rows currently in view." }
                             },
-                            Title = "Blazor DataGrid - Performance | Free UI Components by Radzen",
+                            Title = "Large Dataset Performance in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Blazor Data Grid bound to a large collection of data",
                             Tags = new [] { "datagrid", "bind", "performance", "data", "large" }
                         },
@@ -184,7 +184,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "IQueryable support",
                             Path = "datagrid-virtualization",
-                            Title = "Blazor DataGrid - Virtualization | Free UI Components by Radzen",
+                            Title = "Row Virtualization in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Virtualization allows you to render large amounts of data on demand. The RadzenDataGrid component uses Entity Framework to query the visible data.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "virtualization", "ondemand" }
                         },
@@ -192,7 +192,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "LoadData support",
                             Path = "datagrid-virtualization-loaddata",
-                            Title = "Blazor DataGrid - LoadData Virtualization | Free UI Components by Radzen",
+                            Title = "Virtualization with LoadData in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "RadzenDataGrid supports virtualization with custom data-binding scenarios. Handle the LoadData event as usual.",
                             Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "virtualization", "ondemand" }
                         },
@@ -213,7 +213,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I customize a DataGrid column's cell content?", Answer = "Add a Template to the column and put any Razor markup inside; you get the row item as context to bind to." }
                             },
-                            Title = "Blazor DataGrid - Column Template | Free UI Components by Radzen",
+                            Title = "Customize Cell Content with Column Templates in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Blazor Data Grid custom appearance via column templates. The Template allows you to customize the way data is displayed.",
                             Tags = new [] { "column", "template", "grid", "datagrid", "table"}
                         },
@@ -226,7 +226,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I enable column resizing in the DataGrid?", Answer = "Set AllowColumnResize to true on the grid; users can then drag column borders to resize, and you can set each column's Width for the initial layout." }
                             },
-                            Title = "Blazor DataGrid - Column Resizing | Free UI Components by Radzen",
+                            Title = "Resizable Columns in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Enable column resizing in RadzenDataGrid by setting the AllowColumnResizing property to true.",
                             Tags = new [] { "column", "resizing", "grid", "datagrid", "table"}
                         },
@@ -239,7 +239,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I let users show and hide DataGrid columns?", Answer = "Enable column picking (AllowColumnPicking) and the grid renders a menu where users toggle column visibility." }
                             },
-                            Title = "Blazor DataGrid - Column Picker | Free UI Components by Radzen",
+                            Title = "Column Picker for a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Enable column picker in RadzenDataGrid by setting the AllowColumnPicking property to true.",
                             Tags = new [] { "datagrid", "column", "picker", "chooser" }
                         },
@@ -252,7 +252,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I enable column reordering?", Answer = "Set AllowColumnReorder to true; users can then drag column headers to change the column order." }
                             },
-                            Title = "Blazor DataGrid - Column Reorder | Free UI Components by Radzen",
+                            Title = "Drag to Reorder Columns in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Enable column reorder in RadzenDataGrid by setting the AllowColumnReorder property to true. Define column initial order using column OrderIndex property.",
                             Tags = new [] { "column", "reorder", "grid", "datagrid", "table"}
                         },
@@ -265,7 +265,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I show column totals in the DataGrid?", Answer = "Add a FooterTemplate to the column and compute the aggregate - sum, average, count, min, or max - over the grid's view; it updates as the data is filtered and paged." }
                             },
-                            Title = "Blazor DataGrid - Footer Totals | Free UI Components by Radzen",
+                            Title = "Footer Totals and Aggregates in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "The FooterTemplate column property allows you to display aggregated data in the column footer.",
                             Tags = new [] { "summary", "total", "aggregate", "datagrid", "table", "dataview" }
                         },
@@ -278,7 +278,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I freeze a column in the DataGrid?", Answer = "Set Frozen on the column, and FrozenPosition for left or right; it stays in place while the other columns scroll horizontally." }
                             },
-                            Title = "Blazor DataGrid - Frozen Columns | Free UI Components by Radzen",
+                            Title = "Frozen (Pinned) Columns in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Lock columns in RadzenDataGrid to prevent them from scrolling out of view via the Frozen property.",
                             Tags = new [] { "datagrid", "column", "frozen", "locked" }
                         },
@@ -291,7 +291,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I create grouped or multi-level column headers?", Answer = "Nest child columns inside a parent RadzenDataGridColumn; the parent renders as a spanning header above its children." }
                             },
-                            Title = "Blazor DataGrid - Composite Columns | Free UI Components by Radzen",
+                            Title = "Multi-Level Column Headers in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Use RadzenDataGridColumn Columns property to define child columns.",
                             Tags = new [] { "datagrid", "column", "composite", "merged", "complex" }
                         },
@@ -304,7 +304,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I show a DataGrid column conditionally?", Answer = "Bind the column's Visible property to your condition, or render columns with normal Razor control flow so they appear only when needed." }
                             },
-                            Title = "Blazor DataGrid - Conditional Columns | Free UI Components by Radzen",
+                            Title = "Show or Hide Columns Conditionally in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Use RadzenDataGridColumn Columns property to define child columns conditionally.",
                             Tags = new [] { "datagrid", "column", "conditional", "render", "complex" }
                         }
@@ -320,7 +320,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Simple Mode",
                             Path = "datagrid-simple-filter",
-                            Title = "Blazor DataGrid - Simple Filter Mode | Free UI Components by Radzen",
+                            Title = "Add an Inline Column Filter to a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "RadzenDataGrid simple mode filtering.",
                             Tags = new [] { "filter", "simple", "grid", "datagrid", "table"},
                             Related = new [] { "datagrid-simple-filter-menu", "datagrid-advanced-filter", "datagrid-checkboxlist-filter" },
@@ -333,7 +333,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Simple with menu",
                             Path = "datagrid-simple-filter-menu",
-                            Title = "Blazor DataGrid - Simple Filter with Menu | Free UI Components by Radzen",
+                            Title = "Column Filter with Operator Menu in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "RadzenDataGrid simple mode filtering with Menu.",
                             Tags = new [] { "filter", "simple", "grid", "datagrid", "table", "menu" },
                             Related = new [] { "datagrid-simple-filter", "datagrid-advanced-filter", "datagrid-mixed-filter" },
@@ -346,7 +346,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Advanced Mode",
                             Path = "datagrid-advanced-filter",
-                            Title = "Blazor DataGrid - Advanced Filter Mode | Free UI Components by Radzen",
+                            Title = "Multi-Condition Column Filtering in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "RadzenDataGrid advanced mode filtering.",
                             Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"},
                             Related = new [] { "datagrid-simple-filter", "datagrid-mixed-filter", "datagrid-filter-api" },
@@ -359,7 +359,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "CheckBoxList (Excel like)",
                             Path = "datagrid-checkboxlist-filter",
-                            Title = "Blazor DataGrid - Excel like filtering | Free UI Components by Radzen",
+                            Title = "Excel-Style Checkbox Filtering in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like filtering.",
                             Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list" },
                             Related = new [] { "datagrid-checkboxlist-filter-odata", "datagrid-checkboxlist-lookup-filter", "datagrid-checkboxlist-auto-apply-filter" },
@@ -372,7 +372,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "CheckBoxList with Lookup",
                             Path = "datagrid-checkboxlist-lookup-filter",
-                            Title = "Blazor DataGrid - CheckBoxList Filter with Lookup Data | Free UI Components by Radzen",
+                            Title = "Checkbox Filters with Lookup Data in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Drive the CheckBoxList filter from a lookup data source: filter by id while showing and searching by name.",
                             Tags = new [] { "checkboxlist", "lookup", "filter", "filtering", "datagrid", "table", "dataview" },
                             Related = new [] { "datagrid-checkboxlist-filter", "datagrid-checkboxlist-auto-apply-filter", "datagrid-checkboxlist-filter-odata" },
@@ -385,7 +385,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "CheckBoxList Auto-Apply",
                             Path = "datagrid-checkboxlist-auto-apply-filter",
-                            Title = "Blazor DataGrid - CheckBoxList Filter Auto-Apply | Free UI Components by Radzen",
+                            Title = "Auto-Apply Checkbox Filters in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Apply CheckBoxList column filters immediately as options are selected, without the Apply button.",
                             Tags = new [] { "checkboxlist", "auto", "apply", "filter", "filtering", "datagrid", "table", "dataview" },
                             Related = new [] { "datagrid-checkboxlist-filter", "datagrid-checkboxlist-lookup-filter", "datagrid-checkboxlist-filter-odata" },
@@ -398,7 +398,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "CheckBoxList with OData",
                             Path = "datagrid-checkboxlist-filter-odata",
-                            Title = "Blazor DataGrid - Excel Filter with OData | Free UI Components by Radzen",
+                            Title = "Server-Side Checkbox Filtering with OData in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like filtering with OData.",
                             Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list", "odata" },
                             Related = new [] { "datagrid-checkboxlist-filter", "datagrid-odata", "datagrid-checkboxlist-lookup-filter" },
@@ -411,7 +411,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Mixed Mode",
                             Path = "datagrid-mixed-filter",
-                            Title = "Blazor DataGrid - Mixed Filter Mode | Free UI Components by Radzen",
+                            Title = "Per-Column Filter Modes in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like and advanced mixed mode filtering.",
                             Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"},
                             Related = new [] { "datagrid-advanced-filter", "datagrid-simple-filter", "datagrid-filter-api" },
@@ -424,7 +424,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Enum filtering",
                             Path = "datagrid-enum-filter",
-                            Title = "Blazor DataGrid - Enum Filtering | Free UI Components by Radzen",
+                            Title = "Filter by Enum Values in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use enums in the RadzenDataGrid column filter.",
                             Tags = new [] { "filter", "enum", "grid", "datagrid", "table"},
                             Related = new [] { "datagrid-checkboxlist-filter", "datagrid-simple-filter", "datagrid-advanced-filter" },
@@ -437,7 +437,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filtering sub properties",
                             Path = "datagrid-sub-properties-filter",
-                            Title = "Blazor DataGrid - Sub Property Filter | Free UI Components by Radzen",
+                            Title = "Filter by Nested Properties in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates how to use sub properties in the RadzenDataGrid column filter.",
                             Tags = new [] { "filter", "sub properties", "grid", "datagrid", "table"},
                             Related = new [] { "datagrid-advanced-filter", "datagrid-column-template", "datagrid-iqueryable" },
@@ -450,7 +450,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filter API",
                             Path = "datagrid-filter-api",
-                            Title = "Blazor DataGrid - Filter API | Free UI Components by Radzen",
+                            Title = "Set Filters from Code in a Blazor DataGrid (Filter API) | Free UI Components by Radzen",
                             Description = "Set the initial filter of your RadzenDataGrid via the FilterValue and FilterOperator column properties.",
                             Tags = new [] { "filter", "api", "grid", "datagrid", "table"},
                             Related = new [] { "datagrid-advanced-filter", "datagrid-simple-filter", "datagrid-mixed-filter" },
@@ -463,7 +463,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filter Template",
                             Path = "datagrid-filter-template",
-                            Title = "Blazor DataGrid - Custom Filtering | Free UI Components by Radzen",
+                            Title = "Custom Filter Editors with FilterTemplate in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates how to define custom RadzenDataGrid column filter template.",
                             Tags = new [] { "datagrid", "column", "filter", "template" },
                             Related = new [] { "datagrid-filtervalue-template", "datagrid-advanced-filter", "datagrid-column-template" },
@@ -476,7 +476,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Filter Value Template",
                             Path = "datagrid-filtervalue-template",
-                            Title = "Blazor DataGrid - Filter Value Template | Free UI Components by Radzen",
+                            Title = "Custom Filter Value Display in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates how to define custom RadzenDataGrid column filter value template.",
                             Tags = new [] { "datagrid", "column", "filter", "template", "value" },
                             Related = new [] { "datagrid-filter-template", "datagrid-advanced-filter", "datagrid-column-template" },
@@ -528,7 +528,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I show a self-referencing (parent/child) hierarchy?", Answer = "Bind the grid to the parent rows and render each row's children, matched by the parent id, in a nested grid." }
                             },
-                            Title = "Blazor DataGrid - Self-Reference Hierarchy | Free UI Components by Radzen",
+                            Title = "Self-Referencing Hierarchy in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates how to develop and show a self-referencing hierarchy.",
                             Tags = new [] { "master", "detail", "datagrid", "table", "dataview", "hierarchy", "self-reference" }
                         },
@@ -562,7 +562,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I enable single row selection?", Answer = "Set SelectionMode to Single and bind Value to a single item; the grid raises RowSelect when the selection changes." }
                             },
-                            Title = "Blazor DataGrid - Single Selection | Free UI Components by Radzen",
+                            Title = "Single Row Selection in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable single selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "single", "selection", "datagrid", "table", "dataview" }
                         },
@@ -575,7 +575,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I enable multiple row selection with checkboxes?", Answer = "Set SelectionMode to Multiple and bind Value to a collection; add a header checkbox to select or clear all rows." }
                             },
-                            Title = "Blazor DataGrid - Multi Selection | Free UI Components by Radzen",
+                            Title = "Multiple Row Selection in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable multiple selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "multiple", "selection", "datagrid", "table", "dataview" }
                         },
@@ -588,7 +588,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I enable cell selection in the DataGrid?", Answer = "Turn on cell selection and handle the CellClick event to track the selected cells." }
                             },
-                            Title = "Blazor DataGrid - Cell Selection | Free UI Components by Radzen",
+                            Title = "Cell Selection in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates how to enable cell selection in Blazor RadzenDataGrid component.",
                             Tags = new [] { "cell", "selection", "datagrid", "table", "dataview" }
                         },
@@ -609,7 +609,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I enable sorting in the DataGrid?", Answer = "Set AllowSorting to true on the grid (or Sortable on a column); users sort by clicking the column header." }
                             },
-                            Title = "Blazor DataGrid - Sorting | Free UI Components by Radzen",
+                            Title = "Click-to-Sort Columns in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates sorting in Blazor RadzenDataGrid component.",
                             Tags = new [] { "single", "sort", "datagrid", "table", "dataview" }
                         },
@@ -622,7 +622,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I enable multi-column sorting?", Answer = "Set AllowMultiColumnSorting to true; users add columns to the sort by clicking more headers, and you can show the order with sort indexes." }
                             },
-                            Title = "Blazor DataGrid - Multi-Column Sorting | Free UI Components by Radzen",
+                            Title = "Multi-Column Sorting in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates multiple column sorting in Blazor RadzenDataGrid component.",
                             Tags = new [] { "multi", "sort", "datagrid", "table", "dataview" }
                         },
@@ -635,7 +635,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I set the initial sort order in code?", Answer = "Set each column's SortOrder to Ascending or Descending; the grid applies it on load." }
                             },
-                            Title = "Blazor DataGrid - Sort API | Free UI Components by Radzen",
+                            Title = "Set Sorting from Code in a Blazor DataGrid (Sort API) | Free UI Components by Radzen",
                             Description = "Set the initial sort order of your RadzenDataGrid via the SortOrder column property.",
                             Tags = new [] { "api", "sort", "datagrid", "table", "dataview" }
                         },
@@ -648,7 +648,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I customize how a column sorts?", Answer = "Set the column's SortComparer to an IComparer implementation; the grid uses it instead of the default comparison." }
                             },
-                            Title = "Blazor DataGrid - Custom Sort Comparer | Free UI Components by Radzen",
+                            Title = "Custom Sort Comparer in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Sort a column with a custom IComparer, for example ordering id values by their mapped display name.",
                             Tags = new [] { "comparer", "custom", "sort", "datagrid", "table", "dataview" }
                         }
@@ -669,7 +669,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I move the DataGrid pager to the top?", Answer = "Set PagerPosition to Top, Bottom, or TopAndBottom on the grid." }
                             },
-                            Title = "Blazor DataGrid - Pager Position | Free UI Components by Radzen",
+                            Title = "Pager Position in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Set the pager position to Top, Bottom, or TopAndBottom.",
                             Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
                         },
@@ -682,7 +682,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I align the DataGrid pager?", Answer = "Set PagerHorizontalAlign to Left, Center, Right, or Justify." }
                             },
-                            Title = "Blazor DataGrid - Pager Alignment | Free UI Components by Radzen",
+                            Title = "Pager Alignment in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "See how to change the horizontal alignment of the pager in a RadzenDataGrid.",
                             Tags = new [] { "pager", "paging", "datagrid", "table", "dataview" }
                         },
@@ -695,7 +695,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I set the DataGrid page size and current page in code?", Answer = "Set PageSize and PageSizeOptions, use GoToPage or the Page property to change pages, and handle the PageChanged event." }
                             },
-                            Title = "Blazor DataGrid - Pager API | Free UI Components by Radzen",
+                            Title = "Control Blazor DataGrid Paging from Code (Pager API) | Free UI Components by Radzen",
                             Description = "Blazor RadzenDataGrid Pager API.",
                             Tags = new [] { "pager", "paging", "api", "datagrid", "table", "dataview" }
                         }
@@ -716,7 +716,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I enable grouping in the DataGrid?", Answer = "Set AllowGrouping to true; users drag column headers into the group panel, and you can group from code via the Groups collection." }
                             },
-                            Title = "Blazor DataGrid - Grouping API | Free UI Components by Radzen",
+                            Title = "Group Rows in a Blazor DataGrid (Grouping API) | Free UI Components by Radzen",
                             Description = "Enable DataGrid grouping with AllowGrouping. Localize group panel text and disable grouping per column.",
                             Tags = new [] { "group", "grouping", "datagrid", "table", "dataview", "api" }
                         },
@@ -729,7 +729,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I customize the group header row?", Answer = "Add a GroupHeaderTemplate to the grid and render the group key, counts, or aggregates with your own markup." }
                             },
-                            Title = "Blazor DataGrid - Group Header | Free UI Components by Radzen",
+                            Title = "Custom Group Headers in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Use GroupHeaderTemplate to customize DataGrid group header rows.",
                             Tags = new [] { "group", "grouping", "template", "datagrid", "table", "dataview" }
                         },
@@ -742,7 +742,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I show totals for each group?", Answer = "Add a GroupFooterTemplate to the column and compute the aggregate over the group's data; it renders in each group's footer." }
                             },
-                            Title = "Blazor DataGrid - Group Footer | Free UI Components by Radzen",
+                            Title = "Per-Group Totals in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "The GroupFooterTemplate column property allows you to display aggregated data (totals) in the column footer for each group.",
                             Tags = new [] { "group", "grouping", "footer", "template", "datagrid", "table", "dataview" }
                         }
@@ -757,7 +757,7 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "How do I make the DataGrid more compact?", Answer = "Set Density to Compact to reduce row padding and fit more rows; the default is comfortable." }
                     },
-                    Title = "Blazor DataGrid - Density | Free UI Components by Radzen",
+                    Title = "Compact Density in a Blazor DataGrid | Free UI Components by Radzen",
                     Description = "See how to set a compact density mode of Blazor RadzenDataGrid.",
                     Icon = "\ueb9e",
                     Tags = new [] { "density", "compact", "small", "large", "tight" }
@@ -776,7 +776,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I add a toolbar to the DataGrid?", Answer = "Use the HeaderTemplate to render your own toolbar - buttons, search, or any components - above the grid's columns." }
                             },
-                            Title = "Blazor DataGrid - Custom Header | Free UI Components by Radzen",
+                            Title = "Custom Header Toolbar in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "Gives the grid a custom header, allowing the adding of components to create custom tool bars in addtion to column grouping and column picker.",
                             Tags = new [] { "grid header","header" }
                         },
@@ -789,7 +789,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I put a column picker in a custom header?", Answer = "Render a RadzenDataGridColumnPicker inside the grid's HeaderTemplate so users toggle column visibility from your toolbar." }
                             },
-                            Title = "Blazor DataGrid - Header Column Picker | Free UI Components by Radzen",
+                            Title = "Header Toolbar with Column Picker in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "See how to add a column picker to your Blazor RadzenDataGrid.",
                             Tags = new [] { "grid header","header" }
                         }
@@ -804,7 +804,7 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "How do I change the DataGrid grid lines?", Answer = "Set GridLines to Both, Horizontal, Vertical, or None to control which cell borders are shown." }
                     },
-                    Title = "Blazor DataGrid - Grid Lines | Free UI Components by Radzen",
+                    Title = "Grid Line Options in a Blazor DataGrid | Free UI Components by Radzen",
                     Description = "Deside where to display grid lines in your Blazor RadzenDataGrid.",
                     Icon = "\uf016",
                     Tags = new [] { "grid", "lines", "border", "gridlines" }
@@ -818,7 +818,7 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "How do I add a context menu to DataGrid cells?", Answer = "Handle the CellContextMenu event and open a RadzenContextMenu with your actions for the clicked cell and row." }
                     },
-                    Title = "Blazor DataGrid - Cell Menu | Free UI Components by Radzen",
+                    Title = "Right-Click Context Menu in Blazor DataGrid Cells | Free UI Components by Radzen",
                     Description = "Right click on a table cell to open the context menu.",
                     Icon = "\ue22b",
                     Tags = new [] { "cell", "row", "contextmenu", "menu", "rightclick" }
@@ -839,7 +839,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I save and restore DataGrid state?", Answer = "Bind the Settings property (or handle its change) to capture page, sort, filter, and column layout, then reapply it on load." }
                             },
-                            Title = "Blazor DataGrid - Save/Load Settings | Free UI Components by Radzen",
+                            Title = "Save and Restore Blazor DataGrid State | Free UI Components by Radzen",
                             Description = "Save and load DataGrid state including page index, page size, column filters, sort order, width, and visibility.",
                             Tags = new [] { "save", "load", "settings" }
                         },
@@ -853,7 +853,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "Does saving DataGrid state work with LoadData binding?", Answer = "Yes. Capture the Settings and reapply them; the grid raises LoadData with the restored sort, filter, and page so your query returns the right rows." }
                             },
-                            Title = "Blazor DataGrid - Save/Load Settings | Free UI Components by Radzen",
+                            Title = "Save DataGrid State with LoadData Binding | Free UI Components by Radzen",
                             Description = "This example shows how to save/load DataGrid state using Settings property when binding using LoadData event.",
                             Tags = new [] { "save", "load", "settings", "async", "loaddata" }
                         }
@@ -875,7 +875,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I let users drag to reorder rows?", Answer = "Enable row reordering and handle the RowReorder event to update your data when a row is dropped in a new position." }
                             },
-                            Title = "Blazor DataGrid - Reorder rows | Free UI Components by Radzen",
+                            Title = "Drag to Reorder Rows in a Blazor DataGrid | Free UI Components by Radzen",
                             Description = "This example demonstrates custom DataGrid rows reoder.",
                             Tags = new [] { "datagrid", "reorder", "row" }
                         },
@@ -888,7 +888,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I drag rows from one DataGrid to another?", Answer = "Handle the row drag events on both grids to remove the item from the source and add it to the target collection." }
                             },
-                            Title = "Blazor DataGrid - Drag Rows Between Grids | Free UI Components by Radzen",
+                            Title = "Drag Rows Between Two Blazor DataGrids | Free UI Components by Radzen",
                             Description = "This example demonstrates drag and drop rows between two DataGrid components.",
                             Tags = new [] { "datagrid", "drag", "row", "between" }
                         },
@@ -901,7 +901,7 @@ namespace RadzenBlazorDemos
                             {
                                 new FaqItem { Question = "How do I drag DataGrid rows into the Scheduler?", Answer = "Make the rows draggable and handle the Scheduler's drop to create an appointment from the dropped row." }
                             },
-                            Title = "Blazor DataGrid - Drag Rows to Scheduler | Free UI Components by Radzen",
+                            Title = "Drag DataGrid Rows onto a Scheduler | Free UI Components by Radzen",
                             Description = "This example demonstrates drag and drop rows between DataGrid and Scheduler.",
                             Tags = new [] { "datagrid", "drag", "row", "scheduler" }
                         }
@@ -917,7 +917,7 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "How do I enable inline row editing in the DataGrid?", Answer = "Add an EditTemplate to each editable column and call EditRow to switch a row into edit mode; UpdateRow saves the changes." }
                     },
-                    Title = "Blazor DataGrid - InLine Editing | Free UI Components by Radzen",
+                    Title = "Inline Row Editing in a Blazor DataGrid | Free UI Components by Radzen",
                     Description = "This example demonstrates how to configure the Razden Blazor DataGrid for inline editing.",
                     Icon = "\ue22b",
                     Tags = new [] { "inline", "editor", "datagrid", "table", "dataview" }
@@ -932,7 +932,7 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "How do I enable in-cell editing?", Answer = "Use cell edit mode with an EditTemplate per column; edits commit as the user moves between cells." }
                     },
-                    Title = "Blazor DataGrid - InCell Editing | Free UI Components by Radzen",
+                    Title = "In-Cell Editing in a Blazor DataGrid | Free UI Components by Radzen",
                     Description = "This example demonstrates how to configure the Razden Blazor DataGrid for in-cell editing.",
                     Icon = "\ue745",
                     Tags = new [] { "in-cell", "editor", "datagrid", "table", "dataview" }
@@ -947,7 +947,7 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "How do I style DataGrid rows or cells by value?", Answer = "Use CellRender and RowRender to add CSS classes or inline styles based on the data, or a column Template to render conditional content." }
                     },
-                    Title = "Blazor DataGrid - Conditional Format | Free UI Components by Radzen",
+                    Title = "Conditional Formatting in a Blazor DataGrid | Free UI Components by Radzen",
                     Description = "This example demonstrates RadzenDataGrid with conditional rows and cells template and styles.",
                     Icon = "\ue41d",
                     Tags = new [] { "conditional", "template", "style", "datagrid", "table", "dataview" }
@@ -989,7 +989,7 @@ namespace RadzenBlazorDemos
                     {
                         new FaqItem { Question = "How do I customize the DataGrid's empty state?", Answer = "Use the EmptyTemplate to render your own message or content when the grid has no rows." }
                     },
-                    Title = "Blazor DataGrid - Empty Data Grid | Free UI Components by Radzen",
+                    Title = "Empty State Template in a Blazor DataGrid | Free UI Components by Radzen",
                     Description = "This example demonstrates Blazor DataGrid without data.",
                     Icon = "\ue661",
                     Tags = new [] { "datagrid", "databinding" }
@@ -1022,7 +1022,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Chart Series", Anchor = "#series" }, new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                             Name = "Series",
                             Path = "chart-series",
-                            Title = "Blazor Chart - Series Config | Free UI Components by Radzen",
+                            Title = "Configure Chart Series in Radzen Blazor | Free UI Components by Radzen",
                             Description = "Bind data to a line, bar, pie, or other series - the building block of every Blazor chart.",
                             Related = new [] { "line-chart", "column-chart", "chart-axis" },
                             Faq = new []
@@ -1037,7 +1037,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Min, max and step", Anchor = "#min-max-and-step" }, new () { Text = "Format axis values", Anchor = "#format-axis-values" }, new () { Text = "Display grid lines", Anchor = "#display-grid-lines" }, new () { Text = "Set axis title", Anchor = "#set-axis-title" } ],
                             Name = "Axis",
                             Path = "chart-axis",
-                            Title = "Blazor Chart - Axis Config | Free UI Components by Radzen",
+                            Title = "Chart Axis Configuration in Radzen Blazor | Free UI Components by Radzen",
                             Description = "Control the scale, gridlines, labels, and title of a Blazor chart's axes, or let them fit the data automatically.",
                             Related = new [] { "chart-series", "multiple-axes-chart", "logarithmic-axis-chart" },
                             Faq = new []
@@ -1118,7 +1118,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Legend position", Anchor = "#legend-position" }, new () { Text = "Hide the legend", Anchor = "#hide-the-legend" } ],
                             Name = "Legend",
                             Path = "chart-legend",
-                            Title = "Blazor Chart - Legend Config | Free UI Components by Radzen",
+                            Title = "Chart Legend Options in Radzen Blazor | Free UI Components by Radzen",
                             Description = "Show, move, restyle, or hide the legend that tells readers which series is which on a Blazor chart.",
                             Related = new [] { "chart-series", "chart-tooltip", "pie-chart" },
                             Faq = new []
@@ -1133,7 +1133,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Customize tooltip content", Anchor = "#customize-tooltip-content" }, new () { Text = "Shared tooltip", Anchor = "#shared-tooltip" }, new () { Text = "Split tooltip", Anchor = "#split-tooltip" }, new () { Text = "Disable tooltips", Anchor = "#disable-tooltips" } ],
                             Name = "ToolTip",
                             Path = "chart-tooltip",
-                            Title = "Blazor Chart - ToolTip Config | Free UI Components by Radzen",
+                            Title = "Chart Tooltips in Radzen Blazor | Free UI Components by Radzen",
                             Description = "Show values on hover with Blazor chart tooltips - customize content, share, split, or turn them off.",
                             Related = new [] { "chart-crosshair", "chart-sync", "chart-legend" },
                             Faq = new []
@@ -1149,7 +1149,7 @@ namespace RadzenBlazorDemos
                             Toc = [ new () { Text = "Auto Rotation", Anchor = "#auto-rotation" }, new () { Text = "Predefined Rotation", Anchor = "#rotation" } ],
                             Name = "Label Rotation",
                             Path = "chart-label-rotation",
-                            Title = "Blazor Chart - Label Rotation | Free UI Components by Radzen",
+                            Title = "Rotate Chart Axis Labels in Radzen Blazor | Free UI Components by Radzen",
                             Description = "Rotate crowded category labels on a Blazor chart, automatically or to an angle you set, to keep them readable.",
                             Related = new [] { "chart-axis", "column-chart", "bar-chart" },
                             Faq = new []
@@ -1162,7 +1162,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Interpolation",
                             Path = "chart-interpolation",
-                            Title = "Blazor Chart - Interpolation | Free UI Components by Radzen",
+                            Title = "Line Interpolation and Smoothing in Radzen Blazor Charts | Free UI Components by Radzen",
                             Description = "Choose how a Blazor line or area chart connects its points - straight, smooth spline, or flat steps.",
                             Related = new [] { "line-chart", "spline-chart", "step-line-chart" },
                             Faq = new []
@@ -1176,7 +1176,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Annotations",
                             Path = "chart-annotations",
-                            Title = "Blazor Chart - Annotations | Free UI Components by Radzen",
+                            Title = "Add Annotations to Radzen Blazor Charts | Free UI Components by Radzen",
                             Description = "Add text callouts to specific points on a Blazor chart to flag an event, a peak, or a note.",
                             Related = new [] { "chart-reference-line", "chart-data-labels", "line-chart" },
                             Faq = new []
@@ -1203,7 +1203,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Crosshair",
                             Path = "chart-crosshair",
-                            Title = "Blazor Chart - Crosshair | Free UI Components by Radzen",
+                            Title = "Chart Crosshair in Radzen Blazor | Free UI Components by Radzen",
                             Description = "Add guide lines that track the cursor on a Blazor chart, snapping to the nearest point with an optional value label.",
                             Related = new [] { "chart-tooltip", "chart-sync", "line-chart" },
                             Faq = new []
@@ -1217,7 +1217,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Styling Chart",
                             Path = "styling-chart",
-                            Title = "Blazor Chart - Styling | Free UI Components by Radzen",
+                            Title = "Style and Theme Radzen Blazor Charts | Free UI Components by Radzen",
                             Description = "Restyle a Blazor chart with color schemes, custom series colors, fills, and fonts to match your theme.",
                             Related = new [] { "chart-series", "styling-gauge", "column-chart" },
                             Faq = new []
@@ -2046,6 +2046,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Heatmap",
                     Path = "heatmap-chart",
+                    Title = "Blazor Heatmap Chart Component | Free UI Components by Radzen",
                     Description = "Show values on a labeled color-coded grid with a Blazor heatmap - calendars, matrices, and density. Free and open source.",
                     Tags = new [] { "chart", "heatmap", "grid", "matrix", "color", "intensity" },
                     Icon = "\ue8f0",
@@ -2062,6 +2063,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Treemap",
                     Path = "treemap-chart",
+                    Title = "Blazor Treemap Chart Component | Free UI Components by Radzen",
                     Description = "Show hierarchy and proportion as nested rectangles with a Blazor treemap.",
                     Tags = new [] { "chart", "treemap", "hierarchy", "rectangle", "proportion", "area" },
                     Related = new [] { "sankey-diagram", "pie-chart", "column-chart" },
@@ -2077,6 +2079,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Sparkline",
                     Path = "sparkline",
+                    Title = "Blazor Sparkline Chart Component | Free UI Components by Radzen",
                     Description = "Show a trend inline in word-sized space with a Blazor sparkline - no axes or labels.",
                     Icon = "\uf64f",
                     Tags = new [] { "chart", "sparkline" },
