@@ -31,18 +31,49 @@ internal static class ExcelTextMetrics
         4.57, 7.62, 6.60, 10.16, 6.60, 6.60, 6.09, 4.57, 7.11, 4.57, 7.62
     ];
 
+    // East Asian wide and fullwidth glyphs, measured the same way.
+    private const double WideRegular = 15.25;
+    private const double WideBold = 15.75;
+
     public static double EstimateWidth(string text, bool bold, double? fontSize)
     {
         var widths = bold ? Bold : Regular;
         var total = 0d;
 
-        foreach (var ch in text)
+        foreach (var rune in text.EnumerateRunes())
         {
-            total += ch is >= ' ' and <= '~' ? widths[ch - ' '] : widths['0' - ' '];
+            if (rune.Value is >= ' ' and <= '~')
+            {
+                total += widths[rune.Value - ' '];
+            }
+            else if (IsWide(rune.Value))
+            {
+                total += bold ? WideBold : WideRegular;
+            }
+            else
+            {
+                total += widths['0' - ' '];
+            }
         }
 
         return total * (fontSize ?? 11) / 11;
     }
+
+    // Unicode East Asian Width wide/fullwidth blocks (CJK, kana, hangul, fullwidth forms, emoji).
+    private static bool IsWide(int codePoint) => codePoint is
+        (>= 0x1100 and <= 0x115F) or
+        (>= 0x2E80 and <= 0x303E) or
+        (>= 0x3041 and <= 0x33FF) or
+        (>= 0x3400 and <= 0x4DBF) or
+        (>= 0x4E00 and <= 0x9FFF) or
+        (>= 0xA000 and <= 0xA4CF) or
+        (>= 0xAC00 and <= 0xD7A3) or
+        (>= 0xF900 and <= 0xFAFF) or
+        (>= 0xFE30 and <= 0xFE4F) or
+        (>= 0xFF00 and <= 0xFF60) or
+        (>= 0xFFE0 and <= 0xFFE6) or
+        (>= 0x1F300 and <= 0x1FAFF) or
+        (>= 0x20000 and <= 0x3FFFD);
 
     // The single line that determines a cell's width: wrapped cells render hard line breaks so
     // the longest line governs; non-wrapped cells render with white-space: nowrap which collapses them.

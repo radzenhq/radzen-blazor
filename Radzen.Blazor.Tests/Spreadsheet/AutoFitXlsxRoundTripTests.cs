@@ -155,6 +155,22 @@ public class AutoFitXlsxRoundTripTests
     }
 
     [Fact]
+    public void Write_AutoFitColumn_SizesWideCharactersAtDoubleDigitWidth()
+    {
+        var wb = Build();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "漢字とかな"; // 5 wide glyphs = 5 * 15.25px + padding
+        sheet.Columns[0] = 40;
+        sheet.Columns.SetAutoFit(0);
+
+        using var ms = Save(wb);
+
+        var col = ReadSheetXml(ms).Descendants(Ns + "col").Single();
+        var width = double.Parse(col.Attribute("width")!.Value, System.Globalization.CultureInfo.InvariantCulture);
+        Assert.True(width * 7.5 > 80, $"exported width {width * 7.5}px");
+    }
+
+    [Fact]
     public void Write_NonAutoFitColumn_KeepsModelWidth()
     {
         var wb = Build();
