@@ -3258,12 +3258,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             var format = cell.FormatOrNull;
 
-            if (text.Contains('\n', StringComparison.Ordinal) || text.Contains('\r', StringComparison.Ordinal))
-            {
-                // Wrap renders hard line breaks so the longest line governs; nowrap collapses them.
-                text = text.Replace("\r", "", StringComparison.Ordinal);
-                text = format?.WrapText == true ? LongestLine(text) : text.Replace('\n', ' ');
-            }
+            text = ExcelTextMetrics.DisplayLine(text, format?.WrapText == true);
 
             if (text.Length > AutoFitMaxTextLength)
             {
@@ -3333,21 +3328,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         return items;
-    }
-
-    private static string LongestLine(string text)
-    {
-        var longest = "";
-
-        foreach (var line in text.Split('\n'))
-        {
-            if (line.Length > longest.Length)
-            {
-                longest = line;
-            }
-        }
-
-        return longest;
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

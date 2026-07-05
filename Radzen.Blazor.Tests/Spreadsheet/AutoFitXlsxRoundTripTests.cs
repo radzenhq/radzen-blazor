@@ -117,6 +117,60 @@ public class AutoFitXlsxRoundTripTests
     }
 
     [Fact]
+    public void Write_AutoFitColumn_WidensToFitContentWithExcelMetrics()
+    {
+        var wb = Build();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = 157400d;
+        sheet.Cells[0, 0].Format.NumberFormat = "$#,##0.00";
+        sheet.Cells[0, 0].Format.Bold = true;
+        sheet.Columns[0] = 78; // snug browser-font fit, too narrow for Excel's font
+        sheet.Columns.SetAutoFit(0);
+
+        using var ms = Save(wb);
+
+        var col = ReadSheetXml(ms).Descendants(Ns + "col").Single();
+        var width = double.Parse(col.Attribute("width")!.Value, System.Globalization.CultureInfo.InvariantCulture);
+        // "$157,400.00" needs 76.7px + 5px padding in Aptos Narrow 11
+        Assert.True(width * 7.5 > 81, $"exported width {width * 7.5}px");
+
+        // the model width is not changed by the export
+        Assert.Equal(78, sheet.Columns[0]);
+    }
+
+    [Fact]
+    public void Write_AutoFitColumn_KeepsWiderModelWidth()
+    {
+        var wb = Build();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "abc";
+        sheet.Columns[0] = 200;
+        sheet.Columns.SetAutoFit(0);
+
+        using var ms = Save(wb);
+
+        var col = ReadSheetXml(ms).Descendants(Ns + "col").Single();
+        var width = double.Parse(col.Attribute("width")!.Value, System.Globalization.CultureInfo.InvariantCulture);
+        Assert.Equal(200 / 7.5, width, 3);
+    }
+
+    [Fact]
+    public void Write_NonAutoFitColumn_KeepsModelWidth()
+    {
+        var wb = Build();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = 157400d;
+        sheet.Cells[0, 0].Format.NumberFormat = "$#,##0.00";
+        sheet.Columns[0] = 78;
+
+        using var ms = Save(wb);
+
+        var col = ReadSheetXml(ms).Descendants(Ns + "col").Single();
+        var width = double.Parse(col.Attribute("width")!.Value, System.Globalization.CultureInfo.InvariantCulture);
+        Assert.Equal(78 / 7.5, width, 3);
+    }
+
+    [Fact]
     public void Read_BestFitRangeBeyondSheet_IsCapped()
     {
         using var ms = PatchSheetXml(Save(Build()), """<cols><col min="1" max="16384" width="12" bestFit="1" customWidth="1"/></cols>""");

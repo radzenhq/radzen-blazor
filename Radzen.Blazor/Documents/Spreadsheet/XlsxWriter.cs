@@ -1175,12 +1175,14 @@ class XlsxWriter(Workbook sourceWorkbook)
 
     private static XElement? CreateColumns(Worksheet sheet)
     {
+        var autoFitWidths = ComputeAutoFitWidths(sheet);
+
         var colElements = Enumerable.Range(0, sheet.ColumnCount)
             .Where(col => Math.Abs(sheet.Columns[col] - sheet.Columns.Size) > 1e-6 || sheet.Columns.IsAutoFit(col))
             .Select(col => new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 new XAttribute("min", col + 1),
                 new XAttribute("max", col + 1),
-                new XAttribute("width", ColumnWidthConversion.PixelsToChars(sheet.Columns[col])),
+                new XAttribute("width", ColumnWidthConversion.PixelsToChars(autoFitWidths.TryGetValue(col, out var autoFitWidth) ? autoFitWidth : sheet.Columns[col])),
                 sheet.Columns.IsAutoFit(col) ? new XAttribute("bestFit", "1") : null,
                 new XAttribute("customWidth", "1")))
             .ToList();
@@ -1191,6 +1193,54 @@ class XlsxWriter(Workbook sourceWorkbook)
         }
 
         return new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), colElements);
+    }
+
+    // Auto fitted columns were sized against the browser font; Excel renders the Normal font with
+    // different metrics, so recompute their width from the content using Excel's own character
+    // widths and keep whichever is larger.
+    private static Dictionary<int, double> ComputeAutoFitWidths(Worksheet sheet)
+    {
+        var widths = new Dictionary<int, double>();
+
+        foreach (var cell in sheet.Cells.GetPopulatedCells().ToList())
+        {
+            var col = cell.Address.Column;
+
+            if (!sheet.Columns.IsAutoFit(col) || sheet.MergedCells.Contains(cell.Address))
+            {
+                continue;
+            }
+
+            string? text;
+            Format? format;
+
+            try
+            {
+                text = cell.GetDisplayText();
+                format = cell.GetEffectiveFormat();
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(text))
+            {
+                continue;
+            }
+
+            text = ExcelTextMetrics.DisplayLine(text, format?.WrapText == true);
+
+            var required = ExcelTextMetrics.EstimateWidth(text, format?.Bold == true, format?.FontSize) + 5;
+            var current = widths.TryGetValue(col, out var value) ? value : sheet.Columns[col];
+
+            if (required > current)
+            {
+                widths[col] = Math.Min(required, ColumnWidthConversion.MaxWidthInPixels);
+            }
+        }
+
+        return widths;
     }
 
     private void ProcessSheetData(Worksheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
