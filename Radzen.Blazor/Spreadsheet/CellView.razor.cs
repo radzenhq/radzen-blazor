@@ -123,7 +123,7 @@ public partial class CellView : CellBase, IDisposable
             return null;
         }
 
-        var (formatted, color) = NumberFormat.ApplyWithColor(cell.Format?.NumberFormat, cell.Value, cell.ValueType);
+        var (formatted, color) = NumberFormat.ApplyWithColor(cell.FormatOrNull?.NumberFormat, cell.Value, cell.ValueType);
         numberFormatColor = color;
         return formatted ?? cell.Value?.ToString();
     }

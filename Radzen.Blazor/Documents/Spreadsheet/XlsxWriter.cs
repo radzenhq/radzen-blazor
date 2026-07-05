@@ -1175,11 +1175,12 @@ class XlsxWriter(Workbook sourceWorkbook)
     private static XElement? CreateColumns(Worksheet sheet)
     {
         var colElements = Enumerable.Range(0, sheet.ColumnCount)
-            .Where(col => Math.Abs(sheet.Columns[col] - sheet.Columns.Size) > 1e-6)
+            .Where(col => Math.Abs(sheet.Columns[col] - sheet.Columns.Size) > 1e-6 || sheet.Columns.IsAutoFit(col))
             .Select(col => new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 new XAttribute("min", col + 1),
                 new XAttribute("max", col + 1),
-                new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)),
+                new XAttribute("width", ColumnWidthConversion.PixelsToChars(sheet.Columns[col])),
+                sheet.Columns.IsAutoFit(col) ? new XAttribute("bestFit", "1") : null,
                 new XAttribute("customWidth", "1")))
             .ToList();
 

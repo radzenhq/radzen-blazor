@@ -412,20 +412,28 @@ static class XlsxReader
             {
                 var min = col.Attribute("min")?.Value;
                 var max = col.Attribute("max")?.Value;
-                var width = col.Attribute("width")?.Value;
 
-                if (min is not null && max is not null && width is not null &&
-                    int.TryParse(min, out var minCol) &&
-                    int.TryParse(max, out var maxCol) &&
-                    double.TryParse(width, NumberStyles.Float, CultureInfo.InvariantCulture, out var colWidth))
+                if (min is null || max is null ||
+                    !int.TryParse(min, out var minCol) ||
+                    !int.TryParse(max, out var maxCol))
                 {
-                    // Excel column width to pixels conversion:
-                    // pixels = Truncate(((256 * width + Truncate(128/7)) / 256) * 7)
-                    var pixelWidth = (256 * colWidth + Math.Truncate(128 / 7.0)) / 256 * 7;
+                    continue;
+                }
 
-                    for (var i = minCol - 1; i <= maxCol - 1 && i < sheet.Columns.Count; i++)
+                var bestFit = col.Attribute("bestFit")?.Value is "1" or "true";
+                var hasWidth = double.TryParse(col.Attribute("width")?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var colWidth);
+                var pixelWidth = ColumnWidthConversion.CharsToPixels(colWidth);
+
+                for (var i = minCol - 1; i <= maxCol - 1 && i < sheet.Columns.Count; i++)
+                {
+                    if (hasWidth)
                     {
                         sheet.Columns[i] = pixelWidth;
+                    }
+
+                    if (bestFit)
+                    {
+                        sheet.Columns.SetAutoFit(i);
                     }
                 }
             }

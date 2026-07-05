@@ -6210,25 +6210,49 @@ class Spreadsheet {
     }
   }
 
-    onDoubleClick = (e) => {
-        if (e.target.matches('.rz-spreadsheet-cell')) {
-            const cell = e.target;
-            const row = +cell.dataset.row;
-            const column = +cell.dataset.column;
-            this.dotNetRef.invokeMethodAsync('OnCellDoubleClickAsync', { row, column, pointer: this.toEventArgs(e) });
-        } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const column = +e.target.dataset.column;
-
-            this.dotNetRef.invokeMethodAsync('OnColumnResizeDoubleClickAsync', {
-                row: 0,
-                column: column,
-                pointer: this.toEventArgs(e)
-            });
-        }
+  onDoubleClick = (e) => {
+    if (e.target.matches('.rz-spreadsheet-cell')) {
+      const cell = e.target;
+      const row = +cell.dataset.row;
+      const column = +cell.dataset.column;
+      this.dotNetRef.invokeMethodAsync('OnCellDoubleClickAsync', { row, column, pointer: this.toEventArgs(e) });
+    } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const column = +e.target.dataset.column;
+      this.dotNetRef.invokeMethodAsync('OnColumnResizeDoubleClickAsync', { row: 0, column, pointer: this.toEventArgs(e) });
     }
+  }
+
+  measureTexts = (items) => {
+    const probe = document.createElement('div');
+    probe.className = 'rz-spreadsheet-cell';
+    probe.style.visibility = 'hidden';
+    this.element.appendChild(probe);
+    const style = getComputedStyle(probe);
+    const baseFont = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    const padding = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0)
+      + (parseFloat(style.borderLeftWidth) || 0) + (parseFloat(style.borderRightWidth) || 0);
+    const baseFontSize = style.fontSize;
+    const baseFontFamily = style.fontFamily;
+    this.element.removeChild(probe);
+
+    this.measureCanvas ??= document.createElement('canvas');
+    const context = this.measureCanvas.getContext('2d');
+    context.direction = this.rtl ? 'rtl' : 'ltr';
+
+    return items.map(item => {
+      // Invalid font shorthand assignments are silently ignored; reset so they fall back to the base font.
+      context.font = baseFont;
+      if (item.bold || item.italic || item.fontSize != null || item.fontFamily) {
+        const size = item.fontSize != null ? item.fontSize + 'pt' : baseFontSize;
+        const family = item.fontFamily ? `"${item.fontFamily.replaceAll('"', '\\"')}", ${baseFontFamily}` : baseFontFamily;
+        context.font = `${item.italic ? 'italic ' : ''}${item.bold ? 'bold ' : ''}${size} ${family}`;
+      }
+      const width = context.measureText(item.text).width;
+      return Number.isFinite(width) ? Math.ceil(width + padding) : 0;
+    });
+  }
 
   onColumnPointerUp = (e) => {
     removeEventListener('pointermove', this.onColumnPointerMove);
@@ -6611,6 +6635,9 @@ class SheetEditor {
     document.removeEventListener('selectionchange', this.onSelectionChange);
   }
 }
+
+
+
 
 Radzen.createSheetEditor = (element, value, autoFocus, dotNetRef) => new SheetEditor(element, value, autoFocus, dotNetRef);
 Radzen.createSpreadsheet = (element, dotNetRef, shortcuts) => new Spreadsheet(element, dotNetRef, shortcuts);

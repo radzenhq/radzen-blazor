@@ -94,6 +94,16 @@ public class Cell
         Changed?.Invoke(this);
     }
 
+    internal Format? FormatOrNull => format;
+
+    /// <summary>
+    /// Gets the text displayed in the cell: the number format applied to the value, or the value as a string.
+    /// </summary>
+    public string? GetDisplayText()
+    {
+        return NumberFormat.Apply(format?.NumberFormat, Value, ValueType) ?? Value?.ToString();
+    }
+
     internal Format? GetEffectiveFormat()
     {
         var effectiveFormat = format;
