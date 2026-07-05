@@ -5,15 +5,29 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Undoable command that resizes a column to a new width.
 /// </summary>
-public sealed class ResizeColumnCommand(Worksheet sheet, int column, double oldWidth, double newWidth) : ICommand
+public sealed class ResizeColumnCommand(Worksheet sheet, int column, double oldWidth, double newWidth, bool isAutoFit = false) : ICommand
 {
+    private bool wasAutoFit;
+
     /// <inheritdoc/>
     public SpreadsheetFeature? Feature => null;
 
     /// <inheritdoc/>
     public bool Execute()
     {
+        wasAutoFit = sheet.Columns.IsAutoFit(column);
+
         sheet.Columns[column] = newWidth;
+
+        if (isAutoFit)
+        {
+            sheet.Columns.SetAutoFit(column);
+        }
+        else
+        {
+            sheet.Columns.ClearAutoFit(column);
+        }
+
         return true;
     }
 
@@ -21,6 +35,15 @@ public sealed class ResizeColumnCommand(Worksheet sheet, int column, double oldW
     public void Unexecute()
     {
         sheet.Columns[column] = oldWidth;
+
+        if (wasAutoFit)
+        {
+            sheet.Columns.SetAutoFit(column);
+        }
+        else
+        {
+            sheet.Columns.ClearAutoFit(column);
+        }
     }
 }
 

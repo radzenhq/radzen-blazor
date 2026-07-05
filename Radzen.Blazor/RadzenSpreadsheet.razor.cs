@@ -2709,12 +2709,15 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         return Task.CompletedTask;
     }
 
+    internal const double MinColumnWidth = 24;
+    internal const double MinRowHeight = 16;
+
     private Task OnColumnResizePointerMoveAsync(ColumnResizeCapture capture, PointerEventArgs pointer)
     {
         if (Worksheet != null && capture.Column >= 0 && capture.Column < Worksheet.Columns.Count)
         {
             var delta = pointer.ClientX - capture.StartX;
-            var newWidth = Math.Max(24, capture.StartWidth + delta);
+            var newWidth = Math.Max(MinColumnWidth, capture.StartWidth + delta);
             Worksheet.Columns[capture.Column] = newWidth;
         }
 
@@ -2726,7 +2729,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Worksheet != null && capture.Row >= 0 && capture.Row < Worksheet.Rows.Count)
         {
             var delta = pointer.ClientY - capture.StartY;
-            var newHeight = Math.Max(16, capture.StartHeight + delta);
+            var newHeight = Math.Max(MinRowHeight, capture.StartHeight + delta);
             Worksheet.Rows[capture.Row] = newHeight;
         }
 
@@ -3156,8 +3159,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         activeCapture = null;
     }
     /// <summary>
-    /// Automatically adjusts the column width to fit the content of the longest cell, 
-    /// constrained by a maximum width of 800 pixels or defaults to 100 pixels if empty.
+    /// Invoked by JS interop when a column resize handle is double-clicked. Auto fits the column width to its displayed content.
     /// </summary>
     /// <param name="args">The column event arguments containing the target column index.</param>
     [JSInvokable]
@@ -3165,47 +3167,189 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        if (!IsFeatureAllowed(SpreadsheetFeature.Resizing) || Worksheet == null)
+        if (!IsFeatureAllowed(SpreadsheetFeature.Resizing) || Worksheet == null || jsRef == null ||
+            args.Column < 0 || args.Column >= Worksheet.Columns.Count || Worksheet.Columns.IsHidden(args.Column))
         {
             return;
         }
 
-        var result = await AcceptAsync();
-
-        if (result)
+        if (!await AcceptAsync())
         {
-            int targetColumn = args.Column;
-            double maxWidth = 0;
-            bool hasContent = false;
+            return;
+        }
 
-            for (int r = 0; r < Worksheet.RowCount; r++)
-            {
-                if (Worksheet.Cells.TryGet(r, targetColumn, out var cell))
-                {
-                    var text = cell.GetValue()?.ToString();
-                
-                    if (!string.IsNullOrEmpty(text))
-                    {
-                        hasContent = true;
-                        var estimatedWidth = (text.Length * 8) + 16; 
-                    
-                        if (estimatedWidth > maxWidth)
-                        {
-                            maxWidth = estimatedWidth;
-                        }
-                    }
-                }
-            }
+        var items = GetAutoFitMeasureItems(Worksheet, args.Column);
 
-            var startWidth = Worksheet.Columns[targetColumn];
-            var finalWidth = hasContent ? Math.Min(Math.Max(maxWidth, 24), 800) : 100; // fall back to the default 100
+        if (items.Count == 0)
+        {
+            return;
+        }
 
-            if (startWidth != finalWidth)
-            {
-                await ExecuteAsync(new ResizeColumnCommand(Worksheet, targetColumn, startWidth, finalWidth));
-            }
+        double[]? widths;
+
+        try
+        {
+            widths = await jsRef.InvokeAsync<double[]>("measureTexts", items);
+        }
+        catch (Exception ex) when (ex is JSException or JSDisconnectedException or ObjectDisposedException or TaskCanceledException)
+        {
+            return;
+        }
+
+        if (widths is not { Length: > 0 })
+        {
+            return;
+        }
+
+        var maxWidth = widths.Max();
+
+        if (maxWidth <= 0)
+        {
+            return;
+        }
+
+        var targetWidth = Math.Clamp(maxWidth, MinColumnWidth, ColumnWidthConversion.MaxWidthInPixels);
+        var startWidth = Worksheet.Columns[args.Column];
+
+        if (startWidth != targetWidth || !Worksheet.Columns.IsAutoFit(args.Column))
+        {
+            await ExecuteAsync(new ResizeColumnCommand(Worksheet, args.Column, startWidth, targetWidth, isAutoFit: true));
         }
     }
+
+    private const int AutoFitMaxTextLength = 1000;
+    private const int AutoFitCandidatesPerFontGroup = 20;
+    private const int AutoFitMaxMeasureItems = 200;
+
+    private static List<TextMeasureItem> GetAutoFitMeasureItems(Worksheet sheet, int column)
+    {
+        // Snapshot: computing effective formats can populate cells in the store.
+        var cells = sheet.Cells.GetPopulatedCells().Where(cell => cell.Address.Column == column).ToList();
+
+        var conditionalRanges = sheet.ConditionalFormats.Ranges
+            .Where(range => range.Start.Column <= column && column <= range.End.Column)
+            .ToList();
+
+        var seen = new HashSet<(string, bool, bool, double?, string?)>();
+        var candidates = new List<(Cell Cell, string Text, (bool Bold, bool Italic, double? FontSize, string? FontFamily) Font)>();
+
+        foreach (var cell in cells)
+        {
+            if (sheet.MergedCells.Contains(cell.Address))
+            {
+                continue;
+            }
+
+            string? text;
+
+            try
+            {
+                text = cell.GetDisplayText();
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(text))
+            {
+                continue;
+            }
+
+            var format = cell.FormatOrNull;
+
+            if (text.Contains('\n', StringComparison.Ordinal) || text.Contains('\r', StringComparison.Ordinal))
+            {
+                // Wrap renders hard line breaks so the longest line governs; nowrap collapses them.
+                text = text.Replace("\r", "", StringComparison.Ordinal);
+                text = format?.WrapText == true ? LongestLine(text) : text.Replace('\n', ' ');
+            }
+
+            if (text.Length > AutoFitMaxTextLength)
+            {
+                text = text[..AutoFitMaxTextLength];
+            }
+
+            var font = (format?.Bold == true, format?.Italic == true, format?.FontSize, format?.FontFamily);
+
+            // Conditionally formatted cells are exempt from dedupe - an unstyled twin must not replace them.
+            var conditional = conditionalRanges.Any(range => range.Contains(cell.Address));
+
+            if (!conditional && !seen.Add((text, font.Item1, font.Item2, font.Item3, font.Item4)))
+            {
+                continue;
+            }
+
+            candidates.Add((cell, text, font));
+        }
+
+        var survivors = candidates
+            .GroupBy(candidate => candidate.Font)
+            .SelectMany(group => group.OrderByDescending(candidate => candidate.Text.Length).Take(AutoFitCandidatesPerFontGroup));
+
+        var items = new List<TextMeasureItem>();
+
+        foreach (var (cell, text, font) in survivors)
+        {
+            var (bold, italic, fontSize, fontFamily) = font;
+
+            if (conditionalRanges.Count > 0)
+            {
+                Format? effective;
+
+                try
+                {
+                    effective = cell.GetEffectiveFormat();
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    continue;
+                }
+
+                bold = effective?.Bold == true;
+                italic = effective?.Italic == true;
+                fontSize = effective?.FontSize;
+                fontFamily = effective?.FontFamily;
+            }
+
+            if (fontSize is { } size && !double.IsFinite(size))
+            {
+                fontSize = null;
+            }
+
+            items.Add(new TextMeasureItem
+            {
+                Text = text,
+                Bold = bold,
+                Italic = italic,
+                FontSize = fontSize,
+                FontFamily = fontFamily
+            });
+        }
+
+        if (items.Count > AutoFitMaxMeasureItems)
+        {
+            items = items.OrderByDescending(item => item.Text.Length).Take(AutoFitMaxMeasureItems).ToList();
+        }
+
+        return items;
+    }
+
+    private static string LongestLine(string text)
+    {
+        var longest = "";
+
+        foreach (var line in text.Split('\n'))
+        {
+            if (line.Length > longest.Length)
+            {
+                longest = line;
+            }
+        }
+
+        return longest;
+    }
+
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         activeCapture = null;

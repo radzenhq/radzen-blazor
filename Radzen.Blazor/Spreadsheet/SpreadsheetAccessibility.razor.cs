@@ -183,9 +183,7 @@ public partial class SpreadsheetAccessibility : ComponentBase, IDisposable
             return string.Empty;
         }
 
-        return NumberFormat.Apply(c.Format.NumberFormat, c.Value, c.ValueType)
-            ?? c.Value?.ToString()
-            ?? string.Empty;
+        return c.GetDisplayText() ?? string.Empty;
     }
 
     private static string GetHeader(Worksheet worksheet, CellRef cell, string content)

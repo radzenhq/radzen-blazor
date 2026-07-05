@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
@@ -797,62 +798,414 @@ public class SpreadsheetTests
         Assert.Equal(2, reported[^1]); // the new third sheet becomes active and is reported back
     }
     
+    // ── Auto fit column width ───────────────────────────────────────────
+
+    // SetupModule intercepts the InvokeAsync<IJSObjectReference> that creates the Spreadsheet JS
+    // object, so measureTexts can return a canned result and its payload can be inspected.
+    private static BunitJSModuleInterop SetupSpreadsheetJs(TestContext ctx, params double[] widths)
+    {
+        var module = ctx.JSInterop.SetupModule("Radzen.createSpreadsheet", _ => true);
+        module.Mode = JSRuntimeMode.Loose;
+        if (widths.Length > 0)
+        {
+            module.Setup<double[]>("measureTexts", _ => true).SetResult(widths);
+        }
+        return module;
+    }
+
+    private static Task AutoFit(IRenderedComponent<RadzenSpreadsheet> c, int column)
+        => c.InvokeAsync(() => c.Instance.OnColumnResizeDoubleClickAsync(new CellEventArgs
+        {
+            Column = column,
+            Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs()
+        }));
+
+    private static List<TextMeasureItem> MeasuredItems(BunitJSModuleInterop module)
+    {
+        var invocation = Assert.Single(module.Invocations["measureTexts"]);
+        return Assert.IsType<List<TextMeasureItem>>(invocation.Arguments[0]);
+    }
+
     [Fact]
-    public async Task AutoFitColumn_ResizesToContent_WhenContentExists()
+    public async Task AutoFitColumn_ResizesToMeasuredWidth()
     {
         using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
         sheet.Cells[0, 0].Value = "Short";
         sheet.Cells[1, 0].Value = "This is a much longer string";
-        
+
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
-        await c.InvokeAsync(() => c.Instance.OnColumnResizeDoubleClickAsync(new CellEventArgs 
-        { 
-            Column = 0, 
-            Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs() 
-        }));
+        await AutoFit(c, 0);
 
-        Assert.True(sheet.Columns[0] > 100);
+        Assert.Equal(300, sheet.Columns[0]);
+        Assert.True(sheet.Columns.IsAutoFit(0));
     }
 
     [Fact]
-    public async Task AutoFitColumn_ResizesToDefault_WhenColumnIsEmpty()
+    public async Task AutoFitColumn_MeasuresDisplayedValue_NotFormulaText()
     {
         using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        sheet.Columns[1] = 50; 
-        
+        sheet.Cells[1, 0].Value = 1d;
+        sheet.Cells[2, 0].Value = 2d;
+        sheet.Cells[0, 0].Formula = "=A2+A3";
+
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
-        await c.InvokeAsync(() => c.Instance.OnColumnResizeDoubleClickAsync(new CellEventArgs 
-        { 
-            Column = 1, 
-            Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs() 
-        }));
+        await AutoFit(c, 0);
 
-        Assert.Equal(100, sheet.Columns[1]);
+        var texts = MeasuredItems(module).Select(item => item.Text).ToList();
+        Assert.Contains("3", texts);
+        Assert.DoesNotContain("=A2+A3", texts);
     }
 
     [Fact]
-    public async Task AutoFitColumn_ClampsTo800_WhenContentIsExtremelyLong()
+    public async Task AutoFitColumn_MeasuresNumberFormattedText()
     {
         using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
         var wb = NewWorkbook();
         var sheet = wb.Sheets[0];
-        sheet.Cells[0, 0].Value = new string('A', 500);
-        
+        sheet.Cells[0, 0].Value = 39448d;
+        sheet.Cells[0, 0].Format.NumberFormat = "0.00";
+
         var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
 
-        await c.InvokeAsync(() => c.Instance.OnColumnResizeDoubleClickAsync(new CellEventArgs 
-        { 
-            Column = 0, 
-            Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs() 
-        }));
+        await AutoFit(c, 0);
 
-        Assert.Equal(800, sheet.Columns[0]);
+        var texts = MeasuredItems(module).Select(item => item.Text).ToList();
+        Assert.Contains("39448.00", texts);
+        Assert.DoesNotContain("39448", texts);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_EmptyColumn_KeepsWidth()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Columns[1] = 50;
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 1);
+
+        Assert.Equal(50, sheet.Columns[1]);
+        Assert.False(sheet.Columns.IsAutoFit(1));
+        module.VerifyNotInvoke("measureTexts");
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_IgnoresMergedCells()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "extremely long merged content that spans two columns";
+        sheet.MergedCells.Add(new RangeRef(new CellRef(0, 0), new CellRef(0, 1)));
+        sheet.Cells[1, 0].Value = "tiny";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        var texts = MeasuredItems(module).Select(item => item.Text).ToList();
+        Assert.Equal(["tiny"], texts);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_IncludesHiddenRows()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "short";
+        sheet.Cells[1, 0].Value = "very long content in a hidden row";
+        sheet.Rows.Hide(1);
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        var texts = MeasuredItems(module).Select(item => item.Text).ToList();
+        Assert.Contains("very long content in a hidden row", texts);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_ClampsToMaxAndMinWidth()
+    {
+        using var ctx = CreateContext();
+        SetupSpreadsheetJs(ctx, 50000);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "content";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+        Assert.Equal(ColumnWidthConversion.MaxWidthInPixels, sheet.Columns[0]);
+
+        using var ctx2 = CreateContext();
+        SetupSpreadsheetJs(ctx2, 5);
+        var wb2 = NewWorkbook();
+        var sheet2 = wb2.Sheets[0];
+        sheet2.Cells[0, 0].Value = "content";
+
+        var c2 = ctx2.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb2));
+
+        await AutoFit(c2, 0);
+        Assert.Equal(RadzenSpreadsheet.MinColumnWidth, sheet2.Columns[0]);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_Undo_RestoresWidthAndFlag()
+    {
+        using var ctx = CreateContext();
+        SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "content";
+        sheet.Columns[0] = 120;
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+        Assert.Equal(300, sheet.Columns[0]);
+        Assert.True(sheet.Columns.IsAutoFit(0));
+
+        await c.InvokeAsync(c.Instance.Undo);
+
+        Assert.Equal(120, sheet.Columns[0]);
+        Assert.False(sheet.Columns.IsAutoFit(0));
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_ManualResize_ClearsFlag()
+    {
+        using var ctx = CreateContext();
+        SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "content";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+        Assert.True(sheet.Columns.IsAutoFit(0));
+
+        await Run(c, new ResizeColumnCommand(sheet, 0, 300, 150));
+
+        Assert.Equal(150, sheet.Columns[0]);
+        Assert.False(sheet.Columns.IsAutoFit(0));
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_ResizingDisallowed_DoesNothing()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "content";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p =>
+        {
+            p.Add(x => x.Workbook, wb);
+            p.Add(x => x.AllowResizing, false);
+        });
+
+        await AutoFit(c, 0);
+
+        Assert.Equal(100, sheet.Columns[0]);
+        module.VerifyNotInvoke("measureTexts");
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_DeduplicatesIdenticalCells()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "Same";
+        sheet.Cells[1, 0].Value = "Same";
+        sheet.Cells[2, 0].Value = "Same";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        Assert.Single(MeasuredItems(module));
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_NullMeasurement_DoesNothing()
+    {
+        using var ctx = CreateContext();
+        SetupSpreadsheetJs(ctx);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "content";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        Assert.Equal(100, sheet.Columns[0]);
+        Assert.False(sheet.Columns.IsAutoFit(0));
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_OutOfRangeOrHiddenColumn_DoesNothing()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 2].Value = "content";
+        sheet.Columns.Hide(2);
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, -1);
+        await AutoFit(c, sheet.Columns.Count);
+        await AutoFit(c, 2);
+
+        Assert.Equal(100, sheet.Columns[2]);
+        Assert.False(sheet.Columns.IsAutoFit(2));
+        module.VerifyNotInvoke("measureTexts");
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_ConditionalFormat_AffectsFontAndSkipsDedupe()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = 5d;
+        sheet.Cells[5, 0].Value = 5d; // identical twin outside the rule range
+        sheet.ConditionalFormats.Add(new RangeRef(new CellRef(0, 0), new CellRef(1, 0)),
+            new GreaterThanRule { Value = 0, Format = new Format { Bold = true } });
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        var items = MeasuredItems(module);
+        Assert.Contains(items, item => item.Text == "5" && item.Bold);
+        Assert.Contains(items, item => item.Text == "5" && !item.Bold);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_WrapText_MeasuresLongestLine()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "short\nthe longest line here";
+        sheet.Cells[0, 0].Format.WrapText = true;
+        sheet.Cells[1, 0].Value = "a\nbb";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        var texts = MeasuredItems(module).Select(item => item.Text).ToList();
+        Assert.Contains("the longest line here", texts);
+        Assert.Contains("a bb", texts);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_TruncatesAndCapsPayload()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = new Workbook();
+        var sheet = wb.AddSheet("Sheet1", 250, 5);
+        sheet.Cells[0, 0].Value = new string('A', 1500);
+        for (var row = 1; row < 220; row++)
+        {
+            sheet.Cells[row, 0].Value = $"item {row}";
+            sheet.Cells[row, 0].Format.FontSize = row + 1d; // distinct font group per cell
+        }
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        var items = MeasuredItems(module);
+        Assert.Equal(1000, items.Max(item => item.Text.Length));
+        Assert.True(items.Count <= 200);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_PoisonCell_IsSkipped()
+    {
+        using var ctx = CreateContext();
+        var module = SetupSpreadsheetJs(ctx, 300);
+        var wb = new Workbook();
+        var sheet = wb.AddSheet("Sheet1", 200, 5);
+        sheet.Cells[0, 0].Value = "good";
+        // Out-of-range date serial in a row outside the rendered viewport
+        sheet.Cells[150, 0].Value = 1e10;
+        sheet.Cells[150, 0].Format.NumberFormat = "dddd, mmmm dd, yyyy";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        var texts = MeasuredItems(module).Select(item => item.Text).ToList();
+        Assert.Contains("good", texts);
+        Assert.Equal(300, sheet.Columns[0]);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_AlreadyAtFitWidth_StillSetsFlag()
+    {
+        using var ctx = CreateContext();
+        SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "content";
+        sheet.Columns[0] = 300;
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+        Assert.Equal(300, sheet.Columns[0]);
+        Assert.True(sheet.Columns.IsAutoFit(0));
+
+        await c.InvokeAsync(c.Instance.Undo);
+        Assert.False(sheet.Columns.IsAutoFit(0));
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_Top10RuleOverSparseColumn_DoesNotThrow()
+    {
+        using var ctx = CreateContext();
+        SetupSpreadsheetJs(ctx, 300);
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = 1d;
+        sheet.Cells[1, 0].Value = 2d;
+        sheet.ConditionalFormats.Add(new RangeRef(new CellRef(0, 0), new CellRef(9, 0)),
+            new Top10Rule { Count = 1, Format = new Format { Bold = true } });
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await AutoFit(c, 0);
+
+        Assert.Equal(300, sheet.Columns[0]);
     }
 
     private static class EventCallbackFactory
