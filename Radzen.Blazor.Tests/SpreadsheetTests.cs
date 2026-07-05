@@ -796,6 +796,64 @@ public class SpreadsheetTests
 
         Assert.Equal(2, reported[^1]); // the new third sheet becomes active and is reported back
     }
+    
+    [Fact]
+    public async Task AutoFitColumn_ResizesToContent_WhenContentExists()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = "Short";
+        sheet.Cells[1, 0].Value = "This is a much longer string";
+        
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await c.InvokeAsync(() => c.Instance.OnColumnResizeDoubleClickAsync(new CellEventArgs 
+        { 
+            Column = 0, 
+            Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs() 
+        }));
+
+        Assert.True(sheet.Columns[0] > 100);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_ResizesToDefault_WhenColumnIsEmpty()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Columns[1] = 50; 
+        
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await c.InvokeAsync(() => c.Instance.OnColumnResizeDoubleClickAsync(new CellEventArgs 
+        { 
+            Column = 1, 
+            Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs() 
+        }));
+
+        Assert.Equal(100, sheet.Columns[1]);
+    }
+
+    [Fact]
+    public async Task AutoFitColumn_ClampsTo800_WhenContentIsExtremelyLong()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = new string('A', 500);
+        
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+
+        await c.InvokeAsync(() => c.Instance.OnColumnResizeDoubleClickAsync(new CellEventArgs 
+        { 
+            Column = 0, 
+            Pointer = new Microsoft.AspNetCore.Components.Web.PointerEventArgs() 
+        }));
+
+        Assert.Equal(800, sheet.Columns[0]);
+    }
 
     private static class EventCallbackFactory
     {

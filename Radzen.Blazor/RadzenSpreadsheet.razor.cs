@@ -3155,7 +3155,57 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         activeCapture = null;
     }
+    /// <summary>
+    /// Automatically adjusts the column width to fit the content of the longest cell, 
+    /// constrained by a maximum width of 800 pixels or defaults to 100 pixels if empty.
+    /// </summary>
+    /// <param name="args">The column event arguments containing the target column index.</param>
+    [JSInvokable]
+    public async Task OnColumnResizeDoubleClickAsync(CellEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
 
+        if (!IsFeatureAllowed(SpreadsheetFeature.Resizing) || Worksheet == null)
+        {
+            return;
+        }
+
+        var result = await AcceptAsync();
+
+        if (result)
+        {
+            int targetColumn = args.Column;
+            double maxWidth = 0;
+            bool hasContent = false;
+
+            for (int r = 0; r < Worksheet.RowCount; r++)
+            {
+                if (Worksheet.Cells.TryGet(r, targetColumn, out var cell))
+                {
+                    var text = cell.GetValue()?.ToString();
+                
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        hasContent = true;
+                        var estimatedWidth = (text.Length * 8) + 16; 
+                    
+                        if (estimatedWidth > maxWidth)
+                        {
+                            maxWidth = estimatedWidth;
+                        }
+                    }
+                }
+            }
+
+            var startWidth = Worksheet.Columns[targetColumn];
+            var finalWidth = hasContent ? Math.Min(Math.Max(maxWidth, 24), 800) : 100; // fall back to the default 100
+
+            if (startWidth != finalWidth)
+            {
+                await ExecuteAsync(new ResizeColumnCommand(Worksheet, targetColumn, startWidth, finalWidth));
+            }
+        }
+    }
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         activeCapture = null;
