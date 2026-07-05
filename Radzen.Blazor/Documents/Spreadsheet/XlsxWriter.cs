@@ -1088,7 +1088,7 @@ class XlsxWriter(Workbook sourceWorkbook)
 
         worksheet.Add(CreateDimension(sheet));
         worksheet.Add(CreateSheetViews(sheet));
-        worksheet.Add(CreateSheetFormatPr());
+        worksheet.Add(CreateSheetFormatPr(sheet));
         var cols = CreateColumns(sheet);
         if (cols is not null)
         {
@@ -1110,9 +1110,10 @@ class XlsxWriter(Workbook sourceWorkbook)
             new XAttribute("filterMode", "1"));
     }
 
-    private static XElement CreateSheetFormatPr()
+    private static XElement CreateSheetFormatPr(Worksheet sheet)
     {
         return new XElement(XName.Get("sheetFormatPr", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("defaultColWidth", ColumnWidthConversion.PixelsToChars(sheet.Columns.Size)),
             new XAttribute("defaultRowHeight", "14.25"));
     }
 

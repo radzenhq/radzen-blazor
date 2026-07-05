@@ -14,7 +14,7 @@ public class Axis(double size, int count)
     /// <summary>
     /// The default size of an item of the axis.
     /// </summary>
-    public double Size => size;
+    public double Size { get; internal set; } = size;
 
     private int count = count;
 
@@ -153,7 +153,7 @@ public class Axis(double size, int count)
                 return value;
             }
 
-            return size;
+            return Size;
         }
         set
         {
@@ -226,7 +226,7 @@ public class Axis(double size, int count)
                 }
             }
 
-            return total + size * (Count - data.Count - hidden.Count + hiddenCustomCount);
+            return total + Size * (Count - data.Count - hidden.Count + hiddenCustomCount);
         }
     }
 }
