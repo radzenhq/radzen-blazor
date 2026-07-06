@@ -1,6 +1,6 @@
 @inherits Radzen.RadzenComponent
 
-<a @attributes=@Attributes @onclick=@OnClick @onclick:preventDefault>@ChildContent</a>
+<a style=@Style @attributes=@Attributes @onclick=@OnClick @onclick:preventDefault>@ChildContent</a>
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }

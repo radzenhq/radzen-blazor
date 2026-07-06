@@ -9,7 +9,7 @@ else
     <RadzenPanelMenuItem @bind-Expanded=@Example.Expanded Text="@Example.Name" Path="@GetUrl()" Icon="@Example.Icon" aria-label="@Example.Name" ChildContent="@ChildContent">
         <Template>
             @Example.Name
-            <RadzenBadge Text="Updated" Visible=@Example.Updated BadgeStyle="BadgeStyle.Info"/>
+            <RadzenBadge Text="Upd" Visible=@Example.Updated BadgeStyle="BadgeStyle.Info"/>
             <RadzenBadge Text="New" Visible=@Example.New BadgeStyle="BadgeStyle.Success"/>
             <RadzenBadge Text="Pro" Visible=@Example.Pro BadgeStyle="BadgeStyle.Danger"/>
         </Template>
