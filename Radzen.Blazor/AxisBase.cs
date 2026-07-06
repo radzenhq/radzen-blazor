@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Globalization;
-using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
 {
@@ -83,6 +83,13 @@ namespace Radzen.Blazor
         public int TickDistance { get; set; } = 100;
 
         /// <summary>
+        /// Gets or sets the width of the axis in pixels. If not set, the width is calculated automatically based on the axis content.
+        /// The parameter only has effect for vertically rendered value axes. It is ignored on the category axis in normal charts and on value axes in inverted (bar) charts
+        /// </summary>
+        [Parameter]
+        public int? Width { get; set; }
+
+        /// <summary>
         /// Specifies the minimum value of the axis.
         /// </summary>
         /// <value>The minimum.</value>
@@ -141,7 +148,7 @@ namespace Radzen.Blazor
         [Parameter]
         public object? CrossesAt { get; set; }
 
-    /// <summary>
+        /// <summary>
         /// Specifies the label rotation angle in degrees. Set to <c>null</c> by default which means no rotation is applied. Has higher precedence than <see cref="LabelAutoRotation"/>.
         /// </summary>
         [Parameter]
@@ -165,7 +172,8 @@ namespace Radzen.Blazor
                    DidParameterChange(parameters, nameof(CrossesAt), CrossesAt) ||
                    DidParameterChange(parameters, nameof(Logarithmic), Logarithmic) ||
                    DidParameterChange(parameters, nameof(LogarithmicBase), LogarithmicBase) ||
-                   DidParameterChange(parameters, nameof(Step), Step);
+                   DidParameterChange(parameters, nameof(Step), Step) ||
+                   DidParameterChange(parameters, nameof(Width), Width);
         }
 
         internal string Format(ScaleBase scale, double idx)
