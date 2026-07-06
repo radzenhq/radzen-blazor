@@ -603,6 +603,7 @@ namespace Radzen.Blazor {
         public static string TimeSpanPicker_SecondsUnitText { get { return ResourceManager.GetString("TimeSpanPicker_SecondsUnitText", resourceCulture); } }
         public static string TimeSpanPicker_MillisecondsUnitText { get { return ResourceManager.GetString("TimeSpanPicker_MillisecondsUnitText", resourceCulture); } }
         public static string TimeSpanPicker_MicrosecondsUnitText { get { return ResourceManager.GetString("TimeSpanPicker_MicrosecondsUnitText", resourceCulture); } }
+        public static string Text_AnchorAriaLabel { get { return ResourceManager.GetString("Text_AnchorAriaLabel", resourceCulture); } }
         public static string Upload_ImageAlternateText { get { return ResourceManager.GetString("Upload_ImageAlternateText", resourceCulture); } }
         public static string Upload_ChooseText { get { return ResourceManager.GetString("Upload_ChooseText", resourceCulture); } }
         public static string Upload_DeleteText { get { return ResourceManager.GetString("Upload_DeleteText", resourceCulture); } }

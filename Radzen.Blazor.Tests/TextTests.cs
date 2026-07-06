@@ -312,5 +312,38 @@ namespace Radzen.Blazor.Tests
             Assert.Contains("section-title", component.Markup);
             Assert.Contains("rz-link", component.Markup);
         }
+
+        [Fact]
+        public void Text_Anchor_Renders_DefaultScreenReaderText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            {
+                parameters.Add(p => p.TextStyle, TextStyle.H2);
+                parameters.Add(p => p.Text, "Section Title");
+                parameters.Add(p => p.Anchor, "section-title");
+            });
+
+            Assert.Contains(@"<span class=""rz-sr-only"">Link to this section</span>", component.Markup);
+        }
+
+        [Fact]
+        public void Text_Anchor_Renders_CustomScreenReaderText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenText>(parameters =>
+            {
+                parameters.Add(p => p.TextStyle, TextStyle.H2);
+                parameters.Add(p => p.Text, "Section Title");
+                parameters.Add(p => p.Anchor, "section-title");
+                parameters.Add(p => p.AnchorAriaLabel, "Link to Section Title");
+            });
+
+            Assert.Contains(@"<span class=""rz-sr-only"">Link to Section Title</span>", component.Markup);
+        }
     }
 }
