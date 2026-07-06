@@ -391,6 +391,31 @@ namespace Radzen
             return Value;
         }
 
+        /// <summary>
+        /// Notifies the <see cref="EditContext"/> that the field has changed while validators observe the specified value.
+        /// The stored value is restored afterwards so that two-way binding parameter re-flow keeps working as expected.
+        /// </summary>
+        /// <param name="value">The value validators should observe during the notification.</param>
+        protected void NotifyFieldChanged(T? value)
+        {
+            if (FieldIdentifier.FieldName == null || EditContext == null)
+            {
+                return;
+            }
+
+            var current = _value;
+            _value = value;
+
+            try
+            {
+                EditContext.NotifyFieldChanged(FieldIdentifier);
+            }
+            finally
+            {
+                _value = current;
+            }
+        }
+
 
         /// <summary>
         /// Gets the class list.

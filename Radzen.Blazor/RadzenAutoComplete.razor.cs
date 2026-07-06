@@ -354,7 +354,7 @@ namespace Radzen.Blazor
             }
 
             await ValueChanged.InvokeAsync($"{newValue}");
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            NotifyFieldChanged(newValue);
             await Change.InvokeAsync(newValue);
 
             await SelectedItemChanged.InvokeAsync(null);
