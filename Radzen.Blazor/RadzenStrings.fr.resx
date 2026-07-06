@@ -2233,5 +2233,7 @@
   </data>
   <data name="HtmlEditorTable_MergeInvalidSelection" xml:space="preserve">
     <value>Les cellules sélectionnées doivent former une plage rectangulaire valide avant de pouvoir être fusionnées.</value>
+  <data name="Text_AnchorAriaLabel" xml:space="preserve">
+    <value>Lien vers cette section</value>
   </data>
 </root>
