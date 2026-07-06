@@ -14,7 +14,7 @@
                 <NavLink tabindex="-1" target="@Target" class=@LinkClass style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")" href="@Path" Match="@Match" @onclick="@Toggle">
                     @if (!string.IsNullOrEmpty(Icon) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon" style="@getIconStyle()">@Icon</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" aria-hidden="true" style="@getIconStyle()">@Icon</i>
                     }
                     @if (!string.IsNullOrEmpty(Image) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {
@@ -30,7 +30,7 @@
                     }
                     @if (ChildContent != null && Parent?.ShowArrow == true)
                     {
-                        <i class=@ToggleClass>keyboard_arrow_down</i>
+                        <i class=@ToggleClass aria-hidden="true">keyboard_arrow_down</i>
                     }
                 </NavLink>
             }
@@ -41,7 +41,7 @@
                      @onclick="@Toggle" @onkeydown="OnToggleKeyDown">
                     @if (!string.IsNullOrEmpty(Icon) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon" style="@getIconStyle()">@Icon</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" aria-hidden="true" style="@getIconStyle()">@Icon</i>
                     }
                     @if (!string.IsNullOrEmpty(Image) && Parent?.DisplayStyle != MenuItemDisplayStyle.Text)
                     {
@@ -57,7 +57,7 @@
                     }
                     @if (ChildContent != null && Parent?.ShowArrow == true)
                     {
-                        <i class=@ToggleClass>keyboard_arrow_down</i>
+                        <i class=@ToggleClass aria-hidden="true">keyboard_arrow_down</i>
                     }
                 </div>
             }

@@ -15,7 +15,7 @@
        @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
         @if (!string.IsNullOrEmpty(Icon))
         {
-            <span class="notranslate rzi rz-tabview-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</span>
+            <span class="notranslate rzi rz-tabview-icon" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</span>
         }
         @if (Template != null)
         {

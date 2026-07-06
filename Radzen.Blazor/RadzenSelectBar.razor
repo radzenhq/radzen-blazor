@@ -36,7 +36,7 @@
                 {
                     @if (!string.IsNullOrEmpty(item.Icon))
                     {
-                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@item.Icon</i>
+                        <i class="notranslate rz-button-icon-left rzi" aria-hidden="true" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@item.Icon</i>
                     }
                     @if (!string.IsNullOrEmpty(item.Image))
                     {

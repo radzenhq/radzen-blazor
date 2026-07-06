@@ -2,7 +2,7 @@
 {
 <button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@IsDisabled @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@GetTitle()>
     <span class="rz-button-box">
-        <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+        <i class="notranslate rzi" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
     </span>
 </button>
 }
@@ -10,7 +10,7 @@ else
 {
 <button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@IsDisabled title=@GetTitle()>
     <span class="rz-button-box">
-        <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+        <i class="notranslate rzi" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
     </span>
 </button>
 }

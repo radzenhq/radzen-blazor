@@ -5,7 +5,7 @@
 
 <RadzenButton aria-label=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Open))) title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_Open))) Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button">
     <InputFile OnChange=@OnUploadAsync accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" />
-    <i class="notranslate rzi">folder_open</i>
+    <i class="notranslate rzi" aria-hidden="true">folder_open</i>
 </RadzenButton>
 @code {
     #nullable enable

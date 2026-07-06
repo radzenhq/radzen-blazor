@@ -13,11 +13,11 @@
                     aria-haspopup="menu" aria-expanded="@IsOpen.ToString().ToLowerInvariant()" aria-controls="@GetId()">
                 @if (IsOpen)
                 {
-                    <i class="notranslate rzi">close</i>
+                    <i class="notranslate rzi" aria-hidden="true">close</i>
                 } else
                 {
 
-                    <i class="notranslate rzi">menu</i>
+                    <i class="notranslate rzi" aria-hidden="true">menu</i>
                 }
             </button>
         </li>

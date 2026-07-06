@@ -8,7 +8,7 @@
     Disabled=@IsDisabled Size="ButtonSize.Small"
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertImage)) ?? "Insert Image")>
     <InputFile OnChange=@OnFileSelectedAsync accept="image/*" disabled=@IsDisabled />
-    <i class="notranslate rzi">image</i>
+    <i class="notranslate rzi" aria-hidden="true">image</i>
 </RadzenButton>
 
 @code {

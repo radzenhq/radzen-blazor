@@ -4,7 +4,7 @@
 @inject IJSRuntime JSRuntime
  <button tabindex="-1" title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()"
          aria-haspopup="menu" aria-controls="@filterId" aria-expanded="false">
-     <i class="notranslate rzi">@Grid.FilterIcon</i>
+     <i class="notranslate rzi" aria-hidden="true">@Grid.FilterIcon</i>
     @if (Column.GetFilterOperator() == FilterOperator.DoesNotContain)
     {
         <s>@Column.GetFilterOperatorSymbol(Column.GetFilterOperator())</s>

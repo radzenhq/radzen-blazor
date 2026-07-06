@@ -10,7 +10,7 @@
          tabindex="@(Disabled ? -1 : TabIndex)" @onkeydown="@OnTriggerKeyDown" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeypressPropagation">
         @if (Icon != null)
         {
-            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+            <i class="notranslate rzi" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
         }
         <div class="rz-colorpicker-value" style="background-color: @Value" ></div>
         @if (ShowArrow)

@@ -25,10 +25,10 @@
                     @onkeydown="@(args => OnHeaderKeyDown(args, item))" @onkeydown:preventDefault="preventKeyPress" disabled="@item.Disabled"
                     aria-label="@(string.IsNullOrEmpty(item.Text) ? ItemAriaLabel(i, item) : null)" title="@(string.IsNullOrEmpty(item.Text) ? ItemTitle(i, item) : null)"
                     id="@accordionId" aria-controls="@($"{accordionId}-content")" aria-expanded="@(item.GetSelected() ? "true" : "false")">
-                <span class="@ToggleIconClass(item)">keyboard_arrow_down</span>
+                <span class="@ToggleIconClass(item)" aria-hidden="true">keyboard_arrow_down</span>
                 @if (!string.IsNullOrEmpty(item.Icon))
                 {
-            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@item.Icon</i>
+            <i class="notranslate rzi" aria-hidden="true" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@item.Icon</i>
                 }
                 @if (item.Template != null)
                 {

@@ -14,7 +14,7 @@
       @onkeydown:preventDefault="@preventKeyDown">
     @if (!string.IsNullOrEmpty(Icon))
     {
-        <i class="notranslate rzi rz-chip-icon">@Icon</i>
+        <i class="notranslate rzi rz-chip-icon" aria-hidden="true">@Icon</i>
     }
 
     <span class="rz-chip-text" @onkeydown:stopPropagation>
