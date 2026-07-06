@@ -593,6 +593,15 @@ namespace Radzen.Blazor
                 }
             }
 
+            foreach (var series in invisibleSeries)
+            {
+                var axisName = (series is IChartValueAxisSeries named) ? named.ValueAxisName : null;
+                if (!string.IsNullOrEmpty(axisName) && !namedAxisSeries.ContainsKey(axisName))
+                {
+                    namedAxisSeries[axisName] = new List<IChartSeries> { series };
+                }
+            }
+
             // All series contribute to the shared category scale (bar-family series swap their transforms when axes are inverted)
             foreach (var series in visibleSeries)
             {

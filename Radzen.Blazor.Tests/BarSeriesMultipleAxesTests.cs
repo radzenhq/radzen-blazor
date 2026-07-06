@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,11 @@ public class BarSeriesMultipleAxesTests
 
     private static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx)
     {
+        return RenderChart(ctx, secondSeriesVisible: true);
+    }
+
+    private static IRenderedComponent<RadzenChart> RenderChart(TestContext ctx, bool secondSeriesVisible)
+    {
         return ctx.RenderComponent<RadzenChart>(parameters => parameters
             .AddChildContent<RadzenBarSeries<Item>>(series => series
                 .Add(p => p.Title, "Revenue")
@@ -45,9 +51,25 @@ public class BarSeriesMultipleAxesTests
                 .Add(p => p.CategoryProperty, nameof(Item.Month))
                 .Add(p => p.ValueProperty, nameof(Item.Count))
                 .Add(p => p.ValueAxisName, "count")
+                .Add(p => p.Visible, secondSeriesVisible)
                 .Add(p => p.Data, Data))
             .AddChildContent<RadzenValueAxis>(a => a
                 .Add(p => p.Name, "count")));
+    }
+
+    private static List<string> GetTopAxisLabels(IRenderedComponent<RadzenChart> chart)
+    {
+        return chart.FindAll("g.rz-value-axis-top .rz-tick-text")
+            .Select(t => t.TextContent.Trim())
+            .Where(t => !string.IsNullOrEmpty(t))
+            .ToList();
+    }
+
+    private static void AssertNumericCountAxisLabels(List<string> labels)
+    {
+        Assert.NotEmpty(labels);
+        Assert.All(labels, label => Assert.True(double.TryParse(label, out _), $"Expected numeric tick label but got '{label}'"));
+        Assert.All(labels, label => Assert.True(double.Parse(label) <= 500, $"Expected the axis to fit the count values but got tick '{label}'"));
     }
 
     [Fact]
@@ -172,5 +194,55 @@ public class BarSeriesMultipleAxesTests
         var additionalScale = chart.Instance.GetValueScale("count");
         Assert.Equal(chart.Instance.ValueScale.Output.Start, additionalScale.Output.Start);
         Assert.Equal(chart.Instance.ValueScale.Output.End, additionalScale.Output.End);
+    }
+
+    [Fact]
+    public void Hidden_Named_Series_Keeps_Numeric_Labels_On_Its_Axis()
+    {
+        using var ctx = CreateChartContext();
+        var chart = RenderChart(ctx, secondSeriesVisible: false);
+
+        AssertNumericCountAxisLabels(GetTopAxisLabels(chart));
+    }
+
+    [Fact]
+    public void Hiding_Named_Series_Via_Legend_Keeps_Numeric_Labels_On_Its_Axis()
+    {
+        using var ctx = CreateChartContext();
+        var chart = RenderChart(ctx, secondSeriesVisible: true);
+
+        var countLegendItem = chart.FindAll("span.rz-legend-item").First(i => i.TextContent.Contains("Order Count"));
+        countLegendItem.Click();
+
+        AssertNumericCountAxisLabels(GetTopAxisLabels(chart));
+
+        chart.FindAll("span.rz-legend-item").First(i => i.TextContent.Contains("Order Count")).Click();
+
+        AssertNumericCountAxisLabels(GetTopAxisLabels(chart));
+    }
+
+    [Fact]
+    public void Hidden_Named_Column_Series_Keeps_Its_Own_Scale()
+    {
+        using var ctx = CreateChartContext();
+
+        var chart = ctx.RenderComponent<RadzenChart>(parameters => parameters
+            .AddChildContent<RadzenColumnSeries<Item>>(series => series
+                .Add(p => p.CategoryProperty, nameof(Item.Month))
+                .Add(p => p.ValueProperty, nameof(Item.Revenue))
+                .Add(p => p.Data, Data))
+            .AddChildContent<RadzenColumnSeries<Item>>(series => series
+                .Add(p => p.CategoryProperty, nameof(Item.Month))
+                .Add(p => p.ValueProperty, nameof(Item.Count))
+                .Add(p => p.ValueAxisName, "count")
+                .Add(p => p.Visible, false)
+                .Add(p => p.Data, Data))
+            .AddChildContent<RadzenValueAxis>(a => a
+                .Add(p => p.Name, "count")));
+
+        var additionalScale = chart.Instance.GetValueScale("count");
+
+        Assert.NotSame(chart.Instance.ValueScale, additionalScale);
+        Assert.True(additionalScale.Input.End <= 500, $"Expected a numeric scale fitted to the count values but input was {additionalScale.Input.Start}..{additionalScale.Input.End}");
     }
 }
