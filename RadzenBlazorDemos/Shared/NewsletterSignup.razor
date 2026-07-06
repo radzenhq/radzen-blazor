@@ -22,11 +22,11 @@
             <RadzenTemplateForm TItem="SubscriptionModel" Data="@model" Submit="@OnSubmit">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Center" Gap="0.5rem">
                     <RadzenStack Gap="0.25rem" Style="flex: 1; max-width: 320px;">
-                        <RadzenTextBox @bind-Value="@model.Email" Name="Email" Placeholder="Your email" aria-label="Email address" Style="width: 100%;" />
+                        <RadzenTextBox @bind-Value="@model.Email" Name="Email" Placeholder="Your email" aria-label="Email address" Style="width: 100%;" class="rz-border-radius-8" />
                         <RadzenRequiredValidator Component="Email" Text="Email is required." />
                         <RadzenEmailValidator Component="Email" Text="Please enter a valid email address." />
                     </RadzenStack>
-                    <RadzenButton Text="Subscribe" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" IsBusy="@loading" />
+                    <RadzenButton Text="Join the List" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Base" Shade="Shade.Darker" Variant="Variant.Flat" IsBusy="@loading" />
                 </RadzenStack>
                 <altcha-widget challengeurl="https://app.radzen.com/api/newsletter/challenge" auto="onload" hidefooter hidelogo style="display:none"></altcha-widget>
             </RadzenTemplateForm>
