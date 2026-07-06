@@ -2233,6 +2233,7 @@
   </data>
   <data name="HtmlEditorTable_MergeInvalidSelection" xml:space="preserve">
     <value>Die ausgewählten Zellen müssen einen gültigen rechteckigen Bereich bilden, bevor sie verbunden werden können.</value>
+  </data>
   <data name="Text_AnchorAriaLabel" xml:space="preserve">
     <value>Link zu diesem Abschnitt</value>
   </data>
