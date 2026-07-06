@@ -1313,6 +1313,15 @@ namespace Radzen.Blazor
             if (!_aggregateTypeCache.TryGetValue(key, out var info))
             {
                 var propertyType = aggregate.Property != null ? PropertyAccess.GetPropertyType(typeof(TItem), aggregate.Property) : typeof(object);
+
+                // For dynamic data (e.g. IDictionary<string, object>) the property is a dynamic LINQ
+                // expression, so reflection cannot resolve its type. Fall back to the explicitly
+                // configured Type, mirroring RadzenPivotField.FilterPropertyType.
+                if ((propertyType == null || propertyType == typeof(object)) && aggregate.Type != null)
+                {
+                    propertyType = aggregate.Type;
+                }
+
                 info = (propertyType, propertyType != null && PropertyAccess.IsNumeric(propertyType));
                 _aggregateTypeCache[key] = info;
             }

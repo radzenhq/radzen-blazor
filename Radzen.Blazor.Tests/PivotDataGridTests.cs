@@ -1215,6 +1215,70 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void PivotDataGrid_DictionaryData_SumAggregatesNumericValues()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var data = new List<IDictionary<string, object>>
+            {
+                new Dictionary<string, object> { ["Region"] = "North", ["Year"] = 2023, ["Amount"] = 100.0 },
+                new Dictionary<string, object> { ["Region"] = "North", ["Year"] = 2023, ["Amount"] = 200.0 },
+                new Dictionary<string, object> { ["Region"] = "South", ["Year"] = 2024, ["Amount"] = 300.0 },
+            };
+
+            var regionExpr = PropertyAccess.GetDynamicPropertyExpression("Region", typeof(string));
+            var yearExpr = PropertyAccess.GetDynamicPropertyExpression("Year", typeof(int));
+            var amountExpr = PropertyAccess.GetDynamicPropertyExpression("Amount", typeof(double));
+
+            var component = ctx.RenderComponent<RadzenPivotDataGrid<IDictionary<string, object>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.AllowDrillDown, false);
+                parameters.Add(p => p.AllowFieldsPicking, false);
+
+                parameters.Add<RenderFragment>(p => p.Rows, b =>
+                {
+                    b.OpenComponent<RadzenPivotRow<IDictionary<string, object>>>(0);
+                    b.AddAttribute(1, nameof(RadzenPivotRow<IDictionary<string, object>>.Property), regionExpr);
+                    b.AddAttribute(2, nameof(RadzenPivotRow<IDictionary<string, object>>.Title), "Region");
+                    b.AddAttribute(3, nameof(RadzenPivotRow<IDictionary<string, object>>.Type), typeof(string));
+                    b.CloseComponent();
+                });
+
+                parameters.Add<RenderFragment>(p => p.Columns, b =>
+                {
+                    b.OpenComponent<RadzenPivotColumn<IDictionary<string, object>>>(0);
+                    b.AddAttribute(1, nameof(RadzenPivotColumn<IDictionary<string, object>>.Property), yearExpr);
+                    b.AddAttribute(2, nameof(RadzenPivotColumn<IDictionary<string, object>>.Title), "Year");
+                    b.AddAttribute(3, nameof(RadzenPivotColumn<IDictionary<string, object>>.Type), typeof(int));
+                    b.CloseComponent();
+                });
+
+                parameters.Add<RenderFragment>(p => p.Aggregates, b =>
+                {
+                    b.OpenComponent<RadzenPivotAggregate<IDictionary<string, object>>>(0);
+                    b.AddAttribute(1, nameof(RadzenPivotAggregate<IDictionary<string, object>>.Property), amountExpr);
+                    b.AddAttribute(2, nameof(RadzenPivotAggregate<IDictionary<string, object>>.Title), "Amount");
+                    b.AddAttribute(3, nameof(RadzenPivotAggregate<IDictionary<string, object>>.Aggregate), AggregateFunction.Sum);
+                    b.AddAttribute(4, nameof(RadzenPivotAggregate<IDictionary<string, object>>.Type), typeof(double));
+                    b.CloseComponent();
+                });
+            });
+
+            component.WaitForAssertion(() =>
+            {
+                var rows = component.FindAll("tbody.rz-pivot-body tr.rz-pivot-row");
+                Assert.Equal(2, rows.Count);
+
+                // Sum of Amount, not the item count: North = 100 + 200 = 300, South = 300.
+                Assert.Equal(new[] { "300", "" }, GetValueCellTexts(component, "North"));
+                Assert.Equal(new[] { "", "300" }, GetValueCellTexts(component, "South"));
+            });
+        }
+
+        [Fact]
         public void PivotDataGrid_FormatString_AppliedToValueAndTotalCells()
         {
             using var ctx = new TestContext();
