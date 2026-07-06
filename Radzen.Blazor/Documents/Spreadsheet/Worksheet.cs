@@ -726,37 +726,28 @@ public partial class Worksheet
                 var dr = sr + rowDelta;
                 var dc = sc + colDelta;
 
-                if (!sourceSheet.Cells.TryGet(sr, sc, out var srcCell))
-                {
-                    continue;
-                }
-
                 if (dr < 0 || dr >= RowCount || dc < 0 || dc >= ColumnCount)
                 {
                     continue;
                 }
 
+                if (!sourceSheet.Cells.TryGet(sr, sc, out var srcCell))
+                {
+                    // Empty source cells blank the destination, like Excel.
+                    if (Cells.TryGet(dr, dc, out var existing))
+                    {
+                        existing.Clear();
+                        cells.Add(existing);
+                    }
+                    continue;
+                }
+
+                var adjusted = !string.IsNullOrEmpty(srcCell.Formula) && adjustment != FormulaAdjustment.Preserve
+                    ? AdjustFormulaForCopy(srcCell.Formula!, rowDelta, colDelta)
+                    : null;
+
                 var dstCell = Cells[dr, dc];
-
-                if (!string.IsNullOrEmpty(srcCell.Formula))
-                {
-                    var formula = srcCell.Formula!;
-
-                    if (adjustment == FormulaAdjustment.Preserve)
-                    {
-                        dstCell.Formula = formula;
-                    }
-                    else
-                    {
-                        var adjusted = AdjustFormulaForCopy(formula, rowDelta, colDelta);
-                        dstCell.Formula = adjusted;
-                    }
-                }
-                else
-                {
-                    dstCell.Value = srcCell.Value;
-                }
-
+                dstCell.CopyFrom(srcCell.Clone(), adjusted);
                 cells.Add(dstCell);
             }
         }

@@ -7,7 +7,7 @@ namespace Radzen.Blazor.Spreadsheet;
 #nullable enable
 
 /// <summary>
-/// Base class for commands that snapshot a set of cells (value, formula, format) for undo support.
+/// Base class for commands that snapshot a set of cells as detached clones for undo support.
 /// </summary>
 public abstract class RangeSnapshotCommandBase : ICommand, IProtectedCommand
 {
@@ -23,9 +23,10 @@ public abstract class RangeSnapshotCommandBase : ICommand, IProtectedCommand
     protected readonly Worksheet sheet;
 
     /// <summary>
-    /// The captured cell snapshots keyed by cell reference.
+    /// The captured cell snapshots keyed by cell reference. A snapshot is a detached clone,
+    /// or null when the cell did not exist at capture time.
     /// </summary>
-    protected readonly Dictionary<CellRef, (object? value, string? formula, Format? format)> snapshot = [];
+    protected readonly Dictionary<CellRef, Cell?> snapshot = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RangeSnapshotCommandBase"/> class.
@@ -36,22 +37,11 @@ public abstract class RangeSnapshotCommandBase : ICommand, IProtectedCommand
     }
 
     /// <summary>
-    /// Captures the current value, formula and format of the cell at <paramref name="cellRef"/> into the snapshot.
+    /// Captures the cell at <paramref name="cellRef"/> into the snapshot as a detached clone.
     /// </summary>
     protected void Capture(CellRef cellRef)
     {
-        object? value = null;
-        string? formula = null;
-        Format? format = null;
-
-        if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-        {
-            value = cell.Value;
-            formula = cell.Formula;
-            format = cell.Format?.Clone();
-        }
-
-        snapshot[cellRef] = (value, formula, format);
+        snapshot[cellRef] = sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell) ? cell.Clone() : null;
     }
 
     /// <summary>
@@ -68,37 +58,38 @@ public abstract class RangeSnapshotCommandBase : ICommand, IProtectedCommand
     }
 
     /// <summary>
-    /// Restores the captured cells back into the sheet using the formula-or-value convention.
+    /// Restores the captured cells back into the sheet.
     /// </summary>
     protected void RestoreSnapshot() => Restore(snapshot);
 
     /// <summary>
-    /// Writes the captured (value/formula/format) state of <paramref name="cells"/> back into the sheet.
+    /// Writes the captured cell state back into the sheet. Cells that did not exist at capture
+    /// time are cleared. Batched so dependent formulas recalculate once, even when called
+    /// outside the undo stack.
     /// </summary>
-    protected void Restore(IReadOnlyDictionary<CellRef, (object? value, string? formula, Format? format)> cells)
+    protected void Restore(IReadOnlyDictionary<CellRef, Cell?> cells)
     {
         ArgumentNullException.ThrowIfNull(cells);
 
-        foreach (var entry in cells)
+        sheet.Batch(() =>
         {
-            var cellRef = entry.Key;
-            var (value, formula, format) = entry.Value;
-            var cell = sheet.Cells[cellRef.Row, cellRef.Column];
-
-            if (formula is not null)
+            foreach (var (cellRef, snap) in cells)
             {
-                cell.Formula = formula;
+                if (snap is null)
+                {
+                    if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
+                    {
+                        cell.Clear();
+                    }
+                }
+                else
+                {
+                    // Clone again: CopyFrom aliases the format, and the snapshot must stay
+                    // isolated from later edits of the live cell.
+                    sheet.Cells[cellRef.Row, cellRef.Column].CopyFrom(snap.Clone());
+                }
             }
-            else
-            {
-                cell.Value = value;
-            }
-
-            if (format is not null)
-            {
-                cell.Format = format;
-            }
-        }
+        });
     }
 
     /// <inheritdoc/>

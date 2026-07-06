@@ -27,6 +27,7 @@ class ClearContentsCommand : RangeSnapshotCommandBase
                 {
                     Capture(new CellRef(row, column));
 
+                    // Deliberately not Cell.Clear: Excel's Clear Contents keeps formats.
                     cell.Formula = null;
                     cell.Value = null;
                 }

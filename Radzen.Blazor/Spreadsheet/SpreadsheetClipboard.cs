@@ -159,8 +159,7 @@ class SpreadsheetClipboard
             {
                 if (sourceSheet.Cells.TryGet(sr, sc, out var srcCell))
                 {
-                    srcCell.Formula = null;
-                    srcCell.Value = null;
+                    srcCell.Clear();
                 }
             }
         }

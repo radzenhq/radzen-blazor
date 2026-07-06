@@ -195,7 +195,7 @@ class AutofillCommand : RangeSnapshotCommandBase
                 {
                     sourceValues.Add(srcCell.Value);
                     sourceFormulas.Add(srcCell.Formula);
-                    sourceFormats.Add(srcCell.Format?.Clone());
+                    sourceFormats.Add(srcCell.FormatOrNull?.Clone());
                 }
                 else
                 {
@@ -217,10 +217,7 @@ class AutofillCommand : RangeSnapshotCommandBase
 
                 var dstCell = sheet.Cells[row, column];
 
-                if (sourceFormats[sourceIndex] is not null)
-                {
-                    dstCell.Format = sourceFormats[sourceIndex]!.Clone();
-                }
+                dstCell.Format = sourceFormats[sourceIndex]?.Clone();
 
                 if (!string.IsNullOrEmpty(sourceFormulas[sourceIndex]))
                 {
@@ -273,7 +270,7 @@ class AutofillCommand : RangeSnapshotCommandBase
                 {
                     sourceValues.Add(srcCell.Value);
                     sourceFormulas.Add(srcCell.Formula);
-                    sourceFormats.Add(srcCell.Format?.Clone());
+                    sourceFormats.Add(srcCell.FormatOrNull?.Clone());
                 }
                 else
                 {
@@ -295,10 +292,7 @@ class AutofillCommand : RangeSnapshotCommandBase
 
                 var dstCell = sheet.Cells[row, column];
 
-                if (sourceFormats[sourceIndex] is not null)
-                {
-                    dstCell.Format = sourceFormats[sourceIndex]!.Clone();
-                }
+                dstCell.Format = sourceFormats[sourceIndex]?.Clone();
 
                 if (!string.IsNullOrEmpty(sourceFormulas[sourceIndex]))
                 {

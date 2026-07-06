@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -18,8 +19,9 @@ public class Cell
     private Format? format;
 
     /// <summary>
-    /// Gets or sets the format of the cell.
+    /// Gets or sets the format of the cell. Setting null clears the format.
     /// </summary>
+    [AllowNull]
     public Format Format
     {
         get
@@ -56,7 +58,8 @@ public class Cell
     {
         var clone = new Cell(Worksheet, Address)
         {
-            Data = new CellData(Value),
+            // Share Data: it is immutable, and rebuilding from Value re-infers the type (corrupts "0123").
+            Data = Data,
             QuotePrefix = QuotePrefix,
             Hyperlink = Hyperlink?.Clone(),
         };
@@ -65,22 +68,24 @@ public class Cell
         // A clone is a detached snapshot/transport copy and must stay out of the graph.
         clone.formula = formula;
         clone.FormulaSyntaxTree = FormulaSyntaxTree;
-        if (format is not null)
-        {
-            clone.format = format.Clone();
-            clone.format.Changed += clone.OnFormatChanged;
-        }
+        // Not subscribed to: CopyFrom aliases the format into a live cell, and a stale
+        // subscription would root the discarded clone for the format's lifetime.
+        clone.format = format?.Clone();
         return clone;
     }
 
     /// <summary>
     /// Copies the properties from another cell to this cell.
     /// </summary>
-    public void CopyFrom(Cell other)
+    public void CopyFrom(Cell other) => CopyFrom(other, null);
+
+    // The formula override replaces the source formula in the same setter call; adjusting the
+    // formula on a detached clone instead would register the clone in the live dependency graph.
+    internal void CopyFrom(Cell other, string? formulaOverride)
     {
         ArgumentNullException.ThrowIfNull(other);
         Data = other.Data;
-        Formula = other.Formula;
+        Formula = formulaOverride ?? other.Formula;
         QuotePrefix = other.QuotePrefix;
 
         format?.Changed -= OnFormatChanged;
@@ -92,6 +97,17 @@ public class Cell
         Hyperlink = other.Hyperlink?.Clone();
 
         Changed?.Invoke(this);
+    }
+
+    // Excel's full clear: contents, format, quote prefix and hyperlink. Clear Contents
+    // (which keeps formats) belongs to ClearContentsCommand instead.
+    internal void Clear()
+    {
+        Formula = null;
+        Value = null;
+        Format = null;
+        Hyperlink = null;
+        OnChanged();
     }
 
     internal Format? FormatOrNull => format;
@@ -191,12 +207,12 @@ public class Cell
     {
         if (value is not null && value.StartsWith('\''))
         {
-            if (Formula is not null)
-            {
-                Formula = null;
-            }
-            Value = value[1..];
+            Formula = null;
+            // Bypass the Value setter: the quote prefix means literal text, so the
+            // string must not go through type inference ('0123 stays "0123").
+            Data = CellData.FromString(value[1..]);
             QuotePrefix = true;
+            Worksheet.OnCellValueChanged(this);
         }
         else if (value?.StartsWith('=') == true && value != "=")
         {
@@ -204,6 +220,7 @@ public class Cell
         }
         else
         {
+            Formula = null;
             Value = value;
         }
     }

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Radzen.Documents.Spreadsheet;
 
 namespace Radzen.Blazor.Spreadsheet;
@@ -15,7 +13,7 @@ class PasteCommand : RangeSnapshotCommandBase
     private readonly SpreadsheetClipboard clipboard;
     private readonly RangeRef destination;
     private readonly string? text;
-    private readonly Dictionary<CellRef, (object? value, string? formula, Format? format)> result = [];
+    private readonly Dictionary<CellRef, Cell?> result = [];
     private bool pasted;
 
     public override SheetAction RequiredAction => SheetAction.EditCell;
@@ -32,11 +30,18 @@ class PasteCommand : RangeSnapshotCommandBase
     {
         if (pasted)
         {
-            // Redo: replay the captured result instead of re-running the (possibly consumed) clipboard.
+            // Redo: replay the captured result instead of re-running the (possibly consumed)
+            // clipboard. Execute cleared the snapshot, so re-capture it first or the next
+            // undo would have nothing to restore.
+            foreach (var cellRef in result.Keys)
+            {
+                Capture(cellRef);
+            }
+
             Restore(result);
             return true;
         }
-        
+
         var destinationRange = clipboard.GetPasteRange(sheet, destination, text);
 
         if (destinationRange == RangeRef.Invalid)
@@ -64,25 +69,14 @@ class PasteCommand : RangeSnapshotCommandBase
         pasted = true;
         return true;
     }
-    
+
     public override void Unexecute() => RestoreSnapshot();
 
     private void CaptureResult()
     {
         foreach (var cellRef in snapshot.Keys)
         {
-            string? formula = null;
-            object? value = null;
-            Format? format = null;
-
-            if (sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell))
-            {
-                value = cell.Value;
-                formula = cell.Formula;
-                format = cell.Format?.Clone();
-            }
-
-            result[cellRef] = (value, formula, format);
+            result[cellRef] = sheet.Cells.TryGet(cellRef.Row, cellRef.Column, out var cell) ? cell.Clone() : null;
         }
     }
 }
