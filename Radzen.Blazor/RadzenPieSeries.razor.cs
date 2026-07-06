@@ -724,7 +724,9 @@ namespace Radzen.Blazor
             var s = Math.Sin(halfRad);
 
             // The segment is narrower than the gap: its inset edges cross before reaching the rim.
-            if (h >= radius * s - 1e-6)
+            // Compare the angular inset against the half-sweep (as the inner-edge check below does); the raw
+            // radius * sin(sweep/2) form also collapses for a near-full-circle slice, wrongly dropping it.
+            if (Math.Asin(Math.Min(1, h / radius)) >= halfRad - 1e-9)
             {
                 return "";
             }

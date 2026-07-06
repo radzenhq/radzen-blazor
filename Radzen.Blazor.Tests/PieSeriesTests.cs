@@ -319,6 +319,37 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public async System.Threading.Tasks.Task PieSeries_SegmentGap_DominantSliceNotDropped()
+        {
+            using var ctx = CreateChartContext();
+
+            // One value dwarfs the rest, so the dominant slice sweeps ~359 degrees. Its half-sweep sine is
+            // near zero, which previously tripped the "too narrow for the gap" guard and blanked the chart.
+            var imbalanced = new[]
+            {
+                new DataItem { Category = "Cloud", Value = 4200 },
+                new DataItem { Category = "Licenses", Value = 2 },
+                new DataItem { Category = "Services", Value = 2 },
+                new DataItem { Category = "Support", Value = 2 },
+                new DataItem { Category = "Training", Value = 2 },
+            };
+
+            var chart = ctx.RenderComponent<RadzenChart>(p => p
+                .AddChildContent<RadzenPieSeries<DataItem>>(s => s
+                    .Add(x => x.CategoryProperty, nameof(DataItem.Category))
+                    .Add(x => x.ValueProperty, nameof(DataItem.Value))
+                    .Add(x => x.SegmentGap, 2.0)
+                    .Add(x => x.CornerRadius, 4.0)
+                    .Add(x => x.Data, imbalanced)));
+
+            await chart.InvokeAsync(() => chart.Instance.Resize(400, 300));
+
+            // The near-full-circle slice must still draw its outer rim arc.
+            Assert.Contains("A 118 118", chart.Markup);
+            Assert.DoesNotContain("NaN", chart.Markup);
+        }
+
+        [Fact]
         public async System.Threading.Tasks.Task PieSeries_LargeSegmentGap_ClampedWithoutNaN()
         {
             using var ctx = CreateChartContext();
