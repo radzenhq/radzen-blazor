@@ -5632,6 +5632,8 @@ window.Radzen = {
         }
     },
     toggleDictation: function (componentRef, language) {
+        var restarts = 0;
+
         function start() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -5652,21 +5654,37 @@ window.Radzen = {
                     return;
                 }
 
+                restarts = 0;
+
                 let current = event.results[event.results.length - 1][0]
                 let result = current.transcript;
 
                 try { suppressDisposed(componentRef.invokeMethodAsync("OnResult", result)); } catch { }
             };
+            radzenRecognition.onerror = function (event) {
+                if (event.error == 'not-allowed' || event.error == 'service-not-allowed' || event.error == 'audio-capture' || event.error == 'language-not-supported') {
+                    this.stopRequested = true;
+                }
+            };
             radzenRecognition.onend = function (event) {
+                if (!this.stopRequested && restarts++ < 10) {
+                    start();
+                    return;
+                }
+
+                if (this == radzenRecognition) {
+                    radzenRecognition = null;
+                }
+
                 try { suppressDisposed(componentRef.invokeMethodAsync("StopRecording")); } catch { }
-                radzenRecognition = null;
             };
             radzenRecognition.start();
         }
 
         if (radzenRecognition) {
+            radzenRecognition.stopRequested = true;
             if (radzenRecognition.componentRef._id != componentRef._id) {
-                radzenRecognition.addEventListener('end', start);
+                radzenRecognition.addEventListener('end', function () { start(); });
             }
             radzenRecognition.stop();
         } else {
