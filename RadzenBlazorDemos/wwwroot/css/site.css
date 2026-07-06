@@ -320,7 +320,7 @@ video {
     --rz-menu-item-hover-background-color: var(--rz-base-dark);
     --rz-menu-item-selected-color: var(--rz-on-base-darker);
     --rz-menu-item-selected-background-color: var(--rz-base-dark);
-    --rz-text-overline-color: var(--rz-on-base-darker);
+    --rz-text-caption-color: var(--rz-on-base-darker);
     --rz-card-border: 1px solid var(--rz-base-800);
 }
 
@@ -544,7 +544,7 @@ svg.illustration {
 
 .rz-learn-title {
     display: block;
-    --rz-text-overline-line-height: 1.4;
+    --rz-text-caption-line-height: 1.4;
     padding-inline: var(--rz-menu-item-padding-inline);
     color: var(--rz-text-tertiary-color) !important;
 }
