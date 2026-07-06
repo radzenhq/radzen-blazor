@@ -2233,6 +2233,7 @@
   </data>
   <data name="HtmlEditorTable_MergeInvalidSelection" xml:space="preserve">
     <value>Las celdas seleccionadas deben formar un rango rectangular válido antes de poder combinarse.</value>
+  </data>
   <data name="Text_AnchorAriaLabel" xml:space="preserve">
     <value>Enlace a esta sección</value>
   </data>

@@ -2233,6 +2233,7 @@
   </data>
   <data name="HtmlEditorTable_MergeInvalidSelection" xml:space="preserve">
     <value>選択したセルを結合するには、有効な長方形の範囲になっている必要があります。</value>
+  </data>
   <data name="Text_AnchorAriaLabel" xml:space="preserve">
     <value>このセクションへのリンク</value>
   </data>
