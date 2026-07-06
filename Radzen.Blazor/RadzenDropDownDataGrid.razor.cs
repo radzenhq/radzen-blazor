@@ -261,6 +261,30 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Opens the dropdown popup programmatically.
+        /// </summary>
+        public Task OpenPopup()
+        {
+            return OpenPopup("ArrowDown", false, false);
+        }
+
+        /// <summary>
+        /// Closes the dropdown popup programmatically.
+        /// </summary>
+        public Task ClosePopup()
+        {
+            return ClosePopup(string.Empty);
+        }
+
+        /// <summary>
+        /// Toggles the dropdown popup, opening it if it is closed and closing it if it is open.
+        /// </summary>
+        public Task TogglePopup()
+        {
+            return isPopupOpen ? ClosePopup() : OpenPopup();
+        }
+
+        /// <summary>
         /// Gets or sets the value template.
         /// </summary>
         /// <value>The value template.</value>
