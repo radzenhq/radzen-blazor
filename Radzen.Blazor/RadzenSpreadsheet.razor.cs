@@ -379,9 +379,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             return false;
         }
 
-        if (command is Spreadsheet.IProtectedCommand pc && Worksheet?.Protection.IsActionBlocked(pc.RequiredAction) == true)
+        //check if the command is blocked by sheet protection
+        if (command is IProtectedCommand pc && Worksheet?.Protection.IsActionBlocked(pc.RequiredAction) == true)
         {
-            return false;
+            //allow only if it is a PasteCommand and the target cell is explicitly unlocked
+            bool isPaste = command is PasteCommand;
+            bool isEditable = Worksheet != null && Worksheet.IsCellEditable(Worksheet.Selection.Cell);
+
+            if (!isPaste || !isEditable)
+            {
+                return false;
+            }
         }
 
         if (CommandExecuting.HasDelegate)

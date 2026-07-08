@@ -568,6 +568,12 @@ public partial class Worksheet
             for (var columnIndex = 0; columnIndex < columnCount; columnIndex++)
             {
                 var cell = Cells[address.Row + rowIndex, address.Column + columnIndex];
+            
+                if (Protection.IsProtected && (cell.Format.Locked is true))
+                {
+                    continue;
+                }
+
                 cell.SetValue(cells[columnIndex]);
             }
         }

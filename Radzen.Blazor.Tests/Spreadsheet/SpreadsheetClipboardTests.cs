@@ -58,4 +58,36 @@ public class SpreadsheetClipboardTests
 
         Assert.Equal("=B2", target.Cells[1, 1].Formula);
     }
+    
+    [Fact]
+    public void Paste_Respects_CellLocking_InProtectedSheet()
+    {
+        var sheet = new Worksheet(5, 5);
+    
+        sheet.Cells[0, 0].Format = new Format { Locked = true };
+        sheet.Cells[0, 1].Format = new Format { Locked = false };
+        sheet.Protection.IsProtected = true;
+
+        var clipboard = new SpreadsheetClipboard();
+    
+        clipboard.Paste(sheet, RangeRef.Parse("A1"), "BlockedValue\tAllowedValue");
+
+        Assert.Null(sheet.Cells[0, 0].Value);
+    
+        Assert.Equal("AllowedValue", sheet.Cells[0, 1].Value); 
+    }
+    [Fact]
+    public void Paste_Works_When_Protection_Is_Disabled()
+    {
+        var sheet = new Worksheet(5, 5);
+
+        sheet.Cells[0, 0].Format = new Format { Locked = true };
+        sheet.Protection.IsProtected = false;
+
+        var clipboard = new SpreadsheetClipboard();
+
+        clipboard.Paste(sheet, RangeRef.Parse("A1"), "AllowedValue");
+
+        Assert.Equal("AllowedValue", sheet.Cells[0, 0].Value);
+    }
 }
