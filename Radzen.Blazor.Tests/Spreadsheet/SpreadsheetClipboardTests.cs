@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Xunit;
 
 using Radzen.Documents.Spreadsheet;
@@ -120,5 +121,25 @@ public class SpreadsheetClipboardTests
         Assert.True(result);
         Assert.Equal("Data1", sheet.Cells[0, 0].Value);
         Assert.Equal("Data2", sheet.Cells[0, 1].Value);
+    }
+    
+    [Fact]
+    public async Task CutSelectionAsync_PreventsLockedCells_OnProtectedSheet()
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Test", 5, 5);
+        var spreadsheet = new RadzenSpreadsheet { Workbook = workbook };
+
+        sheet.Cells[0, 0].SetValue("CanCut");
+        sheet.Cells[0, 0].Format = new Format { Locked = false };
+        sheet.Cells[1, 0].SetValue("CannotCut");
+        sheet.Cells[1, 0].Format = new Format { Locked = true };
+        sheet.Protection.IsProtected = true;
+
+        sheet.Selection.Select(new RangeRef(new CellRef(0, 0), new CellRef(1, 0)));
+        await spreadsheet.CutSelectionAsync();
+
+        Assert.Equal("CanCut", sheet.Cells[0, 0].Value);
+        Assert.Equal("CannotCut", sheet.Cells[1, 0].Value);
     }
 }
