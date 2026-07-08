@@ -2257,6 +2257,7 @@ namespace Radzen.Blazor
                 }
 
                 const double estTooltipHeight = 64;
+                const double estTooltipWidth = 220;
                 const double gap = 10;
                 const double minVerticalGap = 6;
                 var topLimit = MarginTop;
@@ -2271,7 +2272,9 @@ namespace Radzen.Blazor
                     // entry.Point is in plot-local coords. Convert to chart-relative by adding margins.
                     var anchorX = entry.Point.X + MarginLeft;
                     var anchorY = entry.Point.Y + MarginTop;
-                    var rightSide = anchorX + gap + 180 <= MarginLeft + plotWidth;
+                    var fitsRight = anchorX + gap + estTooltipWidth <= MarginLeft + plotWidth;
+                    var fitsLeft = anchorX - gap - estTooltipWidth >= MarginLeft;
+                    var rightSide = IsRTL ? !fitsLeft : fitsRight;
                     placements.Add((entry.Series, entry.Data, anchorX, anchorY, rightSide));
                 }
 
@@ -2361,7 +2364,7 @@ namespace Radzen.Blazor
                     var borderSide = p.RightSide ? "border-left" : "border-right";
 
                     builder.OpenElement(seq++, "div");
-                    builder.AddAttribute(seq++, "class", "rz-chart-split-tooltip-item");
+                    builder.AddAttribute(seq++, "class", $"rz-chart-split-tooltip-item{(p.RightSide ? "" : " rz-chart-tooltip-left")}");
                     builder.AddAttribute(seq++, "style",
                         $"position: absolute; top: {ty.ToInvariantString()}px; {positionStyle} " +
                         $"{borderSide}: 3px solid {p.Series.Color}; pointer-events: none;");
@@ -2380,10 +2383,13 @@ namespace Radzen.Blazor
         {
             const double gap = 10;
             const double estTooltipHeight = 64;
+            const double estTooltipWidth = 220;
 
             var anchorX = anchor.X + MarginLeft;
             var anchorY = anchor.Y + MarginTop;
-            var rightSide = anchorX + gap + 180 <= MarginLeft + plotWidth;
+            var fitsRight = anchorX + gap + estTooltipWidth <= MarginLeft + plotWidth;
+            var fitsLeft = anchorX - gap - estTooltipWidth >= MarginLeft;
+            var rightSide = IsRTL ? !fitsLeft : fitsRight;
             var top = Math.Max(MarginTop, Math.Min(MarginTop + plotHeight - estTooltipHeight, anchorY - estTooltipHeight / 2));
 
             string positionStyle;
@@ -2404,7 +2410,7 @@ namespace Radzen.Blazor
             builder.AddAttribute(2, "style", "position: absolute; inset: 0; pointer-events: none; overflow: hidden;");
 
             builder.OpenElement(3, "div");
-            builder.AddAttribute(4, "class", $"rz-chart-category-tooltip{(entering ? " rz-chart-tooltip-appear" : "")}");
+            builder.AddAttribute(4, "class", $"rz-chart-category-tooltip{(rightSide ? "" : " rz-chart-tooltip-left")}{(entering ? " rz-chart-tooltip-appear" : "")}");
             builder.AddAttribute(5, "style",
                 $"position: absolute; top: {top.ToInvariantString()}px; {positionStyle} " +
                 $"{borderSide}: 3px solid {series.Color}; pointer-events: none;");

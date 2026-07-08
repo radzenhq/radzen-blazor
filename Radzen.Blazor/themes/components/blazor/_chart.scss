@@ -641,6 +641,11 @@ $chart-color-schemes: (
   pointer-events: none;
 }
 
+.rz-chart-tooltip-left .rz-chart-tooltip {
+  left: auto;
+  right: 0;
+}
+
 .rz-top-chart-tooltip  {
   transform: translate(-50%, -100%);
 }
