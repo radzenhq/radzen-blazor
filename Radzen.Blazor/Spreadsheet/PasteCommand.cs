@@ -48,21 +48,10 @@ class PasteCommand : RangeSnapshotCommandBase
         {
             return false;
         }
-        
-        if (sheet.Protection.IsProtected)
+        if (sheet.Protection.IsProtected && !sheet.IsRangeEditable(destinationRange))
         {
-            for (int r = destinationRange.Start.Row; r <= destinationRange.End.Row; r++)
-            {
-                for (int c = destinationRange.Start.Column; c <= destinationRange.End.Column; c++)
-                {
-                    if (!sheet.IsCellEditable(new CellRef(r, c)))
-                    {
-                        return false;
-                    }
-                }
-            }
+            return false;
         }
-        
         CaptureRange(destinationRange.GetCells());
 
         if (clipboard.TryGetMoveSource(sheet, out var moveSource))

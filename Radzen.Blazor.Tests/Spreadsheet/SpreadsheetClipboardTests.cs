@@ -59,7 +59,6 @@ public class SpreadsheetClipboardTests
 
         Assert.Equal("=B2", target.Cells[1, 1].Formula);
     }
-    
     [Fact]
     public void PasteCommand_Succeeds_When_All_Target_Cells_Unlocked_In_Protected_Sheet()
     {
@@ -122,7 +121,6 @@ public class SpreadsheetClipboardTests
         Assert.Equal("Data1", sheet.Cells[0, 0].Value);
         Assert.Equal("Data2", sheet.Cells[0, 1].Value);
     }
-    
     [Fact]
     public async Task CutSelectionAsync_PreventsLockedCells_OnProtectedSheet()
     {
