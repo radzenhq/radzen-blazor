@@ -49,6 +49,11 @@ class PasteCommand : RangeSnapshotCommandBase
             return false;
         }
 
+        if (!sheet.IsRangeEditable(destinationRange))
+        {
+            return false;
+        }
+
         CaptureRange(destinationRange.GetCells());
 
         if (clipboard.TryGetMoveSource(sheet, out var moveSource))

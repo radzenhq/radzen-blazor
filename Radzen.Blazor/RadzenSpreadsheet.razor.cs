@@ -404,9 +404,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             return false;
         }
 
-        if (command is Spreadsheet.IProtectedCommand pc && Worksheet?.Protection.IsActionBlocked(pc.RequiredAction) == true)
+        if (command is IProtectedCommand pc && Worksheet?.Protection.IsActionBlocked(pc.RequiredAction) == true)
         {
-            return false;
+            // PasteCommand is a special case: it bypasses the sheet-level EditCell block
+            // because it validates locking at the cell level during DoExecute().
+            if (command is not PasteCommand)
+            {
+                return false;
+            }
         }
 
         if (CommandExecuting.HasDelegate)
@@ -1751,7 +1756,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private async Task CutSelectionAsync()
+    internal async Task CutSelectionAsync()
     {
         if (!IsFeatureAllowed(SpreadsheetFeature.Clipboard) || !IsFeatureAllowed(SpreadsheetFeature.Editing))
         {
@@ -1760,6 +1765,12 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (Worksheet is not null)
         {
+            // reject the cut if the range contains any locked cells on a protected sheet
+            if (!Worksheet.IsRangeEditable(Worksheet.Selection.Range))
+            {
+                return;
+            }
+
             var text = Worksheet.GetDelimitedString(Worksheet.Selection.Range);
             clipboard.Cut(Worksheet);
 

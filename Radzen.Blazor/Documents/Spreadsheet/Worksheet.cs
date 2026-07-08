@@ -1099,4 +1099,29 @@ public partial class Worksheet
         }
     }
 
+    /// <summary>
+    /// Checks if all cells in the specified range are editable.
+    /// </summary>
+    /// <param name="range">The range of cells to validate.</param>
+    /// <returns><c>true</c> if the entire range can be modified; otherwise, <c>false</c>.</returns>
+    public bool IsRangeEditable(RangeRef range)
+    {
+        if (!Protection.IsProtected)
+        {
+            return true;
+        }
+
+        for (int r = range.Start.Row; r <= range.End.Row; r++)
+        {
+            for (int c = range.Start.Column; c <= range.End.Column; c++)
+            {
+                if (!IsCellEditable(new CellRef(r, c)))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }
