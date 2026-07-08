@@ -1718,7 +1718,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (Worksheet is not null)
         {
-          var text = Worksheet.GetDelimitedString(Worksheet.Selection.Range);
+            var text = Worksheet.GetDelimitedString(Worksheet.Selection.Range);
             clipboard.Copy(Worksheet);
 
             if (jsRef is not null)
@@ -1738,10 +1738,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Worksheet is not null)
         {
             // reject the cut if the range contains any locked cells on a protected sheet
-            if (Worksheet.Protection.IsProtected && !Worksheet.IsRangeEditable(Worksheet.Selection.Range))
+            if (!Worksheet.IsRangeEditable(Worksheet.Selection.Range))
             {
                 return;
             }
+
             var text = Worksheet.GetDelimitedString(Worksheet.Selection.Range);
             clipboard.Cut(Worksheet);
 

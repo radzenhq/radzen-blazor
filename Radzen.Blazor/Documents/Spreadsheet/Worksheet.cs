@@ -1095,6 +1095,7 @@ public partial class Worksheet
             };
         }
     }
+
     /// <summary>
     /// Checks if all cells in the specified range are editable.
     /// </summary>
