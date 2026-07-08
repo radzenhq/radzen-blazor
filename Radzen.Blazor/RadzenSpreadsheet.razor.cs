@@ -369,24 +369,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         ArgumentNullException.ThrowIfNull(command);
 
-        if (ReadOnly)
+        if (ReadOnly || (command.Feature is SpreadsheetFeature feature && !IsFeatureAllowed(feature)))
         {
             return false;
         }
 
-        if (command.Feature is SpreadsheetFeature feature && !IsFeatureAllowed(feature))
-        {
-            return false;
-        }
-
-        //check if the command is blocked by sheet protection
         if (command is IProtectedCommand pc && Worksheet?.Protection.IsActionBlocked(pc.RequiredAction) == true)
         {
-            //allow only if it is a PasteCommand and the target cell is explicitly unlocked
-            bool isPaste = command is PasteCommand;
-            bool isEditable = Worksheet != null && Worksheet.IsCellEditable(Worksheet.Selection.Cell);
-
-            if (!isPaste || !isEditable)
+            if (command is not PasteCommand)
             {
                 return false;
             }

@@ -60,34 +60,65 @@ public class SpreadsheetClipboardTests
     }
     
     [Fact]
-    public void Paste_Respects_CellLocking_InProtectedSheet()
+    public void PasteCommand_Succeeds_When_All_Target_Cells_Unlocked_In_Protected_Sheet()
     {
-        var sheet = new Worksheet(5, 5);
-    
-        sheet.Cells[0, 0].Format = new Format { Locked = true };
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Test", 5, 5);
+        var view = new WorkbookView(workbook).GetView(sheet);
+
+        sheet.Cells[0, 0].Format = new Format { Locked = false };
         sheet.Cells[0, 1].Format = new Format { Locked = false };
         sheet.Protection.IsProtected = true;
 
         var clipboard = new SpreadsheetClipboard();
-    
-        clipboard.Paste(sheet, RangeRef.Parse("A1"), "BlockedValue\tAllowedValue");
+        var command = new PasteCommand(clipboard, sheet, RangeRef.Parse("A1"), "Data1\tData2");
 
-        Assert.Null(sheet.Cells[0, 0].Value);
-    
-        Assert.Equal("AllowedValue", sheet.Cells[0, 1].Value); 
+        var result = view.Commands.Execute(command);
+
+        Assert.True(result);
+        Assert.Equal("Data1", sheet.Cells[0, 0].Value);
+        Assert.Equal("Data2", sheet.Cells[0, 1].Value);
     }
+
     [Fact]
-    public void Paste_Works_When_Protection_Is_Disabled()
+    public void PasteCommand_Fails_Entirely_If_Any_Target_Cell_Locked_In_Protected_Sheet()
     {
-        var sheet = new Worksheet(5, 5);
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Test", 5, 5);
+        var view = new WorkbookView(workbook).GetView(sheet);
+
+        sheet.Cells[0, 0].Format = new Format { Locked = false };
+        sheet.Cells[0, 1].Format = new Format { Locked = true };
+        sheet.Protection.IsProtected = true;
+
+        var clipboard = new SpreadsheetClipboard();
+        var command = new PasteCommand(clipboard, sheet, RangeRef.Parse("A1"), "Data1\tData2");
+
+        var result = view.Commands.Execute(command);
+
+        Assert.False(result);
+        Assert.Null(sheet.Cells[0, 0].Value);
+        Assert.Null(sheet.Cells[0, 1].Value);
+    }
+
+    [Fact]
+    public void PasteCommand_Works_When_Protection_Is_Disabled()
+    {
+        var workbook = new Workbook();
+        var sheet = workbook.AddSheet("Test", 5, 5);
+        var view = new WorkbookView(workbook).GetView(sheet);
 
         sheet.Cells[0, 0].Format = new Format { Locked = true };
+        sheet.Cells[0, 1].Format = new Format { Locked = true };
         sheet.Protection.IsProtected = false;
 
         var clipboard = new SpreadsheetClipboard();
+        var command = new PasteCommand(clipboard, sheet, RangeRef.Parse("A1"), "Data1\tData2");
 
-        clipboard.Paste(sheet, RangeRef.Parse("A1"), "AllowedValue");
+        var result = view.Commands.Execute(command);
 
-        Assert.Equal("AllowedValue", sheet.Cells[0, 0].Value);
+        Assert.True(result);
+        Assert.Equal("Data1", sheet.Cells[0, 0].Value);
+        Assert.Equal("Data2", sheet.Cells[0, 1].Value);
     }
 }

@@ -552,33 +552,26 @@ public partial class Worksheet
         return result.ToString();
     }
 
-    internal void InsertDelimitedString(CellRef address, string value, string cellDelimiter = "\t")
-    {
-        ArgumentNullException.ThrowIfNull(value);
-        ArgumentNullException.ThrowIfNull(cellDelimiter);
-        var rows = value.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-
-        var rowCount = Math.Min(rows.Length, RowCount - address.Row);
-
-        for (var rowIndex = 0; rowIndex < rowCount; rowIndex++)
-        {
-            var cells = rows[rowIndex].Split([cellDelimiter], StringSplitOptions.None);
-            var columnCount = Math.Min(cells.Length, ColumnCount - address.Column);
-
-            for (var columnIndex = 0; columnIndex < columnCount; columnIndex++)
-            {
-                var cell = Cells[address.Row + rowIndex, address.Column + columnIndex];
-            
-                if (Protection.IsProtected && (cell.Format.Locked is true))
-                {
-                    continue;
-                }
-
-                cell.SetValue(cells[columnIndex]);
-            }
-        }
-    }
-
+   internal void InsertDelimitedString(CellRef address, string value, string cellDelimiter = "\t")
+   {
+       ArgumentNullException.ThrowIfNull(value);
+       ArgumentNullException.ThrowIfNull(cellDelimiter);
+       var rows = value.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
+   
+       var rowCount = Math.Min(rows.Length, RowCount - address.Row);
+   
+       for (var rowIndex = 0; rowIndex < rowCount; rowIndex++)
+       {
+           var cells = rows[rowIndex].Split([cellDelimiter], StringSplitOptions.None);
+           var columnCount = Math.Min(cells.Length, ColumnCount - address.Column);
+   
+           for (var columnIndex = 0; columnIndex < columnCount; columnIndex++)
+           {
+               var cell = Cells[address.Row + rowIndex, address.Column + columnIndex];
+               cell.SetValue(cells[columnIndex]);
+           }
+       }
+   }
     /// <summary>
     /// Deletes the specified column and shifts cells left. Updates formulas and decreases column count.
     /// </summary>
