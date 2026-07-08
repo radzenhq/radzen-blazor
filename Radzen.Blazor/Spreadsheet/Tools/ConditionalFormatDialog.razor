@@ -1,6 +1,8 @@
+@using System.Globalization
 @using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetDialogBase
 
 <RadzenStack Gap="1rem" Style="min-width: 350px">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
@@ -54,14 +56,6 @@
 
 @code {
 #nullable enable
-    [Inject]
-    public DialogService DialogService { get; set; } = default!;
-
-    [Inject]
-    Localizer Localizer { get; set; } = default!;
-
-    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
-
     [Parameter]
     public ConditionalFormatRuleType RuleType { get; set; } = ConditionalFormatRuleType.GreaterThan;
 
@@ -85,16 +79,12 @@
         var format = new Format { BackgroundColor = BackgroundColor, Color = TextColor };
         ConditionalFormatBase? rule = RuleType switch
         {
-            ConditionalFormatRuleType.GreaterThan when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out var v) =>
+            ConditionalFormatRuleType.GreaterThan when double.TryParse(Value1, NumberStyles.Any, Culture, out var v) =>
                 new GreaterThanRule { Value = v, Format = format },
-            ConditionalFormatRuleType.LessThan when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out var v) =>
+            ConditionalFormatRuleType.LessThan when double.TryParse(Value1, NumberStyles.Any, Culture, out var v) =>
                 new LessThanRule { Value = v, Format = format },
-            ConditionalFormatRuleType.Between when double.TryParse(Value1, System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out var min) &&
-                double.TryParse(Value2, System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out var max) =>
+            ConditionalFormatRuleType.Between when double.TryParse(Value1, NumberStyles.Any, Culture, out var min) &&
+                double.TryParse(Value2, NumberStyles.Any, Culture, out var max) =>
                 new BetweenRule { Minimum = min, Maximum = max, Format = format },
             ConditionalFormatRuleType.EqualTo => new EqualToRule { Value = Value1, Format = format },
             ConditionalFormatRuleType.TextContains => new TextContainsRule { Text = Value1, Format = format },
@@ -107,10 +97,6 @@
         }
     }
 
-    private void OnCancel()
-    {
-        DialogService.Close(null);
-    }
 
     private sealed class DropDownItem<T>(string name, T value)
     {

@@ -181,7 +181,7 @@ public class Table
         for (var i = 0; i < columns.Count; i++)
         {
             var sheetCol = range.Start.Column + i;
-            Worksheet.Cells[headerRow, sheetCol].Value = columns[i].Name;
+            Worksheet.Cells[headerRow, sheetCol].SetValueInvariant(columns[i].Name);
         }
 
         showFilterButton = true;

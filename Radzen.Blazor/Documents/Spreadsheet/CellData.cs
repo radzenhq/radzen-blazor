@@ -100,9 +100,14 @@ public class CellData : IComparable, IComparable<CellData>
     public CellDataType Type { get; }
 
     /// <summary>
-    /// Creates a new instance of CellData with the specified data.
+    /// Creates a new instance of CellData with the specified data. String values are type-inferred
+    /// using the invariant culture.
     /// </summary>
-    public CellData(object? data)
+    public CellData(object? data) : this(data, CultureInfo.InvariantCulture)
+    {
+    }
+
+    internal CellData(object? data, CultureInfo culture)
     {
         if (data is null)
         {
@@ -117,7 +122,7 @@ public class CellData : IComparable, IComparable<CellData>
 
         if (valType == typeof(string) || (isNullable && nullableType == typeof(string)))
         {
-            var converted = TryConvertFromString(data.ToString(), out var convertedData, out var valueType);
+            var converted = TryConvertFromString(data.ToString(), culture, out var convertedData, out var valueType);
             if (converted)
             {
                 Value = convertedData;
@@ -137,6 +142,9 @@ public class CellData : IComparable, IComparable<CellData>
     }
 
     internal static bool TryConvertFromString(string? value, out object? converted, out CellDataType? valueType)
+        => TryConvertFromString(value, CultureInfo.InvariantCulture, out converted, out valueType);
+
+    internal static bool TryConvertFromString(string? value, CultureInfo culture, out object? converted, out CellDataType? valueType)
     {
         if (value is null)
         {
@@ -145,14 +153,27 @@ public class CellData : IComparable, IComparable<CellData>
             return false;
         }
 
-        if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var valNum))
+        var canBeDate = CanBeDate(value);
+
+        // Where the group separator doubles as the date separator (de-DE ".") 17.08.2024 would parse
+        // as the number 17082024, so explicit day-month dates are tried first (Excel semantics).
+        if (canBeDate && GroupSeparatorCollidesWithDateSeparator(culture) &&
+            value.Contains(culture.DateTimeFormat.DateSeparator, StringComparison.Ordinal) &&
+            TryParseDayMonthDate(value, culture, out var collisionDate))
+        {
+            valueType = CellDataType.Date;
+            converted = collisionDate;
+            return true;
+        }
+
+        if (double.TryParse(value, NumberStyles.Any, culture, out var valNum))
         {
             converted = valNum;
             valueType = CellDataType.Number;
             return true;
         }
 
-        if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var valDate))
+        if (canBeDate && TryParseDate(value, culture, out var valDate))
         {
             valueType = CellDataType.Date;
             converted = valDate;
@@ -169,6 +190,68 @@ public class CellData : IComparable, IComparable<CellData>
         converted = null;
         valueType = null;
         return false;
+    }
+
+    // "/" is the custom-format placeholder for the culture's date separator. Lenient TryParse would
+    // steal grouped numbers like "1.234" as month-year dates.
+    private static readonly string[] dayMonthPatterns = ["d/M/yyyy", "d/M/yy", "d/M"];
+
+    private static bool TryParseDayMonthDate(string value, CultureInfo culture, out DateTime date)
+        => DateTime.TryParseExact(value, dayMonthPatterns, culture, DateTimeStyles.None, out date);
+
+    private static bool TryParseDate(string value, CultureInfo culture, out DateTime date)
+    {
+        if (DateTime.TryParse(value, culture, DateTimeStyles.None, out date))
+        {
+            return true;
+        }
+
+        // Rescue canonical/US date strings the culture rejects (e.g. 08/17/2024 under de-DE).
+        return !culture.Equals(CultureInfo.InvariantCulture) &&
+               DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
+    }
+
+    // Skips the expensive DateTime.TryParse for plain text on bulk parsing paths.
+    private static bool CanBeDate(string value)
+    {
+        var hasDigit = false;
+        var hasSeparatorOrLetter = false;
+
+        foreach (var ch in value)
+        {
+            if (char.IsAsciiDigit(ch))
+            {
+                hasDigit = true;
+            }
+            else if (ch is '/' or '-' or '.' or ':' or ',' || char.IsLetter(ch))
+            {
+                hasSeparatorOrLetter = true;
+            }
+
+            if (hasDigit && hasSeparatorOrLetter)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private sealed record SeparatorCollision(CultureInfo Culture, bool Collides);
+
+    private static SeparatorCollision? separatorCollision;
+
+    private static bool GroupSeparatorCollidesWithDateSeparator(CultureInfo culture)
+    {
+        var cached = separatorCollision;
+
+        if (cached is null || !ReferenceEquals(cached.Culture, culture))
+        {
+            cached = new(culture, culture.NumberFormat.NumberGroupSeparator == culture.DateTimeFormat.DateSeparator);
+            separatorCollision = cached;
+        }
+
+        return cached.Collides;
     }
 
     internal bool TryGetInt(out int value, bool allowBooleans = true, bool nonNumericTextAsZero = false)

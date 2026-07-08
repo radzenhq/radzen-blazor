@@ -1,3 +1,4 @@
+using System.Globalization;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -19,7 +20,8 @@ public class FormatCellsDialogTests : TestContext
         return RenderComponent<FormatCellsDialog>(parameters => parameters
             .Add(p => p.SampleValue, sampleValue ?? 1234.5)
             .Add(p => p.ValueType, valueType)
-            .Add(p => p.CurrentFormat, currentFormat));
+            .Add(p => p.CurrentFormat, currentFormat)
+            .Add(p => p.Culture, CultureInfo.InvariantCulture));
     }
 
     [Fact]

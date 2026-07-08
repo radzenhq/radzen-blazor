@@ -134,7 +134,7 @@ public partial class FormatCellsDialog : SpreadsheetDialogBase
             return;
         }
 
-        var result = NumberFormat.Apply(customFormatCode, SampleValue, ValueType);
+        var result = NumberFormat.Apply(customFormatCode, SampleValue, ValueType, Culture);
         preview = result ?? SampleValue.ToString() ?? "";
     }
 

@@ -123,9 +123,9 @@ public partial class CellView : CellBase, IDisposable
             return null;
         }
 
-        var (formatted, color) = NumberFormat.ApplyWithColor(cell.FormatOrNull?.NumberFormat, cell.Value, cell.ValueType);
+        var (formatted, color) = NumberFormat.ApplyWithColor(cell.FormatOrNull?.NumberFormat, cell.Value, cell.ValueType, Worksheet.Culture);
         numberFormatColor = color;
-        return formatted ?? cell.Value?.ToString();
+        return formatted ?? cell.GetValueAsString();
     }
 
     private Type? ResolveRendererType()

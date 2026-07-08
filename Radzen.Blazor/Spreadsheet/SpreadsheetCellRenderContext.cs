@@ -50,11 +50,14 @@ public class SpreadsheetCellEditContext : SpreadsheetCellRenderContext
     }
 
     /// <summary>
-    /// Commits the edited value to the cell. The value is converted to a string and applied through the undo/redo system.
+    /// Commits the edited value to the cell. The value is converted to a string with the workbook
+    /// culture (the same culture the commit re-parses with) and applied through the undo/redo system.
     /// </summary>
     public Task CommitAsync(object? value)
     {
-        editor.Value = value?.ToString();
+        editor.Value = value is IFormattable formattable
+            ? formattable.ToString(null, Worksheet.Culture)
+            : value?.ToString();
         return spreadsheet.AcceptAsync();
     }
 

@@ -2937,6 +2937,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Localization",
+                    Path = "spreadsheet-localization",
+                    Title = "Blazor Spreadsheet Localization | Free UI Components by Radzen",
+                    Description = "Culture-aware editing, number formatting, and formula entry - type 10,50 and =SUM(A1;B1) in comma-decimal cultures.",
+                    Tags = new [] { "spreadsheet", "localization", "culture", "globalization", "locale", "decimal", "separator", "international" },
+                    Related = new [] { "spreadsheet", "spreadsheet-cell-formatting", "spreadsheet-data-validation" }
+                },
+                new Example
+                {
                     Name = "Filtering & Sorting",
                     Path = "spreadsheet-filtering-sorting",
                     Title = "Blazor Spreadsheet Filtering & Sorting | Free UI Components by Radzen",
@@ -3185,6 +3194,14 @@ namespace RadzenBlazorDemos
                     Title = "Import and Export Excel (XLSX) and CSV in Blazor | Radzen",
                     Description = "Import and export Excel (XLSX) and CSV files in Blazor. Upload a file, parse the data, and display the rows, or generate a file users can download.",
                     Tags = new [] { "document", "processing", "import", "export", "xlsx", "csv", "excel", "upload", "download", "read", "write", "parse", "separator", "encoding", "quoting" }
+                },
+                new Example
+                {
+                    Name = "Localization",
+                    Path = "document-processing-localization",
+                    Title = "Culture-Aware Excel Processing in Blazor and C# | Radzen",
+                    Description = "Parse, display, and localize spreadsheet values and formulas per culture in code while files stay canonical and host-independent.",
+                    Tags = new [] { "document", "processing", "localization", "culture", "globalization", "locale", "decimal", "separator", "formula", "invariant" }
                 },
                 new Example
                 {

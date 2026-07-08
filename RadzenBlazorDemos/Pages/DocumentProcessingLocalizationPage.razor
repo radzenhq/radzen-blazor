@@ -1,0 +1,15 @@
+@page "/document-processing-localization"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Document Processing <strong>Localization</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Compare how the same workbook parses input, displays values, and localizes formulas in different
+    cultures. Formulas and values are always stored in canonical invariant form - XLSX and CSV files
+    read and write identically on every host - while <code>SetValue</code>, <code>GetValue</code>, and
+    <code>GetDisplayText</code> follow <code>Workbook.Culture</code>.
+</RadzenText>
+
+<RadzenExample ComponentName="Spreadsheet" Example="DocumentProcessingLocalization">
+    <DocumentProcessingLocalization />
+</RadzenExample>

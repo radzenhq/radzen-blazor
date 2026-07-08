@@ -137,8 +137,7 @@ static class CsvReader
 
         if (options.ParseValues)
         {
-            // Value setter goes through CellData, which auto-detects numeric/date/boolean.
-            cell.Value = raw;
+            cell.SetValueInvariant(raw);
         }
         else
         {

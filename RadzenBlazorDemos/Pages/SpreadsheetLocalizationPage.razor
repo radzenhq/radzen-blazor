@@ -1,0 +1,17 @@
+@page "/spreadsheet-localization"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Spreadsheet <strong>Localization</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Set the <code>Culture</code> property to control how RadzenSpreadsheet parses typed input, renders
+    number formats, and localizes formula entry. In comma-decimal cultures such as de-DE or es-ES users
+    type <code>10,50</code> for ten and a half and enter formulas as <code>=SUM(A1;B1)</code> or
+    <code>=A1*1,5</code> - just like Excel. Set <code>UICulture</code> to localize the toolbar and menus.
+    Files (XLSX, CSV) and the programmatic <code>Cell.Formula</code> API always use canonical invariant
+    values regardless of the culture.
+</RadzenText>
+
+<RadzenExample ComponentName="Spreadsheet" Example="SpreadsheetLocalization">
+    <SpreadsheetLocalization />
+</RadzenExample>

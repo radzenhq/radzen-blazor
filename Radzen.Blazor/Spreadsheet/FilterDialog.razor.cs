@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
+using System.Globalization;
 
 using Radzen.Blazor;
 using Radzen.Documents.Spreadsheet;
@@ -79,6 +80,7 @@ public partial class FilterDialog : SpreadsheetDialogBase
     /// <inheritdoc />
     protected override void OnInitialized()
     {
+        Culture = Worksheet.Culture;
         InitializeFieldName();
         InitializeAvailableOperators();
         InitializeLogicalOperators();
@@ -199,8 +201,22 @@ public partial class FilterDialog : SpreadsheetDialogBase
         return new SheetFilter(criterion, rangeToUse);
     }
 
-    private static FilterCriterion CreateCriterion(int column, FilterOperator operatorType, string value)
+    // Only ordered comparison values convert between the workbook culture and the invariant criterion
+    // form; text and Equals/NotEquals stay verbatim so a literal Contains "1,5" is never rewritten.
+    private static bool IsOrderedOperator(FilterOperator operatorType) =>
+        operatorType is FilterOperator.GreaterThan or FilterOperator.GreaterThanOrEqual
+            or FilterOperator.LessThan or FilterOperator.LessThanOrEqual;
+
+    private string ToInvariantFilterValue(FilterOperator operatorType, string value) =>
+        IsOrderedOperator(operatorType) && !string.IsNullOrEmpty(value) ? ToInvariantNumber(value) : value;
+
+    private string ToLocalFilterValue(FilterOperator operatorType, string value) =>
+        IsOrderedOperator(operatorType) && !string.IsNullOrEmpty(value) ? ToLocalNumber(value) : value;
+
+    private FilterCriterion CreateCriterion(int column, FilterOperator operatorType, string value)
     {
+        value = ToInvariantFilterValue(operatorType, value);
+
         return operatorType switch
         {
             FilterOperator.Equals => new EqualToCriterion { Column = column, Value = value },
@@ -248,13 +264,13 @@ public partial class FilterDialog : SpreadsheetDialogBase
         {
             var firstCriterion = visitor.Criteria[0];
             selectedOperator = firstCriterion.Operator;
-            filterValue = firstCriterion.Value ?? "";
+            filterValue = ToLocalFilterValue(firstCriterion.Operator, firstCriterion.Value ?? "");
 
             if (visitor.Criteria.Count > 1)
             {
                 var secondCriterion = visitor.Criteria[1];
                 secondOperator = secondCriterion.Operator;
-                secondFilterValue = secondCriterion.Value ?? "";
+                secondFilterValue = ToLocalFilterValue(secondCriterion.Operator, secondCriterion.Value ?? "");
                 logicalOperator = visitor.LogicalOperator;
             }
         }

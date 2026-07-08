@@ -37,6 +37,31 @@ public abstract class SpreadsheetDialogBase : ComponentBase
     protected string L(string key) => Localizer.Get(key, DefaultUICulture ?? CultureInfo.CurrentUICulture);
 
     /// <summary>
+    /// The culture used to parse and format values entered in the dialog. The spreadsheet passes
+    /// its workbook culture when opening the dialog.
+    /// </summary>
+    [Parameter]
+    public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
+
+    /// <summary>
+    /// Converts a numeric string entered in <see cref="Culture"/> to the canonical invariant form
+    /// stored by the engine. Non-numeric text is returned verbatim.
+    /// </summary>
+    protected string ToInvariantNumber(string value) =>
+        double.TryParse(value, NumberStyles.Any, Culture, out var number)
+            ? number.ToString(CultureInfo.InvariantCulture)
+            : value;
+
+    /// <summary>
+    /// Converts a canonical invariant numeric string to <see cref="Culture"/> for display.
+    /// Non-numeric text is returned verbatim.
+    /// </summary>
+    protected string ToLocalNumber(string value) =>
+        double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number)
+            ? number.ToString(Culture)
+            : value;
+
+    /// <summary>
     /// Closes the dialog without returning a result.
     /// </summary>
     protected virtual void OnCancel() => DialogService.Close();

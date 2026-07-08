@@ -185,7 +185,7 @@ class AutofillCommand : RangeSnapshotCommandBase
 
         for (var column = source.Start.Column; column <= source.End.Column; column++)
         {
-            var sourceValues = new List<object?>();
+            var sourceData = new List<CellData?>();
             var sourceFormulas = new List<string?>();
             var sourceFormats = new List<Format?>();
 
@@ -193,19 +193,19 @@ class AutofillCommand : RangeSnapshotCommandBase
             {
                 if (sheet.Cells.TryGet(sr, column, out var srcCell))
                 {
-                    sourceValues.Add(srcCell.Value);
+                    sourceData.Add(srcCell.Data);
                     sourceFormulas.Add(srcCell.Formula);
                     sourceFormats.Add(srcCell.FormatOrNull?.Clone());
                 }
                 else
                 {
-                    sourceValues.Add(null);
+                    sourceData.Add(null);
                     sourceFormulas.Add(null);
                     sourceFormats.Add(null);
                 }
             }
 
-            var series = DetectSeries(sourceValues);
+            var series = DetectSeries(sourceData);
 
             var fillIndex = 0;
 
@@ -231,11 +231,25 @@ class AutofillCommand : RangeSnapshotCommandBase
                 }
                 else
                 {
-                    dstCell.Value = sourceValues[sourceIndex];
+                    CopyData(dstCell, sourceData[sourceIndex]);
                 }
 
                 fillIndex++;
             }
+        }
+    }
+
+    // The culture-aware Value setter would re-infer a string's type (text "31.12.2024" -> Date in de-DE).
+    private static void CopyData(Cell dstCell, CellData? data)
+    {
+        if (data is not null)
+        {
+            dstCell.Data = data;
+            dstCell.QuotePrefix = false;
+        }
+        else
+        {
+            dstCell.Value = null;
         }
     }
 
@@ -260,7 +274,7 @@ class AutofillCommand : RangeSnapshotCommandBase
 
         for (var row = source.Start.Row; row <= source.End.Row; row++)
         {
-            var sourceValues = new List<object?>();
+            var sourceData = new List<CellData?>();
             var sourceFormulas = new List<string?>();
             var sourceFormats = new List<Format?>();
 
@@ -268,19 +282,19 @@ class AutofillCommand : RangeSnapshotCommandBase
             {
                 if (sheet.Cells.TryGet(row, sc, out var srcCell))
                 {
-                    sourceValues.Add(srcCell.Value);
+                    sourceData.Add(srcCell.Data);
                     sourceFormulas.Add(srcCell.Formula);
                     sourceFormats.Add(srcCell.FormatOrNull?.Clone());
                 }
                 else
                 {
-                    sourceValues.Add(null);
+                    sourceData.Add(null);
                     sourceFormulas.Add(null);
                     sourceFormats.Add(null);
                 }
             }
 
-            var series = DetectSeries(sourceValues);
+            var series = DetectSeries(sourceData);
 
             var fillIndex = 0;
 
@@ -306,7 +320,7 @@ class AutofillCommand : RangeSnapshotCommandBase
                 }
                 else
                 {
-                    dstCell.Value = sourceValues[sourceIndex];
+                    CopyData(dstCell, sourceData[sourceIndex]);
                 }
 
                 fillIndex++;
@@ -320,18 +334,18 @@ class AutofillCommand : RangeSnapshotCommandBase
     // Tolerance for date-step equality, expressed in days (~86 ms); tight enough to distinguish "off by a second" series, loose enough for round-trips through ToOADate/double.
     private const double DateStepEpsilonInDays = 1e-6;
 
-    private static SeriesInfo? DetectSeries(List<object?> sourceValues)
+    private static SeriesInfo? DetectSeries(List<CellData?> sourceData)
     {
-        if (sourceValues.Count < 2)
+        if (sourceData.Count < 2)
         {
             return null;
         }
 
         var numbers = new List<double>();
 
-        foreach (var v in sourceValues)
+        foreach (var data in sourceData)
         {
-            if (v is double d)
+            if (data?.Value is double d)
             {
                 numbers.Add(d);
             }
@@ -364,9 +378,9 @@ class AutofillCommand : RangeSnapshotCommandBase
 
         var dates = new List<DateTime>();
 
-        foreach (var v in sourceValues)
+        foreach (var data in sourceData)
         {
-            if (v is DateTime dt)
+            if (data?.Value is DateTime dt)
             {
                 dates.Add(dt);
             }

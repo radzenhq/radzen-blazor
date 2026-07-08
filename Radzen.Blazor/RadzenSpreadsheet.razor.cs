@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -52,9 +53,9 @@ public interface ISpreadsheet
     void Redo();
 
     /// <summary>
-    /// Gets the UI culture used for localized strings. Defaults to <see cref="System.Globalization.CultureInfo.CurrentUICulture"/>.
+    /// Gets the UI culture used for localized strings. Defaults to <see cref="CultureInfo.CurrentUICulture"/>.
     /// </summary>
-    System.Globalization.CultureInfo UICulture => System.Globalization.CultureInfo.CurrentUICulture;
+    CultureInfo UICulture => CultureInfo.CurrentUICulture;
 
     /// <summary>
     /// Gets whether there is a command to undo.
@@ -352,6 +353,30 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             SetActiveSheet(SelectedSheetIndex);
         }
+        else if (stampedCulture is not null && !Culture.Equals(stampedCulture))
+        {
+            // Comparing against the last stamped culture keeps a hand-set Workbook.Culture intact.
+            if (Editor is { Mode: not EditMode.None } editor)
+            {
+                // In-flight text was typed under the old culture and would misparse.
+                editor.Cancel();
+            }
+
+            StampCulture(workbook);
+            StateHasChanged();
+        }
+    }
+
+    private CultureInfo? stampedCulture;
+
+    private void StampCulture(Workbook? target)
+    {
+        if (target is not null)
+        {
+            target.Culture = Culture;
+        }
+
+        stampedCulture = Culture;
     }
 
     private int sheetIndex;
@@ -452,6 +477,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         workbook = value;
         workbookView = null;
+        StampCulture(value);
         SetActiveSheet(index);
     }
 
@@ -692,7 +718,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Worksheet != null && validationListRow >= 0 && validationListColumn >= 0
             && Worksheet.Cells.TryGet(validationListRow, validationListColumn, out var cell))
         {
-            return cell.Value?.ToString();
+            return cell.GetValueAsString();
         }
 
         return null;
@@ -926,7 +952,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 { nameof(FormatCellsDialog.CurrentFormat), cell.Format.NumberFormat },
                 { nameof(FormatCellsDialog.SampleValue), cell.Value ?? 1234.5 },
-                { nameof(FormatCellsDialog.ValueType), cell.ValueType }
+                { nameof(FormatCellsDialog.ValueType), cell.ValueType },
+                { nameof(FormatCellsDialog.Culture), Worksheet!.Culture }
             };
 
             var result = await OpenDialogAsync<FormatCellsDialog>(
@@ -1524,6 +1551,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         // aria-describedby reference derive from it and must be unique per spreadsheet on the page.
         base.OnInitialized();
         workbook = Workbook;
+        StampCulture(workbook);
         Bind("Enter", _ => CycleSelectionAsync(1, 0));
         Bind("Escape", _ => CancelEditAsync());
         Bind("Tab", _ => CycleSelectionAsync(0, 1));

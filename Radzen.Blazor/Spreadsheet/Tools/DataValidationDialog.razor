@@ -1,6 +1,8 @@
+@using System.Globalization
 @using Radzen.Blazor
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Documents.Spreadsheet
+@inherits SpreadsheetDialogBase
 
 <RadzenStack Gap="0.5rem" Style="min-width: 400px">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
@@ -138,14 +140,6 @@
 
 @code {
 #nullable enable
-    [Inject]
-    public DialogService DialogService { get; set; } = default!;
-
-    [Inject]
-    Localizer Localizer { get; set; } = default!;
-
-    string L(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
-
     private DataValidationType ValidationType { get; set; } = DataValidationType.WholeNumber;
     private DataValidationOperator Operator { get; set; } = DataValidationOperator.Between;
     private string Formula1 { get; set; } = "";
@@ -217,23 +211,33 @@
         {
             if (Formula1Date.HasValue)
             {
-                formula1 = Formula1Date.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+                formula1 = Formula1Date.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
             if (Formula2Date.HasValue)
             {
-                formula2 = Formula2Date.Value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+                formula2 = Formula2Date.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
         }
         else if (ValidationType == DataValidationType.Time)
         {
             if (Formula1Date.HasValue)
             {
-                formula1 = (Formula1Date.Value.TimeOfDay.TotalDays).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                formula1 = (Formula1Date.Value.TimeOfDay.TotalDays).ToString(CultureInfo.InvariantCulture);
             }
             if (Formula2Date.HasValue)
             {
-                formula2 = (Formula2Date.Value.TimeOfDay.TotalDays).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                formula2 = (Formula2Date.Value.TimeOfDay.TotalDays).ToString(CultureInfo.InvariantCulture);
             }
+        }
+        else if (ValidationType is DataValidationType.WholeNumber or DataValidationType.Decimal or DataValidationType.TextLength)
+        {
+            // Bounds are typed in the workbook culture but stored as canonical invariant fragments.
+            formula1 = NormalizeNumericBound(formula1);
+            formula2 = NormalizeNumericBound(formula2);
+        }
+        else if (ValidationType == DataValidationType.Custom && formula1.StartsWith('='))
+        {
+            formula1 = FormulaLocalizer.ToInvariant(formula1, Culture);
         }
 
         var rule = new DataValidationRule
@@ -255,9 +259,14 @@
         DialogService.Close(rule);
     }
 
-    private void OnCancel()
+    private string NormalizeNumericBound(string value)
     {
-        DialogService.Close(null);
+        if (string.IsNullOrEmpty(value) || value.StartsWith('='))
+        {
+            return value;
+        }
+
+        return ToInvariantNumber(value);
     }
 
     private sealed class DropDownItem<T>(string name, T value)

@@ -536,7 +536,7 @@ static class XlsxReader
                 _ => valueElem!.Value
             };
 
-            sheet.Cells[address.Row, address.Column].Value = value;
+            sheet.Cells[address.Row, address.Column].SetValueInvariant(value);
         }
 
         ApplyCellStyle(cellElem, sheet, address, styleInfo);

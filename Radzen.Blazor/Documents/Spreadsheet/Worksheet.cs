@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -233,6 +234,8 @@ public partial class Worksheet
         get => workbook ??= new Workbook(this);
         internal set => workbook = value;
     }
+
+    internal CultureInfo Culture => Workbook.Culture;
 
     /// <summary>
     /// Returns true if the cell at the given address is editable (either protection is off or the cell is unlocked).

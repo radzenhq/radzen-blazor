@@ -173,7 +173,7 @@ public partial class CellEditor : ComponentBase, IDisposable
     {
         var address = Worksheet.Selection.Cell;
         var cell = address != CellRef.Invalid ? Worksheet.Cells[address] : null;
-        var formattedValue = cell?.Value?.ToString();
+        var formattedValue = cell?.GetValueAsString();
 
         var context = new SpreadsheetCellEditContext(
             formattedValue, cell!, Worksheet, Editor, Spreadsheet

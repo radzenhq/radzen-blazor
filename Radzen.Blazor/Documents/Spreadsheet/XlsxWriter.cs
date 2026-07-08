@@ -1131,7 +1131,7 @@ class XlsxWriter(Workbook sourceWorkbook)
     private static XElement CreateDimension(Worksheet sheet)
     {
         var populated = sheet.Cells.GetPopulatedCells()
-            .Where(c => c.GetValue() is not null)
+            .Where(c => c.Value is not null || c.Formula is not null)
             .ToList();
 
         string refStr;
@@ -1216,7 +1216,8 @@ class XlsxWriter(Workbook sourceWorkbook)
 
             try
             {
-                text = cell.GetDisplayText();
+                // Autofit widths must be culture-independent so saved <col> XML is deterministic.
+                text = cell.FormatDisplayText(CultureInfo.InvariantCulture);
                 format = cell.GetEffectiveFormat();
             }
             catch (ArgumentOutOfRangeException)
@@ -1255,7 +1256,7 @@ class XlsxWriter(Workbook sourceWorkbook)
                 : (rowMap[row] = new SortedDictionary<int, XElement>());
 
         // 1. Real data cells.
-        foreach (var cell in sheet.Cells.GetPopulatedCells().Where(c => c.GetValue() is not null))
+        foreach (var cell in sheet.Cells.GetPopulatedCells().Where(c => c.Value is not null || c.Formula is not null))
         {
             var rowDict = EnsureRow(cell.Address.Row);
             rowDict[cell.Address.Column] = CreateCellElement(sheet, cell.Address.Row, cell.Address.Column, cell, styleTracker, sharedStrings, sharedStringsDoc);

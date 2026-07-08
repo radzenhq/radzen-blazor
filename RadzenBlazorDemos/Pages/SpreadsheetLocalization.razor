@@ -1,0 +1,84 @@
+@using System.Globalization
+@using Radzen.Blazor.Spreadsheet
+@using Radzen.Documents.Spreadsheet
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" class="rz-pb-4">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-mb-0">Language</RadzenText>
+    <RadzenSelectBar @bind-Value="@culture" Data="@cultures" TextProperty="Name" ValueProperty="Culture" Size="ButtonSize.Small" />
+</RadzenStack>
+
+<RadzenSpreadsheet Workbook=@workbook Culture=@culture UICulture=@culture style="height: 600px" />
+
+@code {
+    class Language
+    {
+        public string Name { get; set; } = string.Empty;
+        public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
+    }
+
+    // Cultures with RadzenStrings resx translations, so the toolbar UI localizes together with the values.
+    readonly Language[] cultures =
+    [
+        new() { Name = "English", Culture = new CultureInfo("en-US") },
+        new() { Name = "Deutsch", Culture = new CultureInfo("de-DE") },
+        new() { Name = "Español", Culture = new CultureInfo("es-ES") },
+        new() { Name = "Français", Culture = new CultureInfo("fr-FR") },
+        new() { Name = "Italiano", Culture = new CultureInfo("it-IT") },
+        new() { Name = "日本語", Culture = new CultureInfo("ja-JP") },
+    ];
+
+    CultureInfo culture = new("en-US");
+
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        var sheet = workbook.AddSheet("Localization", 30, 8);
+
+        sheet.BeginUpdate();
+
+        sheet.Columns[0] = 340;
+        for (int i = 1; i < 8; i++) sheet.Columns[i] = 130;
+
+        sheet.Cells["A1"].Value = "Number Formats";
+        sheet.Cells["A1"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A2"].Value = "Formatted number";
+        sheet.Cells["B2"].Value = 1234.5;
+        sheet.Cells["B2"].Format.NumberFormat = "#,##0.00";
+
+        sheet.Cells["A3"].Value = "Percentage";
+        sheet.Cells["B3"].Value = 0.755;
+        sheet.Cells["B3"].Format.NumberFormat = "0.00%";
+
+        sheet.Cells["A6"].Value = "Dates";
+        sheet.Cells["A6"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A7"].Value = "Long date";
+        sheet.Cells["B7"].Value = new DateTime(2024, 3, 17);
+        sheet.Cells["B7"].Format.NumberFormat = "dd-mmmm-yyyy";
+
+        sheet.Cells["A8"].Value = "Short date";
+        sheet.Cells["B8"].Value = new DateTime(2024, 3, 17);
+        sheet.Cells["B8"].Format.NumberFormat = "dd-mmm-yy";
+
+        sheet.Cells["A10"].Value = "Formulas";
+        sheet.Cells["A10"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A11"].Value = "Sum";
+        sheet.Cells["B11"].Formula = "=SUM(B2,500.25)";
+        sheet.Cells["B11"].Format.NumberFormat = "#,##0.00";
+
+        sheet.Cells["A12"].Value = "Scaled";
+        sheet.Cells["B12"].Formula = "=B2*1.5";
+        sheet.Cells["B12"].Format.NumberFormat = "#,##0.00";
+
+        sheet.Cells["A14"].Value = "Try it";
+        sheet.Cells["A14"].Format = new Format { Bold = true, FontSize = 12 };
+
+        sheet.Cells["A15"].Value = "Switch to de-DE or es-ES, then type 10,50 in a cell,";
+        sheet.Cells["A16"].Value = "or enter formulas such as =B2*1,5 and =SUM(B2;500,25).";
+
+        sheet.EndUpdate();
+    }
+}

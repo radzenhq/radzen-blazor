@@ -167,7 +167,7 @@ public class DataValidationRule : ICellValidator
                 {
                     if (sheet.Cells.TryGet(row, col, out var cell) && cell.Value is not null)
                     {
-                        items.Add(cell.Value.ToString() ?? "");
+                        items.Add(cell.GetValueAsString() ?? "");
                     }
                     else
                     {
@@ -251,7 +251,8 @@ public class DataValidationRule : ICellValidator
     private bool ValidateList(Cell cell)
     {
         var items = GetListItems(cell.Worksheet);
-        var cellValue = cell.Value?.ToString() ?? "";
+        // Must match the culture used to render the list items in GetListItems.
+        var cellValue = cell.GetValueAsString() ?? "";
         return items.Any(item => string.Equals(item, cellValue, StringComparison.OrdinalIgnoreCase));
     }
 

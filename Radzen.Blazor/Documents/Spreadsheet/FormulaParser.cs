@@ -320,8 +320,17 @@ internal class FormulaParser
 
     public static FormulaSyntaxTree Parse(string expression)
     {
-        var parser = new FormulaParser(expression);
-        return parser.Parse();
+        try
+        {
+            var parser = new FormulaParser(expression);
+            return parser.Parse();
+        }
+        catch (InvalidOperationException ex)
+        {
+            // The lexer throws on malformed numbers; surface it like parser-collected errors.
+            var token = new FormulaToken(FormulaTokenType.ErrorLiteral, CellError.Name.ToString());
+            return new FormulaSyntaxTree(new ErrorLiteralSyntaxNode(token), [ex.Message]);
+        }
     }
 
     private FormulaSyntaxTree Parse()

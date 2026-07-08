@@ -1,0 +1,63 @@
+@using System.Globalization
+@using Radzen.Documents.Spreadsheet
+
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.P" class="rz-pb-2">
+    Each row below is a <code>Workbook</code> with a different <code>Culture</code>. The canonical
+    <code>Cell.Formula</code> stays identical in every culture - only user-facing entry and display change.
+    <code>Workbook.Culture</code> defaults to <code>CultureInfo.CurrentCulture</code>; set it explicitly in
+    server-side code so results do not depend on the host locale.
+</RadzenText>
+
+<RadzenDataGrid Data="@rows" TItem="CultureRow" AllowPaging="false" class="rz-pb-4">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(CultureRow.Culture)" Title="Culture" Width="90px" />
+        <RadzenDataGridColumn Property="@nameof(CultureRow.LocalFormula)" Title="Formula as the user types it" />
+        <RadzenDataGridColumn Property="@nameof(CultureRow.CanonicalFormula)" Title="Canonical Cell.Formula" />
+        <RadzenDataGridColumn Property="@nameof(CultureRow.FormattedNumber)" Title="1234.5 as #,##0.00" />
+        <RadzenDataGridColumn Property="@nameof(CultureRow.ParsedInput)" Title="Typing &quot;10,50&quot; produces" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    class CultureRow
+    {
+        public string Culture { get; set; } = string.Empty;
+        public string LocalFormula { get; set; } = string.Empty;
+        public string CanonicalFormula { get; set; } = string.Empty;
+        public string FormattedNumber { get; set; } = string.Empty;
+        public string ParsedInput { get; set; } = string.Empty;
+    }
+
+    readonly List<CultureRow> rows = [];
+
+    protected override void OnInitialized()
+    {
+        foreach (var name in new[] { "en-US", "de-DE", "es-ES", "fr-FR", "it-IT", "ja-JP" })
+        {
+            var workbook = new Workbook { Culture = CultureInfo.GetCultureInfo(name) };
+            var sheet = workbook.AddSheet("Sheet1", 5, 5);
+
+            sheet.Cells["A1"].Value = 1000;
+            sheet.Cells["A2"].Value = 234.5;
+
+            var formulaCell = sheet.Cells["B1"];
+            formulaCell.Formula = "=SUM(A1,A2)*1.5";
+
+            var formattedCell = sheet.Cells["C1"];
+            formattedCell.Value = 1234.5;
+            formattedCell.Format.NumberFormat = "#,##0.00";
+
+            var inputCell = sheet.Cells["D1"];
+            inputCell.SetValue("10,50");
+
+            rows.Add(new CultureRow
+            {
+                Culture = name,
+                LocalFormula = formulaCell.GetValue(),
+                CanonicalFormula = formulaCell.Formula,
+                FormattedNumber = formattedCell.GetDisplayText(),
+                ParsedInput = $"{Convert.ToString(inputCell.Value, CultureInfo.InvariantCulture)} ({inputCell.ValueType})"
+            });
+        }
+    }
+}

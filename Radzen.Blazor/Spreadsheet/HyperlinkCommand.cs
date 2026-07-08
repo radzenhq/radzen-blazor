@@ -17,16 +17,14 @@ public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyper
     private readonly Worksheet sheet = sheet;
     private readonly CellRef address = address;
     private readonly Hyperlink? hyperlink = hyperlink;
-    private Hyperlink? previousHyperlink;
-    private object? previousValue;
+    private Cell? previousCell;
 
     /// <inheritdoc/>
     public bool Execute()
     {
         var cell = sheet.Cells[address.Row, address.Column];
 
-        previousHyperlink = cell.Hyperlink?.Clone();
-        previousValue = cell.Value;
+        previousCell = cell.Clone();
 
         cell.Hyperlink = hyperlink?.Clone();
 
@@ -45,13 +43,9 @@ public class HyperlinkCommand(Worksheet sheet, CellRef address, Hyperlink? hyper
     /// <inheritdoc/>
     public void Unexecute()
     {
-        if (sheet.Cells.TryGet(address.Row, address.Column, out var cell))
+        if (previousCell is not null && sheet.Cells.TryGet(address.Row, address.Column, out var cell))
         {
-            cell.Hyperlink = previousHyperlink?.Clone();
-            if (previousValue is not null)
-            {
-                cell.Value = previousValue;
-            }
+            cell.CopyFrom(previousCell.Clone());
         }
     }
 }

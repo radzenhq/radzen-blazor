@@ -32,7 +32,10 @@
         }
 
         var result = await DialogService.OpenAsync<DataValidationDialog>(Spreadsheet.Localize(nameof(RadzenStrings.Spreadsheet_DataValidationTitle)),
-            null, new DialogOptions { Width = "520px" });
+            new Dictionary<string, object?>
+            {
+                { "Culture", Worksheet.Culture }
+            }, new DialogOptions { Width = "520px" });
 
         if (result is DataValidationRule rule)
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace Radzen.Documents.Spreadsheet;
@@ -16,6 +17,19 @@ public class Workbook
     /// Gets the collection of sheets in the workbook.
     /// </summary>
     public IReadOnlyList<Worksheet> Sheets => sheets;
+
+    private CultureInfo? culture;
+
+    /// <summary>
+    /// Gets or sets the culture used to parse typed cell input and to render values and number formats.
+    /// If not set, falls back to <see cref="CultureInfo.CurrentCulture"/>.
+    /// File storage (XLSX, CSV) and formula storage always use the invariant culture regardless of this setting.
+    /// </summary>
+    public CultureInfo Culture
+    {
+        get => culture ?? CultureInfo.CurrentCulture;
+        set => culture = value;
+    }
 
     /// <summary>
     /// Gets or sets the workbook protection settings.

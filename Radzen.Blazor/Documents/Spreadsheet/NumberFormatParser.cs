@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -8,7 +10,32 @@ namespace Radzen.Documents.Spreadsheet;
 
 static class NumberFormatParser
 {
+    // ParsedFormat is immutable and culture-independent (culture applies at render time). Hard-bounded
+    // because format codes can be generated dynamically (AdjustDecimals) - a full cache stops accepting.
+    private const int CacheCapacity = 512;
+    private static readonly ConcurrentDictionary<string, ParsedFormat> cache = new();
+    private static int cacheCount;
+
+    internal static int CacheCount => Volatile.Read(ref cacheCount);
+
     public static ParsedFormat Parse(string formatCode)
+    {
+        if (cache.TryGetValue(formatCode, out var cached))
+        {
+            return cached;
+        }
+
+        var parsed = ParseCore(formatCode);
+
+        if (Volatile.Read(ref cacheCount) < CacheCapacity && cache.TryAdd(formatCode, parsed))
+        {
+            Interlocked.Increment(ref cacheCount);
+        }
+
+        return parsed;
+    }
+
+    private static ParsedFormat ParseCore(string formatCode)
     {
         var parts = SplitSections(formatCode);
         var sections = new List<FormatSection>();

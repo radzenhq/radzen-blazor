@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Radzen.Documents.Spreadsheet;
 
@@ -114,10 +115,17 @@ public class Cell
 
     /// <summary>
     /// Gets the text displayed in the cell: the number format applied to the value, or the value as a string.
+    /// Rendered with the workbook culture.
     /// </summary>
-    public string? GetDisplayText()
+    public string? GetDisplayText() => FormatDisplayText(Culture);
+
+    /// <summary>
+    /// Formats the display text with the specified culture. The XLSX writer measures autofit widths
+    /// with the invariant culture so saved files are host-independent.
+    /// </summary>
+    internal string? FormatDisplayText(CultureInfo culture)
     {
-        return NumberFormat.Apply(format?.NumberFormat, Value, ValueType) ?? Value?.ToString();
+        return NumberFormat.Apply(format?.NumberFormat, Value, ValueType, culture) ?? FormatValue(culture);
     }
 
     internal Format? GetEffectiveFormat()
@@ -162,11 +170,25 @@ public class Cell
             {
                 return;
             }
-            Data = new CellData(value);
+            Data = new CellData(value, Culture);
             QuotePrefix = false;
 
             Worksheet.OnCellValueChanged(this);
         }
+    }
+
+    private CultureInfo Culture => Worksheet.Culture;
+
+    /// <summary>
+    /// Sets the cell value with invariant type inference - file content is canonical and must parse
+    /// the same on every host.
+    /// </summary>
+    internal void SetValueInvariant(string? value)
+    {
+        Data = new CellData(value);
+        QuotePrefix = false;
+
+        Worksheet.OnCellValueChanged(this);
     }
 
     /// <summary>
@@ -176,7 +198,7 @@ public class Cell
     {
         if (!string.IsNullOrEmpty(Formula))
         {
-            return Formula;
+            return FormulaLocalizer.ToLocalized(Formula, Culture);
         }
 
         var text = GetValueAsString();
@@ -184,15 +206,19 @@ public class Cell
     }
 
     /// <summary>
-    /// Gets the value of the cell as a string.
+    /// Gets the value of the cell as a string, formatted with the workbook culture so that the
+    /// text round-trips through <see cref="SetValue"/> under the same culture.
     /// </summary>
-    public string? GetValueAsString()
+    public string? GetValueAsString() => FormatValue(Culture);
+
+    private string? FormatValue(CultureInfo culture)
     {
         return Value switch
         {
             null => null,
             CellError error => error.ToString(),
             string str => str,
+            IFormattable formattable => formattable.ToString(null, culture),
             _ => Value.ToString()
         };
     }
@@ -216,7 +242,7 @@ public class Cell
         }
         else if (value?.StartsWith('=') == true && value != "=")
         {
-            Formula = value;
+            Formula = FormulaLocalizer.ToInvariant(value, Culture);
         }
         else
         {

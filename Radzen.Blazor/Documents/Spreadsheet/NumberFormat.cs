@@ -18,14 +18,31 @@ public static class NumberFormat
     /// Returns null when the format is General/null (caller should fall back to default rendering).
     /// </summary>
     public static string? Apply(string? formatCode, object? value, CellDataType type)
-        => ApplyWithColor(formatCode, value, type).Text;
+        => ApplyWithColor(formatCode, value, type, CultureInfo.InvariantCulture).Text;
+
+    /// <summary>
+    /// Applies a format code to a value and returns the formatted string, rendering separators,
+    /// month/day names and AM/PM designators with the specified culture. Format codes themselves
+    /// are canonical invariant tokens.
+    /// </summary>
+    public static string? Apply(string? formatCode, object? value, CellDataType type, CultureInfo culture)
+        => ApplyWithColor(formatCode, value, type, culture).Text;
 
     /// <summary>
     /// Applies a format code to a value and returns the formatted string and optional color.
     /// The color is determined by color codes in the format string (e.g., [Red], [Green]).
     /// </summary>
     public static (string? Text, string? Color) ApplyWithColor(string? formatCode, object? value, CellDataType type)
+        => ApplyWithColor(formatCode, value, type, CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Applies a format code to a value and returns the formatted string and optional color,
+    /// rendering separators, month/day names and AM/PM designators with the specified culture.
+    /// </summary>
+    public static (string? Text, string? Color) ApplyWithColor(string? formatCode, object? value, CellDataType type, CultureInfo culture)
     {
+        ArgumentNullException.ThrowIfNull(culture);
+
         if (value is null || string.IsNullOrEmpty(formatCode) ||
             string.Equals(formatCode, "General", StringComparison.OrdinalIgnoreCase))
         {
@@ -54,11 +71,11 @@ public static class NumberFormat
 
         if (section.IsDate)
         {
-            text = FormatDate(section, value, type, number);
+            text = FormatDate(section, value, type, number, culture);
         }
         else
         {
-            text = FormatNumber(section, number);
+            text = FormatNumber(section, number, culture);
         }
 
         return (text, section.Color);
@@ -249,7 +266,7 @@ public static class NumberFormat
         return parsed.Sections[0];
     }
 
-    private static string FormatDate(FormatSection section, object? value, CellDataType type, double number)
+    private static string FormatDate(FormatSection section, object? value, CellDataType type, double number, CultureInfo culture)
     {
         DateTime dt;
         if (value is DateTime dateTime)
@@ -290,9 +307,9 @@ public static class NumberFormat
                     {
                         1 => dt.Month.ToString(CultureInfo.InvariantCulture),
                         2 => dt.ToString("MM", CultureInfo.InvariantCulture),
-                        3 => dt.ToString("MMM", CultureInfo.InvariantCulture),
-                        4 => dt.ToString("MMMM", CultureInfo.InvariantCulture),
-                        _ => dt.ToString("MMMM", CultureInfo.InvariantCulture)
+                        3 => dt.ToString("MMM", culture),
+                        4 => dt.ToString("MMMM", culture),
+                        _ => dt.ToString("MMMM", culture)
                     });
                     break;
                 case TokenType.Day:
@@ -300,8 +317,8 @@ public static class NumberFormat
                     {
                         1 => dt.Day.ToString(CultureInfo.InvariantCulture),
                         2 => dt.ToString("dd", CultureInfo.InvariantCulture),
-                        3 => dt.ToString("ddd", CultureInfo.InvariantCulture),
-                        _ => dt.ToString("dddd", CultureInfo.InvariantCulture)
+                        3 => dt.ToString("ddd", culture),
+                        _ => dt.ToString("dddd", culture)
                     });
                     break;
                 case TokenType.Hour:
@@ -332,7 +349,12 @@ public static class NumberFormat
                         : dt.Second.ToString(CultureInfo.InvariantCulture));
                     break;
                 case TokenType.AmPm:
-                    sb.Append(dt.Hour >= 12 ? "PM" : "AM");
+                    var designator = dt.Hour >= 12 ? culture.DateTimeFormat.PMDesignator : culture.DateTimeFormat.AMDesignator;
+                    if (string.IsNullOrEmpty(designator))
+                    {
+                        designator = dt.Hour >= 12 ? "PM" : "AM";
+                    }
+                    sb.Append(designator);
                     break;
             }
         }
@@ -340,7 +362,7 @@ public static class NumberFormat
         return StringBuilderCache.GetStringAndRelease(sb);
     }
 
-    private static string FormatNumber(FormatSection section, double value)
+    private static string FormatNumber(FormatSection section, double value, CultureInfo culture)
     {
         // Section with no digit placeholders (e.g. literal "-") returns just prefix+suffix
         if (!section.HasDigitPlaceholders)
@@ -350,7 +372,7 @@ public static class NumberFormat
 
         if (section.IsScientific)
         {
-            return FormatScientific(section, value);
+            return FormatScientific(section, value, culture);
         }
 
         var absValue = Math.Abs(value);
@@ -400,15 +422,18 @@ public static class NumberFormat
             intStr = intStr.PadLeft(intZeros, '0');
         }
 
+        var groupSeparator = culture.NumberFormat.NumberGroupSeparator;
+        var decimalSeparator = culture.NumberFormat.NumberDecimalSeparator;
+
         if (hasThousands && intStr.Length > 0)
         {
-            var formatted = new StringBuilder(intStr.Length + (intStr.Length - 1) / 3);
+            var formatted = new StringBuilder(intStr.Length + (intStr.Length - 1) / 3 * groupSeparator.Length);
             for (var i = 0; i < intStr.Length; i++)
             {
                 var remaining = intStr.Length - i;
                 if (i > 0 && remaining % 3 == 0)
                 {
-                    formatted.Append(',');
+                    formatted.Append(groupSeparator);
                 }
                 formatted.Append(intStr[i]);
             }
@@ -419,7 +444,7 @@ public static class NumberFormat
 
         if (decimalPlaces > 0)
         {
-            sb.Append('.');
+            sb.Append(decimalSeparator);
             var fracStr = Math.Round(fracPart, decimalPlaces, MidpointRounding.AwayFromZero)
                 .ToString("F" + decimalPlaces, CultureInfo.InvariantCulture);
             // Remove "0." prefix
@@ -465,10 +490,10 @@ public static class NumberFormat
                 fracStr = new string(chars);
             }
 
-            // If all decimal digits stripped, remove the dot too
+            // If all decimal digits stripped, remove the decimal separator too
             if (fracStr.Length == 0)
             {
-                sb.Length--; // remove the '.'
+                sb.Length -= decimalSeparator.Length;
             }
             else
             {
@@ -481,7 +506,7 @@ public static class NumberFormat
         return StringBuilderCache.GetStringAndRelease(sb);
     }
 
-    private static string FormatScientific(FormatSection section, double value)
+    private static string FormatScientific(FormatSection section, double value, CultureInfo culture)
     {
         var sb = StringBuilderCache.Acquire();
         sb.Append(section.Prefix);
@@ -528,7 +553,7 @@ public static class NumberFormat
 
         if (section.DecimalPlaces > 0)
         {
-            sb.Append(mantissa.ToString("F" + section.DecimalPlaces, CultureInfo.InvariantCulture));
+            sb.Append(mantissa.ToString("F" + section.DecimalPlaces, culture));
         }
         else
         {

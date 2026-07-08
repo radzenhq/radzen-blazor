@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Bunit;
@@ -30,6 +31,47 @@ public class SpreadsheetTests
         var wb = new Workbook();
         wb.AddSheet("Sheet1", 10, 10);
         return wb;
+    }
+
+    [Fact]
+    public void CultureParameter_StampsWorkbookAndRerendersFormattedCells()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+        var sheet = wb.Sheets[0];
+        sheet.Cells[0, 0].Value = 1234.5;
+        sheet.Cells[0, 0].Format.NumberFormat = "#,##0.00";
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p
+            .Add(x => x.Workbook, wb)
+            .Add(x => x.Culture, CultureInfo.InvariantCulture));
+
+        Assert.Same(CultureInfo.InvariantCulture, wb.Culture);
+        Assert.Contains("1,234.50", c.Markup);
+
+        var german = CultureInfo.GetCultureInfo("de-DE");
+        c.SetParametersAndRender(p => p.Add(x => x.Culture, german));
+
+        Assert.Same(german, wb.Culture);
+        Assert.Contains("1.234,50", c.Markup);
+    }
+
+    [Fact]
+    public void HandSetWorkbookCulture_SurvivesParameterSets()
+    {
+        using var ctx = CreateContext();
+        var wb = NewWorkbook();
+
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p
+            .Add(x => x.Workbook, wb)
+            .Add(x => x.Culture, CultureInfo.InvariantCulture));
+
+        var german = CultureInfo.GetCultureInfo("de-DE");
+        wb.Culture = german;
+
+        c.SetParametersAndRender(p => p.Add(x => x.ReadOnly, true));
+
+        Assert.Same(german, wb.Culture);
     }
 
     // ExecuteAsync triggers cell-change StateHasChanged callbacks that have to run on
@@ -874,7 +916,9 @@ public class SpreadsheetTests
         sheet.Cells[0, 0].Value = 39448d;
         sheet.Cells[0, 0].Format.NumberFormat = "0.00";
 
-        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p.Add(x => x.Workbook, wb));
+        var c = ctx.RenderComponent<RadzenSpreadsheet>(p => p
+            .Add(x => x.Workbook, wb)
+            .Add(x => x.Culture, CultureInfo.InvariantCulture));
 
         await AutoFit(c, 0);
 
