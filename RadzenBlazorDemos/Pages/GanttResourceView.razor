@@ -1,0 +1,209 @@
+@using RadzenBlazorDemos.Models
+
+<style>
+    .resource-alice .rz-event-content { background: var(--rz-info) !important; }
+    .resource-bob .rz-event-content { background: var(--rz-success) !important; }
+    .resource-carol .rz-event-content { background: var(--rz-warning) !important; }
+    .resource-dave .rz-event-content { background: var(--rz-danger) !important; }
+    .resource-group .rz-event-content { background: var(--rz-base-500) !important; }
+</style>
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-mb-4">
+    <RadzenSelectBar Value="@viewMode" TValue="GanttViewMode" Size="ButtonSize.Small" Change="@OnViewModeChanged">
+        <Items>
+            <RadzenSelectBarItem Text="Project View" Value="GanttViewMode.Task" />
+            <RadzenSelectBarItem Text="Resource View" Value="GanttViewMode.Resource" />
+        </Items>
+    </RadzenSelectBar>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenCheckBox @bind-Value="@hierarchy" Name="hierarchy" TValue="bool" Change="@OnOptionsChanged" />
+        <RadzenLabel Text="Hierarchical resources" Component="hierarchy" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenCheckBox @bind-Value="@showUnassigned" Name="unassigned" TValue="bool" Change="@OnOptionsChanged" />
+        <RadzenLabel Text="Unassigned tasks" Component="unassigned" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenCheckBox @bind-Value="@showHistogram" Name="histogram" TValue="bool" Change="@OnOptionsChanged" />
+        <RadzenLabel Text="Histogram" Component="histogram" />
+    </RadzenStack>
+</RadzenStack>
+
+<RadzenGantt @ref="gantt" TItem="GanttResourceTask"
+             ViewMode="@viewMode"
+             Data="@tasks"
+             Dependencies="@dependencies"
+             ResourceData="@resources"
+             ResourceIdProperty="@nameof(GanttResource.Id)"
+             ResourceParentIdProperty="@(hierarchy ? nameof(GanttResource.ParentId) : null)"
+             ResourceTextProperty="@nameof(GanttResource.Name)"
+             TaskResourceIdProperty="@nameof(GanttResourceTask.ResourceId)"
+             ShowUnassignedTasks="@showUnassigned"
+             ShowHistogram="@showHistogram"
+             HistogramCapacity="4"
+             IdProperty="@nameof(GanttResourceTask.Id)"
+             ParentIdProperty="@nameof(GanttResourceTask.ParentId)"
+             TextProperty="@nameof(GanttResourceTask.Name)"
+             StartProperty="@nameof(GanttResourceTask.Start)"
+             EndProperty="@nameof(GanttResourceTask.End)"
+             ProgressProperty="@nameof(GanttResourceTask.Progress)"
+             TaskRender="@OnTaskRender"
+             Style="width: 100%; height: 560px;"
+             AllowColumnResize="true"
+             AllowSorting="false" AllowFiltering="false">
+    <Columns>
+        <RadzenGanttColumn TItem="GanttResourceTask" Title="Task" Property="@nameof(GanttResourceTask.Name)" Frozen="true" Width="200px" />
+        <RadzenGanttColumn TItem="GanttResourceTask" Title="Start" Property="@nameof(GanttResourceTask.Start)" Width="120px" FormatString="{0:MM/dd/yyyy}" />
+        <RadzenGanttColumn TItem="GanttResourceTask" Title="End" Property="@nameof(GanttResourceTask.End)" Width="120px" FormatString="{0:MM/dd/yyyy}" />
+        <RadzenGanttColumn TItem="GanttResourceTask" Title="Progress" Property="@nameof(GanttResourceTask.Progress)" Width="100px" />
+    </Columns>
+    <ResourceColumns>
+        <RadzenDataGridColumn TItem="object" Title="Name" Width="160px" Frozen="true">
+            <Template Context="item">
+                @if (item is GanttResource res)
+                {
+                    <strong>@res.Name</strong>
+                }
+                else if (item is GanttUnassignedResource unassigned)
+                {
+                    <strong>@unassigned.Text</strong>
+                }
+                else if (item is GanttResourceTask task)
+                {
+                    <span style="padding-left: 8px;">@task.Name</span>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="object" Title="Role" Width="100px">
+            <Template Context="item">
+                @if (item is GanttResource res)
+                {
+                    @res.Role
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="object" Title="Progress" Width="90px" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                @if (item is GanttResourceTask task && task.Progress.HasValue)
+                {
+                    <RadzenProgressBarCircular Value="@task.Progress.Value" Size="ProgressBarCircularSize.ExtraSmall" ShowValue="true" AriaLabel="@($"{task.Name} progress")" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="object" Title="Start" Width="110px">
+            <Template Context="item">
+                @if (item is GanttResourceTask task)
+                {
+                    @task.Start.ToString("MM/dd/yyyy")
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="object" Title="End" Width="110px">
+            <Template Context="item">
+                @if (item is GanttResourceTask task)
+                {
+                    @task.End.ToString("MM/dd/yyyy")
+                }
+            </Template>
+        </RadzenDataGridColumn>
+    </ResourceColumns>
+</RadzenGantt>
+
+@code {
+    GanttViewMode viewMode = GanttViewMode.Resource;
+    RadzenGantt<GanttResourceTask> gantt;
+    bool hierarchy = true;
+    bool showUnassigned = true;
+    bool showHistogram = true;
+
+    async Task OnViewModeChanged(GanttViewMode value)
+    {
+        viewMode = value;
+    }
+
+    async Task OnOptionsChanged(bool value)
+    {
+        StateHasChanged();
+        await Task.Yield();
+        await gantt.Reload();
+    }
+
+    static readonly Dictionary<int, string> resourceColors = new()
+    {
+        [1] = "resource-alice",
+        [2] = "resource-bob",
+        [3] = "resource-carol",
+        [4] = "resource-dave",
+        [10] = "resource-group",
+        [20] = "resource-group",
+        [30] = "resource-group",
+    };
+
+    void OnTaskRender(GanttBarRenderEventArgs<GanttResourceTask> args)
+    {
+        if (resourceColors.TryGetValue(args.Data.ResourceId, out var css))
+        {
+            args.CssClass = css;
+        }
+    }
+
+    List<GanttDependency<GanttResourceTask>> dependencies = new();
+
+    protected override void OnInitialized()
+    {
+        dependencies = new()
+        {
+            // Backend: Auth API -> Data layer
+            new() { From = tasks[3], To = tasks[4] },
+            // Frontend: Wireframes -> UI mockups -> Theme polish
+            new() { From = tasks[6], To = tasks[7] },
+            new() { From = tasks[7], To = tasks[8] },
+            // Integration: Payment module -> Bug fixes, Notifications -> Bug fixes
+            new() { From = tasks[9], To = tasks[11] },
+            new() { From = tasks[10], To = tasks[11] },
+            // QA: Test plan -> Regression
+            new() { From = tasks[12], To = tasks[13] },
+        };
+    }
+
+    List<GanttResource> resources = new()
+    {
+        new() { Id = 10, Name = "Engineering", Role = "Team" },
+        new() { Id = 20, Name = "Design", Role = "Team" },
+        new() { Id = 30, Name = "Quality", Role = "Team" },
+        new() { Id = 1, ParentId = 10, Name = "Alice", Role = "Developer" },
+        new() { Id = 3, ParentId = 10, Name = "Carol", Role = "Developer" },
+        new() { Id = 2, ParentId = 20, Name = "Bob", Role = "Designer" },
+        new() { Id = 4, ParentId = 30, Name = "Dave", Role = "QA" },
+    };
+
+    List<GanttResourceTask> tasks = new()
+    {
+        // Phase parent tasks assigned to teams (summary rows in project view)
+        new() { Id = 1, ParentId = null, ResourceId = 10, Name = "Backend", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(12) },
+        new() { Id = 2, ParentId = null, ResourceId = 20, Name = "Frontend", Start = DateTime.Today.AddDays(-3), End = DateTime.Today.AddDays(10) },
+        new() { Id = 15, ParentId = null, ResourceId = 10, Name = "Integration", Start = DateTime.Today, End = DateTime.Today.AddDays(14) },
+        // Backend child tasks (Alice)
+        new() { Id = 3, ParentId = 1, ResourceId = 1, Name = "Auth API", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(4), Progress = 80 },
+        new() { Id = 4, ParentId = 1, ResourceId = 1, Name = "Data layer", Start = DateTime.Today.AddDays(5), End = DateTime.Today.AddDays(12), Progress = 20 },
+        new() { Id = 5, ParentId = 1, ResourceId = 1, Name = "Code review", Start = DateTime.Today.AddDays(3), End = DateTime.Today.AddDays(6), Progress = 0 },
+
+        // Frontend child tasks (Bob)
+        new() { Id = 6, ParentId = 2, ResourceId = 2, Name = "Wireframes", Start = DateTime.Today.AddDays(-3), End = DateTime.Today.AddDays(2), Progress = 100 },
+        new() { Id = 7, ParentId = 2, ResourceId = 2, Name = "UI mockups", Start = DateTime.Today.AddDays(2), End = DateTime.Today.AddDays(8), Progress = 50 },
+        new() { Id = 8, ParentId = 2, ResourceId = 2, Name = "Theme polish", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(10), Progress = 0 },
+
+        // Integration child tasks (Carol)
+        new() { Id = 9, ParentId = 15, ResourceId = 3, Name = "Payment module", Start = DateTime.Today, End = DateTime.Today.AddDays(8), Progress = 40 },
+        new() { Id = 10, ParentId = 15, ResourceId = 3, Name = "Notifications", Start = DateTime.Today.AddDays(2), End = DateTime.Today.AddDays(7), Progress = 15 },
+        new() { Id = 11, ParentId = 15, ResourceId = 3, Name = "Bug fixes", Start = DateTime.Today.AddDays(9), End = DateTime.Today.AddDays(14), Progress = 0 },
+
+        // QA tasks (Dave — top-level, no parent)
+        new() { Id = 12, ParentId = null, ResourceId = 4, Name = "Test plan", Start = DateTime.Today.AddDays(5), End = DateTime.Today.AddDays(8), Progress = 60 },
+        new() { Id = 13, ParentId = null, ResourceId = 4, Name = "Regression", Start = DateTime.Today.AddDays(9), End = DateTime.Today.AddDays(14), Progress = 0 },
+        new() { Id = 14, ParentId = null, ResourceId = 4, Name = "Load testing", Start = DateTime.Today.AddDays(7), End = DateTime.Today.AddDays(11), Progress = 10 },
+
+        // Not assigned to any resource — shown in the Unassigned row
+        new() { Id = 16, ParentId = null, ResourceId = 0, Name = "Security audit", Start = DateTime.Today.AddDays(4), End = DateTime.Today.AddDays(9), Progress = 0 },
+    };
+}
