@@ -87,6 +87,16 @@
     <DatePickerInitialViewDate />
 </RadzenExample>
 
+<RadzenText Anchor="datepicker#drill-down-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    DatePicker with drill-down navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>NavigationMode="DatePickerNavigationMode.DrillDown"</code> to replace the month and year drop-downs with a clickable calendar title that drills up to a month grid and a year grid.
+</RadzenText>
+<RadzenExample ComponentName="DatePicker" Example="DatePickerDrillDown">
+    <DatePickerDrillDown />
+</RadzenExample>
+
 <RadzenText Anchor="datepicker#min-max-dates" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Set Min and Max dates
 </RadzenText>
@@ -215,6 +225,9 @@
         new KeyboardShortcut { Key = "Shift + PageUp on open popup", Action = "Move focus to the same day of the previous year." },
         new KeyboardShortcut { Key = "Shift + PageDown on open popup", Action = "Move focus to the same day of the next year." },
         new KeyboardShortcut { Key = "Enter or Space in an opened popup", Action = "Select the focused day and close the popup." },
+        new KeyboardShortcut { Key = "Enter or Space on the calendar title (drill-down navigation)", Action = "Drill up to month selection, then to year selection." },
+        new KeyboardShortcut { Key = "Arrow keys in month or year selection (drill-down navigation)", Action = "Move focus between months or years." },
+        new KeyboardShortcut { Key = "PageUp or PageDown in month or year selection (drill-down navigation)", Action = "Move focus to the previous or next year or page of years." },
         new KeyboardShortcut { Key = "Esc in an opened popup", Action = "Close the popup." }
     };
 }

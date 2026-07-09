@@ -34,6 +34,8 @@ $datepicker-calendar-selected-color: var(--rz-on-secondary-dark) !default;
 $datepicker-calendar-selected-background-color: var(--rz-secondary-dark) !default;
 $datepicker-calendar-selected-hover-color: var(--rz-on-secondary) !default;
 $datepicker-calendar-selected-hover-background-color: var(--rz-secondary) !default;
+$datepicker-calendar-range-color: var(--rz-on-secondary-lighter) !default;
+$datepicker-calendar-range-background-color: var(--rz-secondary-lighter) !default;
 $datepicker-calendar-border: var(--rz-border-base-100) !default;
 $datepicker-calendar-border-radius: 0 !default;
 $datepicker-calendar-transition: var(--rz-transition-all) !default;
@@ -224,7 +226,9 @@ $timepicker-border: none !default;
 }
 
 .rz-calendar-prev,
-.rz-calendar-next {
+.rz-calendar-next,
+.rz-calendar-prev-year,
+.rz-calendar-next-year {
   border-radius: var(--rz-datepicker-prev-next-button-border-radius);
 
   .rzi {
@@ -237,6 +241,18 @@ $timepicker-border: none !default;
     *[dir="rtl"] & {
       transform: rotate(180deg);
     }
+  }
+}
+
+.rz-calendar-prev-year {
+  .rz-calendar-prev-year-icon:before {
+    content: 'keyboard_double_arrow_left';
+  }
+}
+
+.rz-calendar-next-year {
+  .rz-calendar-next-year-icon:before {
+    content: 'keyboard_double_arrow_right';
   }
 }
 
@@ -271,6 +287,137 @@ $timepicker-border: none !default;
 .rz-calendar-year-dropdown {
   width: var(--rz-datepicker-year-dropdown-width);
 }
+
+.rz-calendar-views {
+  display: flex;
+  align-items: flex-start;
+}
+
+.rz-calendar-view-panel {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.rz-calendar-panel-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rz-datepicker-header-color);
+  background-color: var(--rz-datepicker-header-background-color);
+  border-bottom: var(--rz-datepicker-header-border);
+  padding-block: var(--rz-datepicker-header-padding-block);
+  padding-inline: var(--rz-datepicker-header-padding-inline);
+}
+
+.rz-calendar-panel-nav {
+  display: flex;
+  align-items: center;
+  flex: none;
+
+  .rz-calendar-prev,
+  .rz-calendar-next {
+    order: 0;
+  }
+}
+
+.rz-calendar-month-title {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  font-size: var(--rz-datepicker-calendar-font-size);
+  color: var(--rz-datepicker-header-color);
+  line-height: 2.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.rz-calendar-title-button {
+    display: block;
+  }
+}
+
+.rz-calendar-title-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: transparent;
+  color: var(--rz-datepicker-header-color);
+  font-size: var(--rz-datepicker-calendar-font-size);
+  line-height: 2.25rem;
+  padding-block: 0;
+  padding-inline: 0.75rem;
+  border-radius: var(--rz-border-radius);
+  cursor: pointer;
+  transition: var(--rz-datepicker-calendar-transition);
+
+  &:hover:not(:disabled) {
+    color: var(--rz-datepicker-calendar-hover-color);
+    background-color: var(--rz-datepicker-calendar-hover-background-color);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-datepicker-focus-outline);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.rz-calendar-months,
+.rz-calendar-years {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  min-height: 16rem;
+  max-width: 26rem;
+  margin-inline: auto;
+}
+
+.rz-calendar-month-cell,
+.rz-calendar-year-cell {
+  border: none;
+  background-color: transparent;
+  color: var(--rz-datepicker-calendar-color);
+  font-size: var(--rz-datepicker-calendar-font-size);
+  padding: var(--rz-datepicker-calendar-item-padding);
+  border-radius: var(--rz-border-radius);
+  cursor: pointer;
+  transition: var(--rz-datepicker-calendar-transition);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover:not(:disabled) {
+    color: var(--rz-datepicker-calendar-hover-color);
+    background-color: var(--rz-datepicker-calendar-hover-background-color);
+  }
+
+  &.rz-state-active {
+    color: var(--rz-datepicker-calendar-selected-color);
+    background-color: var(--rz-datepicker-calendar-selected-background-color);
+
+    &:hover:not(:disabled) {
+      color: var(--rz-datepicker-calendar-selected-hover-color);
+      background-color: var(--rz-datepicker-calendar-selected-hover-background-color);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: var(--rz-datepicker-focus-outline);
+    outline-offset: calc(-1 * var(--rz-outline-width));
+  }
+}
+
 
 .rz-calendar-view-container {
   padding-block: var(--rz-datepicker-calendar-padding-block);
@@ -326,6 +473,12 @@ $timepicker-border: none !default;
         background-color: var(--rz-datepicker-calendar-today-background-color);
         box-shadow: var(--rz-datepicker-calendar-today-box-shadow);
         border-radius: var(--rz-datepicker-calendar-today-border-radius);
+      }
+
+      &.rz-calendar-range {
+        color: var(--rz-datepicker-calendar-range-color);
+        background-color: var(--rz-datepicker-calendar-range-background-color);
+        border-radius: 0;
       }
 
       &.rz-state-focused,

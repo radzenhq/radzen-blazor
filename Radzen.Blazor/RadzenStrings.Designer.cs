@@ -708,6 +708,10 @@ namespace Radzen.Blazor {
         public static string DatePicker_TodayAriaLabel { get { return ResourceManager.GetString("DatePicker_TodayAriaLabel", resourceCulture); } }
         public static string DatePicker_SelectedAriaLabel { get { return ResourceManager.GetString("DatePicker_SelectedAriaLabel", resourceCulture); } }
         public static string DatePicker_DisabledAriaLabel { get { return ResourceManager.GetString("DatePicker_DisabledAriaLabel", resourceCulture); } }
+        public static string DatePicker_RangeStartAriaLabel { get { return ResourceManager.GetString("DatePicker_RangeStartAriaLabel", resourceCulture); } }
+        public static string DatePicker_RangeEndAriaLabel { get { return ResourceManager.GetString("DatePicker_RangeEndAriaLabel", resourceCulture); } }
+        public static string DatePicker_PrevYearAriaLabel { get { return ResourceManager.GetString("DatePicker_PrevYearAriaLabel", resourceCulture); } }
+        public static string DatePicker_NextYearAriaLabel { get { return ResourceManager.GetString("DatePicker_NextYearAriaLabel", resourceCulture); } }
         public static string HtmlEditorFormatBlock_Placeholder { get { return ResourceManager.GetString("HtmlEditorFormatBlock_Placeholder", resourceCulture); } }
         public static string HtmlEditorFormatBlock_Title { get { return ResourceManager.GetString("HtmlEditorFormatBlock_Title", resourceCulture); } }
         public static string HtmlEditorFormatBlock_NormalText { get { return ResourceManager.GetString("HtmlEditorFormatBlock_NormalText", resourceCulture); } }
