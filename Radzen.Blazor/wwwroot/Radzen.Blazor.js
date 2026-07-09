@@ -1139,6 +1139,7 @@ window.Radzen = {
 
       var close = function () {
           commit(state.input);
+          state.last = state.input;
           state.input = null;
           state.value = null;
           if (state.shift) {
@@ -1173,7 +1174,22 @@ window.Radzen = {
           }, 100);
       };
 
+      var findTarget = function () {
+          if (state.last && el.contains(state.last) && isEditable(state.last)) return state.last;
+          var inputs = el.querySelectorAll('input, textarea');
+          for (var i = 0; i < inputs.length; i++) {
+              if (!panel.contains(inputs[i]) && isEditable(inputs[i])) return inputs[i];
+          }
+          return null;
+      };
+
       var executeKey = function (key) {
+          if (!state.input && isInline()) {
+              var target = findTarget();
+              if (target) {
+                  target.focus();
+              }
+          }
           if (!state.input) return;
 
           var action = key.getAttribute('data-vk-action');
