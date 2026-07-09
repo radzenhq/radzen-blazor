@@ -48,8 +48,9 @@
                 @for (var row = 0; row < RowCount; row++)
                 {
                     appointmentsByRow.TryGetValue(row, out var rowAppointments);
+                    var effectiveRowHeight = GetEffectiveRowHeight(row);
                     <tr class="rz-gantt-table-row">
-                        <td class="rz-gantt-table-cell" colspan="@Columns.Count" style="@($"height:{RowHeightPx}px;")">
+                        <td class="rz-gantt-table-cell" colspan="@Columns.Count" style="@($"height:{effectiveRowHeight}px;")">
                             <div class="rz-gantt-row-container" style="@($"width:{TimelineWidthPx}px;font-size:{RowHeightPx}px;")">
                                 <div class="rz-gantt-row-grid" style="@($"width:{TimelineWidthPx}px;")">
                                     @foreach (var column in Columns)
@@ -62,10 +63,11 @@
                                 {
                                     foreach (var appointment in rowAppointments)
                                     {
+                                        var lane = GetLane(appointment);
                                         var baselinePlacement = GetBaselinePlacement(appointment);
                                         if (baselinePlacement.HasValue)
                                         {
-                                            <div class="rz-gantt-baseline" style="@($"inset-inline-start:{baselinePlacement.Value.LeftPercent.ToInvariantString()}%;width:{baselinePlacement.Value.WidthPercent.ToInvariantString()}%;inset-block-start:0.65em;height:0.2em;")" />
+                                            <div class="rz-gantt-baseline" style="@($"inset-inline-start:{baselinePlacement.Value.LeftPercent.ToInvariantString()}%;width:{baselinePlacement.Value.WidthPercent.ToInvariantString()}%;inset-block-start:{(lane + 0.65).ToInvariantString()}em;height:0.2em;")" />
                                         }
 
                                         var isCritical = CriticalItems != null && appointment.Data != null && CriticalItems.Contains(appointment.Data);
@@ -77,7 +79,7 @@
                                             if (leftPercent.HasValue)
                                             {
                                                 <Appointment Data=@appointment
-                                                             Top="0.2"
+                                                             Top="@(lane + 0.2)"
                                                              Left=@leftPercent.Value
                                                              CssClass="@barRenderArgs.barCss"
                                                              ShowAppointmentContent="false"
@@ -92,7 +94,7 @@
                                             if (placement.HasValue)
                                             {
                                                 <Appointment Data=@appointment
-                                                             Top="@(baselinePlacement.HasValue ? 0.1 : 0.2)"
+                                                             Top="@(baselinePlacement.HasValue ? lane + 0.1 : lane + 0.2)"
                                                              Left=@placement.Value.LeftPercent
                                                              Width=@placement.Value.WidthPercent
                                                              Height="@(baselinePlacement.HasValue ? 0.55 : 0.6)"
@@ -110,7 +112,7 @@
                 }
             </tbody>
         </table>
-        <svg class="rz-gantt-links" style="@($"width:{TimelineWidthPx}px;height:{RowCount * RowHeightPx}px;")">
+        <svg class="rz-gantt-links" style="@($"width:{TimelineWidthPx}px;height:{GetTotalHeight()}px;")">
             <defs>
                 <marker id="rz-gantt-link-arrow-end" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                     <path d="M0,0 L6,3 L0,6 Z" class="rz-gantt-link-arrow" />
@@ -157,6 +159,31 @@
         }
       </div>
     </div>
+    @if (Gantt?.ShowHistogram == true)
+    {
+        var histogramValues = BuildHistogramValues();
+        var histogramCapacity = Gantt?.HistogramCapacity;
+        var histogramMax = GetHistogramMax(histogramValues, histogramCapacity);
+        <div class="rz-gantt-histogram-scroll">
+            <div class="rz-gantt-histogram" role="img" aria-label="@Gantt?.HistogramLabel" style="@($"width:{TimelineWidthPx.ToInvariantString()}px;")">
+                @if (histogramMax > 0)
+                {
+                    @for (var i = 0; i < Columns.Count; i++)
+                    {
+                        var histogramValue = histogramValues[i];
+                        var isOverCapacity = histogramCapacity.HasValue && histogramValue > histogramCapacity.Value;
+                        <div class="@(isOverCapacity ? "rz-gantt-histogram-bar rz-gantt-histogram-bar-over" : "rz-gantt-histogram-bar")"
+                             style="@($"width:{Columns[i].WidthPx.ToInvariantString()}px;height:{(histogramValue / histogramMax * 100).ToInvariantString()}%;")"
+                             title="@($"{Columns[i].Label}: {histogramValue.ToString(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)}")"></div>
+                    }
+                    @if (histogramCapacity.HasValue && histogramCapacity.Value <= histogramMax)
+                    {
+                        <div class="rz-gantt-histogram-capacity" style="@($"inset-block-end:{(histogramCapacity.Value / histogramMax * 100).ToInvariantString()}%;width:{TimelineWidthPx.ToInvariantString()}px;")"></div>
+                    }
+                }
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -214,6 +241,22 @@
     [Parameter]
     public Action<GanttBarRenderEventArgs<TItem>>? TaskRender { get; set; }
 
+    /// <summary>
+    /// Optional lane assignment per item for resource view stacking.
+    /// Maps each appointment data object to its lane index within the row.
+    /// When null, all items render in lane 0 (default task view behavior).
+    /// </summary>
+    [Parameter]
+    public IReadOnlyDictionary<object, int>? LaneByItem { get; set; }
+
+    /// <summary>
+    /// Optional lane count per row for resource view stacking.
+    /// Maps each row index to the number of lanes needed. Rows with more lanes get taller.
+    /// When null, all rows use <see cref="RowHeightPx"/> (default task view behavior).
+    /// </summary>
+    [Parameter]
+    public IReadOnlyDictionary<int, int>? LaneCountByRow { get; set; }
+
     [CascadingParameter]
     public IScheduler? Scheduler { get; set; }
 
@@ -226,6 +269,86 @@
     private DotNetObjectReference<GanttTimelineView<TItem>>? dotnetRef;
 
     private static bool IsMilestone(AppointmentData appointment) => appointment.Start == appointment.End;
+
+    private int GetEffectiveRowHeight(int row)
+    {
+        if (LaneCountByRow != null && LaneCountByRow.TryGetValue(row, out var count) && count > 1)
+        {
+            return RowHeightPx * count;
+        }
+        return RowHeightPx;
+    }
+
+    private int GetLane(AppointmentData appointment)
+    {
+        if (LaneByItem != null && appointment.Data != null && LaneByItem.TryGetValue(appointment.Data, out var lane))
+        {
+            return lane;
+        }
+        return 0;
+    }
+
+    private double GetRowStartY(int row)
+    {
+        double y = 0;
+        for (int i = 0; i < row; i++)
+        {
+            y += GetEffectiveRowHeight(i);
+        }
+        return y;
+    }
+
+    private double GetTotalHeight()
+    {
+        double h = 0;
+        for (int i = 0; i < RowCount; i++)
+        {
+            h += GetEffectiveRowHeight(i);
+        }
+        return h;
+    }
+
+    private double GetItemCenterY(int row, object? item)
+    {
+        var y = GetRowStartY(row);
+        if (item != null && LaneByItem != null && LaneByItem.TryGetValue(item, out var lane))
+        {
+            return y + ((lane + 0.5) * RowHeightPx);
+        }
+        return y + (GetEffectiveRowHeight(row) * 0.5);
+    }
+
+    private double[] BuildHistogramValues()
+    {
+        var columns = new List<(DateTime Start, DateTime End)>(Columns.Count);
+        foreach (var column in Columns)
+        {
+            columns.Add((column.Start, column.End));
+        }
+
+        var valueGetter = Gantt?.TimelineHistogramValueGetter;
+        var items = new List<(DateTime Start, DateTime End, double Value)>();
+        foreach (var appointment in Appointments ?? Enumerable.Empty<AppointmentData>())
+        {
+            var value = valueGetter != null && appointment.Data != null ? valueGetter(appointment.Data) : 1;
+            items.Add((appointment.Start, appointment.End, value));
+        }
+
+        return GanttHistogramLayout.Compute(columns, items);
+    }
+
+    private static double GetHistogramMax(double[] values, double? capacity)
+    {
+        var max = capacity ?? 0;
+        foreach (var value in values)
+        {
+            if (value > max)
+            {
+                max = value;
+            }
+        }
+        return max;
+    }
 
     private (string barCss, IDictionary<string, object>? extraAttrs) GetBarRenderArgs(AppointmentData appointment, bool isCritical)
     {
@@ -572,8 +695,8 @@
                 continue;
             }
 
-            var y1 = (fromRow * RowHeightPx) + (RowHeightPx * 0.5);
-            var y2 = (toRow * RowHeightPx) + (RowHeightPx * 0.5);
+            var y1 = GetItemCenterY(fromRow, dependency.From);
+            var y2 = GetItemCenterY(toRow, dependency.To);
             var isCriticalLink = CriticalItems != null && CriticalItems.Contains(dependency.From) && CriticalItems.Contains(dependency.To);
             var cssClass = isCriticalLink ? "rz-gantt-link rz-gantt-link-critical" : null;
             links.Add(new GanttLink(x1.Value, y1, x2.Value, y2, fromIdx, toIdx, type, cssClass));
