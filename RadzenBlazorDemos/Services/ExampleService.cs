@@ -3457,6 +3457,15 @@ namespace RadzenBlazorDemos
                             Title = "Blazor Gantt Customization | Free UI Components by Radzen",
                             Description = "Customize the Gantt with a today line, weekend shading, vertical markers, per-bar styling via TaskRender, and custom bar templates.",
                             Tags = new[] { "gantt", "today", "marker", "weekend", "taskrender", "template", "customize" }
+                        },
+                        new Example
+                        {
+                            Name = "Resource View",
+                            New = true,
+                            Path = "gantt-resource-view",
+                            Title = "Blazor Gantt Resource View | Free UI Components by Radzen",
+                            Description = "Display tasks grouped by resource. Overlapping tasks on the same resource are automatically stacked in lanes. Supports hierarchical resources, an unassigned tasks row and a workload histogram with capacity line.",
+                            Tags = new[] { "gantt", "resource", "view", "lane", "stacking", "overlap", "people", "assignment", "hierarchy", "histogram", "workload", "capacity", "unassigned" }
                         }
                     }
                 },

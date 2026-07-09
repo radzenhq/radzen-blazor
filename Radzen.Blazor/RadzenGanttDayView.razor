@@ -9,9 +9,10 @@
 
     public override string Icon => "calendar_view_day";
 
-    [Parameter]
-    public override string Text { get => text ?? Localize(nameof(RadzenStrings.GanttDayView_Text)); set => text = value; }
     private string? text;
+
+    [Parameter]
+    public override string Text { get => text ?? Localize(nameof(RadzenStrings.Gantt_DayViewText)); set => text = value; }
 
     public override string Title
     {
@@ -69,6 +70,8 @@
                                NonWorkingDays=@(Gantt?.TimelineNonWorkingDays)
                                Markers=@(Gantt?.TimelineMarkers)
                                TaskRender=@(Gantt?.TimelineTaskRender)
+                               LaneByItem=@(Gantt?.LaneByItem)
+                               LaneCountByRow=@(Gantt?.LaneCountByRow)
                                AppointmentMove=OnAppointmentMove />
         </CascadingValue>;
     }

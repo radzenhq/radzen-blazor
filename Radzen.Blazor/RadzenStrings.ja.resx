@@ -1245,6 +1245,24 @@
   <data name="Gantt_IsNotEmptyText" xml:space="preserve">
     <value>空でない</value>
   </data>
+  <data name="Gantt_UnassignedText" xml:space="preserve">
+    <value>未割り当て</value>
+  </data>
+  <data name="Gantt_HistogramLabel" xml:space="preserve">
+    <value>作業負荷</value>
+  </data>
+  <data name="Gantt_DayViewText" xml:space="preserve">
+    <value>日</value>
+  </data>
+  <data name="Gantt_WeekViewText" xml:space="preserve">
+    <value>週</value>
+  </data>
+  <data name="Gantt_MonthViewText" xml:space="preserve">
+    <value>月</value>
+  </data>
+  <data name="Gantt_YearViewText" xml:space="preserve">
+    <value>年</value>
+  </data>
   <!-- Gravatar -->
   <data name="Gravatar_AlternateText" xml:space="preserve">
     <value>gravatar</value>

@@ -3495,8 +3495,9 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Equal("presentation", component.Find("table.rz-grid-table").GetAttribute("role"));
-            Assert.Equal("rowgroup", component.Find("thead").GetAttribute("role"));
-            Assert.Equal("rowgroup", component.Find("tbody").GetAttribute("role"));
+            Assert.Equal("rowgroup", component.Find("div.rz-data-grid-data").GetAttribute("role"));
+            Assert.Equal("presentation", component.Find("thead").GetAttribute("role"));
+            Assert.Equal("presentation", component.Find("tbody").GetAttribute("role"));
 
             var headerCell = component.Find("thead tr th");
             Assert.Equal("row", headerCell.ParentElement!.GetAttribute("role"));

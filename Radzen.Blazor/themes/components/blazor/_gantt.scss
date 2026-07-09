@@ -179,10 +179,58 @@ $gantt-event-border-radius: var(--rz-border-radius) !default;
 
   .rz-gantt-timeline-scroll {
     flex: 1 1 auto;
-    height: 100%;
+    min-height: 0;
     overflow-x: scroll;
     overflow-y: auto;
     background: var(--rz-base-background-color);
+  }
+
+  .rz-gantt-histogram-scroll {
+    flex: none;
+    overflow: hidden;
+    box-sizing: border-box;
+    height: var(--rz-gantt-histogram-height, 3.5rem);
+    border-top: var(--rz-gantt-border);
+    background: var(--rz-base-background-color);
+  }
+
+  .rz-gantt-histogram {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+  }
+
+  .rz-gantt-histogram-spacer {
+    box-sizing: border-box;
+    height: var(--rz-gantt-histogram-height, 3.5rem);
+    border-top: var(--rz-gantt-border);
+    border-inline-end: var(--rz-gantt-border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-inline: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--rz-text-secondary-color);
+    background: var(--rz-base-background-color);
+  }
+
+  .rz-gantt-histogram-bar {
+    flex: none;
+    box-sizing: border-box;
+    background: var(--rz-gantt-histogram-bar-background, var(--rz-primary-light));
+    border-inline-end: 1px solid var(--rz-base-background-color);
+  }
+
+  .rz-gantt-histogram-bar-over {
+    background: var(--rz-gantt-histogram-bar-over-background, var(--rz-danger));
+  }
+
+  .rz-gantt-histogram-capacity {
+    position: absolute;
+    inset-inline-start: 0;
+    border-top: 1px dashed var(--rz-gantt-histogram-capacity-color, var(--rz-danger));
+    pointer-events: none;
   }
 
   .rz-gantt-timeline-content {
