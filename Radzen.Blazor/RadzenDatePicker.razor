@@ -40,89 +40,185 @@
         <RadzenPopup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle
                Close="@OnPopupCloseFromEvent"
                role="dialog" aria-label="@PopupAriaLabel"
-               class="@($"{(Inline ? "rz-datepicker-inline-container " : "rz-datepicker-popup-container ")}")">
+               class="@($"{(Inline ? "rz-datepicker-inline-container " : "rz-datepicker-popup-container ")}{(MonthsToDisplay > 1 ? "rz-datepicker-multiple-months " : "")}")">
                 <div class="rz-calendar" @onkeydown="@OnPopupKeyDown">
                     @if (!TimeOnly)
                     {
+                        @if (MonthsToDisplay == 1 || currentView != CalendarViewKind.Days)
+                        {
                         <div class="rz-calendar-header">
-                            <button id="@(GetId() + "pm")" type="button" tabindex="-1" aria-label="@PrevMonthAriaLabel" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(() => { if (!Disabled) { try { var prev = Culture.Calendar.AddMonths(CurrentDate, -1); if(GetCalendarYear(prev) >= YearFrom) {CurrentDate = prev;}} catch (ArgumentOutOfRangeException) {}} })" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
+                            <button id="@(GetId() + "pm")" type="button" tabindex="-1" aria-label="@(currentView == CalendarViewKind.Days ? PrevMonthAriaLabel : PrevYearAriaLabel)" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(() => NavigateView(-1))" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
                                 <span class="notranslate rzi rz-calendar-prev-icon"></span>
                             </button>
-                            <button id="@(GetId() + "nm")" type="button" tabindex="-1" aria-label="@NextMonthAriaLabel" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(() => { if (!Disabled) { try { var next = Culture.Calendar.AddMonths(CurrentDate, 1); if(GetCalendarYear(next) <= YearTo) {CurrentDate = next;}} catch (ArgumentOutOfRangeException) {} } })" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
+                            <button id="@(GetId() + "nm")" type="button" tabindex="-1" aria-label="@(currentView == CalendarViewKind.Days ? NextMonthAriaLabel : NextYearAriaLabel)" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(() => NavigateView(1))" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
                                 <span class="notranslate rzi rz-calendar-next-icon"></span>
                             </button>
                             <div class="rz-calendar-title">
-                                <RadzenDropDown @ref="monthDropDown" class="rz-calendar-month-dropdown" TabIndex="@TabIndex"
-                                                TValue="int" Value="@GetCalendarMonth(CurrentDate)" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
-                                                Change="@((args) => { var argStr = args?.ToString(); if (!string.IsNullOrEmpty(argStr)) SetMonth(int.Parse(argStr!)); })"/>
-                                <RadzenDropDown @ref="yearDropDown" class="rz-calendar-year-dropdown" TabIndex="@TabIndex"
-                                                TValue="int" Value="@GetCalendarYear(CurrentDate)" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
-                                                Change="@((args) => { var argStr = args?.ToString(); if (!string.IsNullOrEmpty(argStr)) SetYear(int.Parse(argStr!)); })" />
+                                @if (NavigationMode == DatePickerNavigationMode.DrillDown)
+                                {
+                                    <button id="@(GetId() + "tb")" type="button" tabindex="@TabIndex" class="rz-calendar-title-button" @onclick="@OnTitleClick" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">@GetViewTitle()</button>
+                                }
+                                else
+                                {
+                                    <RadzenDropDown @ref="monthDropDown" class="rz-calendar-month-dropdown" TabIndex="@TabIndex"
+                                                    TValue="int" Value="@GetCalendarMonth(CurrentDate)" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
+                                                    Change="@((args) => { var argStr = args?.ToString(); if (!string.IsNullOrEmpty(argStr)) SetMonth(int.Parse(argStr!)); })"/>
+                                    <RadzenDropDown @ref="yearDropDown" class="rz-calendar-year-dropdown" TabIndex="@TabIndex"
+                                                    TValue="int" Value="@GetCalendarYear(CurrentDate)" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
+                                                    Change="@((args) => { var argStr = args?.ToString(); if (!string.IsNullOrEmpty(argStr)) SetYear(int.Parse(argStr!)); })" />
+                                }
                             </div>
                         </div>
+                        }
                         @if(ShowDays)
                         {
+                        @if (currentView == CalendarViewKind.Months)
+                        {
                         <div class="rz-calendar-view-container">
-                            <table class="rz-calendar-view rz-calendar-month-view" style="@(Inline ? "" : "width:100%")"
-                                   role="grid" aria-label="@GetCalendarAriaLabel()">
-                                <thead>
-                                    <tr role="row">
-                                        @if (ShowCalendarWeek)
-                                        {
-                                            <th scope="col" role="columnheader" class="rz-datepicker-week-number">
-                                                <span>@CalendarWeekTitle</span>
-                                            </th>
-                                        }
-                                        @foreach (var day in ShiftedDayNames)
-                                        {
-                                            <th scope="col" role="columnheader" abbr="@day.Full" aria-label="@day.Full">
-                                                <span aria-hidden="true">@day.Abbreviated</span>
-                                            </th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
-                                        int dayNumber = 0;
-                                    }
-                                    @for (int i = 0; i < 6; i++)
-                                    {
-                                        <tr role="row">
-                                            @if (ShowCalendarWeek)
-                                            {
-                                                <td class="rz-calendar-other-month rz-calendar-week-number">@Culture.Calendar.GetWeekOfYear(StartDate.AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
-                                            }
-                                            @for (int j = 0; j < 7; j++)
-                                            {
-                                                @if((DateTime.MaxValue - StartDate).TotalDays <= dayNumber)
-                                                {
-                                                    break;
-                                                }
-
-                                                DateTime date = StartDate.AddDays(dayNumber++);
-                                                var dateArgs = DateAttributes(date);
-                                                var isFocused = FocusedDate.Date == date.Date;
-                                                var cellDisabled = Disabled || dateArgs.Disabled;
-
-                                                <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)"
-                                                    id="@GetDayCellId(date)"
-                                                    role="gridcell"
-                                                    tabindex="@(isFocused && !cellDisabled ? "0" : "-1")"
-                                                    aria-label="@GetDayAriaLabel(date, dateArgs)"
-                                                    aria-selected="@(IsDateSelected(date) ? "true" : "false")"
-                                                    aria-disabled="@(dateArgs.Disabled ? "true" : null)"
-                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })"
-                                                    @onkeydown="@(args => OnDayKeyDown(args, date, dateArgs))"
-                                                    @onkeydown:preventDefault="preventKeyPress"
-                                                    @onkeydown:stopPropagation="stopKeydownPropagation">
-                                                    <span class=@GetDayCssClass(date, dateArgs, false)>@GetCalendarDayOfMonth(date)</span>
-                                                </td>
-                                            }
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                            <div class="rz-calendar-months" role="group" aria-label="@GetViewTitle()">
+                                @foreach (var month in MonthsInView)
+                                {
+                                    var isActiveMonth = month.Value == GetCalendarMonth(CurrentDate);
+                                    var monthDisabled = Disabled || IsMonthDisabled(month.Value);
+                                    <button type="button" id="@($"{GetId()}-month-{month.Value}")" class="@($"rz-calendar-month-cell{(isActiveMonth ? " rz-state-active" : "")}")" disabled="@monthDisabled" aria-disabled="@(monthDisabled ? "true" : "false")" aria-label="@($"{month.Name} {GetViewTitle()}")" aria-current="@(isActiveMonth ? "true" : null)" tabindex="@(isActiveMonth && !monthDisabled ? TabIndex : -1)"
+                                            @onclick="@(() => SelectViewMonth(month.Value))" @onkeydown="@OnMonthCellKeyDown" @onkeydown:preventDefault="preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation">@month.Name</button>
+                                }
+                            </div>
                         </div>
+                        }
+                        else if (currentView == CalendarViewKind.Years)
+                        {
+                        <div class="rz-calendar-view-container">
+                            <div class="rz-calendar-years" role="group" aria-label="@GetViewTitle()">
+                                @foreach (var year in YearsInView)
+                                {
+                                    var isActiveYear = year.Value == GetCalendarYear(CurrentDate);
+                                    <button type="button" id="@($"{GetId()}-year-{year.Value}")" class="@($"rz-calendar-year-cell{(isActiveYear ? " rz-state-active" : "")}")" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")" aria-current="@(isActiveYear ? "true" : null)" tabindex="@(isActiveYear ? TabIndex : -1)"
+                                            @onclick="@(() => SelectViewYear(year.Value))" @onkeydown="@OnYearCellKeyDown" @onkeydown:preventDefault="preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation">@year.Name</button>
+                                }
+                            </div>
+                        </div>
+                        }
+                        else
+                        {
+                        <div class="rz-calendar-views">
+                            @{
+                                var visibleMonthsList = VisibleMonths.ToList();
+                            }
+                            @for (var monthIndex = 0; monthIndex < visibleMonthsList.Count; monthIndex++)
+                            {
+                                var visibleMonth = visibleMonthsList[monthIndex];
+                                var monthStart = GetStartDate(visibleMonth);
+                                <div class="rz-calendar-view-panel">
+                                    @if (MonthsToDisplay > 1)
+                                    {
+                                        <div class="rz-calendar-panel-header">
+                                            @if (monthIndex == 0)
+                                            {
+                                                <div class="rz-calendar-panel-nav rz-calendar-panel-nav-start">
+                                                    <button id="@(GetId() + "py")" type="button" tabindex="-1" aria-label="@PrevYearAriaLabel" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev-year" @onclick="@(() => NavigateYear(-1))" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
+                                                        <span class="notranslate rzi rz-calendar-prev-year-icon"></span>
+                                                    </button>
+                                                    <button id="@(GetId() + "pm")" type="button" tabindex="-1" aria-label="@PrevMonthAriaLabel" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(() => NavigateMonth(-1))" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
+                                                        <span class="notranslate rzi rz-calendar-prev-icon"></span>
+                                                    </button>
+                                                </div>
+                                            }
+                                            @if (NavigationMode == DatePickerNavigationMode.DrillDown)
+                                            {
+                                                <button id="@(GetId() + "tb" + monthIndex)" type="button" tabindex="@TabIndex" class="rz-calendar-month-title rz-calendar-title-button" @onclick="@OnTitleClick" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">@GetMonthTitle(visibleMonth)</button>
+                                            }
+                                            else
+                                            {
+                                                <span class="rz-calendar-month-title" aria-hidden="true">@GetMonthTitle(visibleMonth)</span>
+                                            }
+                                            @if (monthIndex == visibleMonthsList.Count - 1)
+                                            {
+                                                <div class="rz-calendar-panel-nav rz-calendar-panel-nav-end">
+                                                    <button id="@(GetId() + "nm")" type="button" tabindex="-1" aria-label="@NextMonthAriaLabel" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(() => NavigateMonth(1))" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
+                                                        <span class="notranslate rzi rz-calendar-next-icon"></span>
+                                                    </button>
+                                                    <button id="@(GetId() + "ny")" type="button" tabindex="-1" aria-label="@NextYearAriaLabel" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next-year" @onclick="@(() => NavigateYear(1))" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
+                                                        <span class="notranslate rzi rz-calendar-next-year-icon"></span>
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    <div class="rz-calendar-view-container" @onmouseleave="@(IsRange ? (Action)OnCalendarMouseLeave : null!)">
+                                        <table class="rz-calendar-view rz-calendar-month-view" style="@(Inline ? "" : "width:100%")"
+                                               role="grid" aria-label="@GetMonthTitle(visibleMonth)">
+                                            <thead>
+                                                <tr role="row">
+                                                    @if (ShowCalendarWeek)
+                                                    {
+                                                        <th scope="col" role="columnheader" class="rz-datepicker-week-number">
+                                                            <span>@CalendarWeekTitle</span>
+                                                        </th>
+                                                    }
+                                                    @foreach (var day in ShiftedDayNames)
+                                                    {
+                                                        <th scope="col" role="columnheader" abbr="@day.Full" aria-label="@day.Full">
+                                                            <span aria-hidden="true">@day.Abbreviated</span>
+                                                        </th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    int dayNumber = 0;
+                                                }
+                                                @for (int i = 0; i < 6; i++)
+                                                {
+                                                    <tr role="row">
+                                                        @if (ShowCalendarWeek)
+                                                        {
+                                                            <td class="rz-calendar-other-month rz-calendar-week-number">@Culture.Calendar.GetWeekOfYear(monthStart.AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
+                                                        }
+                                                        @for (int j = 0; j < 7; j++)
+                                                        {
+                                                            @if((DateTime.MaxValue - monthStart).TotalDays <= dayNumber)
+                                                            {
+                                                                break;
+                                                            }
+
+                                                            DateTime date = monthStart.AddDays(dayNumber++);
+
+                                                            @if (MonthsToDisplay > 1 && GetCalendarMonth(visibleMonth) != GetCalendarMonth(date))
+                                                            {
+                                                                <td role="gridcell" class="rz-calendar-other-month"></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                var dateArgs = DateAttributes(date);
+                                                                var isFocused = FocusedDate.Date == date.Date;
+                                                                var cellDisabled = Disabled || dateArgs.Disabled;
+
+                                                                <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs, visibleMonth, true)"
+                                                                    id="@GetDayCellId(date)"
+                                                                    role="gridcell"
+                                                                    tabindex="@(isFocused && !cellDisabled ? "0" : "-1")"
+                                                                    aria-label="@GetDayAriaLabel(date, dateArgs)"
+                                                                    aria-selected="@(IsDateSelected(date) ? "true" : "false")"
+                                                                    aria-disabled="@(dateArgs.Disabled ? "true" : null)"
+                                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })"
+                                                                    @onmouseover="@(IsRange && !cellDisabled ? (Action)(() => OnDayMouseOver(date)) : null!)"
+                                                                    @onkeydown="@(args => OnDayKeyDown(args, date, dateArgs))"
+                                                                    @onkeydown:preventDefault="preventKeyPress"
+                                                                    @onkeydown:stopPropagation="stopKeydownPropagation">
+                                                                    <span class=@GetDayCssClass(date, dateArgs, visibleMonth, false)>@GetCalendarDayOfMonth(date)</span>
+                                                                </td>
+                                                            }
+                                                        }
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        }
                         }
                         @if (FooterTemplate != null)
                         {
@@ -132,7 +228,7 @@
                         }
                     }
                 </div>
-                @if (ShowTime)
+                @if (ShowTime && !IsRange)
                 {
                 <div class="rz-timepicker" @onmousedown:stopPropagation>
                         @if (ShowHour)

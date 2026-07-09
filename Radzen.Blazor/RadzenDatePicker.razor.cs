@@ -66,6 +66,389 @@ namespace Radzen.Blazor
         // Holds selected dates when Multiple is true
         List<DateTime> selectedDates = new List<DateTime>();
 
+        internal virtual bool IsRange => false;
+
+        internal virtual string RangeSeparatorText => " - ";
+
+        internal virtual int MonthsToDisplay => 1;
+
+        internal IEnumerable<DateTime> VisibleMonths
+        {
+            get
+            {
+                var current = CurrentDate;
+
+                yield return current;
+
+                for (var i = 1; i < MonthsToDisplay; i++)
+                {
+                    DateTime next;
+
+                    try
+                    {
+                        next = Culture.Calendar.AddMonths(current, 1);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        yield break;
+                    }
+
+                    current = next;
+
+                    yield return current;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets how users change the displayed month and year in the calendar.
+        /// <see cref="DatePickerNavigationMode.DropDown" /> displays month and year drop-downs in the calendar header.
+        /// <see cref="DatePickerNavigationMode.DrillDown" /> makes the calendar title a button which drills up to a month grid and a year grid.
+        /// </summary>
+        /// <value>The navigation mode. Default is <see cref="DatePickerNavigationMode.DropDown" /> for <see cref="RadzenDatePicker{TValue}" /> and <see cref="DatePickerNavigationMode.DrillDown" /> for <see cref="RadzenDateRangePicker" />.</value>
+        [Parameter]
+        public DatePickerNavigationMode NavigationMode { get; set; } = DatePickerNavigationMode.DropDown;
+
+        internal enum CalendarViewKind
+        {
+            Days,
+            Months,
+            Years
+        }
+
+        CalendarViewKind currentView = CalendarViewKind.Days;
+
+        internal CalendarViewKind CurrentView => currentView;
+
+        const int YearsPerPage = 12;
+
+        int YearsPageStart
+        {
+            get
+            {
+                var year = GetCalendarYear(CurrentDate);
+
+                if (year < YearFrom)
+                {
+                    return YearFrom;
+                }
+
+                return YearFrom + (year - YearFrom) / YearsPerPage * YearsPerPage;
+            }
+        }
+
+        bool shouldFocusTitle;
+
+        internal void OnTitleClick()
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            if (currentView == CalendarViewKind.Days)
+            {
+                currentView = CalendarViewKind.Months;
+                shouldFocusTitle = MonthsToDisplay > 1;
+            }
+            else if (currentView == CalendarViewKind.Months)
+            {
+                currentView = CalendarViewKind.Years;
+            }
+        }
+
+        internal void SelectViewMonth(int calendarMonth)
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            SetMonth(calendarMonth);
+            currentView = CalendarViewKind.Days;
+            shouldFocusDay = true;
+        }
+
+        internal void SelectViewYear(int calendarYear)
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            SetYear(calendarYear);
+            currentView = CalendarViewKind.Months;
+            shouldFocusTitle = true;
+        }
+
+        internal void NavigateView(int direction)
+        {
+            if (currentView == CalendarViewKind.Days)
+            {
+                NavigateMonth(direction);
+            }
+            else if (currentView == CalendarViewKind.Months)
+            {
+                NavigateYear(direction);
+            }
+            else
+            {
+                NavigateYearsPage(direction);
+            }
+        }
+
+        void NavigateYearsPage(int direction)
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            var year = GetCalendarYear(CurrentDate);
+            var target = Math.Min(Math.Max(year + direction * YearsPerPage, YearFrom), YearTo);
+
+            if (target != year)
+            {
+                SetYear(target);
+            }
+        }
+
+        internal string GetViewTitle()
+        {
+            var formatYear = YearFormatter ?? FormatYear;
+
+            if (currentView == CalendarViewKind.Months)
+            {
+                return formatYear(GetCalendarYear(CurrentDate));
+            }
+
+            if (currentView == CalendarViewKind.Years)
+            {
+                var start = YearsPageStart;
+                var end = Math.Min(start + YearsPerPage - 1, YearTo);
+
+                return start == end ? formatYear(start) : $"{formatYear(start)} - {formatYear(end)}";
+            }
+
+            return GetMonthTitle(CurrentDate);
+        }
+
+        internal bool IsMonthDisabled(int calendarMonth)
+        {
+            if (!Min.HasValue && !Max.HasValue)
+            {
+                return false;
+            }
+
+            var calendar = Culture.Calendar;
+            var calYear = GetCalendarYear(CurrentDate);
+            var first = new DateTime(calYear, calendarMonth, 1, calendar);
+            var last = first.AddDays(calendar.GetDaysInMonth(calYear, calendarMonth) - 1);
+
+            return (Min.HasValue && last < Min.Value.Date) || (Max.HasValue && first > Max.Value.Date);
+        }
+
+        internal IEnumerable<(string Name, int Value)> MonthsInView => months.Select(m => (m.Name ?? string.Empty, m.Value));
+
+        internal IEnumerable<(string Name, int Value)> YearsInView =>
+            years.Where(y => y.Value >= YearsPageStart && y.Value < YearsPageStart + YearsPerPage).Select(y => (y.Name ?? string.Empty, y.Value));
+
+        void ResetView()
+        {
+            currentView = CalendarViewKind.Days;
+        }
+
+        bool shouldFocusMonthCell;
+        bool shouldFocusYearCell;
+
+        void OnMonthCellKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            var delta = key switch
+            {
+                "ArrowLeft" => -1,
+                "ArrowRight" => 1,
+                "ArrowUp" => -3,
+                "ArrowDown" => 3,
+                _ => 0
+            };
+
+            if (delta != 0)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+                NavigateMonth(delta);
+                shouldFocusMonthCell = true;
+                return;
+            }
+
+            if (key == "PageUp" || key == "PageDown")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+                NavigateYear(key == "PageUp" ? -1 : 1);
+                shouldFocusMonthCell = true;
+                return;
+            }
+
+            if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+                SetMonth(key == "Home" ? 1 : Culture.Calendar.GetMonthsInYear(GetCalendarYear(CurrentDate)));
+                shouldFocusMonthCell = true;
+                return;
+            }
+
+            preventKeyPress = false;
+            stopKeydownPropagation = false;
+        }
+
+        void OnYearCellKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+
+            var delta = key switch
+            {
+                "ArrowLeft" => -1,
+                "ArrowRight" => 1,
+                "ArrowUp" => -3,
+                "ArrowDown" => 3,
+                _ => 0
+            };
+
+            if (delta != 0)
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+                NavigateYear(delta);
+                shouldFocusYearCell = true;
+                return;
+            }
+
+            if (key == "PageUp" || key == "PageDown")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+                NavigateYearsPage(key == "PageUp" ? -1 : 1);
+                shouldFocusYearCell = true;
+                return;
+            }
+
+            if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+                stopKeydownPropagation = true;
+
+                var target = key == "Home" ? YearsPageStart : Math.Min(YearsPageStart + YearsPerPage - 1, YearTo);
+
+                if (target != GetCalendarYear(CurrentDate))
+                {
+                    SetYear(target);
+                }
+
+                shouldFocusYearCell = true;
+                return;
+            }
+
+            preventKeyPress = false;
+            stopKeydownPropagation = false;
+        }
+
+        internal void NavigateMonth(int direction)
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            try
+            {
+                var next = Culture.Calendar.AddMonths(CurrentDate, direction);
+                var year = GetCalendarYear(next);
+
+                if (direction < 0 ? year >= YearFrom : year <= YearTo)
+                {
+                    CurrentDate = next;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+            }
+        }
+
+        internal void NavigateYear(int direction)
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            try
+            {
+                var next = Culture.Calendar.AddYears(CurrentDate, direction);
+                var year = GetCalendarYear(next);
+
+                if (year >= YearFrom && year <= YearTo)
+                {
+                    CurrentDate = next;
+                }
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+            }
+        }
+
+        void EnsureMonthVisible(DateTime date)
+        {
+            if (MonthsToDisplay == 1)
+            {
+                CurrentDate = date;
+                return;
+            }
+
+            var calendar = Culture.Calendar;
+            var firstVisible = new DateTime(calendar.GetYear(CurrentDate), calendar.GetMonth(CurrentDate), 1, calendar);
+            var lastVisible = firstVisible;
+
+            try
+            {
+                lastVisible = calendar.AddMonths(firstVisible, MonthsToDisplay - 1);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+            }
+
+            var target = new DateTime(calendar.GetYear(date), calendar.GetMonth(date), 1, calendar);
+
+            if (target < firstVisible)
+            {
+                CurrentDate = date;
+            }
+            else if (target > lastVisible)
+            {
+                try
+                {
+                    CurrentDate = calendar.AddMonths(date, -(MonthsToDisplay - 1));
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    CurrentDate = date;
+                }
+
+                FocusedDate = date;
+            }
+            else
+            {
+                FocusedDate = date;
+            }
+        }
+
+        DateTime? rangeStart;
+        DateTime? rangeEnd;
+        DateTime? rangeHoverEnd;
+
         private string? calendarWeekTitle;
 
         /// <summary>
@@ -156,6 +539,24 @@ namespace Radzen.Blazor
         [Parameter]
         public string NextMonthAriaLabel { get => nextMonthAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_NextMonthAriaLabel)); set => nextMonthAriaLabel = value; }
 
+        private string? prevYearAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the previous year aria label text.
+        /// </summary>
+        /// <value>The previous year aria label text.</value>
+        [Parameter]
+        public string PrevYearAriaLabel { get => prevYearAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_PrevYearAriaLabel)); set => prevYearAriaLabel = value; }
+
+        private string? nextYearAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the next year aria label text.
+        /// </summary>
+        /// <value>The next year aria label text.</value>
+        [Parameter]
+        public string NextYearAriaLabel { get => nextYearAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_NextYearAriaLabel)); set => nextYearAriaLabel = value; }
+
         private string? toggleAmPmAriaLabel;
 
         /// <summary>
@@ -189,6 +590,22 @@ namespace Radzen.Blazor
         [Parameter]
         public string DisabledAriaLabel { get => disabledAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_DisabledAriaLabel)); set => disabledAriaLabel = value; }
 
+        private string? rangeStartAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the suffix appended to a day cell's aria label when the date is the start of the selected range.
+        /// </summary>
+        [Parameter]
+        public string RangeStartAriaLabel { get => rangeStartAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_RangeStartAriaLabel)); set => rangeStartAriaLabel = value; }
+
+        private string? rangeEndAriaLabel;
+
+        /// <summary>
+        /// Gets or sets the suffix appended to a day cell's aria label when the date is the end of the selected range.
+        /// </summary>
+        [Parameter]
+        public string RangeEndAriaLabel { get => rangeEndAriaLabel ?? Localize(nameof(RadzenStrings.DatePicker_RangeEndAriaLabel)); set => rangeEndAriaLabel = value; }
+
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
@@ -209,6 +626,12 @@ namespace Radzen.Blazor
 
         internal bool IsDateSelected(DateTime date)
         {
+            if (IsRange)
+            {
+                return IsRangeEndpoint(date) ||
+                    (rangeStart.HasValue && rangeEnd.HasValue && date.Date > rangeStart.Value.Date && date.Date < rangeEnd.Value.Date);
+            }
+
             if (Multiple)
             {
                 return selectedDates.Any(d => d.Date == date.Date);
@@ -217,15 +640,60 @@ namespace Radzen.Blazor
             return DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0;
         }
 
+        internal bool IsRangeEndpoint(DateTime date)
+        {
+            return IsRange && (rangeStart?.Date == date.Date || rangeEnd?.Date == date.Date);
+        }
+
+        internal bool IsDateInRange(DateTime date)
+        {
+            if (!IsRange || !rangeStart.HasValue)
+            {
+                return false;
+            }
+
+            var end = rangeEnd ?? rangeHoverEnd;
+
+            return end.HasValue && date.Date > rangeStart.Value.Date && date.Date < end.Value.Date;
+        }
+
+        internal void OnDayMouseOver(DateTime date)
+        {
+            if (Disabled || !IsRange || !rangeStart.HasValue || rangeEnd.HasValue)
+            {
+                return;
+            }
+
+            rangeHoverEnd = date.Date > rangeStart.Value.Date ? date.Date : (DateTime?)null;
+        }
+
+        internal void OnCalendarMouseLeave()
+        {
+            rangeHoverEnd = null;
+        }
+
+        void SyncRangeHover(DateTime date)
+        {
+            if (IsRange && rangeStart.HasValue && !rangeEnd.HasValue)
+            {
+                rangeHoverEnd = date.Date > rangeStart.Value.Date ? date.Date : (DateTime?)null;
+            }
+        }
+
         internal string GetCalendarAriaLabel()
+        {
+            return GetMonthTitle(CurrentDate);
+        }
+
+        internal string GetMonthTitle(DateTime month)
         {
             try
             {
-                return CurrentDate.ToString("Y", Culture);
+                return month.ToString("Y", Culture);
             }
             catch
             {
-                return CurrentDate.ToString("Y", CultureInfo.InvariantCulture);
+                return month.ToString("Y", CultureInfo.InvariantCulture);
             }
         }
 
@@ -246,7 +714,15 @@ namespace Radzen.Blazor
             {
                 states.Add(TodayAriaLabel);
             }
-            if (IsDateSelected(date))
+            if (IsRange && rangeStart?.Date == date.Date)
+            {
+                states.Add(RangeStartAriaLabel);
+            }
+            if (IsRange && rangeEnd?.Date == date.Date)
+            {
+                states.Add(RangeEndAriaLabel);
+            }
+            if (IsDateSelected(date) && !IsRangeEndpoint(date))
             {
                 states.Add(SelectedAriaLabel);
             }
@@ -398,6 +874,7 @@ namespace Radzen.Blazor
         public void OnPopupClose()
         {
             RevertUncommittedTimeChange();
+            ResetView();
             contentStyle = "display:none;";
             StateHasChanged();
         }
@@ -405,6 +882,7 @@ namespace Radzen.Blazor
         void OnPopupCloseFromEvent()
         {
             RevertUncommittedTimeChange();
+            ResetView();
             contentStyle = "display:none;";
             StateHasChanged();
         }
@@ -741,8 +1219,8 @@ namespace Radzen.Blazor
                 };
 
                 var newDate = FocusedDate.AddDays(delta);
-                FocusedDate = newDate;
-                CurrentDate = newDate;
+                EnsureMonthVisible(newDate);
+                SyncRangeHover(newDate);
                 shouldFocusDay = true;
                 return;
             }
@@ -757,8 +1235,8 @@ namespace Radzen.Blazor
                     : 6 - ((7 + (int)FocusedDate.DayOfWeek - (int)Culture.DateTimeFormat.FirstDayOfWeek) % 7);
 
                 var newDate = FocusedDate.AddDays(weekDelta);
-                FocusedDate = newDate;
-                CurrentDate = newDate;
+                EnsureMonthVisible(newDate);
+                SyncRangeHover(newDate);
                 shouldFocusDay = true;
                 return;
             }
@@ -773,8 +1251,8 @@ namespace Radzen.Blazor
                     var newDate = args.ShiftKey
                         ? Culture.Calendar.AddYears(FocusedDate, key == "PageUp" ? -1 : 1)
                         : Culture.Calendar.AddMonths(FocusedDate, key == "PageUp" ? -1 : 1);
-                    FocusedDate = newDate;
-                    CurrentDate = newDate;
+                    EnsureMonthVisible(newDate);
+                    SyncRangeHover(newDate);
                     shouldFocusDay = true;
                 }
                 catch (ArgumentOutOfRangeException) { }
@@ -807,7 +1285,7 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                if (ShowTime && !Multiple)
+                if (ShowTime && !Multiple && !IsRange)
                 {
                     // Apply the date part, keep the popup open, move focus to the hour input.
                     CurrentDate = ClampToMinMax(new DateTime(date.Year, date.Month, date.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second));
@@ -856,7 +1334,32 @@ namespace Radzen.Blazor
                 {
                     _currentDate = default(DateTime);
 
-                    if (Multiple)
+                    if (IsRange)
+                    {
+                        if (value is DateRange range)
+                        {
+                            var start = range.Start.HasValue ? DateTime.SpecifyKind(range.Start.Value.Date, Kind) : (DateTime?)null;
+                            var end = range.End.HasValue ? DateTime.SpecifyKind(range.End.Value.Date, Kind) : (DateTime?)null;
+
+                            if (start.HasValue && end.HasValue && end < start)
+                            {
+                                (start, end) = (end, start);
+                            }
+
+                            rangeStart = start;
+                            rangeEnd = end;
+                            _value = range;
+                            _dateTimeValue = start ?? end;
+                        }
+                        else
+                        {
+                            rangeStart = null;
+                            rangeEnd = null;
+                            _value = null;
+                            _dateTimeValue = null;
+                        }
+                    }
+                    else if (Multiple)
                     {
                         if (value == null)
                         {
@@ -1048,28 +1551,27 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DateTime> CurrentDateChanged { get; set; }
 
-        private DateTime StartDate
+        private DateTime StartDate => GetStartDate(CurrentDate);
+
+        private DateTime GetStartDate(DateTime month)
         {
-            get
+            if (month == DateTime.MinValue)
             {
-                if (CurrentDate == DateTime.MinValue)
-                {
-                    return DateTime.MinValue;
-                }
-
-                var calendar = Culture.Calendar;
-                var calYear = calendar.GetYear(CurrentDate);
-                var calMonth = calendar.GetMonth(CurrentDate);
-                var firstDayOfTheMonth = new DateTime(calYear, calMonth, 1, calendar);
-
-                if (firstDayOfTheMonth == DateTime.MinValue)
-                {
-                    return DateTime.MinValue;
-                }
-
-                int diff = (7 + (firstDayOfTheMonth.DayOfWeek - Culture.DateTimeFormat.FirstDayOfWeek)) % 7;
-                return firstDayOfTheMonth.AddDays(-1 * diff).Date;
+                return DateTime.MinValue;
             }
+
+            var calendar = Culture.Calendar;
+            var calYear = calendar.GetYear(month);
+            var calMonth = calendar.GetMonth(month);
+            var firstDayOfTheMonth = new DateTime(calYear, calMonth, 1, calendar);
+
+            if (firstDayOfTheMonth == DateTime.MinValue)
+            {
+                return DateTime.MinValue;
+            }
+
+            int diff = (7 + (firstDayOfTheMonth.DayOfWeek - Culture.DateTimeFormat.FirstDayOfWeek)) % 7;
+            return firstDayOfTheMonth.AddDays(-1 * diff).Date;
         }
 
         IEnumerable<string> ShiftedAbbreviatedDayNames
@@ -1114,7 +1616,8 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Multiple ? selectedDates.Count > 0 : (DateTimeValue.HasValue && DateTimeValue != default(DateTime) && DateTimeValue != DateTime.MaxValue);
+                return IsRange ? rangeStart.HasValue || rangeEnd.HasValue :
+                    Multiple ? selectedDates.Count > 0 : (DateTimeValue.HasValue && DateTimeValue != default(DateTime) && DateTimeValue != DateTime.MaxValue);
             }
         }
 
@@ -1129,6 +1632,15 @@ namespace Radzen.Blazor
                 if (!HasValue)
                 {
                     return "";
+                }
+
+                if (IsRange)
+                {
+                    var format = string.IsNullOrEmpty(DateFormat) ? "d" : DateFormat;
+                    var startText = rangeStart?.ToString(format, Culture);
+                    var endText = rangeEnd?.ToString(format, Culture);
+
+                    return startText != null && endText != null ? $"{startText}{RangeSeparatorText}{endText}" : startText ?? endText ?? "";
                 }
 
                 if (Multiple)
@@ -1181,6 +1693,26 @@ namespace Radzen.Blazor
 
             DateTime? newValue;
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+
+            if (IsRange)
+            {
+                if (TryParseRangeInput(inputValue, out var start, out var end)
+                    && (!start.HasValue || !DateAttributes(start.Value).Disabled)
+                    && (!end.HasValue || !DateAttributes(end.Value).Disabled))
+                {
+                    rangeStart = start.HasValue ? DateTime.SpecifyKind(start.Value, Kind) : (DateTime?)null;
+                    rangeEnd = end.HasValue ? DateTime.SpecifyKind(end.Value, Kind) : (DateTime?)null;
+                    rangeHoverEnd = null;
+                    await UpdateValueFromRange();
+                }
+                else
+                {
+                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+                }
+
+                return;
+            }
+
             bool valid = TryParseInput(inputValue, out DateTime value);
 
             var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null || AllowClear;
@@ -1255,6 +1787,23 @@ namespace Radzen.Blazor
             }
 
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+
+            if (IsRange)
+            {
+                if (TryParseRangeInput(inputValue, out var start, out var end)
+                    && (start.HasValue || end.HasValue)
+                    && (!start.HasValue || !DateAttributes(start.Value).Disabled)
+                    && (!end.HasValue || !DateAttributes(end.Value).Disabled))
+                {
+                    rangeStart = start.HasValue ? DateTime.SpecifyKind(start.Value, Kind) : (DateTime?)null;
+                    rangeEnd = end.HasValue ? DateTime.SpecifyKind(end.Value, Kind) : (DateTime?)null;
+                    rangeHoverEnd = null;
+                    await UpdateValueFromRange();
+                }
+
+                return;
+            }
+
             bool valid = TryParseInput(inputValue, out DateTime value);
 
             if (!valid || DateAttributes(value).Disabled)
@@ -1303,6 +1852,55 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public Func<string, DateTime?>? ParseInput { get; set; }
+
+        bool TryParseRangeInput(string inputValue, out DateTime? start, out DateTime? end)
+        {
+            start = null;
+            end = null;
+
+            if (string.IsNullOrWhiteSpace(inputValue))
+            {
+                return true;
+            }
+
+            string first;
+            string? second = null;
+            var separatorIndex = inputValue.IndexOf(RangeSeparatorText, StringComparison.Ordinal);
+
+            if (separatorIndex >= 0)
+            {
+                first = inputValue.Substring(0, separatorIndex);
+                second = inputValue.Substring(separatorIndex + RangeSeparatorText.Length);
+            }
+            else
+            {
+                first = inputValue;
+            }
+
+            if (!TryParseInput(first.Trim(), out var startValue))
+            {
+                return false;
+            }
+
+            start = startValue.Date;
+
+            if (!string.IsNullOrWhiteSpace(second))
+            {
+                if (!TryParseInput(second.Trim(), out var endValue))
+                {
+                    return false;
+                }
+
+                end = endValue.Date;
+
+                if (end < start)
+                {
+                    (start, end) = (end, start);
+                }
+            }
+
+            return true;
+        }
 
         private bool TryParseInput(string inputValue, out DateTime value)
         {
@@ -1637,6 +2235,7 @@ namespace Radzen.Blazor
             }
 
             RevertUncommittedTimeChange();
+            ResetView();
 
             if (PopupRenderMode == PopupRenderMode.OnDemand)
             {
@@ -1662,10 +2261,10 @@ namespace Radzen.Blazor
                 {
                     return "";
                 }
-                else
-                {
-                    return $"{contentStyle}";
-                }
+
+                var width = MonthsToDisplay > 1 ? $"width: calc(var(--rz-datepicker-popup-width) * {MonthsToDisplay});" : "";
+
+                return $"{contentStyle}{width}";
             }
         }
 
@@ -1719,6 +2318,7 @@ namespace Radzen.Blazor
             return ClassList.Create("rz-datepicker")
                             .AddInputSize(InputSize)
                             .Add("rz-datepicker-inline", Inline)
+                            .Add("rz-datepicker-range", IsRange)
                             .AddDisabled(Disabled)
                             .Add("rz-state-empty", !HasValue)
                             .Add(FieldIdentifier, EditContext)
@@ -1728,6 +2328,29 @@ namespace Radzen.Blazor
 
         private async Task SetDay(DateTime newValue)
         {
+            if (IsRange)
+            {
+                var picked = DateTime.SpecifyKind(newValue.Date, Kind);
+
+                if (!rangeStart.HasValue || rangeEnd.HasValue || picked < rangeStart.Value)
+                {
+                    rangeStart = picked;
+                    rangeEnd = null;
+                    rangeHoverEnd = null;
+                    await UpdateValueFromRange();
+                }
+                else
+                {
+                    rangeEnd = picked;
+                    rangeHoverEnd = null;
+                    await UpdateValueFromRange();
+                    Close();
+                    await FocusAsync();
+                }
+
+                return;
+            }
+
             if (Multiple)
             {
                 var picked = new DateTime(newValue.Year, newValue.Month, newValue.Day, 0, 0, 0);
@@ -1753,6 +2376,32 @@ namespace Radzen.Blazor
             {
                 await FocusAsync();
             }
+        }
+
+        async Task UpdateValueFromRange()
+        {
+            object? newValue = rangeStart.HasValue || rangeEnd.HasValue ? new DateRange(rangeStart, rangeEnd) : null;
+
+            if (EqualityComparer<object>.Default.Equals(newValue, _value))
+            {
+                return;
+            }
+
+            _value = newValue;
+            _dateTimeValue = rangeStart ?? rangeEnd;
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(newValue == null ? default(TValue) : (TValue)newValue);
+            }
+
+            if (FieldIdentifier.FieldName != null)
+            {
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
+            }
+
+            await Change.InvokeAsync(rangeEnd ?? rangeStart);
+            StateHasChanged();
         }
 
         void ToggleSelectedDate(DateTime date)
@@ -1950,6 +2599,36 @@ namespace Radzen.Blazor
                 }
                 catch { }
             }
+
+            if (shouldFocusTitle && JSRuntime != null)
+            {
+                shouldFocusTitle = false;
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId() + "tb");
+                }
+                catch { }
+            }
+
+            if (shouldFocusMonthCell && JSRuntime != null)
+            {
+                shouldFocusMonthCell = false;
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", $"{GetId()}-month-{GetCalendarMonth(CurrentDate)}");
+                }
+                catch { }
+            }
+
+            if (shouldFocusYearCell && JSRuntime != null)
+            {
+                shouldFocusYearCell = false;
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.focusElement", $"{GetId()}-year-{GetCalendarYear(CurrentDate)}");
+                }
+                catch { }
+            }
         }
 
         private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
@@ -2024,10 +2703,16 @@ namespace Radzen.Blazor
 
         string GetDayCssClass(DateTime date, DateRenderEventArgs dateArgs, bool forCell = true)
         {
+            return GetDayCssClass(date, dateArgs, CurrentDate, forCell);
+        }
+
+        string GetDayCssClass(DateTime date, DateRenderEventArgs dateArgs, DateTime viewMonth, bool forCell)
+        {
             var list = ClassList.Create()
                                .Add("rz-state-default", !forCell)
-                               .Add("rz-calendar-other-month", GetCalendarMonth(CurrentDate) != GetCalendarMonth(date))
-                               .Add("rz-state-active", !forCell && (Multiple ? selectedDates.Any(d => d.Date == date.Date) : (DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)))
+                               .Add("rz-calendar-other-month", GetCalendarMonth(viewMonth) != GetCalendarMonth(date))
+                               .Add("rz-state-active", !forCell && (IsRange ? IsRangeEndpoint(date) : Multiple ? selectedDates.Any(d => d.Date == date.Date) : (DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)))
+                               .Add("rz-calendar-range", !forCell && IsDateInRange(date))
                                .Add("rz-calendar-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-focused", !forCell && FocusedDate.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-disabled", !forCell && dateArgs.Disabled);
@@ -2117,6 +2802,7 @@ namespace Radzen.Blazor
             }
 
             RevertUncommittedTimeChange();
+            ResetView();
 
             if (PopupRenderMode == PopupRenderMode.Initial && JSRuntime != null)
             {

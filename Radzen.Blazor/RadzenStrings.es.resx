@@ -1106,6 +1106,12 @@
   <data name="DatePicker_NextMonthAriaLabel" xml:space="preserve">
     <value>Mes siguiente</value>
   </data>
+  <data name="DatePicker_PrevYearAriaLabel" xml:space="preserve">
+    <value>Año anterior</value>
+  </data>
+  <data name="DatePicker_NextYearAriaLabel" xml:space="preserve">
+    <value>Año siguiente</value>
+  </data>
   <data name="DatePicker_ToggleAmPmAriaLabel" xml:space="preserve">
     <value>Alternar a. m./p. m.</value>
   </data>
@@ -2047,6 +2053,12 @@
   </data>
   <data name="DatePicker_DisabledAriaLabel" xml:space="preserve">
     <value>deshabilitado</value>
+  </data>
+  <data name="DatePicker_RangeStartAriaLabel" xml:space="preserve">
+    <value>inicio del rango</value>
+  </data>
+  <data name="DatePicker_RangeEndAriaLabel" xml:space="preserve">
+    <value>fin del rango</value>
   </data>
   <data name="HtmlEditorFormatBlock_Placeholder" xml:space="preserve">
     <value>Bloque de formato</value>
