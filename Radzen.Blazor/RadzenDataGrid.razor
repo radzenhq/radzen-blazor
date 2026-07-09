@@ -117,7 +117,7 @@
                 <RadzenPager HorizontalAlign="@PagerHorizontalAlign" AlwaysVisible="@PagerAlwaysVisible" @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@ChangePage" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" PagingSummaryFormat="@PagingSummaryFormat" PagingSummaryTemplate="@PagingSummaryTemplate" PageSizeText="@PageSizeText" Density="@Density" FirstPageTitle="@FirstPageTitle" FirstPageAriaLabel="@FirstPageAriaLabel" PrevPageAriaLabel="@PrevPageAriaLabel" PrevPageTitle="@PrevPageTitle" NextPageAriaLabel="@NextPageAriaLabel" NextPageTitle="@NextPageTitle" LastPageAriaLabel="@LastPageAriaLabel" LastPageTitle="@LastPageTitle" PageAriaLabelFormat="@PageAriaLabelFormat" PageTitleFormat="@PageTitleFormat" PrevPageLabel="@PrevPageLabel" NextPageLabel="@NextPageLabel" />
         }
 
-        <div class="rz-data-grid-data" tabindex="-1">
+        <div class="rz-data-grid-data" tabindex="-1" role="rowgroup">
             <table role="presentation" class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "") @(getGridLinesCSSClass())">
                 @if(allColumns.All(c => c.Parent == null))
                 {
@@ -139,7 +139,7 @@
                     }
                 </colgroup>
                 }
-                <thead role="rowgroup">
+                <thead role="presentation">
                     @if (ShowHeader)
                     {
                     @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
@@ -233,7 +233,7 @@
                         </tr>
                     }
                 </thead>
-                <tbody role="rowgroup">
+                <tbody role="presentation">
                     @if (Data != null)
                     {
                         @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Count > 0 && HasAnyData() : true) || LoadData.HasDelegate && HasAnyData() || itemsToInsert.Count > 0)
@@ -277,7 +277,7 @@
                 </tbody>
                 @if (allColumns.Where(c => c.Visible && c.FooterTemplate != null).Any())
                 {
-                    <tfoot role="rowgroup" class="rz-datatable-tfoot" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                    <tfoot role="presentation" class="rz-datatable-tfoot" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
                         @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                         {
                             <tr role="row">

@@ -443,6 +443,12 @@ namespace Radzen.Blazor {
         public static string Gantt_IsNotNullText { get { return ResourceManager.GetString("Gantt_IsNotNullText", resourceCulture); } }
         public static string Gantt_IsEmptyText { get { return ResourceManager.GetString("Gantt_IsEmptyText", resourceCulture); } }
         public static string Gantt_IsNotEmptyText { get { return ResourceManager.GetString("Gantt_IsNotEmptyText", resourceCulture); } }
+        public static string Gantt_UnassignedText { get { return ResourceManager.GetString("Gantt_UnassignedText", resourceCulture); } }
+        public static string Gantt_HistogramLabel { get { return ResourceManager.GetString("Gantt_HistogramLabel", resourceCulture); } }
+        public static string Gantt_DayViewText { get { return ResourceManager.GetString("Gantt_DayViewText", resourceCulture); } }
+        public static string Gantt_WeekViewText { get { return ResourceManager.GetString("Gantt_WeekViewText", resourceCulture); } }
+        public static string Gantt_MonthViewText { get { return ResourceManager.GetString("Gantt_MonthViewText", resourceCulture); } }
+        public static string Gantt_YearViewText { get { return ResourceManager.GetString("Gantt_YearViewText", resourceCulture); } }
         public static string Gravatar_AlternateText { get { return ResourceManager.GetString("Gravatar_AlternateText", resourceCulture); } }
         public static string HtmlEditorAlignCenter_Title { get { return ResourceManager.GetString("HtmlEditorAlignCenter_Title", resourceCulture); } }
         public static string HtmlEditorAlignLeft_Title { get { return ResourceManager.GetString("HtmlEditorAlignLeft_Title", resourceCulture); } }

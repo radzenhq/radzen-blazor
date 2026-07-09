@@ -9,8 +9,10 @@
 
     public override string Icon => "calendar_today";
 
+    private string? text;
+
     [Parameter]
-    public override string Text { get; set; } = "Year";
+    public override string Text { get => text ?? Localize(nameof(RadzenStrings.Gantt_YearViewText)); set => text = value; }
 
     public override string Title
     {
@@ -67,6 +69,8 @@
                                NonWorkingDays=@(Gantt?.TimelineNonWorkingDays)
                                Markers=@(Gantt?.TimelineMarkers)
                                TaskRender=@(Gantt?.TimelineTaskRender)
+                               LaneByItem=@(Gantt?.LaneByItem)
+                               LaneCountByRow=@(Gantt?.LaneCountByRow)
                                AppointmentMove=OnAppointmentMove />
         </CascadingValue>;
     }

@@ -1242,6 +1242,24 @@
   <data name="Gantt_IsNotEmptyText" xml:space="preserve">
     <value>Ist nicht leer</value>
   </data>
+  <data name="Gantt_UnassignedText" xml:space="preserve">
+    <value>Nicht zugewiesen</value>
+  </data>
+  <data name="Gantt_HistogramLabel" xml:space="preserve">
+    <value>Auslastung</value>
+  </data>
+  <data name="Gantt_DayViewText" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="Gantt_WeekViewText" xml:space="preserve">
+    <value>Woche</value>
+  </data>
+  <data name="Gantt_MonthViewText" xml:space="preserve">
+    <value>Monat</value>
+  </data>
+  <data name="Gantt_YearViewText" xml:space="preserve">
+    <value>Jahr</value>
+  </data>
   <!-- Gravatar -->
   <data name="Gravatar_AlternateText" xml:space="preserve">
     <value>Gravatar</value>
