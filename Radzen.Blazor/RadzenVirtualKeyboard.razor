@@ -15,7 +15,7 @@
                                 @for (var keyIndex = 0; keyIndex < section.Rows[rowIndex].Length; keyIndex++)
                                 {
                                     var key = GetKey(section, rowIndex, keyIndex);
-                                    <button type="button" tabindex="-1" class="@key.CssClass" aria-label="@key.AriaLabel"
+                                    <button type="button" tabindex="-1" class="@key.CssClass" aria-label="@key.AriaLabel" aria-pressed="@(key.Action == "shift" ? "false" : null)"
                                             data-vk-key="@key.Text" data-vk-shift="@key.ShiftText" data-vk-action="@key.Action">
                                         @if (key.Icon != null)
                                         {
