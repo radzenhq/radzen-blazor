@@ -194,6 +194,19 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void VirtualKeyboard_Renders_ShiftKeyAsToggleButton()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenVirtualKeyboard>();
+
+            var shiftKey = component.Find(@"[data-vk-action=""shift""]");
+
+            Assert.Equal("false", shiftKey.GetAttribute("aria-pressed"));
+        }
+
+        [Fact]
         public void VirtualKeyboard_Renders_KeysNotFocusable()
         {
             using var ctx = new TestContext();

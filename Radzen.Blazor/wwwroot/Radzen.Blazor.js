@@ -1082,6 +1082,9 @@ window.Radzen = {
       var toggleShift = function () {
           state.shift = !state.shift;
           panel.classList.toggle('rz-virtual-keyboard-shift-active', state.shift);
+          panel.querySelectorAll('[data-vk-action="shift"]').forEach(function (key) {
+              key.setAttribute('aria-pressed', state.shift);
+          });
       };
 
       var reposition = function () {
@@ -1161,18 +1164,13 @@ window.Radzen = {
           state.closeTimeout = setTimeout(function () {
               state.closeTimeout = null;
               var active = document.activeElement;
-              if (!active || !el.contains(active) || !isEditable(active)) {
-                  close();
-              }
+              if (active && (panel.contains(active) || (el.contains(active) && isEditable(active)))) return;
+              close();
           }, 100);
       };
 
-      state.keyHandler = function (e) {
-          if (e.button !== undefined && e.button !== 0) return;
-          e.preventDefault();
-
-          var key = e.target.closest ? e.target.closest('.rz-virtual-keyboard-key') : null;
-          if (!key || !state.input) return;
+      var executeKey = function (key) {
+          if (!state.input) return;
 
           var action = key.getAttribute('data-vk-action');
 
@@ -1200,6 +1198,30 @@ window.Radzen = {
           }
       };
 
+      state.keyHandler = function (e) {
+          if (e.button !== undefined && e.button !== 0) return;
+          e.preventDefault();
+          state.suppressClick = false;
+
+          var key = e.target.closest ? e.target.closest('.rz-virtual-keyboard-key') : null;
+          if (!key) return;
+
+          state.suppressClick = true;
+          executeKey(key);
+      };
+
+      state.clickHandler = function (e) {
+          if (state.suppressClick) {
+              state.suppressClick = false;
+              return;
+          }
+
+          var key = e.target.closest ? e.target.closest('.rz-virtual-keyboard-key') : null;
+          if (key) {
+              executeKey(key);
+          }
+      };
+
       state.mouseDown = function (e) {
           e.preventDefault();
       };
@@ -1207,6 +1229,7 @@ window.Radzen = {
       var pointerEvents = window.PointerEvent !== undefined;
 
       panel.addEventListener(pointerEvents ? 'pointerdown' : 'mousedown', state.keyHandler);
+      panel.addEventListener('click', state.clickHandler);
       if (pointerEvents) {
           panel.addEventListener('mousedown', state.mouseDown);
       }
@@ -1222,6 +1245,7 @@ window.Radzen = {
               }
               restore();
               panel.removeEventListener(pointerEvents ? 'pointerdown' : 'mousedown', state.keyHandler);
+              panel.removeEventListener('click', state.clickHandler);
               if (pointerEvents) {
                   panel.removeEventListener('mousedown', state.mouseDown);
               }
