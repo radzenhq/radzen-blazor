@@ -1,0 +1,8 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Date Range" Component="DateRangePickerNavigationMode" />
+    <RadzenDateRangePicker @bind-Value=@range NavigationMode="DatePickerNavigationMode.DropDown" DateFormat="dd/MM/yyyy" Name="DateRangePickerNavigationMode" Style="min-width: 260px;" />
+</RadzenStack>
+
+@code {
+    DateRange range = new DateRange(DateTime.Today, DateTime.Today.AddDays(7));
+}
