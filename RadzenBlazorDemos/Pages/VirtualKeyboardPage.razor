@@ -1,0 +1,80 @@
+@page "/virtual-keyboard"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor Virtual Keyboard
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    A theme-consistent on-screen keyboard for touch HMI, kiosk and POS scenarios - devices without a physical keyboard.
+    The keyboard opens automatically when an input inside it gets focus and types in that input, so value binding works as with a physical keyboard.
+</RadzenText>
+
+<RadzenText Anchor="virtual-keyboard#attach-on-focus" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Attach the keyboard to inputs
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Wrap the inputs in a <strong>RadzenVirtualKeyboard</strong> component. Focusing any input or text area inside it - including
+    <code>RadzenTextBox</code>, <code>RadzenNumeric</code>, <code>RadzenTextArea</code>, <code>RadzenPassword</code> and plain HTML inputs - opens the keyboard.
+    Key presses raise the native <code>input</code> and <code>change</code> events of the focused input so <code>@@bind-Value</code> updates as expected.
+    The keyboard closes when the input loses focus or when the user taps outside.
+    To also suppress the on-screen keyboard of the operating system on touch devices add <code>inputmode="none"</code> to the inputs.
+</RadzenText>
+<RadzenExample ComponentName="VirtualKeyboard" Example="VirtualKeyboardAttach">
+    <VirtualKeyboardAttach />
+</RadzenExample>
+
+<RadzenText Anchor="virtual-keyboard#numpad" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Numeric keypad
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>Type="VirtualKeyboardType.Numpad"</code> to display a numeric keypad - ideal for entering setpoints and quantities.
+    The decimal key inserts the decimal separator of the current culture. Use the <code>DecimalSeparator</code> property to override it.
+    Set <code>Type="VirtualKeyboardType.All"</code> to show the alphanumeric keyboard and the numeric keypad side by side.
+</RadzenText>
+<RadzenExample ComponentName="VirtualKeyboard" Example="VirtualKeyboardNumpad">
+    <VirtualKeyboardNumpad />
+</RadzenExample>
+
+<RadzenText Anchor="virtual-keyboard#placement" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard placement
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Placement</code> property to control where the keyboard opens: <code>Bottom</code> (default) and <code>Top</code> display a bar
+    fixed to the edge of the viewport while <code>Auto</code> opens a popup next to the focused input.
+</RadzenText>
+<RadzenExample ComponentName="VirtualKeyboard" Example="VirtualKeyboardPlacementExample">
+    <VirtualKeyboardPlacementExample />
+</RadzenExample>
+
+<RadzenText Anchor="virtual-keyboard#custom-layout" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom key layout
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Define your own keys with <code>VirtualKeyboardLayout.FromRows</code> - every space-separated token is a key.
+    A token is either literal text inserted in the input - including multi-character keys such as units of measure or plant-specific symbols -
+    or one of the special keys <code>{backspace}</code>, <code>{enter}</code>, <code>{shift}</code>, <code>{space}</code>,
+    <code>{tab}</code>, <code>{clear}</code>, <code>{close}</code> and <code>{decimal}</code>.
+</RadzenText>
+<RadzenExample ComponentName="VirtualKeyboard" Example="VirtualKeyboardCustomLayout">
+    <VirtualKeyboardCustomLayout />
+</RadzenExample>
+
+<RadzenText Anchor="virtual-keyboard#locale-layouts" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Locale-aware layouts
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Assign one of the built-in presets - <code>VirtualKeyboardLayout.Qwerty</code>, <code>VirtualKeyboardLayout.Qwertz</code> or
+    <code>VirtualKeyboardLayout.Azerty</code> - to the <code>Layout</code> property. The shift key switches to the uppercase and symbol layer.
+</RadzenText>
+<RadzenExample ComponentName="VirtualKeyboard" Example="VirtualKeyboardLocale">
+    <VirtualKeyboardLocale />
+</RadzenExample>
+
+<RadzenText Anchor="virtual-keyboard#inline" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Inline keyboard
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set <code>Placement="VirtualKeyboardPlacement.Inline"</code> to render an always-visible keyboard in place - useful for PIN pads and dedicated entry screens.
+</RadzenText>
+<RadzenExample ComponentName="VirtualKeyboard" Example="VirtualKeyboardInline">
+    <VirtualKeyboardInline />
+</RadzenExample>

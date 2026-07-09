@@ -2426,4 +2426,28 @@
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>Grafico a dispersione</value>
   </data>
+  <data name="VirtualKeyboard_AriaLabel" xml:space="preserve">
+    <value>Tastiera virtuale</value>
+  </data>
+  <data name="VirtualKeyboard_BackspaceAriaLabel" xml:space="preserve">
+    <value>Backspace</value>
+  </data>
+  <data name="VirtualKeyboard_EnterAriaLabel" xml:space="preserve">
+    <value>Invio</value>
+  </data>
+  <data name="VirtualKeyboard_ShiftAriaLabel" xml:space="preserve">
+    <value>Maiusc</value>
+  </data>
+  <data name="VirtualKeyboard_SpaceAriaLabel" xml:space="preserve">
+    <value>Spazio</value>
+  </data>
+  <data name="VirtualKeyboard_TabAriaLabel" xml:space="preserve">
+    <value>Tabulazione</value>
+  </data>
+  <data name="VirtualKeyboard_ClearAriaLabel" xml:space="preserve">
+    <value>Cancella</value>
+  </data>
+  <data name="VirtualKeyboard_CloseAriaLabel" xml:space="preserve">
+    <value>Nascondi tastiera</value>
+  </data>
 </root>

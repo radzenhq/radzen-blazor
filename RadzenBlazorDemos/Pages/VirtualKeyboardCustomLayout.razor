@@ -1,0 +1,19 @@
+<RadzenVirtualKeyboard Layout="@customLayout" Placement="VirtualKeyboardPlacement.Auto">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+        <RadzenFormField Text="Setpoint with unit">
+            <RadzenTextBox @bind-Value=@setpoint />
+        </RadzenFormField>
+    </RadzenStack>
+</RadzenVirtualKeyboard>
+
+@code {
+    string setpoint = "10";
+
+    VirtualKeyboardLayout customLayout = VirtualKeyboardLayout.FromRows(
+        "7 8 9 °C",
+        "4 5 6 bar",
+        "1 2 3 l/min",
+        "- 0 {decimal} rpm",
+        "{clear} {backspace} {enter}"
+    );
+}

@@ -2426,4 +2426,28 @@
   <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
     <value>Graphique en nuage de points</value>
   </data>
+  <data name="VirtualKeyboard_AriaLabel" xml:space="preserve">
+    <value>Clavier virtuel</value>
+  </data>
+  <data name="VirtualKeyboard_BackspaceAriaLabel" xml:space="preserve">
+    <value>Retour arrière</value>
+  </data>
+  <data name="VirtualKeyboard_EnterAriaLabel" xml:space="preserve">
+    <value>Entrée</value>
+  </data>
+  <data name="VirtualKeyboard_ShiftAriaLabel" xml:space="preserve">
+    <value>Maj</value>
+  </data>
+  <data name="VirtualKeyboard_SpaceAriaLabel" xml:space="preserve">
+    <value>Espace</value>
+  </data>
+  <data name="VirtualKeyboard_TabAriaLabel" xml:space="preserve">
+    <value>Tabulation</value>
+  </data>
+  <data name="VirtualKeyboard_ClearAriaLabel" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="VirtualKeyboard_CloseAriaLabel" xml:space="preserve">
+    <value>Masquer le clavier</value>
+  </data>
 </root>

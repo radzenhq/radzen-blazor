@@ -1,0 +1,21 @@
+<RadzenVirtualKeyboard Type="VirtualKeyboardType.Numpad" Placement="VirtualKeyboardPlacement.Auto">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+        <RadzenFormField Text="Temperature setpoint">
+            <RadzenNumeric @bind-Value=@temperature />
+        </RadzenFormField>
+        <RadzenFormField Text="Pressure setpoint">
+            <RadzenNumeric @bind-Value=@pressure />
+        </RadzenFormField>
+    </RadzenStack>
+</RadzenVirtualKeyboard>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" class="rz-pb-12">
+    <RadzenText TextStyle="TextStyle.Body2">
+        Temperature: @temperature °C; Pressure: @pressure bar
+    </RadzenText>
+</RadzenStack>
+
+@code {
+    decimal temperature = 65.5m;
+    decimal pressure = 2.4m;
+}
