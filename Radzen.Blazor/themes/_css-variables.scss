@@ -1189,6 +1189,26 @@
   --rz-security-code-input-font-weight: #{$rz-security-code-input-font-weight};
   --rz-security-code-input-line-height: #{$rz-security-code-input-line-height};
 
+  /* VirtualKeyboard */
+  --rz-virtual-keyboard-panel-background-color: #{$rz-virtual-keyboard-panel-background-color};
+  --rz-virtual-keyboard-panel-padding: #{$rz-virtual-keyboard-panel-padding};
+  --rz-virtual-keyboard-panel-border-radius: #{$rz-virtual-keyboard-panel-border-radius};
+  --rz-virtual-keyboard-panel-shadow: #{$rz-virtual-keyboard-panel-shadow};
+  --rz-virtual-keyboard-key-gap: #{$rz-virtual-keyboard-key-gap};
+  --rz-virtual-keyboard-key-min-width: #{$rz-virtual-keyboard-key-min-width};
+  --rz-virtual-keyboard-key-height: #{$rz-virtual-keyboard-key-height};
+  --rz-virtual-keyboard-key-border-radius: #{$rz-virtual-keyboard-key-border-radius};
+  --rz-virtual-keyboard-key-shadow: #{$rz-virtual-keyboard-key-shadow};
+  --rz-virtual-keyboard-key-font-size: #{$rz-virtual-keyboard-key-font-size};
+  --rz-virtual-keyboard-key-background-color: #{$rz-virtual-keyboard-key-background-color};
+  --rz-virtual-keyboard-key-color: #{$rz-virtual-keyboard-key-color};
+  --rz-virtual-keyboard-key-hover-background-color: #{$rz-virtual-keyboard-key-hover-background-color};
+  --rz-virtual-keyboard-key-active-background-color: #{$rz-virtual-keyboard-key-active-background-color};
+  --rz-virtual-keyboard-key-action-background-color: #{$rz-virtual-keyboard-key-action-background-color};
+  --rz-virtual-keyboard-key-action-color: #{$rz-virtual-keyboard-key-action-color};
+  --rz-virtual-keyboard-key-selected-background-color: #{$rz-virtual-keyboard-key-selected-background-color};
+  --rz-virtual-keyboard-key-selected-color: #{$rz-virtual-keyboard-key-selected-color};
+
   /* SignaturePad */
   --rz-signature-pad-border: #{$rz-signature-pad-border};
   --rz-signature-pad-border-radius: #{$rz-signature-pad-border-radius};
