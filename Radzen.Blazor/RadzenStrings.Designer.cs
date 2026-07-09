@@ -759,5 +759,13 @@ namespace Radzen.Blazor {
         public static string HtmlEditorTable_CopyInvalidSelection { get { return ResourceManager.GetString("HtmlEditorTable_CopyInvalidSelection", resourceCulture); } }
         public static string HtmlEditorTable_PasteBlocked { get { return ResourceManager.GetString("HtmlEditorTable_PasteBlocked", resourceCulture); } }
         public static string HtmlEditorTable_MergeInvalidSelection { get { return ResourceManager.GetString("HtmlEditorTable_MergeInvalidSelection", resourceCulture); } }
+        public static string VirtualKeyboard_AriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_AriaLabel", resourceCulture); } }
+        public static string VirtualKeyboard_BackspaceAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_BackspaceAriaLabel", resourceCulture); } }
+        public static string VirtualKeyboard_EnterAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_EnterAriaLabel", resourceCulture); } }
+        public static string VirtualKeyboard_ShiftAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_ShiftAriaLabel", resourceCulture); } }
+        public static string VirtualKeyboard_SpaceAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_SpaceAriaLabel", resourceCulture); } }
+        public static string VirtualKeyboard_TabAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_TabAriaLabel", resourceCulture); } }
+        public static string VirtualKeyboard_ClearAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_ClearAriaLabel", resourceCulture); } }
+        public static string VirtualKeyboard_CloseAriaLabel { get { return ResourceManager.GetString("VirtualKeyboard_CloseAriaLabel", resourceCulture); } }
     }
 }

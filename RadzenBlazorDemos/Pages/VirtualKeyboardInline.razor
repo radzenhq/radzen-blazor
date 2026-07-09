@@ -1,0 +1,11 @@
+<RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="1rem" class="rz-p-12">
+    <RadzenVirtualKeyboard Type="VirtualKeyboardType.Numpad" Placement="VirtualKeyboardPlacement.Inline">
+        <RadzenFormField Text="Access code">
+            <RadzenPassword @bind-Value=@pin autocomplete="off" />
+        </RadzenFormField>
+    </RadzenVirtualKeyboard>
+</RadzenStack>
+
+@code {
+    string pin;
+}

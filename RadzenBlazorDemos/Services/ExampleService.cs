@@ -2886,6 +2886,25 @@ namespace RadzenBlazorDemos
                     Icon = "\uf09b",
                     Tags = new [] { "upload", "file"}
                 },
+                new Example
+                {
+                    New = true,
+                    Toc = [ new () { Text = "Attach the keyboard to inputs", Anchor = "#attach-on-focus" }, new () { Text = "Numeric keypad", Anchor = "#numpad" }, new () { Text = "Keyboard placement", Anchor = "#placement" }, new () { Text = "Custom key layout", Anchor = "#custom-layout" }, new () { Text = "Locale-aware layouts", Anchor = "#locale-layouts" }, new () { Text = "Inline keyboard", Anchor = "#inline" } ],
+                    Name = "VirtualKeyboard",
+                    Path = "virtual-keyboard",
+                    Title = "Blazor Virtual Keyboard - On-Screen Touch Keyboard | Free UI Components by Radzen",
+                    Description = "The Blazor Virtual Keyboard displays a theme-consistent on-screen keyboard for touch HMI and kiosk scenarios. It opens automatically when an input gets focus and supports alphanumeric and numpad modes, custom key layouts and locale-aware presets.",
+                    Icon = "\ue312",
+                    Tags = new [] { "keyboard", "virtual", "touch", "kiosk", "hmi", "on-screen", "numpad", "input" },
+                    Related = new [] { "textbox", "numeric", "security-code" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I show an on-screen keyboard for Blazor inputs?", Answer = "Wrap the inputs in a RadzenVirtualKeyboard component. The keyboard opens automatically when one of them gets focus and key presses type in the focused input." },
+                        new FaqItem { Question = "Does the Virtual Keyboard work with @bind-Value?", Answer = "Yes. Key presses raise the native input and change events of the focused input so value binding of RadzenTextBox, RadzenNumeric, RadzenTextArea, RadzenPassword and plain HTML inputs updates as if typed on a physical keyboard." },
+                        new FaqItem { Question = "Can I define my own keys?", Answer = "Yes. Set the Layout property to a VirtualKeyboardLayout created with VirtualKeyboardLayout.FromRows - every token is either literal text inserted in the input (including multi-character keys such as units of measure) or a special key like {backspace}, {enter}, {shift}, {space}, {clear} and {close}." },
+                        new FaqItem { Question = "How do I show a QWERTZ or AZERTY keyboard?", Answer = "Assign one of the built-in presets - VirtualKeyboardLayout.Qwertz or VirtualKeyboardLayout.Azerty - to the Layout property. The {decimal} numpad key inserts the decimal separator of the current culture." }
+                    }
+                },
             },
         },
         new Example

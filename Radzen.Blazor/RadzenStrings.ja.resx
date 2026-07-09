@@ -2237,4 +2237,28 @@
   <data name="Text_AnchorAriaLabel" xml:space="preserve">
     <value>このセクションへのリンク</value>
   </data>
+  <data name="VirtualKeyboard_AriaLabel" xml:space="preserve">
+    <value>仮想キーボード</value>
+  </data>
+  <data name="VirtualKeyboard_BackspaceAriaLabel" xml:space="preserve">
+    <value>バックスペース</value>
+  </data>
+  <data name="VirtualKeyboard_EnterAriaLabel" xml:space="preserve">
+    <value>Enter</value>
+  </data>
+  <data name="VirtualKeyboard_ShiftAriaLabel" xml:space="preserve">
+    <value>シフト</value>
+  </data>
+  <data name="VirtualKeyboard_SpaceAriaLabel" xml:space="preserve">
+    <value>スペース</value>
+  </data>
+  <data name="VirtualKeyboard_TabAriaLabel" xml:space="preserve">
+    <value>タブ</value>
+  </data>
+  <data name="VirtualKeyboard_ClearAriaLabel" xml:space="preserve">
+    <value>クリア</value>
+  </data>
+  <data name="VirtualKeyboard_CloseAriaLabel" xml:space="preserve">
+    <value>キーボードを非表示</value>
+  </data>
 </root>

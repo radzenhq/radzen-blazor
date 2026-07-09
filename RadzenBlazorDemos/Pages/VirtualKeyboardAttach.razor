@@ -1,0 +1,25 @@
+<RadzenVirtualKeyboard>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+        <RadzenFormField Text="Batch name">
+            <RadzenTextBox @bind-Value=@name />
+        </RadzenFormField>
+        <RadzenFormField Text="Quantity">
+            <RadzenNumeric @bind-Value=@quantity />
+        </RadzenFormField>
+        <RadzenFormField Text="Notes">
+            <RadzenTextArea @bind-Value=@notes Rows="1" />
+        </RadzenFormField>
+    </RadzenStack>
+</RadzenVirtualKeyboard>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" class="rz-pb-12">
+    <RadzenText TextStyle="TextStyle.Body2">
+        Name: @name; Quantity: @quantity; Notes: @notes
+    </RadzenText>
+</RadzenStack>
+
+@code {
+    string name = "Batch 42";
+    decimal quantity = 10;
+    string notes;
+}
