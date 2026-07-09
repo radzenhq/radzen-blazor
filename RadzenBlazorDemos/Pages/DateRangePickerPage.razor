@@ -1,0 +1,85 @@
+@page "/daterangepicker"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Blazor DateRangePicker
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The Radzen Blazor DateRangePicker lets users select a start and end date from a popup showing two months side by side with an in-range highlight and hover preview of the prospective range.
+</RadzenText>
+
+<RadzenText Anchor="daterangepicker#get-set-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Get and Set the value of DateRangePicker
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <strong>DateRangePicker</strong> binds to a <code>DateRange</code> value with nullable <code>Start</code> and <code>End</code> dates. Use <code>@@bind-Value</code> to get the user input.
+    The first click in the calendar selects the start date and the second click selects the end date. Clicking a date before the pending start date restarts the selection from that date.
+    The popup shows two months side by side by default - use <code>DisplayMonths</code> to change the number of displayed months.
+</RadzenText>
+<RadzenExample ComponentName="DateRangePicker" Example="DateRangePickerBindValue">
+    <DateRangePickerBindValue />
+</RadzenExample>
+
+<RadzenText Anchor="daterangepicker#min-max-dates" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Set Min and Max dates
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Min</code> and <code>Max</code> properties to restrict the dates available for selection. Use the <code>DateRender</code> callback to disable specific dates.
+</RadzenText>
+<RadzenExample ComponentName="DateRangePicker" Example="DateRangePickerMinMax">
+    <DateRangePickerMinMax />
+</RadzenExample>
+
+<RadzenText Anchor="daterangepicker#navigation-mode" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    DateRangePicker navigation mode
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The DateRangePicker uses drill-down navigation by default - clicking a calendar title drills up to a month grid and a year grid for fast navigation to distant dates.
+    Set <code>NavigationMode="DatePickerNavigationMode.DropDown"</code> to disable the clickable titles and navigate with the previous/next buttons only.
+</RadzenText>
+<RadzenExample ComponentName="DateRangePicker" Example="DateRangePickerNavigationMode">
+    <DateRangePickerNavigationMode />
+</RadzenExample>
+
+<RadzenText Anchor="daterangepicker#calendar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    DateRangePicker as calendar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Inline="true"</code> to display the DateRangePicker as an always-visible calendar without an input field.
+</RadzenText>
+<RadzenExample ComponentName="DateRangePicker" Example="DateRangePickerCalendar">
+    <DateRangePickerCalendar />
+</RadzenExample>
+
+<RadzenText Anchor="daterangepicker#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor DateRangePicker component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DateRangePicker component." },
+        new KeyboardShortcut { Key = "Alt + DownArrow", Action = "Open the calendar popup." },
+        new KeyboardShortcut { Key = "RightArrow on open popup", Action = "Move focus to the next day." },
+        new KeyboardShortcut { Key = "LeftArrow on open popup", Action = "Move focus to the previous day." },
+        new KeyboardShortcut { Key = "UpArrow on open popup", Action = "Move focus to the same day of the previous week." },
+        new KeyboardShortcut { Key = "DownArrow on open popup", Action = "Move focus to the same day of the next week." },
+        new KeyboardShortcut { Key = "Home on open popup", Action = "Move focus to the first day of the week." },
+        new KeyboardShortcut { Key = "End on open popup", Action = "Move focus to the last day of the week." },
+        new KeyboardShortcut { Key = "PageUp on open popup", Action = "Move focus to the same day of the previous month." },
+        new KeyboardShortcut { Key = "PageDown on open popup", Action = "Move focus to the same day of the next month." },
+        new KeyboardShortcut { Key = "Shift + PageUp on open popup", Action = "Move focus to the same day of the previous year." },
+        new KeyboardShortcut { Key = "Shift + PageDown on open popup", Action = "Move focus to the same day of the next year." },
+        new KeyboardShortcut { Key = "Enter or Space in an opened popup", Action = "Select the focused day as start or end of the range. The popup closes when the range is complete." },
+        new KeyboardShortcut { Key = "Enter or Space on the calendar title", Action = "Drill up to month selection, then to year selection." },
+        new KeyboardShortcut { Key = "Arrow keys in month or year selection", Action = "Move focus between months or years." },
+        new KeyboardShortcut { Key = "PageUp or PageDown in month selection", Action = "Move focus to the same month of the previous or next year." },
+        new KeyboardShortcut { Key = "PageUp or PageDown in year selection", Action = "Move focus to the previous or next page of years." },
+        new KeyboardShortcut { Key = "Enter or Space on a month or year", Action = "Select it and drill back down." },
+        new KeyboardShortcut { Key = "Esc in an opened popup", Action = "Close the popup." }
+    };
+}

@@ -2327,7 +2327,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "DatePicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Get and Set the value of DatePicker", Anchor = "#get-set-value" }, new () { Text = "DatePicker with immediate value update", Anchor = "#immediate" }, new () { Text = "Get and Set the value of DatePicker using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "DatePicker with time", Anchor = "#datepicker-with-time" }, new () { Text = "Define hour format", Anchor = "#hour-format" }, new () { Text = "Time-only DatePicker", Anchor = "#time-only-datepicker" }, new () { Text = "DatePicker with special or disabled dates", Anchor = "#special-disabled-dates" }, new () { Text = "DatePicker with initial view date and year range", Anchor = "#initial-view-date-and-year-change" }, new () { Text = "DatePicker with drill-down navigation", Anchor = "#drill-down-navigation" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DatePicker with custom footer", Anchor = "#custom-footer" }, new () { Text = "DatePicker with custom input parsing", Anchor = "#custom-input-parsing" }, new () { Text = "DatePicker as calendar", Anchor = "#calendar" }, new () { Text = "DatePicker for year/month selection", Anchor = "#year-month-selection" }, new () { Text = "DatePicker binds to types DateOnly or TimeOnly", Anchor = "#dateonly-timeonly" }, new () { Text = "DatePicker Sizes", Anchor = "#sizes" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "DatePicker",
                     Path = "datepicker",
                     Title = "Blazor DatePicker & Calendar Component | Free UI Components by Radzen",
@@ -2341,6 +2341,24 @@ namespace RadzenBlazorDemos
                         new FaqItem { Question = "How do I let users pick a date and time together?", Answer = "Set ShowTime to true so the picker includes a time selector alongside the calendar; use HourFormat to switch between 12- and 24-hour input." },
                         new FaqItem { Question = "How do I disable specific or past dates?", Answer = "Use the DateRender callback to mark dates as disabled, and set Min and Max to bound the selectable range." },
                         new FaqItem { Question = "Does the DatePicker support DateOnly and TimeOnly?", Answer = "Yes. It binds to DateTime, DateTimeOffset, DateOnly, and TimeOnly values." }
+                    }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Get and Set the value of DateRangePicker", Anchor = "#get-set-value" }, new () { Text = "Set Min and Max dates", Anchor = "#min-max-dates" }, new () { Text = "DateRangePicker navigation mode", Anchor = "#navigation-mode" }, new () { Text = "DateRangePicker as calendar", Anchor = "#calendar" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Name = "DateRangePicker",
+                    Path = "daterangepicker",
+                    Title = "Blazor DateRangePicker Component | Free UI Components by Radzen",
+                    Description = "The Radzen Blazor DateRangePicker lets users select a start and end date from a popup showing two months side by side with an in-range highlight, hover preview, min/max and disabled dates.",
+                    Icon = "\ue916",
+                    Tags = new [] { "calendar", "range", "form", "edit", "datepicker", "daterangepicker" },
+                    Related = new [] { "datepicker", "timespanpicker", "scheduler" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I get the selected date range?", Answer = "Bind Value to a DateRange instance. The DateRangePicker sets its Start and End dates as the user selects them and raises Change when the selection changes." },
+                        new FaqItem { Question = "How does range selection work in the calendar?", Answer = "The first click selects the start date and the second click selects the end date and closes the popup. Clicking a date before the pending start date restarts the selection from that date." },
+                        new FaqItem { Question = "Can I use the DateRangePicker as an always-visible calendar?", Answer = "Yes. Set Inline to true to render the calendar inline instead of a popup." },
+                        new FaqItem { Question = "How do I restrict the selectable dates?", Answer = "Use Min and Max to bound the selectable range and the DateRender callback to disable specific dates." }
                     }
                 },
                 new Example
