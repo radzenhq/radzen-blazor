@@ -1,0 +1,18 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-4">
+    <RadzenLabel Text="Placement" Component="VirtualKeyboardPlacementDropDown" />
+    <RadzenDropDown @bind-Value=@placement Data="@placements" Name="VirtualKeyboardPlacementDropDown" Style="width: 8rem;" />
+</RadzenStack>
+
+<RadzenVirtualKeyboard Placement="@placement">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+        <RadzenFormField Text="Operator name">
+            <RadzenTextBox @bind-Value=@name />
+        </RadzenFormField>
+    </RadzenStack>
+</RadzenVirtualKeyboard>
+
+@code {
+    string name;
+    VirtualKeyboardPlacement placement = VirtualKeyboardPlacement.Auto;
+    IEnumerable<VirtualKeyboardPlacement> placements = new[] { VirtualKeyboardPlacement.Auto, VirtualKeyboardPlacement.Bottom, VirtualKeyboardPlacement.Top };
+}

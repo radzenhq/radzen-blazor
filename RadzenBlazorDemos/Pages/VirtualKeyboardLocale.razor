@@ -1,0 +1,29 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-4">
+    <RadzenLabel Text="Layout" Component="VirtualKeyboardLocaleDropDown" />
+    <RadzenDropDown @bind-Value=@selected Data="@layouts" TextProperty="Key" ValueProperty="Value" Name="VirtualKeyboardLocaleDropDown" Style="width: 8rem;" />
+</RadzenStack>
+
+<RadzenVirtualKeyboard Layout="@selected" Placement="VirtualKeyboardPlacement.Auto">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+        <RadzenFormField Text="Product description">
+            <RadzenTextBox @bind-Value=@description />
+        </RadzenFormField>
+    </RadzenStack>
+</RadzenVirtualKeyboard>
+
+@code {
+    string description;
+    VirtualKeyboardLayout selected;
+
+    IEnumerable<KeyValuePair<string, VirtualKeyboardLayout>> layouts = new[]
+    {
+        new KeyValuePair<string, VirtualKeyboardLayout>("QWERTY", VirtualKeyboardLayout.Qwerty),
+        new KeyValuePair<string, VirtualKeyboardLayout>("QWERTZ", VirtualKeyboardLayout.Qwertz),
+        new KeyValuePair<string, VirtualKeyboardLayout>("AZERTY", VirtualKeyboardLayout.Azerty)
+    };
+
+    protected override void OnInitialized()
+    {
+        selected = layouts.First().Value;
+    }
+}
