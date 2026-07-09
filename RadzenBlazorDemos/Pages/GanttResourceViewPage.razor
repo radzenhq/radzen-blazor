@@ -1,0 +1,18 @@
+@page "/gantt-resource-view"
+
+<PageTitle>Gantt Resource View - Radzen Blazor Components</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Gantt Resource View
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Display tasks grouped by resource. Rows represent resources (people, machines, slots) and task bars are
+    stacked within each resource row. Overlapping tasks are automatically arranged in lanes. Resources can be
+    hierarchical — tasks of collapsed groups roll up onto the group row. Tasks without a matching resource are
+    collected in an Unassigned row, and the histogram below the timeline shows the accumulated workload per
+    time unit with a configurable capacity line.
+</RadzenText>
+
+<RadzenExample ComponentName="Gantt" Example="GanttResourceView" AdditionalSourceCodePages=@(new [] { "/demos/Models/GanttTask.cs" })>
+    <GanttResourceView />
+</RadzenExample>

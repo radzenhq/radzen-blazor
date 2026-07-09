@@ -124,6 +124,11 @@ namespace Radzen.Blazor
             {
                 progressGetter = PropertyAccess.Getter<TItem, object>(ProgressProperty);
             }
+
+            if (IsResourceMode)
+            {
+                InitResourceGetters();
+            }
         }
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -973,7 +978,14 @@ namespace Radzen.Blazor
         /// </summary>
         public async System.Threading.Tasks.Task Reload()
         {
-            if (grid != null)
+            if (IsResourceMode)
+            {
+                if (resourceGrid != null)
+                {
+                    await resourceGrid.Reload();
+                }
+            }
+            else if (grid != null)
             {
                 await grid.Reload();
             }
@@ -1041,11 +1053,22 @@ namespace Radzen.Blazor
             return cachedEndGetter;
         }
 
+        internal IEnumerable<TItem>? SchedulerDataSource => IsResourceMode ? GetResourceModeTasks() : grid?.View;
+
         internal IReadOnlyList<DateTime> TimelineDays => cachedTimelineDays ??= BuildTimelineDays();
 
         internal int TimelineWidthPx => TimelineDays.Count * DayWidthPx;
 
-        internal int TimelineRowCount => cachedTimelineRowCount ??= (TimelineRowIndexByItem.Count > 0 ? TimelineRowIndexByItem.Count : (grid?.View?.Count() ?? gridCount));
+        internal int TimelineRowCount => cachedTimelineRowCount ??= ComputeTimelineRowCount();
+
+        private int ComputeTimelineRowCount()
+        {
+            if (IsResourceMode)
+            {
+                return ComputeResourceModeRowCount();
+            }
+            return TimelineRowIndexByItem.Count > 0 ? TimelineRowIndexByItem.Count : (grid?.View?.Count() ?? gridCount);
+        }
 
         internal IReadOnlyDictionary<object, int> TimelineRowIndexByItem => cachedTimelineRowIndex ??= BuildTimelineRowIndex();
 
@@ -1093,7 +1116,9 @@ namespace Radzen.Blazor
 
         private IReadOnlyList<DateTime> BuildTimelineDays()
         {
-            var data = pagedData?.ToList() ?? new List<TItem>();
+            var data = IsResourceMode
+                ? (resourceModeTasks?.ToList() ?? new List<TItem>())
+                : (pagedData?.ToList() ?? new List<TItem>());
             var sg = GetStartGetter();
             var eg = GetEndGetter();
             if (data.Count == 0 || sg == null || eg == null)
@@ -1154,6 +1179,11 @@ namespace Radzen.Blazor
 
         private IReadOnlyDictionary<object, int> BuildTimelineRowIndex()
         {
+            if (IsResourceMode)
+            {
+                return BuildResourceModeRowIndex();
+            }
+
             var map = new Dictionary<object, int>();
             var index = 0;
             foreach (var item in grid?.View ?? Enumerable.Empty<TItem>())
@@ -1800,20 +1830,21 @@ namespace Radzen.Blazor
 
         private void OnGridRowRender(RowRenderEventArgs<TItem> args)
         {
-            if (!string.IsNullOrWhiteSpace(IdProperty) && !string.IsNullOrWhiteSpace(ParentIdProperty))
+            if (!string.IsNullOrWhiteSpace(IdProperty) && !string.IsNullOrWhiteSpace(ParentIdProperty) && idGetter != null)
             {
-                if (idGetter != null)
+                var query = (Data ?? Enumerable.Empty<TItem>()).AsQueryable()
+                    .Where($"it => it.{ParentIdProperty} == @0", new object[] { idGetter(args.Data!) });
+
+                if (visibleIds != null)
                 {
-                    var query = (Data ?? Enumerable.Empty<TItem>()).AsQueryable()
-                        .Where($"it => it.{ParentIdProperty} == @0", new object[] { idGetter(args.Data!) });
-
-                    if (visibleIds != null)
-                    {
-                        query = query.Where(item => visibleIds.Contains(idGetter(item)));
-                    }
-
-                    args.Expandable = query.Any();
+                    query = query.Where(item => visibleIds.Contains(idGetter(item)));
                 }
+
+                args.Expandable = query.Any();
+            }
+            else
+            {
+                args.Expandable = false;
             }
 
             // Set row height
@@ -1972,13 +2003,18 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Expands a range of rows.
+        /// Expands a range of rows. In resource view mode the resources the items are assigned to
+        /// (including their ancestors) are expanded instead.
         /// </summary>
         /// <param name="items">The range of rows.</param>
         public async Task ExpandRows(IEnumerable<TItem> items)
         {
             ArgumentNullException.ThrowIfNull(items);
-            if (grid != null)
+            if (IsResourceMode)
+            {
+                await ExpandResourceRowsForItems(items);
+            }
+            else if (grid != null)
             {
                 await grid.ExpandRows(items);
             }

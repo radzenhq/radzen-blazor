@@ -26,6 +26,25 @@ namespace RadzenBlazorDemos.Models
         public int SuccessorId { get; set; }
         public GanttDependencyType Type { get; set; } = GanttDependencyType.FinishToStart;
     }
+
+    public class GanttResource
+    {
+        public int Id { get; set; }
+        public int? ParentId { get; set; }
+        public string? Name { get; set; }
+        public string? Role { get; set; }
+    }
+
+    public class GanttResourceTask
+    {
+        public int Id { get; set; }
+        public int? ParentId { get; set; }
+        public int ResourceId { get; set; }
+        public string? Name { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public double? Progress { get; set; }
+    }
 #nullable disable
 }
 

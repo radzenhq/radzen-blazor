@@ -254,6 +254,10 @@ window.Radzen = {
       }
       syncing = true;
       grid.scrollTop = timeline.scrollTop;
+      var histogram = root.querySelector('.rz-gantt-histogram-scroll');
+      if (histogram) {
+        histogram.scrollLeft = timeline.scrollLeft;
+      }
       syncing = false;
     };
 
