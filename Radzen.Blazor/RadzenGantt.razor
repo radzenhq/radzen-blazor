@@ -61,124 +61,182 @@
     <RadzenSplitter class="rz-gantt-splitter" Style="height: 100%;" ChangeStateOnResize="false">
         <RadzenSplitterPane Size="@LeftPaneWidth" Collapsible="false">
             <CascadingValue Value="@this" IsFixed="true">
-                <RadzenDataGrid @ref="grid"
-                                TItem="TItem"
-                                Data="@pagedData"
-                                Count="@gridCount"
-                                IsLoading="@IsLoading"
-                                LoadData="@OnGridLoadData"
-                                LoadChildData="@OnGridLoadChildData"
-                                AllowSorting="@AllowSorting"
-                                AllowMultiColumnSorting="@AllowMultiColumnSorting"
-                                ShowMultiColumnSortingIndex="@ShowMultiColumnSortingIndex"
-                                GotoFirstPageOnSort="@GotoFirstPageOnSort"
-                                AllowFiltering="@AllowFiltering"
-                                FilterMode="@FilterMode"
-                                LogicalFilterOperator="@LogicalFilterOperator"
-                                FilterCaseSensitivity="@FilterCaseSensitivity"
-                                FilterPopupRenderMode="@FilterPopupRenderMode"
-                                AllowPaging="@AllowPaging"
-                                PageSize="@PageSize"
-                                AllowColumnResize="@AllowColumnResize"
-                                AllowColumnReorder="@AllowColumnReorder"
-                                AllowColumnPicking="@AllowColumnPicking"
-                                AllowVirtualization="@AllowVirtualization"
-                                VirtualizationOverscanCount="@VirtualizationOverscanCount"
-                                GridLines="@GridLines"
-                                Density="@Density"
-                                ShowEmptyMessage="@ShowEmptyMessage"
-                                EmptyText="@EmptyText"
-                                Responsive="@Responsive"
-                                ShowHeader="@ShowHeader"
-                                EditMode="@EditMode"
-                                ExpandMode="@ExpandMode"
-                                AllowAlternatingRows="@AllowAlternatingRows"
-                                AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick"
-                                ShowCellDataAsTooltip="@ShowCellDataAsTooltip"
-                                ShowColumnTitleAsTooltip="@ShowColumnTitleAsTooltip"
-                                AllowFilterDateInput="@AllowFilterDateInput"
-                                FilterText="@FilterText"
-                                AndOperatorText="@AndOperatorText"
-                                OrOperatorText="@OrOperatorText"
-                                ApplyFilterText="@ApplyFilterText"
-                                ClearFilterText="@ClearFilterText"
-                                EqualsText="@EqualsText"
-                                NotEqualsText="@NotEqualsText"
-                                LessThanText="@LessThanText"
-                                LessThanOrEqualsText="@LessThanOrEqualsText"
-                                GreaterThanText="@GreaterThanText"
-                                GreaterThanOrEqualsText="@GreaterThanOrEqualsText"
-                                ContainsText="@ContainsText"
-                                DoesNotContainText="@DoesNotContainText"
-                                StartsWithText="@StartsWithText"
-                                EndsWithText="@EndsWithText"
-                                IsNullText="@IsNullText"
-                                IsNotNullText="@IsNotNullText"
-                                IsEmptyText="@IsEmptyText"
-                                IsNotEmptyText="@IsNotEmptyText"
-                                RowRender="@OnGridRowRender"
-                                CellRender="@CellRender"
-                                HeaderCellRender="@HeaderCellRender"
-                                FooterCellRender="@FooterCellRender"
-                                Render="@Render"
-                                Sort="@OnGridSort"
-                                Filter="@OnGridFilter"
-                                FilterCleared="@OnGridFilterCleared"
-                                ColumnResized="@ColumnResized"
-                                ColumnReordering="@ColumnReordering"
-                                ColumnReordered="@ColumnReordered"
-                                RowClick="@RowClick"
-                                RowDoubleClick="@RowDoubleClick"
-                                CellClick="@CellClick"
-                                CellDoubleClick="@CellDoubleClick"
-                                CellContextMenu="@CellContextMenu"
-                                RowSelect="@RowSelect"
-                                RowDeselect="@RowDeselect"
-                                RowExpand="@OnGridRowExpand"
-                                RowCollapse="@OnGridRowCollapse"
-                                RowEdit="@RowEdit"
-                                RowUpdate="@RowUpdate"
-                                RowCreate="@RowCreate"
-                                KeyDown="@KeyDown"
-                                PageSizeChanged="@PageSizeChanged"
-                                PickedColumnsChanged="@PickedColumnsChanged"
-                                LoadSettings="@LoadSettings"
-                                SettingsChanged="@SettingsChanged"
-                                Style="height:100%;width:100%;">
-                    <Columns>
-                        @if (Columns != null)
-                        {
-                            @Columns
-                        }
-                        else 
-                        {
-                            if(!string.IsNullOrEmpty(IdProperty))
+                @if (IsResourceMode)
+                {
+                    <RadzenDataGrid @ref="resourceGrid"
+                                    TItem="object"
+                                    Data="@resourcePagedData"
+                                    Count="@resourceGridCount"
+                                    IsLoading="@IsLoading"
+                                    LoadData="@OnResourceGridLoadData"
+                                    LoadChildData="@OnResourceGridLoadChildData"
+                                    AllowSorting="@AllowSorting"
+                                    AllowFiltering="@AllowFiltering"
+                                    FilterMode="@FilterMode"
+                                    LogicalFilterOperator="@LogicalFilterOperator"
+                                    FilterCaseSensitivity="@FilterCaseSensitivity"
+                                    FilterPopupRenderMode="@FilterPopupRenderMode"
+                                    AllowPaging="@AllowPaging"
+                                    PageSize="@PageSize"
+                                    AllowColumnResize="@AllowColumnResize"
+                                    AllowColumnReorder="@AllowColumnReorder"
+                                    AllowVirtualization="@AllowVirtualization"
+                                    VirtualizationOverscanCount="@VirtualizationOverscanCount"
+                                    GridLines="@GridLines"
+                                    Density="@Density"
+                                    ShowEmptyMessage="@ShowEmptyMessage"
+                                    EmptyText="@EmptyText"
+                                    Responsive="@Responsive"
+                                    ShowHeader="@ShowHeader"
+                                    ExpandMode="@ExpandMode"
+                                    AllowAlternatingRows="@AllowAlternatingRows"
+                                    AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick"
+                                    ShowCellDataAsTooltip="@ShowCellDataAsTooltip"
+                                    ShowColumnTitleAsTooltip="@ShowColumnTitleAsTooltip"
+                                    RowRender="@OnResourceGridRowRender"
+                                    RowExpand="@OnResourceGridRowExpand"
+                                    RowCollapse="@OnResourceGridRowCollapse"
+                                    KeyDown="@KeyDown"
+                                    Style="@GridPaneStyle">
+                        <Columns>
+                            @if (ResourceColumns != null)
                             {
-                                <RadzenGanttColumn TItem="TItem" Title="@IdProperty" Property="@IdProperty" />
+                                @ResourceColumns
                             }
-                            else if(!string.IsNullOrEmpty(ParentIdProperty))
+                            else if (!string.IsNullOrEmpty(ResourceTextProperty))
                             {
-                                <RadzenGanttColumn TItem="TItem" Title="@ParentIdProperty" Property="@ParentIdProperty" />
+                                <RadzenDataGridColumn TItem="object" Title="@ResourceTextProperty" Sortable="false" Filterable="false">
+                                    <Template Context="resourceItem">@GetResourceCellText(resourceItem)</Template>
+                                </RadzenDataGridColumn>
                             }
-                            else if(!string.IsNullOrEmpty(TextProperty))
+                        </Columns>
+                    </RadzenDataGrid>
+                }
+                else
+                {
+                    <RadzenDataGrid @ref="grid"
+                                    TItem="TItem"
+                                    Data="@pagedData"
+                                    Count="@gridCount"
+                                    IsLoading="@IsLoading"
+                                    LoadData="@OnGridLoadData"
+                                    LoadChildData="@OnGridLoadChildData"
+                                    AllowSorting="@AllowSorting"
+                                    AllowMultiColumnSorting="@AllowMultiColumnSorting"
+                                    ShowMultiColumnSortingIndex="@ShowMultiColumnSortingIndex"
+                                    GotoFirstPageOnSort="@GotoFirstPageOnSort"
+                                    AllowFiltering="@AllowFiltering"
+                                    FilterMode="@FilterMode"
+                                    LogicalFilterOperator="@LogicalFilterOperator"
+                                    FilterCaseSensitivity="@FilterCaseSensitivity"
+                                    FilterPopupRenderMode="@FilterPopupRenderMode"
+                                    AllowPaging="@AllowPaging"
+                                    PageSize="@PageSize"
+                                    AllowColumnResize="@AllowColumnResize"
+                                    AllowColumnReorder="@AllowColumnReorder"
+                                    AllowColumnPicking="@AllowColumnPicking"
+                                    AllowVirtualization="@AllowVirtualization"
+                                    VirtualizationOverscanCount="@VirtualizationOverscanCount"
+                                    GridLines="@GridLines"
+                                    Density="@Density"
+                                    ShowEmptyMessage="@ShowEmptyMessage"
+                                    EmptyText="@EmptyText"
+                                    Responsive="@Responsive"
+                                    ShowHeader="@ShowHeader"
+                                    EditMode="@EditMode"
+                                    ExpandMode="@ExpandMode"
+                                    AllowAlternatingRows="@AllowAlternatingRows"
+                                    AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick"
+                                    ShowCellDataAsTooltip="@ShowCellDataAsTooltip"
+                                    ShowColumnTitleAsTooltip="@ShowColumnTitleAsTooltip"
+                                    AllowFilterDateInput="@AllowFilterDateInput"
+                                    FilterText="@FilterText"
+                                    AndOperatorText="@AndOperatorText"
+                                    OrOperatorText="@OrOperatorText"
+                                    ApplyFilterText="@ApplyFilterText"
+                                    ClearFilterText="@ClearFilterText"
+                                    EqualsText="@EqualsText"
+                                    NotEqualsText="@NotEqualsText"
+                                    LessThanText="@LessThanText"
+                                    LessThanOrEqualsText="@LessThanOrEqualsText"
+                                    GreaterThanText="@GreaterThanText"
+                                    GreaterThanOrEqualsText="@GreaterThanOrEqualsText"
+                                    ContainsText="@ContainsText"
+                                    DoesNotContainText="@DoesNotContainText"
+                                    StartsWithText="@StartsWithText"
+                                    EndsWithText="@EndsWithText"
+                                    IsNullText="@IsNullText"
+                                    IsNotNullText="@IsNotNullText"
+                                    IsEmptyText="@IsEmptyText"
+                                    IsNotEmptyText="@IsNotEmptyText"
+                                    RowRender="@OnGridRowRender"
+                                    CellRender="@CellRender"
+                                    HeaderCellRender="@HeaderCellRender"
+                                    FooterCellRender="@FooterCellRender"
+                                    Render="@Render"
+                                    Sort="@OnGridSort"
+                                    Filter="@OnGridFilter"
+                                    FilterCleared="@OnGridFilterCleared"
+                                    ColumnResized="@ColumnResized"
+                                    ColumnReordering="@ColumnReordering"
+                                    ColumnReordered="@ColumnReordered"
+                                    RowClick="@RowClick"
+                                    RowDoubleClick="@RowDoubleClick"
+                                    CellClick="@CellClick"
+                                    CellDoubleClick="@CellDoubleClick"
+                                    CellContextMenu="@CellContextMenu"
+                                    RowSelect="@RowSelect"
+                                    RowDeselect="@RowDeselect"
+                                    RowExpand="@OnGridRowExpand"
+                                    RowCollapse="@OnGridRowCollapse"
+                                    RowEdit="@RowEdit"
+                                    RowUpdate="@RowUpdate"
+                                    RowCreate="@RowCreate"
+                                    KeyDown="@KeyDown"
+                                    PageSizeChanged="@PageSizeChanged"
+                                    PickedColumnsChanged="@PickedColumnsChanged"
+                                    LoadSettings="@LoadSettings"
+                                    SettingsChanged="@SettingsChanged"
+                                    Style="@GridPaneStyle">
+                        <Columns>
+                            @if (Columns != null)
                             {
-                                <RadzenGanttColumn TItem="TItem" Title="@TextProperty" Property="@TextProperty" />
+                                @Columns
                             }
-                            else if(!string.IsNullOrEmpty(StartProperty))
+                            else
                             {
-                                <RadzenGanttColumn TItem="TItem" Title="@StartProperty" Property="@StartProperty" />
+                                if(!string.IsNullOrEmpty(IdProperty))
+                                {
+                                    <RadzenGanttColumn TItem="TItem" Title="@IdProperty" Property="@IdProperty" />
+                                }
+                                else if(!string.IsNullOrEmpty(ParentIdProperty))
+                                {
+                                    <RadzenGanttColumn TItem="TItem" Title="@ParentIdProperty" Property="@ParentIdProperty" />
+                                }
+                                else if(!string.IsNullOrEmpty(TextProperty))
+                                {
+                                    <RadzenGanttColumn TItem="TItem" Title="@TextProperty" Property="@TextProperty" />
+                                }
+                                else if(!string.IsNullOrEmpty(StartProperty))
+                                {
+                                    <RadzenGanttColumn TItem="TItem" Title="@StartProperty" Property="@StartProperty" />
+                                }
+                                else if(!string.IsNullOrEmpty(EndProperty))
+                                {
+                                    <RadzenGanttColumn TItem="TItem" Title="@EndProperty" Property="@EndProperty" />
+                                }
+                                else if(!string.IsNullOrEmpty(ProgressProperty))
+                                {
+                                    <RadzenGanttColumn TItem="TItem" Title="@ProgressProperty" Property="@ProgressProperty" />
+                                }
                             }
-                            else if(!string.IsNullOrEmpty(EndProperty))
-                            {
-                                <RadzenGanttColumn TItem="TItem" Title="@EndProperty" Property="@EndProperty" />
-                            }
-                            else if(!string.IsNullOrEmpty(ProgressProperty))
-                            {
-                                <RadzenGanttColumn TItem="TItem" Title="@ProgressProperty" Property="@ProgressProperty" />
-                            }
-                        }
-                    </Columns>
-                </RadzenDataGrid>
+                        </Columns>
+                    </RadzenDataGrid>
+                }
+                @if (ShowHistogram)
+                {
+                    <div class="rz-gantt-histogram-spacer">@HistogramLabel</div>
+                }
             </CascadingValue>
         </RadzenSplitterPane>
 
@@ -186,7 +244,7 @@
             <CascadingValue Value="@this" IsFixed="true">
                 <RadzenScheduler @ref="scheduler"
                                  TItem="TItem"
-                                 Data="@grid?.View"
+                                 Data="@SchedulerDataSource"
                                  StartProperty="@StartProperty"
                                  EndProperty="@EndProperty"
                                  TextProperty="@TextProperty"
