@@ -1,0 +1,41 @@
+@inherits RadzenComponent
+
+@if (Visible)
+{
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        @ChildContent
+        <div class="@PanelCssClass" style="@PanelStyle" role="group" aria-label="@AriaLabel">
+            <div class="rz-virtual-keyboard-sections">
+                @foreach (var section in Sections)
+                {
+                    <div class="rz-virtual-keyboard-section">
+                        @for (var rowIndex = 0; rowIndex < section.Rows.Count; rowIndex++)
+                        {
+                            <div class="rz-virtual-keyboard-row">
+                                @for (var keyIndex = 0; keyIndex < section.Rows[rowIndex].Length; keyIndex++)
+                                {
+                                    var key = GetKey(section, rowIndex, keyIndex);
+                                    <button type="button" tabindex="-1" class="@key.CssClass" aria-label="@key.AriaLabel"
+                                            data-vk-key="@key.Text" data-vk-shift="@key.ShiftText" data-vk-action="@key.Action">
+                                        @if (key.Icon != null)
+                                        {
+                                            <i class="notranslate rzi">@key.Icon</i>
+                                        }
+                                        else
+                                        {
+                                            <span class="rz-virtual-keyboard-cap">@key.Label</span>
+                                            @if (key.ShiftLabel != null)
+                                            {
+                                                <span class="rz-virtual-keyboard-cap-shift">@key.ShiftLabel</span>
+                                            }
+                                        }
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

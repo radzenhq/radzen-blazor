@@ -1004,6 +1004,240 @@ window.Radzen = {
           }
       };
   },
+  createVirtualKeyboard: function (id, el) {
+      if (!el) return;
+
+      var panel = el.querySelector('.rz-virtual-keyboard-panel');
+      if (!panel) return;
+
+      var state = Radzen[id] = { input: null, shift: false, closeTimeout: null };
+
+      var isInline = function () { return panel.classList.contains('rz-virtual-keyboard-inline'); };
+      var isAuto = function () { return panel.classList.contains('rz-virtual-keyboard-auto'); };
+
+      var isEditable = function (target) {
+          if (!target || target.disabled || target.readOnly) return false;
+          if (target.tagName == 'TEXTAREA') return true;
+          if (target.tagName != 'INPUT') return false;
+          return !['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'range', 'color', 'hidden', 'image'].includes((target.type || 'text').toLowerCase());
+      };
+
+      var setValue = function (input, value, caret) {
+          var proto = input.tagName == 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+          var descriptor = Object.getOwnPropertyDescriptor(proto, 'value');
+          if (descriptor && descriptor.set) {
+              descriptor.set.call(input, value);
+          } else {
+              input.value = value;
+          }
+          if (caret != null) {
+              try { input.setSelectionRange(caret, caret); } catch { }
+          }
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+      };
+
+      var selection = function (input) {
+          var start = null;
+          var end = null;
+          try { start = input.selectionStart; end = input.selectionEnd; } catch { }
+          if (start == null || end == null) {
+              start = end = input.value.length;
+          }
+          return { start: start, end: end };
+      };
+
+      var insert = function (text) {
+          var input = state.input;
+          var range = selection(input);
+          var value = input.value.slice(0, range.start) + text + input.value.slice(range.end);
+          if (input.maxLength > 0 && value.length > input.maxLength) return;
+          setValue(input, value, range.start + text.length);
+      };
+
+      var backspace = function () {
+          var input = state.input;
+          var range = selection(input);
+          if (range.start == range.end) {
+              if (range.start == 0) return;
+              range.start--;
+          }
+          setValue(input, input.value.slice(0, range.start) + input.value.slice(range.end), range.start);
+      };
+
+      var commit = function (input) {
+          if (input && state.value != null && input.value !== state.value) {
+              state.value = input.value;
+              input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+      };
+
+      var enter = function () {
+          var input = state.input;
+          if (input.tagName == 'TEXTAREA') {
+              insert('\n');
+              return;
+          }
+          commit(input);
+          ['keydown', 'keypress', 'keyup'].forEach(function (type) {
+              input.dispatchEvent(new KeyboardEvent(type, { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+          });
+      };
+
+      var toggleShift = function () {
+          state.shift = !state.shift;
+          panel.classList.toggle('rz-virtual-keyboard-shift-active', state.shift);
+      };
+
+      var reposition = function () {
+          if (!state.input || !isAuto()) return;
+          var rect = state.input.getBoundingClientRect();
+          panel.style.left = '0px';
+          panel.style.top = '0px';
+          var panelRect = panel.getBoundingClientRect();
+          var left = Radzen.isRTL(panel) ? rect.right - panelRect.width : rect.left;
+          left = Math.max(0, Math.min(left, window.innerWidth - panelRect.width));
+          var top = rect.bottom + 4;
+          if (top + panelRect.height > window.innerHeight && rect.top > panelRect.height + 4) {
+              top = rect.top - panelRect.height - 4;
+          }
+          top = Math.max(0, Math.min(top, window.innerHeight - panelRect.height));
+          panel.style.left = left + 'px';
+          panel.style.top = top + 'px';
+      };
+
+      var restore = function () {
+          if (panel.parentNode === document.body) {
+              el.appendChild(panel);
+          }
+      };
+
+      var open = function (input) {
+          state.input = input;
+          state.value = input.value;
+          if (isInline()) return;
+          if (panel.parentNode !== document.body) {
+              document.body.appendChild(panel);
+          }
+          panel.style.display = 'block';
+          if (isAuto()) {
+              reposition();
+              window.addEventListener('resize', reposition);
+              document.addEventListener('scroll', reposition, true);
+          } else {
+              panel.style.left = '';
+              panel.style.top = '';
+              var panelRect = panel.getBoundingClientRect();
+              var rect = input.getBoundingClientRect();
+              if (rect.bottom > panelRect.top && rect.top < panelRect.bottom) {
+                  input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+              }
+          }
+      };
+
+      var close = function () {
+          commit(state.input);
+          state.input = null;
+          state.value = null;
+          if (state.shift) {
+              toggleShift();
+          }
+          if (isInline()) return;
+          panel.style.display = 'none';
+          restore();
+          window.removeEventListener('resize', reposition);
+          document.removeEventListener('scroll', reposition, true);
+      };
+
+      state.focusIn = function (e) {
+          if (panel.contains(e.target) || !isEditable(e.target)) return;
+          if (state.closeTimeout) {
+              clearTimeout(state.closeTimeout);
+              state.closeTimeout = null;
+          }
+          if (state.input !== e.target) {
+              commit(state.input);
+              open(e.target);
+          }
+      };
+
+      state.focusOut = function () {
+          if (!state.input) return;
+          state.closeTimeout = setTimeout(function () {
+              state.closeTimeout = null;
+              var active = document.activeElement;
+              if (!active || !el.contains(active) || !isEditable(active)) {
+                  close();
+              }
+          }, 100);
+      };
+
+      state.keyHandler = function (e) {
+          if (e.button !== undefined && e.button !== 0) return;
+          e.preventDefault();
+
+          var key = e.target.closest ? e.target.closest('.rz-virtual-keyboard-key') : null;
+          if (!key || !state.input) return;
+
+          var action = key.getAttribute('data-vk-action');
+
+          if (action == 'backspace') {
+              backspace();
+          } else if (action == 'enter') {
+              enter();
+          } else if (action == 'shift') {
+              toggleShift();
+          } else if (action == 'clear') {
+              setValue(state.input, '', 0);
+          } else if (action == 'close') {
+              var input = state.input;
+              close();
+              if (input) {
+                  input.blur();
+              }
+          } else {
+              var text = state.shift && key.getAttribute('data-vk-shift') ? key.getAttribute('data-vk-shift') : key.getAttribute('data-vk-key');
+              if (text == null) return;
+              insert(text);
+              if (state.shift) {
+                  toggleShift();
+              }
+          }
+      };
+
+      state.mouseDown = function (e) {
+          e.preventDefault();
+      };
+
+      var pointerEvents = window.PointerEvent !== undefined;
+
+      panel.addEventListener(pointerEvents ? 'pointerdown' : 'mousedown', state.keyHandler);
+      if (pointerEvents) {
+          panel.addEventListener('mousedown', state.mouseDown);
+      }
+      el.addEventListener('focusin', state.focusIn);
+      el.addEventListener('focusout', state.focusOut);
+
+      return {
+          dispose: function () {
+              if (!Radzen[id]) return;
+
+              if (state.closeTimeout) {
+                  clearTimeout(state.closeTimeout);
+              }
+              restore();
+              panel.removeEventListener(pointerEvents ? 'pointerdown' : 'mousedown', state.keyHandler);
+              if (pointerEvents) {
+                  panel.removeEventListener('mousedown', state.mouseDown);
+              }
+              el.removeEventListener('focusin', state.focusIn);
+              el.removeEventListener('focusout', state.focusOut);
+              window.removeEventListener('resize', reposition);
+              document.removeEventListener('scroll', reposition, true);
+
+              Radzen[id] = null;
+          }
+      };
+  },
   createSlider: function (
     id,
     slider,
