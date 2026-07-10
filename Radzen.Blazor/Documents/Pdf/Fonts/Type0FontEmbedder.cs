@@ -194,6 +194,12 @@ internal static class Type0FontEmbedder
 
     private static string Utf16BeHex(int codepoint)
     {
+        if (codepoint is < 0 or > 0x10FFFF or (>= 0xD800 and <= 0xDFFF))
+        {
+            // Lone surrogate (or out-of-range value): emit the raw UTF-16 unit.
+            return (codepoint & 0xFFFF).ToString("X4", CultureInfo.InvariantCulture);
+        }
+
         var s = char.ConvertFromUtf32(codepoint);
         var sb = new StringBuilder(s.Length * 4);
         foreach (var ch in s)
