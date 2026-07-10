@@ -1,0 +1,238 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Objects;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// R2 regression tests: hyperlinks (Run.Link -> /Link annotations with /A /URI) and
+// per-page page-number fields (PageNumberField / PageCountField inlines resolved at
+// emit time in headers/footers). All assertions run against the REAL bytes produced
+// by DocumentBuilder.Build() and reparsed with DocumentReader. The new public API
+// (Run.Link, PageNumberField, PageCountField) is reached through reflection so this
+// file compiles against the current code and fails at runtime until the API exists.
+public class HyperlinkPageNumberRegressionTests
+{
+    private const double Tol = 1.0;
+    private const string Url = "https://www.radzen.com/blazor-studio/";
+
+    private static (DocumentBuilder Builder, Section Section) Author(double width = 400, double height = 300)
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(width), Unit.FromPoint(height));
+        section.Margin = Unit.FromPoint(40);
+        return (builder, section);
+    }
+
+    private static void SetLink(Run run, string url)
+    {
+        var property = typeof(Run).GetProperty("Link", BindingFlags.Public | BindingFlags.Instance);
+        Assert.True(property is not null, "Run.Link public property is missing");
+        Assert.True(property!.PropertyType == typeof(string), $"Run.Link must be a string, was {property.PropertyType}");
+        property.SetValue(run, url);
+    }
+
+    private static Run Field(string typeName)
+    {
+        var type = typeof(Run).Assembly.GetType($"Radzen.Documents.Pdf.{typeName}");
+        Assert.True(type is not null, $"public type Radzen.Documents.Pdf.{typeName} is missing");
+        Assert.True(typeof(Run).IsAssignableFrom(type), $"{typeName} must derive from Run so it can be added to Paragraph.Inlines");
+        var instance = Activator.CreateInstance(type!);
+        return Assert.IsAssignableFrom<Run>(instance);
+    }
+
+    // Normalized (X1, Y1, X2, Y2, Uri) for every /Link annotation on the page.
+    private static List<(double X1, double Y1, double X2, double Y2, string Uri)> LinkAnnotations(DocumentReader reader, int pageIndex)
+    {
+        var page = ContentTestHelpers.Kid(reader, pageIndex);
+        var links = new List<(double, double, double, double, string)>();
+        if (!page.TryGetValue("Annots", out var annotsObject) || reader.Resolve(annotsObject!) is not ArrayObject annots)
+        {
+            return links;
+        }
+
+        for (var i = 0; i < annots.Count; i++)
+        {
+            if (reader.Resolve(annots[i]) is not DictionaryObject annot
+                || !annot.TryGetValue("Subtype", out var subtype)
+                || reader.Resolve(subtype!) is not NameObject subtypeName
+                || subtypeName.Value != "Link")
+            {
+                continue;
+            }
+
+            Assert.True(annot.TryGetValue("A", out var actionObject), "/Link annotation must carry an /A action");
+            var action = Assert.IsType<DictionaryObject>(reader.Resolve(actionObject!));
+            var s = Assert.IsType<NameObject>(reader.Resolve(action["S"]));
+            Assert.Equal("URI", s.Value);
+            var uri = Assert.IsType<StringObject>(reader.Resolve(action["URI"]));
+
+            Assert.True(annot.TryGetValue("Rect", out var rectObject), "/Link annotation must carry a /Rect");
+            var rect = Assert.IsType<ArrayObject>(reader.Resolve(rectObject!));
+            Assert.Equal(4, rect.Count);
+            var n = new double[4];
+            for (var j = 0; j < 4; j++)
+            {
+                n[j] = Assert.IsType<NumberObject>(reader.Resolve(rect[j])).DoubleValue;
+            }
+
+            links.Add((Math.Min(n[0], n[2]), Math.Min(n[1], n[3]), Math.Max(n[0], n[2]), Math.Max(n[1], n[3]), uri.Value));
+        }
+
+        return links;
+    }
+
+    // (shown text, baseline X, baseline Y) from the base-14 "x y Td (text) Tj" pattern.
+    private static List<(string Text, double X, double Y)> TextRuns(DocumentReader reader, int pageIndex)
+    {
+        var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, pageIndex));
+        var runs = new List<(string, double, double)>();
+        foreach (Match m in Regex.Matches(content, @"(-?[\d.]+)\s+(-?[\d.]+)\s+Td\s*\((.*?)\)\s*Tj", RegexOptions.Singleline))
+        {
+            runs.Add((m.Groups[3].Value,
+                double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture),
+                double.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture)));
+        }
+
+        return runs;
+    }
+
+    [Fact]
+    public void LinkedRun_EmitsLinkAnnotation_WithUriOverTheTextRect()
+    {
+        var (builder, section) = Author();
+        var paragraph = section.Blocks.AddParagraph();
+        paragraph.Inlines.Add("Visit ");
+        SetLink(paragraph.Inlines.Add("Radzen"), Url);
+
+        var reader = BuildTestSupport.Read(builder);
+        var link = Assert.Single(LinkAnnotations(reader, 0));
+        Assert.Equal(Url, link.Uri);
+
+        var runs = TextRuns(reader, 0);
+        var visit = Assert.Single(runs, r => r.Text.Contains("Visit", StringComparison.Ordinal));
+        var target = Assert.Single(runs, r => r.Text.EndsWith("Radzen", StringComparison.Ordinal));
+
+        Assert.True(link.X2 > link.X1, "link rect must have positive width");
+        Assert.True(link.Y2 > link.Y1, "link rect must have positive height");
+        Assert.True(link.X1 >= visit.X - Tol, $"link rect x1 {link.X1:F2} must not start before the line at {visit.X:F2}");
+        if (target.Text == "Radzen")
+        {
+            // The linked run was drawn as its own fragment: the rect starts exactly at it
+            // and must not cover the unlinked prefix.
+            Assert.True(link.X1 > visit.X + Tol, $"link rect x1 {link.X1:F2} must not cover the unlinked prefix at {visit.X:F2}");
+            Assert.True(link.X1 <= target.X + Tol && target.X <= link.X2, $"link rect [{link.X1:F2},{link.X2:F2}] must cover the linked text x {target.X:F2}");
+        }
+
+        Assert.True(link.Y1 - Tol <= target.Y && target.Y <= link.Y2 + Tol, $"link rect [{link.Y1:F2},{link.Y2:F2}] must cover the linked text baseline {target.Y:F2}");
+    }
+
+    [Fact]
+    public void LinkOnSecondPage_AnnotationLandsOnThatPage()
+    {
+        var (builder, section) = Author();
+        section.Blocks.AddParagraph("page one body");
+        section.Blocks.AddPageBreak();
+        var paragraph = section.Blocks.AddParagraph();
+        SetLink(paragraph.Inlines.Add("second page link"), Url);
+
+        var reader = BuildTestSupport.Read(builder);
+        Assert.Empty(LinkAnnotations(reader, 0));
+        var link = Assert.Single(LinkAnnotations(reader, 1));
+        Assert.Equal(Url, link.Uri);
+    }
+
+    [Fact]
+    public void WrappedLink_EmitsOneAnnotationPerLineFragment()
+    {
+        var (builder, section) = Author(width: 200);
+        var paragraph = section.Blocks.AddParagraph();
+        SetLink(paragraph.Inlines.Add(
+            "an intentionally long hyperlink label that cannot possibly fit on a single narrow line"), Url);
+
+        var reader = BuildTestSupport.Read(builder);
+        var links = LinkAnnotations(reader, 0);
+
+        Assert.True(links.Count >= 2, $"a wrapped link must emit one annotation per fragment, got {links.Count}");
+        Assert.All(links, l => Assert.Equal(Url, l.Uri));
+        Assert.Equal(links.Count, links.Select(l => Math.Round(l.Y1, 1)).Distinct().Count());
+    }
+
+    // Footer text on the given page: runs on the lowest baseline, joined left to right.
+    private static string FooterLine(DocumentReader reader, int pageIndex)
+    {
+        var runs = TextRuns(reader, pageIndex);
+        Assert.NotEmpty(runs);
+        var footerY = runs.Min(r => r.Y);
+        return string.Concat(runs
+            .Where(r => Math.Abs(r.Y - footerY) < Tol)
+            .OrderBy(r => r.X)
+            .Select(r => r.Text));
+    }
+
+    private static DocumentBuilder ThreePageDocumentWithNumberedFooter()
+    {
+        var (builder, section) = Author();
+        var footer = section.Footer.Blocks.AddParagraph();
+        footer.Inlines.Add("Page ");
+        footer.Inlines.Add(Field("PageNumberField"));
+        footer.Inlines.Add(" of ");
+        footer.Inlines.Add(Field("PageCountField"));
+
+        section.Blocks.AddParagraph("body one");
+        section.Blocks.AddPageBreak();
+        section.Blocks.AddParagraph("body two");
+        section.Blocks.AddPageBreak();
+        section.Blocks.AddParagraph("body three");
+        return builder;
+    }
+
+    [Fact]
+    public void Footer_PageNumberAndCountFields_ResolvePerPage()
+    {
+        var reader = BuildTestSupport.Read(ThreePageDocumentWithNumberedFooter());
+
+        var kids = Assert.IsType<ArrayObject>(reader.Resolve(ContentTestHelpers.PagesNode(reader)["Kids"]));
+        Assert.Equal(3, kids.Count);
+
+        for (var i = 0; i < 3; i++)
+        {
+            Assert.Equal($"Page {i + 1} of 3", FooterLine(reader, i));
+        }
+    }
+
+    [Fact]
+    public void Footer_PageNumberFields_SurviveExtractTextRoundTrip()
+    {
+        var document = BuildTestSupport.Reload(ThreePageDocumentWithNumberedFooter());
+        var text = document.ExtractText();
+
+        for (var i = 1; i <= 3; i++)
+        {
+            Assert.Contains($"Page {i} of 3", text, StringComparison.Ordinal);
+        }
+    }
+
+    [Fact]
+    public void SinglePageDocument_FooterShowsPageOneOfOne()
+    {
+        var (builder, section) = Author();
+        var footer = section.Footer.Blocks.AddParagraph();
+        footer.Inlines.Add("Page ");
+        footer.Inlines.Add(Field("PageNumberField"));
+        footer.Inlines.Add(" of ");
+        footer.Inlines.Add(Field("PageCountField"));
+        section.Blocks.AddParagraph("only page");
+
+        var reader = BuildTestSupport.Read(builder);
+        Assert.Equal("Page 1 of 1", FooterLine(reader, 0));
+    }
+}
