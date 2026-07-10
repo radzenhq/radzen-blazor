@@ -6,6 +6,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
+using Colors = Radzen.Documents.Pdf.Colors;
+
 public class ValueTypeTests
 {
     private const double MmToPt = 2.8346456692913385;

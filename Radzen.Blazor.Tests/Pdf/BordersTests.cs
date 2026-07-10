@@ -4,6 +4,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
+using Colors = Radzen.Documents.Pdf.Colors;
+
 public class BordersTests
 {
     [Fact]
