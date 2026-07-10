@@ -6,7 +6,7 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 /// <summary>
 /// Implements the PDF <c>RunLengthDecode</c> filter.
 /// </summary>
-public static class RunLengthFilter
+internal static class RunLengthFilter
 {
     const int Eod = 128;
 

@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 /// <summary>
 /// Implements the PDF <c>ASCII85Decode</c> filter.
 /// </summary>
-public static class Ascii85Filter
+internal static class Ascii85Filter
 {
     /// <summary>
     /// Decodes ASCII85 data terminated by <c>~&gt;</c>. Whitespace is ignored and <c>z</c>

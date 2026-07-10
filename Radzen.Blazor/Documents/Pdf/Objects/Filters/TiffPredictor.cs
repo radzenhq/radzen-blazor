@@ -6,7 +6,7 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 /// Reverses TIFF predictor 2 (horizontal differencing) as used by the PDF
 /// <c>FlateDecode</c> and <c>LZWDecode</c> filters. Supports 8 bits per component.
 /// </summary>
-public static class TiffPredictor
+internal static class TiffPredictor
 {
     /// <summary>
     /// Reverses TIFF predictor 2. Each component adds the reconstructed value of the
