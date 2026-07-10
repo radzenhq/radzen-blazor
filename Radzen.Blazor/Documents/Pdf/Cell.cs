@@ -17,7 +17,7 @@ public class Cell
     }
 
     /// <summary>Gets the block-level content of the cell.</summary>
-    public BlockCollection Blocks { get; } = new();
+    public BlockCollection Blocks { get; } = [];
 
     /// <summary>
     /// Gets or sets the cell text. Getting returns the text of the single paragraph when the cell

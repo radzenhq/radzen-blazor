@@ -10,7 +10,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public class InlineCollection : IReadOnlyList<Run>
 {
-    private readonly List<Run> items = new();
+    private readonly List<Run> items = [];
 
     /// <inheritdoc/>
     public int Count => items.Count;

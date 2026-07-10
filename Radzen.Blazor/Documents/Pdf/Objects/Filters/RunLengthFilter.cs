@@ -47,7 +47,7 @@ internal static class RunLengthFilter
             }
         }
 
-        return output.ToArray();
+        return [.. output];
     }
 
     public static byte[] Encode(byte[] data)
@@ -96,6 +96,6 @@ internal static class RunLengthFilter
         }
 
         output.Add(Eod);
-        return output.ToArray();
+        return [.. output];
     }
 }

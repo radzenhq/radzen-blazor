@@ -11,8 +11,8 @@ namespace Radzen.Documents.Pdf.Objects;
 /// </summary>
 public sealed class DictionaryObject : DocumentObject, IEnumerable<KeyValuePair<string, DocumentObject>>
 {
-    private readonly List<string> keys = new();
-    private readonly Dictionary<string, DocumentObject> values = new();
+    private readonly List<string> keys = [];
+    private readonly Dictionary<string, DocumentObject> values = [];
 
     /// <summary>
     /// Gets the number of entries in the dictionary.

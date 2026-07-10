@@ -16,7 +16,7 @@ internal static class TiffPredictor
         int rowLength = colors * columns;
         if (rowLength == 0)
         {
-            return Array.Empty<byte>();
+            return [];
         }
 
         var output = (byte[])data.Clone();

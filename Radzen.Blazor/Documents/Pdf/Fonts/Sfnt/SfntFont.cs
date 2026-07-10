@@ -138,7 +138,7 @@ internal sealed class SfntFont
             return faces;
         }
 
-        return new[] { new SfntFont(data, 0) };
+        return [new SfntFont(data, 0)];
     }
 
     private static uint ReadTagValue(byte[] data)

@@ -30,7 +30,7 @@ internal static class FlateFilter
         // empty zlib stream (header, empty stored block, Adler-32 of no data).
         if (data.Length == 0)
         {
-            return new byte[] { 0x78, 0x9C, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01 };
+            return [0x78, 0x9C, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01];
         }
 
         using var output = new MemoryStream();

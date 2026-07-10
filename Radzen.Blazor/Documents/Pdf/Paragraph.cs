@@ -10,7 +10,7 @@ namespace Radzen.Documents.Pdf;
 public class Paragraph : Block
 {
     /// <summary>Gets the inline text runs.</summary>
-    public InlineCollection Inlines { get; } = new();
+    public InlineCollection Inlines { get; } = [];
 
     /// <summary>
     /// Gets or sets the paragraph text. Getting returns the concatenation of the run texts, or

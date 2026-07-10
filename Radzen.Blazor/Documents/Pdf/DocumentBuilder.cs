@@ -11,7 +11,7 @@ public class DocumentBuilder
     public DocumentInfo Info { get; } = new();
 
     /// <summary>Gets the named style definitions.</summary>
-    public StyleCollection Styles { get; } = new();
+    public StyleCollection Styles { get; } = [];
 
     /// <summary>Gets the ordered sections of the document.</summary>
     public SectionCollection Sections { get; } = new();
