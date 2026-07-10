@@ -31,9 +31,15 @@ internal sealed class StandardSecurityHandler
     private readonly int permissions;
     private readonly int keyLength;
     private readonly bool encryptMetadata;
-    private readonly CryptMethod cipher;
+    private readonly CryptMethod streamCipher;
+    private readonly CryptMethod stringCipher;
 
     public StandardSecurityHandler(DictionaryObject encrypt, byte[] documentId, byte[] password)
+        : this(encrypt, documentId, Encoding.Latin1.GetString(password ?? throw new ArgumentNullException(nameof(password))))
+    {
+    }
+
+    public StandardSecurityHandler(DictionaryObject encrypt, byte[] documentId, string password)
     {
         ArgumentNullException.ThrowIfNull(encrypt);
         ArgumentNullException.ThrowIfNull(documentId);
@@ -57,9 +63,13 @@ internal sealed class StandardSecurityHandler
             _ => Math.Max(5, GetInt(encrypt, "Length", 40) / 8),
         };
 
-        cipher = ResolveCipher(encrypt);
+        streamCipher = ResolveCipher(encrypt, "StmF");
+        stringCipher = ResolveCipher(encrypt, "StrF");
         FileKey = [];
-        Authenticate(password);
+
+        // Revision 6 passwords are UTF-8 (ISO 32000-2 7.6.4.3.3); earlier
+        // revisions use the PDFDocEncoding/Latin-1 byte interpretation.
+        Authenticate(revision >= 5 ? Encoding.UTF8.GetBytes(password) : Encoding.Latin1.GetBytes(password));
     }
 
     private enum CryptMethod
@@ -76,7 +86,13 @@ internal sealed class StandardSecurityHandler
 
     public bool IsOwnerPassword { get; private set; }
 
-    public byte[] Decrypt(byte[] data, int objectNumber, int generation)
+    public byte[] DecryptStream(byte[] data, int objectNumber, int generation)
+        => Decrypt(streamCipher, data, objectNumber, generation);
+
+    public byte[] DecryptString(byte[] data, int objectNumber, int generation)
+        => Decrypt(stringCipher, data, objectNumber, generation);
+
+    private byte[] Decrypt(CryptMethod cipher, byte[] data, int objectNumber, int generation)
     {
         ArgumentNullException.ThrowIfNull(data);
         if (data.Length == 0)
@@ -93,16 +109,26 @@ internal sealed class StandardSecurityHandler
         };
     }
 
-    private CryptMethod ResolveCipher(DictionaryObject encrypt)
+    // /StmF and /StrF name the crypt filter in /CF; /Identity means no
+    // encryption for that class of data (ISO 32000-1 7.6.5).
+    private CryptMethod ResolveCipher(DictionaryObject encrypt, string selector)
     {
         if (version < 4)
         {
             return CryptMethod.Rc4;
         }
 
+        var filterName = encrypt.TryGetValue(selector, out var selected) && selected is NameObject chosen
+            ? chosen.Value
+            : "StdCF";
+        if (string.Equals(filterName, "Identity", StringComparison.Ordinal))
+        {
+            return CryptMethod.Identity;
+        }
+
         if (encrypt.TryGetValue("CF", out var cf) && cf is DictionaryObject cfDict
-            && cfDict.TryGetValue("StdCF", out var std) && std is DictionaryObject stdDict
-            && stdDict.TryGetValue("CFM", out var cfm) && cfm is NameObject method)
+            && cfDict.TryGetValue(filterName, out var filter) && filter is DictionaryObject filterDict
+            && filterDict.TryGetValue("CFM", out var cfm) && cfm is NameObject method)
         {
             return method.Value switch
             {
