@@ -26,3 +26,9 @@ dotnet_diagnostic.IDE0066.severity = warning
 
 # Unnecessary using directives
 dotnet_diagnostic.IDE0005.severity = warning
+
+# Null propagation (?.)
+dotnet_diagnostic.IDE0031.severity = warning
+
+# Simplify member access
+dotnet_diagnostic.IDE0002.severity = warning
