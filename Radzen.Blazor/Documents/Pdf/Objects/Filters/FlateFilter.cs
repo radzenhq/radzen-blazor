@@ -41,4 +41,11 @@ internal static class FlateFilter
 
         return output.ToArray();
     }
+
+    public static StreamObject EncodeStream(byte[] data)
+    {
+        var stream = new StreamObject(Encode(data));
+        stream.Dictionary["Filter"] = new NameObject("FlateDecode");
+        return stream;
+    }
 }

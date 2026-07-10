@@ -6,6 +6,7 @@ using System.Text;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
@@ -51,7 +52,7 @@ internal static class Type0FontEmbedder
             EmbedGlyf(writer, font, usedGids, descriptor);
         }
 
-        descriptor["CIDSet"] = writer.Add(RawStream(BuildCidSet(usedGids)));
+        descriptor["CIDSet"] = writer.Add(FlateFilter.EncodeStream(BuildCidSet(usedGids)));
         var descriptorRef = writer.Add(descriptor);
 
         var descendant = new DictionaryObject
@@ -76,7 +77,7 @@ internal static class Type0FontEmbedder
         }
 
         var descendantRef = writer.Add(descendant);
-        var toUnicodeRef = writer.Add(RawStream(BuildToUnicode(gidToUnicode)));
+        var toUnicodeRef = writer.Add(FlateFilter.EncodeStream(BuildToUnicode(gidToUnicode)));
 
         var top = new DictionaryObject
         {
@@ -94,7 +95,7 @@ internal static class Type0FontEmbedder
     private static void EmbedGlyf(DocumentWriter writer, SfntFont font, SortedSet<ushort> usedGids, DictionaryObject descriptor)
     {
         var subset = GlyfSubsetter.Subset(font, usedGids);
-        var stream = RawStream(subset);
+        var stream = FlateFilter.EncodeStream(subset);
         stream.Dictionary["Length1"] = new NumberObject(subset.Length);
         descriptor["FontFile2"] = writer.Add(stream);
     }
@@ -124,7 +125,7 @@ internal static class Type0FontEmbedder
         }
 
         var subset = CffSubsetter.Subset(cff, gids);
-        var stream = RawStream(subset);
+        var stream = FlateFilter.EncodeStream(subset);
         stream.Dictionary["Subtype"] = new NameObject("CIDFontType0C");
         descriptor["FontFile3"] = writer.Add(stream);
     }
@@ -240,7 +241,6 @@ internal static class Type0FontEmbedder
 
     private static short ReadInt16(byte[] data, int offset) => (short)((data[offset] << 8) | data[offset + 1]);
 
-    private static StreamObject RawStream(byte[] data) => new(data);
 
     private static string SubsetTag(IEnumerable<ushort> gids)
     {

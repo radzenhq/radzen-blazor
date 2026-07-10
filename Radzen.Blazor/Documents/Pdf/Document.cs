@@ -1,4 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Objects.Filters;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -306,7 +307,7 @@ public sealed class Document
         {
             if (page.Generated is { } generated)
             {
-                pageNode["Contents"] = writer.Add(new StreamObject(generated.Content));
+                pageNode["Contents"] = writer.Add(FlateFilter.EncodeStream(generated.Content));
                 var resources = BuildGeneratedResources(writer, generated, fontRefs, imageRefs);
                 if (resources is not null)
                 {
