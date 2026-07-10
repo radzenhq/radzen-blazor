@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Fonts;
@@ -83,6 +84,8 @@ internal static class WinAnsiEncoding
 
     private static readonly Dictionary<char, byte> CharToCode = BuildReverseMap();
 
+    private static readonly Dictionary<string, int> NameToCodePoint = BuildNameMap();
+
     private static Dictionary<char, byte> BuildReverseMap()
     {
         var map = new Dictionary<char, byte>(256);
@@ -96,6 +99,49 @@ internal static class WinAnsiEncoding
         }
 
         return map;
+    }
+
+    private static Dictionary<string, int> BuildNameMap()
+    {
+        var map = new Dictionary<string, int>(256, StringComparer.Ordinal);
+        for (var code = 0; code < Names.Length; code++)
+        {
+            var name = Names[code];
+            var cp = CodePoints[code];
+            if (cp != 0 && !map.ContainsKey(name))
+            {
+                map[name] = cp;
+            }
+        }
+
+        return map;
+    }
+
+    // Adobe glyph name -> Unicode code point, covering the WinAnsi glyph set plus the
+    // "uniXXXX"/"uXXXX..." conventions used by /Differences arrays.
+    public static bool TryGetCodePointByName(string name, out int codePoint)
+    {
+        if (NameToCodePoint.TryGetValue(name, out codePoint))
+        {
+            return true;
+        }
+
+        if (name.Length == 7 && name.StartsWith("uni", StringComparison.Ordinal)
+            && int.TryParse(name.AsSpan(3), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var uni))
+        {
+            codePoint = uni;
+            return true;
+        }
+
+        if (name.Length is >= 5 and <= 7 && name[0] == 'u'
+            && int.TryParse(name.AsSpan(1), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var u))
+        {
+            codePoint = u;
+            return true;
+        }
+
+        codePoint = 0;
+        return false;
     }
 
     public static bool TryGetChar(byte code, out char c)
