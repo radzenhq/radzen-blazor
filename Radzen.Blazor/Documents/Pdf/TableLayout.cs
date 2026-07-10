@@ -152,7 +152,7 @@ internal static class TableLayout
 
                 var padding = cell.Padding.Point;
                 var contentWidth = cellWidth - (2 * padding);
-                var align = table.Columns[c].Alignment ?? cell.Alignment;
+                var align = table.Columns[c].Alignment ?? cell.AlignmentValue ?? table.Rows[r].AlignmentValue;
                 var (items, contentHeight) = LayoutContent(cell, contentWidth, align, fonts, measureImage);
 
                 placed.Add(new Placed
@@ -222,7 +222,10 @@ internal static class TableLayout
             };
             var offset = (contentBox.Height - p.ContentHeight) * factor;
 
-            var alignFactor = (table.Columns[p.Column].Alignment ?? p.Cell.Alignment) switch
+            var alignFactor = (table.Columns[p.Column].Alignment
+                ?? p.Cell.AlignmentValue
+                ?? table.Rows[p.Row].AlignmentValue
+                ?? HorizontalAlignment.Left) switch
             {
                 HorizontalAlignment.Center => 0.5,
                 HorizontalAlignment.Right => 1.0,
@@ -347,7 +350,7 @@ internal static class TableLayout
     private static (List<CellItem> Items, double Height) LayoutContent(
         Cell cell,
         double contentWidth,
-        HorizontalAlignment align,
+        HorizontalAlignment? align,
         FontCollection fonts,
         System.Func<Image, (double Width, double Height)>? measureImage)
     {
@@ -357,8 +360,12 @@ internal static class TableLayout
         {
             if (block is Paragraph paragraph)
             {
-                var original = paragraph.Alignment;
-                paragraph.Alignment = align;
+                var original = paragraph.AlignmentValue;
+                if (original is null && align is { } inherited)
+                {
+                    paragraph.AlignmentValue = inherited;
+                }
+
                 try
                 {
                     foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts))
@@ -369,7 +376,7 @@ internal static class TableLayout
                 }
                 finally
                 {
-                    paragraph.Alignment = original;
+                    paragraph.AlignmentValue = original;
                 }
             }
             else if (block is Image image)

@@ -33,8 +33,24 @@ public class Paragraph : Block
     /// <summary>Gets the paragraph font.</summary>
     public Font Font { get; } = new();
 
+    private HorizontalAlignment? alignment;
+
     /// <summary>Gets or sets the horizontal alignment. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
-    public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
+    public HorizontalAlignment Alignment
+    {
+        get => alignment ?? HorizontalAlignment.Left;
+        set => alignment = value;
+    }
+
+    internal HorizontalAlignment? AlignmentValue
+    {
+        get => alignment;
+        set => alignment = value;
+    }
+
+    internal HorizontalAlignment? StyleAlignment { get; set; }
+
+    internal HorizontalAlignment EffectiveAlignment => alignment ?? StyleAlignment ?? HorizontalAlignment.Left;
 
     /// <summary>Gets or sets the spacing before the paragraph.</summary>
     public Unit SpacingBefore { get; set; }
