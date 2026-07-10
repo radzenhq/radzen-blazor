@@ -23,3 +23,6 @@ dotnet_diagnostic.IDE0290.severity = warning
 
 # Switch expressions
 dotnet_diagnostic.IDE0066.severity = warning
+
+# Unnecessary using directives
+dotnet_diagnostic.IDE0005.severity = warning
