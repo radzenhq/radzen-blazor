@@ -131,10 +131,12 @@ internal sealed class DocumentGenerator
 
         foreach (var plan in plans)
         {
+            var generated = Finalize(plan);
             var page = new Page(plan.Size.Width, plan.Size.Height)
             {
-                Generated = Finalize(plan),
+                Generated = generated,
             };
+            page.SetContent(generated.Content);
             document.Pages.Insert(document.Pages.Count, page);
         }
 
@@ -482,23 +484,24 @@ internal sealed class DocumentGenerator
         var i = 0;
         while (i < text.Length)
         {
-            var (face, _) = fonts.ResolveGlyph(primary, text[i]);
+            var (face, _) = fonts.ResolveGlyph(primary, CodePointAt(text, i));
             var generated = ResolveSfnt(face);
             var bytes = new List<byte>();
             var advance = 0.0;
             while (i < text.Length)
             {
-                var (candidate, gid) = fonts.ResolveGlyph(primary, text[i]);
+                var codepoint = CodePointAt(text, i);
+                var (candidate, gid) = fonts.ResolveGlyph(primary, codepoint);
                 if (candidate != face)
                 {
                     break;
                 }
 
-                generated.GidToUnicode[gid] = text[i];
+                generated.GidToUnicode[gid] = codepoint;
                 bytes.Add((byte)(gid >> 8));
                 bytes.Add((byte)(gid & 0xFF));
                 advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
-                i++;
+                i += codepoint > 0xFFFF ? 2 : 1;
             }
 
             plan.UsedFonts.Add(generated);
@@ -515,6 +518,13 @@ internal sealed class DocumentGenerator
             runX += advance;
         }
     }
+
+    // A lone surrogate yields its own code unit so it maps through the same
+    // gid-to-unicode path without throwing.
+    private static int CodePointAt(string text, int index)
+        => char.IsHighSurrogate(text[index]) && index + 1 < text.Length && char.IsLowSurrogate(text[index + 1])
+            ? char.ConvertToUtf32(text[index], text[index + 1])
+            : text[index];
 
     private GeneratedFont ResolveSfnt(SfntFont sfnt)
     {

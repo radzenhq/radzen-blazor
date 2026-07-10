@@ -109,7 +109,7 @@ public sealed class FontCollection
             ? primary
             : throw new InvalidOperationException($"No font is registered for family '{font.Name}'.");
 
-    internal (SfntFont Face, ushort GlyphId) ResolveGlyph(SfntFont primary, char c)
+    internal (SfntFont Face, ushort GlyphId) ResolveGlyph(SfntFont primary, int c)
     {
         var glyph = primary.GetGlyphId(c);
         if (glyph != 0)
@@ -124,7 +124,7 @@ public sealed class FontCollection
 
     // Walks the fallback chain only, returning the first face that maps the codepoint
     // to a non-notdef glyph.
-    internal bool TryResolveFallbackGlyph(char c, out SfntFont face, out ushort glyph)
+    internal bool TryResolveFallbackGlyph(int c, out SfntFont face, out ushort glyph)
     {
         foreach (var name in fallback)
         {

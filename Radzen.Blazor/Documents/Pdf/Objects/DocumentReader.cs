@@ -584,6 +584,37 @@ public sealed class DocumentReader
         throw new DocumentParseException("Invalid stream length.", -1);
     }
 
+    /// <summary>
+    /// Decodes the data of a stream object by applying its full <c>/Filter</c>
+    /// chain (with <c>/DecodeParms</c> predictors) in order. A stream without a
+    /// filter returns its data unchanged.
+    /// </summary>
+    /// <param name="stream">The stream object to decode.</param>
+    /// <returns>The decoded stream bytes.</returns>
+    /// <exception cref="DocumentParseException">The chain contains an unsupported filter.</exception>
+    public byte[] DecodeStream(StreamObject stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        var filter = stream.Dictionary.TryGetValue("Filter", out var filterObject) && filterObject is not null
+            ? Resolve(filterObject)
+            : null;
+        var names = FilterNames(filter);
+        if (names.Count == 0)
+        {
+            return stream.Data;
+        }
+
+        var parms = FilterParms(stream.Dictionary, names.Count);
+        var result = stream.Data;
+        for (var i = 0; i < names.Count; i++)
+        {
+            result = ApplyFilter(names[i], result, parms[i]);
+        }
+
+        return result;
+    }
+
     private static byte[] DecodeStreamData(DictionaryObject dictionary, byte[] data)
     {
         var filter = dictionary.TryGetValue("Filter", out var filterObject) ? filterObject : null;
@@ -603,16 +634,16 @@ public sealed class DocumentReader
         return result;
     }
 
-    private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms)
+    private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms) => name switch
     {
-        if (!string.Equals(name, "FlateDecode", StringComparison.Ordinal)
-            && !string.Equals(name, "Fl", StringComparison.Ordinal))
-        {
-            throw new DocumentParseException($"Unsupported cross-reference filter '{name}'.", -1);
-        }
-
-        return ApplyPredictor(FlateFilter.Decode(data), parms);
-    }
+        "FlateDecode" or "Fl" => ApplyPredictor(FlateFilter.Decode(data), parms),
+        "LZWDecode" or "LZW" => ApplyPredictor(
+            LzwFilter.Decode(data, parms is not null ? ParmInt(parms, "EarlyChange", 1) : 1), parms),
+        "RunLengthDecode" or "RL" => RunLengthFilter.Decode(data),
+        "ASCIIHexDecode" or "AHx" => AsciiHexFilter.Decode(data),
+        "ASCII85Decode" or "A85" => Ascii85Filter.Decode(data),
+        _ => throw new DocumentParseException($"Unsupported stream filter '{name}'.", -1),
+    };
 
     private static byte[] ApplyPredictor(byte[] data, DictionaryObject? parms)
     {

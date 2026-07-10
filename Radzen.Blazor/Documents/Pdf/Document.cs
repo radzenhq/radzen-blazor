@@ -14,6 +14,7 @@ namespace Radzen.Documents.Pdf;
 public sealed class Document
 {
     private readonly Dictionary<Page, DictionaryObject> sourcePages = [];
+    private readonly Dictionary<Page, DictionaryObject> sourceResources = [];
     private DocumentReader? source;
     private DictionaryObject? sourceAcroForm;
 
@@ -151,6 +152,10 @@ public sealed class Document
         page.SetTextFonts(BuildTextFonts(reader, resources));
         document.Pages.Insert(document.Pages.Count, page);
         document.sourcePages[page] = node;
+        if (resources is not null)
+        {
+            document.sourceResources[page] = resources;
+        }
     }
 
     private static System.Collections.Generic.Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
@@ -200,7 +205,7 @@ public sealed class Document
         var resolved = reader.Resolve(contents!);
         if (resolved is StreamObject stream)
         {
-            return stream.Data;
+            return reader.DecodeStream(stream);
         }
 
         if (resolved is ArrayObject array)
@@ -215,7 +220,8 @@ public sealed class Document
                         joined.WriteByte((byte)'\n');
                     }
 
-                    joined.Write(part.Data, 0, part.Data.Length);
+                    var decoded = reader.DecodeStream(part);
+                    joined.Write(decoded, 0, decoded.Length);
                 }
             }
 
@@ -287,7 +293,17 @@ public sealed class Document
             };
 
             var pageRef = writer.Add(pageNode);
+            if (importer is not null && sourcePages.TryGetValue(page, out var sourceNode))
+            {
+                importer.Seed(sourceNode, pageRef);
+            }
 
+            kids.Add(pageRef);
+            pageNodes.Add((page, pageNode, pageRef));
+        }
+
+        foreach (var (page, pageNode, _) in pageNodes)
+        {
             if (page.Generated is { } generated)
             {
                 pageNode["Contents"] = writer.Add(new StreamObject(generated.Content));
@@ -296,27 +312,25 @@ public sealed class Document
                 {
                     pageNode["Resources"] = resources;
                 }
+
+                continue;
             }
-            else
+
+            var contentBytes = page.BuildContent(out var emitter);
+            if (contentBytes is not null)
             {
-                var contentBytes = page.BuildContent(out var emitter);
-                if (contentBytes is not null)
-                {
-                    pageNode["Contents"] = writer.Add(new StreamObject(contentBytes));
-
-                    if (emitter is not null)
-                    {
-                        var resources = BuildResources(emitter);
-                        if (resources is not null)
-                        {
-                            pageNode["Resources"] = resources;
-                        }
-                    }
-                }
+                pageNode["Contents"] = writer.Add(new StreamObject(contentBytes));
             }
 
-            kids.Add(pageRef);
-            pageNodes.Add((page, pageNode, pageRef));
+            var emitted = emitter is not null ? BuildResources(emitter) : null;
+            var merged = importer is not null && source is not null
+                && sourceResources.TryGetValue(page, out var loadedResources)
+                ? MergeResources(importer, source, loadedResources, emitted)
+                : emitted;
+            if (merged is not null)
+            {
+                pageNode["Resources"] = merged;
+            }
         }
 
         pagesNode["Type"] = new NameObject("Pages");
@@ -347,14 +361,6 @@ public sealed class Document
     // (possibly mutated) field objects.
     private void PreserveForm(GraphImporter importer, DictionaryObject catalog, List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
     {
-        foreach (var (page, _, reference) in pageNodes)
-        {
-            if (sourcePages.TryGetValue(page, out var sourceNode))
-            {
-                importer.Seed(sourceNode, reference);
-            }
-        }
-
         foreach (var (page, node, _) in pageNodes)
         {
             if (source is null || !sourcePages.TryGetValue(page, out var sourceNode)
@@ -377,6 +383,55 @@ public sealed class Document
         {
             catalog["AcroForm"] = importer.ImportInstance(sourceAcroForm);
         }
+    }
+
+    // Imports the loaded page's effective /Resources into the writer and overlays
+    // any newly emitted entries (emitter keys win on collision) so a re-save keeps
+    // the source fonts, XObjects and graphics states.
+    private static DictionaryObject MergeResources(
+        GraphImporter importer,
+        DocumentReader reader,
+        DictionaryObject loaded,
+        DictionaryObject? emitted)
+    {
+        var result = new DictionaryObject();
+        foreach (var key in loaded.Keys)
+        {
+            result[key] = importer.ImportValue(loaded[key]);
+        }
+
+        if (emitted is null)
+        {
+            return result;
+        }
+
+        foreach (var key in emitted.Keys)
+        {
+            if (result.ContainsKey(key) && emitted[key] is DictionaryObject added)
+            {
+                var combined = new DictionaryObject();
+                if (reader.Resolve(loaded[key]) is DictionaryObject sub)
+                {
+                    foreach (var name in sub.Keys)
+                    {
+                        combined[name] = importer.ImportValue(sub[name]);
+                    }
+                }
+
+                foreach (var name in added.Keys)
+                {
+                    combined[name] = added[name];
+                }
+
+                result[key] = combined;
+            }
+            else
+            {
+                result[key] = emitted[key];
+            }
+        }
+
+        return result;
     }
 
     private static DictionaryObject? BuildGeneratedResources(
