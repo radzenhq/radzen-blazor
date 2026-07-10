@@ -202,15 +202,12 @@ internal sealed class DocumentGenerator
         }
     }
 
-    private (double Width, double Height) MeasureImage(Image image)
-    {
-        var (width, height, _) = Decode(image);
-        return (width, height);
-    }
+    private (double Width, double Height) MeasureImage(Image image, double availableWidth)
+        => ImageDecoder.Measure(image, Decode(image).Image, availableWidth);
 
     private void EmitImage(PagePlan plan, PositionedImage positioned, double left, double top)
     {
-        var (_, _, xobject) = Decode(positioned.Source);
+        var xobject = Decode(positioned.Source);
         plan.Images.Add(new ImageDraw
         {
             X = left,
@@ -225,13 +222,14 @@ internal sealed class DocumentGenerator
     private void EmitFragment(PagePlan plan, PositionedTableFragment positioned, double left, double contentTop)
     {
         var layout = positioned.Layout;
+        var x = left + (layout.Source?.LeftIndent.Point ?? 0);
         foreach (var row in positioned.Fragment.Rows)
         {
             if (layout.Source?.Rows[row.SourceRow].Background is { } background)
             {
                 plan.Fills.Add(new FillDraw
                 {
-                    X = left,
+                    X = x,
                     Y = contentTop - (positioned.Y + row.Y + row.Height),
                     Width = layout.Width,
                     Height = row.Height,
@@ -247,7 +245,7 @@ internal sealed class DocumentGenerator
                 }
 
                 var delta = positioned.Y + row.Y - cell.Bounds.Y;
-                EmitCell(plan, layout, cell, left, contentTop, delta);
+                EmitCell(plan, layout, cell, x, contentTop, delta);
             }
         }
     }
@@ -275,7 +273,7 @@ internal sealed class DocumentGenerator
 
         foreach (var image in cell.Images)
         {
-            var (_, _, xobject) = Decode(image.Source);
+            var xobject = Decode(image.Source);
             plan.Images.Add(new ImageDraw
             {
                 X = left + image.X,
@@ -289,9 +287,10 @@ internal sealed class DocumentGenerator
 
         foreach (var nested in cell.Tables)
         {
+            var nestedLeft = left + nested.X + (nested.Layout.Source?.LeftIndent.Point ?? 0);
             foreach (var nestedCell in nested.Layout.Cells)
             {
-                EmitCell(plan, nested.Layout, nestedCell, left + nested.X, contentTop, delta + nested.Y);
+                EmitCell(plan, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y);
             }
         }
     }
@@ -299,6 +298,7 @@ internal sealed class DocumentGenerator
     private static void EmitBorders(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta)
     {
         var cellBorders = cell.Cell.Borders;
+        var rowBorders = layout.Source?.Rows[cell.Row].Borders;
         var tableBorders = layout.Source?.Borders;
 
         var x = left + cell.Bounds.X;
@@ -306,16 +306,43 @@ internal sealed class DocumentGenerator
         var right = x + cell.Bounds.Width;
         var bottom = top - cell.Bounds.Height;
 
-        EmitEdge(plan, cellBorders.Top, tableBorders?.Top, x, top, right, top);
-        EmitEdge(plan, cellBorders.Right, tableBorders?.Right, right, bottom, right, top);
-        EmitEdge(plan, cellBorders.Bottom, tableBorders?.Bottom, x, bottom, right, bottom);
-        EmitEdge(plan, cellBorders.Left, tableBorders?.Left, x, bottom, x, top);
+        EmitEdge(plan, cellBorders.Top, rowBorders?.Top, tableBorders?.Top, x, top, right, top);
+        EmitEdge(plan, cellBorders.Right, rowBorders?.Right, tableBorders?.Right, right, bottom, right, top);
+        EmitEdge(plan, cellBorders.Bottom, rowBorders?.Bottom, tableBorders?.Bottom, x, bottom, right, bottom);
+        EmitEdge(plan, cellBorders.Left, rowBorders?.Left, tableBorders?.Left, x, bottom, x, top);
     }
 
-    private static void EmitEdge(PagePlan plan, Border cellEdge, Border? tableEdge, double x1, double y1, double x2, double y2)
+    private static void EmitEdge(
+        PagePlan plan,
+        Border cellEdge,
+        Border? rowEdge,
+        Border? tableEdge,
+        double x1,
+        double y1,
+        double x2,
+        double y2)
     {
-        var edge = cellEdge.IsSet || tableEdge is null ? cellEdge : tableEdge;
-        if (edge.Style == BorderStyle.None)
+        var edge = cellEdge;
+        if (!cellEdge.IsSet)
+        {
+            if (rowEdge?.IsSet == true)
+            {
+                edge = rowEdge;
+            }
+            else if (tableEdge is not null)
+            {
+                edge = tableEdge;
+            }
+        }
+
+        // MigraDoc semantics: a positive width alone makes the edge a visible solid line.
+        var style = edge.Style;
+        if (style == BorderStyle.None && edge.Width > 0)
+        {
+            style = BorderStyle.Solid;
+        }
+
+        if (style == BorderStyle.None)
         {
             return;
         }
@@ -328,7 +355,7 @@ internal sealed class DocumentGenerator
             Y2 = y2,
             LineWidth = edge.Width > 0 ? edge.Width : 0.5,
             Color = edge.Color,
-            Style = edge.Style,
+            Style = style,
         });
     }
 
@@ -577,7 +604,7 @@ internal sealed class DocumentGenerator
         return [.. bytes];
     }
 
-    private (double Width, double Height, GeneratedImage Image) Decode(Image image)
+    private GeneratedImage Decode(Image image)
     {
         if (!images.TryGetValue(image, out var generated))
         {
@@ -590,8 +617,7 @@ internal sealed class DocumentGenerator
             images[image] = generated;
         }
 
-        var (width, height) = ImageDecoder.Measure(image, generated.Image);
-        return (width, height, generated);
+        return generated;
     }
 
     private static GeneratedPage Finalize(PagePlan plan)

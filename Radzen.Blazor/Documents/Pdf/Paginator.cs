@@ -67,7 +67,7 @@ internal static class Paginator
     public static IReadOnlyList<PaginatedPage> Paginate(
         DocumentBuilder document,
         FontCollection fonts,
-        System.Func<Image, (double Width, double Height)>? measureImage = null)
+        System.Func<Image, double, (double Width, double Height)>? measureImage = null)
     {
         var pages = new List<PaginatedPage>();
         foreach (var section in document.Sections)
@@ -81,7 +81,7 @@ internal static class Paginator
     public static IReadOnlyList<PaginatedPage> Paginate(
         Section section,
         FontCollection fonts,
-        System.Func<Image, (double Width, double Height)>? measureImage = null)
+        System.Func<Image, double, (double Width, double Height)>? measureImage = null)
     {
         var pages = new List<PaginatedPage>();
         PaginateSection(section, fonts, pages, measureImage);
@@ -92,7 +92,7 @@ internal static class Paginator
         Section section,
         FontCollection fonts,
         List<PaginatedPage> pages,
-        System.Func<Image, (double Width, double Height)>? measureImage)
+        System.Func<Image, double, (double Width, double Height)>? measureImage)
     {
         var (pageWidth, pageHeight) = EffectiveSize(section);
         var left = section.Margins.Left.Point;
@@ -221,7 +221,7 @@ internal static class Paginator
 
             if (block is Image image)
             {
-                var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image) : measureImage(image);
+                var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
                 if (cursor + imageHeight > contentHeight + Eps && HasPageContent())
                 {
                     Flush();
@@ -359,8 +359,8 @@ internal static class Paginator
         }
     }
 
-    private static (double Width, double Height) MeasureImage(Image image)
-        => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data));
+    private static (double Width, double Height) MeasureImage(Image image, double availableWidth)
+        => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
 
     private static bool NextFirstLine(
         BlockCollection blocks,
@@ -409,7 +409,7 @@ internal static class Paginator
         HeaderFooter band,
         double width,
         FontCollection fonts,
-        System.Func<Image, (double Width, double Height)>? measureImage)
+        System.Func<Image, double, (double Width, double Height)>? measureImage)
     {
         var result = new BandLayout();
         var images = result.Images;
@@ -435,7 +435,7 @@ internal static class Paginator
 
             if (block is Image image)
             {
-                var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image) : measureImage(image);
+                var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image, width) : measureImage(image, width);
                 images.Add(new PositionedImage
                 {
                     Source = image,

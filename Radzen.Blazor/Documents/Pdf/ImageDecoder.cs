@@ -29,7 +29,8 @@ internal static class ImageDecoder
     }
 
     // Rendered size honoring explicit Width/Height, keeping aspect when one is omitted.
-    public static (double Width, double Height) Measure(Image image, ImageXObject xobject)
+    // A fully unsized image renders at 96dpi and is clamped to the available width.
+    public static (double Width, double Height) Measure(Image image, ImageXObject xobject, double availableWidth)
     {
         var dict = xobject.Image.Dictionary;
         var pixelWidth = ((NumberObject)dict["Width"]).DoubleValue;
@@ -50,7 +51,15 @@ internal static class ImageDecoder
             return (pixelWidth * ho.Point / pixelHeight, ho.Point);
         }
 
-        return (pixelWidth, pixelHeight);
+        var width = pixelWidth * 72.0 / 96.0;
+        var height = pixelHeight * 72.0 / 96.0;
+        if (availableWidth > 0 && !double.IsInfinity(availableWidth) && width > availableWidth)
+        {
+            height *= availableWidth / width;
+            width = availableWidth;
+        }
+
+        return (width, height);
     }
 
     private static bool IsPng(byte[] data)

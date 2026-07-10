@@ -103,7 +103,7 @@ internal static class TableLayout
         Table table,
         double availableWidth,
         FontCollection fonts,
-        System.Func<Image, (double Width, double Height)>? measureImage = null)
+        System.Func<Image, double, (double Width, double Height)>? measureImage = null)
     {
         var columnWidths = ResolveColumnWidths(table, availableWidth);
         var columnX = Prefix(columnWidths);
@@ -352,7 +352,7 @@ internal static class TableLayout
         double contentWidth,
         HorizontalAlignment? align,
         FontCollection fonts,
-        System.Func<Image, (double Width, double Height)>? measureImage)
+        System.Func<Image, double, (double Width, double Height)>? measureImage)
     {
         var items = new List<CellItem>();
         double height = 0;
@@ -382,8 +382,8 @@ internal static class TableLayout
             else if (block is Image image)
             {
                 var (imageWidth, imageHeight) = measureImage is null
-                    ? ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data))
-                    : measureImage(image);
+                    ? ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), contentWidth)
+                    : measureImage(image, contentWidth);
                 items.Add(new CellItem { Image = image, Width = imageWidth, Height = imageHeight });
                 height += imageHeight;
             }
