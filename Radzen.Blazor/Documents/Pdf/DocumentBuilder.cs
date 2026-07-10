@@ -15,4 +15,7 @@ public class DocumentBuilder
 
     /// <summary>Gets the ordered sections of the document.</summary>
     public SectionCollection Sections { get; } = new();
+
+    /// <summary>Gets the font collection used to register and resolve fonts.</summary>
+    public FontCollection Fonts { get; } = new();
 }
