@@ -314,6 +314,11 @@ public sealed class Document
                     pageNode["Resources"] = resources;
                 }
 
+                if (generated.Links.Count > 0)
+                {
+                    pageNode["Annots"] = BuildLinkAnnotations(writer, generated.Links);
+                }
+
                 continue;
             }
 
@@ -433,6 +438,38 @@ public sealed class Document
         }
 
         return result;
+    }
+
+    private static ArrayObject BuildLinkAnnotations(DocumentWriter writer, IReadOnlyList<GeneratedLink> links)
+    {
+        var annots = new ArrayObject();
+        foreach (var link in links)
+        {
+            ArrayObject rect =
+            [
+                new NumberObject(link.X1),
+                new NumberObject(link.Y1),
+                new NumberObject(link.X2),
+                new NumberObject(link.Y2),
+            ];
+
+            ArrayObject border = [new NumberObject(0.0), new NumberObject(0.0), new NumberObject(0.0)];
+
+            annots.Add(writer.Add(new DictionaryObject
+            {
+                ["Type"] = new NameObject("Annot"),
+                ["Subtype"] = new NameObject("Link"),
+                ["Rect"] = rect,
+                ["Border"] = border,
+                ["A"] = new DictionaryObject
+                {
+                    ["S"] = new NameObject("URI"),
+                    ["URI"] = new StringObject(link.Uri),
+                },
+            }));
+        }
+
+        return annots;
     }
 
     private static DictionaryObject? BuildGeneratedResources(
