@@ -82,6 +82,31 @@ internal sealed class CffFont
         return (int)Math.Round(width, MidpointRounding.AwayFromZero);
     }
 
+    internal byte[] GetCharStringBytes(int glyphIndex) => charStrings.GetBytes(glyphIndex);
+
+    internal byte[][] GetGlobalSubrBytes() => Extract(globalSubrs);
+
+    internal byte[][] GetLocalSubrBytes(int fd)
+    {
+        var subrs = fdArray[fd].LocalSubrs;
+        return subrs is null ? [] : Extract(subrs);
+    }
+
+    internal double GetDefaultWidthX(int fd) => fdArray[fd].DefaultWidthX;
+
+    internal double GetNominalWidthX(int fd) => fdArray[fd].NominalWidthX;
+
+    private static byte[][] Extract(CffIndex index)
+    {
+        var result = new byte[index.Count][];
+        for (var i = 0; i < index.Count; i++)
+        {
+            result[i] = index.GetBytes(i);
+        }
+
+        return result;
+    }
+
     public static CffFont Parse(byte[] cffData)
     {
         ArgumentNullException.ThrowIfNull(cffData);
