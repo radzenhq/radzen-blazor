@@ -177,6 +177,11 @@ internal sealed class DocumentGenerator
                 EmitImage(plan, positioned, left, height);
             }
 
+            foreach (var positioned in page.HeaderTables)
+            {
+                EmitFragment(plan, positioned, left, height);
+            }
+
             var bandTop = height - (page.ContentBox.Y + page.ContentBox.Height);
             foreach (var line in page.Footer)
             {
@@ -186,6 +191,11 @@ internal sealed class DocumentGenerator
             foreach (var positioned in page.FooterImages)
             {
                 EmitImage(plan, positioned, left, bandTop);
+            }
+
+            foreach (var positioned in page.FooterTables)
+            {
+                EmitFragment(plan, positioned, left, bandTop);
             }
 
             plans.Add(plan);
