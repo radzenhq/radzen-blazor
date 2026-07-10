@@ -276,29 +276,9 @@ public class DocumentWriteTests
         document.Pages.Add();
 
         using var stream = new MemoryStream();
-        document.Save(stream);
+        document.SaveToStream(stream);
 
         Assert.Equal(document.ToArray(), stream.ToArray());
-    }
-
-    [Fact]
-    public void Save_ToPath_WritesSameBytesAsToArray()
-    {
-        var document = new Document();
-        document.Info.Title = "OnDisk";
-        document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("disk"));
-
-        var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".pdf");
-        try
-        {
-            document.Save(path);
-            Assert.True(File.Exists(path));
-            Assert.Equal(document.ToArray(), File.ReadAllBytes(path));
-        }
-        finally
-        {
-            File.Delete(path);
-        }
     }
 
     [Fact]

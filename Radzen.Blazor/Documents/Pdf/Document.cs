@@ -24,7 +24,7 @@ public sealed class Document
     public byte[] ToArray()
     {
         using var stream = new MemoryStream();
-        Save(stream);
+        SaveToStream(stream);
         return stream.ToArray();
     }
 
@@ -32,7 +32,7 @@ public sealed class Document
     /// Serializes the document to the given stream.
     /// </summary>
     /// <param name="stream">The destination stream.</param>
-    public void Save(Stream stream)
+    public void SaveToStream(Stream stream)
     {
         System.ArgumentNullException.ThrowIfNull(stream);
 
@@ -82,17 +82,6 @@ public sealed class Document
         }
 
         writer.Close();
-    }
-
-    /// <summary>
-    /// Serializes the document to the file at the given path.
-    /// </summary>
-    /// <param name="path">The destination file path.</param>
-    public void Save(string path)
-    {
-        System.ArgumentNullException.ThrowIfNull(path);
-        using var stream = File.Create(path);
-        Save(stream);
     }
 
     private static ArrayObject MediaBox(Page page) =>
