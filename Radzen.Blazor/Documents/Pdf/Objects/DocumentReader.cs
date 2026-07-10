@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Radzen.Documents.Pdf.Objects.Encryption;
 using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Objects;
@@ -23,6 +24,9 @@ public sealed class DocumentReader
     private readonly Dictionary<int, ObjectStream> objectStreams = [];
     private DictionaryObject trailer = new();
     private Dictionary<int, long>? scanned;
+    private StandardSecurityHandler? security;
+    private int encryptObjectNumber = -1;
+    private bool decryptionReady;
 
     private DocumentReader(byte[] data)
     {
@@ -57,15 +61,33 @@ public sealed class DocumentReader
     }
 
     /// <summary>
+    /// Gets a value indicating whether the document is encrypted (its trailer
+    /// carries an <c>/Encrypt</c> entry and a security handler was constructed).
+    /// </summary>
+    public bool IsEncrypted => security is not null;
+
+    /// <summary>
     /// Parses a PDF document from a byte array.
     /// </summary>
     /// <param name="data">The complete document bytes.</param>
     /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
-    public static DocumentReader Parse(byte[] data)
+    public static DocumentReader Parse(byte[] data) => Parse(data, null);
+
+    /// <summary>
+    /// Parses a PDF document from a byte array, supplying a password for an
+    /// encrypted document. Opening an encrypted document whose user and owner
+    /// passwords both reject the supplied password throws
+    /// <see cref="InvalidPasswordException"/>.
+    /// </summary>
+    /// <param name="data">The complete document bytes.</param>
+    /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
+    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
+    public static DocumentReader Parse(byte[] data, string? password)
     {
         ArgumentNullException.ThrowIfNull(data);
         var reader = new DocumentReader(data);
         reader.Load();
+        reader.InitializeSecurity(password, throwOnFailure: true);
         return reader;
     }
 
@@ -74,12 +96,21 @@ public sealed class DocumentReader
     /// </summary>
     /// <param name="stream">The source stream.</param>
     /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
-    public static DocumentReader Parse(Stream stream)
+    public static DocumentReader Parse(Stream stream) => Parse(stream, null);
+
+    /// <summary>
+    /// Parses a PDF document from a stream, supplying a password for an encrypted
+    /// document. The stream is fully read into memory.
+    /// </summary>
+    /// <param name="stream">The source stream.</param>
+    /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
+    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
+    public static DocumentReader Parse(Stream stream, string? password)
     {
         ArgumentNullException.ThrowIfNull(stream);
         using var buffer = new MemoryStream();
         stream.CopyTo(buffer);
-        return Parse(buffer.ToArray());
+        return Parse(buffer.ToArray(), password);
     }
 
     /// <summary>
@@ -99,9 +130,20 @@ public sealed class DocumentReader
             throw new DocumentParseException("Object not found.", -1);
         }
 
-        var value = entry.Type == 2
-            ? GetCompressedObject((int)entry.Field2, (int)entry.Field3)
-            : GetUncompressedObject(number, entry.Field2);
+        DocumentObject value;
+        if (entry.Type == 2)
+        {
+            value = GetCompressedObject((int)entry.Field2, (int)entry.Field3);
+        }
+        else
+        {
+            value = GetUncompressedObject(number, entry.Field2, out var generation);
+            if (security is not null && number != encryptObjectNumber)
+            {
+                value = DecryptObject(value, number, generation);
+            }
+        }
+
         cache[number] = value;
         return value;
     }
@@ -121,6 +163,81 @@ public sealed class DocumentReader
         }
 
         return value;
+    }
+
+    private void InitializeSecurity(string? password, bool throwOnFailure)
+    {
+        if (!trailer.TryGetValue("Encrypt", out var encryptObject) || encryptObject is null)
+        {
+            return;
+        }
+
+        if (encryptObject is ReferenceObject reference)
+        {
+            encryptObjectNumber = reference.ObjectNumber;
+        }
+
+        if (Resolve(encryptObject) is not DictionaryObject encrypt)
+        {
+            return;
+        }
+
+        var handler = new StandardSecurityHandler(encrypt, ReadDocumentId(), Encoding.Latin1.GetBytes(password ?? ""));
+        decryptionReady = handler.IsUserPassword || handler.IsOwnerPassword;
+        if (!decryptionReady && throwOnFailure)
+        {
+            throw new InvalidPasswordException();
+        }
+
+        security = handler;
+    }
+
+    private byte[] ReadDocumentId()
+    {
+        if (trailer.TryGetValue("ID", out var id) && id is ArrayObject array
+            && array.Count > 0 && array[0] is StringObject first)
+        {
+            return Encoding.Latin1.GetBytes(first.Value);
+        }
+
+        return [];
+    }
+
+    private DocumentObject DecryptObject(DocumentObject value, int number, int generation)
+    {
+        switch (value)
+        {
+            case StringObject text:
+                var plain = security!.Decrypt(Encoding.Latin1.GetBytes(text.Value), number, generation);
+                return new StringObject(Encoding.Latin1.GetString(plain));
+            case StreamObject stream:
+                var decrypted = security!.Decrypt(stream.Data, number, generation);
+                var result = new StreamObject(decrypted);
+                foreach (var key in stream.Dictionary.Keys)
+                {
+                    result.Dictionary[key] = DecryptObject(stream.Dictionary[key], number, generation);
+                }
+
+                return result;
+            case DictionaryObject dictionary:
+                var mapped = new DictionaryObject();
+                foreach (var key in dictionary.Keys)
+                {
+                    mapped[key] = DecryptObject(dictionary[key], number, generation);
+                }
+
+                return mapped;
+            case ArrayObject array:
+                var items = new ArrayObject();
+                foreach (var item in array)
+                {
+                    items.Add(DecryptObject(item, number, generation));
+                }
+
+                return items;
+            default:
+                return value;
+        }
     }
 
     private void Load()
@@ -214,7 +331,7 @@ public sealed class DocumentReader
 
     private DictionaryObject ParseXrefStreamAt(long offset)
     {
-        if (!TryParseObjectAt(offset, null, out var value) || value is not StreamObject stream)
+        if (!TryParseObjectAt(offset, null, out var value, out _) || value is not StreamObject stream)
         {
             throw new DocumentParseException("Expected cross-reference stream.", (int)offset);
         }
@@ -304,16 +421,16 @@ public sealed class DocumentReader
         return value;
     }
 
-    private DocumentObject GetUncompressedObject(int number, long offset)
+    private DocumentObject GetUncompressedObject(int number, long offset, out int generation)
     {
-        if (TryParseObjectAt(offset, number, out var value))
+        if (TryParseObjectAt(offset, number, out var value, out generation))
         {
             return value!;
         }
 
         var offsets = ScannedOffsets();
         if (offsets.TryGetValue(number, out var recovered) && recovered != offset
-            && TryParseObjectAt(recovered, number, out value))
+            && TryParseObjectAt(recovered, number, out value, out generation))
         {
             return value!;
         }
@@ -364,9 +481,10 @@ public sealed class DocumentReader
         return container;
     }
 
-    private bool TryParseObjectAt(long offset, int? expected, out DocumentObject? value)
+    private bool TryParseObjectAt(long offset, int? expected, out DocumentObject? value, out int generation)
     {
         value = null;
+        generation = 0;
         if (offset < 0 || offset >= data.Length)
         {
             return false;
@@ -386,10 +504,13 @@ public sealed class DocumentReader
                 return false;
             }
 
-            if (lexer.Next().Kind != TokenKind.Integer)
+            var generationToken = lexer.Next();
+            if (generationToken.Kind != TokenKind.Integer)
             {
                 return false;
             }
+
+            generation = (int)generationToken.IntValue;
 
             var keyword = lexer.Next();
             if (keyword.Kind != TokenKind.Keyword || keyword.Text != "obj")
