@@ -10,7 +10,7 @@ namespace Radzen.Documents.Pdf.Objects;
 /// </summary>
 public sealed class ArrayObject : DocumentObject, IEnumerable<DocumentObject>
 {
-    private readonly List<DocumentObject> items = new();
+    private readonly List<DocumentObject> items = [];
 
     /// <summary>
     /// Gets the number of elements in the array.

@@ -18,9 +18,9 @@ internal static class GlyfSubsetter
     private const uint ChecksumMagic = 0xB1B0AFBA;
 
     private static readonly string[] RetainedTags =
-    {
+    [
         "cmap", "glyf", "head", "hhea", "hmtx", "loca", "maxp", "name", "OS/2", "post",
-    };
+    ];
 
     public static byte[] Subset(SfntFont font, IReadOnlyCollection<ushort> glyphIds)
     {

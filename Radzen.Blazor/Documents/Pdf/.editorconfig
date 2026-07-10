@@ -1,0 +1,15 @@
+# Style rules enforced at build time for the PDF library only.
+[*.cs]
+
+# Collection initialization / expression simplification
+dotnet_style_prefer_collection_expression = when_types_loosely_match
+dotnet_diagnostic.IDE0028.severity = warning
+dotnet_diagnostic.IDE0300.severity = warning
+dotnet_diagnostic.IDE0301.severity = warning
+dotnet_diagnostic.IDE0302.severity = warning
+dotnet_diagnostic.IDE0303.severity = warning
+dotnet_diagnostic.IDE0304.severity = warning
+dotnet_diagnostic.IDE0305.severity = warning
+
+# Simplified new(...) when the type is apparent
+dotnet_diagnostic.IDE0090.severity = warning

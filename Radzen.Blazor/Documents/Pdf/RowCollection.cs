@@ -11,7 +11,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public class RowCollection : IReadOnlyList<Row>
 {
-    private readonly List<Row> items = new();
+    private readonly List<Row> items = [];
     private readonly Table table;
 
     internal RowCollection(Table table) => this.table = table;

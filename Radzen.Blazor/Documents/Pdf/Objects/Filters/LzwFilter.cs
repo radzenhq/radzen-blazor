@@ -15,7 +15,7 @@ internal static class LzwFilter
         var output = new List<byte>();
         if (data.Length == 0)
         {
-            return output.ToArray();
+            return [.. output];
         }
 
         var table = new List<byte[]>();
@@ -24,11 +24,11 @@ internal static class LzwFilter
             table.Clear();
             for (int i = 0; i < 256; i++)
             {
-                table.Add(new[] { (byte)i });
+                table.Add([(byte)i]);
             }
 
-            table.Add(Array.Empty<byte>());
-            table.Add(Array.Empty<byte>());
+            table.Add([]);
+            table.Add([]);
         }
 
         ResetTable();
@@ -98,6 +98,6 @@ internal static class LzwFilter
             previous = code;
         }
 
-        return output.ToArray();
+        return [.. output];
     }
 }

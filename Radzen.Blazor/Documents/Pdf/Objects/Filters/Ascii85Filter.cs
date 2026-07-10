@@ -67,7 +67,7 @@ internal static class Ascii85Filter
             }
         }
 
-        return output.ToArray();
+        return [.. output];
     }
 
     public static byte[] Encode(byte[] data)
@@ -114,7 +114,7 @@ internal static class Ascii85Filter
 
         output.Add((byte)'~');
         output.Add((byte)'>');
-        return output.ToArray();
+        return [.. output];
     }
 
     static bool IsWhitespace(byte b) =>

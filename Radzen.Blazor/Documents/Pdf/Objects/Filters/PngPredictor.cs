@@ -12,7 +12,7 @@ internal static class PngPredictor
         int rowLength = RowLength(colors, bitsPerComponent, columns);
         if (rowLength == 0)
         {
-            return Array.Empty<byte>();
+            return [];
         }
 
         int stride = rowLength + 1;
@@ -60,7 +60,7 @@ internal static class PngPredictor
         int rowLength = RowLength(colors, bitsPerComponent, columns);
         if (rowLength == 0)
         {
-            return Array.Empty<byte>();
+            return [];
         }
 
         int filter = predictor >= 10 ? predictor - 10 : predictor;

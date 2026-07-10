@@ -18,13 +18,13 @@ namespace Radzen.Documents.Pdf.Objects;
 public sealed class DocumentWriter
 {
     private static readonly byte[] Header =
-    {
+    [
         (byte)'%', (byte)'P', (byte)'D', (byte)'F', (byte)'-', (byte)'1', (byte)'.', (byte)'7', (byte)'\n',
         (byte)'%', 0xE2, 0xE3, 0xCF, 0xD3, (byte)'\n',
-    };
+    ];
 
     private readonly Stream stream;
-    private readonly List<DocumentObject> objects = new();
+    private readonly List<DocumentObject> objects = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentWriter"/> class.

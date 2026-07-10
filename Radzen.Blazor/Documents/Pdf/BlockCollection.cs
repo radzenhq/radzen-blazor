@@ -12,7 +12,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public class BlockCollection : IReadOnlyList<Block>
 {
-    private readonly List<Block> items = new();
+    private readonly List<Block> items = [];
 
     /// <inheritdoc/>
     public int Count => items.Count;

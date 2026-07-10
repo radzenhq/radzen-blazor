@@ -49,7 +49,7 @@ internal static class AsciiHexFilter
             output.Add((byte)(high << 4));
         }
 
-        return output.ToArray();
+        return [.. output];
     }
 
     public static byte[] Encode(byte[] data)

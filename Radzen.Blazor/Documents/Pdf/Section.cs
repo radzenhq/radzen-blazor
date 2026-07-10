@@ -50,5 +50,5 @@ public class Section
     public HeaderFooter Footer { get; } = new();
 
     /// <summary>Gets the body content blocks.</summary>
-    public BlockCollection Blocks { get; } = new();
+    public BlockCollection Blocks { get; } = [];
 }

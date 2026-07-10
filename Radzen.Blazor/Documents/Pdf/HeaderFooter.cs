@@ -8,5 +8,5 @@ namespace Radzen.Documents.Pdf;
 public class HeaderFooter
 {
     /// <summary>Gets the content blocks of the header or footer.</summary>
-    public BlockCollection Blocks { get; } = new();
+    public BlockCollection Blocks { get; } = [];
 }

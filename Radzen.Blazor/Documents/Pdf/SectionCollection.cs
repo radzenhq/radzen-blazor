@@ -10,7 +10,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public class SectionCollection : IReadOnlyList<Section>
 {
-    private readonly List<Section> items = new();
+    private readonly List<Section> items = [];
 
     /// <inheritdoc/>
     public int Count => items.Count;
