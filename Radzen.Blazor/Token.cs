@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
 
-namespace Radzen;
+namespace Radzen.Expressions;
 
 /// <summary>
 /// Represents a token in an expression.
