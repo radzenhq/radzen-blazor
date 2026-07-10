@@ -66,6 +66,7 @@ internal sealed class DocumentGenerator
         public required Color Color { get; init; }
         public required GeneratedFont Font { get; init; }
         public required byte[] Bytes { get; init; }
+        public Rect? Clip { get; set; }
     }
 
     private sealed class ImageDraw
@@ -412,9 +413,27 @@ internal sealed class DocumentGenerator
 
         EmitBorders(plan, layout, cell, left, contentTop, delta);
 
+        var firstText = plan.Texts.Count;
+        var overflows = false;
         foreach (var line in cell.Lines)
         {
             EmitLine(plan, line.Line, left + line.X, contentTop - (line.Y + delta));
+            overflows |= line.Line.Width > cell.ContentBox.Width + 0.01;
+        }
+
+        // An unbreakable token wider than the cell is clipped to the cell box so it
+        // never overpaints the neighboring cell.
+        if (overflows)
+        {
+            var clip = new Rect(
+                left + cell.Bounds.X,
+                contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
+                cell.Bounds.Width,
+                cell.Bounds.Height);
+            for (var t = firstText; t < plan.Texts.Count; t++)
+            {
+                plan.Texts[t].Clip = clip;
+            }
         }
 
         foreach (var image in cell.Images)
@@ -865,6 +884,19 @@ internal sealed class DocumentGenerator
 
         foreach (var text in plan.Texts)
         {
+            if (text.Clip is { } clip)
+            {
+                writer.WriteRaw("q\n");
+                writer.WriteNumber(clip.X);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(clip.Y);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(clip.Width);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(clip.Height);
+                writer.WriteRaw(" re W n\n");
+            }
+
             writer.WriteRaw("BT\n");
             writer.WriteColor(text.Color, "rg");
             writer.WriteName(text.Font.Key);
@@ -877,6 +909,10 @@ internal sealed class DocumentGenerator
             writer.WriteRaw(" Td\n");
             writer.WriteString(text.Bytes);
             writer.WriteRaw(" Tj\nET\n");
+            if (text.Clip is not null)
+            {
+                writer.WriteRaw("Q\n");
+            }
         }
 
         var usedFonts = new List<GeneratedFont>(plan.UsedFonts);
