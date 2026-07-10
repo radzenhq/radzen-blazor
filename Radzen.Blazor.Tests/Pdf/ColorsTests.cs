@@ -4,6 +4,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
+using Colors = Radzen.Documents.Pdf.Colors;
+
 public class ColorsTests
 {
     private static void AssertRgb(Color c, byte r, byte g, byte b)
