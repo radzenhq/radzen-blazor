@@ -23,6 +23,13 @@ public sealed class Page
     public Unit Height { get; }
 
     /// <summary>
+    /// Gets the ordered collection of content elements. When non-empty, it is
+    /// emitted as the page content stream and overrides any raw content set with
+    /// <see cref="SetContent"/>.
+    /// </summary>
+    public ContentCollection Content { get; } = [];
+
+    /// <summary>
     /// Sets the raw content stream for this page. The bytes are stored verbatim
     /// and written without a compression filter.
     /// </summary>
