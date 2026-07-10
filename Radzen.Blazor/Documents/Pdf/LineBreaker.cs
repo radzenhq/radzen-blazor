@@ -89,10 +89,7 @@ internal static class LineBreaker
 
                     var spaces = text[start..i];
                     var w = fonts.MeasureText(spaces, run.Font);
-                    if (current != null)
-                    {
-                        current.GapAfter += w;
-                    }
+                    current?.GapAfter += w;
                 }
                 else
                 {
