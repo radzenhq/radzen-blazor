@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Radzen.Documents.Pdf.Objects;
 
@@ -16,6 +17,159 @@ public sealed class Document
 
     /// <summary>Gets the ordered collection of pages.</summary>
     public PageCollection Pages { get; } = [];
+
+    /// <summary>
+    /// Loads a physical document from a stream. The stream is read in full and
+    /// parsed through the internal reader; each page's raw content-stream bytes
+    /// are retained verbatim so untouched pages re-serialize unchanged.
+    /// </summary>
+    /// <param name="stream">The source stream.</param>
+    /// <param name="options">Load options such as the decryption password.</param>
+    /// <returns>The loaded document.</returns>
+    public static Document LoadFromStream(Stream stream, LoadOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        using var buffer = new MemoryStream();
+        stream.CopyTo(buffer);
+        var reader = DocumentReader.Parse(buffer.ToArray(), options?.Password);
+
+        var document = new Document();
+        ReadInfo(reader, document.Info);
+
+        var catalog = reader.Trailer.TryGetValue("Root", out var root) && reader.Resolve(root!) is DictionaryObject c
+            ? c
+            : null;
+        if (catalog is not null && catalog.TryGetValue("Pages", out var pagesRef)
+            && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
+        {
+            CollectPages(reader, pagesNode, null, document);
+        }
+
+        return document;
+    }
+
+    /// <summary>
+    /// Appends a deep copy of every page in <paramref name="other"/> to this
+    /// document. Each appended page keeps its own content stream (no resource
+    /// deduplication) and <paramref name="other"/> is left unchanged.
+    /// </summary>
+    /// <param name="other">The document whose pages are copied.</param>
+    public void Append(Document other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        foreach (var source in other.Pages)
+        {
+            var page = new Page(source.Width, source.Height);
+            var content = source.GetContent();
+            if (content is not null)
+            {
+                page.SetContent([.. content]);
+            }
+
+            Pages.Insert(Pages.Count, page);
+        }
+    }
+
+    private static void CollectPages(DocumentReader reader, DictionaryObject node, ArrayObject? inheritedBox, Document document)
+    {
+        var box = node.TryGetValue("MediaBox", out var mediaBox) && reader.Resolve(mediaBox!) is ArrayObject own
+            ? own
+            : inheritedBox;
+
+        if (node.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
+        {
+            foreach (var kid in kids)
+            {
+                if (reader.Resolve(kid) is DictionaryObject child)
+                {
+                    CollectPages(reader, child, box, document);
+                }
+            }
+
+            return;
+        }
+
+        var (width, height) = Dimensions(box);
+        var page = new Page(width, height);
+        var content = ReadContent(reader, node);
+        if (content is not null)
+        {
+            page.SetContent(content);
+        }
+
+        document.Pages.Insert(document.Pages.Count, page);
+    }
+
+    private static (Unit Width, Unit Height) Dimensions(ArrayObject? box)
+    {
+        if (box is null || box.Count < 4)
+        {
+            return (PageSizes.A4.Width, PageSizes.A4.Height);
+        }
+
+        var llx = Number(box[0]);
+        var lly = Number(box[1]);
+        var urx = Number(box[2]);
+        var ury = Number(box[3]);
+        return (Unit.FromPoint(urx - llx), Unit.FromPoint(ury - lly));
+    }
+
+    private static double Number(DocumentObject value) => value is NumberObject number ? number.DoubleValue : 0.0;
+
+    private static byte[]? ReadContent(DocumentReader reader, DictionaryObject page)
+    {
+        if (!page.TryGetValue("Contents", out var contents))
+        {
+            return null;
+        }
+
+        var resolved = reader.Resolve(contents!);
+        if (resolved is StreamObject stream)
+        {
+            return stream.Data;
+        }
+
+        if (resolved is ArrayObject array)
+        {
+            using var joined = new MemoryStream();
+            for (var i = 0; i < array.Count; i++)
+            {
+                if (reader.Resolve(array[i]) is StreamObject part)
+                {
+                    if (i > 0)
+                    {
+                        joined.WriteByte((byte)'\n');
+                    }
+
+                    joined.Write(part.Data, 0, part.Data.Length);
+                }
+            }
+
+            return joined.ToArray();
+        }
+
+        return null;
+    }
+
+    private static void ReadInfo(DocumentReader reader, DocumentInfo target)
+    {
+        if (!reader.Trailer.TryGetValue("Info", out var infoObject)
+            || reader.Resolve(infoObject!) is not DictionaryObject info)
+        {
+            return;
+        }
+
+        target.Title = Text(reader, info, "Title");
+        target.Author = Text(reader, info, "Author");
+        target.Subject = Text(reader, info, "Subject");
+        target.Keywords = Text(reader, info, "Keywords");
+        target.Creator = Text(reader, info, "Creator");
+    }
+
+    private static string? Text(DocumentReader reader, DictionaryObject dictionary, string key)
+        => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text ? text.Value : null;
 
     /// <summary>
     /// Serializes the document to a byte array.
