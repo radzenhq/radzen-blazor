@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
-using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf;
 
@@ -131,200 +130,84 @@ internal sealed class DocumentGenerator
 
     private void GenerateSection(Section section, List<PagePlan> plans)
     {
-        if (HasFlowOnly(section))
-        {
-            GenerateFlowSection(section, plans);
-        }
-        else
-        {
-            GenerateMixedSection(section, plans);
-        }
-    }
-
-    private static bool HasFlowOnly(Section section)
-    {
-        foreach (var block in section.Blocks)
-        {
-            if (block is not Paragraph && block is not PageBreak)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private void GenerateFlowSection(Section section, List<PagePlan> plans)
-    {
-        foreach (var page in Paginator.Paginate(section, fonts))
+        foreach (var page in Paginator.Paginate(section, fonts, MeasureImage))
         {
             var height = page.Size.Height.Point;
             var plan = new PagePlan { Size = page.Size };
-
+            var left = page.ContentBox.X;
             var contentTop = height - page.ContentBox.Y;
+
             foreach (var line in page.Lines)
             {
-                EmitLine(plan, line.Line, page.ContentBox.X, contentTop - line.Y);
+                EmitLine(plan, line.Line, left, contentTop - line.Y);
+            }
+
+            foreach (var positioned in page.Tables)
+            {
+                EmitFragment(plan, positioned, left, contentTop);
+            }
+
+            foreach (var positioned in page.Images)
+            {
+                var (_, _, xobject) = Decode(positioned.Source);
+                plan.Images.Add(new ImageDraw
+                {
+                    X = left,
+                    Y = contentTop - positioned.Y - positioned.Height,
+                    Width = positioned.Width,
+                    Height = positioned.Height,
+                    Image = xobject,
+                });
+                plan.UsedImages.Add(xobject);
             }
 
             foreach (var line in page.Header)
             {
-                EmitLine(plan, line.Line, page.ContentBox.X, height - line.Y);
+                EmitLine(plan, line.Line, left, height - line.Y);
             }
 
             var bandTop = height - (page.ContentBox.Y + page.ContentBox.Height);
             foreach (var line in page.Footer)
             {
-                EmitLine(plan, line.Line, page.ContentBox.X, bandTop - line.Y);
+                EmitLine(plan, line.Line, left, bandTop - line.Y);
             }
 
             plans.Add(plan);
         }
     }
 
-    private void GenerateMixedSection(Section section, List<PagePlan> plans)
+    private (double Width, double Height) MeasureImage(Image image)
     {
-        var (pageWidth, pageHeight) = EffectiveSize(section);
-        var left = section.Margins.Left.Point;
-        var top = section.Margins.Top.Point;
-        var right = section.Margins.Right.Point;
-        var bottom = section.Margins.Bottom.Point;
-        var contentWidth = pageWidth - left - right;
-        var contentHeight = pageHeight - top - bottom;
-        var size = new PageSize(Unit.FromPoint(pageWidth), Unit.FromPoint(pageHeight));
-        var contentTop = pageHeight - top;
-
-        PagePlan plan = new() { Size = size };
-        plans.Add(plan);
-        var cursor = 0.0;
-
-        PagePlan NewPage()
-        {
-            plan = new PagePlan { Size = size };
-            plans.Add(plan);
-            cursor = 0;
-            return plan;
-        }
-
-        foreach (var block in section.Blocks)
-        {
-            switch (block)
-            {
-                case PageBreak:
-                    NewPage();
-                    break;
-
-                case Paragraph paragraph:
-                    cursor += paragraph.SpacingBefore.Point;
-                    foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts))
-                    {
-                        if (cursor + line.Height > contentHeight + 1e-6 && HasContent(plan))
-                        {
-                            NewPage();
-                        }
-
-                        EmitLine(plan, line, left, contentTop - cursor);
-                        cursor += line.Height;
-                    }
-
-                    cursor += paragraph.SpacingAfter.Point;
-                    break;
-
-                case Image image:
-                    var (iw, ih, xobject) = Decode(image);
-                    if (cursor + ih > contentHeight + 1e-6 && HasContent(plan))
-                    {
-                        NewPage();
-                    }
-
-                    plan.Images.Add(new ImageDraw
-                    {
-                        X = left,
-                        Y = contentTop - cursor - ih,
-                        Width = iw,
-                        Height = ih,
-                        Image = xobject,
-                    });
-                    plan.UsedImages.Add(xobject);
-                    cursor += ih;
-                    break;
-
-                case Table table:
-                    if (HasContent(plan))
-                    {
-                        NewPage();
-                    }
-
-                    EmitTable(table, left, contentTop, contentWidth, contentHeight, plans, ref plan, out cursor);
-                    break;
-            }
-        }
+        var (width, height, _) = Decode(image);
+        return (width, height);
     }
 
-    private void EmitTable(
-        Table table,
-        double left,
-        double contentTop,
-        double contentWidth,
-        double contentHeight,
-        List<PagePlan> plans,
-        ref PagePlan plan,
-        out double cursor)
+    private void EmitFragment(PagePlan plan, PositionedTableFragment positioned, double left, double contentTop)
     {
-        var layout = TableLayout.Layout(table, contentWidth, fonts);
-        var fragments = TablePaginator.Paginate(layout, table, contentHeight);
-        var cellsByRow = new Dictionary<int, List<LaidOutCell>>();
-        foreach (var cell in layout.Cells)
+        var layout = positioned.Layout;
+        foreach (var row in positioned.Fragment.Rows)
         {
-            if (!cellsByRow.TryGetValue(cell.Row, out var list))
+            foreach (var cell in layout.Cells)
             {
-                list = [];
-                cellsByRow[cell.Row] = list;
-            }
-
-            list.Add(cell);
-        }
-
-        var fragmentHeight = 0.0;
-        for (var f = 0; f < fragments.Count; f++)
-        {
-            if (f > 0)
-            {
-                plan = new PagePlan { Size = plan.Size };
-                plans.Add(plan);
-            }
-
-            var fragment = fragments[f];
-            fragmentHeight = fragment.Height;
-            foreach (var row in fragment.Rows)
-            {
-                if (!cellsByRow.TryGetValue(row.SourceRow, out var cells))
+                if (cell.Row != row.SourceRow)
                 {
                     continue;
                 }
 
-                foreach (var cell in cells)
-                {
-                    var delta = row.Y - cell.Bounds.Y;
-                    EmitCell(plan, cell, left, contentTop, delta);
-                }
+                var delta = positioned.Y + row.Y - cell.Bounds.Y;
+                EmitCell(plan, cell, left, contentTop, delta);
             }
         }
-
-        cursor = fragmentHeight;
     }
 
     private void EmitCell(PagePlan plan, LaidOutCell cell, double left, double contentTop, double delta)
     {
-        var bounds = cell.Bounds;
         EmitBorders(plan, cell, left, contentTop, delta);
 
         foreach (var line in cell.Lines)
         {
             EmitLine(plan, line.Line, left + line.X, contentTop - (line.Y + delta));
         }
-
-        _ = bounds;
     }
 
     private static void EmitBorders(PagePlan plan, LaidOutCell cell, double left, double contentTop, double delta)
@@ -496,33 +379,7 @@ internal sealed class DocumentGenerator
             images[image] = generated;
         }
 
-        var dict = generated.Image.Image.Dictionary;
-        var pixelWidth = ((NumberObject)dict["Width"]).DoubleValue;
-        var pixelHeight = ((NumberObject)dict["Height"]).DoubleValue;
-
-        double width;
-        double height;
-        if (image.Width is { } w && image.Height is { } h)
-        {
-            width = w.Point;
-            height = h.Point;
-        }
-        else if (image.Width is { } wo)
-        {
-            width = wo.Point;
-            height = pixelHeight * width / pixelWidth;
-        }
-        else if (image.Height is { } ho)
-        {
-            height = ho.Point;
-            width = pixelWidth * height / pixelHeight;
-        }
-        else
-        {
-            width = pixelWidth;
-            height = pixelHeight;
-        }
-
+        var (width, height) = ImageDecoder.Measure(image, generated.Image);
         return (width, height, generated);
     }
 
@@ -586,13 +443,4 @@ internal sealed class DocumentGenerator
         };
     }
 
-    private static bool HasContent(PagePlan plan)
-        => plan.Texts.Count > 0 || plan.Images.Count > 0 || plan.Rects.Count > 0;
-
-    private static (double Width, double Height) EffectiveSize(Section section)
-    {
-        var width = section.PageSize.Width.Point;
-        var height = section.PageSize.Height.Point;
-        return section.Orientation == PageOrientation.Landscape ? (height, width) : (width, height);
-    }
 }

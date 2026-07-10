@@ -28,6 +28,31 @@ internal static class ImageDecoder
         throw new NotSupportedException("Unrecognized image format; only PNG and JPEG are supported.");
     }
 
+    // Rendered size honoring explicit Width/Height, keeping aspect when one is omitted.
+    public static (double Width, double Height) Measure(Image image, ImageXObject xobject)
+    {
+        var dict = xobject.Image.Dictionary;
+        var pixelWidth = ((NumberObject)dict["Width"]).DoubleValue;
+        var pixelHeight = ((NumberObject)dict["Height"]).DoubleValue;
+
+        if (image.Width is { } w && image.Height is { } h)
+        {
+            return (w.Point, h.Point);
+        }
+
+        if (image.Width is { } wo)
+        {
+            return (wo.Point, pixelHeight * wo.Point / pixelWidth);
+        }
+
+        if (image.Height is { } ho)
+        {
+            return (pixelWidth * ho.Point / pixelHeight, ho.Point);
+        }
+
+        return (pixelWidth, pixelHeight);
+    }
+
     private static bool IsPng(byte[] data)
     {
         if (data.Length < PngSignature.Length)
