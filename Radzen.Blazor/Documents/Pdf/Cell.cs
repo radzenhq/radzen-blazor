@@ -61,8 +61,16 @@ public class Cell
     /// <summary>Gets the default font for content in the cell.</summary>
     public Font Font { get; } = new();
 
+    private HorizontalAlignment? alignment;
+
     /// <summary>Gets or sets the horizontal content alignment. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
-    public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
+    public HorizontalAlignment Alignment
+    {
+        get => alignment ?? HorizontalAlignment.Left;
+        set => alignment = value;
+    }
+
+    internal HorizontalAlignment? AlignmentValue => alignment;
 
     /// <summary>Gets or sets the vertical content alignment. Defaults to <see cref="VerticalAlignment.Top"/>.</summary>
     public VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;

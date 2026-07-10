@@ -17,4 +17,8 @@ public class Run(string text)
 
     /// <summary>Gets the run font.</summary>
     public Font Font { get; } = new();
+
+    internal Font? EffectiveFont { get; set; }
+
+    internal Font ResolvedFont => EffectiveFont ?? Font;
 }

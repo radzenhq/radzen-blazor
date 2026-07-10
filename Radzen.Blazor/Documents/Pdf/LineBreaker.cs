@@ -50,27 +50,38 @@ internal static class LineBreaker
 
     public static IReadOnlyList<LineBox> Break(Paragraph paragraph, double maxWidthPoints, FontCollection fonts)
     {
-        var words = Tokenize(paragraph, fonts);
         var boxes = new List<LineBox>();
-        if (words.Count == 0)
+        foreach (var words in Tokenize(paragraph, fonts))
         {
-            return boxes;
-        }
+            if (words.Count == 0)
+            {
+                continue;
+            }
 
-        var lineRanges = Wrap(words, maxWidthPoints);
-        for (var li = 0; li < lineRanges.Count; li++)
-        {
-            var (first, last) = lineRanges[li];
-            var isLast = li == lineRanges.Count - 1;
-            boxes.Add(BuildLine(words, first, last, maxWidthPoints, paragraph, fonts, isLast));
+            var lineRanges = Wrap(words, maxWidthPoints);
+            for (var li = 0; li < lineRanges.Count; li++)
+            {
+                var (first, last) = lineRanges[li];
+                var isLast = li == lineRanges.Count - 1;
+                boxes.Add(BuildLine(words, first, last, maxWidthPoints, paragraph, fonts, isLast));
+            }
         }
 
         return boxes;
     }
 
-    private static List<Word> Tokenize(Paragraph paragraph, FontCollection fonts)
+    private static bool IsInlineWhitespace(char c) => c is ' ' or '\t';
+
+    private static bool IsLineBreak(char c) => c is '\n' or '\r';
+
+    // Splits the paragraph into forced-break segments ('\n', '\r' and "\r\n"), each a
+    // list of words separated by breakable whitespace (' ' and '\t'). NBSP is a word
+    // character; control characters never enter fragment text.
+    private static List<List<Word>> Tokenize(Paragraph paragraph, FontCollection fonts)
     {
+        var segments = new List<List<Word>>();
         var words = new List<Word>();
+        segments.Add(words);
         Word? current = null;
 
         foreach (var run in paragraph.Inlines)
@@ -79,28 +90,40 @@ internal static class LineBreaker
             var i = 0;
             while (i < text.Length)
             {
-                if (text[i] == ' ')
+                if (IsLineBreak(text[i]))
                 {
-                    var start = i;
-                    while (i < text.Length && text[i] == ' ')
+                    if (text[i] == '\r' && i + 1 < text.Length && text[i + 1] == '\n')
                     {
                         i++;
                     }
 
-                    var spaces = text[start..i];
-                    var w = fonts.MeasureText(spaces, run.Font);
+                    i++;
+                    words = [];
+                    segments.Add(words);
+                    current = null;
+                }
+                else if (IsInlineWhitespace(text[i]))
+                {
+                    var count = 0;
+                    while (i < text.Length && IsInlineWhitespace(text[i]))
+                    {
+                        count++;
+                        i++;
+                    }
+
+                    var w = fonts.MeasureText(new string(' ', count), run.ResolvedFont);
                     current?.GapAfter += w;
                 }
                 else
                 {
                     var start = i;
-                    while (i < text.Length && text[i] != ' ')
+                    while (i < text.Length && !IsInlineWhitespace(text[i]) && !IsLineBreak(text[i]))
                     {
                         i++;
                     }
 
                     var segment = text[start..i];
-                    var advance = fonts.MeasureText(segment, run.Font);
+                    var advance = fonts.MeasureText(segment, run.ResolvedFont);
                     var piece = new Piece
                     {
                         Run = run,
@@ -122,7 +145,7 @@ internal static class LineBreaker
             }
         }
 
-        return words;
+        return segments;
     }
 
     private static List<(int First, int Last)> Wrap(List<Word> words, double max)
@@ -191,7 +214,8 @@ internal static class LineBreaker
         var wordCount = last - first + 1;
         var gapCount = wordCount - 1;
 
-        var justify = paragraph.Alignment == HorizontalAlignment.Justify && !isLast && gapCount > 0;
+        var alignment = paragraph.EffectiveAlignment;
+        var justify = alignment == HorizontalAlignment.Justify && !isLast && gapCount > 0;
 
         double x0;
         double justifiedGap = 0;
@@ -202,7 +226,7 @@ internal static class LineBreaker
         }
         else
         {
-            x0 = paragraph.Alignment switch
+            x0 = alignment switch
             {
                 HorizontalAlignment.Right or HorizontalAlignment.End => max - naturalWidth,
                 HorizontalAlignment.Center => (max - naturalWidth) / 2.0,
@@ -238,10 +262,11 @@ internal static class LineBreaker
         double baseline = 0;
         foreach (var frag in box.Fragments)
         {
-            var size = frag.Run.Font.Size;
+            var font = frag.Run.ResolvedFont;
+            var size = font.Size;
             double h;
             double asc;
-            if (fonts.TryResolvePrimary(frag.Run.Font, out var face))
+            if (fonts.TryResolvePrimary(font, out var face))
             {
                 var upm = face.UnitsPerEm;
                 asc = face.Ascent * size / upm;

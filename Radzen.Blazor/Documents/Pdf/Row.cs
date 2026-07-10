@@ -23,8 +23,16 @@ public class Row
     /// <summary>Gets the default font for cells in the row.</summary>
     public Font Font { get; } = new();
 
+    private HorizontalAlignment? alignment;
+
     /// <summary>Gets or sets the horizontal content alignment. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
-    public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
+    public HorizontalAlignment Alignment
+    {
+        get => alignment ?? HorizontalAlignment.Left;
+        set => alignment = value;
+    }
+
+    internal HorizontalAlignment? AlignmentValue => alignment;
 
     /// <summary>Gets or sets the row background color, or <see langword="null"/> for none.</summary>
     public Color? Background { get; set; }

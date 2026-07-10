@@ -13,24 +13,35 @@ public sealed class FontCollection
 {
     private const uint TtcTag = 0x74746366; // 'ttcf'
 
-    private readonly Dictionary<string, SfntFont> registered = new(StringComparer.Ordinal);
+    private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];
     private readonly List<string> fallback = [];
 
     /// <summary>
-    /// Registers a font under the given family key. The stream is buffered fully so it may be
-    /// closed immediately after. For a TrueType collection the face whose internal family name
-    /// matches <paramref name="family"/> is selected; a plain font is registered under the key
-    /// regardless of its internal name. Registering an existing family overwrites it.
+    /// Registers a font as the regular face of the given family. The stream is buffered fully so
+    /// it may be closed immediately after. For a TrueType collection the face whose internal
+    /// family name matches <paramref name="family"/> is selected; a plain font is registered
+    /// under the key regardless of its internal name. Registering an existing face overwrites it.
     /// </summary>
     /// <param name="family">The family key to register the font under.</param>
     /// <param name="font">A stream containing the font data.</param>
-    public void Register(string family, Stream font)
+    public void Register(string family, Stream font) => Register(family, font, bold: false, italic: false);
+
+    /// <summary>
+    /// Registers a font as the face of the given family with the specified style. Runs whose
+    /// <see cref="Font.Bold"/>/<see cref="Font.Italic"/> flags match the registered style use this
+    /// face; when no styled face exists the regular face of the family is used instead.
+    /// </summary>
+    /// <param name="family">The family key to register the font under.</param>
+    /// <param name="font">A stream containing the font data.</param>
+    /// <param name="bold">Whether this face is the bold face of the family.</param>
+    /// <param name="italic">Whether this face is the italic face of the family.</param>
+    public void Register(string family, Stream font, bool bold, bool italic)
     {
         ArgumentNullException.ThrowIfNull(family);
         ArgumentNullException.ThrowIfNull(font);
 
         var bytes = ReadFully(font);
-        registered[family] = IsCollection(bytes)
+        registered[(family, bold, italic)] = IsCollection(bytes)
             ? SfntFont.Parse(bytes, family)
             : SfntFont.Parse(bytes);
     }
@@ -50,9 +61,9 @@ public sealed class FontCollection
 
     /// <summary>
     /// Measures the width of <paramref name="text"/> in points at <paramref name="font"/>'s size.
-    /// A registered family (matched by exact <see cref="Font.Name"/>) is measured from its hmtx
-    /// advances with per-character fallback; otherwise a base-14 font is measured. No kerning is
-    /// applied.
+    /// A registered family (matched by <see cref="Font.Name"/> and style) is measured from its
+    /// hmtx advances with per-character fallback; otherwise a base-14 font is measured. No
+    /// kerning is applied.
     /// </summary>
     /// <param name="text">The text to measure.</param>
     /// <param name="font">The font to measure with.</param>
@@ -81,8 +92,17 @@ public sealed class FontCollection
             : throw new InvalidOperationException($"No font is registered for family '{font.Name}'.");
     }
 
+    // Resolves style-aware: exact (family, bold, italic) face first, then the regular
+    // face of the family, then any registered face of the family.
     internal bool TryResolvePrimary(Font font, out SfntFont primary)
-        => registered.TryGetValue(font.Name, out primary!);
+    {
+        if (registered.TryGetValue((font.Name, font.Bold, font.Italic), out primary!))
+        {
+            return true;
+        }
+
+        return (font.Bold || font.Italic) && TryResolveFamily(font.Name, out primary);
+    }
 
     internal SfntFont ResolvePrimarySfnt(Font font)
         => TryResolvePrimary(font, out var primary)
@@ -97,19 +117,49 @@ public sealed class FontCollection
             return (primary, glyph);
         }
 
+        return TryResolveFallbackGlyph(c, out var face, out var candidate)
+            ? (face, candidate)
+            : (primary, (ushort)0);
+    }
+
+    // Walks the fallback chain only, returning the first face that maps the codepoint
+    // to a non-notdef glyph.
+    internal bool TryResolveFallbackGlyph(char c, out SfntFont face, out ushort glyph)
+    {
         foreach (var name in fallback)
         {
-            if (registered.TryGetValue(name, out var face))
+            if (TryResolveFamily(name, out face!))
             {
-                var candidate = face.GetGlyphId(c);
-                if (candidate != 0)
+                glyph = face.GetGlyphId(c);
+                if (glyph != 0)
                 {
-                    return (face, candidate);
+                    return true;
                 }
             }
         }
 
-        return (primary, 0);
+        face = null!;
+        glyph = 0;
+        return false;
+    }
+
+    private bool TryResolveFamily(string family, out SfntFont face)
+    {
+        if (registered.TryGetValue((family, false, false), out face!))
+        {
+            return true;
+        }
+
+        foreach (var pair in registered)
+        {
+            if (string.Equals(pair.Key.Family, family, StringComparison.Ordinal))
+            {
+                face = pair.Value;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsCollection(byte[] data)

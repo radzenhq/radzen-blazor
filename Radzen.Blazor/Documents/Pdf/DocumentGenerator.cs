@@ -114,6 +114,8 @@ internal sealed class DocumentGenerator
 
     private Document Run()
     {
+        StyleResolver.Resolve(builder);
+
         var document = new Document();
         document.Info.Title = builder.Info.Title;
         document.Info.Author = builder.Info.Author;
@@ -320,6 +322,7 @@ internal sealed class DocumentGenerator
 
     private void EmitLine(PagePlan plan, LineBox line, double originX, double baseline)
     {
+        var y = baseline - line.Baseline;
         foreach (var fragment in line.Fragments)
         {
             var text = fragment.Text;
@@ -328,31 +331,140 @@ internal sealed class DocumentGenerator
                 continue;
             }
 
-            var font = fragment.Run.Font;
-            var y = baseline - line.Baseline;
+            var font = fragment.Run.ResolvedFont;
             if (fonts.TryResolvePrimary(font, out var primary))
             {
                 EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y);
             }
             else
             {
-                var generated = ResolveBase14(font);
-                var bytes = EncodeWinAnsi(text);
-                if (bytes.Length == 0)
+                EmitBase14Fragment(plan, fragment, font, originX + fragment.XOffset, y);
+            }
+        }
+
+        EmitUnderlines(plan, line, originX, y);
+    }
+
+    // One underline per maximal group of consecutive fragments of the same underlined
+    // run, spanning from the first fragment's start to the last fragment's end so
+    // inter-word gaps inside the run stay underlined.
+    private static void EmitUnderlines(PagePlan plan, LineBox line, double originX, double y)
+    {
+        var fragments = line.Fragments;
+        var i = 0;
+        while (i < fragments.Count)
+        {
+            var run = fragments[i].Run;
+            var font = run.ResolvedFont;
+            if (!font.Underline || fragments[i].Text.Length == 0)
+            {
+                i++;
+                continue;
+            }
+
+            var start = fragments[i].XOffset;
+            var end = fragments[i].XOffset + fragments[i].Advance;
+            var j = i + 1;
+            while (j < fragments.Count && fragments[j].Run == run)
+            {
+                end = fragments[j].XOffset + fragments[j].Advance;
+                j++;
+            }
+
+            var underlineY = y - (font.Size * 0.12);
+            plan.Edges.Add(new EdgeDraw
+            {
+                X1 = originX + start,
+                Y1 = underlineY,
+                X2 = originX + end,
+                Y2 = underlineY,
+                LineWidth = System.Math.Max(font.Size * 0.06, 0.5),
+                Color = font.Color,
+                Style = BorderStyle.Solid,
+            });
+
+            i = j;
+        }
+    }
+
+    // Base-14 WinAnsi path. Characters outside cp1252 are never dropped: they render
+    // through the registered fallback chain when it supplies a glyph, otherwise a
+    // visible '?' placeholder is substituted.
+    private void EmitBase14Fragment(PagePlan plan, LineFragment fragment, Font font, double startX, double y)
+    {
+        var metrics = Base14Metrics.Resolve(font) ?? Base14Metrics.Resolve(new Font())!;
+        var size = font.Size;
+        var text = fragment.Text;
+        var x = startX;
+
+        var i = 0;
+        while (i < text.Length)
+        {
+            if (fonts.TryResolveFallbackGlyph(text[i], out var face, out _) && !WinAnsiEncoding.TryGetCode(text[i], out _))
+            {
+                var generated = ResolveSfnt(face);
+                var bytes = new List<byte>();
+                var advance = 0.0;
+                while (i < text.Length
+                    && !WinAnsiEncoding.TryGetCode(text[i], out _)
+                    && fonts.TryResolveFallbackGlyph(text[i], out var candidate, out var gid)
+                    && candidate == face)
                 {
-                    continue;
+                    generated.GidToUnicode[gid] = text[i];
+                    bytes.Add((byte)(gid >> 8));
+                    bytes.Add((byte)(gid & 0xFF));
+                    advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
+                    i++;
                 }
 
                 plan.UsedFonts.Add(generated);
                 plan.Texts.Add(new TextDraw
                 {
-                    X = originX + fragment.XOffset,
+                    X = x,
                     Baseline = y,
-                    Size = font.Size,
+                    Size = size,
                     Color = font.Color,
                     Font = generated,
-                    Bytes = bytes,
+                    Bytes = [.. bytes],
                 });
+
+                x += advance;
+            }
+            else
+            {
+                var builderText = new System.Text.StringBuilder();
+                while (i < text.Length)
+                {
+                    if (WinAnsiEncoding.TryGetCode(text[i], out _))
+                    {
+                        builderText.Append(text[i]);
+                    }
+                    else if (!fonts.TryResolveFallbackGlyph(text[i], out _, out _))
+                    {
+                        builderText.Append('?');
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    i++;
+                }
+
+                var segment = builderText.ToString();
+                var generated = ResolveBase14(font);
+                plan.UsedFonts.Add(generated);
+                plan.Texts.Add(new TextDraw
+                {
+                    X = x,
+                    Baseline = y,
+                    Size = size,
+                    Color = font.Color,
+                    Font = generated,
+                    Bytes = EncodeWinAnsi(segment),
+                });
+
+                x += metrics.MeasureString(segment, size);
             }
         }
     }
@@ -362,7 +474,7 @@ internal sealed class DocumentGenerator
     // by the embedded subset that owns it - not the primary's .notdef.
     private void EmitSfntFragment(PagePlan plan, LineFragment fragment, SfntFont primary, double startX, double y)
     {
-        var font = fragment.Run.Font;
+        var font = fragment.Run.ResolvedFont;
         var size = font.Size;
         var text = fragment.Text;
         var runX = startX;

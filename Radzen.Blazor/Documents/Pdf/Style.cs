@@ -22,6 +22,14 @@ public class Style
     /// <summary>Gets the style font.</summary>
     public Font Font { get; } = new();
 
+    private HorizontalAlignment? alignment;
+
     /// <summary>Gets or sets the horizontal alignment. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
-    public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
+    public HorizontalAlignment Alignment
+    {
+        get => alignment ?? HorizontalAlignment.Left;
+        set => alignment = value;
+    }
+
+    internal HorizontalAlignment? AlignmentValue => alignment;
 }
