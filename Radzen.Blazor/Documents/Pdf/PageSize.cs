@@ -7,22 +7,17 @@ namespace Radzen.Documents.Pdf;
 /// <summary>
 /// The width and height of a page.
 /// </summary>
-public readonly struct PageSize : IEquatable<PageSize>
+/// <remarks>
+/// Initializes a new <see cref="PageSize"/>.
+/// </remarks>
+public readonly struct PageSize(Unit width, Unit height) : IEquatable<PageSize>
 {
-    /// <summary>
-    /// Initializes a new <see cref="PageSize"/>.
-    /// </summary>
-    public PageSize(Unit width, Unit height)
-    {
-        Width = width;
-        Height = height;
-    }
 
     /// <summary>Gets the page width.</summary>
-    public Unit Width { get; }
+    public Unit Width { get; } = width;
 
     /// <summary>Gets the page height.</summary>
-    public Unit Height { get; }
+    public Unit Height { get; } = height;
 
     /// <summary>
     /// Determines whether two page sizes are equal.

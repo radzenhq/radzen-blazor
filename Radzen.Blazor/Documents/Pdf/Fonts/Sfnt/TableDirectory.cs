@@ -5,17 +5,11 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-internal readonly struct TableRecord
+internal readonly struct TableRecord(uint offset, uint length)
 {
-    public TableRecord(uint offset, uint length)
-    {
-        Offset = offset;
-        Length = length;
-    }
+    public uint Offset { get; } = offset;
 
-    public uint Offset { get; }
-
-    public uint Length { get; }
+    public uint Length { get; } = length;
 }
 
 // Parses the sfnt table directory at a given offset in the buffer.

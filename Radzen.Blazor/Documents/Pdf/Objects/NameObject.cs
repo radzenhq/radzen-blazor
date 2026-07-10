@@ -9,21 +9,17 @@ namespace Radzen.Documents.Pdf.Objects;
 /// slash; delimiters, whitespace, the number sign, and bytes outside the
 /// range 0x21-0x7E are escaped as <c>#xx</c> using uppercase hexadecimal.
 /// </summary>
-public sealed class NameObject : DocumentObject
+/// <remarks>
+/// Initializes a new instance of the <see cref="NameObject"/> class.
+/// </remarks>
+/// <param name="value">The unescaped name (without the leading slash).</param>
+public sealed class NameObject(string value) : DocumentObject
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NameObject"/> class.
-    /// </summary>
-    /// <param name="value">The unescaped name (without the leading slash).</param>
-    public NameObject(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the unescaped name value.
     /// </summary>
-    public string Value { get; }
+    public string Value { get; } = value;
 
     /// <inheritdoc />
     public override void Write(Stream stream)

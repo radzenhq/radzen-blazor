@@ -15,7 +15,11 @@ namespace Radzen.Documents.Pdf.Objects;
 /// returns its indirect reference; the object may be mutated afterwards.
 /// Object bodies are serialized only when <see cref="Close"/> is called.
 /// </remarks>
-public sealed class DocumentWriter
+/// <remarks>
+/// Initializes a new instance of the <see cref="DocumentWriter"/> class.
+/// </remarks>
+/// <param name="stream">The destination stream.</param>
+public sealed class DocumentWriter(Stream stream)
 {
     private static readonly byte[] Header =
     [
@@ -23,17 +27,8 @@ public sealed class DocumentWriter
         (byte)'%', 0xE2, 0xE3, 0xCF, 0xD3, (byte)'\n',
     ];
 
-    private readonly Stream stream;
+    private readonly Stream stream = stream ?? throw new ArgumentNullException(nameof(stream));
     private readonly List<DocumentObject> objects = [];
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentWriter"/> class.
-    /// </summary>
-    /// <param name="stream">The destination stream.</param>
-    public DocumentWriter(Stream stream)
-    {
-        this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
-    }
 
     /// <summary>
     /// Gets the trailer dictionary. Entries such as <c>/Root</c> are written
