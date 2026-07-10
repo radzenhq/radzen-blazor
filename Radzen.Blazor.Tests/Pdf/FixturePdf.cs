@@ -58,4 +58,11 @@ internal sealed class FixturePdf
         => offset.ToString("D10", CultureInfo.InvariantCulture)
            + " " + generation.ToString("D5", CultureInfo.InvariantCulture)
            + " " + type + " \n";
+
+    // A cross-reference stream entry encoded with W = [1 2 1] (ISO 32000-1
+    // 7.5.8.3): 1-byte type, 2-byte big-endian field2, 1-byte field3.
+    // Type 1 => field2 is the byte offset, field3 the generation.
+    // Type 2 => field2 is the object stream number, field3 the index within it.
+    public static byte[] XrefStreamEntry(int type, int field2, int field3)
+        => new[] { (byte)type, (byte)((field2 >> 8) & 0xFF), (byte)(field2 & 0xFF), (byte)field3 };
 }
