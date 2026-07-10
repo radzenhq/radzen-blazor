@@ -367,34 +367,78 @@ internal sealed class DocumentGenerator
             }
 
             var font = fragment.Run.Font;
-            GeneratedFont generated;
-            byte[] bytes;
-            if (fonts.TryResolvePrimary(font, out var sfnt))
+            var y = baseline - line.Baseline;
+            if (fonts.TryResolvePrimary(font, out var primary))
             {
-                generated = ResolveSfnt(sfnt);
-                bytes = EncodeType0(generated, sfnt, text);
+                EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y);
             }
             else
             {
-                generated = ResolveBase14(font);
-                bytes = EncodeWinAnsi(text);
-            }
+                var generated = ResolveBase14(font);
+                var bytes = EncodeWinAnsi(text);
+                if (bytes.Length == 0)
+                {
+                    continue;
+                }
 
-            if (bytes.Length == 0)
+                plan.UsedFonts.Add(generated);
+                plan.Texts.Add(new TextDraw
+                {
+                    X = originX + fragment.XOffset,
+                    Baseline = y,
+                    Size = font.Size,
+                    Color = font.Color,
+                    Font = generated,
+                    Bytes = bytes,
+                });
+            }
+        }
+    }
+
+    // Splits a fragment into maximal sub-runs by the physical face that actually
+    // supplies each glyph (primary or a SetFallback face), so every glyph is drawn
+    // by the embedded subset that owns it - not the primary's .notdef.
+    private void EmitSfntFragment(PagePlan plan, LineFragment fragment, SfntFont primary, double startX, double y)
+    {
+        var font = fragment.Run.Font;
+        var size = font.Size;
+        var text = fragment.Text;
+        var runX = startX;
+
+        var i = 0;
+        while (i < text.Length)
+        {
+            var (face, _) = fonts.ResolveGlyph(primary, text[i]);
+            var generated = ResolveSfnt(face);
+            var bytes = new List<byte>();
+            var advance = 0.0;
+            while (i < text.Length)
             {
-                continue;
+                var (candidate, gid) = fonts.ResolveGlyph(primary, text[i]);
+                if (candidate != face)
+                {
+                    break;
+                }
+
+                generated.GidToUnicode[gid] = text[i];
+                bytes.Add((byte)(gid >> 8));
+                bytes.Add((byte)(gid & 0xFF));
+                advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
+                i++;
             }
 
             plan.UsedFonts.Add(generated);
             plan.Texts.Add(new TextDraw
             {
-                X = originX + fragment.XOffset,
-                Baseline = baseline - line.Baseline,
-                Size = font.Size,
+                X = runX,
+                Baseline = y,
+                Size = size,
                 Color = font.Color,
                 Font = generated,
-                Bytes = bytes,
+                Bytes = [.. bytes],
             });
+
+            runX += advance;
         }
     }
 
@@ -423,20 +467,6 @@ internal sealed class DocumentGenerator
         base14Fonts[name] = generated;
         allFonts.Add(generated);
         return generated;
-    }
-
-    private static byte[] EncodeType0(GeneratedFont generated, SfntFont sfnt, string text)
-    {
-        var bytes = new List<byte>(text.Length * 2);
-        foreach (var c in text)
-        {
-            var gid = sfnt.GetGlyphId(c);
-            generated.GidToUnicode[gid] = c;
-            bytes.Add((byte)(gid >> 8));
-            bytes.Add((byte)(gid & 0xFF));
-        }
-
-        return [.. bytes];
     }
 
     private static byte[] EncodeWinAnsi(string text)
