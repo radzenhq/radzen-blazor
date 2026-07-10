@@ -1,0 +1,100 @@
+#nullable enable
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Radzen.Documents.Pdf;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// P3(b): FontCollection keys registered faces by (family, bold, italic) so
+// Font.Bold/Italic select the matching registered face, with a regular fallback
+// when no styled face exists. Pinned API: a Register overload
+// Register(string family, Stream font, bool bold, bool italic); when that
+// overload is absent these tests fall back to plain Register (which today
+// overwrites the family and loses the style distinction).
+public class StyledFaceRegistrationTests
+{
+    private const string Family = "Liberation Sans";
+
+    private static void RegisterFace(FontCollection fonts, string resource, bool bold, bool italic)
+    {
+        using var stream = new MemoryStream(PdfTestResources.ReadAllBytes(resource));
+        var styled = typeof(FontCollection).GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .FirstOrDefault(m => m.Name == "Register"
+                && m.GetParameters() is { Length: 4 } p
+                && p[0].ParameterType == typeof(string)
+                && p[1].ParameterType == typeof(Stream)
+                && p[2].ParameterType == typeof(bool)
+                && p[3].ParameterType == typeof(bool));
+
+        if (styled != null)
+        {
+            styled.Invoke(fonts, [Family, stream, bold, italic]);
+        }
+        else
+        {
+            fonts.Register(Family, stream);
+        }
+    }
+
+    private static void RegisterBoth(FontCollection fonts)
+    {
+        RegisterFace(fonts, "Fonts/LiberationSans-Regular.ttf", bold: false, italic: false);
+        RegisterFace(fonts, "Fonts/LiberationSans-Bold.ttf", bold: true, italic: false);
+    }
+
+    [Fact]
+    public void BoldRun_UsesRegisteredBoldFace()
+    {
+        var builder = new DocumentBuilder();
+        RegisterBoth(builder.Fonts);
+
+        var section = builder.Sections.Add();
+        var paragraph = section.Blocks.AddParagraph();
+        var regular = paragraph.Inlines.Add("Regular ");
+        regular.Font.Name = Family;
+        var bold = paragraph.Inlines.Add("Bold");
+        bold.Font.Name = Family;
+        bold.Font.Bold = true;
+
+        var reader = BuildTestSupport.Read(builder);
+        var type0 = BuildTestSupport.Type0Fonts(reader);
+
+        Assert.Equal(2, type0.Count);
+        var names = type0.Select(f => BuildTestSupport.Name(reader, f, "BaseFont")).ToList();
+        Assert.Contains(names, n => n.Contains("Bold", System.StringComparison.Ordinal));
+        Assert.Contains(names, n => !n.Contains("Bold", System.StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Measurement_IsStyleAware_WhenBoldFaceRegistered()
+    {
+        var fonts = new FontCollection();
+        RegisterBoth(fonts);
+
+        var regularWidth = fonts.MeasureText("Hello Width", new Font { Name = Family, Size = 12 });
+        var boldWidth = fonts.MeasureText("Hello Width", new Font { Name = Family, Size = 12, Bold = true });
+
+        Assert.NotEqual(regularWidth, boldWidth);
+    }
+
+    [Fact]
+    public void BoldRequested_RegularOnlyRegistered_FallsBackToRegularFace()
+    {
+        var builder = new DocumentBuilder();
+        RegisterFace(builder.Fonts, "Fonts/LiberationSans-Regular.ttf", bold: false, italic: false);
+
+        var section = builder.Sections.Add();
+        var paragraph = section.Blocks.AddParagraph();
+        var run = paragraph.Inlines.Add("Bold wanted");
+        run.Font.Name = Family;
+        run.Font.Bold = true;
+
+        var reader = BuildTestSupport.Read(builder);
+        Assert.Single(BuildTestSupport.Type0Fonts(reader));
+
+        var reloaded = BuildTestSupport.Reload(builder);
+        Assert.Contains("Bold wanted", reloaded.ExtractText(), System.StringComparison.Ordinal);
+    }
+}
