@@ -1,0 +1,74 @@
+using System.Globalization;
+using System.IO;
+using System.Text;
+
+namespace Radzen.Documents.Pdf.Objects;
+
+/// <summary>
+/// A PDF name object (ISO 32000-1 section 7.3.5). Serialized with a leading
+/// slash; delimiters, whitespace, the number sign, and bytes outside the
+/// range 0x21-0x7E are escaped as <c>#xx</c> using uppercase hexadecimal.
+/// </summary>
+public sealed class NameObject : DocumentObject
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NameObject"/> class.
+    /// </summary>
+    /// <param name="value">The unescaped name (without the leading slash).</param>
+    public NameObject(string value)
+    {
+        Value = value;
+    }
+
+    /// <summary>
+    /// Gets the unescaped name value.
+    /// </summary>
+    public string Value { get; }
+
+    /// <inheritdoc />
+    public override void Write(Stream stream)
+    {
+        PdfBytes.WriteAscii(stream, Escape(Value));
+    }
+
+    internal static string Escape(string name)
+    {
+        var builder = new StringBuilder(name.Length + 1);
+        builder.Append('/');
+
+        foreach (var ch in name)
+        {
+            var code = ch & 0xFF;
+            if (code > 0x20 && code < 0x7F && !IsDelimiter(code) && code != '#')
+            {
+                builder.Append((char)code);
+            }
+            else
+            {
+                builder.Append('#').Append(code.ToString("X2", CultureInfo.InvariantCulture));
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private static bool IsDelimiter(int code)
+    {
+        switch (code)
+        {
+            case '(':
+            case ')':
+            case '<':
+            case '>':
+            case '[':
+            case ']':
+            case '{':
+            case '}':
+            case '/':
+            case '%':
+                return true;
+            default:
+                return false;
+        }
+    }
+}
