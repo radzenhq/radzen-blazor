@@ -250,6 +250,53 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Splitter_Bar_PointerDown_StartsResize()
+        {
+            using var ctx = new TestContext();
+            var component = RenderSplitter(ctx);
+
+            var bar = component.Find("div.rz-splitter-bar");
+            bar.PointerDown(new Microsoft.AspNetCore.Components.Web.PointerEventArgs());
+
+            ctx.JSInterop.VerifyInvoke("Radzen.startSplitterResize");
+        }
+
+        [Fact]
+        public void Splitter_CollapseButton_PointerDown_DoesNotStartResize()
+        {
+            using var ctx = new TestContext();
+            var component = RenderSplitter(ctx);
+
+            var collapse = component.Find("span.rz-collapse");
+
+            Assert.Throws<MissingEventHandlerException>(() => collapse.PointerDown(new Microsoft.AspNetCore.Components.Web.PointerEventArgs()));
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.startSplitterResize");
+        }
+
+        [Fact]
+        public void Splitter_ExpandButton_PointerDown_DoesNotStartResize()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenSplitter>(parameters =>
+            {
+                parameters.AddChildContent<RadzenSplitterPane>(pane =>
+                {
+                    pane.Add(p => p.Size, "30%");
+                    pane.Add(p => p.Collapsible, true);
+                    pane.Add(p => p.Collapsed, true);
+                });
+                parameters.AddChildContent<RadzenSplitterPane>();
+            });
+
+            var expand = component.Find("span.rz-expand");
+
+            Assert.Throws<MissingEventHandlerException>(() => expand.PointerDown(new Microsoft.AspNetCore.Components.Web.PointerEventArgs()));
+            Assert.DoesNotContain(ctx.JSInterop.Invocations, i => i.Identifier == "Radzen.startSplitterResize");
+        }
+
+        [Fact]
         public void Splitter_Renders_WithClassName()
         {
             using var ctx = new TestContext();

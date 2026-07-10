@@ -30,6 +30,7 @@
                     aria-label="@CollapseAriaLabel"
                     aria-expanded="@AriaExpanded"
                     @onkeydown="@(args => OnKeyPress(args, false))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation=stopKeypressPropagation
+                    @onpointerdown:stopPropagation="true"
                     @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter!.OnCollapse(Index))>
                 </span>
             }
@@ -56,6 +57,7 @@
                     aria-label="@ExpandAriaLabel"
                     aria-expanded="@AriaExpanded"
                     @onkeydown="@(args => OnKeyPress(args, true))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation=stopKeypressPropagation
+                    @onpointerdown:stopPropagation="true"
                     @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter!.OnExpand(Index))>
                 </span>
             }
