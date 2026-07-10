@@ -307,8 +307,23 @@ public sealed class Document
         {
             if (page.Generated is { } generated)
             {
-                pageNode["Contents"] = writer.Add(FlateFilter.EncodeStream(generated.Content));
+                var generatedRef = writer.Add(FlateFilter.EncodeStream(generated.Content));
+                var overlay = page.BuildOverlay(out var overlayEmitter);
+                if (overlay is null)
+                {
+                    pageNode["Contents"] = generatedRef;
+                }
+                else
+                {
+                    pageNode["Contents"] = new ArrayObject { generatedRef, writer.Add(new StreamObject(overlay)) };
+                }
+
                 var resources = BuildGeneratedResources(writer, generated, fontRefs, imageRefs);
+                if (overlayEmitter is not null)
+                {
+                    resources = OverlayResources(resources, overlayEmitter);
+                }
+
                 if (resources is not null)
                 {
                     pageNode["Resources"] = resources;
@@ -554,6 +569,33 @@ public sealed class Document
         var reference = writer.Add(xobject.Image);
         cache[image] = reference;
         return reference;
+    }
+
+    // Adds the fonts referenced by an overlay stream to a built page's resources.
+    // Overlay keys use a distinct prefix so generated entries are never clobbered.
+    private static DictionaryObject? OverlayResources(DictionaryObject? resources, ContentWriter emitter)
+    {
+        var emitted = BuildResources(emitter);
+        if (emitted is null)
+        {
+            return resources;
+        }
+
+        resources ??= new DictionaryObject();
+        if (resources.TryGetValue("Font", out var existing) && existing is DictionaryObject fonts
+            && emitted["Font"] is DictionaryObject added)
+        {
+            foreach (var key in added.Keys)
+            {
+                fonts[key] = added[key];
+            }
+        }
+        else
+        {
+            resources["Font"] = emitted["Font"];
+        }
+
+        return resources;
     }
 
     private static DictionaryObject? BuildResources(ContentWriter emitter)

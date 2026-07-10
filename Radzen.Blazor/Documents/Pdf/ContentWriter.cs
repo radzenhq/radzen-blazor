@@ -8,7 +8,8 @@ namespace Radzen.Documents.Pdf;
 #nullable enable
 
 // Accumulates a page content stream and the base-14 font resources it references.
-internal sealed class ContentWriter
+// The font key prefix keeps overlay streams from colliding with generated resources.
+internal sealed class ContentWriter(string fontKeyPrefix = "F")
 {
     private readonly List<byte> buffer = [];
     private readonly Dictionary<string, string> keysByBaseFont = new(System.StringComparer.Ordinal);
@@ -24,7 +25,7 @@ internal sealed class ContentWriter
         var baseFont = Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
         if (!keysByBaseFont.TryGetValue(baseFont, out var key))
         {
-            key = "F" + keysByBaseFont.Count.ToString(CultureInfo.InvariantCulture);
+            key = fontKeyPrefix + keysByBaseFont.Count.ToString(CultureInfo.InvariantCulture);
             keysByBaseFont[baseFont] = key;
         }
 

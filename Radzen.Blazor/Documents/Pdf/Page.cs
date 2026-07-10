@@ -102,6 +102,26 @@ public sealed class Page
         return bytes;
     }
 
+    // A built page keeps the generator's bytes as its base; Content holds only the
+    // user's additions, emitted here as a second content stream appended on save.
+    internal byte[]? BuildOverlay(out ContentWriter? emitter)
+    {
+        emitter = null;
+        if (elements.Count == 0)
+        {
+            return null;
+        }
+
+        var writer = new ContentWriter("SF");
+        foreach (var element in elements)
+        {
+            element.Emit(writer);
+        }
+
+        emitter = writer;
+        return writer.ToArray();
+    }
+
     private void EnsureMaterialized()
     {
         if (materialized)
@@ -110,7 +130,7 @@ public sealed class Page
         }
 
         materialized = true;
-        if (content is null)
+        if (content is null || Generated is not null)
         {
             return;
         }
