@@ -6,7 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-using Colors = Radzen.Documents.Pdf.Colors;
 
 public class ValueTypeTests
 {
@@ -115,7 +114,7 @@ public class ValueTypeTests
             Bold = true,
             Italic = true,
             Underline = true,
-            Color = Colors.DarkBlue
+            Color = Color.DarkBlue
         };
 
         Assert.Equal("Helvetica", f.Name);
@@ -123,7 +122,7 @@ public class ValueTypeTests
         Assert.True(f.Bold);
         Assert.True(f.Italic);
         Assert.True(f.Underline);
-        Assert.Equal(Colors.DarkBlue, f.Color);
+        Assert.Equal(Color.DarkBlue, f.Color);
     }
 
     private static void AssertMembers<TEnum>(params string[] expected) where TEnum : struct, Enum

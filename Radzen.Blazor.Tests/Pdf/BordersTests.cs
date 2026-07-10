@@ -4,7 +4,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-using Colors = Radzen.Documents.Pdf.Colors;
 
 public class BordersTests
 {
@@ -48,11 +47,11 @@ public class BordersTests
     {
         var borders = new Borders
         {
-            Color = Colors.Red,
+            Color = Color.Red,
             Style = BorderStyle.Dashed
         };
 
-        Assert.Equal(Colors.Red, borders.Top.Color);
+        Assert.Equal(Color.Red, borders.Top.Color);
         Assert.Equal(BorderStyle.Dashed, borders.Left.Style);
     }
 
@@ -62,12 +61,12 @@ public class BordersTests
         var border = new Border
         {
             Width = 3,
-            Color = Colors.Blue,
+            Color = Color.Blue,
             Style = BorderStyle.Dotted
         };
 
         Assert.Equal(3, border.Width, 9);
-        Assert.Equal(Colors.Blue, border.Color);
+        Assert.Equal(Color.Blue, border.Color);
         Assert.Equal(BorderStyle.Dotted, border.Style);
     }
 }

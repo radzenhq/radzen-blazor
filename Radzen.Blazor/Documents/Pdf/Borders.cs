@@ -23,7 +23,7 @@ public class Borders
     public double Width { get; set; }
 
     /// <summary>Gets or sets the box-level border color.</summary>
-    public Color Color { get; set; } = Colors.Black;
+    public Color Color { get; set; } = Color.Black;
 
     /// <summary>Gets or sets the box-level border line style.</summary>
     public BorderStyle Style { get; set; } = BorderStyle.None;
