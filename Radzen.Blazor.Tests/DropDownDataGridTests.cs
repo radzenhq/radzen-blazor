@@ -508,6 +508,23 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("rz-datatable-loading", component.Markup);
         }
+
+        [Fact]
+        public void DropDownDataGrid_Forwards_LoadingTemplate_ToInnerDataGrid()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1", "Item2" };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.IsLoading, true);
+                parameters.Add(p => p.LoadingTemplate, b => b.AddMarkupContent(0, "<span class=\"loading-marker\">Loading...</span>"));
+            });
+
+            Assert.Contains("loading-marker", component.Markup);
+        }
     }
 }
 
