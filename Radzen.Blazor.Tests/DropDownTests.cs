@@ -1091,5 +1091,57 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("Item 1", combobox.GetAttribute("aria-label"));
         }
+
+        [Fact]
+        public void DropDown_Renders_LoadingTemplate_WhenIsLoading()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters
+                    .Add(p => p.IsLoading, true)
+                    .Add(p => p.LoadingTemplate, b => b.AddMarkupContent(0, "<span class=\"loading-marker\">Loading...</span>"));
+            });
+
+            Assert.Contains("loading-marker", component.Markup);
+            Assert.DoesNotContain("Item 1", component.Markup);
+            Assert.DoesNotContain("Item 2", component.Markup);
+        }
+
+        [Fact]
+        public void DropDown_DoesNotRender_LoadingTemplate_WhenNotLoading()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters
+                    .Add(p => p.LoadingTemplate, b => b.AddMarkupContent(0, "<span class=\"loading-marker\">Loading...</span>"));
+            });
+
+            Assert.DoesNotContain("loading-marker", component.Markup);
+            Assert.Contains("Item 1", component.Markup);
+        }
+
+        [Fact]
+        public void DropDown_Suppresses_EmptyTemplate_WhileLoading()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, new DataItem[] { })
+                    .Add(p => p.TextProperty, nameof(DataItem.Text))
+                    .Add(p => p.IsLoading, true)
+                    .Add(p => p.EmptyTemplate, b => b.AddMarkupContent(0, "<span class=\"empty-marker\">No data</span>"));
+            });
+
+            Assert.DoesNotContain("empty-marker", component.Markup);
+        }
     }
 }

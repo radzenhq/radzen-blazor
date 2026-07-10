@@ -1,0 +1,42 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
+    <RadzenLabel Text="Select Value" Component="DropDownLoading" />
+    <RadzenDropDown @bind-Value=@companyName Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CompanyName)"
+                    AllowFiltering="true" LoadData=@OnLoadData IsLoading=@isLoading Name="DropDownLoading" Style="width: 100%; max-width: 400px;">
+        <LoadingTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-2">
+                <RadzenProgressBarCircular Size="ProgressBarCircularSize.ExtraSmall" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+                <RadzenText TextStyle="TextStyle.Body2">Loading customers...</RadzenText>
+            </RadzenStack>
+        </LoadingTemplate>
+    </RadzenDropDown>
+</RadzenStack>
+<RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" class="rz-pb-12">
+    <RadzenText TextStyle="TextStyle.Body2">
+        Open the dropdown and type e.g. <strong>"France"</strong> to see the loading and result states.
+    </RadzenText>
+</RadzenStack>
+
+@code {
+    string companyName;
+    IEnumerable<Customer> customers;
+    bool isLoading;
+
+    async Task OnLoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        // Simulate a slow data source so the LoadingTemplate is visible.
+        await Task.Delay(800);
+
+        customers = dbContext.Customers
+            .Where(c => string.IsNullOrEmpty(args.Filter) || c.CompanyName.ToLowerInvariant().Contains(args.Filter.ToLowerInvariant()))
+            .OrderBy(c => c.CompanyName)
+            .ToList();
+
+        isLoading = false;
+    }
+}
