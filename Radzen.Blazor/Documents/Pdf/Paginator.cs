@@ -51,6 +51,10 @@ internal sealed class PaginatedPage
 
     public IReadOnlyList<PositionedImage> FooterImages { get; init; } = [];
 
+    public IReadOnlyList<PositionedTableFragment> HeaderTables { get; init; } = [];
+
+    public IReadOnlyList<PositionedTableFragment> FooterTables { get; init; } = [];
+
     public IReadOnlyList<PositionedTableFragment> Tables { get; init; } = [];
 
     public IReadOnlyList<PositionedImage> Images { get; init; } = [];
@@ -96,13 +100,18 @@ internal static class Paginator
         var right = section.Margins.Right.Point;
         var bottom = section.Margins.Bottom.Point;
 
-        var contentBox = new Rect(left, top, pageWidth - left - right, pageHeight - top - bottom);
+        var contentWidth = pageWidth - left - right;
         var size = new PageSize(Unit.FromPoint(pageWidth), Unit.FromPoint(pageHeight));
-        var contentHeight = contentBox.Height;
-        var contentWidth = contentBox.Width;
 
-        var (header, headerImages) = LayoutBand(section.Header, contentWidth, fonts, measureImage);
-        var (footer, footerImages) = LayoutBand(section.Footer, contentWidth, fonts, measureImage);
+        var header = LayoutBand(section.Header, contentWidth, fonts, measureImage);
+        var footer = LayoutBand(section.Footer, contentWidth, fonts, measureImage);
+
+        // The header band hangs from the page top and the footer band sits on the page
+        // bottom; a band taller than its margin shrinks the body so they never overlap.
+        var contentTop = System.Math.Max(top, header.Height);
+        var contentBottom = System.Math.Max(bottom, footer.Height);
+        var contentBox = new Rect(left, contentTop, contentWidth, pageHeight - contentTop - contentBottom);
+        var contentHeight = contentBox.Height;
 
         List<PositionedLine> current = [];
         List<PositionedTableFragment> currentTables = [];
@@ -118,10 +127,12 @@ internal static class Paginator
                 ContentBox = contentBox,
                 Number = pages.Count + 1,
                 Lines = current,
-                Header = header,
-                Footer = footer,
-                HeaderImages = headerImages,
-                FooterImages = footerImages,
+                Header = header.Lines,
+                Footer = footer.Lines,
+                HeaderImages = header.Images,
+                FooterImages = footer.Images,
+                HeaderTables = header.Tables,
+                FooterTables = footer.Tables,
                 Tables = currentTables,
                 Images = currentImages,
             });
@@ -383,17 +394,45 @@ internal static class Paginator
         return sum;
     }
 
-    private static (List<PositionedLine> Lines, List<PositionedImage> Images) LayoutBand(
+    private sealed class BandLayout
+    {
+        public List<PositionedLine> Lines { get; } = [];
+
+        public List<PositionedImage> Images { get; } = [];
+
+        public List<PositionedTableFragment> Tables { get; } = [];
+
+        public double Height { get; set; }
+    }
+
+    private static BandLayout LayoutBand(
         HeaderFooter band,
         double width,
         FontCollection fonts,
         System.Func<Image, (double Width, double Height)>? measureImage)
     {
-        List<PositionedLine> result = [];
-        List<PositionedImage> images = [];
+        var result = new BandLayout();
+        var images = result.Images;
         double cursor = 0;
         foreach (var block in band.Blocks)
         {
+            if (block is Table table)
+            {
+                var layout = TableLayout.Layout(table, width, fonts, measureImage);
+                foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
+                {
+                    result.Tables.Add(new PositionedTableFragment
+                    {
+                        Layout = layout,
+                        Fragment = fragment,
+                        Y = cursor,
+                    });
+                    cursor += fragment.Height;
+                }
+
+                continue;
+            }
+
             if (block is Image image)
             {
                 var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image) : measureImage(image);
@@ -417,14 +456,15 @@ internal static class Paginator
             var y = cursor + paragraph.SpacingBefore.Point;
             foreach (var box in lines)
             {
-                result.Add(new PositionedLine { Line = box, Source = paragraph, Y = y });
+                result.Lines.Add(new PositionedLine { Line = box, Source = paragraph, Y = y });
                 y += box.Height;
             }
 
             cursor = y + paragraph.SpacingAfter.Point;
         }
 
-        return (result, images);
+        result.Height = cursor;
+        return result;
     }
 
     private static (double Width, double Height) EffectiveSize(Section section)
