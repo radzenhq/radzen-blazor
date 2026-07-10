@@ -210,28 +210,18 @@ public sealed class Document
 
             var pageRef = writer.Add(pageNode);
 
-            if (page.Content.Count > 0)
+            var contentBytes = page.BuildContent(out var emitter);
+            if (contentBytes is not null)
             {
-                var emitter = new ContentWriter();
-                foreach (var element in page.Content)
-                {
-                    element.Emit(emitter);
-                }
+                pageNode["Contents"] = writer.Add(new StreamObject(contentBytes));
 
-                pageNode["Contents"] = writer.Add(new StreamObject(emitter.ToArray()));
-
-                var resources = BuildResources(emitter);
-                if (resources is not null)
+                if (emitter is not null)
                 {
-                    pageNode["Resources"] = resources;
-                }
-            }
-            else
-            {
-                var content = page.GetContent();
-                if (content is not null)
-                {
-                    pageNode["Contents"] = writer.Add(new StreamObject(content));
+                    var resources = BuildResources(emitter);
+                    if (resources is not null)
+                    {
+                        pageNode["Resources"] = resources;
+                    }
                 }
             }
 

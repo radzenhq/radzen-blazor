@@ -8,7 +8,10 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Page
 {
+    private readonly ContentCollection elements = [];
     private byte[]? content;
+    private bool materialized;
+    private byte[]? snapshot;
 
     internal Page(Unit width, Unit height)
     {
@@ -23,11 +26,18 @@ public sealed class Page
     public Unit Height { get; }
 
     /// <summary>
-    /// Gets the ordered collection of content elements. When non-empty, it is
-    /// emitted as the page content stream and overrides any raw content set with
-    /// <see cref="SetContent"/>.
+    /// Gets the ordered collection of content elements. For a loaded page the raw
+    /// content stream is parsed into elements on first access; an untouched page
+    /// still re-serializes byte-for-byte from its retained raw bytes.
     /// </summary>
-    public ContentCollection Content { get; } = [];
+    public ContentCollection Content
+    {
+        get
+        {
+            EnsureMaterialized();
+            return elements;
+        }
+    }
 
     /// <summary>
     /// Sets the raw content stream for this page. The bytes are stored verbatim
@@ -46,4 +56,78 @@ public sealed class Page
     /// </summary>
     /// <returns>The raw content bytes, or <c>null</c>.</returns>
     public byte[]? GetContent() => content;
+
+    // Resolves the content-stream bytes to write. An untouched loaded page reuses its
+    // retained raw bytes; a modified (or freshly authored) page re-encodes from
+    // elements and returns the emitter so its font resources can be built.
+    internal byte[]? BuildContent(out ContentWriter? emitter)
+    {
+        emitter = null;
+        if (elements.Count == 0)
+        {
+            return content;
+        }
+
+        var writer = new ContentWriter();
+        foreach (var element in elements)
+        {
+            element.Emit(writer);
+        }
+
+        var bytes = writer.ToArray();
+        if (content is not null && snapshot is not null && Same(bytes, snapshot))
+        {
+            return content;
+        }
+
+        emitter = writer;
+        return bytes;
+    }
+
+    private void EnsureMaterialized()
+    {
+        if (materialized)
+        {
+            return;
+        }
+
+        materialized = true;
+        if (content is null)
+        {
+            return;
+        }
+
+        ContentInterpreter.Materialize(content, elements);
+
+        if (elements.Count == 0)
+        {
+            return;
+        }
+
+        var writer = new ContentWriter();
+        foreach (var element in elements)
+        {
+            element.Emit(writer);
+        }
+
+        snapshot = writer.ToArray();
+    }
+
+    private static bool Same(byte[] a, byte[] b)
+    {
+        if (a.Length != b.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < a.Length; i++)
+        {
+            if (a[i] != b[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

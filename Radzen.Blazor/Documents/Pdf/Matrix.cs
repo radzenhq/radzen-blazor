@@ -48,6 +48,9 @@ public readonly struct Matrix : IEquatable<Matrix>
     /// </summary>
     public static Matrix Translate(double tx, double ty) => new(1, 0, 0, 1, tx, ty);
 
+    internal static Matrix FromComponents(double a, double b, double c, double d, double e, double f)
+        => new(a, b, c, d, e, f);
+
     /// <summary>
     /// Creates a scaling matrix.
     /// </summary>
