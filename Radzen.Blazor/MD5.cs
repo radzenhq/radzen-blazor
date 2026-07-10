@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Linq;
 
 namespace Radzen;
 
@@ -60,6 +59,23 @@ public class MD5
     /// <returns>The MD5 hash as a string.</returns>
     public static string Calculate(byte[] input)
     {
+        var digest = ComputeHash(input);
+        var result = new System.Text.StringBuilder(32);
+        foreach (var b in digest)
+        {
+            result.Append(b.ToString("x2", CultureInfo.InvariantCulture));
+        }
+
+        return result.ToString();
+    }
+
+    /// <summary>
+    /// Computes the raw 16-byte MD5 digest of the input (RFC 1321).
+    /// </summary>
+    /// <param name="input">The bytes to hash.</param>
+    /// <returns>The 16-byte digest.</returns>
+    public static byte[] ComputeHash(byte[] input)
+    {
         ArgumentNullException.ThrowIfNull(input);
 
         uint a0 = 0x67452301;   // A
@@ -67,7 +83,8 @@ public class MD5
         uint c0 = 0x98badcfe;   // C
         uint d0 = 0x10325476;   // D
 
-        var addLength = (56 - ((input.Length + 1) % 64)) % 64; // calculate the new length with padding
+        // Pad so the byte length is congruent to 56 (mod 64). C# % can be negative, so normalize.
+        var addLength = (((56 - ((input.Length + 1) % 64)) % 64) + 64) % 64;
         var processedInput = new byte[input.Length + 1 + addLength + 8];
         Array.Copy(input, processedInput, input.Length);
         processedInput[input.Length] = 0x80; // add 1
@@ -124,12 +141,12 @@ public class MD5
             d0 += D;
         }
 
-        return GetByteString(a0) + GetByteString(b0) + GetByteString(c0) + GetByteString(d0);
-    }
-
-    private static string GetByteString(uint x)
-    {
-        return String.Join("", BitConverter.GetBytes(x).Select(y => y.ToString("x2", CultureInfo.InvariantCulture)));
+        var digest = new byte[16];
+        Array.Copy(BitConverter.GetBytes(a0), 0, digest, 0, 4);
+        Array.Copy(BitConverter.GetBytes(b0), 0, digest, 4, 4);
+        Array.Copy(BitConverter.GetBytes(c0), 0, digest, 8, 4);
+        Array.Copy(BitConverter.GetBytes(d0), 0, digest, 12, 4);
+        return digest;
     }
 }
 
