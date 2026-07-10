@@ -46,28 +46,62 @@ internal static class LineBreaker
         public List<Piece> Pieces { get; } = [];
         public double Width { get; set; }
         public double GapAfter { get; set; }
+        public int TabsAfter { get; set; }
     }
+
+    private const double TabStop = 36.0;
 
     public static IReadOnlyList<LineBox> Break(Paragraph paragraph, double maxWidthPoints, FontCollection fonts)
     {
         var boxes = new List<LineBox>();
+        var indent = paragraph.LeftIndent.Point;
+        var max = maxWidthPoints - indent;
         foreach (var words in Tokenize(paragraph, fonts))
         {
             if (words.Count == 0)
             {
+                boxes.Add(EmptyLine(paragraph, fonts));
                 continue;
             }
 
-            var lineRanges = Wrap(words, maxWidthPoints);
+            var lineRanges = Wrap(words, max);
             for (var li = 0; li < lineRanges.Count; li++)
             {
                 var (first, last) = lineRanges[li];
                 var isLast = li == lineRanges.Count - 1;
-                boxes.Add(BuildLine(words, first, last, maxWidthPoints, paragraph, fonts, isLast));
+                boxes.Add(BuildLine(words, first, last, max, indent, paragraph, fonts, isLast));
             }
         }
 
         return boxes;
+    }
+
+    // An empty segment (empty paragraph or blank forced-break line) occupies one line
+    // of the paragraph's resolved font instead of collapsing to zero height.
+    private static LineBox EmptyLine(Paragraph paragraph, FontCollection fonts)
+    {
+        var font = paragraph.EffectiveFont ?? paragraph.Font;
+        var (height, ascent) = FontExtent(font, fonts);
+        return new LineBox
+        {
+            Fragments = [],
+            Width = 0,
+            Height = height * paragraph.LineSpacing,
+            Baseline = ascent,
+        };
+    }
+
+    // Position where the word after `word` starts, given `word` ends at `position`:
+    // the inter-word gap, then each tab advances to the next default tab stop.
+    private static double NextStart(double position, Word word)
+    {
+        var p = position + word.GapAfter;
+        for (var t = 0; t < word.TabsAfter; t++)
+        {
+            p = (System.Math.Floor((p + 1e-6) / TabStop) + 1) * TabStop;
+        }
+
+        return p;
     }
 
     private static bool IsInlineWhitespace(char c) => c is ' ' or '\t';
@@ -104,15 +138,31 @@ internal static class LineBreaker
                 }
                 else if (IsInlineWhitespace(text[i]))
                 {
-                    var count = 0;
+                    var spaces = 0;
                     while (i < text.Length && IsInlineWhitespace(text[i]))
                     {
-                        count++;
+                        if (text[i] == '\t')
+                        {
+                            if (current == null)
+                            {
+                                current = new Word();
+                                words.Add(current);
+                            }
+
+                            current.TabsAfter++;
+                        }
+                        else
+                        {
+                            spaces++;
+                        }
+
                         i++;
                     }
 
-                    var w = fonts.MeasureText(new string(' ', count), run.ResolvedFont);
-                    current?.GapAfter += w;
+                    if (spaces > 0 && current != null)
+                    {
+                        current.GapAfter += fonts.MeasureText(new string(' ', spaces), run.ResolvedFont);
+                    }
                 }
                 else
                 {
@@ -133,7 +183,7 @@ internal static class LineBreaker
                         Advance = advance,
                     };
 
-                    if (current == null || current.GapAfter > 0)
+                    if (current == null || current.GapAfter > 0 || current.TabsAfter > 0)
                     {
                         current = new Word();
                         words.Add(current);
@@ -155,13 +205,13 @@ internal static class LineBreaker
         while (i < words.Count)
         {
             var j = i;
-            var width = words[i].Width;
+            var end = words[i].Width;
             while (j + 1 < words.Count)
             {
-                var gap = words[j].GapAfter;
-                if (width + gap + words[j + 1].Width <= max)
+                var nextEnd = NextStart(end, words[j]) + words[j + 1].Width;
+                if (nextEnd <= max)
                 {
-                    width += gap + words[j + 1].Width;
+                    end = nextEnd;
                     j++;
                 }
                 else
@@ -182,13 +232,14 @@ internal static class LineBreaker
         int first,
         int last,
         double max,
+        double indent,
         Paragraph paragraph,
         FontCollection fonts,
         bool isLast)
     {
         var fragments = new List<LineFragment>();
         double advances = 0;
-        double naturalGaps = 0;
+        var hasTabs = false;
         for (var w = first; w <= last; w++)
         {
             foreach (var piece in words[w].Pieces)
@@ -204,37 +255,14 @@ internal static class LineBreaker
                 advances += piece.Advance;
             }
 
-            if (w < last)
+            if (w < last && words[w].TabsAfter > 0)
             {
-                naturalGaps += words[w].GapAfter;
+                hasTabs = true;
             }
         }
 
-        var naturalWidth = advances + naturalGaps;
-        var wordCount = last - first + 1;
-        var gapCount = wordCount - 1;
-
-        var alignment = paragraph.EffectiveAlignment;
-        var justify = alignment == HorizontalAlignment.Justify && !isLast && gapCount > 0;
-
-        double x0;
-        double justifiedGap = 0;
-        if (justify)
-        {
-            x0 = 0;
-            justifiedGap = (max - advances) / gapCount;
-        }
-        else
-        {
-            x0 = alignment switch
-            {
-                HorizontalAlignment.Right or HorizontalAlignment.End => max - naturalWidth,
-                HorizontalAlignment.Center => (max - naturalWidth) / 2.0,
-                _ => 0,
-            };
-        }
-
-        var cursor = x0;
+        // Natural placement from 0; tab stops are relative to the line origin.
+        var cursor = 0.0;
         var fi = 0;
         for (var w = first; w <= last; w++)
         {
@@ -247,7 +275,55 @@ internal static class LineBreaker
 
             if (w < last)
             {
-                cursor += justify ? justifiedGap : words[w].GapAfter;
+                cursor = NextStart(cursor, words[w]);
+            }
+        }
+
+        var naturalWidth = cursor;
+        var wordCount = last - first + 1;
+        var gapCount = wordCount - 1;
+
+        var alignment = paragraph.EffectiveAlignment;
+        var justify = alignment == HorizontalAlignment.Justify && !isLast && gapCount > 0 && !hasTabs;
+
+        double x0;
+        if (justify)
+        {
+            x0 = 0;
+            var justifiedGap = (max - advances) / gapCount;
+            cursor = 0;
+            fi = 0;
+            for (var w = first; w <= last; w++)
+            {
+                foreach (var _ in words[w].Pieces)
+                {
+                    fragments[fi].XOffset = cursor;
+                    cursor += fragments[fi].Advance;
+                    fi++;
+                }
+
+                if (w < last)
+                {
+                    cursor += justifiedGap;
+                }
+            }
+        }
+        else
+        {
+            x0 = alignment switch
+            {
+                HorizontalAlignment.Right or HorizontalAlignment.End => max - naturalWidth,
+                HorizontalAlignment.Center => (max - naturalWidth) / 2.0,
+                _ => 0,
+            };
+        }
+
+        var shift = indent + x0;
+        if (shift != 0)
+        {
+            foreach (var fragment in fragments)
+            {
+                fragment.XOffset += shift;
             }
         }
 
@@ -262,27 +338,24 @@ internal static class LineBreaker
         double baseline = 0;
         foreach (var frag in box.Fragments)
         {
-            var font = frag.Run.ResolvedFont;
-            var size = font.Size;
-            double h;
-            double asc;
-            if (fonts.TryResolvePrimary(font, out var face))
-            {
-                var upm = face.UnitsPerEm;
-                asc = face.Ascent * size / upm;
-                h = (face.Ascent - face.Descent + face.LineGap) * size / upm;
-            }
-            else
-            {
-                asc = size * 0.9;
-                h = size * 1.2;
-            }
-
+            var (h, asc) = FontExtent(frag.Run.ResolvedFont, fonts);
             natural = System.Math.Max(natural, h);
             baseline = System.Math.Max(baseline, asc);
         }
 
         box.Height = natural * lineSpacing;
         box.Baseline = baseline;
+    }
+
+    private static (double Height, double Ascent) FontExtent(Font font, FontCollection fonts)
+    {
+        var size = font.Size;
+        if (fonts.TryResolvePrimary(font, out var face))
+        {
+            var upm = face.UnitsPerEm;
+            return ((face.Ascent - face.Descent + face.LineGap) * size / upm, face.Ascent * size / upm);
+        }
+
+        return (size * 1.2, size * 0.9);
     }
 }

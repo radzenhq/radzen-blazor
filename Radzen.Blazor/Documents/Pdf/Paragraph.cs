@@ -52,6 +52,11 @@ public class Paragraph : Block
 
     internal HorizontalAlignment EffectiveAlignment => alignment ?? StyleAlignment ?? HorizontalAlignment.Left;
 
+    internal Font? EffectiveFont { get; set; }
+
+    /// <summary>Gets or sets the left indent applied to every line of the paragraph.</summary>
+    public Unit LeftIndent { get; set; }
+
     /// <summary>Gets or sets the spacing before the paragraph.</summary>
     public Unit SpacingBefore { get; set; }
 

@@ -60,6 +60,20 @@ internal static class StyleResolver
             }
         }
 
+        var paragraphFont = new Font();
+        paragraphFont.InheritFrom(paragraph.Font);
+        foreach (var font in inherited)
+        {
+            paragraphFont.InheritFrom(font);
+        }
+
+        foreach (var style in chain)
+        {
+            paragraphFont.InheritFrom(style.Font);
+        }
+
+        paragraph.EffectiveFont = paragraphFont;
+
         foreach (var run in paragraph.Inlines)
         {
             var effective = new Font();

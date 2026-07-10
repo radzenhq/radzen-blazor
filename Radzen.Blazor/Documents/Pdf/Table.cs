@@ -27,4 +27,7 @@ public sealed class Table : Block
 
     /// <summary>Gets or sets the fixed table width, or <see langword="null"/> for automatic sizing.</summary>
     public Unit? Width { get; set; }
+
+    /// <summary>Gets or sets the horizontal offset of the table from the left content edge.</summary>
+    public Unit LeftIndent { get; set; }
 }

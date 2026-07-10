@@ -36,4 +36,7 @@ public class Row
 
     /// <summary>Gets or sets the row background color, or <see langword="null"/> for none.</summary>
     public Color? Background { get; set; }
+
+    /// <summary>Gets the row-level borders, cascaded to the cells' unset edges.</summary>
+    public Borders Borders { get; } = new();
 }
