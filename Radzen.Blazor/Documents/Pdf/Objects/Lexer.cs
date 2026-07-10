@@ -4,16 +4,10 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-internal sealed class Lexer
+internal sealed class Lexer(byte[] data, int position)
 {
-    private readonly byte[] data;
-    private int position;
-
-    public Lexer(byte[] data, int position)
-    {
-        this.data = data;
-        this.position = position;
-    }
+    private readonly byte[] data = data;
+    private int position = position;
 
     public int Position => position;
 
@@ -169,7 +163,7 @@ internal sealed class Lexer
             }
         }
 
-        return Token.Name(Encoding.Latin1.GetString(bytes.ToArray()));
+        return Token.Name(Encoding.Latin1.GetString([.. bytes]));
     }
 
     private Token ReadLiteralString()
@@ -201,7 +195,7 @@ internal sealed class Lexer
                 depth--;
                 if (depth == 0)
                 {
-                    return Token.String(TokenKind.StringLiteral, bytes.ToArray());
+                    return Token.String(TokenKind.StringLiteral, [.. bytes]);
                 }
 
                 bytes.Add(b);
@@ -302,7 +296,7 @@ internal sealed class Lexer
                     bytes.Add((byte)(high << 4));
                 }
 
-                return Token.String(TokenKind.HexString, bytes.ToArray());
+                return Token.String(TokenKind.HexString, [.. bytes]);
             }
 
             if (IsWhitespace(b))

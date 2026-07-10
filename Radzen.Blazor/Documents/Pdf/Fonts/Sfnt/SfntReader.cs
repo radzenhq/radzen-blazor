@@ -5,17 +5,11 @@ using System.IO;
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
 // Big-endian primitive reader over a byte[] with a movable cursor.
-internal sealed class SfntReader
+internal sealed class SfntReader(byte[] data, int position = 0)
 {
-    private readonly byte[] data;
+    private readonly byte[] data = data ?? throw new ArgumentNullException(nameof(data));
 
-    public SfntReader(byte[] data, int position = 0)
-    {
-        this.data = data ?? throw new ArgumentNullException(nameof(data));
-        Position = position;
-    }
-
-    public int Position { get; set; }
+    public int Position { get; set; } = position;
 
     public int Length => data.Length;
 

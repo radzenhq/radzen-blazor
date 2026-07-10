@@ -24,20 +24,20 @@ internal sealed class Token
     public byte[] Bytes { get; }
 
     public static Token Integer(long value)
-        => new(TokenKind.Integer, value, value, string.Empty, Array.Empty<byte>());
+        => new(TokenKind.Integer, value, value, string.Empty, []);
 
     public static Token Real(double value)
-        => new(TokenKind.Real, (long)value, value, string.Empty, Array.Empty<byte>());
+        => new(TokenKind.Real, (long)value, value, string.Empty, []);
 
     public static Token Name(string text)
-        => new(TokenKind.Name, 0, 0, text, Array.Empty<byte>());
+        => new(TokenKind.Name, 0, 0, text, []);
 
     public static Token Keyword(string text)
-        => new(TokenKind.Keyword, 0, 0, text, Array.Empty<byte>());
+        => new(TokenKind.Keyword, 0, 0, text, []);
 
     public static Token String(TokenKind kind, byte[] bytes)
         => new(kind, 0, 0, string.Empty, bytes);
 
     public static Token Delimiter(TokenKind kind)
-        => new(kind, 0, 0, string.Empty, Array.Empty<byte>());
+        => new(kind, 0, 0, string.Empty, []);
 }

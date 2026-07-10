@@ -7,30 +7,23 @@ namespace Radzen.Documents.Pdf;
 /// <summary>
 /// An axis-aligned rectangle defined by its top-left corner, width and height.
 /// </summary>
-public readonly struct Rect : IEquatable<Rect>
+/// <remarks>
+/// Initializes a new <see cref="Rect"/>.
+/// </remarks>
+public readonly struct Rect(double x, double y, double width, double height) : IEquatable<Rect>
 {
-    /// <summary>
-    /// Initializes a new <see cref="Rect"/>.
-    /// </summary>
-    public Rect(double x, double y, double width, double height)
-    {
-        X = x;
-        Y = y;
-        Width = width;
-        Height = height;
-    }
 
     /// <summary>Gets the X coordinate of the top-left corner.</summary>
-    public double X { get; }
+    public double X { get; } = x;
 
     /// <summary>Gets the Y coordinate of the top-left corner.</summary>
-    public double Y { get; }
+    public double Y { get; } = y;
 
     /// <summary>Gets the width.</summary>
-    public double Width { get; }
+    public double Width { get; } = width;
 
     /// <summary>Gets the height.</summary>
-    public double Height { get; }
+    public double Height { get; } = height;
 
     /// <summary>Gets the left edge (equal to <see cref="X"/>).</summary>
     public double Left => X;

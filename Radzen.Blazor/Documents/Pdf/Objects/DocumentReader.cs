@@ -14,8 +14,8 @@ namespace Radzen.Documents.Pdf.Objects;
 public sealed class DocumentReader
 {
     private readonly byte[] data;
-    private readonly Dictionary<int, XrefEntry> entries = new();
-    private readonly Dictionary<int, DocumentObject> cache = new();
+    private readonly Dictionary<int, XrefEntry> entries = [];
+    private readonly Dictionary<int, DocumentObject> cache = [];
     private DictionaryObject trailer = new();
 
     private DocumentReader(byte[] data)
@@ -303,16 +303,10 @@ public sealed class DocumentReader
         return long.Parse(Encoding.Latin1.GetString(data, start, index - start), CultureInfo.InvariantCulture);
     }
 
-    private readonly struct XrefEntry
+    private readonly struct XrefEntry(long offset, bool inUse)
     {
-        public XrefEntry(long offset, bool inUse)
-        {
-            Offset = offset;
-            InUse = inUse;
-        }
+        public long Offset { get; } = offset;
 
-        public long Offset { get; }
-
-        public bool InUse { get; }
+        public bool InUse { get; } = inUse;
     }
 }

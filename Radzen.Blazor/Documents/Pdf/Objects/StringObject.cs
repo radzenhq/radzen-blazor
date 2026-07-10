@@ -9,21 +9,17 @@ namespace Radzen.Documents.Pdf.Objects;
 /// control escapes are used where applicable, and any other byte outside
 /// printable ASCII is written as a 3-digit octal escape.
 /// </summary>
-public sealed class StringObject : DocumentObject
+/// <remarks>
+/// Initializes a new instance of the <see cref="StringObject"/> class.
+/// </remarks>
+/// <param name="value">The raw string value; each character is treated as a byte 0-255.</param>
+public sealed class StringObject(string value) : DocumentObject
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="StringObject"/> class.
-    /// </summary>
-    /// <param name="value">The raw string value; each character is treated as a byte 0-255.</param>
-    public StringObject(string value)
-    {
-        Value = value;
-    }
 
     /// <summary>
     /// Gets the raw string value.
     /// </summary>
-    public string Value { get; }
+    public string Value { get; } = value;
 
     /// <inheritdoc />
     public override void Write(Stream stream)

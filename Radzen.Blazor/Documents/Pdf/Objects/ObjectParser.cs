@@ -6,7 +6,7 @@ namespace Radzen.Documents.Pdf.Objects;
 internal sealed class ObjectParser
 {
     private readonly Lexer lexer;
-    private readonly List<Token> lookahead = new();
+    private readonly List<Token> lookahead = [];
 
     internal ObjectParser(Lexer lexer)
     {
