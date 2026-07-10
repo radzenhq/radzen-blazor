@@ -4,21 +4,10 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Implements the PDF <c>ASCIIHexDecode</c> filter.
-/// </summary>
 internal static class AsciiHexFilter
 {
     const string HexDigits = "0123456789ABCDEF";
 
-    /// <summary>
-    /// Decodes ASCII hexadecimal data terminated by <c>&gt;</c>. Whitespace is ignored and a
-    /// trailing odd digit is padded with a zero.
-    /// </summary>
-    /// <param name="data">The encoded input.</param>
-    /// <returns>The decoded bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
-    /// <exception cref="InvalidDataException">The input contains an invalid character.</exception>
     public static byte[] Decode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -63,12 +52,6 @@ internal static class AsciiHexFilter
         return output.ToArray();
     }
 
-    /// <summary>
-    /// Encodes bytes as uppercase ASCII hexadecimal terminated by <c>&gt;</c>.
-    /// </summary>
-    /// <param name="data">The raw input.</param>
-    /// <returns>The encoded bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
     public static byte[] Encode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
