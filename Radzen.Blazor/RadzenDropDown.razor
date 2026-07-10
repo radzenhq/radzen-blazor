@@ -192,7 +192,11 @@
                 }
             }
             <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="@PopupStyle">
-                @if (Data != null && Data.Cast<object>().Any())
+                @if (IsLoading && LoadingTemplate != null)
+                {
+                    @LoadingTemplate
+                }
+                else if (Data != null && Data.Cast<object>().Any())
                 {
                     <ul id="@ListId" @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")"
                         role="listbox" aria-multiselectable="@(Multiple ? "true" : "false")">
@@ -202,7 +206,7 @@
                         }
                     </ul>
                 }
-                else
+                else if (!IsLoading)
                 {
                     @EmptyTemplate
                 }

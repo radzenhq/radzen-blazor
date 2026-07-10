@@ -380,6 +380,61 @@ namespace Radzen.Blazor.Tests
             var activeOption = component.Find($"li[id=\"{active}\"]");
             Assert.Equal("option", activeOption.GetAttribute("role"));
         }
+
+        [Fact]
+        public void ListBox_Renders_LoadingTemplate_WhenIsLoading()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple", "Banana" };
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.IsLoading, true)
+                    .Add(p => p.LoadingTemplate, b => b.AddMarkupContent(0, "<span class=\"loading-marker\">Loading...</span>"));
+            });
+
+            Assert.Contains("loading-marker", component.Markup);
+            Assert.DoesNotContain("Apple", component.Markup);
+            Assert.DoesNotContain("Banana", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_DoesNotRender_LoadingTemplate_WhenNotLoading()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple", "Banana" };
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.LoadingTemplate, b => b.AddMarkupContent(0, "<span class=\"loading-marker\">Loading...</span>"));
+            });
+
+            Assert.DoesNotContain("loading-marker", component.Markup);
+            Assert.Contains("Apple", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Suppresses_EmptyTemplate_WhileLoading()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, new List<string>())
+                    .Add(p => p.IsLoading, true)
+                    .Add(p => p.EmptyTemplate, b => b.AddMarkupContent(0, "<span class=\"empty-marker\">No data</span>"));
+            });
+
+            Assert.DoesNotContain("empty-marker", component.Markup);
+        }
     }
 }
 

@@ -83,6 +83,20 @@ namespace Radzen
         public EventCallback<Radzen.LoadDataArgs> LoadData { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance loading indicator is shown.
+        /// </summary>
+        /// <value><c>true</c> if this instance loading indicator is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool IsLoading { get; set; }
+
+        /// <summary>
+        /// Gets or sets the loading template shown while <see cref="IsLoading"/> is <c>true</c>.
+        /// </summary>
+        /// <value>The loading template.</value>
+        [Parameter]
+        public RenderFragment? LoadingTemplate { get; set; }
+
+        /// <summary>
         /// The form
         /// </summary>
         IRadzenForm? form;

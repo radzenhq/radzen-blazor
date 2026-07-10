@@ -1,0 +1,50 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-sm-12">
+    <RadzenListBox @bind-Value=@companyName Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CompanyName)"
+                   AllowFiltering="true" LoadData=@OnLoadData IsLoading=@isLoading
+                   Style="width: 100%; max-width: 400px; height: 200px"
+                   InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select company" } })">
+        <LoadingTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-4">
+                <RadzenProgressBarCircular Size="ProgressBarCircularSize.ExtraSmall" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+                <RadzenText TextStyle="TextStyle.Body2">Loading customers...</RadzenText>
+            </RadzenStack>
+        </LoadingTemplate>
+    </RadzenListBox>
+    <RadzenText TextStyle="TextStyle.Body2">
+        The list loads its data with a simulated delay; filtering reloads it and shows the loading state again.
+    </RadzenText>
+</RadzenStack>
+
+@code {
+    string companyName;
+    IEnumerable<Customer> customers;
+    bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await OnLoadData(new LoadDataArgs());
+    }
+
+    async Task OnLoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        // Simulate a slow data source so the LoadingTemplate is visible.
+        await Task.Delay(800);
+
+        customers = dbContext.Customers
+            .Where(c => string.IsNullOrEmpty(args.Filter) || c.CompanyName.ToLowerInvariant().Contains(args.Filter.ToLowerInvariant()))
+            .OrderBy(c => c.CompanyName)
+            .ToList();
+
+        isLoading = false;
+    }
+}
