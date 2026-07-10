@@ -12,6 +12,7 @@ public sealed class Page
     private byte[]? content;
     private bool materialized;
     private byte[]? snapshot;
+    private System.Collections.Generic.IReadOnlyDictionary<string, Fonts.ReverseFont>? textFonts;
 
     internal Page(Unit width, Unit height)
     {
@@ -56,6 +57,19 @@ public sealed class Page
     /// </summary>
     /// <returns>The raw content bytes, or <c>null</c>.</returns>
     public byte[]? GetContent() => content;
+
+    /// <summary>
+    /// Extracts the visible text of this page in reading order: top to bottom, then
+    /// left to right. Char codes are reversed to Unicode through each font's
+    /// <c>/ToUnicode</c> CMap, <c>/Differences</c> array or standard WinAnsi encoding.
+    /// </summary>
+    /// <returns>The page text, or an empty string when the page has no text.</returns>
+    public string ExtractText() => TextExtractor.Extract(content, textFonts);
+
+    internal void SetTextFonts(System.Collections.Generic.IReadOnlyDictionary<string, Fonts.ReverseFont> fonts)
+    {
+        textFonts = fonts;
+    }
 
     // Resolves the content-stream bytes to write. An untouched loaded page reuses its
     // retained raw bytes; a modified (or freshly authored) page re-encodes from

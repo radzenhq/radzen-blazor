@@ -43,10 +43,37 @@ public sealed class Document
         if (catalog is not null && catalog.TryGetValue("Pages", out var pagesRef)
             && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
         {
-            CollectPages(reader, pagesNode, null, document);
+            CollectPages(reader, pagesNode, null, null, document);
         }
 
         return document;
+    }
+
+    /// <summary>
+    /// Extracts the visible text of every page in reading order, concatenated in
+    /// page order with a newline between pages.
+    /// </summary>
+    /// <returns>The document text, or an empty string when there is no text.</returns>
+    public string ExtractText()
+    {
+        var builder = new System.Text.StringBuilder();
+        foreach (var page in Pages)
+        {
+            var text = page.ExtractText();
+            if (text.Length == 0)
+            {
+                continue;
+            }
+
+            if (builder.Length > 0)
+            {
+                builder.Append('\n');
+            }
+
+            builder.Append(text);
+        }
+
+        return builder.ToString();
     }
 
     /// <summary>
@@ -72,11 +99,15 @@ public sealed class Document
         }
     }
 
-    private static void CollectPages(DocumentReader reader, DictionaryObject node, ArrayObject? inheritedBox, Document document)
+    private static void CollectPages(DocumentReader reader, DictionaryObject node, ArrayObject? inheritedBox, DictionaryObject? inheritedResources, Document document)
     {
         var box = node.TryGetValue("MediaBox", out var mediaBox) && reader.Resolve(mediaBox!) is ArrayObject own
             ? own
             : inheritedBox;
+
+        var resources = node.TryGetValue("Resources", out var resourcesObject) && reader.Resolve(resourcesObject!) is DictionaryObject ownResources
+            ? ownResources
+            : inheritedResources;
 
         if (node.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
         {
@@ -84,7 +115,7 @@ public sealed class Document
             {
                 if (reader.Resolve(kid) is DictionaryObject child)
                 {
-                    CollectPages(reader, child, box, document);
+                    CollectPages(reader, child, box, resources, document);
                 }
             }
 
@@ -99,7 +130,29 @@ public sealed class Document
             page.SetContent(content);
         }
 
+        page.SetTextFonts(BuildTextFonts(reader, resources));
         document.Pages.Insert(document.Pages.Count, page);
+    }
+
+    private static System.Collections.Generic.Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
+    {
+        var fonts = new System.Collections.Generic.Dictionary<string, Fonts.ReverseFont>(System.StringComparer.Ordinal);
+        if (resources is null
+            || !resources.TryGetValue("Font", out var fontObject)
+            || reader.Resolve(fontObject!) is not DictionaryObject fontDictionary)
+        {
+            return fonts;
+        }
+
+        foreach (var key in fontDictionary.Keys)
+        {
+            if (reader.Resolve(fontDictionary[key]) is DictionaryObject font)
+            {
+                fonts[key] = Fonts.ReverseFont.Build(reader, font);
+            }
+        }
+
+        return fonts;
     }
 
     private static (Unit Width, Unit Height) Dimensions(ArrayObject? box)
