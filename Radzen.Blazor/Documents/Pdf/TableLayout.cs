@@ -15,6 +15,28 @@ internal sealed class LaidOutLine
     public required double Y { get; init; }
 }
 
+internal sealed class LaidOutImage
+{
+    public required Image Source { get; init; }
+
+    public required double X { get; init; }
+
+    public required double Y { get; init; }
+
+    public required double Width { get; init; }
+
+    public required double Height { get; init; }
+}
+
+internal sealed class LaidOutNestedTable
+{
+    public required LaidOutTable Layout { get; init; }
+
+    public required double X { get; init; }
+
+    public required double Y { get; init; }
+}
+
 internal sealed class LaidOutCell
 {
     public required Cell Cell { get; init; }
@@ -32,6 +54,10 @@ internal sealed class LaidOutCell
     public required Rect ContentBox { get; init; }
 
     public required IReadOnlyList<LaidOutLine> Lines { get; init; }
+
+    public IReadOnlyList<LaidOutImage> Images { get; init; } = [];
+
+    public IReadOnlyList<LaidOutNestedTable> Tables { get; init; } = [];
 }
 
 internal sealed class LaidOutTable
@@ -45,10 +71,22 @@ internal sealed class LaidOutTable
     public required double Height { get; init; }
 
     public required IReadOnlyList<LaidOutCell> Cells { get; init; }
+
+    public Table? Source { get; init; }
 }
 
 internal static class TableLayout
 {
+    private sealed class CellItem
+    {
+        public LineBox? Line { get; init; }
+        public Block? Source { get; init; }
+        public Image? Image { get; init; }
+        public LaidOutTable? Table { get; init; }
+        public double Width { get; init; }
+        public required double Height { get; init; }
+    }
+
     private sealed class Placed
     {
         public required Cell Cell { get; init; }
@@ -58,10 +96,14 @@ internal static class TableLayout
         public required int RowSpan { get; init; }
         public required double ContentWidth { get; init; }
         public required double ContentHeight { get; init; }
-        public required List<(LineBox Line, Block Source)> Lines { get; init; }
+        public required List<CellItem> Items { get; init; }
     }
 
-    public static LaidOutTable Layout(Table table, double availableWidth, FontCollection fonts)
+    public static LaidOutTable Layout(
+        Table table,
+        double availableWidth,
+        FontCollection fonts,
+        System.Func<Image, (double Width, double Height)>? measureImage = null)
     {
         var columnWidths = ResolveColumnWidths(table, availableWidth);
         var columnX = Prefix(columnWidths);
@@ -111,7 +153,7 @@ internal static class TableLayout
                 var padding = cell.Padding.Point;
                 var contentWidth = cellWidth - (2 * padding);
                 var align = table.Columns[c].Alignment ?? cell.Alignment;
-                var (lines, contentHeight) = LayoutContent(cell, contentWidth, align, fonts);
+                var (items, contentHeight) = LayoutContent(cell, contentWidth, align, fonts, measureImage);
 
                 placed.Add(new Placed
                 {
@@ -122,7 +164,7 @@ internal static class TableLayout
                     RowSpan = rowSpan,
                     ContentWidth = contentWidth,
                     ContentHeight = contentHeight,
-                    Lines = lines,
+                    Items = items,
                 });
 
                 c += span;
@@ -180,18 +222,51 @@ internal static class TableLayout
             };
             var offset = (contentBox.Height - p.ContentHeight) * factor;
 
-            var lines = new List<LaidOutLine>(p.Lines.Count);
-            var cursorY = contentBox.Top + offset;
-            foreach (var (line, source) in p.Lines)
+            var alignFactor = (table.Columns[p.Column].Alignment ?? p.Cell.Alignment) switch
             {
-                lines.Add(new LaidOutLine
+                HorizontalAlignment.Center => 0.5,
+                HorizontalAlignment.Right => 1.0,
+                _ => 0.0,
+            };
+
+            var lines = new List<LaidOutLine>();
+            var laidImages = new List<LaidOutImage>();
+            var nestedTables = new List<LaidOutNestedTable>();
+            var cursorY = contentBox.Top + offset;
+            foreach (var item in p.Items)
+            {
+                if (item.Line is { } line && item.Source is { } source)
                 {
-                    Line = line,
-                    Source = source,
-                    X = contentBox.Left,
-                    Y = cursorY,
-                });
-                cursorY += line.Height;
+                    lines.Add(new LaidOutLine
+                    {
+                        Line = line,
+                        Source = source,
+                        X = contentBox.Left,
+                        Y = cursorY,
+                    });
+                }
+                else if (item.Image is { } image)
+                {
+                    laidImages.Add(new LaidOutImage
+                    {
+                        Source = image,
+                        X = contentBox.Left + ((contentBox.Width - item.Width) * alignFactor),
+                        Y = cursorY,
+                        Width = item.Width,
+                        Height = item.Height,
+                    });
+                }
+                else if (item.Table is { } nested)
+                {
+                    nestedTables.Add(new LaidOutNestedTable
+                    {
+                        Layout = nested,
+                        X = contentBox.Left,
+                        Y = cursorY,
+                    });
+                }
+
+                cursorY += item.Height;
             }
 
             cells.Add(new LaidOutCell
@@ -204,6 +279,8 @@ internal static class TableLayout
                 Bounds = bounds,
                 ContentBox = contentBox,
                 Lines = lines,
+                Images = laidImages,
+                Tables = nestedTables,
             });
         }
 
@@ -221,6 +298,7 @@ internal static class TableLayout
 
         return new LaidOutTable
         {
+            Source = table,
             ColumnWidths = columnWidths,
             RowHeights = rowHeights,
             Width = totalWidth,
@@ -266,35 +344,51 @@ internal static class TableLayout
         return widths;
     }
 
-    private static (List<(LineBox, Block)> Lines, double Height) LayoutContent(
-        Cell cell, double contentWidth, HorizontalAlignment align, FontCollection fonts)
+    private static (List<CellItem> Items, double Height) LayoutContent(
+        Cell cell,
+        double contentWidth,
+        HorizontalAlignment align,
+        FontCollection fonts,
+        System.Func<Image, (double Width, double Height)>? measureImage)
     {
-        var lines = new List<(LineBox, Block)>();
+        var items = new List<CellItem>();
         double height = 0;
         foreach (var block in cell.Blocks)
         {
-            if (block is not Paragraph paragraph)
+            if (block is Paragraph paragraph)
             {
-                continue;
-            }
-
-            var original = paragraph.Alignment;
-            paragraph.Alignment = align;
-            try
-            {
-                foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts))
+                var original = paragraph.Alignment;
+                paragraph.Alignment = align;
+                try
                 {
-                    lines.Add((line, block));
-                    height += line.Height;
+                    foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts))
+                    {
+                        items.Add(new CellItem { Line = line, Source = block, Height = line.Height });
+                        height += line.Height;
+                    }
+                }
+                finally
+                {
+                    paragraph.Alignment = original;
                 }
             }
-            finally
+            else if (block is Image image)
             {
-                paragraph.Alignment = original;
+                var (imageWidth, imageHeight) = measureImage is null
+                    ? ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data))
+                    : measureImage(image);
+                items.Add(new CellItem { Image = image, Width = imageWidth, Height = imageHeight });
+                height += imageHeight;
+            }
+            else if (block is Table nested)
+            {
+                var layout = Layout(nested, contentWidth, fonts, measureImage);
+                items.Add(new CellItem { Table = layout, Height = layout.Height });
+                height += layout.Height;
             }
         }
 
-        return (lines, height);
+        return (items, height);
     }
 
     private static double[] Prefix(double[] values)
