@@ -210,11 +210,29 @@ public sealed class Document
 
             var pageRef = writer.Add(pageNode);
 
-            var content = page.GetContent();
-            if (content is not null)
+            if (page.Content.Count > 0)
             {
-                var contentStream = new StreamObject(content);
-                pageNode["Contents"] = writer.Add(contentStream);
+                var emitter = new ContentWriter();
+                foreach (var element in page.Content)
+                {
+                    element.Emit(emitter);
+                }
+
+                pageNode["Contents"] = writer.Add(new StreamObject(emitter.ToArray()));
+
+                var resources = BuildResources(emitter);
+                if (resources is not null)
+                {
+                    pageNode["Resources"] = resources;
+                }
+            }
+            else
+            {
+                var content = page.GetContent();
+                if (content is not null)
+                {
+                    pageNode["Contents"] = writer.Add(new StreamObject(content));
+                }
             }
 
             kids.Add(pageRef);
@@ -236,6 +254,29 @@ public sealed class Document
         }
 
         writer.Close();
+    }
+
+    private static DictionaryObject? BuildResources(ContentWriter emitter)
+    {
+        DictionaryObject? fonts = null;
+        foreach (var (baseFont, key) in emitter.Fonts)
+        {
+            fonts ??= new DictionaryObject();
+            fonts[key] = new DictionaryObject
+            {
+                ["Type"] = new NameObject("Font"),
+                ["Subtype"] = new NameObject("Type1"),
+                ["BaseFont"] = new NameObject(baseFont),
+                ["Encoding"] = new NameObject("WinAnsiEncoding"),
+            };
+        }
+
+        if (fonts is null)
+        {
+            return null;
+        }
+
+        return new DictionaryObject { ["Font"] = fonts };
     }
 
     private static ArrayObject MediaBox(Page page) =>
