@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
@@ -67,6 +68,124 @@ internal static class CffDict
         }
 
         return result;
+    }
+
+    public static void WriteInteger(List<byte> dst, int value)
+    {
+        if (value is >= -107 and <= 107)
+        {
+            dst.Add((byte)(value + 139));
+        }
+        else if (value is >= 108 and <= 1131)
+        {
+            var w = value - 108;
+            dst.Add((byte)((w >> 8) + 247));
+            dst.Add((byte)(w & 0xff));
+        }
+        else if (value is >= -1131 and <= -108)
+        {
+            var w = -value - 108;
+            dst.Add((byte)((w >> 8) + 251));
+            dst.Add((byte)(w & 0xff));
+        }
+        else if (value is >= -32768 and <= 32767)
+        {
+            dst.Add(28);
+            dst.Add((byte)(value >> 8));
+            dst.Add((byte)value);
+        }
+        else
+        {
+            WriteInteger32(dst, value);
+        }
+    }
+
+    // Forces the 5-byte 32-bit integer form so an operand's encoded width is stable
+    // regardless of the value; used for placeholder offsets resolved in a later pass.
+    public static void WriteOffset(List<byte> dst, int value) => WriteInteger32(dst, value);
+
+    public static void WriteNumber(List<byte> dst, double value)
+    {
+        if (value == System.Math.Floor(value) && value is >= int.MinValue and <= int.MaxValue)
+        {
+            WriteInteger(dst, (int)value);
+        }
+        else
+        {
+            WriteReal(dst, value);
+        }
+    }
+
+    public static void WriteOperator(List<byte> dst, int op)
+    {
+        if (op >= 1200)
+        {
+            dst.Add(TwoByteOperator);
+            dst.Add((byte)(op - 1200));
+        }
+        else
+        {
+            dst.Add((byte)op);
+        }
+    }
+
+    private static void WriteInteger32(List<byte> dst, int value)
+    {
+        dst.Add(29);
+        dst.Add((byte)(value >> 24));
+        dst.Add((byte)(value >> 16));
+        dst.Add((byte)(value >> 8));
+        dst.Add((byte)value);
+    }
+
+    private static void WriteReal(List<byte> dst, double value)
+    {
+        var s = value.ToString("R", CultureInfo.InvariantCulture);
+        var nibbles = new List<byte>();
+        for (var k = 0; k < s.Length; k++)
+        {
+            var c = s[k];
+            if (c is >= '0' and <= '9')
+            {
+                nibbles.Add((byte)(c - '0'));
+            }
+            else if (c == '.')
+            {
+                nibbles.Add(0xa);
+            }
+            else if (c == '-')
+            {
+                nibbles.Add(0xe);
+            }
+            else if (c is 'E' or 'e')
+            {
+                if (k + 1 < s.Length && s[k + 1] == '-')
+                {
+                    nibbles.Add(0xc);
+                    k++;
+                }
+                else
+                {
+                    nibbles.Add(0xb);
+                    if (k + 1 < s.Length && s[k + 1] == '+')
+                    {
+                        k++;
+                    }
+                }
+            }
+        }
+
+        nibbles.Add(0xf);
+        if (nibbles.Count % 2 == 1)
+        {
+            nibbles.Add(0xf);
+        }
+
+        dst.Add(30);
+        for (var k = 0; k < nibbles.Count; k += 2)
+        {
+            dst.Add((byte)((nibbles[k] << 4) | nibbles[k + 1]));
+        }
     }
 
     private static int SkipReal(byte[] data, int i)

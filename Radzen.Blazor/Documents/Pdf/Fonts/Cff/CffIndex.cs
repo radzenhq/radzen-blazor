@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
@@ -19,6 +20,56 @@ internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
         var result = new byte[length];
         Array.Copy(data, start, result, 0, length);
         return result;
+    }
+
+    public static byte[] Write(IReadOnlyList<byte[]> entries)
+    {
+        ArgumentNullException.ThrowIfNull(entries);
+
+        var count = entries.Count;
+        if (count == 0)
+        {
+            return [0, 0];
+        }
+
+        var dataSize = 0;
+        foreach (var entry in entries)
+        {
+            dataSize += entry.Length;
+        }
+
+        var lastOffset = dataSize + 1;
+        var offSize = lastOffset <= 0xFF ? 1 : lastOffset <= 0xFFFF ? 2 : lastOffset <= 0xFFFFFF ? 3 : 4;
+
+        var result = new byte[2 + 1 + ((count + 1) * offSize) + dataSize];
+        var pos = 0;
+        result[pos++] = (byte)(count >> 8);
+        result[pos++] = (byte)count;
+        result[pos++] = (byte)offSize;
+
+        var offset = 1;
+        WriteOffsetValue(result, ref pos, offset, offSize);
+        foreach (var entry in entries)
+        {
+            offset += entry.Length;
+            WriteOffsetValue(result, ref pos, offset, offSize);
+        }
+
+        foreach (var entry in entries)
+        {
+            Array.Copy(entry, 0, result, pos, entry.Length);
+            pos += entry.Length;
+        }
+
+        return result;
+    }
+
+    private static void WriteOffsetValue(byte[] dst, ref int pos, int value, int size)
+    {
+        for (var i = size - 1; i >= 0; i--)
+        {
+            dst[pos++] = (byte)(value >> (8 * i));
+        }
     }
 
     public static CffIndex Read(byte[] data, int offset)
