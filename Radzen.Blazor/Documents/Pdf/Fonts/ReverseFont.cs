@@ -114,7 +114,7 @@ internal sealed class ReverseFont
             return (EmptyMap, 0);
         }
 
-        return ToUnicodeCMap.Parse(stream.Data);
+        return ToUnicodeCMap.Parse(reader.DecodeStream(stream));
     }
 
     private static Dictionary<int, string> BuildWinAnsiMap()
