@@ -20,6 +20,10 @@ public sealed class Page
         Height = height;
     }
 
+    // Pre-generated content and resources produced by DocumentBuilder.Build; when set,
+    // the document writer emits these bytes and resources directly (see Document.SaveToStream).
+    internal GeneratedPage? Generated { get; set; }
+
     /// <summary>Gets the page width in points.</summary>
     public Unit Width { get; }
 
