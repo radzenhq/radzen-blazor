@@ -1,0 +1,17 @@
+@page "/gantt-multi-year"
+
+<PageTitle>Gantt Multi-Year Timescale - Radzen Blazor Components</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Gantt Multi-Year Timescale
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Display long-running projects on zoomed-out timescales. The Year view renders one cell per month and the
+    Years view renders one cell per quarter grouped by year, so multi-year tasks fit without horizontal scrolling.
+    Both views honor <code>ViewStart</code> and <code>ViewEnd</code>, and the zoom-to-fit button picks the best
+    timescale for the full task range automatically.
+</RadzenText>
+
+<RadzenExample ComponentName="Gantt" Example="GanttMultiYear" AdditionalSourceCodePages=@(new [] { "/demos/Models/GanttTask.cs" })>
+    <GanttMultiYear />
+</RadzenExample>

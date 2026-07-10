@@ -7,12 +7,12 @@
     [CascadingParameter]
     internal RadzenGantt<TItem>? Gantt { get; set; }
 
-    public override string Icon => "calendar_today";
+    public override string Icon => "date_range";
 
     private string? text;
 
     [Parameter]
-    public override string Text { get => text ?? Localize(nameof(RadzenStrings.Gantt_YearViewText)); set => text = value; }
+    public override string Text { get => text ?? Localize(nameof(RadzenStrings.Gantt_YearsViewText)); set => text = value; }
 
     public override string Title
     {
@@ -35,10 +35,11 @@
             if (Gantt?.ViewStart.HasValue == true)
             {
                 var start = Gantt.ViewStart.Value.Date;
-                return new DateTime(start.Year, start.Month, 1);
+                return QuarterStart(start);
             }
 
-            return YearStart;
+            var date = Scheduler?.CurrentDate.Date ?? DateTime.Today;
+            return new DateTime(date.Year, 1, 1);
         }
     }
 
@@ -49,21 +50,24 @@
             if (Gantt?.ViewEnd.HasValue == true)
             {
                 var end = Gantt.ViewEnd.Value.Date;
-                return new DateTime(end.Year, end.Month, 1).AddMonths(1);
+                return QuarterStart(end).AddMonths(3);
             }
 
-            return StartDate.AddYears(1);
+            var years = Math.Max(1, Gantt?.YearsInView ?? 3);
+            return StartDate.AddYears(years);
         }
     }
 
     public override DateTime Next()
     {
-        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddYears(1);
+        var years = Math.Max(1, Gantt?.YearsInView ?? 3);
+        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddYears(years);
     }
 
     public override DateTime Prev()
     {
-        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddYears(-1);
+        var years = Math.Max(1, Gantt?.YearsInView ?? 3);
+        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddYears(-years);
     }
 
     public override RenderFragment Render()
@@ -71,7 +75,7 @@
         var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
         var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
         var quarterFormat = Localize(nameof(RadzenStrings.Gantt_QuarterFormat));
-        var columns = BuildMonthColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 80, culture, quarterFormat);
+        var columns = BuildQuarterColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 80, culture, quarterFormat);
         var timelineWidth = columns.Sum(c => c.WidthPx);
 
         Gantt?.ComputeCriticalPath(appointments, Gantt?.TimelineRowIndexByItem);
@@ -100,36 +104,33 @@
         </CascadingValue>;
     }
 
-    internal const double AverageDaysPerMonth = 30.4369;
+    internal const double AverageDaysPerQuarter = 91.3106;
 
-    internal static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildMonthColumns(DateTime start, DateTime end, int monthWidth, CultureInfo culture, string quarterFormat)
+    internal static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildQuarterColumns(DateTime start, DateTime end, int quarterWidth, CultureInfo culture, string quarterFormat)
     {
         var columns = new List<GanttTimelineView<TItem>.GanttTimelineColumn>();
-        var current = new DateTime(start.Year, start.Month, 1);
+        var current = QuarterStart(start);
         while (current < end.Date)
         {
-            var next = current.AddMonths(1);
-            var daysInMonth = (next - current).TotalDays;
+            var next = current.AddMonths(3);
+            var daysInQuarter = (next - current).TotalDays;
             var quarter = (current.Month - 1) / 3 + 1;
             columns.Add(new GanttTimelineView<TItem>.GanttTimelineColumn
             {
                 Start = current,
                 End = next,
-                Label = current.ToString("MMM", culture),
-                GroupLabel = $"{string.Format(culture, quarterFormat, quarter)} {current.ToString("yyyy", culture)}",
-                WidthPx = monthWidth * daysInMonth / AverageDaysPerMonth
+                Label = string.Format(culture, quarterFormat, quarter),
+                GroupLabel = current.ToString("yyyy", culture),
+                WidthPx = quarterWidth * daysInQuarter / AverageDaysPerQuarter
             });
             current = next;
         }
         return columns;
     }
 
-    private DateTime YearStart
+    private static DateTime QuarterStart(DateTime date)
     {
-        get
-        {
-            var date = Scheduler?.CurrentDate.Date ?? DateTime.Today;
-            return new DateTime(date.Year, 1, 1);
-        }
+        var quarterMonth = ((date.Month - 1) / 3) * 3 + 1;
+        return new DateTime(date.Year, quarterMonth, 1);
     }
 }

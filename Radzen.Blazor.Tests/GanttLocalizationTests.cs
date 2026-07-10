@@ -22,7 +22,9 @@ namespace Radzen.Blazor.Tests
                 nameof(RadzenStrings.Gantt_DayViewText),
                 nameof(RadzenStrings.Gantt_WeekViewText),
                 nameof(RadzenStrings.Gantt_MonthViewText),
-                nameof(RadzenStrings.Gantt_YearViewText)
+                nameof(RadzenStrings.Gantt_YearViewText),
+                nameof(RadzenStrings.Gantt_YearsViewText),
+                nameof(RadzenStrings.Gantt_QuarterFormat)
             };
 
             foreach (var key in keys)

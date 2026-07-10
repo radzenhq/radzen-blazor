@@ -34,6 +34,7 @@ namespace Radzen.Blazor
         private RadzenGanttWeekView<TItem>? weekView;
         private RadzenGanttMonthView<TItem>? monthView;
         private RadzenGanttYearView<TItem>? yearView;
+        private RadzenGanttYearsView<TItem>? yearsView;
         private GanttZoomLevel? pendingZoomLevel;
         private bool scrollToFirstEvent = true;
 
@@ -258,6 +259,13 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public int WeeksInView { get; set; } = 4;
+
+        /// <summary>
+        /// Number of years to render in the multi-year Years view when <see cref="ViewStart"/> and
+        /// <see cref="ViewEnd"/> are not set. Default is <c>3</c>.
+        /// </summary>
+        [Parameter]
+        public int YearsInView { get; set; } = 3;
 
         /// <summary>
         /// Date format for header cells.
@@ -1164,6 +1172,7 @@ namespace Radzen.Blazor
                 GanttZoomLevel.Week => 7,
                 GanttZoomLevel.Month => 14,
                 GanttZoomLevel.Year => 30,
+                GanttZoomLevel.Years => 60,
                 _ => 14
             };
             start = start.AddDays(-pad);
@@ -1230,6 +1239,7 @@ namespace Radzen.Blazor
                 GanttZoomLevel.Day => dayView,
                 GanttZoomLevel.Month => monthView,
                 GanttZoomLevel.Year => yearView,
+                GanttZoomLevel.Years => yearsView,
                 _ => weekView
             };
         }
@@ -1634,6 +1644,11 @@ namespace Radzen.Blazor
                 {
                     yield return yearView;
                 }
+
+                if (yearsView != null)
+                {
+                    yield return yearsView;
+                }
             }
         }
 
@@ -1755,9 +1770,13 @@ namespace Radzen.Blazor
             {
                 bestZoom = GanttZoomLevel.Month;
             }
-            else
+            else if (span.TotalDays <= 730)
             {
                 bestZoom = GanttZoomLevel.Year;
+            }
+            else
+            {
+                bestZoom = GanttZoomLevel.Years;
             }
 
             var pad = bestZoom switch
@@ -1766,6 +1785,7 @@ namespace Radzen.Blazor
                 GanttZoomLevel.Week => 3,
                 GanttZoomLevel.Month => 7,
                 GanttZoomLevel.Year => 14,
+                GanttZoomLevel.Years => 30,
                 _ => 3
             };
 
