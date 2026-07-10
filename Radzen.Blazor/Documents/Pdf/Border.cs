@@ -48,4 +48,6 @@ public class Border
         get => style ?? owner?.Style ?? BorderStyle.None;
         set => style = value;
     }
+
+    internal bool IsSet => width is not null || color is not null || style is not null || owner?.IsSet == true;
 }

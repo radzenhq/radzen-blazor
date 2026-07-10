@@ -19,14 +19,44 @@ public class Borders
         Left = new Border(this);
     }
 
+    private double width;
+    private Color color = Color.Black;
+    private BorderStyle style = BorderStyle.None;
+
     /// <summary>Gets or sets the box-level border width in points.</summary>
-    public double Width { get; set; }
+    public double Width
+    {
+        get => width;
+        set
+        {
+            width = value;
+            IsSet = true;
+        }
+    }
 
     /// <summary>Gets or sets the box-level border color.</summary>
-    public Color Color { get; set; } = Color.Black;
+    public Color Color
+    {
+        get => color;
+        set
+        {
+            color = value;
+            IsSet = true;
+        }
+    }
 
     /// <summary>Gets or sets the box-level border line style.</summary>
-    public BorderStyle Style { get; set; } = BorderStyle.None;
+    public BorderStyle Style
+    {
+        get => style;
+        set
+        {
+            style = value;
+            IsSet = true;
+        }
+    }
+
+    internal bool IsSet { get; private set; }
 
     /// <summary>Gets the top border edge.</summary>
     public Border Top { get; }

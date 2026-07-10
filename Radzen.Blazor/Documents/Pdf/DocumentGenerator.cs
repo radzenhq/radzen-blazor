@@ -62,20 +62,31 @@ internal sealed class DocumentGenerator
         public required GeneratedImage Image { get; init; }
     }
 
-    private sealed class RectDraw
+    private sealed class FillDraw
     {
         public required double X { get; init; }
         public required double Y { get; init; }
         public required double Width { get; init; }
         public required double Height { get; init; }
+        public required Color Color { get; init; }
+    }
+
+    private sealed class EdgeDraw
+    {
+        public required double X1 { get; init; }
+        public required double Y1 { get; init; }
+        public required double X2 { get; init; }
+        public required double Y2 { get; init; }
         public required double LineWidth { get; init; }
         public required Color Color { get; init; }
+        public required BorderStyle Style { get; init; }
     }
 
     private sealed class PagePlan
     {
         public required PageSize Size { get; init; }
-        public List<RectDraw> Rects { get; } = [];
+        public List<FillDraw> Fills { get; } = [];
+        public List<EdgeDraw> Edges { get; } = [];
         public List<ImageDraw> Images { get; } = [];
         public List<TextDraw> Texts { get; } = [];
         public HashSet<GeneratedFont> UsedFonts { get; } = [];
@@ -149,16 +160,7 @@ internal sealed class DocumentGenerator
 
             foreach (var positioned in page.Images)
             {
-                var (_, _, xobject) = Decode(positioned.Source);
-                plan.Images.Add(new ImageDraw
-                {
-                    X = left,
-                    Y = contentTop - positioned.Y - positioned.Height,
-                    Width = positioned.Width,
-                    Height = positioned.Height,
-                    Image = xobject,
-                });
-                plan.UsedImages.Add(xobject);
+                EmitImage(plan, positioned, left, contentTop);
             }
 
             foreach (var line in page.Header)
@@ -166,10 +168,20 @@ internal sealed class DocumentGenerator
                 EmitLine(plan, line.Line, left, height - line.Y);
             }
 
+            foreach (var positioned in page.HeaderImages)
+            {
+                EmitImage(plan, positioned, left, height);
+            }
+
             var bandTop = height - (page.ContentBox.Y + page.ContentBox.Height);
             foreach (var line in page.Footer)
             {
                 EmitLine(plan, line.Line, left, bandTop - line.Y);
+            }
+
+            foreach (var positioned in page.FooterImages)
+            {
+                EmitImage(plan, positioned, left, bandTop);
             }
 
             plans.Add(plan);
@@ -182,11 +194,37 @@ internal sealed class DocumentGenerator
         return (width, height);
     }
 
+    private void EmitImage(PagePlan plan, PositionedImage positioned, double left, double top)
+    {
+        var (_, _, xobject) = Decode(positioned.Source);
+        plan.Images.Add(new ImageDraw
+        {
+            X = left,
+            Y = top - positioned.Y - positioned.Height,
+            Width = positioned.Width,
+            Height = positioned.Height,
+            Image = xobject,
+        });
+        plan.UsedImages.Add(xobject);
+    }
+
     private void EmitFragment(PagePlan plan, PositionedTableFragment positioned, double left, double contentTop)
     {
         var layout = positioned.Layout;
         foreach (var row in positioned.Fragment.Rows)
         {
+            if (layout.Source?.Rows[row.SourceRow].Background is { } background)
+            {
+                plan.Fills.Add(new FillDraw
+                {
+                    X = left,
+                    Y = contentTop - (positioned.Y + row.Y + row.Height),
+                    Width = layout.Width,
+                    Height = row.Height,
+                    Color = background,
+                });
+            }
+
             foreach (var cell in layout.Cells)
             {
                 if (cell.Row != row.SourceRow)
@@ -195,47 +233,88 @@ internal sealed class DocumentGenerator
                 }
 
                 var delta = positioned.Y + row.Y - cell.Bounds.Y;
-                EmitCell(plan, cell, left, contentTop, delta);
+                EmitCell(plan, layout, cell, left, contentTop, delta);
             }
         }
     }
 
-    private void EmitCell(PagePlan plan, LaidOutCell cell, double left, double contentTop, double delta)
+    private void EmitCell(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta)
     {
-        EmitBorders(plan, cell, left, contentTop, delta);
+        if (cell.Cell.Background is { } background)
+        {
+            plan.Fills.Add(new FillDraw
+            {
+                X = left + cell.Bounds.X,
+                Y = contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
+                Width = cell.Bounds.Width,
+                Height = cell.Bounds.Height,
+                Color = background,
+            });
+        }
+
+        EmitBorders(plan, layout, cell, left, contentTop, delta);
 
         foreach (var line in cell.Lines)
         {
             EmitLine(plan, line.Line, left + line.X, contentTop - (line.Y + delta));
         }
+
+        foreach (var image in cell.Images)
+        {
+            var (_, _, xobject) = Decode(image.Source);
+            plan.Images.Add(new ImageDraw
+            {
+                X = left + image.X,
+                Y = contentTop - (image.Y + delta) - image.Height,
+                Width = image.Width,
+                Height = image.Height,
+                Image = xobject,
+            });
+            plan.UsedImages.Add(xobject);
+        }
+
+        foreach (var nested in cell.Tables)
+        {
+            foreach (var nestedCell in nested.Layout.Cells)
+            {
+                EmitCell(plan, nested.Layout, nestedCell, left + nested.X, contentTop, delta + nested.Y);
+            }
+        }
     }
 
-    private static void EmitBorders(PagePlan plan, LaidOutCell cell, double left, double contentTop, double delta)
+    private static void EmitBorders(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta)
     {
-        var borders = cell.Cell.Borders;
-        var visible = borders.Top.Style != BorderStyle.None
-            || borders.Right.Style != BorderStyle.None
-            || borders.Bottom.Style != BorderStyle.None
-            || borders.Left.Style != BorderStyle.None;
-        if (!visible)
+        var cellBorders = cell.Cell.Borders;
+        var tableBorders = layout.Source?.Borders;
+
+        var x = left + cell.Bounds.X;
+        var top = contentTop - (cell.Bounds.Y + delta);
+        var right = x + cell.Bounds.Width;
+        var bottom = top - cell.Bounds.Height;
+
+        EmitEdge(plan, cellBorders.Top, tableBorders?.Top, x, top, right, top);
+        EmitEdge(plan, cellBorders.Right, tableBorders?.Right, right, bottom, right, top);
+        EmitEdge(plan, cellBorders.Bottom, tableBorders?.Bottom, x, bottom, right, bottom);
+        EmitEdge(plan, cellBorders.Left, tableBorders?.Left, x, bottom, x, top);
+    }
+
+    private static void EmitEdge(PagePlan plan, Border cellEdge, Border? tableEdge, double x1, double y1, double x2, double y2)
+    {
+        var edge = cellEdge.IsSet || tableEdge is null ? cellEdge : tableEdge;
+        if (edge.Style == BorderStyle.None)
         {
             return;
         }
 
-        var x = left + cell.Bounds.X;
-        var topEdge = contentTop - (cell.Bounds.Y + delta);
-        var width = cell.Bounds.Width;
-        var height = cell.Bounds.Height;
-        var lineWidth = borders.Top.Width > 0 ? borders.Top.Width : 0.5;
-
-        plan.Rects.Add(new RectDraw
+        plan.Edges.Add(new EdgeDraw
         {
-            X = x,
-            Y = topEdge - height,
-            Width = width,
-            Height = height,
-            LineWidth = lineWidth,
-            Color = borders.Top.Color,
+            X1 = x1,
+            Y1 = y1,
+            X2 = x2,
+            Y2 = y2,
+            LineWidth = edge.Width > 0 ? edge.Width : 0.5,
+            Color = edge.Color,
+            Style = edge.Style,
         });
     }
 
@@ -387,19 +466,43 @@ internal sealed class DocumentGenerator
     {
         var writer = new ContentWriter();
 
-        foreach (var rect in plan.Rects)
+        foreach (var fill in plan.Fills)
         {
-            writer.WriteColor(rect.Color, "RG");
-            writer.WriteNumber(rect.LineWidth);
+            writer.WriteColor(fill.Color, "rg");
+            writer.WriteNumber(fill.X);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(fill.Y);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(fill.Width);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(fill.Height);
+            writer.WriteRaw(" re f\n");
+        }
+
+        foreach (var edge in plan.Edges)
+        {
+            writer.WriteRaw("q\n");
+            writer.WriteColor(edge.Color, "RG");
+            writer.WriteNumber(edge.LineWidth);
             writer.WriteRaw(" w\n");
-            writer.WriteNumber(rect.X);
+            if (edge.Style is BorderStyle.Dashed or BorderStyle.Dotted)
+            {
+                var on = edge.Style == BorderStyle.Dashed ? 3.0 : 1.0;
+                writer.WriteRaw("[");
+                writer.WriteNumber(on * edge.LineWidth);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(on * edge.LineWidth);
+                writer.WriteRaw("] 0 d\n");
+            }
+
+            writer.WriteNumber(edge.X1);
             writer.WriteRaw(" ");
-            writer.WriteNumber(rect.Y);
+            writer.WriteNumber(edge.Y1);
+            writer.WriteRaw(" m\n");
+            writer.WriteNumber(edge.X2);
             writer.WriteRaw(" ");
-            writer.WriteNumber(rect.Width);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(rect.Height);
-            writer.WriteRaw(" re S\n");
+            writer.WriteNumber(edge.Y2);
+            writer.WriteRaw(" l\nS\nQ\n");
         }
 
         foreach (var image in plan.Images)
