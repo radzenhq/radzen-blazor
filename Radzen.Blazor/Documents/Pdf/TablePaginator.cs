@@ -56,6 +56,27 @@ internal static class TablePaginator
             headerHeight += layout.RowHeights[h];
         }
 
+        // Rows covered by a RowSpan > 1 cell move between fragments as one group.
+        var reach = new int[source.Rows.Count];
+        for (var i = 0; i < reach.Length; i++)
+        {
+            reach[i] = i;
+        }
+
+        foreach (var cell in layout.Cells)
+        {
+            if (cell.RowSpan <= 1)
+            {
+                continue;
+            }
+
+            var end = cell.Row + cell.RowSpan - 1;
+            for (var r = cell.Row; r <= end && r < reach.Length; r++)
+            {
+                reach[r] = System.Math.Max(reach[r], end);
+            }
+        }
+
         List<TableFragment> fragments = [];
         var body = 0;
         while (true)
@@ -66,12 +87,25 @@ internal static class TablePaginator
             List<int> placed = [];
             while (body < bodies.Count)
             {
-                var rowHeight = layout.RowHeights[bodies[body]];
-                if (placed.Count == 0 || running + rowHeight <= available + 1e-6)
+                var last = body;
+                var groupEnd = reach[bodies[body]];
+                double groupHeight = layout.RowHeights[bodies[body]];
+                while (last + 1 < bodies.Count && bodies[last + 1] <= groupEnd)
                 {
-                    placed.Add(bodies[body]);
-                    running += rowHeight;
-                    body++;
+                    last++;
+                    groupEnd = System.Math.Max(groupEnd, reach[bodies[last]]);
+                    groupHeight += layout.RowHeights[bodies[last]];
+                }
+
+                if (placed.Count == 0 || running + groupHeight <= available + 1e-6)
+                {
+                    for (var g = body; g <= last; g++)
+                    {
+                        placed.Add(bodies[g]);
+                    }
+
+                    running += groupHeight;
+                    body = last + 1;
                 }
                 else
                 {

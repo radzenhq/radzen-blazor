@@ -128,14 +128,9 @@ internal static class TableLayout
                     break;
                 }
 
-                var span = cell.ColumnSpan;
-                if (c + span > nCols)
-                {
-                    continue;
-                }
-
-                var rowSpan = cell.RowSpan;
-                var lastRow = System.Math.Min(nRows, r + rowSpan);
+                var span = System.Math.Min(cell.ColumnSpan, nCols - c);
+                var rowSpan = System.Math.Min(cell.RowSpan, nRows - r);
+                var lastRow = r + rowSpan;
                 for (var rr = r; rr < lastRow; rr++)
                 {
                     for (var cc = c; cc < c + span; cc++)
@@ -152,7 +147,7 @@ internal static class TableLayout
 
                 var padding = cell.Padding.Point;
                 var contentWidth = cellWidth - (2 * padding);
-                var align = table.Columns[c].Alignment ?? cell.AlignmentValue ?? table.Rows[r].AlignmentValue;
+                var align = ColumnAlignment(table, c) ?? cell.AlignmentValue ?? table.Rows[r].AlignmentValue;
                 var (items, contentHeight) = LayoutContent(cell, contentWidth, align, fonts, measureImage);
 
                 placed.Add(new Placed
@@ -183,6 +178,29 @@ internal static class TableLayout
             if (h > rowHeights[p.Row])
             {
                 rowHeights[p.Row] = h;
+            }
+        }
+
+        // Rows covered by a spanning cell grow (last row absorbs the deficit) so the
+        // spanned content always fits within the combined row heights.
+        foreach (var p in placed)
+        {
+            if (p.RowSpan <= 1)
+            {
+                continue;
+            }
+
+            var needed = p.ContentHeight + (2 * p.Cell.Padding.Point);
+            double covered = 0;
+            var end = p.Row + p.RowSpan - 1;
+            for (var rr = p.Row; rr <= end; rr++)
+            {
+                covered += rowHeights[rr];
+            }
+
+            if (needed > covered)
+            {
+                rowHeights[end] += needed - covered;
             }
         }
 
@@ -222,7 +240,7 @@ internal static class TableLayout
             };
             var offset = (contentBox.Height - p.ContentHeight) * factor;
 
-            var alignFactor = (table.Columns[p.Column].Alignment
+            var alignFactor = (ColumnAlignment(table, p.Column)
                 ?? p.Cell.AlignmentValue
                 ?? table.Rows[p.Row].AlignmentValue
                 ?? HorizontalAlignment.Left) switch
@@ -310,9 +328,43 @@ internal static class TableLayout
         };
     }
 
+    private static HorizontalAlignment? ColumnAlignment(Table table, int column)
+        => column < table.Columns.Count ? table.Columns[column].Alignment : null;
+
     private static double[] ResolveColumnWidths(Table table, double availableWidth)
     {
         var count = table.Columns.Count;
+        if (count == 0)
+        {
+            // No declared columns: derive them from the widest row so content is not
+            // silently dropped.
+            foreach (var row in table.Rows)
+            {
+                var cells = 0;
+                foreach (var cell in row.Cells)
+                {
+                    cells += System.Math.Max(1, cell.ColumnSpan);
+                }
+
+                count = System.Math.Max(count, cells);
+            }
+
+            if (count == 0)
+            {
+                return [];
+            }
+
+            var total = table.Width?.Point ?? availableWidth;
+            var derived = new double[count];
+            var share = System.Math.Max(0, total / count);
+            for (var i = 0; i < count; i++)
+            {
+                derived[i] = share;
+            }
+
+            return derived;
+        }
+
         var widths = new double[count];
         double fixedSum = 0;
         var autoCount = 0;
@@ -334,8 +386,8 @@ internal static class TableLayout
             return widths;
         }
 
-        var total = table.Width?.Point ?? availableWidth;
-        var each = (total - fixedSum) / autoCount;
+        var remaining = table.Width?.Point ?? availableWidth;
+        var each = System.Math.Max(0, (remaining - fixedSum) / autoCount);
         for (var i = 0; i < count; i++)
         {
             if (table.Columns[i].Width is null)

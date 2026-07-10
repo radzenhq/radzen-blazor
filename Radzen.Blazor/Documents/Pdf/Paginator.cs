@@ -291,7 +291,9 @@ internal static class Paginator
                 }
                 else if (!first)
                 {
-                    placeCount = k;
+                    // A continuation line taller than the page still makes progress:
+                    // place it alone on an empty page instead of looping forever.
+                    placeCount = k > 0 || HasPageContent() ? k : 1;
                 }
                 else if (k < para.Orphans)
                 {
