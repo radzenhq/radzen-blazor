@@ -1,0 +1,110 @@
+using System;
+
+namespace Radzen.Documents.Pdf;
+
+#nullable enable
+
+/// <summary>
+/// Represents an RGBA color with 8 bits per channel.
+/// </summary>
+public readonly struct Color : IEquatable<Color>
+{
+    private Color(byte a, byte r, byte g, byte b)
+    {
+        A = a;
+        R = r;
+        G = g;
+        B = b;
+    }
+
+    /// <summary>
+    /// Gets the alpha channel (0 transparent, 255 opaque).
+    /// </summary>
+    public byte A { get; }
+
+    /// <summary>
+    /// Gets the red channel.
+    /// </summary>
+    public byte R { get; }
+
+    /// <summary>
+    /// Gets the green channel.
+    /// </summary>
+    public byte G { get; }
+
+    /// <summary>
+    /// Gets the blue channel.
+    /// </summary>
+    public byte B { get; }
+
+    /// <summary>
+    /// Creates an opaque color from the specified red, green and blue channels.
+    /// </summary>
+    public static Color FromRgb(byte r, byte g, byte b) => new(255, r, g, b);
+
+    /// <summary>
+    /// Creates a color from the specified alpha, red, green and blue channels.
+    /// </summary>
+    public static Color FromArgb(byte a, byte r, byte g, byte b) => new(a, r, g, b);
+
+    /// <summary>
+    /// Creates a color from a CSS hex string. Supports <c>#RGB</c>, <c>#RRGGBB</c> and <c>#AARRGGBB</c>,
+    /// with or without a leading <c>#</c>.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="hex"/> is <see langword="null"/>.</exception>
+    /// <exception cref="FormatException"><paramref name="hex"/> is not a valid hex color.</exception>
+    public static Color FromHex(string hex)
+    {
+        ArgumentNullException.ThrowIfNull(hex);
+
+        var value = hex.StartsWith('#') ? hex.Substring(1) : hex;
+
+        switch (value.Length)
+        {
+            case 3:
+                return FromRgb(ParseNibble(value[0]), ParseNibble(value[1]), ParseNibble(value[2]));
+            case 6:
+                return FromRgb(ParseByte(value, 0), ParseByte(value, 2), ParseByte(value, 4));
+            case 8:
+                return FromArgb(ParseByte(value, 0), ParseByte(value, 2), ParseByte(value, 4), ParseByte(value, 6));
+            default:
+                throw new FormatException($"'{hex}' is not a valid hex color.");
+        }
+    }
+
+    private static byte ParseByte(string value, int index)
+        => (byte)((ParseHexDigit(value[index]) << 4) | ParseHexDigit(value[index + 1]));
+
+    private static byte ParseNibble(char c)
+    {
+        var nibble = ParseHexDigit(c);
+        return (byte)((nibble << 4) | nibble);
+    }
+
+    private static int ParseHexDigit(char c) => c switch
+    {
+        >= '0' and <= '9' => c - '0',
+        >= 'a' and <= 'f' => c - 'a' + 10,
+        >= 'A' and <= 'F' => c - 'A' + 10,
+        _ => throw new FormatException($"'{c}' is not a valid hex digit."),
+    };
+
+    /// <summary>
+    /// Determines whether two colors are equal.
+    /// </summary>
+    public static bool operator ==(Color left, Color right) => left.Equals(right);
+
+    /// <summary>
+    /// Determines whether two colors are not equal.
+    /// </summary>
+    public static bool operator !=(Color left, Color right) => !left.Equals(right);
+
+    /// <inheritdoc/>
+    public bool Equals(Color other) => A == other.A && R == other.R && G == other.G && B == other.B;
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => obj is Color other && Equals(other);
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => HashCode.Combine(A, R, G, B);
+}
