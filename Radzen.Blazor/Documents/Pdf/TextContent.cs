@@ -23,9 +23,13 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     /// <summary>Gets or sets the fill color of the text. Defaults to black.</summary>
     public Color Color { get; set; } = Color.Black;
 
+    // Resource name captured when materializing a loaded page; when set, re-emission
+    // keeps the original /Font reference instead of registering a base-14 face.
+    internal string? FontResourceName { get; set; }
+
     internal override void EmitBody(ContentWriter writer)
     {
-        var key = writer.RegisterFont(Font);
+        var key = FontResourceName ?? writer.RegisterFont(Font);
 
         writer.WriteRaw("BT\n");
         writer.WriteColor(Color, "rg");

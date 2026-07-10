@@ -23,6 +23,12 @@ internal static class ContentInterpreter
         var textMatrix = Matrix.Identity;
         var lineMatrix = Matrix.Identity;
         var fontSize = 0.0;
+        string? fontName = null;
+
+        var currentX = 0.0;
+        var currentY = 0.0;
+        var startX = 0.0;
+        var startY = 0.0;
 
         var pathOps = new List<PathOp>();
         var operands = new List<Token>();
@@ -113,6 +119,7 @@ internal static class ContentInterpreter
                     break;
 
                 case "Tf":
+                    fontName = LastName(operands);
                     fontSize = LastNumber(operands);
                     break;
 
@@ -128,27 +135,85 @@ internal static class ContentInterpreter
                     break;
 
                 case "Tj":
-                    EmitText(target, operands, textMatrix, state, fontSize, artifactDepth);
+                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth);
                     break;
 
                 case "TJ":
-                    EmitText(target, operands, textMatrix, state, fontSize, artifactDepth);
+                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth);
                     break;
 
                 case "m":
-                    pathOps.Add(new PathOp("m", [Number(operands, 0), Number(operands, 1)]));
+                {
+                    var x = Number(operands, 0);
+                    var y = Number(operands, 1);
+                    pathOps.Add(new PathOp("m", [x, y]));
+                    startX = currentX = x;
+                    startY = currentY = y;
                     break;
+                }
 
                 case "l":
-                    pathOps.Add(new PathOp("l", [Number(operands, 0), Number(operands, 1)]));
+                    currentX = Number(operands, 0);
+                    currentY = Number(operands, 1);
+                    pathOps.Add(new PathOp("l", [currentX, currentY]));
                     break;
 
                 case "c":
-                    pathOps.Add(new PathOp("c", Numbers(operands, 6)));
+                {
+                    var n = Numbers(operands, 6);
+                    pathOps.Add(new PathOp("c", n));
+                    currentX = n[4];
+                    currentY = n[5];
                     break;
+                }
+
+                case "v":
+                {
+                    var n = Numbers(operands, 4);
+                    pathOps.Add(new PathOp("c", [currentX, currentY, n[0], n[1], n[2], n[3]]));
+                    currentX = n[2];
+                    currentY = n[3];
+                    break;
+                }
+
+                case "y":
+                {
+                    var n = Numbers(operands, 4);
+                    pathOps.Add(new PathOp("c", [n[0], n[1], n[2], n[3], n[2], n[3]]));
+                    currentX = n[2];
+                    currentY = n[3];
+                    break;
+                }
+
+                case "re":
+                {
+                    var n = Numbers(operands, 4);
+                    pathOps.Add(new PathOp("m", [n[0], n[1]]));
+                    pathOps.Add(new PathOp("l", [n[0] + n[2], n[1]]));
+                    pathOps.Add(new PathOp("l", [n[0] + n[2], n[1] + n[3]]));
+                    pathOps.Add(new PathOp("l", [n[0], n[1] + n[3]]));
+                    pathOps.Add(new PathOp("h", []));
+                    startX = currentX = n[0];
+                    startY = currentY = n[1];
+                    break;
+                }
 
                 case "h":
                     pathOps.Add(new PathOp("h", []));
+                    currentX = startX;
+                    currentY = startY;
+                    break;
+
+                case "Do":
+                    if (LastName(operands) is { } xobject)
+                    {
+                        target.Add(new XObjectContent(xobject)
+                        {
+                            Transform = state.Ctm,
+                            IsArtifact = artifactDepth > 0,
+                        });
+                    }
+
                     break;
 
                 case "S":
@@ -197,7 +262,7 @@ internal static class ContentInterpreter
         }
     }
 
-    private static void EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, double fontSize, int artifactDepth)
+    private static void EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, string? fontName, double fontSize, int artifactDepth)
     {
         var bytes = LastString(operands);
         if (bytes is null)
@@ -208,6 +273,7 @@ internal static class ContentInterpreter
         target.Add(new TextContent(Decode(bytes), 0, 0)
         {
             Font = new Font { Size = fontSize },
+            FontResourceName = fontName,
             Color = state.Fill,
             Transform = textMatrix * state.Ctm,
             IsArtifact = artifactDepth > 0,
@@ -322,6 +388,19 @@ internal static class ContentInterpreter
         }
 
         return 0.0;
+    }
+
+    private static string? LastName(List<Token> operands)
+    {
+        for (var i = operands.Count - 1; i >= 0; i--)
+        {
+            if (operands[i].Kind == TokenKind.Name)
+            {
+                return operands[i].Text;
+            }
+        }
+
+        return null;
     }
 
     private static byte[]? LastString(List<Token> operands)

@@ -160,6 +160,7 @@ internal sealed class DocumentGenerator
                 Generated = generated,
             };
             page.SetContent(generated.Content);
+            page.SetTextFonts(BuildExtractionFonts(generated));
             document.Pages.Insert(document.Pages.Count, page);
         }
 
@@ -826,6 +827,20 @@ internal sealed class DocumentGenerator
         }
 
         return generated;
+    }
+
+    // Reverse maps for fresh (unsaved) text extraction: embedded Type0 fonts decode
+    // their glyph-id codes through the accumulated gid-to-Unicode table, mirroring
+    // the /ToUnicode CMap the embedder writes on save.
+    private static Dictionary<string, ReverseFont> BuildExtractionFonts(GeneratedPage generated)
+    {
+        var map = new Dictionary<string, ReverseFont>(System.StringComparer.Ordinal);
+        foreach (var font in generated.Fonts)
+        {
+            map[font.Key] = font.Sfnt is null ? ReverseFont.WinAnsi : ReverseFont.FromGlyphIds(font.GidToUnicode);
+        }
+
+        return map;
     }
 
     private static GeneratedPage Finalize(PagePlan plan)
