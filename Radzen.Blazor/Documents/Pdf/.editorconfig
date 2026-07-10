@@ -13,3 +13,7 @@ dotnet_diagnostic.IDE0305.severity = warning
 
 # Simplified new(...) when the type is apparent
 dotnet_diagnostic.IDE0090.severity = warning
+
+# Index (^) and range (..) operators
+dotnet_diagnostic.IDE0056.severity = warning
+dotnet_diagnostic.IDE0057.severity = warning

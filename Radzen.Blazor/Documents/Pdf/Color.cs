@@ -57,7 +57,7 @@ public readonly struct Color : IEquatable<Color>
     {
         ArgumentNullException.ThrowIfNull(hex);
 
-        var value = hex.StartsWith('#') ? hex.Substring(1) : hex;
+        var value = hex.StartsWith('#') ? hex[1..] : hex;
 
         switch (value.Length)
         {

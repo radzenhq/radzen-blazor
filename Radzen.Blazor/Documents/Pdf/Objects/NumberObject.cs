@@ -97,8 +97,8 @@ public sealed class NumberObject : DocumentObject
         }
 
         var digits = dot < 0
-            ? text.Substring(start, eIndex - start)
-            : text.Substring(start, dot - start) + text.Substring(dot + 1, eIndex - dot - 1);
+            ? text[start..eIndex]
+            : text[start..dot] + text.Substring(dot + 1, eIndex - dot - 1);
         var integerLength = dot < 0 ? eIndex - start : dot - start;
         var pointPosition = integerLength + exponent;
 

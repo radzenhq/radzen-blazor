@@ -30,6 +30,6 @@ internal sealed class HorizontalMetrics
             return advanceWidths[glyphId];
         }
 
-        return advanceWidths[advanceWidths.Length - 1];
+        return advanceWidths[^1];
     }
 }
