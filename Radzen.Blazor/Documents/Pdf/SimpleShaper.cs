@@ -24,12 +24,15 @@ public sealed class SimpleShaper(FontCollection fonts) : ITextShaper
 
         var glyphs = new List<PositionedGlyph>(text.Length);
         double total = 0;
-        for (var i = 0; i < text.Length; i++)
+        var i = 0;
+        while (i < text.Length)
         {
-            var (face, glyph) = fonts.ResolveGlyph(primary, text[i]);
+            var codepoint = FontCollection.CodePointAt(text, i);
+            var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
             var advance = face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
             glyphs.Add(new PositionedGlyph(glyph, advance, i));
             total += advance;
+            i += codepoint > 0xFFFF ? 2 : 1;
         }
 
         return new GlyphRun(glyphs, font, total);

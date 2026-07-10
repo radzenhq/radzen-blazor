@@ -7,7 +7,9 @@ namespace Radzen.Documents.Pdf.Objects;
 /// A PDF literal string object (ISO 32000-1 section 7.3.4.2). Serialized in
 /// parentheses; the backslash and both parentheses are escaped, the named
 /// control escapes are used where applicable, and any other byte outside
-/// printable ASCII is written as a 3-digit octal escape.
+/// printable ASCII is written as a 3-digit octal escape. A value containing
+/// characters above U+00FF is written as a UTF-16BE text string with a byte
+/// order mark (ISO 32000-2 section 7.9.2.2).
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="StringObject"/> class.
@@ -27,9 +29,9 @@ public sealed class StringObject(string value) : DocumentObject
         var builder = new StringBuilder(Value.Length + 2);
         builder.Append('(');
 
-        foreach (var ch in Value)
+        foreach (var b in EncodeBytes(Value))
         {
-            var code = ch & 0xFF;
+            var code = (int)b;
             switch (code)
             {
                 case '\\':
@@ -72,6 +74,29 @@ public sealed class StringObject(string value) : DocumentObject
 
         builder.Append(')');
         PdfBytes.WriteAscii(stream, builder.ToString());
+    }
+
+    private static byte[] EncodeBytes(string value)
+    {
+        foreach (var ch in value)
+        {
+            if (ch > 0xFF)
+            {
+                var bytes = new byte[2 + Encoding.BigEndianUnicode.GetByteCount(value)];
+                bytes[0] = 0xFE;
+                bytes[1] = 0xFF;
+                Encoding.BigEndianUnicode.GetBytes(value, 0, value.Length, bytes, 2);
+                return bytes;
+            }
+        }
+
+        var raw = new byte[value.Length];
+        for (var i = 0; i < value.Length; i++)
+        {
+            raw[i] = (byte)value[i];
+        }
+
+        return raw;
     }
 
     private static string ToOctal(int code)
