@@ -36,7 +36,7 @@ public class Border
     /// </summary>
     public Color Color
     {
-        get => color ?? owner?.Color ?? Colors.Black;
+        get => color ?? owner?.Color ?? Color.Black;
         set => color = value;
     }
 

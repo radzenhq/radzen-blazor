@@ -23,5 +23,5 @@ public class Font
     public bool Underline { get; set; }
 
     /// <summary>Gets or sets the text color. Defaults to black.</summary>
-    public Color Color { get; set; } = Colors.Black;
+    public Color Color { get; set; } = Color.Black;
 }
