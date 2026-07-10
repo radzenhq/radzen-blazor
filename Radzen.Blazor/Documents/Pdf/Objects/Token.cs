@@ -1,5 +1,3 @@
-using System;
-
 namespace Radzen.Documents.Pdf.Objects;
 
 internal sealed class Token
