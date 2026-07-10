@@ -1,0 +1,62 @@
+using System.Linq;
+
+namespace Radzen.Documents.Pdf;
+
+#nullable enable
+
+/// <summary>
+/// A block of inline text runs with paragraph-level formatting.
+/// </summary>
+public class Paragraph : Block
+{
+    /// <summary>Gets the inline text runs.</summary>
+    public InlineCollection Inlines { get; } = new();
+
+    /// <summary>
+    /// Gets or sets the paragraph text. Getting returns the concatenation of the run texts, or
+    /// <see langword="null"/> when there are no runs. Setting <see langword="null"/> clears the runs;
+    /// setting a value replaces all runs with a single run holding that text.
+    /// </summary>
+    public string? Text
+    {
+        get => Inlines.Count == 0 ? null : string.Concat(Inlines.Select(run => run.Text));
+        set
+        {
+            Inlines.Clear();
+            if (value != null)
+            {
+                Inlines.Add(value);
+            }
+        }
+    }
+
+    /// <summary>Gets the paragraph font.</summary>
+    public Font Font { get; } = new();
+
+    /// <summary>Gets or sets the horizontal alignment. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
+    public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
+
+    /// <summary>Gets or sets the spacing before the paragraph.</summary>
+    public Unit SpacingBefore { get; set; }
+
+    /// <summary>Gets or sets the spacing after the paragraph.</summary>
+    public Unit SpacingAfter { get; set; }
+
+    /// <summary>Gets or sets the line spacing multiplier. Defaults to 1.0.</summary>
+    public double LineSpacing { get; set; } = 1.0;
+
+    /// <summary>Gets or sets the name of the applied named style.</summary>
+    public string? StyleName { get; set; }
+
+    /// <summary>Gets or sets a value indicating whether the paragraph is kept on a single page.</summary>
+    public bool KeepTogether { get; set; }
+
+    /// <summary>Gets or sets a value indicating whether the paragraph is kept with the next block.</summary>
+    public bool KeepWithNext { get; set; }
+
+    /// <summary>Gets or sets the minimum number of lines left at the top of a page. Defaults to 2.</summary>
+    public int Widows { get; set; } = 2;
+
+    /// <summary>Gets or sets the minimum number of lines left at the bottom of a page. Defaults to 2.</summary>
+    public int Orphans { get; set; } = 2;
+}
