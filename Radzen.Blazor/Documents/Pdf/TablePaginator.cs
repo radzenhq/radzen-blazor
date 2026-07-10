@@ -29,6 +29,12 @@ internal sealed class TableFragment
 internal static class TablePaginator
 {
     public static IReadOnlyList<TableFragment> Paginate(LaidOutTable layout, Table source, double availableHeight)
+        => Paginate(layout, source, availableHeight, availableHeight);
+
+    // The first fragment may get less room than the rest (it starts at the flow cursor);
+    // subsequent fragments start at the top of a fresh page.
+    public static IReadOnlyList<TableFragment> Paginate(
+        LaidOutTable layout, Table source, double firstAvailable, double subsequentAvailable)
     {
         List<int> headers = [];
         List<int> bodies = [];
@@ -55,12 +61,13 @@ internal static class TablePaginator
         while (true)
         {
             var startedNew = fragments.Count == 0 && body == 0;
+            var available = fragments.Count == 0 ? firstAvailable : subsequentAvailable;
             var running = headerHeight;
             List<int> placed = [];
             while (body < bodies.Count)
             {
                 var rowHeight = layout.RowHeights[bodies[body]];
-                if (placed.Count == 0 || running + rowHeight <= availableHeight + 1e-6)
+                if (placed.Count == 0 || running + rowHeight <= available + 1e-6)
                 {
                     placed.Add(bodies[body]);
                     running += rowHeight;

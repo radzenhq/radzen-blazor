@@ -13,6 +13,26 @@ internal sealed class PositionedLine
     public required double Y { get; init; }
 }
 
+internal sealed class PositionedTableFragment
+{
+    public required LaidOutTable Layout { get; init; }
+
+    public required TableFragment Fragment { get; init; }
+
+    public required double Y { get; init; }
+}
+
+internal sealed class PositionedImage
+{
+    public required Image Source { get; init; }
+
+    public required double Y { get; init; }
+
+    public required double Width { get; init; }
+
+    public required double Height { get; init; }
+}
+
 internal sealed class PaginatedPage
 {
     public required PageSize Size { get; init; }
@@ -26,31 +46,45 @@ internal sealed class PaginatedPage
     public required IReadOnlyList<PositionedLine> Header { get; init; }
 
     public required IReadOnlyList<PositionedLine> Footer { get; init; }
+
+    public IReadOnlyList<PositionedTableFragment> Tables { get; init; } = [];
+
+    public IReadOnlyList<PositionedImage> Images { get; init; } = [];
 }
 
 internal static class Paginator
 {
     private const double Eps = 1e-6;
 
-    public static IReadOnlyList<PaginatedPage> Paginate(DocumentBuilder document, FontCollection fonts)
+    public static IReadOnlyList<PaginatedPage> Paginate(
+        DocumentBuilder document,
+        FontCollection fonts,
+        System.Func<Image, (double Width, double Height)>? measureImage = null)
     {
         var pages = new List<PaginatedPage>();
         foreach (var section in document.Sections)
         {
-            PaginateSection(section, fonts, pages);
+            PaginateSection(section, fonts, pages, measureImage);
         }
 
         return pages;
     }
 
-    public static IReadOnlyList<PaginatedPage> Paginate(Section section, FontCollection fonts)
+    public static IReadOnlyList<PaginatedPage> Paginate(
+        Section section,
+        FontCollection fonts,
+        System.Func<Image, (double Width, double Height)>? measureImage = null)
     {
         var pages = new List<PaginatedPage>();
-        PaginateSection(section, fonts, pages);
+        PaginateSection(section, fonts, pages, measureImage);
         return pages;
     }
 
-    private static void PaginateSection(Section section, FontCollection fonts, List<PaginatedPage> pages)
+    private static void PaginateSection(
+        Section section,
+        FontCollection fonts,
+        List<PaginatedPage> pages,
+        System.Func<Image, (double Width, double Height)>? measureImage)
     {
         var (pageWidth, pageHeight) = EffectiveSize(section);
         var left = section.Margins.Left.Point;
@@ -67,6 +101,10 @@ internal static class Paginator
         var footer = LayoutBand(section.Footer, contentWidth, fonts);
 
         List<PositionedLine> current = [];
+        List<PositionedTableFragment> currentTables = [];
+        List<PositionedImage> currentImages = [];
+
+        bool HasPageContent() => current.Count > 0 || currentTables.Count > 0 || currentImages.Count > 0;
 
         void Flush()
         {
@@ -78,8 +116,62 @@ internal static class Paginator
                 Lines = current,
                 Header = header,
                 Footer = footer,
+                Tables = currentTables,
+                Images = currentImages,
             });
             current = [];
+            currentTables = [];
+            currentImages = [];
+        }
+
+        double cursor = 0;
+
+        // A table starts at the current cursor; its first fragment gets the remaining
+        // height and only breaks early when the repeating header plus the first body
+        // row cannot fit. Every later fragment starts a fresh page at full height.
+        void PlaceTable(Table table)
+        {
+            var layout = TableLayout.Layout(table, contentWidth, fonts);
+
+            double headerHeight = 0;
+            double firstBodyHeight = 0;
+            var seenBody = false;
+            for (var r = 0; r < table.Rows.Count; r++)
+            {
+                if (table.Rows[r].IsHeader)
+                {
+                    headerHeight += layout.RowHeights[r];
+                }
+                else if (!seenBody)
+                {
+                    firstBodyHeight = layout.RowHeights[r];
+                    seenBody = true;
+                }
+            }
+
+            if (HasPageContent() && cursor + headerHeight + firstBodyHeight > contentHeight + Eps)
+            {
+                Flush();
+                cursor = 0;
+            }
+
+            var fragments = TablePaginator.Paginate(layout, table, contentHeight - cursor, contentHeight);
+            for (var f = 0; f < fragments.Count; f++)
+            {
+                if (f > 0)
+                {
+                    Flush();
+                    cursor = 0;
+                }
+
+                currentTables.Add(new PositionedTableFragment
+                {
+                    Layout = layout,
+                    Fragment = fragments[f],
+                    Y = cursor,
+                });
+                cursor += fragments[f].Height;
+            }
         }
 
         var blocks = section.Blocks;
@@ -93,7 +185,6 @@ internal static class Paginator
         }
 
         var startPageCount = pages.Count;
-        double cursor = 0;
 
         for (var i = 0; i < blocks.Count; i++)
         {
@@ -102,6 +193,32 @@ internal static class Paginator
             {
                 Flush();
                 cursor = 0;
+                continue;
+            }
+
+            if (block is Table table)
+            {
+                PlaceTable(table);
+                continue;
+            }
+
+            if (block is Image image)
+            {
+                var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image) : measureImage(image);
+                if (cursor + imageHeight > contentHeight + Eps && HasPageContent())
+                {
+                    Flush();
+                    cursor = 0;
+                }
+
+                currentImages.Add(new PositionedImage
+                {
+                    Source = image,
+                    Y = cursor,
+                    Width = imageWidth,
+                    Height = imageHeight,
+                });
+                cursor += imageHeight;
                 continue;
             }
 
@@ -140,7 +257,7 @@ internal static class Paginator
                 if (k >= nrem)
                 {
                     placeCount = nrem;
-                    if (first && para.KeepWithNext && current.Count > 0 &&
+                    if (first && para.KeepWithNext && HasPageContent() &&
                         NextFirstLine(blocks, broken, i, out var nextSpacingBefore, out var nextHeight))
                     {
                         var afterCursor = blockTop + SumHeights(lines, offset, placeCount) + spacingAfter;
@@ -183,7 +300,7 @@ internal static class Paginator
                     }
                 }
 
-                if (moveWhole && current.Count == 0)
+                if (moveWhole && !HasPageContent())
                 {
                     moveWhole = false;
                     placeCount = k >= nrem ? nrem : (k > 0 ? k : 1);
@@ -219,11 +336,14 @@ internal static class Paginator
             }
         }
 
-        if (current.Count > 0 || pages.Count == startPageCount)
+        if (HasPageContent() || pages.Count == startPageCount)
         {
             Flush();
         }
     }
+
+    private static (double Width, double Height) MeasureImage(Image image)
+        => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data));
 
     private static bool NextFirstLine(
         BlockCollection blocks,
