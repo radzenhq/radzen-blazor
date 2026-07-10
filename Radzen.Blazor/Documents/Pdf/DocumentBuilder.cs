@@ -18,4 +18,21 @@ public class DocumentBuilder
 
     /// <summary>Gets the font collection used to register and resolve fonts.</summary>
     public FontCollection Fonts { get; } = new();
+
+    /// <summary>
+    /// Runs the layout engine over the sections and produces a physical <see cref="Document"/>.
+    /// Paragraphs flow across pages, tables lay out and paginate (repeating header rows),
+    /// images decode and scale to their box, registered fonts embed as Type0/CID and base-14
+    /// families embed by name.
+    /// </summary>
+    /// <returns>The generated document.</returns>
+    public Document Build() => DocumentGenerator.Generate(this);
+
+    /// <summary>Builds the document and serializes it to the given stream.</summary>
+    /// <param name="stream">The destination stream.</param>
+    public void SaveToStream(System.IO.Stream stream) => Build().SaveToStream(stream);
+
+    /// <summary>Builds the document and serializes it to a byte array.</summary>
+    /// <returns>The complete PDF file bytes.</returns>
+    public byte[] ToArray() => Build().ToArray();
 }

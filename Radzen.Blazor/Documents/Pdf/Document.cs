@@ -273,6 +273,9 @@ public sealed class Document
         var importer = source is not null ? new GraphImporter(source, writer) : null;
         var pageNodes = new List<(Page Page, DictionaryObject Node, ReferenceObject Reference)>();
 
+        var fontRefs = new Dictionary<GeneratedFont, DocumentObject>();
+        var imageRefs = new Dictionary<GeneratedImage, ReferenceObject>();
+
         var kids = new ArrayObject();
         foreach (var page in Pages)
         {
@@ -285,17 +288,29 @@ public sealed class Document
 
             var pageRef = writer.Add(pageNode);
 
-            var contentBytes = page.BuildContent(out var emitter);
-            if (contentBytes is not null)
+            if (page.Generated is { } generated)
             {
-                pageNode["Contents"] = writer.Add(new StreamObject(contentBytes));
-
-                if (emitter is not null)
+                pageNode["Contents"] = writer.Add(new StreamObject(generated.Content));
+                var resources = BuildGeneratedResources(writer, generated, fontRefs, imageRefs);
+                if (resources is not null)
                 {
-                    var resources = BuildResources(emitter);
-                    if (resources is not null)
+                    pageNode["Resources"] = resources;
+                }
+            }
+            else
+            {
+                var contentBytes = page.BuildContent(out var emitter);
+                if (contentBytes is not null)
+                {
+                    pageNode["Contents"] = writer.Add(new StreamObject(contentBytes));
+
+                    if (emitter is not null)
                     {
-                        pageNode["Resources"] = resources;
+                        var resources = BuildResources(emitter);
+                        if (resources is not null)
+                        {
+                            pageNode["Resources"] = resources;
+                        }
                     }
                 }
             }
@@ -362,6 +377,90 @@ public sealed class Document
         {
             catalog["AcroForm"] = importer.ImportInstance(sourceAcroForm);
         }
+    }
+
+    private static DictionaryObject? BuildGeneratedResources(
+        DocumentWriter writer,
+        GeneratedPage page,
+        Dictionary<GeneratedFont, DocumentObject> fontRefs,
+        Dictionary<GeneratedImage, ReferenceObject> imageRefs)
+    {
+        DictionaryObject? fonts = null;
+        foreach (var font in page.Fonts)
+        {
+            fonts ??= new DictionaryObject();
+            fonts[font.Key] = ResolveFont(writer, font, fontRefs);
+        }
+
+        DictionaryObject? xobjects = null;
+        foreach (var image in page.Images)
+        {
+            xobjects ??= new DictionaryObject();
+            xobjects[image.Key] = ResolveImage(writer, image, imageRefs);
+        }
+
+        if (fonts is null && xobjects is null)
+        {
+            return null;
+        }
+
+        var resources = new DictionaryObject();
+        if (fonts is not null)
+        {
+            resources["Font"] = fonts;
+        }
+
+        if (xobjects is not null)
+        {
+            resources["XObject"] = xobjects;
+        }
+
+        return resources;
+    }
+
+    private static DocumentObject ResolveFont(DocumentWriter writer, GeneratedFont font, Dictionary<GeneratedFont, DocumentObject> cache)
+    {
+        if (cache.TryGetValue(font, out var existing))
+        {
+            return existing;
+        }
+
+        DocumentObject reference;
+        if (font.Sfnt is { } sfnt)
+        {
+            reference = Fonts.Type0FontEmbedder.Embed(writer, sfnt, font.GidToUnicode);
+        }
+        else
+        {
+            reference = new DictionaryObject
+            {
+                ["Type"] = new NameObject("Font"),
+                ["Subtype"] = new NameObject("Type1"),
+                ["BaseFont"] = new NameObject(font.Base14 ?? "Helvetica"),
+                ["Encoding"] = new NameObject("WinAnsiEncoding"),
+            };
+        }
+
+        cache[font] = reference;
+        return reference;
+    }
+
+    private static ReferenceObject ResolveImage(DocumentWriter writer, GeneratedImage image, Dictionary<GeneratedImage, ReferenceObject> cache)
+    {
+        if (cache.TryGetValue(image, out var existing))
+        {
+            return existing;
+        }
+
+        var xobject = image.Image;
+        if (xobject.SoftMask is { } mask)
+        {
+            xobject.Image.Dictionary["SMask"] = writer.Add(mask);
+        }
+
+        var reference = writer.Add(xobject.Image);
+        cache[image] = reference;
+        return reference;
     }
 
     private static DictionaryObject? BuildResources(ContentWriter emitter)
