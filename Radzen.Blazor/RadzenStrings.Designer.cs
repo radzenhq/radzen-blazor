@@ -450,6 +450,8 @@ namespace Radzen.Blazor {
         public static string Gantt_WeekViewText { get { return ResourceManager.GetString("Gantt_WeekViewText", resourceCulture); } }
         public static string Gantt_MonthViewText { get { return ResourceManager.GetString("Gantt_MonthViewText", resourceCulture); } }
         public static string Gantt_YearViewText { get { return ResourceManager.GetString("Gantt_YearViewText", resourceCulture); } }
+        public static string Gantt_YearsViewText { get { return ResourceManager.GetString("Gantt_YearsViewText", resourceCulture); } }
+        public static string Gantt_QuarterFormat { get { return ResourceManager.GetString("Gantt_QuarterFormat", resourceCulture); } }
         public static string Gravatar_AlternateText { get { return ResourceManager.GetString("Gravatar_AlternateText", resourceCulture); } }
         public static string HtmlEditorAlignCenter_Title { get { return ResourceManager.GetString("HtmlEditorAlignCenter_Title", resourceCulture); } }
         public static string HtmlEditorAlignLeft_Title { get { return ResourceManager.GetString("HtmlEditorAlignLeft_Title", resourceCulture); } }
