@@ -50,21 +50,10 @@ public sealed class NameObject(string value) : DocumentObject
 
     private static bool IsDelimiter(int code)
     {
-        switch (code)
+        return code switch
         {
-            case '(':
-            case ')':
-            case '<':
-            case '>':
-            case '[':
-            case ']':
-            case '{':
-            case '}':
-            case '/':
-            case '%':
-                return true;
-            default:
-                return false;
-        }
+            '(' or ')' or '<' or '>' or '[' or ']' or '{' or '}' or '/' or '%' => true,
+            _ => false,
+        };
     }
 }

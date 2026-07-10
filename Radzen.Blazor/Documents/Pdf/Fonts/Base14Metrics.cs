@@ -81,25 +81,18 @@ internal sealed class Base14Metrics
             return null;
         }
 
-        switch (name.ToLowerInvariant())
+        return name.ToLowerInvariant() switch
         {
-            case "helvetica":
-                return StyleSuffix(font, "Helvetica", "-Bold", "-Oblique", "-BoldOblique");
-            case "courier":
-                return StyleSuffix(font, "Courier", "-Bold", "-Oblique", "-BoldOblique");
-            case "times":
-            case "times-roman":
-                return font.Bold && font.Italic ? "Times-BoldItalic"
-                    : font.Bold ? "Times-Bold"
-                    : font.Italic ? "Times-Italic"
-                    : "Times-Roman";
-            case "symbol":
-                return "Symbol";
-            case "zapfdingbats":
-                return "ZapfDingbats";
-            default:
-                return EntryByName.ContainsKey(name) ? name : null;
-        }
+            "helvetica" => StyleSuffix(font, "Helvetica", "-Bold", "-Oblique", "-BoldOblique"),
+            "courier" => StyleSuffix(font, "Courier", "-Bold", "-Oblique", "-BoldOblique"),
+            "times" or "times-roman" => font.Bold && font.Italic ? "Times-BoldItalic"
+                                : font.Bold ? "Times-Bold"
+                                : font.Italic ? "Times-Italic"
+                                : "Times-Roman",
+            "symbol" => "Symbol",
+            "zapfdingbats" => "ZapfDingbats",
+            _ => EntryByName.ContainsKey(name) ? name : null,
+        };
     }
 
     private static string StyleSuffix(Font font, string family, string bold, string italic, string boldItalic)

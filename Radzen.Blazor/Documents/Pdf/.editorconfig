@@ -20,3 +20,6 @@ dotnet_diagnostic.IDE0057.severity = warning
 
 # Primary constructors
 dotnet_diagnostic.IDE0290.severity = warning
+
+# Switch expressions
+dotnet_diagnostic.IDE0066.severity = warning
