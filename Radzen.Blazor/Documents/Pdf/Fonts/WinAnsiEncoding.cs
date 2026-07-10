@@ -98,6 +98,13 @@ internal static class WinAnsiEncoding
         return map;
     }
 
+    public static bool TryGetChar(byte code, out char c)
+    {
+        var cp = CodePoints[code];
+        c = (char)cp;
+        return cp != 0;
+    }
+
     public static bool TryGetCode(char c, out byte code) => CharToCode.TryGetValue(c, out code);
 
     public static bool CanEncode(char c) => CharToCode.ContainsKey(c);
