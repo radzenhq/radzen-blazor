@@ -63,8 +63,27 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Multiple { get; set; }
 
-        // Holds selected dates when Multiple is true
+        /// <summary>
+        /// Gets or sets whether a date range can be selected.
+        /// When enabled, users select a start and an end date from the calendar - by clicking them or by dragging
+        /// from one day to another - and the value will be a collection containing the start and end dates.
+        /// </summary>
+        /// <value><c>true</c> to enable date range selection; otherwise, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Range { get; set; }
+
+        // Holds selected dates when Multiple or Range is true
         List<DateTime> selectedDates = new List<DateTime>();
+
+        // True while a range selection is in progress (start picked, end pending) when Range is true
+        bool rangeSelecting;
+
+        // True when the current mouse press started the range (drag origin); releasing on the same day
+        // must not complete the range so that click-click selection works
+        bool rangeStartedByPress;
+
+        // The day the pointer is over while a range selection is in progress, used to preview the range
+        DateTime? rangePreviewDate;
 
         private string? calendarWeekTitle;
 
@@ -209,12 +228,41 @@ namespace Radzen.Blazor
 
         internal bool IsDateSelected(DateTime date)
         {
+            if (Range)
+            {
+                if (selectedDates.Count == 2)
+                {
+                    return date.Date >= selectedDates[0].Date && date.Date <= selectedDates[1].Date;
+                }
+
+                return selectedDates.Any(d => d.Date == date.Date);
+            }
+
             if (Multiple)
             {
                 return selectedDates.Any(d => d.Date == date.Date);
             }
 
             return DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0;
+        }
+
+        // Gets the current range bounds - either the committed range or the preview while selecting
+        (DateTime Start, DateTime End)? GetRangeBounds()
+        {
+            if (!Range || selectedDates.Count == 0)
+            {
+                return null;
+            }
+
+            if (selectedDates.Count == 2)
+            {
+                return (selectedDates[0].Date, selectedDates[1].Date);
+            }
+
+            var anchor = selectedDates[0].Date;
+            var preview = (rangePreviewDate ?? anchor).Date;
+
+            return preview < anchor ? (preview, anchor) : (anchor, preview);
         }
 
         internal string GetCalendarAriaLabel()
@@ -744,6 +792,12 @@ namespace Radzen.Blazor
                 FocusedDate = newDate;
                 CurrentDate = newDate;
                 shouldFocusDay = true;
+
+                if (Range && rangeSelecting)
+                {
+                    rangePreviewDate = newDate.Date;
+                }
+
                 return;
             }
 
@@ -807,7 +861,7 @@ namespace Radzen.Blazor
                 preventKeyPress = true;
                 stopKeydownPropagation = true;
 
-                if (ShowTime && !Multiple)
+                if (ShowTime && !Multiple && !Range)
                 {
                     // Apply the date part, keep the popup open, move focus to the hour input.
                     CurrentDate = ClampToMinMax(new DateTime(date.Year, date.Month, date.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second));
@@ -856,7 +910,7 @@ namespace Radzen.Blazor
                 {
                     _currentDate = default(DateTime);
 
-                    if (Multiple)
+                    if (Multiple || Range)
                     {
                         if (value == null)
                         {
@@ -951,6 +1005,12 @@ namespace Radzen.Blazor
                             selectedDates.Clear();
                             _value = null;
                             _dateTimeValue = null;
+                        }
+
+                        if (Range)
+                        {
+                            rangeSelecting = selectedDates.Count == 1;
+                            rangePreviewDate = null;
                         }
                     }
                     else
@@ -1114,7 +1174,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Multiple ? selectedDates.Count > 0 : (DateTimeValue.HasValue && DateTimeValue != default(DateTime) && DateTimeValue != DateTime.MaxValue);
+                return Multiple || Range ? selectedDates.Count > 0 : (DateTimeValue.HasValue && DateTimeValue != default(DateTime) && DateTimeValue != DateTime.MaxValue);
             }
         }
 
@@ -1131,10 +1191,10 @@ namespace Radzen.Blazor
                     return "";
                 }
 
-                if (Multiple)
+                if (Multiple || Range)
                 {
                     var format = string.IsNullOrEmpty(DateFormat) ? "d" : DateFormat;
-                    return string.Join(", ", selectedDates.Select(d => d.ToString(format, Culture)));
+                    return string.Join(Range ? " - " : ", ", selectedDates.Select(d => d.ToString(format, Culture)));
                 }
 
                 return HasValue ? string.Format(Culture, "{0:" + DateFormat + "}", Value) : "";
@@ -1181,9 +1241,32 @@ namespace Radzen.Blazor
 
             DateTime? newValue;
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
-            bool valid = TryParseInput(inputValue, out DateTime value);
 
             var nullable = Nullable.GetUnderlyingType(typeof(TValue)) != null || AllowClear;
+
+            if (Range)
+            {
+                if (!await TryParseRangeInput(inputValue))
+                {
+                    if (nullable)
+                    {
+                        await JSRuntime!.InvokeAsync<string>("Radzen.setInputValue", input, "");
+
+                        selectedDates.Clear();
+                        rangeSelecting = false;
+                        rangePreviewDate = null;
+                        await UpdateValueFromSelectedDates(null);
+                    }
+                    else
+                    {
+                        await JSRuntime!.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+                    }
+                }
+
+                return;
+            }
+
+            bool valid = TryParseInput(inputValue, out DateTime value);
 
             if (valid && !DateAttributes(value).Disabled)
             {
@@ -1255,6 +1338,14 @@ namespace Radzen.Blazor
             }
 
             var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+
+            if (Range)
+            {
+                // Ignore invalid intermediate input while the user is typing
+                await TryParseRangeInput(inputValue);
+                return;
+            }
+
             bool valid = TryParseInput(inputValue, out DateTime value);
 
             if (!valid || DateAttributes(value).Disabled)
@@ -1304,6 +1395,37 @@ namespace Radzen.Blazor
         [Parameter]
         public Func<string, DateTime?>? ParseInput { get; set; }
 
+        // Parses range input in the form "start - end" or a single start date. Returns true if the input was applied.
+        private async Task<bool> TryParseRangeInput(string inputValue)
+        {
+            var parts = (inputValue ?? "").Split(" - ").Select(p => p.Trim()).ToArray();
+
+            switch (parts.Length)
+            {
+                case 2 when TryParseInput(parts[0], out var start) && TryParseInput(parts[1], out var end)
+                                                                   && !DateAttributes(start).Disabled && !DateAttributes(end).Disabled:
+                    {
+                        if (end < start)
+                        {
+                            (start, end) = (end, start);
+                        }
+
+                        selectedDates = [DateTime.SpecifyKind(start.Date, Kind), DateTime.SpecifyKind(end.Date, Kind)];
+                        rangeSelecting = false;
+                        rangePreviewDate = null;
+                        await UpdateValueFromSelectedDates(end.Date);
+
+                        return true;
+                    }
+                case 1 when TryParseInput(parts[0], out var single) && !DateAttributes(single).Disabled:
+                    await StartRange(single.Date);
+
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         private bool TryParseInput(string inputValue, out DateTime value)
         {
             value = DateTime.MinValue;
@@ -1339,9 +1461,11 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if (Multiple)
+            if (Multiple || Range)
             {
                 selectedDates.Clear();
+                rangeSelecting = false;
+                rangePreviewDate = null;
                 _value = null;
                 _dateTimeValue = null;
 
@@ -1728,7 +1852,11 @@ namespace Radzen.Blazor
 
         private async Task SetDay(DateTime newValue)
         {
-            if (Multiple)
+            if (Range)
+            {
+                await SetRangeDay(newValue.Date);
+            }
+            else if (Multiple)
             {
                 var picked = new DateTime(newValue.Year, newValue.Month, newValue.Day, 0, 0, 0);
                 ToggleSelectedDate(picked);
@@ -1749,10 +1877,93 @@ namespace Radzen.Blazor
                     Close();
                 }
             }
-            if (!Multiple)
+            if (!Multiple && !Range)
             {
                 await FocusAsync();
             }
+        }
+
+        private async Task SetRangeDay(DateTime picked)
+        {
+            if (!rangeSelecting || selectedDates.Count == 0)
+            {
+                await StartRange(picked);
+            }
+            else
+            {
+                await CompleteRange(picked);
+            }
+        }
+
+        private async Task StartRange(DateTime picked)
+        {
+            selectedDates = [DateTime.SpecifyKind(picked, Kind)];
+            rangeSelecting = true;
+            rangePreviewDate = picked;
+            FocusedDate = picked;
+
+            await UpdateValueFromSelectedDates(picked);
+        }
+
+        private async Task CompleteRange(DateTime picked)
+        {
+            var anchor = selectedDates[0];
+            var start = anchor <= picked ? anchor : picked;
+            var end = anchor <= picked ? picked : anchor;
+            selectedDates = [DateTime.SpecifyKind(start, Kind), DateTime.SpecifyKind(end, Kind)];
+            rangeSelecting = false;
+            rangePreviewDate = null;
+
+            await UpdateValueFromSelectedDates(picked);
+        }
+
+        internal Func<Task>? RangeMouseDownHandler(DateTime date, DateRenderEventArgs dateArgs)
+        {
+            if (!Range || Disabled || dateArgs.Disabled)
+            {
+                return null;
+            }
+
+            return async () =>
+            {
+                if (!rangeSelecting || selectedDates.Count == 0)
+                {
+                    rangeStartedByPress = true;
+                    await StartRange(date.Date);
+                }
+                else
+                {
+                    rangeStartedByPress = false;
+                }
+            };
+        }
+
+        internal Func<Task>? RangeMouseUpHandler(DateTime date, DateRenderEventArgs dateArgs)
+        {
+            if (!Range || Disabled || dateArgs.Disabled)
+            {
+                return null;
+            }
+
+            return async () =>
+            {
+                if (rangeSelecting && selectedDates.Count > 0 && (date.Date != selectedDates[0].Date || !rangeStartedByPress))
+                {
+                    await CompleteRange(date.Date);
+                }
+
+                rangeStartedByPress = false;
+            };
+        }
+
+        internal Action? RangeMouseOverHandler(DateTime date, DateRenderEventArgs dateArgs)
+        {
+            if (!Range || !rangeSelecting || Disabled || dateArgs.Disabled)
+            {
+                return null;
+            }
+
+            return () => rangePreviewDate = date.Date;
         }
 
         void ToggleSelectedDate(DateTime date)
@@ -2024,10 +2235,15 @@ namespace Radzen.Blazor
 
         string GetDayCssClass(DateTime date, DateRenderEventArgs dateArgs, bool forCell = true)
         {
+            var rangeBounds = GetRangeBounds();
+
             var list = ClassList.Create()
                                .Add("rz-state-default", !forCell)
                                .Add("rz-calendar-other-month", GetCalendarMonth(CurrentDate) != GetCalendarMonth(date))
-                               .Add("rz-state-active", !forCell && (Multiple ? selectedDates.Any(d => d.Date == date.Date) : (DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)))
+                               .Add("rz-state-active", !forCell && (Multiple || Range ? selectedDates.Any(d => d.Date == date.Date) : (DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)))
+                               .Add("rz-calendar-range-start", forCell && rangeBounds.HasValue && date.Date == rangeBounds.Value.Start)
+                               .Add("rz-calendar-range-end", forCell && rangeBounds.HasValue && date.Date == rangeBounds.Value.End && rangeBounds.Value.End != rangeBounds.Value.Start)
+                               .Add("rz-calendar-range", forCell && rangeBounds.HasValue && date.Date > rangeBounds.Value.Start && date.Date < rangeBounds.Value.End)
                                .Add("rz-calendar-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-focused", !forCell && FocusedDate.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-disabled", !forCell && dateArgs.Disabled);

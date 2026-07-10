@@ -1659,5 +1659,431 @@ namespace Radzen.Blazor.Tests
             var wrapper = component.Find("div.rz-calendar-view-container");
             Assert.Null(wrapper.GetAttribute("tabindex"));
         }
+
+        static IRenderedComponent<RadzenDatePicker<TValue>> RenderRangePicker<TValue>(TestContext ctx, DateTime initial, Action<TValue> onValueChanged)
+        {
+            return ctx.RenderComponent<RadzenDatePicker<TValue>>(parameters =>
+            {
+                parameters.Add(p => p.Range, true);
+                parameters.Add(p => p.InitialViewDate, initial);
+                parameters.Add(p => p.ValueChanged, args => { onValueChanged(args); });
+            });
+        }
+
+        static AngleSharp.Dom.IElement FindDay(IRenderedFragment component, string day)
+        {
+            return component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == day).ParentElement;
+        }
+
+        static void PressDay(IRenderedFragment component, string day)
+        {
+            component.InvokeAsync(() => FindDay(component, day).MouseDown());
+            component.InvokeAsync(() => FindDay(component, day).MouseUp());
+        }
+
+        [Fact]
+        public void DatePicker_Range_ClickClick_Selects_StartAndEnd()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            PressDay(component, "10");
+            PressDay(component, "15");
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Equal(new DateTime(2024, 1, 10), list[0].Value.Date);
+            Assert.Equal(new DateTime(2024, 1, 15), list[1].Value.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Range_FirstClick_Emits_StartOnly()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            PressDay(component, "10");
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Single(list);
+            Assert.Equal(new DateTime(2024, 1, 10), list[0].Value.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Range_Drag_Selects_Range()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            component.InvokeAsync(() => FindDay(component, "10").MouseDown());
+            component.InvokeAsync(() => FindDay(component, "12").MouseOver());
+            component.InvokeAsync(() => FindDay(component, "15").MouseUp());
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Equal(new DateTime(2024, 1, 10), list[0].Value.Date);
+            Assert.Equal(new DateTime(2024, 1, 15), list[1].Value.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Range_BackwardsDrag_Normalizes_StartAndEnd()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            component.InvokeAsync(() => FindDay(component, "20").MouseDown());
+            component.InvokeAsync(() => FindDay(component, "5").MouseUp());
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Equal(new DateTime(2024, 1, 5), list[0].Value.Date);
+            Assert.Equal(new DateTime(2024, 1, 20), list[1].Value.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Range_SecondClick_OnEarlierDay_Normalizes_StartAndEnd()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            PressDay(component, "20");
+            PressDay(component, "5");
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Equal(new DateTime(2024, 1, 5), list[0].Value.Date);
+            Assert.Equal(new DateTime(2024, 1, 20), list[1].Value.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Range_TwoPresses_OnSameDay_Selects_SingleDayRange()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            PressDay(component, "10");
+            PressDay(component, "10");
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Equal(new DateTime(2024, 1, 10), list[0].Value.Date);
+            Assert.Equal(new DateTime(2024, 1, 10), list[1].Value.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Range_NewPress_AfterCompleteRange_StartsNewRange()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            PressDay(component, "10");
+            PressDay(component, "15");
+            PressDay(component, "20");
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Single(list);
+            Assert.Equal(new DateTime(2024, 1, 20), list[0].Value.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Range_Renders_RangeCssClasses_ForCompletedRange()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            PressDay(component, "10");
+            PressDay(component, "15");
+
+            Assert.Contains("rz-calendar-range-start", FindDay(component, "10").ClassList);
+            Assert.Contains("rz-calendar-range-end", FindDay(component, "15").ClassList);
+            Assert.Contains("rz-calendar-range", FindDay(component, "12").ClassList);
+            Assert.DoesNotContain("rz-calendar-range", FindDay(component, "16").ClassList);
+            Assert.Contains("rz-state-active", FindDay(component, "10").FirstElementChild.ClassList);
+            Assert.Contains("rz-state-active", FindDay(component, "15").FirstElementChild.ClassList);
+        }
+
+        [Fact]
+        public void DatePicker_Range_Preview_Highlights_WhileSelecting()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            component.InvokeAsync(() => FindDay(component, "10").MouseDown());
+            component.InvokeAsync(() => FindDay(component, "13").MouseOver());
+
+            Assert.Contains("rz-calendar-range-start", FindDay(component, "10").ClassList);
+            Assert.Contains("rz-calendar-range", FindDay(component, "11").ClassList);
+            Assert.Contains("rz-calendar-range", FindDay(component, "12").ClassList);
+            Assert.Contains("rz-calendar-range-end", FindDay(component, "13").ClassList);
+            Assert.DoesNotContain("rz-calendar-range", FindDay(component, "14").ClassList);
+        }
+
+        [Fact]
+        public void DatePicker_Range_InRangeDays_Are_AriaSelected()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            PressDay(component, "10");
+            PressDay(component, "15");
+
+            Assert.Equal("true", FindDay(component, "10").GetAttribute("aria-selected"));
+            Assert.Equal("true", FindDay(component, "12").GetAttribute("aria-selected"));
+            Assert.Equal("true", FindDay(component, "15").GetAttribute("aria-selected"));
+            Assert.Equal("false", FindDay(component, "16").GetAttribute("aria-selected"));
+        }
+
+        [Fact]
+        public void DatePicker_Range_FormattedValue_Shows_StartAndEnd()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime?>>>(parameters =>
+            {
+                parameters.Add(p => p.Range, true);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
+                parameters.Add(p => p.DateFormat, "dd/MM/yyyy");
+                parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
+                parameters.Add(p => p.ValueChanged, args => { emitted = args; });
+            });
+
+            PressDay(component, "10");
+            PressDay(component, "15");
+
+            Assert.Equal("10/01/2024 - 15/01/2024", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DatePicker_Range_Clear_Resets_Value()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime?>>>(parameters =>
+            {
+                parameters.Add(p => p.Range, true);
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
+                parameters.Add(p => p.ValueChanged, args => { emitted = args; });
+            });
+
+            PressDay(component, "10");
+            PressDay(component, "15");
+            Assert.NotNull(emitted);
+
+            await component.InvokeAsync(() => component.Find(".rz-dropdown-clear-icon").Click());
+
+            Assert.Null(emitted);
+            Assert.Equal("", component.Find("input").GetAttribute("value"));
+            Assert.DoesNotContain("rz-calendar-range-start", FindDay(component, "10").ClassList);
+            Assert.DoesNotContain("rz-state-active", FindDay(component, "10").FirstElementChild.ClassList);
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task DatePicker_Range_DisabledDates_CannotBeSelected()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime?>>>(parameters =>
+            {
+                parameters.Add(p => p.Range, true);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
+                parameters.Add(p => p.DateRender, args => { args.Disabled = args.Date.Date == new DateTime(2024, 1, 12); });
+                parameters.Add(p => p.ValueChanged, args => { emitted = args; });
+            });
+
+            try
+            {
+                await component.InvokeAsync(() => FindDay(component, "12").MouseDown());
+            }
+            catch (Bunit.MissingEventHandlerException)
+            {
+                // expected - disabled days have no range mouse handlers
+            }
+
+            Assert.Null(emitted);
+        }
+
+        [Fact]
+        public void DatePicker_Range_TypedInput_Parses_Range()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+            ctx.JSInterop.Setup<string>("Radzen.getInputValue", _ => true).SetResult("10/01/2024 - 15/01/2024");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime?>>>(parameters =>
+            {
+                parameters.Add(p => p.Range, true);
+                parameters.Add(p => p.DateFormat, "dd/MM/yyyy");
+                parameters.Add(p => p.Culture, CultureInfo.InvariantCulture);
+                parameters.Add(p => p.ValueChanged, args => { emitted = args; });
+            });
+
+            component.InvokeAsync(() => component.Find("input").Change("10/01/2024 - 15/01/2024"));
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Equal(new DateTime(2024, 1, 10), list[0].Value.Date);
+            Assert.Equal(new DateTime(2024, 1, 15), list[1].Value.Date);
+        }
+
+        [Fact]
+        public void DatePicker_Range_Accepts_Preset_Value()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime?>>>(parameters =>
+            {
+                parameters.Add(p => p.Range, true);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
+                parameters.Add(p => p.Value, new List<DateTime?> { new DateTime(2024, 1, 10), new DateTime(2024, 1, 15) });
+            });
+
+            Assert.Contains("rz-calendar-range-start", FindDay(component, "10").ClassList);
+            Assert.Contains("rz-calendar-range", FindDay(component, "12").ClassList);
+            Assert.Contains("rz-calendar-range-end", FindDay(component, "15").ClassList);
+        }
+
+        [Fact]
+        public void DatePicker_Range_Emits_DateOnlyNullable_Collection()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateOnly?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateOnly?>>(ctx, new DateTime(2024, 4, 1), args => emitted = args);
+
+            PressDay(component, "7");
+            PressDay(component, "9");
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Equal(new DateOnly(2024, 4, 7), list[0].Value);
+            Assert.Equal(new DateOnly(2024, 4, 9), list[1].Value);
+        }
+
+        [Fact]
+        public void DatePicker_Range_KeyboardNavigation_Previews_Range_WhileSelecting()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            component.InvokeAsync(() => FindDay(component, "10").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" }));
+            component.InvokeAsync(() => FindDay(component, "10").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" }));
+            component.InvokeAsync(() => FindDay(component, "11").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" }));
+
+            Assert.Contains("rz-calendar-range-start", FindDay(component, "10").ClassList);
+            Assert.Contains("rz-calendar-range", FindDay(component, "11").ClassList);
+            Assert.Contains("rz-calendar-range-end", FindDay(component, "12").ClassList);
+        }
+
+        [Fact]
+        public void DatePicker_Range_Keyboard_Selects_Range_WhenShowTimeIsSet()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime?>>>(parameters =>
+            {
+                parameters.Add(p => p.Range, true);
+                parameters.Add(p => p.ShowTime, true);
+                parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
+                parameters.Add(p => p.ValueChanged, args => { emitted = args; });
+            });
+
+            component.InvokeAsync(() => FindDay(component, "10").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" }));
+            component.InvokeAsync(() => FindDay(component, "15").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" }));
+
+            Assert.NotNull(emitted);
+            Assert.Equal(2, emitted.Count());
+        }
+
+        [Fact]
+        public void DatePicker_Range_Keyboard_EnterOnTwoDays_Selects_Range()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var component = RenderRangePicker<IEnumerable<DateTime?>>(ctx, new DateTime(2024, 1, 1), args => emitted = args);
+
+            component.InvokeAsync(() => FindDay(component, "10").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" }));
+            component.InvokeAsync(() => FindDay(component, "15").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "Enter" }));
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Equal(new DateTime(2024, 1, 10), list[0].Value.Date);
+            Assert.Equal(new DateTime(2024, 1, 15), list[1].Value.Date);
+        }
     }
 }

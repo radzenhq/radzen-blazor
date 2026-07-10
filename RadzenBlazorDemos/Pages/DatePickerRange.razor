@@ -1,0 +1,16 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select date range" Component="DatePickerRange" />
+    <RadzenDatePicker Range @bind-Value=@range TValue="IEnumerable<DateTime?>" Name="DatePickerRange" />
+</RadzenStack>
+<RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" class="rz-pb-12">
+    <RadzenText TextStyle="TextStyle.Body2">
+        Start: @(start?.ToString("D") ?? "not set"), End: @(end?.ToString("D") ?? "not set")
+    </RadzenText>
+</RadzenStack>
+
+@code {
+    IEnumerable<DateTime?> range;
+
+    DateTime? start => range?.FirstOrDefault();
+    DateTime? end => range?.Skip(1).FirstOrDefault();
+}

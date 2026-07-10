@@ -34,6 +34,8 @@ $datepicker-calendar-selected-color: var(--rz-on-secondary-dark) !default;
 $datepicker-calendar-selected-background-color: var(--rz-secondary-dark) !default;
 $datepicker-calendar-selected-hover-color: var(--rz-on-secondary) !default;
 $datepicker-calendar-selected-hover-background-color: var(--rz-secondary) !default;
+$datepicker-calendar-range-color: var(--rz-text-color) !default;
+$datepicker-calendar-range-background-color: var(--rz-secondary-lighter) !default;
 $datepicker-calendar-border: var(--rz-border-base-100) !default;
 $datepicker-calendar-border-radius: 0 !default;
 $datepicker-calendar-transition: var(--rz-transition-all) !default;
@@ -350,6 +352,16 @@ $timepicker-border: none !default;
         background-color: var(--rz-datepicker-calendar-selected-hover-background-color);
       }
     }
+
+    &.rz-calendar-range .rz-state-default:not(.rz-state-active) {
+      color: var(--rz-datepicker-calendar-range-color);
+      background-color: var(--rz-datepicker-calendar-range-background-color);
+      border-radius: 0;
+    }
+  }
+
+  &.rz-calendar-range-selection {
+    user-select: none;
   }
 
   .rz-state-disabled {

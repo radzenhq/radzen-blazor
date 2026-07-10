@@ -1,0 +1,22 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select date range" Component="DatePickerRangePresets" />
+    <RadzenDatePicker Range @bind-Value=@range TValue="IEnumerable<DateTime?>" Name="DatePickerRangePresets">
+        <FooterTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0.25rem" Wrap="FlexWrap.Wrap" class="rz-py-2">
+                <RadzenButton Text="Today" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Click=@(() => SetRange(DateTime.Today, DateTime.Today)) />
+                <RadzenButton Text="Yesterday" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Click=@(() => SetRange(DateTime.Today.AddDays(-1), DateTime.Today.AddDays(-1))) />
+                <RadzenButton Text="Last 7 days" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Click=@(() => SetRange(DateTime.Today.AddDays(-6), DateTime.Today)) />
+                <RadzenButton Text="This month" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Click=@(() => SetRange(new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1), new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month)))) />
+            </RadzenStack>
+        </FooterTemplate>
+    </RadzenDatePicker>
+</RadzenStack>
+
+@code {
+    IEnumerable<DateTime?> range;
+
+    void SetRange(DateTime start, DateTime end)
+    {
+        range = new DateTime?[] { start, end };
+    }
+}

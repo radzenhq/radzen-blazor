@@ -63,7 +63,7 @@
                         @if(ShowDays)
                         {
                         <div class="rz-calendar-view-container">
-                            <table class="rz-calendar-view rz-calendar-month-view" style="@(Inline ? "" : "width:100%")"
+                            <table class="rz-calendar-view rz-calendar-month-view@(Range ? " rz-calendar-range-selection" : "")" style="@(Inline ? "" : "width:100%")"
                                    role="grid" aria-label="@GetCalendarAriaLabel()">
                                 <thead>
                                     <tr role="row">
@@ -111,7 +111,10 @@
                                                     aria-label="@GetDayAriaLabel(date, dateArgs)"
                                                     aria-selected="@(IsDateSelected(date) ? "true" : "false")"
                                                     aria-disabled="@(dateArgs.Disabled ? "true" : null)"
-                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })"
+                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled && !Range) { await SetDay(date); } })"
+                                                    @onmousedown="@(RangeMouseDownHandler(date, dateArgs)!)"
+                                                    @onmouseup="@(RangeMouseUpHandler(date, dateArgs)!)"
+                                                    @onmouseover="@(RangeMouseOverHandler(date, dateArgs)!)"
                                                     @onkeydown="@(args => OnDayKeyDown(args, date, dateArgs))"
                                                     @onkeydown:preventDefault="preventKeyPress"
                                                     @onkeydown:stopPropagation="stopKeydownPropagation">
