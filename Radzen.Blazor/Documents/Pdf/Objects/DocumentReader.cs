@@ -182,7 +182,7 @@ public sealed class DocumentReader
             return;
         }
 
-        var handler = new StandardSecurityHandler(encrypt, ReadDocumentId(), Encoding.Latin1.GetBytes(password ?? ""));
+        var handler = new StandardSecurityHandler(encrypt, ReadDocumentId(), password ?? "");
         decryptionReady = handler.IsUserPassword || handler.IsOwnerPassword;
         if (!decryptionReady && throwOnFailure)
         {
@@ -190,6 +190,10 @@ public sealed class DocumentReader
         }
 
         security = handler;
+
+        // Objects cached before the handler existed were not decrypted.
+        cache.Clear();
+        objectStreams.Clear();
     }
 
     private byte[] ReadDocumentId()
@@ -208,10 +212,10 @@ public sealed class DocumentReader
         switch (value)
         {
             case StringObject text:
-                var plain = security!.Decrypt(Encoding.Latin1.GetBytes(text.Value), number, generation);
+                var plain = security!.DecryptString(Encoding.Latin1.GetBytes(text.Value), number, generation);
                 return new StringObject(Encoding.Latin1.GetString(plain));
             case StreamObject stream:
-                var decrypted = security!.Decrypt(stream.Data, number, generation);
+                var decrypted = security!.DecryptStream(stream.Data, number, generation);
                 var result = new StreamObject(decrypted);
                 foreach (var key in stream.Dictionary.Keys)
                 {
@@ -306,7 +310,17 @@ public sealed class DocumentReader
             if (Matches(index, "trailer"))
             {
                 index += 7;
-                return (DictionaryObject)ObjectParser.Parse(data, index);
+                var trailerDict = (DictionaryObject)ObjectParser.Parse(data, index);
+
+                // Hybrid-reference file (ISO 32000-1 7.5.8.4): the classic
+                // trailer points at a cross-reference stream holding the
+                // entries for compressed objects.
+                if (trailerDict.TryGetValue("XRefStm", out var hybrid) && hybrid is NumberObject hybridOffset)
+                {
+                    ParseXrefStreamAt((long)hybridOffset.DoubleValue);
+                }
+
+                return trailerDict;
             }
 
             var start = (int)ReadLong(ref index);
@@ -595,29 +609,14 @@ public sealed class DocumentReader
     public byte[] DecodeStream(StreamObject stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
-
-        var filter = stream.Dictionary.TryGetValue("Filter", out var filterObject) && filterObject is not null
-            ? Resolve(filterObject)
-            : null;
-        var names = FilterNames(filter);
-        if (names.Count == 0)
-        {
-            return stream.Data;
-        }
-
-        var parms = FilterParms(stream.Dictionary, names.Count);
-        var result = stream.Data;
-        for (var i = 0; i < names.Count; i++)
-        {
-            result = ApplyFilter(names[i], result, parms[i]);
-        }
-
-        return result;
+        return DecodeStreamData(stream.Dictionary, stream.Data);
     }
 
-    private static byte[] DecodeStreamData(DictionaryObject dictionary, byte[] data)
+    private byte[] DecodeStreamData(DictionaryObject dictionary, byte[] data)
     {
-        var filter = dictionary.TryGetValue("Filter", out var filterObject) ? filterObject : null;
+        var filter = dictionary.TryGetValue("Filter", out var filterObject) && filterObject is not null
+            ? Resolve(filterObject)
+            : null;
         var names = FilterNames(filter);
         if (names.Count == 0)
         {
@@ -672,7 +671,7 @@ public sealed class DocumentReader
     private static int ParmInt(DictionaryObject parms, string key, int fallback)
         => parms.TryGetValue(key, out var value) && value is NumberObject number ? number.IntValue : fallback;
 
-    private static List<string> FilterNames(DocumentObject? filter)
+    private List<string> FilterNames(DocumentObject? filter)
     {
         var names = new List<string>();
         if (filter is NameObject name)
@@ -683,7 +682,7 @@ public sealed class DocumentReader
         {
             foreach (var item in array)
             {
-                if (item is NameObject entryName)
+                if (Resolve(item) is NameObject entryName)
                 {
                     names.Add(entryName.Value);
                 }
@@ -693,7 +692,7 @@ public sealed class DocumentReader
         return names;
     }
 
-    private static List<DictionaryObject?> FilterParms(DictionaryObject dictionary, int count)
+    private List<DictionaryObject?> FilterParms(DictionaryObject dictionary, int count)
     {
         var parms = new List<DictionaryObject?>(count);
         DocumentObject? source = null;
@@ -706,11 +705,16 @@ public sealed class DocumentReader
             source = abbreviated;
         }
 
+        if (source is not null)
+        {
+            source = Resolve(source);
+        }
+
         if (source is ArrayObject array)
         {
             for (var i = 0; i < count; i++)
             {
-                parms.Add(i < array.Count ? array[i] as DictionaryObject : null);
+                parms.Add(i < array.Count ? Resolve(array[i]) as DictionaryObject : null);
             }
         }
         else
@@ -770,6 +774,53 @@ public sealed class DocumentReader
         }
 
         trailer["Size"] = new NumberObject(maxNumber + 1);
+
+        var preserved = FindRawTrailer();
+        if (preserved is not null)
+        {
+            foreach (var key in (string[])["Encrypt", "ID", "Info"])
+            {
+                if (preserved.TryGetValue(key, out var value) && value is not null)
+                {
+                    trailer[key] = value;
+                }
+            }
+
+            if (!trailer.TryGetValue("Root", out var root) || root is null)
+            {
+                if (preserved.TryGetValue("Root", out var preservedRoot) && preservedRoot is not null)
+                {
+                    trailer["Root"] = preservedRoot;
+                }
+            }
+        }
+    }
+
+    // Locates the last parseable trailer dictionary in the raw bytes so a
+    // repaired document keeps /Encrypt, /ID and /Info.
+    private DictionaryObject? FindRawTrailer()
+    {
+        const string pattern = "trailer";
+        for (var i = data.Length - pattern.Length; i >= 0; i--)
+        {
+            if (!Matches(i, pattern))
+            {
+                continue;
+            }
+
+            try
+            {
+                if (ObjectParser.Parse(data, i + pattern.Length) is DictionaryObject dictionary)
+                {
+                    return dictionary;
+                }
+            }
+            catch (DocumentParseException)
+            {
+            }
+        }
+
+        return null;
     }
 
     private Dictionary<int, long> ScannedOffsets()

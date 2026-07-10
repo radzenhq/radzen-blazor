@@ -66,7 +66,7 @@ internal sealed class ObjectParser
             return new ReferenceObject((int)token.IntValue, (int)generation.IntValue);
         }
 
-        return new NumberObject((int)token.IntValue);
+        return new NumberObject(token.IntValue);
     }
 
     private DocumentObject ParseArray()

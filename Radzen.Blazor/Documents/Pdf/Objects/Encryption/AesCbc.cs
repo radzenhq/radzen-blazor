@@ -56,10 +56,11 @@ internal static class AesCbc
     public static byte[] DecryptCbcNoPadding(byte[] key, byte[] iv, byte[] cipher)
     {
         var roundKeys = ExpandKey(key, out var rounds);
-        var result = new byte[cipher.Length];
+        var whole = cipher.Length / 16 * 16;
+        var result = new byte[whole];
         var previous = (byte[])iv.Clone();
         var block = new byte[16];
-        for (var offset = 0; offset < cipher.Length; offset += 16)
+        for (var offset = 0; offset < whole; offset += 16)
         {
             Array.Copy(cipher, offset, block, 0, 16);
             var decrypted = DecryptBlock(block, roundKeys, rounds);

@@ -19,6 +19,16 @@ public sealed class NumberObject : DocumentObject
     /// </summary>
     /// <param name="value">The integer value.</param>
     public NumberObject(int value)
+        : this((long)value)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new integer-valued instance of the <see cref="NumberObject"/>
+    /// class from a 64-bit value, preserving integers wider than 32 bits.
+    /// </summary>
+    /// <param name="value">The integer value.</param>
+    public NumberObject(long value)
     {
         integerValue = value;
         realValue = value;
@@ -52,8 +62,15 @@ public sealed class NumberObject : DocumentObject
     public double DoubleValue => IsInteger ? integerValue : realValue;
 
     /// <inheritdoc />
+    /// <exception cref="InvalidOperationException">The value is NaN or infinite; PDF
+    /// has no valid token for non-finite numbers (ISO 32000-1 section 7.3.3).</exception>
     public override void Write(Stream stream)
     {
+        if (!IsInteger && !double.IsFinite(realValue))
+        {
+            throw new InvalidOperationException("A PDF number cannot be NaN or infinite.");
+        }
+
         PdfBytes.WriteAscii(stream, IsInteger
             ? integerValue.ToString(CultureInfo.InvariantCulture)
             : FormatReal(realValue));
