@@ -2,99 +2,98 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Radzen.Documents.Pdf.Objects.Filters
+namespace Radzen.Documents.Pdf.Objects.Filters;
+
+/// <summary>
+/// Implements the PDF <c>ASCIIHexDecode</c> filter.
+/// </summary>
+public static class AsciiHexFilter
 {
+    const string HexDigits = "0123456789ABCDEF";
+
     /// <summary>
-    /// Implements the PDF <c>ASCIIHexDecode</c> filter.
+    /// Decodes ASCII hexadecimal data terminated by <c>&gt;</c>. Whitespace is ignored and a
+    /// trailing odd digit is padded with a zero.
     /// </summary>
-    public static class AsciiHexFilter
+    /// <param name="data">The encoded input.</param>
+    /// <returns>The decoded bytes.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidDataException">The input contains an invalid character.</exception>
+    public static byte[] Decode(byte[] data)
     {
-        const string HexDigits = "0123456789ABCDEF";
+        ArgumentNullException.ThrowIfNull(data);
 
-        /// <summary>
-        /// Decodes ASCII hexadecimal data terminated by <c>&gt;</c>. Whitespace is ignored and a
-        /// trailing odd digit is padded with a zero.
-        /// </summary>
-        /// <param name="data">The encoded input.</param>
-        /// <returns>The decoded bytes.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
-        /// <exception cref="InvalidDataException">The input contains an invalid character.</exception>
-        public static byte[] Decode(byte[] data)
+        var output = new List<byte>();
+        int high = -1;
+
+        foreach (byte b in data)
         {
-            ArgumentNullException.ThrowIfNull(data);
-
-            var output = new List<byte>();
-            int high = -1;
-
-            foreach (byte b in data)
+            if (b == (byte)'>')
             {
-                if (b == (byte)'>')
-                {
-                    break;
-                }
-
-                if (IsWhitespace(b))
-                {
-                    continue;
-                }
-
-                int value = HexValue(b);
-                if (value < 0)
-                {
-                    throw new InvalidDataException($"Invalid ASCIIHex character 0x{b:X2}.");
-                }
-
-                if (high < 0)
-                {
-                    high = value;
-                }
-                else
-                {
-                    output.Add((byte)((high << 4) | value));
-                    high = -1;
-                }
+                break;
             }
 
-            if (high >= 0)
+            if (IsWhitespace(b))
             {
-                output.Add((byte)(high << 4));
+                continue;
             }
 
-            return output.ToArray();
+            int value = HexValue(b);
+            if (value < 0)
+            {
+                throw new InvalidDataException($"Invalid ASCIIHex character 0x{b:X2}.");
+            }
+
+            if (high < 0)
+            {
+                high = value;
+            }
+            else
+            {
+                output.Add((byte)((high << 4) | value));
+                high = -1;
+            }
         }
 
-        /// <summary>
-        /// Encodes bytes as uppercase ASCII hexadecimal terminated by <c>&gt;</c>.
-        /// </summary>
-        /// <param name="data">The raw input.</param>
-        /// <returns>The encoded bytes.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
-        public static byte[] Encode(byte[] data)
+        if (high >= 0)
         {
-            ArgumentNullException.ThrowIfNull(data);
-
-            var output = new byte[data.Length * 2 + 1];
-            int j = 0;
-
-            foreach (byte b in data)
-            {
-                output[j++] = (byte)HexDigits[b >> 4];
-                output[j++] = (byte)HexDigits[b & 0x0F];
-            }
-
-            output[j] = (byte)'>';
-            return output;
+            output.Add((byte)(high << 4));
         }
 
-        static bool IsWhitespace(byte b) =>
-            b is 0 or 9 or 10 or 12 or 13 or 32;
-
-        static int HexValue(byte b) => b switch
-        {
-            >= (byte)'0' and <= (byte)'9' => b - '0',
-            >= (byte)'A' and <= (byte)'F' => b - 'A' + 10,
-            >= (byte)'a' and <= (byte)'f' => b - 'a' + 10,
-            _ => -1,
-        };
+        return output.ToArray();
     }
+
+    /// <summary>
+    /// Encodes bytes as uppercase ASCII hexadecimal terminated by <c>&gt;</c>.
+    /// </summary>
+    /// <param name="data">The raw input.</param>
+    /// <returns>The encoded bytes.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
+    public static byte[] Encode(byte[] data)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+
+        var output = new byte[data.Length * 2 + 1];
+        int j = 0;
+
+        foreach (byte b in data)
+        {
+            output[j++] = (byte)HexDigits[b >> 4];
+            output[j++] = (byte)HexDigits[b & 0x0F];
+        }
+
+        output[j] = (byte)'>';
+        return output;
+    }
+
+    static bool IsWhitespace(byte b) =>
+        b is 0 or 9 or 10 or 12 or 13 or 32;
+
+    static int HexValue(byte b) => b switch
+    {
+        >= (byte)'0' and <= (byte)'9' => b - '0',
+        >= (byte)'A' and <= (byte)'F' => b - 'A' + 10,
+        >= (byte)'a' and <= (byte)'f' => b - 'a' + 10,
+        _ => -1,
+    };
 }
