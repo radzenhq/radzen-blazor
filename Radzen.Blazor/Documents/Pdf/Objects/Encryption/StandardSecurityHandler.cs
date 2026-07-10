@@ -265,11 +265,11 @@ internal sealed class StandardSecurityHandler
 
         if (u.Length >= 48)
         {
-            var userHash = Hash2B(pw, u[32..40], []);
+            var userHash = HashPassword(pw, u[32..40], []);
             if (Equal(userHash, u, 32))
             {
                 IsUserPassword = true;
-                var intermediate = Hash2B(pw, u[40..48], []);
+                var intermediate = HashPassword(pw, u[40..48], []);
                 FileKey = AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, userEncrypted);
                 return;
             }
@@ -277,16 +277,23 @@ internal sealed class StandardSecurityHandler
 
         if (o.Length >= 48 && u.Length >= 48)
         {
-            var ownerHash = Hash2B(pw, o[32..40], u[..48]);
+            var ownerHash = HashPassword(pw, o[32..40], u[..48]);
             if (Equal(ownerHash, o, 32))
             {
                 IsOwnerPassword = true;
-                var intermediate = Hash2B(pw, o[40..48], u[..48]);
+                var intermediate = HashPassword(pw, o[40..48], u[..48]);
                 FileKey = AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, ownerEncrypted);
                 return;
             }
         }
     }
+
+    // Revision 5 (Acrobat 9 ExtensionLevel 3) hashes with a single SHA-256 pass;
+    // the iterated algorithm 2.B loop applies to revision 6 only.
+    private byte[] HashPassword(byte[] password, byte[] salt, byte[] userData)
+        => revision == 5
+            ? SHA256.HashData(Concat(password, salt, userData))
+            : Hash2B(password, salt, userData);
 
     // ISO 32000-2 algorithm 2.B.
     private static byte[] Hash2B(byte[] password, byte[] salt, byte[] userData)

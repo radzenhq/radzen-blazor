@@ -643,21 +643,26 @@ internal sealed class DocumentGenerator
         var i = 0;
         while (i < text.Length)
         {
-            if (fonts.TryResolveFallbackGlyph(text[i], out var face, out _) && !WinAnsiEncoding.TryGetCode(text[i], out _))
+            if (fonts.TryResolveFallbackGlyph(CodePointAt(text, i), out var face, out _) && !IsWinAnsi(CodePointAt(text, i)))
             {
                 var generated = ResolveSfnt(face);
                 var bytes = new List<byte>();
                 var advance = 0.0;
-                while (i < text.Length
-                    && !WinAnsiEncoding.TryGetCode(text[i], out _)
-                    && fonts.TryResolveFallbackGlyph(text[i], out var candidate, out var gid)
-                    && candidate == face)
+                while (i < text.Length)
                 {
-                    generated.GidToUnicode[gid] = text[i];
+                    var codepoint = CodePointAt(text, i);
+                    if (IsWinAnsi(codepoint)
+                        || !fonts.TryResolveFallbackGlyph(codepoint, out var candidate, out var gid)
+                        || candidate != face)
+                    {
+                        break;
+                    }
+
+                    generated.GidToUnicode[gid] = codepoint;
                     bytes.Add((byte)(gid >> 8));
                     bytes.Add((byte)(gid & 0xFF));
                     advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
-                    i++;
+                    i += codepoint > 0xFFFF ? 2 : 1;
                 }
 
                 plan.UsedFonts.Add(generated);
@@ -678,11 +683,12 @@ internal sealed class DocumentGenerator
                 var builderText = new System.Text.StringBuilder();
                 while (i < text.Length)
                 {
-                    if (WinAnsiEncoding.TryGetCode(text[i], out _))
+                    var codepoint = CodePointAt(text, i);
+                    if (IsWinAnsi(codepoint))
                     {
-                        builderText.Append(text[i]);
+                        builderText.Append((char)codepoint);
                     }
-                    else if (!fonts.TryResolveFallbackGlyph(text[i], out _, out _))
+                    else if (!fonts.TryResolveFallbackGlyph(codepoint, out _, out _))
                     {
                         builderText.Append('?');
                     }
@@ -691,7 +697,7 @@ internal sealed class DocumentGenerator
                         break;
                     }
 
-                    i++;
+                    i += codepoint > 0xFFFF ? 2 : 1;
                 }
 
                 var segment = builderText.ToString();
@@ -760,12 +766,10 @@ internal sealed class DocumentGenerator
         }
     }
 
-    // A lone surrogate yields its own code unit so it maps through the same
-    // gid-to-unicode path without throwing.
-    private static int CodePointAt(string text, int index)
-        => char.IsHighSurrogate(text[index]) && index + 1 < text.Length && char.IsLowSurrogate(text[index + 1])
-            ? char.ConvertToUtf32(text[index], text[index + 1])
-            : text[index];
+    private static int CodePointAt(string text, int index) => FontCollection.CodePointAt(text, index);
+
+    private static bool IsWinAnsi(int codepoint)
+        => codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out _);
 
     private GeneratedFont ResolveSfnt(SfntFont sfnt)
     {

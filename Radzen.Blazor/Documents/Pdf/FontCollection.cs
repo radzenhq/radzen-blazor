@@ -60,9 +60,11 @@ public sealed class FontCollection
     }
 
     /// <summary>
-    /// Measures the width of <paramref name="text"/> in points at <paramref name="font"/>'s size.
-    /// A registered family (matched by <see cref="Font.Name"/> and style) is measured from its
-    /// hmtx advances with per-character fallback; otherwise a base-14 font is measured. No
+    /// Measures the width of <paramref name="text"/> in points at <paramref name="font"/>'s size,
+    /// iterating Unicode codepoints. A registered family (matched by <see cref="Font.Name"/> and
+    /// style) is measured from its hmtx advances with per-codepoint fallback; a base-14 font is
+    /// measured from its WinAnsi widths, with fallback-served codepoints measured by the fallback
+    /// face and unmapped codepoints measured as the '?' substitute that emission draws. No
     /// kerning is applied.
     /// </summary>
     /// <param name="text">The text to measure.</param>
@@ -77,20 +79,58 @@ public sealed class FontCollection
         if (TryResolvePrimary(font, out var primary))
         {
             double sum = 0;
-            foreach (var c in text)
+            var i = 0;
+            while (i < text.Length)
             {
-                var (face, glyph) = ResolveGlyph(primary, c);
+                var codepoint = CodePointAt(text, i);
+                var (face, glyph) = ResolveGlyph(primary, codepoint);
                 sum += face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
+                i += codepoint > 0xFFFF ? 2 : 1;
             }
 
             return sum;
         }
 
-        var base14 = Base14Metrics.Resolve(font);
-        return base14 != null
-            ? base14.MeasureString(text, font.Size)
-            : throw new InvalidOperationException($"No font is registered for family '{font.Name}'.");
+        var base14 = Base14Metrics.Resolve(font)
+            ?? throw new InvalidOperationException($"No font is registered for family '{font.Name}'.");
+        return MeasureBase14(text, font, base14);
     }
+
+    // Mirrors DocumentGenerator.EmitBase14Fragment: WinAnsi codepoints use base-14
+    // widths, non-WinAnsi codepoints served by the fallback chain use the fallback
+    // face's advances, and anything else measures as the '?' substitute.
+    private double MeasureBase14(string text, Font font, Base14Metrics metrics)
+    {
+        WinAnsiEncoding.TryGetCode('?', out var question);
+        double sum = 0;
+        var i = 0;
+        while (i < text.Length)
+        {
+            var codepoint = CodePointAt(text, i);
+            if (codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out var code))
+            {
+                sum += metrics.GetWidth(code) * font.Size / 1000.0;
+            }
+            else if (TryResolveFallbackGlyph(codepoint, out var face, out var glyph))
+            {
+                sum += face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
+            }
+            else
+            {
+                sum += metrics.GetWidth(question) * font.Size / 1000.0;
+            }
+
+            i += codepoint > 0xFFFF ? 2 : 1;
+        }
+
+        return sum;
+    }
+
+    // A lone surrogate yields its own code unit so it resolves without throwing.
+    internal static int CodePointAt(ReadOnlySpan<char> text, int index)
+        => char.IsHighSurrogate(text[index]) && index + 1 < text.Length && char.IsLowSurrogate(text[index + 1])
+            ? char.ConvertToUtf32(text[index], text[index + 1])
+            : text[index];
 
     // Resolves style-aware: exact (family, bold, italic) face first, then the regular
     // face of the family, then any registered face of the family.

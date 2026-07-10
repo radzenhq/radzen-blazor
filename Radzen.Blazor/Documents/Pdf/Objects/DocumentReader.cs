@@ -250,11 +250,25 @@ public sealed class DocumentReader
         {
             LoadFromXref();
         }
-        catch (DocumentParseException)
+        catch (Exception exception) when (IsRecoverableParseFailure(exception))
         {
             Repair();
         }
     }
+
+    // Malformed cross-reference data throws plain BCL exceptions (a /Type /XRef
+    // stream missing /W, mistyped dictionary values, truncated entries); all of
+    // them mean the xref is unusable and the repair scan should run.
+    private static bool IsRecoverableParseFailure(Exception exception)
+        => exception is DocumentParseException
+            or KeyNotFoundException
+            or InvalidCastException
+            or ArgumentException
+            or OverflowException
+            or IndexOutOfRangeException
+            or FormatException
+            or InvalidOperationException
+            or EndOfStreamException;
 
     private void LoadFromXref()
     {
@@ -304,6 +318,7 @@ public sealed class DocumentReader
 
     private DictionaryObject ParseClassicXref(int index)
     {
+        var section = new Dictionary<int, XrefEntry>();
         while (true)
         {
             SkipWhitespace(ref index);
@@ -312,12 +327,21 @@ public sealed class DocumentReader
                 index += 7;
                 var trailerDict = (DictionaryObject)ObjectParser.Parse(data, index);
 
-                // Hybrid-reference file (ISO 32000-1 7.5.8.4): the classic
-                // trailer points at a cross-reference stream holding the
-                // entries for compressed objects.
+                // Hybrid-reference file (ISO 32000-1 7.5.8.4): the /XRefStm
+                // cross-reference stream takes precedence over this classic
+                // section, which lists compressed objects as free for the
+                // benefit of pre-1.5 readers.
                 if (trailerDict.TryGetValue("XRefStm", out var hybrid) && hybrid is NumberObject hybridOffset)
                 {
                     ParseXrefStreamAt((long)hybridOffset.DoubleValue);
+                }
+
+                foreach (var pair in section)
+                {
+                    if (!entries.ContainsKey(pair.Key))
+                    {
+                        entries[pair.Key] = pair.Value;
+                    }
                 }
 
                 return trailerDict;
@@ -333,9 +357,9 @@ public sealed class DocumentReader
                 var type = data[index];
                 index++;
                 var number = start + i;
-                if (!entries.ContainsKey(number))
+                if (!entries.ContainsKey(number) && !section.ContainsKey(number))
                 {
-                    entries[number] = type == (byte)'n'
+                    section[number] = type == (byte)'n'
                         ? new XrefEntry(1, entryOffset, 0)
                         : new XrefEntry(0, 0, 0);
                 }
@@ -571,6 +595,11 @@ public sealed class DocumentReader
         }
 
         var length = ResolveLength(dictionary);
+        if (length < 0 || dataStart + (long)length > data.Length)
+        {
+            length = RecoverStreamLength(dataStart);
+        }
+
         var payload = new byte[length];
         Array.Copy(data, dataStart, payload, 0, length);
         var stream = new StreamObject(payload);
@@ -580,6 +609,33 @@ public sealed class DocumentReader
         }
 
         return stream;
+    }
+
+    // A wrong /Length (negative or past the end of the file) falls back to
+    // scanning for the "endstream" keyword instead of throwing a BCL exception.
+    private int RecoverStreamLength(int dataStart)
+    {
+        const string keyword = "endstream";
+        for (var i = dataStart; i <= data.Length - keyword.Length; i++)
+        {
+            if (Matches(i, keyword))
+            {
+                var end = i;
+                if (end > dataStart && data[end - 1] == 10)
+                {
+                    end--;
+                }
+
+                if (end > dataStart && data[end - 1] == 13)
+                {
+                    end--;
+                }
+
+                return end - dataStart;
+            }
+        }
+
+        throw new DocumentParseException("Invalid stream length.", dataStart);
     }
 
     private int ResolveLength(DictionaryObject dictionary)
