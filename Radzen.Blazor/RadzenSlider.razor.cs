@@ -124,8 +124,19 @@ namespace Radzen.Blazor
                 {
                     if (_jsRef != null)
                     {
-                        await _jsRef.InvokeVoidAsync("dispose");
-                        await _jsRef.DisposeAsync();
+                        try
+                        {
+                            await _jsRef.InvokeVoidAsync("dispose");
+                            await _jsRef.DisposeAsync();
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                        }
+                        catch (JSException)
+                        {
+                        }
+
+                        _jsRef = null;
                     }
 
                     _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSlider", UniqueID, Reference, Element, Range, Range ? minHandle : handle, maxHandle, Min, Max, Value, Step, Orientation == Orientation.Vertical);
@@ -140,8 +151,19 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            _jsRef?.InvokeVoidAsync("dispose");
-            _jsRef?.DisposeAsync();
+            try
+            {
+                _jsRef?.InvokeVoidAsync("dispose");
+                _jsRef?.DisposeAsync();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (JSException)
+            {
+            }
+
+            _jsRef = null;
         }
 
         /// <summary>
