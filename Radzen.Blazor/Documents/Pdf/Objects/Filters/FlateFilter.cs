@@ -4,18 +4,8 @@ using System.IO.Compression;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Implements the PDF <c>FlateDecode</c> filter using zlib-wrapped DEFLATE.
-/// </summary>
 internal static class FlateFilter
 {
-    /// <summary>
-    /// Decompresses a zlib (RFC 1950) stream.
-    /// </summary>
-    /// <param name="data">The zlib-compressed input.</param>
-    /// <returns>The decompressed bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
-    /// <exception cref="InvalidDataException">The input is not a valid zlib stream.</exception>
     public static byte[] Decode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -32,12 +22,6 @@ internal static class FlateFilter
         return output.ToArray();
     }
 
-    /// <summary>
-    /// Compresses bytes into a zlib (RFC 1950) stream.
-    /// </summary>
-    /// <param name="data">The raw input.</param>
-    /// <returns>The zlib-compressed bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
     public static byte[] Encode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);

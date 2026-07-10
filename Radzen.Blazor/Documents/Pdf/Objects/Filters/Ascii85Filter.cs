@@ -4,19 +4,8 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Implements the PDF <c>ASCII85Decode</c> filter.
-/// </summary>
 internal static class Ascii85Filter
 {
-    /// <summary>
-    /// Decodes ASCII85 data terminated by <c>~&gt;</c>. Whitespace is ignored and <c>z</c>
-    /// expands to four zero bytes.
-    /// </summary>
-    /// <param name="data">The encoded input.</param>
-    /// <returns>The decoded bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
-    /// <exception cref="InvalidDataException">The input contains an invalid character.</exception>
     public static byte[] Decode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -81,12 +70,6 @@ internal static class Ascii85Filter
         return output.ToArray();
     }
 
-    /// <summary>
-    /// Encodes bytes as ASCII85 terminated by <c>~&gt;</c>.
-    /// </summary>
-    /// <param name="data">The raw input.</param>
-    /// <returns>The encoded bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
     public static byte[] Encode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);

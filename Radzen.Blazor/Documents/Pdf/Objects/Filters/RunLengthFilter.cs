@@ -3,20 +3,10 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Implements the PDF <c>RunLengthDecode</c> filter.
-/// </summary>
 internal static class RunLengthFilter
 {
     const int Eod = 128;
 
-    /// <summary>
-    /// Decodes run-length data. A length byte 0-127 copies the next length+1 bytes
-    /// literally, 129-255 repeats the next byte 257-length times, and 128 marks end of data.
-    /// </summary>
-    /// <param name="data">The encoded input.</param>
-    /// <returns>The decoded bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
     public static byte[] Decode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -60,12 +50,6 @@ internal static class RunLengthFilter
         return output.ToArray();
     }
 
-    /// <summary>
-    /// Encodes bytes using run-length compression terminated by the end-of-data marker.
-    /// </summary>
-    /// <param name="data">The raw input.</param>
-    /// <returns>The encoded bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
     public static byte[] Encode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);

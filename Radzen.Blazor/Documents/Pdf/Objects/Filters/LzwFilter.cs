@@ -3,22 +3,11 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Implements the PDF <c>LZWDecode</c> filter with MSB-first bit packing, variable
-/// 9-12 bit codes, and configurable early change.
-/// </summary>
 internal static class LzwFilter
 {
     const int Clear = 256;
     const int Eod = 257;
 
-    /// <summary>
-    /// Decodes an LZW stream.
-    /// </summary>
-    /// <param name="data">The encoded input.</param>
-    /// <param name="early">The early-change value (1 to advance the code width one code early, 0 otherwise).</param>
-    /// <returns>The decoded bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
     public static byte[] Decode(byte[] data, int early)
     {
         ArgumentNullException.ThrowIfNull(data);

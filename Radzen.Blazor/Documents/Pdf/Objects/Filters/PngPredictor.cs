@@ -2,21 +2,8 @@ using System;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Applies and reverses PNG predictors (PDF <c>Predictor</c> values 10-15) as used by
-/// the <c>FlateDecode</c> and <c>LZWDecode</c> filters.
-/// </summary>
 internal static class PngPredictor
 {
-    /// <summary>
-    /// Reverses PNG prediction. Each row is prefixed with a PNG filter-type byte (0-4).
-    /// </summary>
-    /// <param name="data">The predicted rows, each prefixed with its filter-type byte.</param>
-    /// <param name="colors">Number of colour components per sample.</param>
-    /// <param name="bitsPerComponent">Bits per colour component.</param>
-    /// <param name="columns">Number of samples per row.</param>
-    /// <returns>The reconstructed raw bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
     public static byte[] Decode(byte[] data, int colors, int bitsPerComponent, int columns)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -65,16 +52,6 @@ internal static class PngPredictor
         return output;
     }
 
-    /// <summary>
-    /// Applies PNG prediction using the given PDF predictor value.
-    /// </summary>
-    /// <param name="data">The raw rows.</param>
-    /// <param name="predictor">The PDF predictor value (10=None, 11=Sub, 12=Up, 13=Average, 14=Paeth).</param>
-    /// <param name="colors">Number of colour components per sample.</param>
-    /// <param name="bitsPerComponent">Bits per colour component.</param>
-    /// <param name="columns">Number of samples per row.</param>
-    /// <returns>The predicted rows, each prefixed with its filter-type byte.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
     public static byte[] Encode(byte[] data, int predictor, int colors, int bitsPerComponent, int columns)
     {
         ArgumentNullException.ThrowIfNull(data);

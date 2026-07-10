@@ -2,23 +2,8 @@ using System;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Reverses TIFF predictor 2 (horizontal differencing) as used by the PDF
-/// <c>FlateDecode</c> and <c>LZWDecode</c> filters. Supports 8 bits per component.
-/// </summary>
 internal static class TiffPredictor
 {
-    /// <summary>
-    /// Reverses TIFF predictor 2. Each component adds the reconstructed value of the
-    /// same component in the previous sample.
-    /// </summary>
-    /// <param name="data">The horizontally differenced rows.</param>
-    /// <param name="colors">Number of colour components per sample.</param>
-    /// <param name="bitsPerComponent">Bits per colour component (only 8 is supported).</param>
-    /// <param name="columns">Number of samples per row.</param>
-    /// <returns>The reconstructed raw bytes.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="data"/> is <see langword="null"/>.</exception>
-    /// <exception cref="NotSupportedException"><paramref name="bitsPerComponent"/> is not 8.</exception>
     public static byte[] Decode(byte[] data, int colors, int bitsPerComponent, int columns)
     {
         ArgumentNullException.ThrowIfNull(data);
