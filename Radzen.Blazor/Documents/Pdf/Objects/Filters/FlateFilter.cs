@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 /// <summary>
 /// Implements the PDF <c>FlateDecode</c> filter using zlib-wrapped DEFLATE.
 /// </summary>
-public static class FlateFilter
+internal static class FlateFilter
 {
     /// <summary>
     /// Decompresses a zlib (RFC 1950) stream.

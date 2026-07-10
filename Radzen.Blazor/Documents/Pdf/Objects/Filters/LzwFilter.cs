@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 /// Implements the PDF <c>LZWDecode</c> filter with MSB-first bit packing, variable
 /// 9-12 bit codes, and configurable early change.
 /// </summary>
-public static class LzwFilter
+internal static class LzwFilter
 {
     const int Clear = 256;
     const int Eod = 257;

@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 /// <summary>
 /// Implements the PDF <c>ASCIIHexDecode</c> filter.
 /// </summary>
-public static class AsciiHexFilter
+internal static class AsciiHexFilter
 {
     const string HexDigits = "0123456789ABCDEF";
 

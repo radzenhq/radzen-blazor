@@ -6,7 +6,7 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 /// Applies and reverses PNG predictors (PDF <c>Predictor</c> values 10-15) as used by
 /// the <c>FlateDecode</c> and <c>LZWDecode</c> filters.
 /// </summary>
-public static class PngPredictor
+internal static class PngPredictor
 {
     /// <summary>
     /// Reverses PNG prediction. Each row is prefixed with a PNG filter-type byte (0-4).
