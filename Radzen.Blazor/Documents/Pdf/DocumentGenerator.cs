@@ -28,6 +28,19 @@ internal sealed class GeneratedImage
     public required ImageXObject Image { get; init; }
 }
 
+internal sealed class GeneratedLink
+{
+    public required double X1 { get; init; }
+
+    public required double Y1 { get; init; }
+
+    public required double X2 { get; init; }
+
+    public required double Y2 { get; init; }
+
+    public required string Uri { get; init; }
+}
+
 internal sealed class GeneratedPage
 {
     public required byte[] Content { get; init; }
@@ -35,6 +48,8 @@ internal sealed class GeneratedPage
     public required IReadOnlyList<GeneratedFont> Fonts { get; init; }
 
     public required IReadOnlyList<GeneratedImage> Images { get; init; }
+
+    public IReadOnlyList<GeneratedLink> Links { get; init; } = [];
 }
 
 // Runs the merged layout engine (Paginator for paragraph flow, TableLayout +
@@ -89,6 +104,7 @@ internal sealed class DocumentGenerator
         public List<EdgeDraw> Edges { get; } = [];
         public List<ImageDraw> Images { get; } = [];
         public List<TextDraw> Texts { get; } = [];
+        public List<GeneratedLink> Links { get; } = [];
         public HashSet<GeneratedFont> UsedFonts { get; } = [];
         public HashSet<GeneratedImage> UsedImages { get; } = [];
     }
@@ -123,10 +139,16 @@ internal sealed class DocumentGenerator
         document.Info.Keywords = builder.Info.Keywords;
         document.Info.Creator = builder.Info.Creator;
 
-        var plans = new List<PagePlan>();
+        var paginated = new List<PaginatedPage>();
         foreach (var section in builder.Sections)
         {
-            GenerateSection(section, plans);
+            paginated.AddRange(Paginator.Paginate(section, fonts, MeasureImage));
+        }
+
+        var plans = new List<PagePlan>();
+        for (var i = 0; i < paginated.Count; i++)
+        {
+            plans.Add(GeneratePage(paginated[i], i + 1, paginated.Count));
         }
 
         foreach (var plan in plans)
@@ -143,63 +165,187 @@ internal sealed class DocumentGenerator
         return document;
     }
 
-    private void GenerateSection(Section section, List<PagePlan> plans)
+    private PagePlan GeneratePage(PaginatedPage page, int pageNumber, int pageCount)
     {
-        foreach (var page in Paginator.Paginate(section, fonts, MeasureImage))
+        var height = page.Size.Height.Point;
+        var plan = new PagePlan { Size = page.Size };
+        var left = page.ContentBox.X;
+        var contentTop = height - page.ContentBox.Y;
+        var width = page.ContentBox.Width;
+
+        foreach (var line in page.Lines)
         {
-            var height = page.Size.Height.Point;
-            var plan = new PagePlan { Size = page.Size };
-            var left = page.ContentBox.X;
-            var contentTop = height - page.ContentBox.Y;
-
-            foreach (var line in page.Lines)
-            {
-                EmitLine(plan, line.Line, left, contentTop - line.Y);
-            }
-
-            foreach (var positioned in page.Tables)
-            {
-                EmitFragment(plan, positioned, left, contentTop);
-            }
-
-            foreach (var positioned in page.Images)
-            {
-                EmitImage(plan, positioned, left, contentTop);
-            }
-
-            foreach (var line in page.Header)
-            {
-                EmitLine(plan, line.Line, left, height - line.Y);
-            }
-
-            foreach (var positioned in page.HeaderImages)
-            {
-                EmitImage(plan, positioned, left, height);
-            }
-
-            foreach (var positioned in page.HeaderTables)
-            {
-                EmitFragment(plan, positioned, left, height);
-            }
-
-            var bandTop = height - (page.ContentBox.Y + page.ContentBox.Height);
-            foreach (var line in page.Footer)
-            {
-                EmitLine(plan, line.Line, left, bandTop - line.Y);
-            }
-
-            foreach (var positioned in page.FooterImages)
-            {
-                EmitImage(plan, positioned, left, bandTop);
-            }
-
-            foreach (var positioned in page.FooterTables)
-            {
-                EmitFragment(plan, positioned, left, bandTop);
-            }
-
-            plans.Add(plan);
+            EmitLine(plan, line.Line, left, contentTop - line.Y);
         }
+
+        foreach (var positioned in page.Tables)
+        {
+            EmitFragment(plan, positioned, left, contentTop);
+        }
+
+        foreach (var positioned in page.Images)
+        {
+            EmitImage(plan, positioned, left, contentTop);
+        }
+
+        EmitBandLines(plan, page.Header, left, height, width, pageNumber, pageCount);
+
+        foreach (var positioned in page.HeaderImages)
+        {
+            EmitImage(plan, positioned, left, height);
+        }
+
+        foreach (var positioned in page.HeaderTables)
+        {
+            EmitFragment(plan, positioned, left, height);
+        }
+
+        var bandTop = height - (page.ContentBox.Y + page.ContentBox.Height);
+        EmitBandLines(plan, page.Footer, left, bandTop, width, pageNumber, pageCount);
+
+        foreach (var positioned in page.FooterImages)
+        {
+            EmitImage(plan, positioned, left, bandTop);
+        }
+
+        foreach (var positioned in page.FooterTables)
+        {
+            EmitFragment(plan, positioned, left, bandTop);
+        }
+
+        return plan;
+    }
+
+    // Header/footer bands are laid out once per section and reused on every page, so
+    // a paragraph containing page-number fields is re-resolved here at emit time with
+    // the actual page number and total count substituted.
+    private void EmitBandLines(
+        PagePlan plan,
+        IReadOnlyList<PositionedLine> lines,
+        double left,
+        double top,
+        double width,
+        int pageNumber,
+        int pageCount)
+    {
+        var i = 0;
+        while (i < lines.Count)
+        {
+            var line = lines[i];
+            if (line.Source is Paragraph paragraph && HasField(paragraph))
+            {
+                EmitLine(plan, ResolveFields(paragraph, line.Line, width, pageNumber, pageCount), left, top - line.Y);
+                while (i < lines.Count && lines[i].Source == paragraph)
+                {
+                    i++;
+                }
+            }
+            else
+            {
+                EmitLine(plan, line.Line, left, top - line.Y);
+                i++;
+            }
+        }
+    }
+
+    private static bool SameStyle(Run a, Run b)
+    {
+        var fontA = a.ResolvedFont;
+        var fontB = b.ResolvedFont;
+        return a.Link == b.Link
+            && fontA.Name == fontB.Name
+            && fontA.Size == fontB.Size
+            && fontA.Bold == fontB.Bold
+            && fontA.Italic == fontB.Italic
+            && fontA.Underline == fontB.Underline
+            && fontA.Color.Equals(fontB.Color);
+    }
+
+    private static bool HasField(Paragraph paragraph)
+    {
+        foreach (var run in paragraph.Inlines)
+        {
+            if (run is PageNumberField or PageCountField)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Consecutive runs of the same style merge into one fragment so the resolved
+    // line is drawn as one text run with its inter-word spaces intact.
+    private LineBox ResolveFields(Paragraph paragraph, LineBox template, double width, int pageNumber, int pageCount)
+    {
+        var pieces = new List<(Run Run, System.Text.StringBuilder Text)>();
+        foreach (var run in paragraph.Inlines)
+        {
+            var text = run switch
+            {
+                PageNumberField => pageNumber.ToString(CultureInfo.InvariantCulture),
+                PageCountField => pageCount.ToString(CultureInfo.InvariantCulture),
+                _ => run.Text,
+            };
+
+            if (text.Length == 0)
+            {
+                continue;
+            }
+
+            if (pieces.Count > 0 && SameStyle(pieces[^1].Run, run))
+            {
+                pieces[^1].Text.Append(text);
+            }
+            else
+            {
+                pieces.Add((run, new System.Text.StringBuilder(text)));
+            }
+        }
+
+        var fragments = new List<LineFragment>();
+        double advance = 0;
+        foreach (var (run, builderText) in pieces)
+        {
+            var text = builderText.ToString();
+            var measured = fonts.MeasureText(text, run.ResolvedFont);
+            fragments.Add(new LineFragment
+            {
+                Run = run,
+                Text = text,
+                Start = 0,
+                Length = text.Length,
+                XOffset = advance,
+                Advance = measured,
+            });
+            advance += measured;
+        }
+
+        var indent = paragraph.LeftIndent.Point;
+        var max = width - indent;
+        var x0 = paragraph.EffectiveAlignment switch
+        {
+            HorizontalAlignment.Right or HorizontalAlignment.End => max - advance,
+            HorizontalAlignment.Center => (max - advance) / 2.0,
+            _ => 0,
+        };
+
+        var shift = indent + x0;
+        if (shift != 0)
+        {
+            foreach (var fragment in fragments)
+            {
+                fragment.XOffset += shift;
+            }
+        }
+
+        return new LineBox
+        {
+            Fragments = fragments,
+            Width = advance,
+            Height = template.Height,
+            Baseline = template.Baseline,
+        };
     }
 
     private (double Width, double Height) MeasureImage(Image image, double availableWidth)
@@ -382,6 +528,45 @@ internal sealed class DocumentGenerator
         }
 
         EmitUnderlines(plan, line, originX, y);
+        EmitLinks(plan, line, originX, y);
+    }
+
+    // One /Link rect per maximal group of consecutive fragments of the same linked
+    // run on this line; a run wrapped over several lines gets one rect per line.
+    private static void EmitLinks(PagePlan plan, LineBox line, double originX, double y)
+    {
+        var fragments = line.Fragments;
+        var i = 0;
+        while (i < fragments.Count)
+        {
+            var run = fragments[i].Run;
+            if (run.Link is not { Length: > 0 } uri || fragments[i].Text.Length == 0)
+            {
+                i++;
+                continue;
+            }
+
+            var start = fragments[i].XOffset;
+            var end = start + fragments[i].Advance;
+            var j = i + 1;
+            while (j < fragments.Count && fragments[j].Run == run)
+            {
+                end = fragments[j].XOffset + fragments[j].Advance;
+                j++;
+            }
+
+            var size = run.ResolvedFont.Size;
+            plan.Links.Add(new GeneratedLink
+            {
+                X1 = originX + start,
+                Y1 = y - (size * 0.3),
+                X2 = originX + end,
+                Y2 = y + (size * 0.9),
+                Uri = uri,
+            });
+
+            i = j;
+        }
     }
 
     // One underline per maximal group of consecutive fragments of the same underlined
@@ -701,6 +886,7 @@ internal sealed class DocumentGenerator
             Content = writer.ToArray(),
             Fonts = usedFonts,
             Images = usedImages,
+            Links = [.. plan.Links],
         };
     }
 
