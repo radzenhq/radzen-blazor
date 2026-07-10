@@ -1260,6 +1260,12 @@
   <data name="Gantt_YearViewText" xml:space="preserve">
     <value>Jahr</value>
   </data>
+  <data name="Gantt_YearsViewText" xml:space="preserve">
+    <value>Jahre</value>
+  </data>
+  <data name="Gantt_QuarterFormat" xml:space="preserve">
+    <value>Q{0}</value>
+  </data>
   <!-- Gravatar -->
   <data name="Gravatar_AlternateText" xml:space="preserve">
     <value>Gravatar</value>

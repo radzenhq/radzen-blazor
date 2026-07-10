@@ -3445,6 +3445,15 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Multi-Year Timescale",
+                            New = true,
+                            Path = "gantt-multi-year",
+                            Title = "Blazor Gantt Multi-Year Timescale | Free UI Components by Radzen",
+                            Description = "Display long-running projects with month-per-cell and quarter-per-cell timescales. Multi-year tasks fit without horizontal scrolling.",
+                            Tags = new[] { "gantt", "year", "years", "quarter", "timescale", "zoom", "multi-year", "long", "range" }
+                        },
+                        new Example
+                        {
                             Name = "Resource View",
                             New = true,
                             Path = "gantt-resource-view",

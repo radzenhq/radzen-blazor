@@ -1,0 +1,63 @@
+@using RadzenBlazorDemos.Models
+
+<RadzenGantt @ref="gantt" TItem="GanttTask"
+             Data="@tasks"
+             Dependencies="@dependencies"
+             ZoomLevel="GanttZoomLevel.Years"
+             YearsInView="4"
+             DayWidthPx="42"
+             LeftPaneWidth="40%"
+             IdProperty="@nameof(GanttTask.Id)"
+             ParentIdProperty="@nameof(GanttTask.ParentId)"
+             TextProperty="@nameof(GanttTask.Name)"
+             StartProperty="@nameof(GanttTask.Start)"
+             EndProperty="@nameof(GanttTask.End)"
+             ProgressProperty="@nameof(GanttTask.Progress)"
+             Style="width: 100%; height: 480px;"
+             AllowColumnResize="true">
+    <Columns>
+        <RadzenGanttColumn Title="Task" Property="@nameof(GanttTask.Name)" Frozen="true" Width="220px" />
+        <RadzenGanttColumn Title="Start" Property="@nameof(GanttTask.Start)" Width="110px" FormatString="{0:d}" />
+        <RadzenGanttColumn Title="End" Property="@nameof(GanttTask.End)" Width="110px" FormatString="{0:d}" />
+    </Columns>
+</RadzenGantt>
+
+@code {
+    RadzenGantt<GanttTask> gantt;
+
+    List<GanttTask> tasks = new()
+    {
+        new() { Id = 1, Name = "Capital program", Start = new DateTime(2025, 1, 6), End = new DateTime(2028, 4, 28), Progress = 30 },
+        new() { Id = 2, ParentId = 1, Name = "Design", Start = new DateTime(2025, 1, 6), End = new DateTime(2025, 9, 30), Progress = 100 },
+        new() { Id = 3, ParentId = 1, Name = "Permitting", Start = new DateTime(2025, 6, 2), End = new DateTime(2026, 3, 31), Progress = 85 },
+        new() { Id = 4, ParentId = 1, Name = "Construction", Start = new DateTime(2026, 1, 12), End = new DateTime(2027, 10, 29), Progress = 20 },
+        new() { Id = 5, ParentId = 4, Name = "Site preparation", Start = new DateTime(2026, 1, 12), End = new DateTime(2026, 6, 30), Progress = 60 },
+        new() { Id = 6, ParentId = 4, Name = "Structural works", Start = new DateTime(2026, 5, 4), End = new DateTime(2027, 3, 31), Progress = 10 },
+        new() { Id = 7, ParentId = 4, Name = "Systems installation", Start = new DateTime(2027, 1, 4), End = new DateTime(2027, 10, 29), Progress = 0 },
+        new() { Id = 8, ParentId = 1, Name = "Commissioning", Start = new DateTime(2027, 8, 2), End = new DateTime(2028, 4, 28), Progress = 0 },
+    };
+
+    List<GanttDependency<GanttTask>> dependencies;
+
+    protected override void OnInitialized()
+    {
+        dependencies = new()
+        {
+            new() { From = tasks[1], To = tasks[2] },
+            new() { From = tasks[2], To = tasks[3] },
+            new() { From = tasks[4], To = tasks[5] },
+            new() { From = tasks[5], To = tasks[6] },
+            new() { From = tasks[3], To = tasks[7] },
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await gantt.ExpandRows(tasks);
+        }
+    }
+}

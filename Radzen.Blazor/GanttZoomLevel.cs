@@ -21,9 +21,14 @@ namespace Radzen.Blazor
         Month,
 
         /// <summary>
-        /// Year-level scale (still renders days, but intended for the widest ranges).
+        /// Year-level scale (one cell per month). Honors ViewStart and ViewEnd and can span multiple years.
         /// </summary>
-        Year
+        Year,
+
+        /// <summary>
+        /// Multi-year scale (one cell per quarter, grouped by year) for the widest ranges.
+        /// </summary>
+        Years
     }
 }
 
