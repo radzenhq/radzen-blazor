@@ -33,26 +33,17 @@ internal sealed class ObjectParser
     internal DocumentObject ParseValue()
     {
         var token = NextToken();
-        switch (token.Kind)
+        return token.Kind switch
         {
-            case TokenKind.Integer:
-                return ParseIntegerOrReference(token);
-            case TokenKind.Real:
-                return new NumberObject(token.RealValue);
-            case TokenKind.Name:
-                return new NameObject(token.Text);
-            case TokenKind.StringLiteral:
-            case TokenKind.HexString:
-                return new StringObject(Encoding.Latin1.GetString(token.Bytes));
-            case TokenKind.ArrayOpen:
-                return ParseArray();
-            case TokenKind.DictOpen:
-                return ParseDictionary();
-            case TokenKind.Keyword:
-                return ParseKeyword(token);
-            default:
-                throw new DocumentParseException("Unexpected token.", lexer.Position);
-        }
+            TokenKind.Integer => ParseIntegerOrReference(token),
+            TokenKind.Real => new NumberObject(token.RealValue),
+            TokenKind.Name => new NameObject(token.Text),
+            TokenKind.StringLiteral or TokenKind.HexString => new StringObject(Encoding.Latin1.GetString(token.Bytes)),
+            TokenKind.ArrayOpen => ParseArray(),
+            TokenKind.DictOpen => ParseDictionary(),
+            TokenKind.Keyword => ParseKeyword(token),
+            _ => throw new DocumentParseException("Unexpected token.", lexer.Position),
+        };
     }
 
     private Token Peek(int ahead)
@@ -126,16 +117,12 @@ internal sealed class ObjectParser
 
     private DocumentObject ParseKeyword(Token token)
     {
-        switch (token.Text)
+        return token.Text switch
         {
-            case "true":
-                return new BooleanObject(true);
-            case "false":
-                return new BooleanObject(false);
-            case "null":
-                return new NullObject();
-            default:
-                throw new DocumentParseException("Unexpected keyword.", lexer.Position);
-        }
+            "true" => new BooleanObject(true),
+            "false" => new BooleanObject(false),
+            "null" => new NullObject(),
+            _ => throw new DocumentParseException("Unexpected keyword.", lexer.Position),
+        };
     }
 }

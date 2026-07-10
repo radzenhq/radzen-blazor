@@ -59,17 +59,13 @@ public readonly struct Color : IEquatable<Color>
 
         var value = hex.StartsWith('#') ? hex[1..] : hex;
 
-        switch (value.Length)
+        return value.Length switch
         {
-            case 3:
-                return FromRgb(ParseNibble(value[0]), ParseNibble(value[1]), ParseNibble(value[2]));
-            case 6:
-                return FromRgb(ParseByte(value, 0), ParseByte(value, 2), ParseByte(value, 4));
-            case 8:
-                return FromArgb(ParseByte(value, 0), ParseByte(value, 2), ParseByte(value, 4), ParseByte(value, 6));
-            default:
-                throw new FormatException($"'{hex}' is not a valid hex color.");
-        }
+            3 => FromRgb(ParseNibble(value[0]), ParseNibble(value[1]), ParseNibble(value[2])),
+            6 => FromRgb(ParseByte(value, 0), ParseByte(value, 2), ParseByte(value, 4)),
+            8 => FromArgb(ParseByte(value, 0), ParseByte(value, 2), ParseByte(value, 4), ParseByte(value, 6)),
+            _ => throw new FormatException($"'{hex}' is not a valid hex color."),
+        };
     }
 
     private static byte ParseByte(string value, int index)
