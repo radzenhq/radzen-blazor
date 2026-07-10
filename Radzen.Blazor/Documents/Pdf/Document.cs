@@ -1,5 +1,6 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Radzen.Documents.Pdf;
@@ -12,11 +13,21 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Document
 {
+    private readonly Dictionary<Page, DictionaryObject> sourcePages = [];
+    private DocumentReader? source;
+    private DictionaryObject? sourceAcroForm;
+
     /// <summary>Gets the document metadata.</summary>
     public DocumentInfo Info { get; } = new();
 
     /// <summary>Gets the ordered collection of pages.</summary>
     public PageCollection Pages { get; } = [];
+
+    /// <summary>
+    /// Gets the interactive form of a loaded document, or <c>null</c> when the
+    /// document has no AcroForm.
+    /// </summary>
+    public AcroForm? AcroForm { get; private set; }
 
     /// <summary>
     /// Loads a physical document from a stream. The stream is read in full and
@@ -34,7 +45,7 @@ public sealed class Document
         stream.CopyTo(buffer);
         var reader = DocumentReader.Parse(buffer.ToArray(), options?.Password);
 
-        var document = new Document();
+        var document = new Document { source = reader };
         ReadInfo(reader, document.Info);
 
         var catalog = reader.Trailer.TryGetValue("Root", out var root) && reader.Resolve(root!) is DictionaryObject c
@@ -44,6 +55,13 @@ public sealed class Document
             && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
         {
             CollectPages(reader, pagesNode, null, null, document);
+        }
+
+        if (catalog is not null && catalog.TryGetValue("AcroForm", out var formObject)
+            && reader.Resolve(formObject!) is DictionaryObject form)
+        {
+            document.sourceAcroForm = form;
+            document.AcroForm = new AcroForm(reader, form);
         }
 
         return document;
@@ -132,6 +150,7 @@ public sealed class Document
 
         page.SetTextFonts(BuildTextFonts(reader, resources));
         document.Pages.Insert(document.Pages.Count, page);
+        document.sourcePages[page] = node;
     }
 
     private static System.Collections.Generic.Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
@@ -251,6 +270,9 @@ public sealed class Document
         var pagesNode = new DictionaryObject();
         var pagesRef = writer.Add(pagesNode);
 
+        var importer = source is not null ? new GraphImporter(source, writer) : null;
+        var pageNodes = new List<(Page Page, DictionaryObject Node, ReferenceObject Reference)>();
+
         var kids = new ArrayObject();
         foreach (var page in Pages)
         {
@@ -279,6 +301,7 @@ public sealed class Document
             }
 
             kids.Add(pageRef);
+            pageNodes.Add((page, pageNode, pageRef));
         }
 
         pagesNode["Type"] = new NameObject("Pages");
@@ -287,6 +310,11 @@ public sealed class Document
 
         catalog["Type"] = new NameObject("Catalog");
         catalog["Pages"] = pagesRef;
+
+        if (importer is not null)
+        {
+            PreserveForm(importer, catalog, pageNodes);
+        }
 
         writer.Trailer["Root"] = catalogRef;
 
@@ -297,6 +325,43 @@ public sealed class Document
         }
 
         writer.Close();
+    }
+
+    // Carries the loaded interactive form across a save: widget /Annots stay on
+    // their pages and the catalog keeps its /AcroForm, both pointing at the same
+    // (possibly mutated) field objects.
+    private void PreserveForm(GraphImporter importer, DictionaryObject catalog, List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+    {
+        foreach (var (page, _, reference) in pageNodes)
+        {
+            if (sourcePages.TryGetValue(page, out var sourceNode))
+            {
+                importer.Seed(sourceNode, reference);
+            }
+        }
+
+        foreach (var (page, node, _) in pageNodes)
+        {
+            if (source is null || !sourcePages.TryGetValue(page, out var sourceNode)
+                || !sourceNode.TryGetValue("Annots", out var annotsObject)
+                || source.Resolve(annotsObject!) is not ArrayObject annots)
+            {
+                continue;
+            }
+
+            var imported = new ArrayObject();
+            foreach (var annot in annots)
+            {
+                imported.Add(importer.ImportValue(annot));
+            }
+
+            node["Annots"] = imported;
+        }
+
+        if (sourceAcroForm is not null)
+        {
+            catalog["AcroForm"] = importer.ImportInstance(sourceAcroForm);
+        }
     }
 
     private static DictionaryObject? BuildResources(ContentWriter emitter)
