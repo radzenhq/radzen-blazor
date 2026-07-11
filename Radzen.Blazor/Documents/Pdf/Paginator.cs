@@ -291,7 +291,12 @@ internal static class Paginator
                 continue;
             }
 
-            if (block is not Paragraph para || broken[i] is not { } lines)
+            if (block is not Paragraph para)
+            {
+                throw new System.NotSupportedException($"Block type '{block.GetType().Name}' is not supported in section content.");
+            }
+
+            if (broken[i] is not { } lines)
             {
                 continue;
             }
@@ -438,7 +443,7 @@ internal static class Paginator
             _ => HorizontalAlignment.Left,
         };
 
-    private static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks)
+    internal static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks)
     {
         var hasList = false;
         foreach (var block in blocks)
@@ -652,7 +657,8 @@ internal static class Paginator
         var result = new BandLayout();
         var images = result.Images;
         double cursor = 0;
-        foreach (var block in band.Blocks)
+        // Lists expand to marker paragraphs exactly as in section content.
+        foreach (var block in ExpandBlocks(band.Blocks))
         {
             if (block is Table table)
             {
@@ -701,9 +707,15 @@ internal static class Paginator
                 continue;
             }
 
+            if (block is PageBreak)
+            {
+                // A header/footer band cannot page-break, so a page break inside one is a no-op.
+                continue;
+            }
+
             if (block is not Paragraph paragraph)
             {
-                continue;
+                throw new System.NotSupportedException($"Block type '{block.GetType().Name}' is not supported in a header/footer band.");
             }
 
             var lines = LineBreaker.Break(paragraph, width, fonts);
