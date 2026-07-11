@@ -12,9 +12,11 @@ namespace Radzen.Blazor.Pdf.Tests;
 // the subset renumbers glyphs into a contiguous space 0..N-1 holding exactly the
 // closure of the requested set (requested + recursive composite components +
 // glyph 0), with compact loca/glyf/hmtx sized for N glyphs. Composite glyphs have
-// their component ids rewritten into the compact space; simple-glyph outline
-// bytes survive byte-identical. The compact gid assignment is recovered
-// structurally (outline bytes, advance multisets) rather than pinned to an order.
+// their component ids rewritten into the compact space; simple-glyph outlines
+// survive with their contours/points intact but with instruction bytecode STRIPPED
+// (the subset drops the cvt/fpgm/prep hinting tables to stay compact). The compact
+// gid assignment is recovered structurally (outline bytes, advance multisets)
+// rather than pinned to an order.
 //
 // Glyph IDs and advances derived from LiberationSans-Regular.ttf via fontTools 4.60.2:
 //   'H'=43 'e'=72 'l'=79 'o'=82 'W'=58 'r'=85 'd'=71 space=3
@@ -65,17 +67,46 @@ public class GlyfSubsetterTests
         return outlines;
     }
 
+    // The subset strips instruction bytecode from every glyph, so a source outline
+    // survives with its contours/points intact but zero instructions. Normalize the
+    // expected simple-glyph bytes the same way the subsetter does before matching.
     private static int FindOutline(byte[][] outlines, byte[] expected)
     {
+        var target = StripSimpleInstructions(expected);
         for (var gid = 0; gid < outlines.Length; gid++)
         {
-            if (outlines[gid].AsSpan().SequenceEqual(expected))
+            if (outlines[gid].AsSpan().SequenceEqual(target))
             {
                 return gid;
             }
         }
 
         return -1;
+    }
+
+    // Mirrors GlyfSubsetter: set instructionLength to 0, drop the instructions[]
+    // block, keep flags/coordinates, and pad an odd result to a 2-byte boundary.
+    private static byte[] StripSimpleInstructions(byte[] g)
+    {
+        if (g.Length < 10 || (short)((g[0] << 8) | g[1]) < 0)
+        {
+            return g; // empty or composite outline
+        }
+
+        var contours = (short)((g[0] << 8) | g[1]);
+        var instrLenPos = 10 + contours * 2;
+        var instrLen = (g[instrLenPos] << 8) | g[instrLenPos + 1];
+        var headLen = instrLenPos + 2;
+        var tailStart = headLen + instrLen;
+        var tailLen = g.Length - tailStart;
+
+        var written = headLen + tailLen;
+        var result = new byte[(written & 1) != 0 ? written + 1 : written];
+        Array.Copy(g, 0, result, 0, headLen);
+        result[headLen - 2] = 0;
+        result[headLen - 1] = 0;
+        Array.Copy(g, tailStart, result, headLen, tailLen);
+        return result;
     }
 
     // 1. Basic subset round-trips through the parser with a COMPACT glyph count.
@@ -127,7 +158,7 @@ public class GlyfSubsetterTests
     }
 
     [Fact]
-    public void Subset_Hello_SimpleOutlinesSurviveByteIdentical()
+    public void Subset_Hello_SimpleOutlineShapesSurviveWithInstructionsStripped()
     {
         var font = LiberationSansRegular();
         var subset = GlyfSubsetter.Subset(font, GlyphIds(font, "Hello"));
