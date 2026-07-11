@@ -79,12 +79,16 @@ internal static class TablePaginator
 
         List<TableFragment> fragments = [];
         var body = 0;
+
+        // The first fragment starts at the flow cursor (firstAvailable); once anything is
+        // emitted every later fragment starts fresh at subsequentAvailable.
+        var onFirst = true;
         while (true)
         {
-            var startedNew = fragments.Count == 0 && body == 0;
-            var available = fragments.Count == 0 ? firstAvailable : subsequentAvailable;
+            var available = onFirst ? firstAvailable : subsequentAvailable;
             var running = headerHeight;
             List<int> placed = [];
+            var deferred = false;
             while (body < bodies.Count)
             {
                 var last = body;
@@ -97,7 +101,19 @@ internal static class TablePaginator
                     groupHeight += layout.RowHeights[bodies[last]];
                 }
 
-                if (placed.Count == 0 || running + groupHeight <= available + 1e-6)
+                var fits = running + groupHeight <= available + 1e-6;
+
+                // A KeepTogether group that overflows the partial first fragment but fits a
+                // fresh page is pushed there whole instead of being force-split at the break.
+                if (placed.Count == 0 && !fits && onFirst && available + 1e-6 < subsequentAvailable
+                    && headerHeight + groupHeight <= subsequentAvailable + 1e-6
+                    && GroupKeepTogether(source, bodies, body, last))
+                {
+                    deferred = true;
+                    break;
+                }
+
+                if (placed.Count == 0 || fits)
                 {
                     for (var g = body; g <= last; g++)
                     {
@@ -113,12 +129,25 @@ internal static class TablePaginator
                 }
             }
 
-            if (placed.Count == 0 && !startedNew)
+            if (placed.Count == 0)
             {
+                if (deferred)
+                {
+                    onFirst = false;
+                    continue;
+                }
+
+                // A header-only (or empty) table still yields a single fragment.
+                if (fragments.Count == 0)
+                {
+                    fragments.Add(BuildFragment(1, layout, headers, placed));
+                }
+
                 break;
             }
 
             fragments.Add(BuildFragment(fragments.Count + 1, layout, headers, placed));
+            onFirst = false;
 
             if (body >= bodies.Count)
             {
@@ -127,6 +156,19 @@ internal static class TablePaginator
         }
 
         return fragments;
+    }
+
+    private static bool GroupKeepTogether(Table source, List<int> bodies, int first, int last)
+    {
+        for (var g = first; g <= last; g++)
+        {
+            if (source.Rows[bodies[g]].KeepTogether)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static TableFragment BuildFragment(int number, LaidOutTable layout, List<int> headers, List<int> bodyRows)
