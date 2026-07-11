@@ -252,15 +252,10 @@ internal static class TableLayout
             };
             var offset = (contentBox.Height - p.ContentHeight) * factor;
 
-            var alignFactor = (p.Cell.AlignmentValue
+            var cellAlignment = p.Cell.AlignmentValue
                 ?? ColumnAlignment(table, p.Column)
                 ?? table.Rows[p.Row].AlignmentValue
-                ?? HorizontalAlignment.Left) switch
-            {
-                HorizontalAlignment.Center => 0.5,
-                HorizontalAlignment.Right => 1.0,
-                _ => 0.0,
-            };
+                ?? HorizontalAlignment.Left;
 
             var lines = new List<LaidOutLine>();
             var laidImages = new List<LaidOutImage>();
@@ -284,7 +279,7 @@ internal static class TableLayout
                     laidImages.Add(new LaidOutImage
                     {
                         Source = image,
-                        X = contentBox.Left + ((contentBox.Width - item.Width) * alignFactor),
+                        X = contentBox.Left + ((contentBox.Width - item.Width) * AlignFactor(image.Alignment, cellAlignment)),
                         Y = cursorY,
                         Width = item.Width,
                         Height = item.Height,
@@ -295,7 +290,7 @@ internal static class TableLayout
                     laidCodes.Add(new LaidOutCode
                     {
                         Source = code,
-                        X = contentBox.Left + ((contentBox.Width - item.Width) * alignFactor),
+                        X = contentBox.Left + ((contentBox.Width - item.Width) * AlignFactor(BlockAlignment(code), cellAlignment)),
                         Y = cursorY,
                     });
                 }
@@ -353,6 +348,24 @@ internal static class TableLayout
 
     private static HorizontalAlignment? ColumnAlignment(Table table, int column)
         => column < table.Columns.Count ? table.Columns[column].Alignment : null;
+
+    private static HorizontalAlignment BlockAlignment(Block code) => code switch
+    {
+        QrCode qr => qr.Alignment,
+        Barcode barcode => barcode.Alignment,
+        _ => HorizontalAlignment.Left,
+    };
+
+    // Non-text content honors its OWN alignment, falling back to the cell's only when the
+    // block leaves it at the default Left. The factor matches how text resolves alignment
+    // (Right/End flush right, Center centered, Left/Start/Justify flush left).
+    private static double AlignFactor(HorizontalAlignment blockAlignment, HorizontalAlignment cellAlignment)
+        => (blockAlignment == HorizontalAlignment.Left ? cellAlignment : blockAlignment) switch
+        {
+            HorizontalAlignment.Right or HorizontalAlignment.End => 1.0,
+            HorizontalAlignment.Center => 0.5,
+            _ => 0.0,
+        };
 
     private static double[] ResolveColumnWidths(Table table, double availableWidth)
     {
