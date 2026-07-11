@@ -18,50 +18,50 @@ namespace Radzen.Blazor
         /// <summary>
         /// Code 128 (subset B). Encodes ASCII text and is widely supported.
         /// </summary>
-        Code128,
+        Code128 = (int)Radzen.Documents.BarcodeType.Code128,
 
         /// <summary>
         /// Code 39. Supports uppercase letters, digits, and a limited set of symbols.
         /// </summary>
-        Code39,
+        Code39 = (int)Radzen.Documents.BarcodeType.Code39,
 
         /// <summary>EAN-13 (GTIN-13).</summary>
-        Ean13,
+        Ean13 = (int)Radzen.Documents.BarcodeType.Ean13,
 
         /// <summary>EAN-8 (GTIN-8).</summary>
-        Ean8,
+        Ean8 = (int)Radzen.Documents.BarcodeType.Ean8,
 
         /// <summary>UPC-A.</summary>
-        UpcA,
+        UpcA = (int)Radzen.Documents.BarcodeType.UpcA,
 
         /// <summary>ITF (Interleaved 2 of 5).</summary>
-        Itf,
+        Itf = (int)Radzen.Documents.BarcodeType.Itf,
 
         /// <summary>POSTNET (USPS). 4/5-state style using short/long bars.</summary>
-        Postnet,
+        Postnet = (int)Radzen.Documents.BarcodeType.Postnet,
 
         /// <summary>RM4SCC (Royal Mail 4-state customer code).</summary>
-        Rm4scc,
+        Rm4scc = (int)Radzen.Documents.BarcodeType.Rm4scc,
 
         /// <summary>Codabar.</summary>
-        Codabar,
+        Codabar = (int)Radzen.Documents.BarcodeType.Codabar,
 
         /// <summary>Pharmacode (one-track).</summary>
-        Pharmacode,
+        Pharmacode = (int)Radzen.Documents.BarcodeType.Pharmacode,
 
         /// <summary>ISBN (encodes as EAN-13 with 978/979 prefix).</summary>
-        Isbn,
+        Isbn = (int)Radzen.Documents.BarcodeType.Isbn,
 
         /// <summary>ISSN (encodes as EAN-13 with 977 prefix).</summary>
-        Issn,
+        Issn = (int)Radzen.Documents.BarcodeType.Issn,
 
         /// <summary>
         /// MSI (Modified Plessey). Numeric-only barcode, commonly used for inventory.
         /// </summary>
-        Msi,
+        Msi = (int)Radzen.Documents.BarcodeType.Msi,
 
         /// <summary>Telepen.</summary>
-        Telepen
+        Telepen = (int)Radzen.Documents.BarcodeType.Telepen
     }
 
     /// <summary>
