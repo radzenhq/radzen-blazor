@@ -147,10 +147,15 @@ internal static class CffSubsetter
         var set = new SortedSet<int> { 0 };
         foreach (var gid in glyphIds)
         {
-            if (gid >= 0 && gid < font.GlyphCount)
+            // A corrupt font (e.g. a cmap returning a gid past the charstring count)
+            // must fail loudly here rather than silently emit a wrong glyph.
+            if (gid < 0 || gid >= font.GlyphCount)
             {
-                set.Add(gid);
+                throw new ArgumentOutOfRangeException(nameof(glyphIds), gid,
+                    $"Requested glyph id {gid} is outside the font's glyph range [0, {font.GlyphCount}).");
             }
+
+            set.Add(gid);
         }
 
         return [.. set];
