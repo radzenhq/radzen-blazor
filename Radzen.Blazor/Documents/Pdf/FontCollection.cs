@@ -107,9 +107,9 @@ public sealed class FontCollection
             {
                 return cached;
             }
-
-            return ParseAndStore(signature, sharedWithCaller ? [.. bytes] : bytes);
         }
+
+        return ParseAndStore(signature, sharedWithCaller ? [.. bytes] : bytes);
     }
 
     private static ParsedSource FromMemoryStream(MemoryStream ms)
@@ -131,25 +131,39 @@ public sealed class FontCollection
             {
                 return cached;
             }
-
-            var bytes = new byte[length];
-            ms.Position = 0;
-            ms.ReadExactly(bytes);
-            return ParseAndStore(signature, bytes);
         }
+
+        var bytes = new byte[length];
+        ms.Position = 0;
+        ms.ReadExactly(bytes);
+        return ParseAndStore(signature, bytes);
     }
 
+    // Parses outside the lock so concurrent Register() calls for different font
+    // content do not serialize behind each other's multi-megabyte parse; the lock is
+    // only held for the dictionary lookup/publish. The cache is content-keyed and
+    // byte-verified, so if another thread published an equal entry while we were
+    // parsing, we discard our copy and adopt theirs instead of storing a duplicate.
     private static ParsedSource ParseAndStore((ulong, int) signature, byte[] ownedBytes)
     {
-        PruneDeadEntries();
         var parsed = ParseCopy(ownedBytes);
-        parseCache[signature] = new WeakReference<ParsedSource>(parsed);
-        foreach (var face in parsed.Faces)
-        {
-            faceRetention.Add(face, parsed);
-        }
 
-        return parsed;
+        lock (parseCache)
+        {
+            if (TryGetLive(signature, out var already) && already.Data.AsSpan().SequenceEqual(ownedBytes))
+            {
+                return already;
+            }
+
+            PruneDeadEntries();
+            parseCache[signature] = new WeakReference<ParsedSource>(parsed);
+            foreach (var face in parsed.Faces)
+            {
+                faceRetention.Add(face, parsed);
+            }
+
+            return parsed;
+        }
     }
 
     private static bool TryGetLive((ulong, int) signature, out ParsedSource cached)
