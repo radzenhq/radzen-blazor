@@ -35,26 +35,24 @@ public class FontParseCacheTests
     }
 
     [Fact]
-    public void DistinctArraysGetDistinctParses()
+    public void CloneOfSameContentSharesParse()
     {
         var bytes = FontBytes();
         var clone = (byte[])bytes.Clone();
         var first = RegisterAndResolve(bytes, Exposed(bytes));
         var second = RegisterAndResolve(clone, Exposed(clone));
 
-        Assert.NotSame(first, second);
-        Assert.Equal(first.GlyphCount, second.GlyphCount);
+        Assert.Same(first, second);
     }
 
     [Fact]
-    public void NonExposedStreamStillRegisters()
+    public void NonExposedStreamsWithSameContentShareParse()
     {
         var bytes = FontBytes();
         var first = RegisterAndResolve(bytes, new MemoryStream(bytes));
         var second = RegisterAndResolve(bytes, new MemoryStream(bytes));
 
-        Assert.NotSame(first, second);
-        Assert.Equal(first.GlyphCount, second.GlyphCount);
+        Assert.Same(first, second);
     }
 
     [Fact]
