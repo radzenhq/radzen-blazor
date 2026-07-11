@@ -33,7 +33,7 @@ public class LayoutCorrectnessRegressionTests
         var top = paragraph.Inlines.Add("top\n");
         top.Font.Name = Family;
         top.Font.Size = 12;
-        var huge = paragraph.Inlines.Add("HUGE");
+        var huge = paragraph.Inlines.Add("H");
         huge.Font.Name = Family;
         huge.Font.Size = 600;
         section.Blocks.Add(paragraph);

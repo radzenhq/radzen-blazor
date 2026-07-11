@@ -129,6 +129,7 @@ internal sealed class DocumentGenerator
     private readonly Dictionary<object, StructureElement> blockElements = [];
     private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
     private StructureElement documentElement = null!;
+    private readonly Dictionary<StructureElement, int> structureOrder = [];
 
     private DocumentGenerator(DocumentBuilder builder)
     {
@@ -155,6 +156,7 @@ internal sealed class DocumentGenerator
         document.Info.Creator = builder.Info.Creator;
 
         BuildStructureTree();
+        IndexStructure();
 
         var paginated = new List<PaginatedPage>();
         foreach (var section in builder.Sections)
@@ -211,6 +213,24 @@ internal sealed class DocumentGenerator
             foreach (var block in section.Blocks)
             {
                 MapBlock(block, sect);
+            }
+        }
+    }
+
+    // Assign each structure element its DFS pre-order rank once so per-page tagged emission can
+    // order that page's content-bearing elements without re-walking the whole tree per page.
+    private void IndexStructure()
+    {
+        var index = 0;
+        var stack = new Stack<StructureElement>();
+        stack.Push(documentElement);
+        while (stack.Count > 0)
+        {
+            var element = stack.Pop();
+            structureOrder[element] = index++;
+            for (var c = element.Children.Count - 1; c >= 0; c--)
+            {
+                stack.Push(element.Children[c]);
             }
         }
     }
@@ -721,6 +741,7 @@ internal sealed class DocumentGenerator
     private List<LineFragment> CoalesceFragments(IReadOnlyList<LineFragment> fragments)
     {
         var result = new List<LineFragment>(fragments.Count);
+        var spaceWidths = new Dictionary<Font, double>();
         var i = 0;
         while (i < fragments.Count)
         {
@@ -738,18 +759,17 @@ internal sealed class DocumentGenerator
                     break;
                 }
 
-                var gap = text[end..next.Start];
                 var allSpaces = true;
-                foreach (var c in gap)
+                for (var g = end; g < next.Start; g++)
                 {
-                    if (c != ' ')
+                    if (text[g] != ' ')
                     {
                         allSpaces = false;
                         break;
                     }
                 }
 
-                var gapWidth = gap.Length == 0 ? 0 : fonts.MeasureText(gap, run.ResolvedFont);
+                var gapWidth = next.Start == end ? 0 : (next.Start - end) * SpaceWidth(run.ResolvedFont, spaceWidths);
                 if (!allSpaces || System.Math.Abs(next.XOffset - right - gapWidth) > 0.001)
                 {
                     break;
@@ -781,6 +801,19 @@ internal sealed class DocumentGenerator
         }
 
         return result;
+    }
+
+    // Spaces carry no kerning, so a gap of N spaces measures as N * one space width; cache the
+    // per-font single-space advance rather than measuring a fresh substring per gap.
+    private double SpaceWidth(Font font, Dictionary<Font, double> cache)
+    {
+        if (!cache.TryGetValue(font, out var width))
+        {
+            width = fonts.MeasureText(" ", font);
+            cache[font] = width;
+        }
+
+        return width;
     }
 
     private void EmitLine(PagePlan plan, LineBox line, double originX, double baseline, StructureElement? element)
@@ -1274,8 +1307,7 @@ internal sealed class DocumentGenerator
             }
         }
 
-        var mcid = 0;
-        WriteTaggedContent(writer, documentElement, pageIndex, taggedImages, taggedTexts, ref mcid);
+        WriteTaggedContent(writer, pageIndex, taggedImages, taggedTexts);
 
         var usedFonts = new List<GeneratedFont>(plan.UsedFonts);
         var usedImages = new List<GeneratedImage>(plan.UsedImages);
@@ -1299,18 +1331,35 @@ internal sealed class DocumentGenerator
         list.Add(draw);
     }
 
-    private static void WriteTaggedContent(
+    // Emits only the elements that carry content on this page, ordered by their DFS pre-order rank so
+    // the byte output matches a full-tree pre-order walk without the per-page O(elements) recursion.
+    private void WriteTaggedContent(
         ContentWriter writer,
-        StructureElement element,
         int pageIndex,
         Dictionary<StructureElement, List<ImageDraw>> taggedImages,
-        Dictionary<StructureElement, List<TextDraw>> taggedTexts,
-        ref int mcid)
+        Dictionary<StructureElement, List<TextDraw>> taggedTexts)
     {
-        var hasImages = taggedImages.TryGetValue(element, out var elementImages);
-        var hasTexts = taggedTexts.TryGetValue(element, out var elementTexts);
-        if (hasImages || hasTexts)
+        var elements = new List<StructureElement>(taggedImages.Count + taggedTexts.Count);
+        foreach (var element in taggedImages.Keys)
         {
+            elements.Add(element);
+        }
+
+        foreach (var element in taggedTexts.Keys)
+        {
+            if (!taggedImages.ContainsKey(element))
+            {
+                elements.Add(element);
+            }
+        }
+
+        elements.Sort((a, b) => structureOrder[a].CompareTo(structureOrder[b]));
+
+        var mcid = 0;
+        foreach (var element in elements)
+        {
+            var hasImages = taggedImages.TryGetValue(element, out var elementImages);
+            var hasTexts = taggedTexts.TryGetValue(element, out var elementTexts);
             writer.WriteName(element.Type);
             writer.WriteRaw(" <</MCID ");
             writer.WriteRaw(mcid.ToString(CultureInfo.InvariantCulture));
@@ -1335,11 +1384,6 @@ internal sealed class DocumentGenerator
             writer.WriteRaw("EMC\n");
             element.Marks.Add((pageIndex, mcid));
             mcid++;
-        }
-
-        foreach (var child in element.Children)
-        {
-            WriteTaggedContent(writer, child, pageIndex, taggedImages, taggedTexts, ref mcid);
         }
     }
 

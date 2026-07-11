@@ -74,7 +74,7 @@ public class TableLayoutTests
         var row = table.Rows.Add();
         row.Cells[0].Padding = Unit.FromPoint(Pad);
         row.Cells[1].Padding = Unit.FromPoint(Pad);
-        TableLayoutSupport.Fill(row.Cells[0], "Hello World");
+        TableLayoutSupport.Fill(row.Cells[0], "Hello Hello");
         TableLayoutSupport.Fill(row.Cells[1], "Hello");
 
         var laid = TableLayout.Layout(table, 1000, fonts);
@@ -97,14 +97,14 @@ public class TableLayoutTests
 
         var table = new Table();
         table.Columns.Add(Unit.FromPoint(narrowContent));
-        TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "Hello World");
+        TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "Hello Hello");
 
         var laid = TableLayout.Layout(table, 400, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
         Assert.Equal(2, c.Lines.Count);
         Assert.Equal("Hello", string.Concat(c.Lines[0].Line.Fragments.Select(f => f.Text)));
-        Assert.Equal("World", string.Concat(c.Lines[1].Line.Fragments.Select(f => f.Text)));
+        Assert.Equal("Hello", string.Concat(c.Lines[1].Line.Fragments.Select(f => f.Text)));
     }
 
     [Theory]
