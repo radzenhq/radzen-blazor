@@ -122,7 +122,18 @@ public class FontContentCacheTests
         Assert.Same(first, second);
     }
 
+    // Unique content (sfnt ignores trailing bytes) so no other concurrently running
+    // test shares - and thus roots - this parsed face during the GC loop.
+    private static byte[] UniqueSansBytes()
+    {
+        var bytes = SansBytes();
+        var unique = new byte[bytes.Length + 26];
+        Array.Copy(bytes, unique, bytes.Length);
+        "RZLEAK-CONTENTCACHE-UNIQUE"u8.CopyTo(unique.AsSpan(bytes.Length));
+        return unique;
+    }
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static WeakReference RegisterIdiomaticAndDrop()
-        => new(RegisterIdiomatic(Family, SansBytes()));
+        => new(RegisterIdiomatic(Family, UniqueSansBytes()));
 }
