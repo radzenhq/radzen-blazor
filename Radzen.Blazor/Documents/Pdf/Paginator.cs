@@ -47,6 +47,12 @@ internal sealed class PaginatedPage
 
     public required IReadOnlyList<PositionedLine> Footer { get; init; }
 
+    /// <summary>Header band top edge, measured down from the page top.</summary>
+    public double HeaderTop { get; init; }
+
+    /// <summary>Footer band top edge, measured down from the page top.</summary>
+    public double FooterTop { get; init; }
+
     public IReadOnlyList<PositionedImage> HeaderImages { get; init; } = [];
 
     public IReadOnlyList<PositionedImage> FooterImages { get; init; } = [];
@@ -106,10 +112,13 @@ internal static class Paginator
         var header = LayoutBand(section.Header, contentWidth, fonts, measureImage);
         var footer = LayoutBand(section.Footer, contentWidth, fonts, measureImage);
 
-        // The header band hangs from the page top and the footer band sits on the page
-        // bottom; a band taller than its margin shrinks the body so they never overlap.
-        var contentTop = System.Math.Max(top, header.Height);
-        var contentBottom = System.Math.Max(bottom, footer.Height);
+        // The header band starts HeaderDistance below the page top and the footer band
+        // ends FooterDistance above the page bottom; a band whose extent exceeds its
+        // margin shrinks the body so they never overlap.
+        var headerDistance = section.HeaderDistance.Point;
+        var footerDistance = section.FooterDistance.Point;
+        var contentTop = System.Math.Max(top, header.Height > 0 ? headerDistance + header.Height : 0);
+        var contentBottom = System.Math.Max(bottom, footer.Height > 0 ? footerDistance + footer.Height : 0);
         var contentBox = new Rect(left, contentTop, contentWidth, pageHeight - contentTop - contentBottom);
         var contentHeight = contentBox.Height;
 
@@ -129,6 +138,8 @@ internal static class Paginator
                 Lines = current,
                 Header = header.Lines,
                 Footer = footer.Lines,
+                HeaderTop = headerDistance,
+                FooterTop = pageHeight - footerDistance - footer.Height,
                 HeaderImages = header.Images,
                 FooterImages = footer.Images,
                 HeaderTables = header.Tables,
@@ -150,23 +161,7 @@ internal static class Paginator
         {
             var layout = TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
 
-            double headerHeight = 0;
-            double firstBodyHeight = 0;
-            var seenBody = false;
-            for (var r = 0; r < table.Rows.Count; r++)
-            {
-                if (table.Rows[r].IsHeader)
-                {
-                    headerHeight += layout.RowHeights[r];
-                }
-                else if (!seenBody)
-                {
-                    firstBodyHeight = layout.RowHeights[r];
-                    seenBody = true;
-                }
-            }
-
-            if (HasPageContent() && cursor + headerHeight + firstBodyHeight > contentHeight + Eps)
+            if (HasPageContent() && cursor + TableFirstFragmentHeight(table, layout) > contentHeight + Eps)
             {
                 Flush();
                 cursor = 0;
@@ -275,7 +270,7 @@ internal static class Paginator
                 {
                     placeCount = nrem;
                     if (first && para.KeepWithNext && HasPageContent() &&
-                        NextFirstLine(blocks, broken, i, out var nextSpacingBefore, out var nextHeight))
+                        NextBlockFirstHeight(blocks, broken, i, contentWidth, fonts, measureImage, out var nextSpacingBefore, out var nextHeight))
                     {
                         var afterCursor = blockTop + SumHeights(lines, offset, placeCount) + spacingAfter;
                         if (afterCursor + nextSpacingBefore + nextHeight > contentHeight + Eps)
@@ -364,25 +359,66 @@ internal static class Paginator
     private static (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
 
-    private static bool NextFirstLine(
+    // The required height of the header rows plus the first body row: the minimum a
+    // table needs on a page before its first fragment breaks early.
+    private static double TableFirstFragmentHeight(Table table, LaidOutTable layout)
+    {
+        double headerHeight = 0;
+        double firstBodyHeight = 0;
+        var seenBody = false;
+        for (var r = 0; r < table.Rows.Count; r++)
+        {
+            if (table.Rows[r].IsHeader)
+            {
+                headerHeight += layout.RowHeights[r];
+            }
+            else if (!seenBody)
+            {
+                firstBodyHeight = layout.RowHeights[r];
+                seenBody = true;
+            }
+        }
+
+        return headerHeight + firstBodyHeight;
+    }
+
+    // The height the NEXT block needs at the top of a page: the first line of a
+    // paragraph, the header rows plus first body row of a table, or a whole image.
+    private static bool NextBlockFirstHeight(
         BlockCollection blocks,
         IReadOnlyList<LineBox>?[] broken,
         int index,
+        double contentWidth,
+        FontCollection fonts,
+        System.Func<Image, double, (double Width, double Height)>? measureImage,
         out double spacingBefore,
         out double height)
     {
         spacingBefore = 0;
         height = 0;
         var next = index + 1;
-        if (next >= blocks.Count || blocks[next] is not Paragraph paragraph ||
-            broken[next] is not { Count: > 0 } lines)
+        if (next >= blocks.Count)
         {
             return false;
         }
 
-        spacingBefore = paragraph.SpacingBefore.Point;
-        height = lines[0].Height;
-        return true;
+        switch (blocks[next])
+        {
+            case Paragraph paragraph when broken[next] is { Count: > 0 } lines:
+                spacingBefore = paragraph.SpacingBefore.Point;
+                height = lines[0].Height;
+                return true;
+            case Table table:
+                var layout = TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+                height = TableFirstFragmentHeight(table, layout);
+                return true;
+            case Image image:
+                var (_, imageHeight) = measureImage is null ? MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
+                height = imageHeight;
+                return true;
+            default:
+                return false;
+        }
     }
 
     private static double SumHeights(IReadOnlyList<LineBox> lines, int start, int count)

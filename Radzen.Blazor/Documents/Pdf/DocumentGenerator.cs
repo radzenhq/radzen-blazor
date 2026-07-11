@@ -191,19 +191,20 @@ internal sealed class DocumentGenerator
             EmitImage(plan, positioned, left, contentTop);
         }
 
-        EmitBandLines(plan, page.Header, left, height, width, pageNumber, pageCount);
+        var headerTop = height - page.HeaderTop;
+        EmitBandLines(plan, page.Header, left, headerTop, width, pageNumber, pageCount);
 
         foreach (var positioned in page.HeaderImages)
         {
-            EmitImage(plan, positioned, left, height);
+            EmitImage(plan, positioned, left, headerTop);
         }
 
         foreach (var positioned in page.HeaderTables)
         {
-            EmitFragment(plan, positioned, left, height);
+            EmitFragment(plan, positioned, left, headerTop);
         }
 
-        var bandTop = height - (page.ContentBox.Y + page.ContentBox.Height);
+        var bandTop = height - page.FooterTop;
         EmitBandLines(plan, page.Footer, left, bandTop, width, pageNumber, pageCount);
 
         foreach (var positioned in page.FooterImages)

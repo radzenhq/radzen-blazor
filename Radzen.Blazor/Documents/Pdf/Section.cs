@@ -43,6 +43,18 @@ public class Section
         }
     }
 
+    /// <summary>
+    /// Gets or sets the distance between the top page edge and the header band.
+    /// Sections created through <see cref="DocumentBuilder"/> default to 1.25 cm.
+    /// </summary>
+    public Unit HeaderDistance { get; set; }
+
+    /// <summary>
+    /// Gets or sets the distance between the bottom page edge and the footer band.
+    /// Sections created through <see cref="DocumentBuilder"/> default to 1.25 cm.
+    /// </summary>
+    public Unit FooterDistance { get; set; }
+
     /// <summary>Gets the page header.</summary>
     public HeaderFooter Header { get; } = new();
 
