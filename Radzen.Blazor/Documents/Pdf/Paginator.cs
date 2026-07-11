@@ -4,7 +4,7 @@ namespace Radzen.Documents.Pdf;
 
 #nullable enable
 
-internal sealed class PositionedLine
+internal readonly struct PositionedLine
 {
     public required LineBox Line { get; init; }
 
@@ -13,7 +13,7 @@ internal sealed class PositionedLine
     public required double Y { get; init; }
 }
 
-internal sealed class PositionedTableFragment
+internal readonly struct PositionedTableFragment
 {
     public required LaidOutTable Layout { get; init; }
 
@@ -22,7 +22,7 @@ internal sealed class PositionedTableFragment
     public required double Y { get; init; }
 }
 
-internal sealed class PositionedImage
+internal readonly struct PositionedImage
 {
     public required Image Source { get; init; }
 

@@ -4,7 +4,7 @@ namespace Radzen.Documents.Pdf;
 
 #nullable enable
 
-internal sealed class FragmentRow
+internal readonly struct FragmentRow
 {
     public required int SourceRow { get; init; }
 

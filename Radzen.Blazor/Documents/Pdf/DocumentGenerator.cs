@@ -58,7 +58,7 @@ internal sealed class GeneratedPage
 // images and stroked cell borders - never materializing ContentElement objects.
 internal sealed class DocumentGenerator
 {
-    private sealed class TextDraw
+    private struct TextDraw
     {
         public required double X { get; init; }
         public required double Baseline { get; init; }
@@ -70,7 +70,7 @@ internal sealed class DocumentGenerator
         public Rect? Clip { get; set; }
     }
 
-    private sealed class ImageDraw
+    private readonly struct ImageDraw
     {
         public required double X { get; init; }
         public required double Y { get; init; }
@@ -79,7 +79,7 @@ internal sealed class DocumentGenerator
         public required GeneratedImage Image { get; init; }
     }
 
-    private sealed class FillDraw
+    private readonly struct FillDraw
     {
         public required double X { get; init; }
         public required double Y { get; init; }
@@ -88,7 +88,7 @@ internal sealed class DocumentGenerator
         public required Color Color { get; init; }
     }
 
-    private sealed class EdgeDraw
+    private readonly struct EdgeDraw
     {
         public required double X1 { get; init; }
         public required double Y1 { get; init; }
@@ -113,6 +113,7 @@ internal sealed class DocumentGenerator
 
     private readonly DocumentBuilder builder;
     private readonly FontCollection fonts;
+    private readonly List<byte> scratchBytes = [];
     private readonly List<GeneratedFont> allFonts = [];
     private readonly Dictionary<string, GeneratedFont> base14Fonts = new(System.StringComparer.Ordinal);
     private readonly Dictionary<SfntFont, GeneratedFont> sfntFonts = [];
@@ -337,9 +338,10 @@ internal sealed class DocumentGenerator
         var shift = indent + x0;
         if (shift != 0)
         {
-            foreach (var fragment in fragments)
+            var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
+            for (var f = 0; f < span.Length; f++)
             {
-                fragment.XOffset += shift;
+                span[f].XOffset += shift;
             }
         }
 
@@ -433,9 +435,10 @@ internal sealed class DocumentGenerator
                 contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
                 cell.Bounds.Width,
                 cell.Bounds.Height);
-            for (var t = firstText; t < plan.Texts.Count; t++)
+            var texts = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Texts);
+            for (var t = firstText; t < texts.Length; t++)
             {
-                plan.Texts[t].Clip = clip;
+                texts[t].Clip = clip;
             }
         }
 
@@ -530,8 +533,10 @@ internal sealed class DocumentGenerator
     private void EmitLine(PagePlan plan, LineBox line, double originX, double baseline)
     {
         var y = baseline - line.Baseline;
-        foreach (var fragment in line.Fragments)
+        var lineFragments = line.Fragments;
+        for (var fi = 0; fi < lineFragments.Count; fi++)
         {
+            var fragment = lineFragments[fi];
             var text = fragment.Text;
             if (text.Length == 0)
             {
@@ -649,7 +654,8 @@ internal sealed class DocumentGenerator
             if (fonts.TryResolveFallbackGlyph(CodePointAt(text, i), out var face, out _) && !IsWinAnsi(CodePointAt(text, i)))
             {
                 var generated = ResolveSfnt(face);
-                var bytes = new List<byte>();
+                var bytes = scratchBytes;
+                bytes.Clear();
                 var advance = 0.0;
                 while (i < text.Length)
                 {
@@ -736,7 +742,8 @@ internal sealed class DocumentGenerator
         {
             var (face, _) = fonts.ResolveGlyph(primary, CodePointAt(text, i));
             var generated = ResolveSfnt(face);
-            var bytes = new List<byte>();
+            var bytes = scratchBytes;
+            bytes.Clear();
             var advance = 0.0;
             while (i < text.Length)
             {
