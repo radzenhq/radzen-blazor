@@ -19,8 +19,8 @@ internal static class GlyfSubsetter
     private const ushort WeHaveAScale = 0x0008;
     private const ushort XAndYScale = 0x0040;
     private const ushort TwoByTwo = 0x0080;
+    private const ushort WeHaveInstructions = 0x0100;
     private const uint ChecksumMagic = 0xB1B0AFBA;
-    private static readonly string[] HintingTables = ["cvt ", "fpgm", "prep"];
 
     public static byte[] Subset(SfntFont font, IReadOnlyCollection<ushort> glyphIds)
     {
@@ -66,18 +66,20 @@ internal static class GlyfSubsetter
         gidMap = BuildMap(ordered);
         var count = ordered.Count;
 
-        var glyfLength = 0;
+        // Upper bound: stripping instructions only shrinks glyphs, and per-glyph
+        // 2-byte padding adds at most one byte per glyph (offset by removed bytes).
+        var glyfUpperBound = 0;
         foreach (var gid in ordered)
         {
-            glyfLength += (int)(loca[gid + 1] - loca[gid]);
+            glyfUpperBound += (int)(loca[gid + 1] - loca[gid]) + 1;
         }
 
         var pool = System.Buffers.ArrayPool<byte>.Shared;
-        var newGlyf = pool.Rent(Math.Max(glyfLength, 1));
+        var newGlyf = pool.Rent(Math.Max(glyfUpperBound, 1));
         var newLoca = new byte[(count + 1) * 4];
         try
         {
-            FillGlyf(glyf, loca, ordered, gidMap, newGlyf, newLoca);
+            var glyfLength = FillGlyf(glyf, loca, ordered, gidMap, newGlyf, newLoca);
             var newHead = BuildHead(head);
             var newHmtx = BuildHmtx(font, ordered);
             var newHhea = BuildHhea(font, count);
@@ -209,7 +211,11 @@ internal static class GlyfSubsetter
         return tail;
     }
 
-    private static void FillGlyf(ReadOnlySpan<byte> glyf, LocaTable loca, List<ushort> ordered, Dictionary<ushort, ushort> gidMap, byte[] newGlyf, byte[] newLoca)
+    // Copies each glyph outline (renumbering composite components) while STRIPPING
+    // instruction bytecode, since the subset drops the cvt/fpgm/prep tables that
+    // bytecode depends on. Hinting is irrelevant at document render sizes and the
+    // outline (contours/points) is untouched. Returns the total glyf byte length.
+    private static int FillGlyf(ReadOnlySpan<byte> glyf, LocaTable loca, List<ushort> ordered, Dictionary<ushort, ushort> gidMap, byte[] newGlyf, byte[] newLoca)
     {
         var offset = 0;
         for (var newGid = 0; newGid < ordered.Count; newGid++)
@@ -218,34 +224,81 @@ internal static class GlyfSubsetter
             var gid = ordered[newGid];
             var start = (int)loca[gid];
             var length = (int)(loca[gid + 1] - loca[gid]);
-            glyf.Slice(start, length).CopyTo(newGlyf.AsSpan(offset));
 
-            if (length >= 10 && ReadInt16(glyf, start) < 0)
+            int written;
+            if (length < 10)
             {
-                RewriteComponents(newGlyf, offset, gidMap);
+                glyf.Slice(start, length).CopyTo(newGlyf.AsSpan(offset));
+                written = length;
+            }
+            else if (ReadInt16(glyf, start) < 0)
+            {
+                written = CopyCompositeStripped(glyf, start, length, gidMap, newGlyf, offset);
+            }
+            else
+            {
+                written = CopySimpleStripped(glyf, start, length, newGlyf, offset);
             }
 
-            offset += length;
+            // loca offsets stay 2-byte aligned; pad an odd stripped length by one.
+            if ((written & 1) != 0)
+            {
+                newGlyf[offset + written] = 0;
+                written++;
+            }
+
+            offset += written;
         }
 
         WriteUInt32(newLoca, ordered.Count * 4, (uint)offset);
+        return offset;
     }
 
-    private static void RewriteComponents(byte[] outline, int glyphOffset, Dictionary<ushort, ushort> gidMap)
+    // Simple glyph: after endPtsOfContours[numberOfContours] set instructionLength
+    // to 0 and drop the instructions[] block, keeping flags/coordinates that follow.
+    private static int CopySimpleStripped(ReadOnlySpan<byte> glyf, int start, int length, byte[] newGlyf, int offset)
     {
-        var pos = glyphOffset + 10;
-        while (true)
-        {
-            var flags = ReadUInt16(outline, pos);
-            var component = ReadUInt16(outline, pos + 2);
-            WriteUInt16(outline, pos + 2, gidMap[component]);
-            pos += ComponentRecordTail(flags) + 4;
+        var numberOfContours = ReadInt16(glyf, start);
+        var instrLenPos = start + 10 + numberOfContours * 2;
+        var instrLen = ReadUInt16(glyf, instrLenPos);
 
-            if ((flags & MoreComponents) == 0)
-            {
-                break;
-            }
+        var headLen = instrLenPos + 2 - start;
+        glyf.Slice(start, headLen).CopyTo(newGlyf.AsSpan(offset));
+        WriteUInt16(newGlyf, offset + headLen - 2, 0);
+
+        var tailStart = instrLenPos + 2 + instrLen;
+        var tailLen = start + length - tailStart;
+        glyf.Slice(tailStart, tailLen).CopyTo(newGlyf.AsSpan(offset + headLen));
+
+        return headLen + tailLen;
+    }
+
+    // Composite glyph: renumber components, then if the last component's flags carry
+    // WE_HAVE_INSTRUCTIONS clear that bit and drop the trailing instruction block.
+    private static int CopyCompositeStripped(ReadOnlySpan<byte> glyf, int start, int length, Dictionary<ushort, ushort> gidMap, byte[] newGlyf, int offset)
+    {
+        glyf.Slice(start, length).CopyTo(newGlyf.AsSpan(offset));
+
+        var pos = offset + 10;
+        int lastFlagsPos;
+        ushort flags;
+        do
+        {
+            lastFlagsPos = pos;
+            flags = ReadUInt16(newGlyf, pos);
+            var component = ReadUInt16(newGlyf, pos + 2);
+            WriteUInt16(newGlyf, pos + 2, gidMap[component]);
+            pos += ComponentRecordTail(flags) + 4;
         }
+        while ((flags & MoreComponents) != 0);
+
+        var lastFlags = ReadUInt16(newGlyf, lastFlagsPos);
+        if ((lastFlags & WeHaveInstructions) != 0)
+        {
+            WriteUInt16(newGlyf, lastFlagsPos, (ushort)(lastFlags & ~WeHaveInstructions));
+        }
+
+        return pos - offset; // end of components; trailing instructions dropped
     }
 
     private static byte[] BuildHead(ReadOnlySpan<byte> head)
@@ -308,6 +361,11 @@ internal static class GlyfSubsetter
 
         var result = maxp.ToArray();
         WriteUInt16(result, 4, (ushort)glyphCount);
+        if (result.Length >= 26)
+        {
+            WriteUInt16(result, 24, 0); // maxSizeOfInstructions: no glyph keeps instructions
+        }
+
         return result;
     }
 
@@ -349,17 +407,6 @@ internal static class GlyfSubsetter
         if (font.TryGetTableMemory("post", out var post))
         {
             tables.Add(("post", BuildPost(post.Span)));
-        }
-
-        // Glyph outlines are copied verbatim including their instruction bytecode,
-        // which CALLs fpgm functions and reads cvt; carry those and prep through so
-        // hint-executing rasterizers do not error on missing data.
-        foreach (var tag in HintingTables)
-        {
-            if (font.TryGetTableMemory(tag, out var hinting))
-            {
-                tables.Add((tag, hinting));
-            }
         }
 
         tables.Sort(static (a, b) => string.CompareOrdinal(a.Tag, b.Tag));
