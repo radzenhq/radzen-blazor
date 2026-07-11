@@ -25,6 +25,9 @@ public sealed class Table : Block
     /// <summary>Gets the table-level borders.</summary>
     public Borders Borders { get; } = new();
 
+    /// <summary>Gets the default font for cells that do not specify their own.</summary>
+    public Font Font { get; } = new();
+
     /// <summary>Gets or sets the fixed table width, or <see langword="null"/> for automatic sizing.</summary>
     public Unit? Width { get; set; }
 

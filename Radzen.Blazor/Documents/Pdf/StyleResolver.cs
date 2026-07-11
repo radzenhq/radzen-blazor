@@ -40,7 +40,16 @@ internal static class StyleResolver
         {
             foreach (var cell in row.Cells)
             {
-                var context = new List<Font>(inherited.Count + 2) { cell.Font, row.Font };
+                var context = new List<Font> { cell.Font };
+                // Cell named style sits below the explicit cell font, above row/table defaults;
+                // Normal is excluded here so it stays the last (document-default) fallback.
+                foreach (var style in StyleChain(cell.StyleName, styles, includeNormal: false))
+                {
+                    context.Add(style.Font);
+                }
+
+                context.Add(row.Font);
+                context.Add(table.Font);
                 context.AddRange(inherited);
                 ResolveBlocks(cell.Blocks, styles, context);
             }
@@ -93,7 +102,7 @@ internal static class StyleResolver
         }
     }
 
-    private static List<Style> StyleChain(string? name, StyleCollection styles)
+    private static List<Style> StyleChain(string? name, StyleCollection styles, bool includeNormal = true)
     {
         var chain = new List<Style>();
         var visited = new HashSet<string>(System.StringComparer.Ordinal);
@@ -104,7 +113,7 @@ internal static class StyleResolver
             name = style.BaseStyle;
         }
 
-        if (!visited.Contains(styles.Normal.Name))
+        if (includeNormal && !visited.Contains(styles.Normal.Name))
         {
             chain.Add(styles.Normal);
         }

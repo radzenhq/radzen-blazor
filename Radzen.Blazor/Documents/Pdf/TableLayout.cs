@@ -145,8 +145,7 @@ internal static class TableLayout
                     cellWidth += columnWidths[cc];
                 }
 
-                var padding = cell.Padding.Point;
-                var contentWidth = cellWidth - (2 * padding);
+                var contentWidth = cellWidth - cell.PaddingLeft.Point - cell.PaddingRight.Point;
                 var align = cell.AlignmentValue ?? ColumnAlignment(table, c) ?? table.Rows[r].AlignmentValue;
                 var (items, contentHeight) = LayoutContent(cell, contentWidth, align, fonts, measureImage);
 
@@ -174,7 +173,7 @@ internal static class TableLayout
                 continue;
             }
 
-            var h = p.ContentHeight + (2 * p.Cell.Padding.Point);
+            var h = p.ContentHeight + p.Cell.PaddingTop.Point + p.Cell.PaddingBottom.Point;
             if (h > rowHeights[p.Row])
             {
                 rowHeights[p.Row] = h;
@@ -190,7 +189,7 @@ internal static class TableLayout
                 continue;
             }
 
-            var needed = p.ContentHeight + (2 * p.Cell.Padding.Point);
+            var needed = p.ContentHeight + p.Cell.PaddingTop.Point + p.Cell.PaddingBottom.Point;
             double covered = 0;
             var end = p.Row + p.RowSpan - 1;
             for (var rr = p.Row; rr <= end; rr++)
@@ -224,13 +223,14 @@ internal static class TableLayout
 
             var x = columnX[p.Column];
             var y = rowY[p.Row];
-            var padding = p.Cell.Padding.Point;
+            var padLeft = p.Cell.PaddingLeft.Point;
+            var padTop = p.Cell.PaddingTop.Point;
             var bounds = new Rect(x, y, width, height);
             var contentBox = new Rect(
-                x + padding,
-                y + padding,
-                width - (2 * padding),
-                height - (2 * padding));
+                x + padLeft,
+                y + padTop,
+                width - padLeft - p.Cell.PaddingRight.Point,
+                height - padTop - p.Cell.PaddingBottom.Point);
 
             var factor = p.Cell.VerticalAlignment switch
             {

@@ -38,6 +38,20 @@ public class RowCollection : IReadOnlyList<Row>
         return row;
     }
 
+    /// <summary>
+    /// Removes the row at the specified index.
+    /// </summary>
+    /// <param name="index">The zero-based index of the row to remove.</param>
+    /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index"/> is out of range.</exception>
+    public void RemoveAt(int index) => items.RemoveAt(index);
+
+    /// <summary>
+    /// Removes the specified row.
+    /// </summary>
+    /// <param name="row">The row to remove.</param>
+    /// <returns><see langword="true"/> if the row was removed; otherwise <see langword="false"/>.</returns>
+    public bool Remove(Row row) => items.Remove(row);
+
     /// <inheritdoc/>
     public IEnumerator<Row> GetEnumerator() => items.GetEnumerator();
 

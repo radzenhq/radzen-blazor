@@ -215,6 +215,50 @@ public class TableTests
     }
 
     [Fact]
+    public void Rows_RemoveAt_RemovesTargetRowAndKeepsOthers()
+    {
+        var t = new Table();
+        t.Columns.Add();
+        var r0 = t.Rows.Add();
+        r0.Cells[0].Text = "zero";
+        var r1 = t.Rows.Add();
+        r1.Cells[0].Text = "one";
+        var r2 = t.Rows.Add();
+        r2.Cells[0].Text = "two";
+
+        t.Rows.RemoveAt(1);
+
+        Assert.Equal(2, t.Rows.Count);
+        Assert.Same(r0, t.Rows[0]);
+        Assert.Same(r2, t.Rows[1]);
+        Assert.Equal("zero", t.Rows[0].Cells[0].Text);
+        Assert.Equal("two", t.Rows[1].Cells[0].Text);
+    }
+
+    [Fact]
+    public void Rows_Remove_RemovesMatchingRow()
+    {
+        var t = new Table();
+        t.Columns.Add();
+        var r0 = t.Rows.Add();
+        var r1 = t.Rows.Add();
+
+        Assert.True(t.Rows.Remove(r0));
+        Assert.Single(t.Rows);
+        Assert.Same(r1, t.Rows[0]);
+        Assert.False(t.Rows.Remove(r0));
+    }
+
+    [Fact]
+    public void Rows_RemoveAt_OutOfRange_Throws()
+    {
+        var t = new Table();
+        t.Columns.Add();
+        t.Rows.Add();
+        Assert.Throws<ArgumentOutOfRangeException>(() => t.Rows.RemoveAt(5));
+    }
+
+    [Fact]
     public void Cell_ColumnSpanLessThanOne_Throws()
     {
         var t = new Table();

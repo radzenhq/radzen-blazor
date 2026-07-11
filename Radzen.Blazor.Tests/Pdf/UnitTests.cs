@@ -71,6 +71,41 @@ public class UnitTests
     }
 
     [Fact]
+    public void Parse_MapsUnitsToPoints()
+    {
+        Assert.Equal(CmToPt * 9, Unit.Parse("9cm").Point, 9);
+        Assert.Equal(MmToPt * 5, Unit.Parse("5mm").Point, 9);
+        Assert.Equal(72, Unit.Parse("1in").Point, 9);
+        Assert.Equal(12, Unit.Parse("12pt").Point, 9);
+    }
+
+    [Fact]
+    public void Parse_BareNumber_IsPoints()
+    {
+        Assert.Equal(12, Unit.Parse("12").Point, 9);
+        Assert.Equal(3.5, Unit.Parse(" 3.5 ").Point, 9);
+    }
+
+    [Fact]
+    public void Parse_IsCultureInvariant()
+    {
+        Assert.Equal(1.5, Unit.Parse("1.5pt").Point, 9);
+    }
+
+    [Fact]
+    public void ImplicitFromString_Parses()
+    {
+        Unit u = "1in";
+        Assert.Equal(72, u.Point, 9);
+    }
+
+    [Fact]
+    public void Parse_InvalidText_Throws()
+    {
+        Assert.Throws<System.FormatException>(() => Unit.Parse("abc"));
+    }
+
+    [Fact]
     public void Comparison_Operators()
     {
         var small = Unit.FromPoint(3);
