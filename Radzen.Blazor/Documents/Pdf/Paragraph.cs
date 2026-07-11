@@ -52,6 +52,9 @@ public class Paragraph : Block
 
     internal HorizontalAlignment EffectiveAlignment => alignment ?? StyleAlignment ?? HorizontalAlignment.Left;
 
+    internal HorizontalAlignment ResolveAlignment(HorizontalAlignment? inherited)
+        => alignment ?? StyleAlignment ?? inherited ?? HorizontalAlignment.Left;
+
     internal Font? EffectiveFont { get; set; }
 
     /// <summary>Gets or sets the left indent applied to every line of the paragraph.</summary>
