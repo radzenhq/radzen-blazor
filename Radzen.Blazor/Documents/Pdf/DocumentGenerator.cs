@@ -127,6 +127,7 @@ internal sealed class DocumentGenerator
     private readonly Dictionary<SfntFont, GeneratedFont> sfntFonts = [];
     private readonly Dictionary<Image, GeneratedImage> images = [];
     private readonly Dictionary<object, StructureElement> blockElements = [];
+    private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
     private StructureElement documentElement = null!;
 
     private DocumentGenerator(DocumentBuilder builder)
@@ -301,7 +302,7 @@ internal sealed class DocumentGenerator
 
         foreach (var positioned in page.Tables)
         {
-            EmitFragment(plan, positioned, left, contentTop);
+            EmitFragment(plan, positioned, left, contentTop, pageNumber, pageCount);
         }
 
         foreach (var positioned in page.Images)
@@ -319,7 +320,7 @@ internal sealed class DocumentGenerator
 
         foreach (var positioned in page.HeaderTables)
         {
-            EmitFragment(plan, positioned, left, headerTop);
+            EmitFragment(plan, positioned, left, headerTop, pageNumber, pageCount);
         }
 
         var bandTop = height - page.FooterTop;
@@ -332,7 +333,7 @@ internal sealed class DocumentGenerator
 
         foreach (var positioned in page.FooterTables)
         {
-            EmitFragment(plan, positioned, left, bandTop);
+            EmitFragment(plan, positioned, left, bandTop, pageNumber, pageCount);
         }
 
         return plan;
@@ -356,7 +357,13 @@ internal sealed class DocumentGenerator
             var line = lines[i];
             if (line.Source is Paragraph paragraph && HasField(paragraph))
             {
-                EmitLine(plan, ResolveFields(paragraph, line.Line, width, pageNumber, pageCount), left, top - line.Y, null);
+                var y = line.Y;
+                foreach (var box in ResolveFields(paragraph, width, pageNumber, pageCount))
+                {
+                    EmitLine(plan, box, left, top - y, null);
+                    y += box.Height;
+                }
+
                 while (i < lines.Count && lines[i].Source == paragraph)
                 {
                     i++;
@@ -397,11 +404,18 @@ internal sealed class DocumentGenerator
         return false;
     }
 
-    // Consecutive runs of the same style merge into one fragment so the resolved
-    // line is drawn as one text run with its inter-word spaces intact. Tabs split
-    // fragments and advance to the default left tab stops; when the paragraph opts
-    // into RightTabStop the text after the last tab is pushed flush right.
-    private LineBox ResolveFields(Paragraph paragraph, LineBox template, double width, int pageNumber, int pageCount)
+    // Substitutes page-number/count fields with their resolved text, then re-runs the
+    // line breaker so the paragraph wraps, honors '\n' forced breaks and tab stops, and
+    // emits ALL of its lines. Consecutive runs of the same style merge into one piece so
+    // the field text keeps its inter-word spaces intact (the breaker re-inserts the gaps
+    // and CoalesceFragments restores them at emit); tabs are re-encoded as '\t' between
+    // pieces so a trailing tab is preserved rather than dropped.
+    private IReadOnlyList<LineBox> ResolveFields(
+        Paragraph paragraph,
+        double width,
+        int pageNumber,
+        int pageCount,
+        HorizontalAlignment? inheritedAlignment = null)
     {
         var pieces = new List<(Run Run, System.Text.StringBuilder Text, int TabsBefore)>();
         var pendingTabs = 0;
@@ -440,76 +454,32 @@ internal sealed class DocumentGenerator
             }
         }
 
-        var lastTab = -1;
-        for (var i = 0; i < pieces.Count; i++)
+        // A trailing tab (no piece follows it) survives as a final tabs-only piece.
+        if (pendingTabs > 0 && pieces.Count > 0)
         {
-            if (pieces[i].TabsBefore > 0)
-            {
-                lastTab = i;
-            }
+            pieces.Add((pieces[^1].Run, new System.Text.StringBuilder(), pendingTabs));
         }
 
-        var fragments = new List<LineFragment>();
-        double advance = 0;
+        var resolved = new Paragraph
+        {
+            LeftIndent = paragraph.LeftIndent,
+            LineSpacing = paragraph.LineSpacing,
+            RightTabStop = paragraph.RightTabStop,
+            AlignmentValue = paragraph.AlignmentValue,
+            StyleAlignment = paragraph.StyleAlignment,
+            EffectiveFont = paragraph.EffectiveFont,
+        };
+
         foreach (var (run, builderText, tabsBefore) in pieces)
         {
-            for (var t = 0; t < tabsBefore; t++)
+            resolved.Inlines.Add(new Run(new string('\t', tabsBefore) + builderText.ToString())
             {
-                advance = LineBreaker.AdvanceToTabStop(advance);
-            }
-
-            var text = builderText.ToString();
-            var measured = fonts.MeasureText(text, run.ResolvedFont);
-            fragments.Add(new LineFragment
-            {
-                Run = run,
-                Text = text,
-                Start = 0,
-                Length = text.Length,
-                XOffset = advance,
-                Advance = measured,
+                EffectiveFont = run.ResolvedFont,
+                Link = run.Link,
             });
-            advance += measured;
         }
 
-        var indent = paragraph.LeftIndent.Point;
-        var max = width - indent;
-
-        if (paragraph.RightTabStop && lastTab >= 0 && advance < max)
-        {
-            var delta = max - advance;
-            var trailing = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
-            for (var f = lastTab; f < trailing.Length; f++)
-            {
-                trailing[f].XOffset += delta;
-            }
-
-            advance = max;
-        }
-        var x0 = paragraph.EffectiveAlignment switch
-        {
-            HorizontalAlignment.Right or HorizontalAlignment.End => max - advance,
-            HorizontalAlignment.Center => (max - advance) / 2.0,
-            _ => 0,
-        };
-
-        var shift = indent + x0;
-        if (shift != 0)
-        {
-            var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
-            for (var f = 0; f < span.Length; f++)
-            {
-                span[f].XOffset += shift;
-            }
-        }
-
-        return new LineBox
-        {
-            Fragments = fragments,
-            Width = advance,
-            Height = template.Height,
-            Baseline = template.Baseline,
-        };
+        return LineBreaker.Break(resolved, width, fonts, inheritedAlignment);
     }
 
     private (double Width, double Height) MeasureImage(Image image, double availableWidth)
@@ -530,10 +500,11 @@ internal sealed class DocumentGenerator
         plan.UsedImages.Add(xobject);
     }
 
-    private void EmitFragment(PagePlan plan, PositionedTableFragment positioned, double left, double contentTop)
+    private void EmitFragment(PagePlan plan, PositionedTableFragment positioned, double left, double contentTop, int pageNumber, int pageCount)
     {
         var layout = positioned.Layout;
         var x = left + (layout.Source?.LeftIndent.Point ?? 0);
+        var rowIndex = RowIndex(layout);
         foreach (var row in positioned.Fragment.Rows)
         {
             if (layout.Source?.Rows[row.SourceRow].Background is { } background)
@@ -548,20 +519,43 @@ internal sealed class DocumentGenerator
                 });
             }
 
-            foreach (var cell in layout.Cells)
+            var rowCells = row.SourceRow < rowIndex.Length ? rowIndex[row.SourceRow] : null;
+            if (rowCells is null)
             {
-                if (cell.Row != row.SourceRow)
-                {
-                    continue;
-                }
+                continue;
+            }
 
+            foreach (var cell in rowCells)
+            {
                 var delta = positioned.Y + row.Y - cell.Bounds.Y;
-                EmitCell(plan, layout, cell, x, contentTop, delta, null);
+                EmitCell(plan, layout, cell, x, contentTop, delta, null, pageNumber, pageCount);
             }
         }
     }
 
-    private void EmitCell(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta, StructureElement? inherited)
+    // Groups a table's flat cell list by source row once (cached per layout) so a
+    // multi-fragment table no longer rescans every cell for each row it emits.
+    private List<LaidOutCell>[] RowIndex(LaidOutTable layout)
+    {
+        if (tableRows.TryGetValue(layout, out var cached))
+        {
+            return cached;
+        }
+
+        var rows = new List<LaidOutCell>[layout.RowHeights.Count];
+        foreach (var cell in layout.Cells)
+        {
+            if (cell.Row < rows.Length)
+            {
+                (rows[cell.Row] ??= []).Add(cell);
+            }
+        }
+
+        tableRows[layout] = rows;
+        return rows;
+    }
+
+    private void EmitCell(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta, StructureElement? inherited, int pageNumber, int pageCount)
     {
         var element = ElementOf(cell.Cell) ?? inherited;
         if (cell.Cell.Background is { } background)
@@ -580,10 +574,34 @@ internal sealed class DocumentGenerator
 
         var firstText = plan.Texts.Count;
         var overflows = false;
-        foreach (var line in cell.Lines)
+        var cellLines = cell.Lines;
+        var li = 0;
+        while (li < cellLines.Count)
         {
-            EmitLine(plan, line.Line, left + line.X, contentTop - (line.Y + delta), element);
-            overflows |= line.Line.Width > cell.ContentBox.Width + 0.01;
+            var line = cellLines[li];
+            // Fields (page number/count) in a band-table cell resolve per page here,
+            // re-broken to the cell's content width, replacing the placeholder layout.
+            if (line.Source is Paragraph paragraph && HasField(paragraph))
+            {
+                var y = line.Y;
+                foreach (var box in ResolveFields(paragraph, cell.ContentBox.Width, pageNumber, pageCount))
+                {
+                    EmitLine(plan, box, left + line.X, contentTop - (y + delta), element);
+                    overflows |= box.Width > cell.ContentBox.Width + 0.01;
+                    y += box.Height;
+                }
+
+                while (li < cellLines.Count && cellLines[li].Source == paragraph)
+                {
+                    li++;
+                }
+            }
+            else
+            {
+                EmitLine(plan, line.Line, left + line.X, contentTop - (line.Y + delta), element);
+                overflows |= line.Line.Width > cell.ContentBox.Width + 0.01;
+                li++;
+            }
         }
 
         // An unbreakable token wider than the cell is clipped to the cell box so it
@@ -622,7 +640,7 @@ internal sealed class DocumentGenerator
             var nestedLeft = left + nested.X + (nested.Layout.Source?.LeftIndent.Point ?? 0);
             foreach (var nestedCell in nested.Layout.Cells)
             {
-                EmitCell(plan, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y, element);
+                EmitCell(plan, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y, element, pageNumber, pageCount);
             }
         }
     }
@@ -869,8 +887,9 @@ internal sealed class DocumentGenerator
         }
     }
 
-    // One strike per maximal group of consecutive strikethrough fragments (across
-    // runs), drawn at roughly the x-height midline above the baseline.
+    // One strike per maximal group of consecutive strikethrough fragments that share
+    // size and color (across runs), drawn at roughly the x-height midline above the
+    // baseline; a change in size or color starts a new correctly-styled line.
     private static void EmitStrikethroughs(PagePlan plan, LineBox line, double originX, double y)
     {
         var fragments = line.Fragments;
@@ -887,7 +906,10 @@ internal sealed class DocumentGenerator
             var start = fragments[i].XOffset;
             var end = fragments[i].XOffset + fragments[i].Advance;
             var j = i + 1;
-            while (j < fragments.Count && fragments[j].Run.ResolvedFont.Strikethrough)
+            while (j < fragments.Count
+                && fragments[j].Run.ResolvedFont.Strikethrough
+                && fragments[j].Run.ResolvedFont.Size == font.Size
+                && fragments[j].Run.ResolvedFont.Color.Equals(font.Color))
             {
                 end = fragments[j].XOffset + fragments[j].Advance;
                 j++;
@@ -938,7 +960,9 @@ internal sealed class DocumentGenerator
                         break;
                     }
 
-                    generated.GidToUnicode[gid] = codepoint;
+                    // First-seen codepoint wins so glyphs shared by several codepoints
+                    // (e.g. hyphen/soft-hyphen) map deterministically, not by draw order.
+                    generated.GidToUnicode.TryAdd(gid, codepoint);
                     bytes.Add((byte)(gid >> 8));
                     bytes.Add((byte)(gid & 0xFF));
                     advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
@@ -1027,7 +1051,9 @@ internal sealed class DocumentGenerator
                     break;
                 }
 
-                generated.GidToUnicode[gid] = codepoint;
+                // First-seen codepoint wins so glyphs shared by several codepoints
+                // (e.g. hyphen/soft-hyphen) map deterministically, not by draw order.
+                generated.GidToUnicode.TryAdd(gid, codepoint);
                 bytes.Add((byte)(gid >> 8));
                 bytes.Add((byte)(gid & 0xFF));
                 advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
