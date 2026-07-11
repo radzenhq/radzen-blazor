@@ -68,6 +68,7 @@ internal sealed class DocumentGenerator
         public required byte[] Bytes { get; init; }
         public double StrokeWidth { get; init; }
         public double Shear { get; init; }
+        public StructureElement? Element { get; init; }
         public Rect? Clip { get; set; }
     }
 
@@ -78,6 +79,7 @@ internal sealed class DocumentGenerator
         public required double Width { get; init; }
         public required double Height { get; init; }
         public required GeneratedImage Image { get; init; }
+        public StructureElement? Element { get; init; }
     }
 
     private readonly struct FillDraw
@@ -119,6 +121,8 @@ internal sealed class DocumentGenerator
     private readonly Dictionary<string, GeneratedFont> base14Fonts = new(System.StringComparer.Ordinal);
     private readonly Dictionary<SfntFont, GeneratedFont> sfntFonts = [];
     private readonly Dictionary<Image, GeneratedImage> images = [];
+    private readonly Dictionary<object, StructureElement> blockElements = [];
+    private StructureElement documentElement = null!;
 
     private DocumentGenerator(DocumentBuilder builder)
     {
@@ -143,6 +147,8 @@ internal sealed class DocumentGenerator
         document.Info.Keywords = builder.Info.Keywords;
         document.Info.Creator = builder.Info.Creator;
 
+        BuildStructureTree();
+
         var paginated = new List<PaginatedPage>();
         foreach (var section in builder.Sections)
         {
@@ -155,9 +161,12 @@ internal sealed class DocumentGenerator
             plans.Add(GeneratePage(paginated[i], i + 1, paginated.Count));
         }
 
-        foreach (var plan in plans)
+        document.Structure = documentElement;
+
+        for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
         {
-            var generated = Finalize(plan);
+            var plan = plans[pageIndex];
+            var generated = Finalize(plan, pageIndex);
             var page = new Page(plan.Size.Width, plan.Size.Height)
             {
                 Generated = generated,
@@ -170,6 +179,95 @@ internal sealed class DocumentGenerator
         return document;
     }
 
+    // The logical structure tree mirrors the authoring DOM in authoring order:
+    // Document -> Sect per Section -> P (or H1..H6 by StyleName), Table -> TR ->
+    // TH/TD, Figure per image. Header and footer content stays unmapped (untagged).
+    private void BuildStructureTree()
+    {
+        documentElement = new StructureElement { Type = "Document" };
+        foreach (var section in builder.Sections)
+        {
+            var sect = new StructureElement { Type = "Sect" };
+            documentElement.Children.Add(sect);
+            foreach (var block in section.Blocks)
+            {
+                MapBlock(block, sect);
+            }
+        }
+    }
+
+    private void MapBlock(Block block, StructureElement parent)
+    {
+        switch (block)
+        {
+            case Paragraph paragraph:
+                var p = new StructureElement { Type = HeadingType(paragraph.StyleName) };
+                parent.Children.Add(p);
+                blockElements[paragraph] = p;
+                break;
+            case Table table:
+                var element = new StructureElement { Type = "Table" };
+                parent.Children.Add(element);
+                foreach (var row in table.Rows)
+                {
+                    var tr = new StructureElement { Type = "TR" };
+                    element.Children.Add(tr);
+                    foreach (var cell in row.Cells)
+                    {
+                        var td = new StructureElement { Type = row.IsHeader ? "TH" : "TD" };
+                        tr.Children.Add(td);
+                        blockElements[cell] = td;
+                    }
+                }
+
+                break;
+            case Image image:
+                var figure = new StructureElement { Type = "Figure" };
+                parent.Children.Add(figure);
+                blockElements[image] = figure;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static string HeadingType(string? styleName)
+    {
+        if (styleName is null)
+        {
+            return "P";
+        }
+
+        if (styleName.Length == 8
+            && styleName.StartsWith("Heading", System.StringComparison.OrdinalIgnoreCase)
+            && styleName[7] is >= '1' and <= '6')
+        {
+            return Heading(styleName[7]);
+        }
+
+        if (styleName.Length == 2
+            && (styleName[0] == 'H' || styleName[0] == 'h')
+            && styleName[1] is >= '1' and <= '6')
+        {
+            return Heading(styleName[1]);
+        }
+
+        return "P";
+    }
+
+    private static string Heading(char level) => level switch
+    {
+        '1' => "H1",
+        '2' => "H2",
+        '3' => "H3",
+        '4' => "H4",
+        '5' => "H5",
+        _ => "H6",
+    };
+
+    private StructureElement? ElementOf(object block)
+        => blockElements.TryGetValue(block, out var element) ? element : null;
+
     private PagePlan GeneratePage(PaginatedPage page, int pageNumber, int pageCount)
     {
         var height = page.Size.Height.Point;
@@ -180,7 +278,7 @@ internal sealed class DocumentGenerator
 
         foreach (var line in page.Lines)
         {
-            EmitLine(plan, line.Line, left, contentTop - line.Y);
+            EmitLine(plan, line.Line, left, contentTop - line.Y, ElementOf(line.Source));
         }
 
         foreach (var positioned in page.Tables)
@@ -240,7 +338,7 @@ internal sealed class DocumentGenerator
             var line = lines[i];
             if (line.Source is Paragraph paragraph && HasField(paragraph))
             {
-                EmitLine(plan, ResolveFields(paragraph, line.Line, width, pageNumber, pageCount), left, top - line.Y);
+                EmitLine(plan, ResolveFields(paragraph, line.Line, width, pageNumber, pageCount), left, top - line.Y, null);
                 while (i < lines.Count && lines[i].Source == paragraph)
                 {
                     i++;
@@ -248,7 +346,7 @@ internal sealed class DocumentGenerator
             }
             else
             {
-                EmitLine(plan, line.Line, left, top - line.Y);
+                EmitLine(plan, line.Line, left, top - line.Y, null);
                 i++;
             }
         }
@@ -409,6 +507,7 @@ internal sealed class DocumentGenerator
             Width = positioned.Width,
             Height = positioned.Height,
             Image = xobject,
+            Element = ElementOf(positioned.Source),
         });
         plan.UsedImages.Add(xobject);
     }
@@ -439,13 +538,14 @@ internal sealed class DocumentGenerator
                 }
 
                 var delta = positioned.Y + row.Y - cell.Bounds.Y;
-                EmitCell(plan, layout, cell, x, contentTop, delta);
+                EmitCell(plan, layout, cell, x, contentTop, delta, null);
             }
         }
     }
 
-    private void EmitCell(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta)
+    private void EmitCell(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta, StructureElement? inherited)
     {
+        var element = ElementOf(cell.Cell) ?? inherited;
         if (cell.Cell.Background is { } background)
         {
             plan.Fills.Add(new FillDraw
@@ -464,7 +564,7 @@ internal sealed class DocumentGenerator
         var overflows = false;
         foreach (var line in cell.Lines)
         {
-            EmitLine(plan, line.Line, left + line.X, contentTop - (line.Y + delta));
+            EmitLine(plan, line.Line, left + line.X, contentTop - (line.Y + delta), element);
             overflows |= line.Line.Width > cell.ContentBox.Width + 0.01;
         }
 
@@ -494,6 +594,7 @@ internal sealed class DocumentGenerator
                 Width = image.Width,
                 Height = image.Height,
                 Image = xobject,
+                Element = element,
             });
             plan.UsedImages.Add(xobject);
         }
@@ -503,7 +604,7 @@ internal sealed class DocumentGenerator
             var nestedLeft = left + nested.X + (nested.Layout.Source?.LeftIndent.Point ?? 0);
             foreach (var nestedCell in nested.Layout.Cells)
             {
-                EmitCell(plan, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y);
+                EmitCell(plan, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y, element);
             }
         }
     }
@@ -641,7 +742,7 @@ internal sealed class DocumentGenerator
         return result;
     }
 
-    private void EmitLine(PagePlan plan, LineBox line, double originX, double baseline)
+    private void EmitLine(PagePlan plan, LineBox line, double originX, double baseline, StructureElement? element)
     {
         var y = baseline - line.Baseline;
         var lineFragments = CoalesceFragments(line.Fragments);
@@ -657,11 +758,11 @@ internal sealed class DocumentGenerator
             var font = fragment.Run.ResolvedFont;
             if (fonts.TryResolvePrimary(font, out var primary))
             {
-                EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y);
+                EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y, element);
             }
             else
             {
-                EmitBase14Fragment(plan, fragment, font, originX + fragment.XOffset, y);
+                EmitBase14Fragment(plan, fragment, font, originX + fragment.XOffset, y, element);
             }
         }
 
@@ -793,7 +894,7 @@ internal sealed class DocumentGenerator
     // Base-14 WinAnsi path. Characters outside cp1252 are never dropped: they render
     // through the registered fallback chain when it supplies a glyph, otherwise a
     // visible '?' placeholder is substituted.
-    private void EmitBase14Fragment(PagePlan plan, LineFragment fragment, Font font, double startX, double y)
+    private void EmitBase14Fragment(PagePlan plan, LineFragment fragment, Font font, double startX, double y, StructureElement? element)
     {
         var metrics = Base14Metrics.Resolve(font) ?? Base14Metrics.Resolve(new Font())!;
         var size = font.Size;
@@ -835,6 +936,7 @@ internal sealed class DocumentGenerator
                     Color = font.Color,
                     Font = generated,
                     Bytes = [.. bytes],
+                    Element = element,
                 });
 
                 x += advance;
@@ -872,6 +974,7 @@ internal sealed class DocumentGenerator
                     Color = font.Color,
                     Font = generated,
                     Bytes = EncodeWinAnsi(segment),
+                    Element = element,
                 });
 
                 x += metrics.MeasureString(segment, size);
@@ -882,7 +985,7 @@ internal sealed class DocumentGenerator
     // Splits a fragment into maximal sub-runs by the physical face that actually
     // supplies each glyph (primary or a SetFallback face), so every glyph is drawn
     // by the embedded subset that owns it - not the primary's .notdef.
-    private void EmitSfntFragment(PagePlan plan, LineFragment fragment, SfntFont primary, double startX, double y)
+    private void EmitSfntFragment(PagePlan plan, LineFragment fragment, SfntFont primary, double startX, double y, StructureElement? element)
     {
         var font = fragment.Run.ResolvedFont;
         var size = font.Size;
@@ -922,6 +1025,7 @@ internal sealed class DocumentGenerator
                 Color = font.Color,
                 Font = generated,
                 Bytes = [.. bytes],
+                Element = element,
                 // Synthetic bold: no real bold face is available, so the glyphs are
                 // thickened by fill+stroke with a small stroke width at emission.
                 StrokeWidth = font.Bold && !face.Bold ? size * 0.03 : 0,
@@ -1010,7 +1114,11 @@ internal sealed class DocumentGenerator
         return map;
     }
 
-    private static GeneratedPage Finalize(PagePlan plan)
+    // Content emission order: fills and edges (untagged artifacts), untagged images
+    // and texts (headers/footers), then tagged content grouped per structure element
+    // in depth-first tree order - one BDC <</MCID n>> ... EMC per element per page -
+    // so BDC order in the stream always equals the tree's reading order.
+    private GeneratedPage Finalize(PagePlan plan, int pageIndex)
     {
         var writer = new ContentWriter();
 
@@ -1053,79 +1161,35 @@ internal sealed class DocumentGenerator
             writer.WriteRaw(" l\nS\nQ\n");
         }
 
+        var taggedImages = new Dictionary<StructureElement, List<ImageDraw>>();
+        var taggedTexts = new Dictionary<StructureElement, List<TextDraw>>();
+
         foreach (var image in plan.Images)
         {
-            writer.WriteRaw("q\n");
-            writer.WriteNumber(image.Width);
-            writer.WriteRaw(" 0 0 ");
-            writer.WriteNumber(image.Height);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(image.X);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(image.Y);
-            writer.WriteRaw(" cm\n");
-            writer.WriteName(image.Image.Key);
-            writer.WriteRaw(" Do\nQ\n");
+            if (image.Element is { } element)
+            {
+                Accumulate(taggedImages, element, image);
+            }
+            else
+            {
+                WriteImageDraw(writer, image);
+            }
         }
 
         foreach (var text in plan.Texts)
         {
-            if (text.Clip is { } clip)
+            if (text.Element is { } element)
             {
-                writer.WriteRaw("q\n");
-                writer.WriteNumber(clip.X);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(clip.Y);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(clip.Width);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(clip.Height);
-                writer.WriteRaw(" re W n\n");
-            }
-
-            writer.WriteRaw("BT\n");
-            writer.WriteColor(text.Color, "rg");
-            writer.WriteName(text.Font.Key);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(text.Size);
-            writer.WriteRaw(" Tf\n");
-            if (text.StrokeWidth > 0)
-            {
-                writer.WriteColor(text.Color, "RG");
-                writer.WriteNumber(text.StrokeWidth);
-                writer.WriteRaw(" w\n2 Tr\n");
-            }
-
-            if (text.Shear != 0)
-            {
-                writer.WriteRaw("1 0 ");
-                writer.WriteNumber(text.Shear);
-                writer.WriteRaw(" 1 ");
-                writer.WriteNumber(text.X);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(text.Baseline);
-                writer.WriteRaw(" Tm\n");
+                Accumulate(taggedTexts, element, text);
             }
             else
             {
-                writer.WriteNumber(text.X);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(text.Baseline);
-                writer.WriteRaw(" Td\n");
-            }
-            writer.WriteString(text.Bytes);
-            writer.WriteRaw(" Tj\n");
-            if (text.StrokeWidth > 0)
-            {
-                writer.WriteRaw("0 Tr\n");
-            }
-
-            writer.WriteRaw("ET\n");
-            if (text.Clip is not null)
-            {
-                writer.WriteRaw("Q\n");
+                WriteTextDraw(writer, text);
             }
         }
+
+        var mcid = 0;
+        WriteTaggedContent(writer, documentElement, pageIndex, taggedImages, taggedTexts, ref mcid);
 
         var usedFonts = new List<GeneratedFont>(plan.UsedFonts);
         var usedImages = new List<GeneratedImage>(plan.UsedImages);
@@ -1138,4 +1202,133 @@ internal sealed class DocumentGenerator
         };
     }
 
+    private static void Accumulate<T>(Dictionary<StructureElement, List<T>> map, StructureElement element, T draw)
+    {
+        if (!map.TryGetValue(element, out var list))
+        {
+            list = [];
+            map[element] = list;
+        }
+
+        list.Add(draw);
+    }
+
+    private static void WriteTaggedContent(
+        ContentWriter writer,
+        StructureElement element,
+        int pageIndex,
+        Dictionary<StructureElement, List<ImageDraw>> taggedImages,
+        Dictionary<StructureElement, List<TextDraw>> taggedTexts,
+        ref int mcid)
+    {
+        var hasImages = taggedImages.TryGetValue(element, out var elementImages);
+        var hasTexts = taggedTexts.TryGetValue(element, out var elementTexts);
+        if (hasImages || hasTexts)
+        {
+            writer.WriteName(element.Type);
+            writer.WriteRaw(" <</MCID ");
+            writer.WriteRaw(mcid.ToString(CultureInfo.InvariantCulture));
+            writer.WriteRaw(">> BDC\n");
+
+            if (hasImages)
+            {
+                foreach (var image in elementImages!)
+                {
+                    WriteImageDraw(writer, image);
+                }
+            }
+
+            if (hasTexts)
+            {
+                foreach (var text in elementTexts!)
+                {
+                    WriteTextDraw(writer, text);
+                }
+            }
+
+            writer.WriteRaw("EMC\n");
+            element.Marks.Add((pageIndex, mcid));
+            mcid++;
+        }
+
+        foreach (var child in element.Children)
+        {
+            WriteTaggedContent(writer, child, pageIndex, taggedImages, taggedTexts, ref mcid);
+        }
+    }
+
+    private static void WriteImageDraw(ContentWriter writer, in ImageDraw image)
+    {
+        writer.WriteRaw("q\n");
+        writer.WriteNumber(image.Width);
+        writer.WriteRaw(" 0 0 ");
+        writer.WriteNumber(image.Height);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(image.X);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(image.Y);
+        writer.WriteRaw(" cm\n");
+        writer.WriteName(image.Image.Key);
+        writer.WriteRaw(" Do\nQ\n");
+    }
+
+    private static void WriteTextDraw(ContentWriter writer, in TextDraw text)
+    {
+        if (text.Clip is { } clip)
+        {
+            writer.WriteRaw("q\n");
+            writer.WriteNumber(clip.X);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(clip.Y);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(clip.Width);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(clip.Height);
+            writer.WriteRaw(" re W n\n");
+        }
+
+        writer.WriteRaw("BT\n");
+        writer.WriteColor(text.Color, "rg");
+        writer.WriteName(text.Font.Key);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(text.Size);
+        writer.WriteRaw(" Tf\n");
+        if (text.StrokeWidth > 0)
+        {
+            writer.WriteColor(text.Color, "RG");
+            writer.WriteNumber(text.StrokeWidth);
+            writer.WriteRaw(" w\n2 Tr\n");
+        }
+
+        if (text.Shear != 0)
+        {
+            writer.WriteRaw("1 0 ");
+            writer.WriteNumber(text.Shear);
+            writer.WriteRaw(" 1 ");
+            writer.WriteNumber(text.X);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(text.Baseline);
+            writer.WriteRaw(" Tm\n");
+        }
+        else
+        {
+            writer.WriteNumber(text.X);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(text.Baseline);
+            writer.WriteRaw(" Td\n");
+        }
+
+        writer.WriteString(text.Bytes);
+        writer.WriteRaw(" Tj\n");
+        if (text.StrokeWidth > 0)
+        {
+            writer.WriteRaw("0 Tr\n");
+        }
+
+        writer.WriteRaw("ET\n");
+        if (text.Clip is not null)
+        {
+            writer.WriteRaw("Q\n");
+        }
+    }
 }
