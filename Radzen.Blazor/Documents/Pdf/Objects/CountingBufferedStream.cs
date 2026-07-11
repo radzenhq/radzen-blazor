@@ -83,9 +83,16 @@ internal sealed class CountingBufferedStream(Stream inner) : Stream
     {
         if (disposing && buffer is not null)
         {
-            FlushBuffer();
-            ArrayPool<byte>.Shared.Return(buffer);
-            buffer = null;
+            var rented = buffer;
+            try
+            {
+                FlushBuffer();
+            }
+            finally
+            {
+                buffer = null;
+                ArrayPool<byte>.Shared.Return(rented);
+            }
         }
 
         base.Dispose(disposing);
