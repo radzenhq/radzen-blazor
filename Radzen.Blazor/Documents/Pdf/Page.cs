@@ -106,6 +106,7 @@ public sealed class Page
             }
 
             overlay = appended.ToArray();
+            appended.Dispose();
             overlayEmitter = appended;
             return content;
         }
@@ -116,13 +117,15 @@ public sealed class Page
             element.Emit(writer);
         }
 
+        var bytes = writer.ToArray();
+        writer.Dispose();
         emitter = writer;
-        return writer.ToArray();
+        return bytes;
     }
 
     private bool OriginalElementsIntact()
     {
-        var writer = new ContentWriter();
+        using var writer = new ContentWriter();
         for (var i = 0; i < materializedCount; i++)
         {
             elements[i].Emit(writer);
@@ -147,8 +150,10 @@ public sealed class Page
             element.Emit(writer);
         }
 
+        var bytes = writer.ToArray();
+        writer.Dispose();
         emitter = writer;
-        return writer.ToArray();
+        return bytes;
     }
 
     private void EnsureMaterialized()
@@ -167,7 +172,7 @@ public sealed class Page
         ContentInterpreter.Materialize(content, elements);
         materializedCount = elements.Count;
 
-        var writer = new ContentWriter();
+        using var writer = new ContentWriter();
         foreach (var element in elements)
         {
             element.Emit(writer);

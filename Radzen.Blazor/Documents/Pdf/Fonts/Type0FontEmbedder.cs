@@ -21,7 +21,11 @@ internal static class Type0FontEmbedder
     private const int StemV = 80;
     private const int DefaultWidth = 1000;
 
-    public static ReferenceObject Embed(DocumentWriter writer, SfntFont font, IReadOnlyDictionary<ushort, int> gidToUnicode)
+    // compactGidMap is the original-to-compact renumbering the generator already computed
+    // and used to remap the content-stream codes; passing it in keeps a single source of
+    // truth so W/CIDSet/ToUnicode cannot silently disagree with the drawn glyph codes.
+    // When null (direct callers) the map is derived here as before.
+    public static ReferenceObject Embed(DocumentWriter writer, SfntFont font, IReadOnlyDictionary<ushort, int> gidToUnicode, IReadOnlyDictionary<ushort, ushort>? compactGidMap = null)
     {
         ArgumentNullException.ThrowIfNull(writer);
         ArgumentNullException.ThrowIfNull(font);
@@ -48,24 +52,23 @@ internal static class Type0FontEmbedder
         // The CIDSet must flag exactly the glyphs present in the embedded subset
         // (PDF/A 6.2.11.4.2): every compact gid 0..N-1 owns a loca entry (glyf)
         // or a charstring (CFF), so all bits are set.
-        Dictionary<ushort, ushort> gidMap;
+        IReadOnlyDictionary<ushort, ushort> gidMap;
         if (font.IsCff)
         {
-            gidMap = CffSubsetter.BuildCompactGidMap(usedGids);
+            gidMap = compactGidMap ?? CffSubsetter.BuildCompactGidMap(usedGids);
             EmbedCff(writer, font, usedGids, descriptor);
         }
         else
         {
-            gidMap = EmbedGlyf(writer, font, usedGids, descriptor);
+            var glyfMap = EmbedGlyf(writer, font, usedGids, descriptor);
+            System.Diagnostics.Debug.Assert(compactGidMap is null || SameMap(compactGidMap, glyfMap),
+                "Generator and glyf-subsetter compact gid maps diverged.");
+            gidMap = compactGidMap ?? glyfMap;
         }
 
         var cidSet = BuildFullCidSet(gidMap.Count);
         var widths = BuildWidths(font, usedGids, gidMap);
-        var toUnicode = new Dictionary<ushort, int>(gidToUnicode.Count);
-        foreach (var (gid, codepoint) in gidToUnicode)
-        {
-            toUnicode[gidMap[gid]] = codepoint;
-        }
+        var toUnicode = RemapToCompactGids(gidToUnicode, gidMap);
 
         descriptor["CIDSet"] = writer.Add(FlateFilter.EncodeStream(cidSet));
         var descriptorRef = writer.Add(descriptor);
@@ -147,7 +150,38 @@ internal static class Type0FontEmbedder
     // usedGids is sorted, so the compact CIDs it produces are ascending; consecutive
     // CIDs collapse into a single "startCid [w0 w1 ...]" run instead of one c [w] pair
     // per glyph, which is much smaller when the used glyphs fill a contiguous CID block.
-    private static ArrayObject BuildWidths(SfntFont font, SortedSet<ushort> usedGids, Dictionary<ushort, ushort> gidMap)
+    // The single gid->Unicode remap shared by the embedder and the generator's fresh-text
+    // extraction fonts: each drawn glyph's Unicode is re-keyed by its compact gid.
+    public static Dictionary<ushort, int> RemapToCompactGids(IReadOnlyDictionary<ushort, int> gidToUnicode, IReadOnlyDictionary<ushort, ushort> gidMap)
+    {
+        var remapped = new Dictionary<ushort, int>(gidToUnicode.Count);
+        foreach (var (gid, codepoint) in gidToUnicode)
+        {
+            remapped[gidMap[gid]] = codepoint;
+        }
+
+        return remapped;
+    }
+
+    private static bool SameMap(IReadOnlyDictionary<ushort, ushort> a, IReadOnlyDictionary<ushort, ushort> b)
+    {
+        if (a.Count != b.Count)
+        {
+            return false;
+        }
+
+        foreach (var (gid, compact) in a)
+        {
+            if (!b.TryGetValue(gid, out var other) || other != compact)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static ArrayObject BuildWidths(SfntFont font, SortedSet<ushort> usedGids, IReadOnlyDictionary<ushort, ushort> gidMap)
     {
         var w = new ArrayObject();
         ArrayObject? run = null;
