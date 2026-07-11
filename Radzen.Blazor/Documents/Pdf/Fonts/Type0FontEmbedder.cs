@@ -42,16 +42,19 @@ internal static class Type0FontEmbedder
             ["StemV"] = new NumberObject(StemV),
         };
 
-        // The CIDSet must flag every glyph present in the embedded subset (PDF/A
-        // 6.2.11.4.2), including composite component glyphs the subsetter pulls in.
-        var embeddedGids = new SortedSet<ushort>(usedGids) { 0 };
+        // The CIDSet must flag exactly the glyphs present in the embedded subset
+        // (PDF/A 6.2.11.4.2): for glyf that is the outline-bearing closure (composite
+        // components included, empty-outline glyphs like space excluded); CFF
+        // charstrings are always present, so used + notdef.
+        SortedSet<ushort> embeddedGids;
         if (font.IsCff)
         {
             EmbedCff(writer, font, usedGids, descriptor);
+            embeddedGids = [.. usedGids, 0];
         }
         else
         {
-            embeddedGids.UnionWith(EmbedGlyf(writer, font, usedGids, descriptor));
+            embeddedGids = [.. EmbedGlyf(writer, font, usedGids, descriptor)];
         }
 
         descriptor["CIDSet"] = writer.Add(FlateFilter.EncodeStream(BuildCidSet(embeddedGids)));

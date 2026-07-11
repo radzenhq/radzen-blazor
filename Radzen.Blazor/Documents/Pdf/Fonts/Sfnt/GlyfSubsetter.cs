@@ -64,16 +64,28 @@ internal static class GlyfSubsetter
         var longLoca = ReadInt16(head, 50) != 0;
         var loca = new LocaTable(locaMemory.Span, longLoca);
 
-        closure = ComputeClosure(glyf, loca, numGlyphs, glyphIds);
+        var fullClosure = ComputeClosure(glyf, loca, numGlyphs, glyphIds);
 
-        var glyfLength = MeasureGlyf(loca, numGlyphs, closure);
+        // The out set reports only glyphs actually emitted with outline data. A
+        // PDF/A CIDSet must mark exactly the present glyphs (veraPDF 6.2.11.4.2),
+        // so used glyphs with an empty outline (e.g. space) are excluded.
+        closure = [];
+        foreach (var gid in fullClosure)
+        {
+            if (loca[gid + 1] > loca[gid])
+            {
+                closure.Add(gid);
+            }
+        }
+
+        var glyfLength = MeasureGlyf(loca, numGlyphs, fullClosure);
         var locaLength = (numGlyphs + 1) * 4;
         var pool = System.Buffers.ArrayPool<byte>.Shared;
         var newGlyf = pool.Rent(glyfLength);
         var newLoca = pool.Rent(locaLength);
         try
         {
-            FillGlyf(glyf, loca, numGlyphs, closure, newGlyf, newLoca);
+            FillGlyf(glyf, loca, numGlyphs, fullClosure, newGlyf, newLoca);
             var newHead = BuildHead(head);
             return Assemble(font, newGlyf.AsMemory(0, glyfLength), newLoca.AsMemory(0, locaLength), newHead, out length);
         }
