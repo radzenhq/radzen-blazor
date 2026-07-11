@@ -1,0 +1,150 @@
+#nullable enable
+using System;
+using System.Buffers.Binary;
+using System.Collections.Generic;
+using System.Linq;
+using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Fonts.Cff;
+using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Pdf.Objects;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// veraPDF 1.30.2 clause 6.2.11.4.2 test 2: the /CIDSet in the FontDescriptor of an
+// embedded CID font must identify ALL CIDs present in the embedded subset - not just
+// the CIDs referenced by content. These tests reload real PdfA3B Build() output,
+// re-parse the embedded FontFile2/FontFile3 with the internal SfntFont/CffFont, and
+// require the CIDSet bit set to equal the glyph set actually embedded (including
+// notdef and composite component glyphs the glyf subsetter pulled into the closure)
+// with no extra bits.
+public class PdfACidSetExactTests
+{
+    // Latin accented + Cyrillic breve forms force composite glyphs in Liberation Sans,
+    // so the glyf closure embeds component glyphs that no CID references directly.
+    private const string LatinSample = "Voilà - le café naïve! Мой рай";
+    private const string CjkSample = "Ab Мир 中产";
+
+    private static DocumentReader Build(Action<DocumentBuilder> register, string family, string text)
+    {
+        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
+        register(builder);
+        var section = builder.Sections.Add();
+        BuildTestSupport.AddText(section, text, family);
+        return BuildTestSupport.Read(builder);
+    }
+
+    private static DictionaryObject Descriptor(DocumentReader reader)
+    {
+        var top = Assert.Single(BuildTestSupport.Type0Fonts(reader));
+        var descendants = Assert.IsType<ArrayObject>(reader.Resolve(top["DescendantFonts"]));
+        Assert.Equal(1, descendants.Count);
+        var descendant = Assert.IsType<DictionaryObject>(reader.Resolve(descendants[0]));
+        return Assert.IsType<DictionaryObject>(reader.Resolve(descendant["FontDescriptor"]));
+    }
+
+    private static HashSet<int> CidSetBits(DocumentReader reader, DictionaryObject descriptor)
+    {
+        Assert.True(descriptor.ContainsKey("CIDSet"), "FontDescriptor must keep /CIDSet");
+        var stream = Assert.IsType<StreamObject>(reader.Resolve(descriptor["CIDSet"]));
+        return Type0EmbedSupport.SetBits(reader.DecodeStream(stream));
+    }
+
+    private static HashSet<int> UsedGids(SfntFont font, string text)
+    {
+        var set = new HashSet<int>();
+        foreach (var ch in text)
+        {
+            var gid = font.GetGlyphId(ch);
+            if (gid != 0)
+            {
+                set.Add(gid);
+            }
+        }
+
+        return set;
+    }
+
+    // Glyphs with outline data in the embedded glyf subset. The subsetter keeps the
+    // original gid numbering (CID == gid under Identity-H) and writes zero-length
+    // loca ranges for glyphs outside the closure.
+    private static HashSet<int> EmbeddedGlyfGlyphs(byte[] fontFile2)
+    {
+        var subset = SfntFont.Parse(fontFile2);
+        Assert.True(subset.TryGetTable("loca", out var loca), "subset has loca");
+        Assert.True(subset.TryGetTable("head", out var head), "subset has head");
+
+        var longLoca = BinaryPrimitives.ReadInt16BigEndian(head.AsSpan(50)) != 0;
+        uint Offset(int index) => longLoca
+            ? BinaryPrimitives.ReadUInt32BigEndian(loca.AsSpan(index * 4))
+            : BinaryPrimitives.ReadUInt16BigEndian(loca.AsSpan(index * 2)) * 2u;
+
+        var set = new HashSet<int>();
+        for (var gid = 0; gid < subset.GlyphCount; gid++)
+        {
+            if (Offset(gid + 1) > Offset(gid))
+            {
+                set.Add(gid);
+            }
+        }
+
+        return set;
+    }
+
+    private static void AssertSameCids(HashSet<int> embedded, HashSet<int> bits)
+    {
+        var missing = embedded.Except(bits).Order().ToArray();
+        var extra = bits.Except(embedded).Order().ToArray();
+        Assert.True(missing.Length == 0,
+            $"CIDSet is missing embedded glyphs: {string.Join(", ", missing)}");
+        Assert.True(extra.Length == 0,
+            $"CIDSet marks CIDs not present in the embedded subset: {string.Join(", ", extra)}");
+    }
+
+    [Fact]
+    public void PdfA3B_LiberationGlyfSubset_CidSetMatchesEmbeddedGlyphsExactly()
+    {
+        var reader = Build(BuildTestSupport.RegisterLatin, BuildTestSupport.Latin, LatinSample);
+        var descriptor = Descriptor(reader);
+
+        var fontFile = Assert.IsType<StreamObject>(reader.Resolve(descriptor["FontFile2"]));
+        var withData = EmbeddedGlyfGlyphs(reader.DecodeStream(fontFile));
+
+        var used = UsedGids(Type0EmbedSupport.LoadLiberation(), LatinSample);
+
+        // Precondition: the sample must pull composite component glyphs into the
+        // closure, otherwise this test cannot distinguish CIDSet == used from
+        // CIDSet == embedded.
+        var components = withData.Where(gid => gid != 0 && !used.Contains(gid)).ToArray();
+        Assert.True(components.Length > 0, "sample must embed composite component glyphs");
+
+        // Present in the subset = glyphs with outlines, plus notdef, plus any used
+        // glyph that legitimately has an empty outline (e.g. space).
+        var embedded = new HashSet<int>(withData) { 0 };
+        embedded.UnionWith(used);
+
+        AssertSameCids(embedded, CidSetBits(reader, descriptor));
+    }
+
+    [Fact]
+    public void PdfA3B_NotoCffSubset_CidSetMatchesEmbeddedCharsetExactly()
+    {
+        var reader = Build(BuildTestSupport.RegisterCjk, BuildTestSupport.Cjk, CjkSample);
+        var descriptor = Descriptor(reader);
+
+        var fontFile = Assert.IsType<StreamObject>(reader.Resolve(descriptor["FontFile3"]));
+        var cff = CffFont.Parse(reader.DecodeStream(fontFile));
+
+        // The CID-keyed subset charset maps every embedded glyph to its CID.
+        var embedded = new HashSet<int>();
+        for (var i = 0; i < cff.GlyphCount; i++)
+        {
+            embedded.Add(cff.Charset[i]);
+        }
+
+        Assert.Contains(0, embedded);
+        Assert.True(embedded.Count > 5, "sample must embed several glyphs");
+
+        AssertSameCids(embedded, CidSetBits(reader, descriptor));
+    }
+}
