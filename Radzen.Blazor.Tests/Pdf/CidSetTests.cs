@@ -46,18 +46,26 @@ public class CidSetTests
     }
 
     [Fact]
-    public void Liberation_CidSetMarksEveryUsedGlyph()
+    public void Liberation_CidSetMarksUsedGlyphsExceptEmptyOutlines()
     {
         var font = Type0EmbedSupport.LoadLiberation();
-        var map = Type0EmbedSupport.BuildMap(font, LiberationSample);
+        var map = Type0EmbedSupport.BuildMap(font, LiberationSample + " ");
         var e = Type0EmbedSupport.Embed(font, map);
 
         var stream = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["CIDSet"]);
         var cidSet = Type0EmbedSupport.DecodeStream(e.Reader, stream);
 
+        // Space has an empty glyf outline; per PDF/A (veraPDF 6.2.11.4.2) it is not
+        // "present in the font program" and must not be marked, even though it is used.
+        var spaceGid = font.GetGlyphId(' ');
+        Assert.False(Type0EmbedSupport.CidBit(cidSet, spaceGid), "empty-outline space must not be marked");
+
         foreach (var gid in map.Keys)
         {
-            Assert.True(Type0EmbedSupport.CidBit(cidSet, gid), $"CIDSet missing gid {gid}");
+            if (gid != spaceGid)
+            {
+                Assert.True(Type0EmbedSupport.CidBit(cidSet, gid), $"CIDSet missing gid {gid}");
+            }
         }
 
         Assert.False(Type0EmbedSupport.CidBit(cidSet, 2000));

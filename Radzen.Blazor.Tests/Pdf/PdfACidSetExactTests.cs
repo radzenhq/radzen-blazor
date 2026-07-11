@@ -118,12 +118,15 @@ public class PdfACidSetExactTests
         var components = withData.Where(gid => gid != 0 && !used.Contains(gid)).ToArray();
         Assert.True(components.Length > 0, "sample must embed composite component glyphs");
 
-        // Present in the subset = glyphs with outlines, plus notdef, plus any used
-        // glyph that legitimately has an empty outline (e.g. space).
-        var embedded = new HashSet<int>(withData) { 0 };
-        embedded.UnionWith(used);
+        // Precondition: the sample uses at least one glyph with an empty outline
+        // (space), which must NOT be marked in the CIDSet per veraPDF 6.2.11.4.2.
+        Assert.True(used.Any(gid => !withData.Contains(gid)),
+            "sample must use an empty-outline glyph (e.g. space) to guard over-marking");
 
-        AssertSameCids(embedded, CidSetBits(reader, descriptor));
+        // Present in the subset = exactly the glyphs written with outline data
+        // (outline-bearing closure incl. notdef and composite components); used
+        // glyphs with an empty outline (space) are absent from the font program.
+        AssertSameCids(new HashSet<int>(withData), CidSetBits(reader, descriptor));
     }
 
     [Fact]
