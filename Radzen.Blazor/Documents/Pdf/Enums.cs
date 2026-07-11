@@ -22,6 +22,21 @@ public enum HorizontalAlignment
 }
 
 /// <summary>
+/// Alignment of the text that follows a tab stop.
+/// </summary>
+public enum TabAlignment
+{
+    /// <summary>The following text starts at the tab stop.</summary>
+    Left,
+    /// <summary>The following text is centered on the tab stop.</summary>
+    Center,
+    /// <summary>The following text ends at the tab stop.</summary>
+    Right,
+    /// <summary>The following text aligns its first decimal separator on the tab stop.</summary>
+    Decimal,
+}
+
+/// <summary>
 /// Vertical alignment of content.
 /// </summary>
 public enum VerticalAlignment
