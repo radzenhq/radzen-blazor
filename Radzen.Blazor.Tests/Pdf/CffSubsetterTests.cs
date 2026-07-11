@@ -1,6 +1,7 @@
 #nullable enable
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Fonts.Cff;
@@ -8,15 +9,15 @@ using Radzen.Documents.Pdf.Fonts.Cff;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Contract for CffSubsetter.Subset(CffFont, IReadOnlyCollection<int> glyphIds).
-// The subsetter rebuilds a compact, embeddable CFF that contains only the closure of
-// the requested glyphs: the requested original glyph ids plus glyph 0 (.notdef). CID-keyed
-// input yields CID-keyed output. Charstring subrs may be retained wholesale; only glyphs
-// (charstrings) are dropped, so the glyph closure is exactly requested-union-{0}.
+// COMPACT CID model (PDF CIDFontType0 with content codes == compact ids): the
+// subsetter rebuilds a CID-keyed CFF holding exactly the closure of the requested
+// glyphs (requested original gids plus glyph 0) RENUMBERED into a contiguous
+// space 0..N-1 with an IDENTITY charset (CID == new gid). Glyph 0 stays .notdef.
+// Charstrings are copied verbatim, so a kept glyph is located in the output by
+// matching its original charstring bytes; its advance width must survive.
 //
-// The oracle is F4a CffFont.Parse: the subset bytes are re-parsed and every expectation is
-// checked on the parsed result. Output glyph ordering is treated as opaque - a kept glyph is
-// located in the output by searching the charset for its ORIGINAL CID (unique per glyph in an
-// Adobe-Identity CID font), then its advance width / FD are read at that output gid.
+// The oracle is CffFont.Parse: the subset bytes are re-parsed and every
+// expectation is checked on the parsed result.
 //
 // Values derived from the exact fixture NotoSansSC-Subset.otf via fontTools 4.60.2
 // (font["CFF "].cff, getGlyphOrder, cidNNNNN name -> CID, Type 2 charstring .width):
@@ -27,7 +28,8 @@ namespace Radzen.Blazor.Pdf.Tests;
 //   gid 190 -> CID 307   width 608
 //   gid 300 -> CID 2341  width 1000
 //   gid 657 -> CID 65456 width 1000
-// Not-requested probes: gid 223 -> CID 340, gid 418 -> CID 28904.
+// Not-requested probes: gid 223 and gid 418. The original charset is NOT identity
+// above gid ~190, so identity-charset assertions genuinely pin the renumbering.
 // This is a CID-keyed CFF (ROS Adobe Identity 0), 658 glyphs, CFF table 59984 bytes.
 public class CffSubsetterTests
 {
@@ -46,19 +48,30 @@ public class CffSubsetterTests
     private static CffFont SubsetAndReparse(params int[] glyphIds)
         => CffFont.Parse(CffSubsetter.Subset(OriginalFont(), glyphIds));
 
-    // charset[outGid] -> original CID; find the output gid carrying a given original CID.
-    private static int OutGidForCid(CffFont cff, int cid)
+    // Charstrings are copied verbatim: the output gids carrying the original
+    // glyph's charstring bytes. Duplicates are possible (Latin 'A' gid 34 and
+    // Cyrillic А gid 190 share identical charstrings in the fixture).
+    private static List<int> OutGidsForOriginal(CffFont subset, CffFont original, int originalGid)
     {
-        var charset = cff.Charset;
-        for (var i = 0; i < charset.Length; i++)
+        var expected = original.GetCharStringBytes(originalGid);
+        var matches = new List<int>();
+        for (var gid = 0; gid < subset.GlyphCount; gid++)
         {
-            if (charset[i] == cid)
+            if (subset.GetCharStringBytes(gid).AsSpan().SequenceEqual(expected))
             {
-                return i;
+                matches.Add(gid);
             }
         }
 
-        return -1;
+        return matches;
+    }
+
+    private static void AssertIdentityCharset(CffFont subset)
+    {
+        for (var gid = 0; gid < subset.GlyphCount; gid++)
+        {
+            Assert.Equal(gid, subset.Charset[gid]);
+        }
     }
 
     [Fact]
@@ -88,29 +101,25 @@ public class CffSubsetterTests
     }
 
     [Fact]
-    public void Subset_Glyph0AlwaysPresent()
+    public void Subset_CharsetIsIdentityOverCompactSpace()
     {
-        // Glyph 0 is not in the requested set but must be pulled into the closure.
-        Assert.DoesNotContain(0, Requested);
-
         var subset = SubsetAndReparse(Requested);
 
-        Assert.NotEqual(-1, OutGidForCid(subset, 0));
+        // Original CIDs (307, 2341, 65456, ...) are renumbered away: CID == new gid.
+        AssertIdentityCharset(subset);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(1)]
-    [InlineData(34)]
-    [InlineData(66)]
-    [InlineData(307)]
-    [InlineData(2341)]
-    [InlineData(65456)]
-    public void Subset_KeptGlyphsRetainOriginalCid(int cid)
+    [Fact]
+    public void Subset_NotdefStaysAtGid0()
     {
+        // Glyph 0 is not in the requested set but must be pulled into the closure
+        // and keep its position: compact gid 0 carries the original .notdef.
+        Assert.DoesNotContain(0, Requested);
+
+        var original = OriginalFont();
         var subset = SubsetAndReparse(Requested);
 
-        Assert.NotEqual(-1, OutGidForCid(subset, cid));
+        Assert.Equal(original.GetCharStringBytes(0), subset.GetCharStringBytes(0));
     }
 
     [Theory]
@@ -118,44 +127,33 @@ public class CffSubsetterTests
     [InlineData(1, 224)]
     [InlineData(34, 608)]
     [InlineData(66, 563)]
-    [InlineData(307, 608)]
-    [InlineData(2341, 1000)]
-    [InlineData(65456, 1000)]
-    public void Subset_KeptGlyphsRetainOriginalAdvanceWidth(int cid, int expectedWidth)
-    {
-        var subset = SubsetAndReparse(Requested);
-        var outGid = OutGidForCid(subset, cid);
-        Assert.NotEqual(-1, outGid);
-
-        Assert.Equal(expectedWidth, subset.GetAdvanceWidth(outGid));
-    }
-
-    // Cross-check the subset advance against the original font at the same CID.
-    [Theory]
-    [InlineData(1, 1)]
-    [InlineData(34, 34)]
-    [InlineData(66, 66)]
-    [InlineData(190, 307)]
-    [InlineData(300, 2341)]
-    [InlineData(657, 65456)]
-    public void Subset_WidthMatchesOriginalFontAtSameCid(int originalGid, int cid)
+    [InlineData(190, 608)]
+    [InlineData(300, 1000)]
+    [InlineData(657, 1000)]
+    public void Subset_KeptGlyphsRetainCharstringAndAdvance(int originalGid, int expectedWidth)
     {
         var original = OriginalFont();
         var subset = SubsetAndReparse(Requested);
-        var outGid = OutGidForCid(subset, cid);
-        Assert.NotEqual(-1, outGid);
 
-        Assert.Equal(original.GetAdvanceWidth(originalGid), subset.GetAdvanceWidth(outGid));
+        var outGids = OutGidsForOriginal(subset, original, originalGid);
+        Assert.NotEmpty(outGids);
+
+        foreach (var outGid in outGids)
+        {
+            Assert.Equal(expectedWidth, subset.GetAdvanceWidth(outGid));
+            Assert.Equal(original.GetAdvanceWidth(originalGid), subset.GetAdvanceWidth(outGid));
+        }
     }
 
     [Theory]
-    [InlineData(340)]   // gid 223, not requested
-    [InlineData(28904)] // gid 418, not requested
-    public void Subset_NotKeptGlyphIsAbsent(int cid)
+    [InlineData(223)]
+    [InlineData(418)]
+    public void Subset_NotKeptGlyphIsAbsent(int originalGid)
     {
+        var original = OriginalFont();
         var subset = SubsetAndReparse(Requested);
 
-        Assert.Equal(-1, OutGidForCid(subset, cid));
+        Assert.Empty(OutGidsForOriginal(subset, original, originalGid));
     }
 
     [Fact]
@@ -173,12 +171,14 @@ public class CffSubsetterTests
     [Fact]
     public void Subset_SingleGlyph_StillKeepsNotdef()
     {
+        var original = OriginalFont();
         var subset = SubsetAndReparse(34);
 
         Assert.Equal(2, subset.GlyphCount);
-        Assert.NotEqual(-1, OutGidForCid(subset, 0));
-        Assert.NotEqual(-1, OutGidForCid(subset, 34));
         Assert.True(subset.IsCidKeyed);
+        AssertIdentityCharset(subset);
+        Assert.Equal(original.GetCharStringBytes(0), subset.GetCharStringBytes(0));
+        Assert.NotEmpty(OutGidsForOriginal(subset, original, 34));
     }
 
     [Fact]
@@ -187,8 +187,8 @@ public class CffSubsetterTests
         var subset = SubsetAndReparse();
 
         Assert.Equal(1, subset.GlyphCount);
-        Assert.NotEqual(-1, OutGidForCid(subset, 0));
         Assert.True(subset.IsCidKeyed);
+        AssertIdentityCharset(subset);
     }
 
     [Fact]
@@ -233,5 +233,6 @@ public class CffSubsetterTests
         var subset = CffFont.Parse(CffSubsetter.Subset(OriginalFont(), [34, 34, 66, 66, 66]));
 
         Assert.Equal(3, subset.GlyphCount); // {0, 34, 66}
+        AssertIdentityCharset(subset);
     }
 }

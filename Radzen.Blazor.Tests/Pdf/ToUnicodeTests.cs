@@ -7,10 +7,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 // Contract for the /ToUnicode CMap the embedder attaches to the Type0 font. The
 // CMap keys are the CIDs used in the content stream and map to the source text.
-// For the glyf path the CIDs are COMPACT renumbered gids (all < the embedded
-// subset's numGlyphs); for the CFF path CID == original gid. The stream is parsed
-// back and inverted to recover a Cyrillic+ASCII string (glyf font) and a CJK
-// string (CFF font).
+// On BOTH paths the CIDs are COMPACT renumbered ids (all < the embedded subset's
+// glyph count). The stream is parsed back and inverted to recover a
+// Cyrillic+ASCII string (glyf font) and a CJK string (CFF font).
 public class ToUnicodeTests
 {
     private const string LiberationSample = "Radzen Привет";
@@ -54,11 +53,17 @@ public class ToUnicodeTests
         var bytes = Type0EmbedSupport.DecodeStream(e.Reader, stream);
         var cmap = Type0EmbedSupport.ParseToUnicode(bytes);
 
-        Assert.Equal(NotoSample, Type0EmbedSupport.Reconstruct(font, cmap, NotoSample));
+        var fontFile = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["FontFile3"]);
+        var subset = Radzen.Documents.Pdf.Fonts.Cff.CffFont.Parse(
+            Type0EmbedSupport.DecodeStream(e.Reader, fontFile));
 
-        Assert.Equal("中", cmap[font.GetGlyphId('中')]); // gid 395
-        Assert.Equal("产", cmap[font.GetGlyphId('产')]); // gid 396
-        Assert.Equal("М", cmap[font.GetGlyphId('М')]); // Cyrillic, gid 202
+        // Every character of the sample is recoverable from exactly one CMap code,
+        // and every code lies in the compact CID space of the embedded CFF subset.
+        foreach (var ch in NotoSample)
+        {
+            var code = Type0EmbedSupport.NewGid(cmap, ch);
+            Assert.InRange(code, 0, subset.GlyphCount - 1);
+        }
     }
 
     [Fact]

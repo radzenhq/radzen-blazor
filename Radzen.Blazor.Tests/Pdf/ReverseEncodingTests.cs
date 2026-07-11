@@ -65,12 +65,12 @@ public class ReverseEncodingTests
         var top = "Привет";
         var bottom = "Мир";
 
+        var map = Type0EmbedSupport.BuildMap(font, top + bottom);
+
         var content = new System.Collections.Generic.List<byte>();
         // bottom run authored first, at a lower baseline; extraction must reorder.
-        content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 600, ExtractionSupport.IdentityCodes(font, bottom)));
-        content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 700, ExtractionSupport.IdentityCodes(font, top)));
-
-        var map = Type0EmbedSupport.BuildMap(font, top + bottom);
+        content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 600, Type0EmbedSupport.CompactCodes(font, map, bottom)));
+        content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 700, Type0EmbedSupport.CompactCodes(font, map, top)));
         var document = ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, font, map), [.. content]);
 
         var text = document.Pages[0].ExtractText();
@@ -107,7 +107,7 @@ public class ReverseEncodingTests
     private static Radzen.Documents.Pdf.Document BuildType0Page(Radzen.Documents.Pdf.Fonts.Sfnt.SfntFont font, string sample)
     {
         var map = Type0EmbedSupport.BuildMap(font, sample);
-        var codes = ExtractionSupport.IdentityCodes(font, sample);
+        var codes = Type0EmbedSupport.CompactCodes(font, map, sample);
         var content = ExtractionSupport.TextRun("F1", 12, 72, 700, codes);
         return ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, font, map), content);
     }

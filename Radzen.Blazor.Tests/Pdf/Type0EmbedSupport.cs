@@ -215,16 +215,24 @@ internal static class Type0EmbedSupport
         return Encoding.BigEndianUnicode.GetString(bytes);
     }
 
-    public static string Reconstruct(SfntFont font, Dictionary<int, string> toUnicode, string text)
+    // Content-stream bytes for a sample under the COMPACT scheme: embed once,
+    // invert the emitted ToUnicode, and encode each char as its compact 2-byte
+    // code. Mapping-agnostic - only assumes ToUnicode keys ARE the content codes.
+    public static byte[] CompactCodes(SfntFont font, IReadOnlyDictionary<ushort, int> map, string text)
     {
-        var builder = new StringBuilder();
-        foreach (var ch in text)
+        var e = Embed(font, map);
+        var stream = Stream(e.Reader, e.Top["ToUnicode"]);
+        var cmap = ParseToUnicode(DecodeStream(e.Reader, stream));
+
+        var bytes = new byte[text.Length * 2];
+        for (var i = 0; i < text.Length; i++)
         {
-            var gid = font.GetGlyphId(ch);
-            builder.Append(toUnicode[gid]);
+            var code = NewGid(cmap, text[i]);
+            bytes[i * 2] = (byte)(code >> 8);
+            bytes[(i * 2) + 1] = (byte)(code & 0xFF);
         }
 
-        return builder.ToString();
+        return bytes;
     }
 
     // Reverse ToUnicode lookup: the unique compact code mapping to ch.
