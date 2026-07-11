@@ -42,8 +42,31 @@ public sealed class FontCollection
 
         var bytes = ReadFully(font);
         registered[(family, bold, italic)] = IsCollection(bytes)
-            ? SfntFont.Parse(bytes, family)
+            ? SelectCollectionFace(bytes, family, bold, italic)
             : SfntFont.Parse(bytes);
+    }
+
+    // Prefers the family-named face whose parsed Bold/Italic flags match the requested
+    // style; falls back to the first face matching the family name.
+    private static SfntFont SelectCollectionFace(byte[] data, string family, bool bold, bool italic)
+    {
+        SfntFont? named = null;
+        foreach (var face in SfntFont.ParseCollection(data))
+        {
+            if (!string.Equals(face.FamilyName, family, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (face.Bold == bold && face.Italic == italic)
+            {
+                return face;
+            }
+
+            named ??= face;
+        }
+
+        return named ?? throw new InvalidDataException($"No font face with family name '{family}' was found.");
     }
 
     /// <summary>

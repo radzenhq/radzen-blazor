@@ -200,6 +200,13 @@ internal sealed class SfntFont
     {
         if (!directory.TryGet("OS/2", out var os2))
         {
+            if (directory.TryGet("head", out var head))
+            {
+                var macStyle = new SfntReader(data).ReadUInt16At((int)head.Offset + 44);
+                Bold = (macStyle & 0x01) != 0;
+                Italic = (macStyle & 0x02) != 0;
+            }
+
             return;
         }
 

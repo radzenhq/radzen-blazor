@@ -66,6 +66,7 @@ internal sealed class DocumentGenerator
         public required Color Color { get; init; }
         public required GeneratedFont Font { get; init; }
         public required byte[] Bytes { get; init; }
+        public double StrokeWidth { get; init; }
         public Rect? Clip { get; set; }
     }
 
@@ -761,6 +762,9 @@ internal sealed class DocumentGenerator
                 Color = font.Color,
                 Font = generated,
                 Bytes = [.. bytes],
+                // Synthetic bold: no real bold face is available, so the glyphs are
+                // thickened by fill+stroke with a small stroke width at emission.
+                StrokeWidth = font.Bold && !face.Bold ? size * 0.03 : 0,
             });
 
             runX += advance;
@@ -922,12 +926,25 @@ internal sealed class DocumentGenerator
             writer.WriteRaw(" ");
             writer.WriteNumber(text.Size);
             writer.WriteRaw(" Tf\n");
+            if (text.StrokeWidth > 0)
+            {
+                writer.WriteColor(text.Color, "RG");
+                writer.WriteNumber(text.StrokeWidth);
+                writer.WriteRaw(" w\n2 Tr\n");
+            }
+
             writer.WriteNumber(text.X);
             writer.WriteRaw(" ");
             writer.WriteNumber(text.Baseline);
             writer.WriteRaw(" Td\n");
             writer.WriteString(text.Bytes);
-            writer.WriteRaw(" Tj\nET\n");
+            writer.WriteRaw(" Tj\n");
+            if (text.StrokeWidth > 0)
+            {
+                writer.WriteRaw("0 Tr\n");
+            }
+
+            writer.WriteRaw("ET\n");
             if (text.Clip is not null)
             {
                 writer.WriteRaw("Q\n");
