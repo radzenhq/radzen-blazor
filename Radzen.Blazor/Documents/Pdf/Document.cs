@@ -284,7 +284,28 @@ public sealed class Document
     }
 
     private static string? Text(DocumentReader reader, DictionaryObject dictionary, string key)
-        => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text ? text.Value : null;
+        => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text
+            ? DecodeTextString(text.Value)
+            : null;
+
+    // A PDF text string (ISO 32000 7.9.2.2) whose raw bytes start with the FE FF
+    // byte order mark is UTF-16BE; otherwise the bytes are PDFDocEncoding/Latin1,
+    // which StringObject.Value already exposes verbatim as chars 0-255.
+    private static string DecodeTextString(string raw)
+    {
+        if (raw.Length < 2 || raw[0] != 0xFE || raw[1] != 0xFF)
+        {
+            return raw;
+        }
+
+        var bytes = new byte[raw.Length - 2];
+        for (var i = 0; i < bytes.Length; i++)
+        {
+            bytes[i] = (byte)raw[i + 2];
+        }
+
+        return System.Text.Encoding.BigEndianUnicode.GetString(bytes);
+    }
 
     /// <summary>
     /// Serializes the document to a byte array.
