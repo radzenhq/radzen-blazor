@@ -125,7 +125,17 @@ internal static class TableLayout
 
                 if (c >= nCols)
                 {
-                    break;
+                    // Rows covered by a RowSpan from above legitimately end up with a trailing,
+                    // never-filled cell (RowCollection.Add() always adds one cell per column); only
+                    // a cell that actually carries content represents real, silently-lost data.
+                    if (cell.Blocks.Count == 0)
+                    {
+                        break;
+                    }
+
+                    throw new System.InvalidOperationException(
+                        $"Row {r} has more cells than the table's resolved column count ({nCols}); " +
+                        $"cell at grid position {c} has no column to occupy.");
                 }
 
                 var span = System.Math.Min(cell.ColumnSpan, nCols - c);
