@@ -724,6 +724,9 @@ public sealed class Document
                 ["Subtype"] = new NameObject("Link"),
                 ["Rect"] = rect,
                 ["Border"] = border,
+                // PDF/A (ISO 19005-3 6.3.2) requires the Print flag (bit 3 = 4) set
+                // and Hidden/NoView clear on every annotation.
+                ["F"] = new NumberObject(4),
                 ["A"] = new DictionaryObject
                 {
                     ["S"] = new NameObject("URI"),
