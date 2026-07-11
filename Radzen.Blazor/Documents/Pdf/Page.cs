@@ -11,6 +11,7 @@ public sealed class Page
     private readonly ContentCollection elements = [];
     private byte[]? content;
     private bool materialized;
+    private int materializedCount;
     private byte[]? snapshot;
     private System.Collections.Generic.IReadOnlyDictionary<string, Fonts.ReverseFont>? textFonts;
 
@@ -76,13 +77,36 @@ public sealed class Page
     }
 
     // Resolves the content-stream bytes to write. An untouched loaded page reuses its
-    // retained raw bytes; a modified (or freshly authored) page re-encodes from
-    // elements and returns the emitter so its font resources can be built.
-    internal byte[]? BuildContent(out ContentWriter? emitter)
+    // retained raw bytes. A loaded page whose original elements are intact but that
+    // gained new elements keeps its raw bytes untouched and returns the additions as a
+    // separate overlay stream. Any other modification (or a freshly authored page)
+    // re-encodes from elements; the emitters carry the resources each stream needs.
+    internal byte[]? BuildContent(out ContentWriter? emitter, out byte[]? overlay, out ContentWriter? overlayEmitter)
     {
         emitter = null;
+        overlay = null;
+        overlayEmitter = null;
         if (elements.Count == 0)
         {
+            return content;
+        }
+
+        if (content is not null && snapshot is not null && elements.Count >= materializedCount
+            && OriginalElementsIntact())
+        {
+            if (elements.Count == materializedCount)
+            {
+                return content;
+            }
+
+            var appended = new ContentWriter("SF", "SIm");
+            for (var i = materializedCount; i < elements.Count; i++)
+            {
+                elements[i].Emit(appended);
+            }
+
+            overlay = appended.ToArray();
+            overlayEmitter = appended;
             return content;
         }
 
@@ -92,14 +116,19 @@ public sealed class Page
             element.Emit(writer);
         }
 
-        var bytes = writer.ToArray();
-        if (content is not null && snapshot is not null && Same(bytes, snapshot))
+        emitter = writer;
+        return writer.ToArray();
+    }
+
+    private bool OriginalElementsIntact()
+    {
+        var writer = new ContentWriter();
+        for (var i = 0; i < materializedCount; i++)
         {
-            return content;
+            elements[i].Emit(writer);
         }
 
-        emitter = writer;
-        return bytes;
+        return snapshot is not null && Same(writer.ToArray(), snapshot);
     }
 
     // A built page keeps the generator's bytes as its base; Content holds only the
@@ -112,7 +141,7 @@ public sealed class Page
             return null;
         }
 
-        var writer = new ContentWriter("SF");
+        var writer = new ContentWriter("SF", "SIm");
         foreach (var element in elements)
         {
             element.Emit(writer);
@@ -136,11 +165,7 @@ public sealed class Page
         }
 
         ContentInterpreter.Materialize(content, elements);
-
-        if (elements.Count == 0)
-        {
-            return;
-        }
+        materializedCount = elements.Count;
 
         var writer = new ContentWriter();
         foreach (var element in elements)
