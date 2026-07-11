@@ -486,6 +486,25 @@ public sealed class Document
                 }
             }
         }
+
+        // Overlay text added through Page.Content emits a non-embedded base-14 Type1
+        // font, which the generated.Fonts scan above cannot see; reject it with the
+        // same error the generator raises. Loaded original text keeps its own font
+        // reference (FontResourceName) and is not re-emitted as a base-14 face.
+        foreach (var page in Pages)
+        {
+            foreach (var element in page.Content)
+            {
+                if (element is not TextContent { FontResourceName: null } text)
+                {
+                    continue;
+                }
+
+                var name = Fonts.Base14Metrics.Resolve(text.Font)?.PostScriptName ?? "Helvetica";
+                throw new InvalidOperationException(
+                    $"PDF/A forbids the standard-14 font '{name}' referenced by name; register an embeddable font file for '{text.Font.Name}' with DocumentBuilder.Fonts instead.");
+            }
+        }
     }
 
     private void WriteAttachments(DocumentWriter writer, DictionaryObject catalog)
