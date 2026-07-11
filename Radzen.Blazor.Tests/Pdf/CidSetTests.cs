@@ -1,17 +1,20 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Linq;
+using Radzen.Documents.Pdf.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Contract for the /CIDSet stream inside the FontDescriptor: a bitmap whose set
-// bits mark the CIDs present in the subset. Under Identity-H CID == glyph id.
+// bits mark the CIDs present in the subset.
 //
 // The CID-keyed CFF subsetter closes over exactly (requested gids) + {0} with no
-// component expansion, so the Noto case pins an exact bit set. The TrueType glyf
-// subsetter also pulls in composite component glyphs, so the Liberation case only
-// pins that every used gid is marked (and an unused gid is not).
+// component expansion and keeps CID == original gid, so the Noto case pins an
+// exact bit set. The TrueType glyf subsetter renumbers into a COMPACT contiguous
+// glyph space 0..N-1 (used + composite closure + notdef), so the Liberation case
+// pins CIDSet == exactly {0..N-1} where N is the embedded subset's numGlyphs.
 public class CidSetTests
 {
     private const string LiberationSample = "Radzen Привет";
@@ -46,28 +49,26 @@ public class CidSetTests
     }
 
     [Fact]
-    public void Liberation_CidSetMarksUsedGlyphsExceptEmptyOutlines()
+    public void Liberation_CidSetMarksExactlyTheCompactGlyphSpace()
     {
         var font = Type0EmbedSupport.LoadLiberation();
         var map = Type0EmbedSupport.BuildMap(font, LiberationSample + " ");
         var e = Type0EmbedSupport.Embed(font, map);
 
+        var fontFile = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["FontFile2"]);
+        var subset = SfntFont.Parse(Type0EmbedSupport.DecodeStream(e.Reader, fontFile));
+
+        var expected = Type0EmbedSupport.GlyfClosure(font, map.Keys.Select(gid => (int)gid));
+        var n = (int)subset.GlyphCount;
+        Assert.Equal(expected.Count, n);
+        Assert.True(n < font.GlyphCount, "subset must be compact");
+
+        // Every compact gid 0..N-1 is present in the font program (including the
+        // empty-outline space glyph, which owns a loca entry), so the CIDSet marks
+        // exactly the compact space with no gaps and no extra bits.
         var stream = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["CIDSet"]);
-        var cidSet = Type0EmbedSupport.DecodeStream(e.Reader, stream);
+        var bits = Type0EmbedSupport.SetBits(Type0EmbedSupport.DecodeStream(e.Reader, stream));
 
-        // Space has an empty glyf outline; per PDF/A (veraPDF 6.2.11.4.2) it is not
-        // "present in the font program" and must not be marked, even though it is used.
-        var spaceGid = font.GetGlyphId(' ');
-        Assert.False(Type0EmbedSupport.CidBit(cidSet, spaceGid), "empty-outline space must not be marked");
-
-        foreach (var gid in map.Keys)
-        {
-            if (gid != spaceGid)
-            {
-                Assert.True(Type0EmbedSupport.CidBit(cidSet, gid), $"CIDSet missing gid {gid}");
-            }
-        }
-
-        Assert.False(Type0EmbedSupport.CidBit(cidSet, 2000));
+        Assert.Equal(Enumerable.Range(0, n).ToHashSet(), bits);
     }
 }

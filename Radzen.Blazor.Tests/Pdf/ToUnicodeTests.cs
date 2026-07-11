@@ -6,9 +6,11 @@ using Xunit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Contract for the /ToUnicode CMap the embedder attaches to the Type0 font. The
-// CMap keys are CIDs (== glyph ids under Identity-H) and map to the source text.
-// The stream is parsed back and inverted to recover a Cyrillic+ASCII string (glyf
-// font) and a CJK string (CFF font).
+// CMap keys are the CIDs used in the content stream and map to the source text.
+// For the glyf path the CIDs are COMPACT renumbered gids (all < the embedded
+// subset's numGlyphs); for the CFF path CID == original gid. The stream is parsed
+// back and inverted to recover a Cyrillic+ASCII string (glyf font) and a CJK
+// string (CFF font).
 public class ToUnicodeTests
 {
     private const string LiberationSample = "Radzen Привет";
@@ -24,12 +26,22 @@ public class ToUnicodeTests
         var bytes = Type0EmbedSupport.DecodeStream(e.Reader, stream);
         var cmap = Type0EmbedSupport.ParseToUnicode(bytes);
 
-        Assert.Equal(LiberationSample, Type0EmbedSupport.Reconstruct(font, cmap, LiberationSample));
+        var fontFile = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["FontFile2"]);
+        var subset = Radzen.Documents.Pdf.Fonts.Sfnt.SfntFont.Parse(
+            Type0EmbedSupport.DecodeStream(e.Reader, fontFile));
+
+        // Every character of the sample is recoverable from exactly one CMap code,
+        // and every code lies in the compact glyph space of the embedded subset.
+        foreach (var ch in LiberationSample)
+        {
+            var code = Type0EmbedSupport.NewGid(cmap, ch);
+            Assert.InRange(code, 0, subset.GlyphCount - 1);
+        }
 
         // Cyrillic 'е' (U+0435) and Latin 'e' (U+0065) are distinct glyphs.
-        Assert.Equal("е", cmap[font.GetGlyphId('е')]);
-        Assert.Equal("e", cmap[font.GetGlyphId('e')]);
-        Assert.Equal(" ", cmap[font.GetGlyphId(' ')]);
+        Assert.NotEqual(
+            Type0EmbedSupport.NewGid(cmap, 'е'),
+            Type0EmbedSupport.NewGid(cmap, 'e'));
     }
 
     [Fact]

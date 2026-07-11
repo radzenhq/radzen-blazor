@@ -226,4 +226,108 @@ internal static class Type0EmbedSupport
 
         return builder.ToString();
     }
+
+    // Reverse ToUnicode lookup: the unique compact code mapping to ch.
+    public static int NewGid(Dictionary<int, string> toUnicode, char ch)
+    {
+        var expected = ch.ToString();
+        var matches = new List<int>();
+        foreach (var (code, value) in toUnicode)
+        {
+            if (value == expected)
+            {
+                matches.Add(code);
+            }
+        }
+
+        return Assert.Single(matches);
+    }
+
+    // Independent composite-closure walker over the ORIGINAL font: requested gids
+    // plus recursively referenced glyf component gids plus .notdef. Includes glyphs
+    // with empty outlines (e.g. space) - the compact subset must assign them a gid
+    // so the content stream can reference them.
+    public static HashSet<int> GlyfClosure(SfntFont font, IEnumerable<int> gids)
+    {
+        Assert.True(font.TryGetTable("glyf", out var glyf), "font has glyf");
+        Assert.True(font.TryGetTable("loca", out var loca), "font has loca");
+        Assert.True(font.TryGetTable("head", out var head), "font has head");
+        var longLoca = System.Buffers.Binary.BinaryPrimitives.ReadInt16BigEndian(head.AsSpan(50)) != 0;
+
+        uint Offset(int index) => longLoca
+            ? System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(loca.AsSpan(index * 4))
+            : System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(loca.AsSpan(index * 2)) * 2u;
+
+        ushort U16(int offset) => System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(glyf.AsSpan(offset));
+
+        var closure = new HashSet<int> { 0 };
+        var pending = new Stack<int>();
+        pending.Push(0);
+        foreach (var gid in gids)
+        {
+            if (closure.Add(gid))
+            {
+                pending.Push(gid);
+            }
+        }
+
+        while (pending.Count > 0)
+        {
+            var gid = pending.Pop();
+            var start = (int)Offset(gid);
+            var end = (int)Offset(gid + 1);
+            if (end - start < 10 || (short)U16(start) >= 0)
+            {
+                continue;
+            }
+
+            var pos = start + 10;
+            while (true)
+            {
+                var flags = U16(pos);
+                var component = (int)U16(pos + 2);
+                if (closure.Add(component))
+                {
+                    pending.Push(component);
+                }
+
+                pos += 4;
+                pos += (flags & 0x0001) != 0 ? 4 : 2; // ARG_1_AND_2_ARE_WORDS
+                if ((flags & 0x0008) != 0)
+                {
+                    pos += 2; // WE_HAVE_A_SCALE
+                }
+                else if ((flags & 0x0040) != 0)
+                {
+                    pos += 4; // X_AND_Y_SCALE
+                }
+                else if ((flags & 0x0080) != 0)
+                {
+                    pos += 8; // 2x2
+                }
+
+                if ((flags & 0x0020) == 0) // MORE_COMPONENTS
+                {
+                    break;
+                }
+            }
+        }
+
+        return closure;
+    }
+
+    // Raw glyf outline bytes of a glyph in an sfnt font (empty array for empty outlines).
+    public static byte[] OutlineBytes(SfntFont font, int gid)
+    {
+        Assert.True(font.TryGetTable("glyf", out var glyf));
+        Assert.True(font.TryGetTable("loca", out var loca));
+        Assert.True(font.TryGetTable("head", out var head));
+        var longLoca = System.Buffers.Binary.BinaryPrimitives.ReadInt16BigEndian(head.AsSpan(50)) != 0;
+
+        uint Offset(int index) => longLoca
+            ? System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(loca.AsSpan(index * 4))
+            : System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(loca.AsSpan(index * 2)) * 2u;
+
+        return glyf[(int)Offset(gid)..(int)Offset(gid + 1)];
+    }
 }

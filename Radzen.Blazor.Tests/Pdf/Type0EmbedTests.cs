@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -16,7 +17,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 // that preserves the used glyphs and their advances.
 //
 // glyf fixture: LiberationSans-Regular.ttf, upem 2048, sample "Radzen Привет".
-//   'R' gid 53 adv 1479 -> 722 ; ' ' gid 3 adv 569 -> 278 ; 'П' gid 976 -> 719.
+//   Original gids 'R'=53 ' '=3 'П'=976; scaled advances R=722 space=278 П=719.
+//   The glyf subsetter renumbers into a compact space, so compact gids are
+//   recovered through ToUnicode rather than pinned.
 // CFF  fixture: NotoSansSC-Subset.otf (ROS Adobe-Identity-0), upem 1000,
 //   sample "Ab Мир 中产". '中' gid 395 adv 1000 ; 'М' gid 202 adv 812.
 public class Type0EmbedTests
@@ -86,27 +89,34 @@ public class Type0EmbedTests
         Assert.IsType<StreamObject>(e.Reader.Resolve(d["FontFile2"]));
     }
 
+    // The glyf path renumbers into a compact glyph space; W is keyed by the NEW
+    // compact gid, recovered per character through the ToUnicode CMap.
     [Fact]
-    public void Liberation_WidthsMatchScaledAdvances()
+    public void Liberation_WidthsMatchScaledAdvancesKeyedByCompactGid()
     {
         var font = Type0EmbedSupport.LoadLiberation();
         var map = Type0EmbedSupport.BuildMap(font, LiberationSample);
         var e = Type0EmbedSupport.Embed(font, map);
 
+        var stream = Type0EmbedSupport.Stream(e.Reader, e.Top["ToUnicode"]);
+        var toUnicode = Type0EmbedSupport.ParseToUnicode(Type0EmbedSupport.DecodeStream(e.Reader, stream));
+
         var widths = Type0EmbedSupport.ParseWidths(e.Reader, (ArrayObject)e.Reader.Resolve(e.Descendant["W"]));
-        foreach (var gid in map.Keys)
+        foreach (var (gid, cp) in map)
         {
-            Assert.True(widths.ContainsKey(gid), $"W missing CID {gid}");
-            Assert.Equal(Type0EmbedSupport.ScaleWidth(font, gid), widths[gid]);
+            var newGid = Type0EmbedSupport.NewGid(toUnicode, (char)cp);
+            Assert.True(widths.ContainsKey(newGid), $"W missing compact CID {newGid} for U+{cp:X4}");
+            Assert.Equal(Type0EmbedSupport.ScaleWidth(font, gid), widths[newGid]);
         }
 
-        Assert.Equal(722, widths[53]);
-        Assert.Equal(278, widths[3]);
-        Assert.Equal(719, widths[976]);
+        // fontTools-derived scaled advances: R=722, space=278, П=719.
+        Assert.Equal(722, widths[Type0EmbedSupport.NewGid(toUnicode, 'R')]);
+        Assert.Equal(278, widths[Type0EmbedSupport.NewGid(toUnicode, ' ')]);
+        Assert.Equal(719, widths[Type0EmbedSupport.NewGid(toUnicode, 'П')]);
     }
 
     [Fact]
-    public void Liberation_FontFile2IsSubsetPreservingGlyphs()
+    public void Liberation_FontFile2IsCompactSubsetPreservingAdvances()
     {
         var font = Type0EmbedSupport.LoadLiberation();
         var map = Type0EmbedSupport.BuildMap(font, LiberationSample);
@@ -115,11 +125,19 @@ public class Type0EmbedTests
         var fontFile = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["FontFile2"]);
         var subset = SfntFont.Parse(Type0EmbedSupport.DecodeStream(e.Reader, fontFile));
 
-        Assert.Equal(font.GlyphCount, subset.GlyphCount);
+        // Compact renumbering: numGlyphs is the closure size, not the original 2620.
+        var expected = Type0EmbedSupport.GlyfClosure(font, map.Keys.Select(gid => (int)gid));
+        Assert.Equal(expected.Count, (int)subset.GlyphCount);
+        Assert.True(subset.GlyphCount < font.GlyphCount, "subset must be compact");
+
+        var stream = Type0EmbedSupport.Stream(e.Reader, e.Top["ToUnicode"]);
+        var toUnicode = Type0EmbedSupport.ParseToUnicode(Type0EmbedSupport.DecodeStream(e.Reader, stream));
+
         foreach (var (gid, cp) in map)
         {
-            Assert.Equal(gid, subset.GetGlyphId(cp));
-            Assert.Equal(font.GetAdvanceWidth((ushort)gid), subset.GetAdvanceWidth((ushort)gid));
+            var newGid = Type0EmbedSupport.NewGid(toUnicode, (char)cp);
+            Assert.InRange(newGid, 0, subset.GlyphCount - 1);
+            Assert.Equal(font.GetAdvanceWidth((ushort)gid), subset.GetAdvanceWidth((ushort)newGid));
         }
     }
 

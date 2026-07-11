@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
 using Radzen.Documents.Pdf;
@@ -13,11 +12,12 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 // veraPDF 1.30.2 clause 6.2.11.4.2 test 2: the /CIDSet in the FontDescriptor of an
 // embedded CID font must identify ALL CIDs present in the embedded subset - not just
-// the CIDs referenced by content. These tests reload real PdfA3B Build() output,
-// re-parse the embedded FontFile2/FontFile3 with the internal SfntFont/CffFont, and
-// require the CIDSet bit set to equal the glyph set actually embedded (including
-// notdef and composite component glyphs the glyf subsetter pulled into the closure)
-// with no extra bits.
+// the CIDs referenced by content. These tests reload real PdfA3B Build() output and
+// re-parse the embedded FontFile2/FontFile3 with the internal SfntFont/CffFont.
+//
+// The glyf subsetter renumbers glyphs into a COMPACT contiguous space 0..N-1
+// (used + composite closure + notdef), so every gid in the embedded font program
+// is present and the CIDSet must mark exactly 0..N-1 with no extra bits.
 public class PdfACidSetExactTests
 {
     // Latin accented + Cyrillic breve forms force composite glyphs in Liberation Sans,
@@ -65,32 +65,6 @@ public class PdfACidSetExactTests
         return set;
     }
 
-    // Glyphs with outline data in the embedded glyf subset. The subsetter keeps the
-    // original gid numbering (CID == gid under Identity-H) and writes zero-length
-    // loca ranges for glyphs outside the closure.
-    private static HashSet<int> EmbeddedGlyfGlyphs(byte[] fontFile2)
-    {
-        var subset = SfntFont.Parse(fontFile2);
-        Assert.True(subset.TryGetTable("loca", out var loca), "subset has loca");
-        Assert.True(subset.TryGetTable("head", out var head), "subset has head");
-
-        var longLoca = BinaryPrimitives.ReadInt16BigEndian(head.AsSpan(50)) != 0;
-        uint Offset(int index) => longLoca
-            ? BinaryPrimitives.ReadUInt32BigEndian(loca.AsSpan(index * 4))
-            : BinaryPrimitives.ReadUInt16BigEndian(loca.AsSpan(index * 2)) * 2u;
-
-        var set = new HashSet<int>();
-        for (var gid = 0; gid < subset.GlyphCount; gid++)
-        {
-            if (Offset(gid + 1) > Offset(gid))
-            {
-                set.Add(gid);
-            }
-        }
-
-        return set;
-    }
-
     private static void AssertSameCids(HashSet<int> embedded, HashSet<int> bits)
     {
         var missing = embedded.Except(bits).Order().ToArray();
@@ -102,31 +76,38 @@ public class PdfACidSetExactTests
     }
 
     [Fact]
-    public void PdfA3B_LiberationGlyfSubset_CidSetMatchesEmbeddedGlyphsExactly()
+    public void PdfA3B_LiberationGlyfSubset_IsCompactAndCidSetMarksAllGids()
     {
         var reader = Build(BuildTestSupport.RegisterLatin, BuildTestSupport.Latin, LatinSample);
         var descriptor = Descriptor(reader);
 
         var fontFile = Assert.IsType<StreamObject>(reader.Resolve(descriptor["FontFile2"]));
-        var withData = EmbeddedGlyfGlyphs(reader.DecodeStream(fontFile));
+        var bytes = reader.DecodeStream(fontFile);
+        var subset = SfntFont.Parse(bytes);
 
-        var used = UsedGids(Type0EmbedSupport.LoadLiberation(), LatinSample);
+        var original = Type0EmbedSupport.LoadLiberation();
+        var used = UsedGids(original, LatinSample);
+        var expected = Type0EmbedSupport.GlyfClosure(original, used);
 
         // Precondition: the sample must pull composite component glyphs into the
-        // closure, otherwise this test cannot distinguish CIDSet == used from
-        // CIDSet == embedded.
-        var components = withData.Where(gid => gid != 0 && !used.Contains(gid)).ToArray();
-        Assert.True(components.Length > 0, "sample must embed composite component glyphs");
+        // closure, otherwise this test cannot distinguish "used" from "embedded".
+        Assert.True(expected.Count > used.Count + 1, "sample must embed composite component glyphs");
 
-        // Precondition: the sample uses at least one glyph with an empty outline
-        // (space), which must NOT be marked in the CIDSet per veraPDF 6.2.11.4.2.
-        Assert.True(used.Any(gid => !withData.Contains(gid)),
-            "sample must use an empty-outline glyph (e.g. space) to guard over-marking");
+        // Compact renumbering: numGlyphs == |used + closure + notdef|, not the
+        // original glyph count, and loca covers exactly the compact space.
+        var n = (int)subset.GlyphCount;
+        Assert.Equal(expected.Count, n);
+        Assert.True(n < original.GlyphCount / 10,
+            $"numGlyphs {n} must be compact, not the original {original.GlyphCount}");
 
-        // Present in the subset = exactly the glyphs written with outline data
-        // (outline-bearing closure incl. notdef and composite components); used
-        // glyphs with an empty outline (space) are absent from the font program.
-        AssertSameCids(new HashSet<int>(withData), CidSetBits(reader, descriptor));
+        var loca = SfntChecksumValidator.ReadLocaOffsets(bytes);
+        Assert.Equal(n + 1, loca.Length);
+        Assert.True(subset.TryGetTable("glyf", out var glyf));
+        Assert.Equal((uint)glyf.Length, loca[^1]);
+
+        // All compact gids are present in the font program (every gid has a loca
+        // entry), so the CIDSet must mark exactly 0..N-1.
+        AssertSameCids(Enumerable.Range(0, n).ToHashSet(), CidSetBits(reader, descriptor));
     }
 
     [Fact]
