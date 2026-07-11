@@ -24,7 +24,11 @@ public class SectionCollection : IReadOnlyList<Section>
     /// <returns>The newly created section.</returns>
     public Section Add()
     {
-        var section = new Section();
+        var section = new Section
+        {
+            HeaderDistance = Unit.FromCentimeter(1.25),
+            FooterDistance = Unit.FromCentimeter(1.25),
+        };
         items.Add(section);
         return section;
     }
