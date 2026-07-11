@@ -79,6 +79,13 @@ public class Paragraph : Block
     /// </summary>
     public bool RightTabStop { get; set; }
 
+    /// <summary>
+    /// Gets the explicit tab stops. When any are defined, a '\t' advances to the next stop at or
+    /// beyond the current position and the following text run is aligned per that stop. When empty,
+    /// tabs keep the default 36pt left-tab grid.
+    /// </summary>
+    public TabStopCollection TabStops { get; } = [];
+
     /// <summary>Gets or sets a value indicating whether the paragraph is kept on a single page.</summary>
     public bool KeepTogether { get; set; }
 

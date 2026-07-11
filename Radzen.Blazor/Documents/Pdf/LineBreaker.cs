@@ -51,10 +51,10 @@ internal static class LineBreaker
         public int TabsAfter { get; set; }
     }
 
-    private const double TabStop = 36.0;
+    private const double DefaultTabStopWidth = 36.0;
 
     internal static double AdvanceToTabStop(double position)
-        => (System.Math.Floor((position + 1e-6) / TabStop) + 1) * TabStop;
+        => (System.Math.Floor((position + 1e-6) / DefaultTabStopWidth) + 1) * DefaultTabStopWidth;
 
     public static IReadOnlyList<LineBox> Break(
         Paragraph paragraph,
@@ -299,6 +299,11 @@ internal static class LineBreaker
 
         var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
 
+        if (paragraph.TabStops.Count > 0)
+        {
+            return BuildTabStopLine(span, fragments, words, first, last, indent, paragraph, fonts);
+        }
+
         // Natural placement from 0; tab stops are relative to the line origin.
         var cursor = 0.0;
         var fi = 0;
@@ -398,6 +403,157 @@ internal static class LineBreaker
         var box = new LineBox { Fragments = fragments, Width = naturalWidth };
         Measure(box, paragraph.LineSpacing, fonts);
         return box;
+    }
+
+    // Explicit tab stops: place each tab-delimited segment against the next stop at or beyond the
+    // cursor, applying that stop's alignment. Paragraph-alignment shifting is not applied here so the
+    // stops stay put; wrapped lines with no tabs still land left at the indent.
+    private static LineBox BuildTabStopLine(
+        System.Span<LineFragment> span,
+        List<LineFragment> fragments,
+        List<Word> words,
+        int first,
+        int last,
+        double indent,
+        Paragraph paragraph,
+        FontCollection fonts)
+    {
+        var stops = new List<TabStop>(paragraph.TabStops.Count);
+        for (var s = 0; s < paragraph.TabStops.Count; s++)
+        {
+            stops.Add(paragraph.TabStops[s]);
+        }
+
+        stops.Sort((a, b) => a.Position.Point.CompareTo(b.Position.Point));
+
+        double naturalWidth = 0;
+        var cursor = 0.0;
+        var fi = 0;
+        var w = first;
+        var tabsBefore = 0;
+        while (w <= last)
+        {
+            var segEnd = w;
+            while (segEnd < last && words[segEnd].TabsAfter == 0)
+            {
+                segEnd++;
+            }
+
+            var alignment = TabAlignment.Left;
+            var stopPos = cursor;
+            for (var t = 0; t < tabsBefore; t++)
+            {
+                if (TryNextStop(stops, cursor, out var nextPos, out var nextAlign))
+                {
+                    stopPos = nextPos;
+                    alignment = nextAlign;
+                }
+                else
+                {
+                    stopPos = AdvanceToTabStop(cursor);
+                    alignment = TabAlignment.Left;
+                }
+
+                cursor = stopPos;
+            }
+
+            var (segWidth, decimalOffset) = MeasureSegment(span, words, w, segEnd, fi, fonts);
+
+            var start = tabsBefore == 0
+                ? cursor
+                : alignment switch
+                {
+                    TabAlignment.Right => stopPos - segWidth,
+                    TabAlignment.Center => stopPos - (segWidth / 2.0),
+                    TabAlignment.Decimal => stopPos - decimalOffset,
+                    _ => stopPos,
+                };
+
+            var x = start;
+            for (var ww = w; ww <= segEnd; ww++)
+            {
+                for (var p = 0; p < words[ww].PieceCount; p++)
+                {
+                    span[fi].XOffset = x;
+                    x += span[fi].Advance;
+                    fi++;
+                }
+
+                if (ww < segEnd)
+                {
+                    x += words[ww].GapAfter;
+                }
+            }
+
+            cursor = x;
+            naturalWidth = System.Math.Max(naturalWidth, cursor);
+            tabsBefore = segEnd < last ? words[segEnd].TabsAfter : 0;
+            w = segEnd + 1;
+        }
+
+        if (indent != 0)
+        {
+            for (var f = 0; f < span.Length; f++)
+            {
+                span[f].XOffset += indent;
+            }
+        }
+
+        var box = new LineBox { Fragments = fragments, Width = naturalWidth };
+        Measure(box, paragraph.LineSpacing, fonts);
+        return box;
+    }
+
+    // Segment width (advances plus interior word gaps) and the offset from the segment start to its
+    // first '.' (decimal alignment); falls back to the full width when there is no separator.
+    private static (double Width, double DecimalOffset) MeasureSegment(
+        System.Span<LineFragment> span, List<Word> words, int wStart, int wEnd, int fiStart, FontCollection fonts)
+    {
+        double width = 0;
+        double decimalOffset = -1;
+        var f = fiStart;
+        for (var ww = wStart; ww <= wEnd; ww++)
+        {
+            for (var p = 0; p < words[ww].PieceCount; p++)
+            {
+                var fragment = span[f];
+                if (decimalOffset < 0)
+                {
+                    var dot = fragment.Text.IndexOf('.', System.StringComparison.Ordinal);
+                    if (dot >= 0)
+                    {
+                        decimalOffset = width + fonts.MeasureText(fragment.Text[..dot], fragment.Run.ResolvedFont);
+                    }
+                }
+
+                width += fragment.Advance;
+                f++;
+            }
+
+            if (ww < wEnd)
+            {
+                width += words[ww].GapAfter;
+            }
+        }
+
+        return (width, decimalOffset < 0 ? width : decimalOffset);
+    }
+
+    private static bool TryNextStop(List<TabStop> stops, double cursor, out double position, out TabAlignment alignment)
+    {
+        for (var i = 0; i < stops.Count; i++)
+        {
+            if (stops[i].Position.Point > cursor + 1e-6)
+            {
+                position = stops[i].Position.Point;
+                alignment = stops[i].Alignment;
+                return true;
+            }
+        }
+
+        position = 0;
+        alignment = TabAlignment.Left;
+        return false;
     }
 
     private static void Measure(LineBox box, double lineSpacing, FontCollection fonts)

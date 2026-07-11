@@ -470,6 +470,11 @@ internal sealed class DocumentGenerator
             EffectiveFont = paragraph.EffectiveFont,
         };
 
+        foreach (var stop in paragraph.TabStops)
+        {
+            resolved.TabStops.Add(stop);
+        }
+
         foreach (var (run, builderText, tabsBefore) in pieces)
         {
             resolved.Inlines.Add(new Run(new string('\t', tabsBefore) + builderText.ToString())
