@@ -85,16 +85,19 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         WriteRaw(name);
     }
 
+    // Content-stream operands are emitted at 1/1000-unit precision: sub-0.001pt
+    // coordinate rounding is invisible, and 3-decimal color/matrix values quantize
+    // to the same 8-bit channels and glyph positions while shrinking the stream.
     public void WriteNumber(double value)
     {
         Span<char> chars = stackalloc char[32];
-        if (value.TryFormat(chars, out var written, "0.######", CultureInfo.InvariantCulture))
+        if (value.TryFormat(chars, out var written, "0.###", CultureInfo.InvariantCulture))
         {
             WriteRaw(chars[..written]);
         }
         else
         {
-            WriteRaw(value.ToString("0.######", CultureInfo.InvariantCulture));
+            WriteRaw(value.ToString("0.###", CultureInfo.InvariantCulture));
         }
     }
 
