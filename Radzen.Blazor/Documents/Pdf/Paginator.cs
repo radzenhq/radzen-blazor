@@ -148,7 +148,7 @@ internal static class Paginator
         // row cannot fit. Every later fragment starts a fresh page at full height.
         void PlaceTable(Table table)
         {
-            var layout = TableLayout.Layout(table, contentWidth, fonts, measureImage);
+            var layout = TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
 
             double headerHeight = 0;
             double firstBodyHeight = 0;
@@ -420,7 +420,7 @@ internal static class Paginator
         {
             if (block is Table table)
             {
-                var layout = TableLayout.Layout(table, width, fonts, measureImage);
+                var layout = TableLayout.Layout(table, System.Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage);
                 foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
                 {
                     result.Tables.Add(new PositionedTableFragment

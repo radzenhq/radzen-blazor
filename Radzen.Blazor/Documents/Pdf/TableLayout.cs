@@ -147,7 +147,7 @@ internal static class TableLayout
 
                 var padding = cell.Padding.Point;
                 var contentWidth = cellWidth - (2 * padding);
-                var align = ColumnAlignment(table, c) ?? cell.AlignmentValue ?? table.Rows[r].AlignmentValue;
+                var align = cell.AlignmentValue ?? ColumnAlignment(table, c) ?? table.Rows[r].AlignmentValue;
                 var (items, contentHeight) = LayoutContent(cell, contentWidth, align, fonts, measureImage);
 
                 placed.Add(new Placed
@@ -240,8 +240,8 @@ internal static class TableLayout
             };
             var offset = (contentBox.Height - p.ContentHeight) * factor;
 
-            var alignFactor = (ColumnAlignment(table, p.Column)
-                ?? p.Cell.AlignmentValue
+            var alignFactor = (p.Cell.AlignmentValue
+                ?? ColumnAlignment(table, p.Column)
                 ?? table.Rows[p.Row].AlignmentValue
                 ?? HorizontalAlignment.Left) switch
             {
@@ -412,23 +412,24 @@ internal static class TableLayout
         {
             if (block is Paragraph paragraph)
             {
-                var original = paragraph.AlignmentValue;
-                if (original is null && align is { } inherited)
+                var spacingBefore = paragraph.SpacingBefore.Point;
+                if (spacingBefore > 0)
                 {
-                    paragraph.AlignmentValue = inherited;
+                    items.Add(new CellItem { Height = spacingBefore });
+                    height += spacingBefore;
                 }
 
-                try
+                foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts, align))
                 {
-                    foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts))
-                    {
-                        items.Add(new CellItem { Line = line, Source = block, Height = line.Height });
-                        height += line.Height;
-                    }
+                    items.Add(new CellItem { Line = line, Source = block, Height = line.Height });
+                    height += line.Height;
                 }
-                finally
+
+                var spacingAfter = paragraph.SpacingAfter.Point;
+                if (spacingAfter > 0)
                 {
-                    paragraph.AlignmentValue = original;
+                    items.Add(new CellItem { Height = spacingAfter });
+                    height += spacingAfter;
                 }
             }
             else if (block is Image image)
@@ -441,7 +442,7 @@ internal static class TableLayout
             }
             else if (block is Table nested)
             {
-                var layout = Layout(nested, contentWidth, fonts, measureImage);
+                var layout = Layout(nested, System.Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage);
                 items.Add(new CellItem { Table = layout, Height = layout.Height });
                 height += layout.Height;
             }

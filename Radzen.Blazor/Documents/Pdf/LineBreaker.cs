@@ -51,7 +51,11 @@ internal static class LineBreaker
 
     private const double TabStop = 36.0;
 
-    public static IReadOnlyList<LineBox> Break(Paragraph paragraph, double maxWidthPoints, FontCollection fonts)
+    public static IReadOnlyList<LineBox> Break(
+        Paragraph paragraph,
+        double maxWidthPoints,
+        FontCollection fonts,
+        HorizontalAlignment? inheritedAlignment = null)
     {
         var boxes = new List<LineBox>();
         var indent = paragraph.LeftIndent.Point;
@@ -69,7 +73,7 @@ internal static class LineBreaker
             {
                 var (first, last) = lineRanges[li];
                 var isLast = li == lineRanges.Count - 1;
-                boxes.Add(BuildLine(words, first, last, max, indent, paragraph, fonts, isLast));
+                boxes.Add(BuildLine(words, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment));
             }
         }
 
@@ -235,7 +239,8 @@ internal static class LineBreaker
         double indent,
         Paragraph paragraph,
         FontCollection fonts,
-        bool isLast)
+        bool isLast,
+        HorizontalAlignment? inheritedAlignment)
     {
         var fragments = new List<LineFragment>();
         double advances = 0;
@@ -283,7 +288,7 @@ internal static class LineBreaker
         var wordCount = last - first + 1;
         var gapCount = wordCount - 1;
 
-        var alignment = paragraph.EffectiveAlignment;
+        var alignment = paragraph.ResolveAlignment(inheritedAlignment);
         var justify = alignment == HorizontalAlignment.Justify && !isLast && gapCount > 0 && !hasTabs;
 
         double x0;
