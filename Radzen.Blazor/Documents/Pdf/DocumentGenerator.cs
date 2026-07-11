@@ -140,7 +140,7 @@ internal sealed class DocumentGenerator
     {
         StyleResolver.Resolve(builder);
 
-        var document = new Document();
+        var document = new Document { Conformance = builder.Conformance };
         document.Info.Title = builder.Info.Title;
         document.Info.Author = builder.Info.Author;
         document.Info.Subject = builder.Info.Subject;
@@ -1059,6 +1059,12 @@ internal sealed class DocumentGenerator
     private GeneratedFont ResolveBase14(Font font)
     {
         var name = Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
+        if (builder.Conformance != PdfAConformance.None)
+        {
+            throw new System.InvalidOperationException(
+                $"PDF/A forbids the standard-14 font '{name}' referenced by name; register an embeddable font file for '{font.Name}' with DocumentBuilder.Fonts instead.");
+        }
+
         if (base14Fonts.TryGetValue(name, out var existing))
         {
             return existing;
