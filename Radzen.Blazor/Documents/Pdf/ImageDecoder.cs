@@ -159,8 +159,8 @@ internal static class ImageDecoder
             0 => new ImageXObject(BuildImage(width, height, bitDepth, new NameObject("DeviceGray"), samples), null),
             2 => new ImageXObject(BuildImage(width, height, bitDepth, new NameObject("DeviceRGB"), samples), null),
             3 => BuildPalettedPng(width, height, bitDepth, samples, palette, transparency),
-            4 => BuildAlphaPng(width, height, new NameObject("DeviceGray"), samples, 1),
-            6 => BuildAlphaPng(width, height, new NameObject("DeviceRGB"), samples, 3),
+            4 => BuildAlphaPng(width, height, new NameObject("DeviceGray"), samples, 1, bitDepth),
+            6 => BuildAlphaPng(width, height, new NameObject("DeviceRGB"), samples, 3, bitDepth),
             _ => throw new NotSupportedException($"Unsupported PNG colour type {colorType}."),
         };
     }
@@ -205,10 +205,12 @@ internal static class ImageDecoder
         return new ImageXObject(image, mask);
     }
 
-    private static ImageXObject BuildAlphaPng(int width, int height, NameObject colorSpace, byte[] samples, int colorChannels)
+    private static ImageXObject BuildAlphaPng(int width, int height, NameObject colorSpace, byte[] samples, int colorChannels, int bitDepth)
     {
         var pixelCount = width * height;
-        var stride = colorChannels + 1;
+        // PNG restricts gray+alpha/RGBA to 8 or 16 bit; 16-bit samples are big-endian, downsampled to their high byte.
+        var bytesPerSample = bitDepth / 8;
+        var stride = (colorChannels + 1) * bytesPerSample;
         var color = new byte[pixelCount * colorChannels];
         var alpha = new byte[pixelCount];
 
@@ -216,10 +218,10 @@ internal static class ImageDecoder
         {
             for (var c = 0; c < colorChannels; c++)
             {
-                color[(i * colorChannels) + c] = samples[(i * stride) + c];
+                color[(i * colorChannels) + c] = samples[(i * stride) + (c * bytesPerSample)];
             }
 
-            alpha[i] = samples[(i * stride) + colorChannels];
+            alpha[i] = samples[(i * stride) + (colorChannels * bytesPerSample)];
         }
 
         var image = BuildImage(width, height, 8, colorSpace, color);
