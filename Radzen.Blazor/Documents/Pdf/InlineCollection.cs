@@ -41,6 +41,21 @@ public class InlineCollection : IReadOnlyList<Run>
         return run;
     }
 
+    /// <summary>
+    /// Appends an inline image that flows within the paragraph line, buffering the bytes from
+    /// the specified stream.
+    /// </summary>
+    /// <param name="stream">The source image stream.</param>
+    /// <returns>The newly created inline image.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    public InlineImage AddImage(System.IO.Stream stream)
+    {
+        System.ArgumentNullException.ThrowIfNull(stream);
+        var image = InlineImage.FromStream(stream);
+        items.Add(image);
+        return image;
+    }
+
     internal void Clear() => items.Clear();
 
     /// <inheritdoc/>

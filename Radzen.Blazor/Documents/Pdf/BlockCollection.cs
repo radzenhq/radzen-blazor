@@ -79,6 +79,13 @@ public class BlockCollection : IReadOnlyList<Block>
     public PageBreak AddPageBreak() => Add(new PageBreak());
 
     /// <summary>
+    /// Appends an empty list.
+    /// </summary>
+    /// <param name="style">The marker style. Defaults to <see cref="ListStyle.Bullet"/>.</param>
+    /// <returns>The newly created list.</returns>
+    public List AddList(ListStyle style = ListStyle.Bullet) => Add(new List { Style = style });
+
+    /// <summary>
     /// Appends an image, buffering the bytes from the specified stream.
     /// </summary>
     /// <param name="stream">The source image stream.</param>

@@ -36,30 +36,44 @@ internal static class ImageDecoder
         var pixelWidth = ((NumberObject)dict["Width"]).DoubleValue;
         var pixelHeight = ((NumberObject)dict["Height"]).DoubleValue;
 
+        double baseWidth;
+        double baseHeight;
         if (image.Width is { } w && image.Height is { } h)
         {
-            return (w.Point, h.Point);
+            baseWidth = w.Point;
+            baseHeight = h.Point;
         }
-
-        if (image.Width is { } wo)
+        else if (image.Width is { } wo)
         {
-            return (wo.Point, pixelHeight * wo.Point / pixelWidth);
+            baseWidth = wo.Point;
+            baseHeight = pixelHeight * wo.Point / pixelWidth;
         }
-
-        if (image.Height is { } ho)
+        else if (image.Height is { } ho)
         {
-            return (pixelWidth * ho.Point / pixelHeight, ho.Point);
+            baseWidth = pixelWidth * ho.Point / pixelHeight;
+            baseHeight = ho.Point;
         }
-
-        var width = pixelWidth * 72.0 / 96.0;
-        var height = pixelHeight * 72.0 / 96.0;
-        if (availableWidth > 0 && !double.IsInfinity(availableWidth) && width > availableWidth)
+        else
         {
-            height *= availableWidth / width;
-            width = availableWidth;
+            baseWidth = pixelWidth * 72.0 / 96.0;
+            baseHeight = pixelHeight * 72.0 / 96.0;
         }
 
-        return (width, height);
+        if (image.FitBox is { } box)
+        {
+            var scale = System.Math.Min(box.Width.Point / baseWidth, box.Height.Point / baseHeight);
+            return (baseWidth * scale, baseHeight * scale);
+        }
+
+        // Only a fully unsized image is clamped to the available width; an explicit dimension wins.
+        if (image.Width is null && image.Height is null
+            && availableWidth > 0 && !double.IsInfinity(availableWidth) && baseWidth > availableWidth)
+        {
+            baseHeight *= availableWidth / baseWidth;
+            baseWidth = availableWidth;
+        }
+
+        return (baseWidth, baseHeight);
     }
 
     private static bool IsPng(byte[] data)
