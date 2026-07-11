@@ -99,6 +99,12 @@ internal sealed class XmpMetadata
         }
 
         builder.Append("  </rdf:Description>\n");
+
+        if (FacturX is not null)
+        {
+            AppendFacturXExtensionSchema(builder);
+        }
+
         builder.Append(" </rdf:RDF>\n");
         builder.Append("</x:xmpmeta>\n");
 
@@ -110,6 +116,49 @@ internal sealed class XmpMetadata
         builder.Append("<?xpacket end=\"w\"?>");
 
         return Encoding.UTF8.GetBytes(builder.ToString());
+    }
+
+    private static readonly (string Name, string Description)[] FacturXProperties =
+    [
+        ("DocumentFileName", "The name of the embedded XML document"),
+        ("DocumentType", "The type of the hybrid document in capital letters, e.g. INVOICE or ORDER"),
+        ("Version", "The actual version of the standard applying to the embedded XML document"),
+        ("ConformanceLevel", "The conformance level of the embedded XML document"),
+    ];
+
+    // PDF/A 6.6.2.3.1: properties outside the XMP predefined schemas must be
+    // declared through a pdfaExtension extension schema.
+    private static void AppendFacturXExtensionSchema(StringBuilder builder)
+    {
+        builder.Append("  <rdf:Description rdf:about=\"\"\n");
+        builder.Append("   xmlns:pdfaExtension=\"http://www.aiim.org/pdfa/ns/extension/\"\n");
+        builder.Append("   xmlns:pdfaSchema=\"http://www.aiim.org/pdfa/ns/schema#\"\n");
+        builder.Append("   xmlns:pdfaProperty=\"http://www.aiim.org/pdfa/ns/property#\">\n");
+        builder.Append("   <pdfaExtension:schemas>\n");
+        builder.Append("    <rdf:Bag>\n");
+        builder.Append("     <rdf:li rdf:parseType=\"Resource\">\n");
+        builder.Append("      <pdfaSchema:schema>Factur-X PDFA Extension Schema</pdfaSchema:schema>\n");
+        builder.Append("      <pdfaSchema:namespaceURI>").Append(FacturXNamespace).Append("</pdfaSchema:namespaceURI>\n");
+        builder.Append("      <pdfaSchema:prefix>fx</pdfaSchema:prefix>\n");
+        builder.Append("      <pdfaSchema:property>\n");
+        builder.Append("       <rdf:Seq>\n");
+
+        foreach (var (name, description) in FacturXProperties)
+        {
+            builder.Append("        <rdf:li rdf:parseType=\"Resource\">\n");
+            builder.Append("         <pdfaProperty:name>").Append(name).Append("</pdfaProperty:name>\n");
+            builder.Append("         <pdfaProperty:valueType>Text</pdfaProperty:valueType>\n");
+            builder.Append("         <pdfaProperty:category>external</pdfaProperty:category>\n");
+            builder.Append("         <pdfaProperty:description>").Append(description).Append("</pdfaProperty:description>\n");
+            builder.Append("        </rdf:li>\n");
+        }
+
+        builder.Append("       </rdf:Seq>\n");
+        builder.Append("      </pdfaSchema:property>\n");
+        builder.Append("     </rdf:li>\n");
+        builder.Append("    </rdf:Bag>\n");
+        builder.Append("   </pdfaExtension:schemas>\n");
+        builder.Append("  </rdf:Description>\n");
     }
 
     public StreamObject BuildStream()

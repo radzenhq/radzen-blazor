@@ -42,16 +42,19 @@ internal static class Type0FontEmbedder
             ["StemV"] = new NumberObject(StemV),
         };
 
+        // The CIDSet must flag every glyph present in the embedded subset (PDF/A
+        // 6.2.11.4.2), including composite component glyphs the subsetter pulls in.
+        var embeddedGids = new SortedSet<ushort>(usedGids) { 0 };
         if (font.IsCff)
         {
             EmbedCff(writer, font, usedGids, descriptor);
         }
         else
         {
-            EmbedGlyf(writer, font, usedGids, descriptor);
+            embeddedGids.UnionWith(EmbedGlyf(writer, font, usedGids, descriptor));
         }
 
-        descriptor["CIDSet"] = writer.Add(FlateFilter.EncodeStream(BuildCidSet(usedGids)));
+        descriptor["CIDSet"] = writer.Add(FlateFilter.EncodeStream(BuildCidSet(embeddedGids)));
         var descriptorRef = writer.Add(descriptor);
 
         var descendant = new DictionaryObject
@@ -91,14 +94,15 @@ internal static class Type0FontEmbedder
         return writer.Add(top);
     }
 
-    private static void EmbedGlyf(DocumentWriter writer, SfntFont font, SortedSet<ushort> usedGids, DictionaryObject descriptor)
+    private static HashSet<ushort> EmbedGlyf(DocumentWriter writer, SfntFont font, SortedSet<ushort> usedGids, DictionaryObject descriptor)
     {
-        var subset = GlyfSubsetter.SubsetPooled(font, usedGids, out var subsetLength);
+        var subset = GlyfSubsetter.SubsetPooled(font, usedGids, out var subsetLength, out var closure);
         try
         {
             var stream = FlateFilter.EncodeStream(subset.AsSpan(0, subsetLength));
             stream.Dictionary["Length1"] = new NumberObject(subsetLength);
             descriptor["FontFile2"] = writer.Add(stream);
+            return closure;
         }
         finally
         {

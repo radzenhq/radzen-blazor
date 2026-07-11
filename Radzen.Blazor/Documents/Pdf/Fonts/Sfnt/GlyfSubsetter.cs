@@ -35,9 +35,13 @@ internal static class GlyfSubsetter
         }
     }
 
-    // Returns a pooled array holding the subset in its first length bytes; the
-    // caller must return it to ArrayPool<byte>.Shared.
     public static byte[] SubsetPooled(SfntFont font, IReadOnlyCollection<ushort> glyphIds, out int length)
+        => SubsetPooled(font, glyphIds, out length, out _);
+
+    // Returns a pooled array holding the subset in its first length bytes; the
+    // caller must return it to ArrayPool<byte>.Shared. closure receives the full
+    // embedded glyph set including composite component glyphs.
+    public static byte[] SubsetPooled(SfntFont font, IReadOnlyCollection<ushort> glyphIds, out int length, out HashSet<ushort> closure)
     {
         ArgumentNullException.ThrowIfNull(font);
         ArgumentNullException.ThrowIfNull(glyphIds);
@@ -60,7 +64,7 @@ internal static class GlyfSubsetter
         var longLoca = ReadInt16(head, 50) != 0;
         var loca = new LocaTable(locaMemory.Span, longLoca);
 
-        var closure = ComputeClosure(glyf, loca, numGlyphs, glyphIds);
+        closure = ComputeClosure(glyf, loca, numGlyphs, glyphIds);
 
         var glyfLength = MeasureGlyf(loca, numGlyphs, closure);
         var locaLength = (numGlyphs + 1) * 4;
