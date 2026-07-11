@@ -187,7 +187,7 @@ public class TableLayoutTests
     }
 
     [Fact]
-    public void HorizontalAlignment_ColumnOverridesCell()
+    public void HorizontalAlignment_CellOverridesColumn()
     {
         var fonts = TableLayoutSupport.Fonts();
         var wHello = TableLayoutSupport.Measure(fonts, "Hello", 12);
@@ -201,6 +201,6 @@ public class TableLayoutTests
         var laid = TableLayout.Layout(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
-        Assert.Equal(200 - wHello, c.Lines[0].Line.Fragments[0].XOffset, 5);
+        Assert.Equal((200 - wHello) / 2.0, c.Lines[0].Line.Fragments[0].XOffset, 5);
     }
 }
