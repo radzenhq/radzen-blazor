@@ -68,7 +68,7 @@ public class SpanGeometryTests
         var r1 = table.Rows.Add();
         r0.Cells[0].RowSpan = 2;
         TableLayoutSupport.Fill(r0.Cells[0], "tall");
-        TableLayoutSupport.Fill(r0.Cells[1], "Hello World");
+        TableLayoutSupport.Fill(r0.Cells[1], "Hello Hello");
         TableLayoutSupport.Fill(r1.Cells[0], "Hi");
         TableLayoutSupport.Fill(r1.Cells[1], "gone");
 

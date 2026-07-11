@@ -25,8 +25,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 //  - One LineFragment per maximal non-space run of chars within a single Run. Text is
 //    the word with NO surrounding spaces; Start/Length index into that Run's Text.
 //    Fragment.Advance == FontCollection.MeasureText(Text, run.Font).
-//  - Words are never split mid-word (no hyphenation); a word wider than maxWidth
-//    occupies its own line and overflows.
+//  - Words that fit are never split mid-word (no hyphenation). A single token wider
+//    than maxWidth is broken at code-point granularity so no line exceeds the measure;
+//    a lone glyph wider than maxWidth occupies its own line as a last resort.
 //  - LineBox.Width is the natural visible width of the line (sum of fragment advances
 //    plus interior single-space gaps); trailing spaces are excluded.
 public class LineBreakTests
@@ -51,12 +52,14 @@ public class LineBreakTests
     }
 
     [Fact]
-    public void TinyWidth_EachWordOnItsOwnLine()
+    public void EachWordOnItsOwnLine_WhenWidthHoldsTheWidestWord()
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
+        var widest = Words.Max(w => LineLayoutSupport.WordWidth(fonts, w, 12));
 
-        var lines = LineBreaker.Break(paragraph, 1.0, fonts);
+        // Wide enough for any single word, too narrow for the narrowest word pair: word-level wrap only.
+        var lines = LineBreaker.Break(paragraph, widest + 1.0, fonts);
 
         Assert.Equal(Words.Length, lines.Count);
         foreach (var line in lines)
@@ -66,6 +69,23 @@ public class LineBreakTests
 
         Assert.Equal("The", lines[0].Fragments[0].Text);
         Assert.Equal("here", lines[^1].Fragments[0].Text);
+    }
+
+    [Fact]
+    public void SingleCharacterPerLine_WhenWidthIsSmallerThanEveryGlyph()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var paragraph = LineLayoutSupport.SingleRun(Sentence);
+
+        var lines = LineBreaker.Break(paragraph, 1.0, fonts);
+
+        var nonSpace = Sentence.Count(c => c != ' ');
+        Assert.Equal(nonSpace, lines.Count);
+        foreach (var line in lines)
+        {
+            Assert.Single(line.Fragments);
+            Assert.Equal(1, line.Fragments[0].Text.Length);
+        }
     }
 
     [Fact]
@@ -150,18 +170,21 @@ public class LineBreakTests
     }
 
     [Fact]
-    public void OverlongSingleWord_StaysOnOneLine_AndOverflows()
+    public void OverlongSingleWord_SplitsAcrossLines_WithinTheMeasure()
     {
+        const string Token = "Supercalifragilistic";
         var fonts = LineLayoutSupport.Fonts();
-        var paragraph = LineLayoutSupport.SingleRun("Supercalifragilistic");
-        var width = LineLayoutSupport.WordWidth(fonts, "Supercalifragilistic", 12);
+        var paragraph = LineLayoutSupport.SingleRun(Token);
+        var width = LineLayoutSupport.WordWidth(fonts, Token, 12);
+        var max = width / 3.0;
 
-        var lines = LineBreaker.Break(paragraph, width / 3.0, fonts);
+        var lines = LineBreaker.Break(paragraph, max, fonts);
 
-        Assert.Single(lines);
-        Assert.Single(lines[0].Fragments);
-        Assert.Equal(width, lines[0].Fragments[0].Advance, 6);
-        Assert.True(lines[0].Width > width / 3.0);
+        Assert.True(lines.Count > 1);
+        Assert.All(lines, line => Assert.True(line.Width <= max + 1e-6));
+        var joined = string.Concat(lines.Select(l => l.Fragments[0].Text));
+        Assert.Equal(Token, joined);
+        Assert.All(lines, line => Assert.True(line.Fragments[0].XOffset >= 0));
     }
 
     [Fact]

@@ -79,7 +79,15 @@ internal static class LineBreaker
                 var (first, last) = lineRanges[li];
                 var isLast = li == lineRanges.Count - 1;
                 var includeMarker = boxes.Count == 0;
-                boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment, includeMarker));
+                if (paragraph.TabStops.Count == 0 && first == last && words[first].Width > max
+                    && IsBreakable(words[first], pieces))
+                {
+                    BreakOversizedWord(boxes, words[first], pieces, max, indent, paragraph, fonts, inheritedAlignment, includeMarker);
+                }
+                else
+                {
+                    boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment, includeMarker));
+                }
             }
         }
 
@@ -114,6 +122,19 @@ internal static class LineBreaker
         return p;
     }
 
+    // Spaces carry no kerning, so a run of them measures as count * one space width; cache the
+    // per-font single-space advance to avoid allocating and measuring a fresh space string per gap.
+    private static double SpaceWidth(FontCollection fonts, Font font, Dictionary<Font, double> cache)
+    {
+        if (!cache.TryGetValue(font, out var width))
+        {
+            width = fonts.MeasureText(" ", font);
+            cache[font] = width;
+        }
+
+        return width;
+    }
+
     private static bool IsInlineWhitespace(char c) => c is ' ' or '\t';
 
     private static bool IsLineBreak(char c) => c is '\n' or '\r';
@@ -127,6 +148,7 @@ internal static class LineBreaker
         var words = new List<Word>();
         segments.Add(words);
         pieces = [];
+        var spaceWidths = new Dictionary<Font, double>();
         var current = default(Word);
         var hasCurrent = false;
 
@@ -204,7 +226,7 @@ internal static class LineBreaker
 
                     if (spaces > 0 && hasCurrent)
                     {
-                        current.GapAfter += fonts.MeasureText(new string(' ', spaces), run.ResolvedFont);
+                        current.GapAfter += spaces * SpaceWidth(fonts, run.ResolvedFont, spaceWidths);
                     }
                 }
                 else
@@ -278,6 +300,150 @@ internal static class LineBreaker
         }
 
         return lines;
+    }
+
+    // A word is emergency-breakable only when every piece carries real text; inline images and
+    // empty pieces cannot be split at character granularity, and a non-breaking space (U+00A0)
+    // keeps its word intact (it overflows rather than breaks, honoring the author's intent).
+    private static bool IsBreakable(Word word, List<Piece> pieces)
+    {
+        for (var p = word.PieceStart; p < word.PieceStart + word.PieceCount; p++)
+        {
+            var piece = pieces[p];
+            if (piece.Run is InlineImage || piece.Text.Length == 0 || piece.Text.Contains('\u00A0', System.StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // A single token wider than the measure is split at character (code point) granularity so no
+    // line exceeds max. Surrogate pairs stay intact; at least one code point is placed per line so
+    // progress is guaranteed even when a single glyph is wider than max.
+    private static void BreakOversizedWord(
+        List<LineBox> boxes,
+        Word word,
+        List<Piece> pieces,
+        double max,
+        double indent,
+        Paragraph paragraph,
+        FontCollection fonts,
+        HorizontalAlignment? inheritedAlignment,
+        bool includeMarker)
+    {
+        var fragments = new List<LineFragment>();
+        var lineWidth = 0.0;
+        var markerPending = includeMarker;
+
+        for (var p = word.PieceStart; p < word.PieceStart + word.PieceCount; p++)
+        {
+            var piece = pieces[p];
+            var text = piece.Text;
+            var font = piece.Run.ResolvedFont;
+            var fragStart = 0;
+            var fragAdvance = 0.0;
+            var i = 0;
+            while (i < text.Length)
+            {
+                var cpLen = char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1])
+                    ? 2
+                    : 1;
+                var advance = fonts.MeasureText(text.Substring(i, cpLen), font);
+                if ((lineWidth > 0 || fragAdvance > 0) && lineWidth + fragAdvance + advance > max)
+                {
+                    if (i > fragStart)
+                    {
+                        fragments.Add(MakeCharFragment(piece, fragStart, i, fragAdvance));
+                        lineWidth += fragAdvance;
+                    }
+
+                    boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending));
+                    fragments = [];
+                    lineWidth = 0.0;
+                    fragStart = i;
+                    fragAdvance = 0.0;
+                }
+
+                fragAdvance += advance;
+                i += cpLen;
+            }
+
+            if (text.Length > fragStart)
+            {
+                fragments.Add(MakeCharFragment(piece, fragStart, text.Length, fragAdvance));
+                lineWidth += fragAdvance;
+            }
+        }
+
+        if (fragments.Count > 0)
+        {
+            boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending));
+        }
+    }
+
+    private static LineFragment MakeCharFragment(Piece piece, int startInText, int endInText, double advance)
+        => new()
+        {
+            Run = piece.Run,
+            Text = piece.Text[startInText..endInText],
+            Start = piece.Start + startInText,
+            Length = endInText - startInText,
+            Advance = advance,
+        };
+
+    private static LineBox FinishOversizedLine(
+        List<LineFragment> fragments,
+        double width,
+        double max,
+        double indent,
+        Paragraph paragraph,
+        FontCollection fonts,
+        HorizontalAlignment? inheritedAlignment,
+        ref bool markerPending)
+    {
+        var alignment = paragraph.ResolveAlignment(inheritedAlignment);
+        var x0 = alignment switch
+        {
+            HorizontalAlignment.Right or HorizontalAlignment.End => max - width,
+            HorizontalAlignment.Center => (max - width) / 2.0,
+            _ => 0,
+        };
+
+        // A lone glyph wider than max would drive x0 negative; clamp so the line never shifts left of the indent.
+        if (x0 < 0)
+        {
+            x0 = 0;
+        }
+
+        var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
+        var cursor = indent + x0;
+        for (var f = 0; f < span.Length; f++)
+        {
+            span[f].XOffset = cursor;
+            cursor += span[f].Advance;
+        }
+
+        if (markerPending && paragraph.MarkerText is { Length: > 0 } markerText)
+        {
+            var markerFont = paragraph.EffectiveFont ?? paragraph.Font;
+            fragments.Insert(0, new LineFragment
+            {
+                Run = new Run(markerText) { EffectiveFont = markerFont },
+                Text = markerText,
+                Start = 0,
+                Length = markerText.Length,
+                XOffset = paragraph.MarkerIndent.Point,
+                Advance = fonts.MeasureText(markerText, markerFont),
+            });
+        }
+
+        markerPending = false;
+
+        var box = new LineBox { Fragments = fragments, Width = width };
+        Measure(box, paragraph.LineSpacing, fonts);
+        return box;
     }
 
     private static LineBox BuildLine(
