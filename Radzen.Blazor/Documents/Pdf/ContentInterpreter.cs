@@ -33,6 +33,8 @@ internal static class ContentInterpreter
         var pathOps = new List<PathOp>();
         var operands = new List<Token>();
         var stringBuffer = new List<byte>();
+        var arrayNumbers = new List<double>();
+        var clipMode = PathClipMode.None;
         var artifactDepth = 0;
         var markedContent = new Stack<bool>();
 
@@ -50,11 +52,16 @@ internal static class ContentInterpreter
 
                 case TokenKind.ArrayStart:
                     stringBuffer.Clear();
+                    arrayNumbers.Clear();
                     for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.ArrayEnd; i++)
                     {
                         if (tokens[i].Kind == TokenKind.String)
                         {
                             stringBuffer.AddRange(tokens[i].Bytes!);
+                        }
+                        else if (tokens[i].Kind == TokenKind.Number)
+                        {
+                            arrayNumbers.Add(tokens[i].Number);
                         }
                     }
 
@@ -97,18 +104,61 @@ internal static class ContentInterpreter
 
                 case "rg":
                     state.Fill = Rgb(operands);
+                    state.FillPaint = null;
                     break;
 
                 case "RG":
                     state.Stroke = Rgb(operands);
+                    state.StrokePaint = null;
                     break;
 
                 case "g":
                     state.Fill = Gray(operands);
+                    state.FillPaint = null;
                     break;
 
                 case "G":
                     state.Stroke = Gray(operands);
+                    state.StrokePaint = null;
+                    break;
+
+                case "k":
+                    state.FillPaint = new DeviceColor(DeviceColorKind.Cmyk, null, Numbers(operands, 4));
+                    break;
+
+                case "K":
+                    state.StrokePaint = new DeviceColor(DeviceColorKind.Cmyk, null, Numbers(operands, 4));
+                    break;
+
+                case "cs":
+                    state.FillColorSpace = LastName(operands);
+                    break;
+
+                case "CS":
+                    state.StrokeColorSpace = LastName(operands);
+                    break;
+
+                case "scn":
+                case "sc":
+                    state.FillPaint = new DeviceColor(DeviceColorKind.Named, state.FillColorSpace, AllNumbers(operands));
+                    break;
+
+                case "SCN":
+                case "SC":
+                    state.StrokePaint = new DeviceColor(DeviceColorKind.Named, state.StrokeColorSpace, AllNumbers(operands));
+                    break;
+
+                case "d":
+                    state.DashArray = [.. arrayNumbers];
+                    state.DashPhase = LastNumber(operands);
+                    break;
+
+                case "W":
+                    clipMode = PathClipMode.NonZero;
+                    break;
+
+                case "W*":
+                    clipMode = PathClipMode.EvenOdd;
                     break;
 
                 case "BT":
@@ -217,31 +267,54 @@ internal static class ContentInterpreter
                     break;
 
                 case "S":
-                    EmitPath(target, pathOps, state, stroke: true, fill: false, close: false, artifactDepth);
+                    EmitPath(target, pathOps, state, stroke: true, fill: false, close: false, evenOdd: false, clipMode, artifactDepth);
+                    clipMode = PathClipMode.None;
                     break;
 
                 case "s":
-                    EmitPath(target, pathOps, state, stroke: true, fill: false, close: true, artifactDepth);
+                    EmitPath(target, pathOps, state, stroke: true, fill: false, close: true, evenOdd: false, clipMode, artifactDepth);
+                    clipMode = PathClipMode.None;
                     break;
 
                 case "f":
                 case "F":
+                    EmitPath(target, pathOps, state, stroke: false, fill: true, close: false, evenOdd: false, clipMode, artifactDepth);
+                    clipMode = PathClipMode.None;
+                    break;
+
                 case "f*":
-                    EmitPath(target, pathOps, state, stroke: false, fill: true, close: false, artifactDepth);
+                    EmitPath(target, pathOps, state, stroke: false, fill: true, close: false, evenOdd: true, clipMode, artifactDepth);
+                    clipMode = PathClipMode.None;
                     break;
 
                 case "B":
+                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: false, evenOdd: false, clipMode, artifactDepth);
+                    clipMode = PathClipMode.None;
+                    break;
+
                 case "B*":
-                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: false, artifactDepth);
+                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: false, evenOdd: true, clipMode, artifactDepth);
+                    clipMode = PathClipMode.None;
                     break;
 
                 case "b":
+                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: true, evenOdd: false, clipMode, artifactDepth);
+                    clipMode = PathClipMode.None;
+                    break;
+
                 case "b*":
-                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: true, artifactDepth);
+                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: true, evenOdd: true, clipMode, artifactDepth);
+                    clipMode = PathClipMode.None;
                     break;
 
                 case "n":
+                    if (clipMode != PathClipMode.None)
+                    {
+                        EmitPath(target, pathOps, state, stroke: false, fill: false, close: false, evenOdd: false, clipMode, artifactDepth);
+                    }
+
                     pathOps.Clear();
+                    clipMode = PathClipMode.None;
                     break;
 
                 case "BDC":
@@ -291,15 +364,21 @@ internal static class ContentInterpreter
         });
     }
 
-    private static void EmitPath(ContentCollection target, List<PathOp> pathOps, GraphicsState state, bool stroke, bool fill, bool close, int artifactDepth)
+    private static void EmitPath(ContentCollection target, List<PathOp> pathOps, GraphicsState state, bool stroke, bool fill, bool close, bool evenOdd, PathClipMode clip, int artifactDepth)
     {
         var path = new PathContent
         {
             Stroke = stroke,
             Fill = fill,
+            EvenOdd = evenOdd,
+            Clip = clip,
             Thickness = state.LineWidth,
             StrokeColor = state.Stroke,
             FillColor = state.Fill,
+            StrokePaint = state.StrokePaint,
+            FillPaint = state.FillPaint,
+            DashArray = state.DashArray,
+            DashPhase = state.DashPhase,
             Transform = state.Ctm,
             IsArtifact = artifactDepth > 0,
         };
@@ -372,6 +451,20 @@ internal static class ContentInterpreter
         }
 
         return result;
+    }
+
+    private static double[] AllNumbers(List<Token> operands)
+    {
+        var numbers = new List<double>();
+        foreach (var token in operands)
+        {
+            if (token.Kind == TokenKind.Number)
+            {
+                numbers.Add(token.Number);
+            }
+        }
+
+        return [.. numbers];
     }
 
     private static double Number(List<Token> operands, int index)
@@ -811,12 +904,30 @@ internal static class ContentInterpreter
 
         public double LineWidth { get; set; } = 1;
 
+        public DeviceColor? FillPaint { get; set; }
+
+        public DeviceColor? StrokePaint { get; set; }
+
+        public string? FillColorSpace { get; set; }
+
+        public string? StrokeColorSpace { get; set; }
+
+        public double[]? DashArray { get; set; }
+
+        public double DashPhase { get; set; }
+
         public GraphicsState Clone() => new()
         {
             Ctm = Ctm,
             Fill = Fill,
             Stroke = Stroke,
             LineWidth = LineWidth,
+            FillPaint = FillPaint,
+            StrokePaint = StrokePaint,
+            FillColorSpace = FillColorSpace,
+            StrokeColorSpace = StrokeColorSpace,
+            DashArray = DashArray,
+            DashPhase = DashPhase,
         };
     }
 }

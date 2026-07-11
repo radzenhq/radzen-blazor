@@ -90,7 +90,7 @@ public sealed class AcroForm
         const double fontSize = 12.0;
         var baseline = height > fontSize ? (height - fontSize) / 2.0 : 2.0;
 
-        var writer = new ContentWriter();
+        using var writer = new ContentWriter();
         writer.WriteRaw("/Tx BMC\nq\n");
         new TextContent(value, Unit.FromPoint(2.0), Unit.FromPoint(baseline))
         {

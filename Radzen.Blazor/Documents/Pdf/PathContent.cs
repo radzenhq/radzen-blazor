@@ -27,6 +27,22 @@ public sealed class PathContent : ContentElement
     /// <summary>Gets or sets the fill color. Defaults to black.</summary>
     public Color FillColor { get; set; } = Color.Black;
 
+    // Round-trip state carried from a decoded content stream so a re-encode preserves
+    // the source operators. Even-odd selects the f*/B* fill rule; Clip emits W/W* before
+    // the paint operator; the dash array/phase emit a d operator; Fill/StrokePaint carry
+    // a non-RGB device color (CMYK k/K or a named colorspace cs+scn) verbatim.
+    internal bool EvenOdd { get; set; }
+
+    internal PathClipMode Clip { get; set; }
+
+    internal double[]? DashArray { get; set; }
+
+    internal double DashPhase { get; set; }
+
+    internal DeviceColor? FillPaint { get; set; }
+
+    internal DeviceColor? StrokePaint { get; set; }
+
     /// <summary>Begins a new subpath at the given point.</summary>
     /// <param name="x">The X coordinate.</param>
     /// <param name="y">The Y coordinate.</param>
@@ -56,12 +72,45 @@ public sealed class PathContent : ContentElement
         {
             writer.WriteNumber(Thickness);
             writer.WriteRaw(" w\n");
-            writer.WriteColor(StrokeColor, "RG");
+
+            if (StrokePaint is { } strokePaint)
+            {
+                EmitDeviceColor(writer, strokePaint, stroke: true);
+            }
+            else
+            {
+                writer.WriteColor(StrokeColor, "RG");
+            }
+        }
+
+        if (DashArray is { } dash)
+        {
+            writer.WriteRaw("[");
+            for (var i = 0; i < dash.Length; i++)
+            {
+                if (i > 0)
+                {
+                    writer.WriteRaw(" ");
+                }
+
+                writer.WriteNumber(dash[i]);
+            }
+
+            writer.WriteRaw("] ");
+            writer.WriteNumber(DashPhase);
+            writer.WriteRaw(" d\n");
         }
 
         if (Fill)
         {
-            writer.WriteColor(FillColor, "rg");
+            if (FillPaint is { } fillPaint)
+            {
+                EmitDeviceColor(writer, fillPaint, stroke: false);
+            }
+            else
+            {
+                writer.WriteColor(FillColor, "rg");
+            }
         }
 
         foreach (var segment in segments)
@@ -76,17 +125,64 @@ public sealed class PathContent : ContentElement
             writer.WriteRaw("\n");
         }
 
-        var paint = (Stroke, Fill) switch
+        if (Clip == PathClipMode.NonZero)
         {
-            (true, true) => "B",
-            (false, true) => "f",
-            (true, false) => "S",
-            _ => "n",
-        };
+            writer.WriteRaw("W\n");
+        }
+        else if (Clip == PathClipMode.EvenOdd)
+        {
+            writer.WriteRaw("W*\n");
+        }
 
-        writer.WriteRaw(paint);
+        writer.WriteRaw(Paint());
+        writer.WriteRaw("\n");
+    }
+
+    private string Paint() => (Stroke, Fill) switch
+    {
+        (true, true) => EvenOdd ? "B*" : "B",
+        (false, true) => EvenOdd ? "f*" : "f",
+        (true, false) => "S",
+        _ => "n",
+    };
+
+    private static void EmitDeviceColor(ContentWriter writer, DeviceColor color, bool stroke)
+    {
+        if (color.Kind == DeviceColorKind.Named && color.ColorSpace is { } name)
+        {
+            writer.WriteName(name);
+            writer.WriteRaw(stroke ? " CS\n" : " cs\n");
+        }
+
+        foreach (var operand in color.Operands)
+        {
+            writer.WriteNumber(operand);
+            writer.WriteRaw(" ");
+        }
+
+        var op = color.Kind == DeviceColorKind.Named
+            ? (stroke ? "SCN" : "scn")
+            : (stroke ? "K" : "k");
+        writer.WriteRaw(op);
         writer.WriteRaw("\n");
     }
 
     private readonly record struct Segment(string Operator, double[] Operands);
 }
+
+internal enum PathClipMode
+{
+    None,
+    NonZero,
+    EvenOdd,
+}
+
+internal enum DeviceColorKind
+{
+    Cmyk,
+    Named,
+}
+
+// A path color set by an operator other than rg/RG: CMYK (k/K) or a color in a named
+// colorspace (cs/scn). Operands are preserved verbatim so the path re-emits equivalently.
+internal readonly record struct DeviceColor(DeviceColorKind Kind, string? ColorSpace, double[] Operands);

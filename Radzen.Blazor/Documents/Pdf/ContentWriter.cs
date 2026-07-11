@@ -11,10 +11,11 @@ namespace Radzen.Documents.Pdf;
 // Accumulates a page content stream and the base-14 font and image XObject resources
 // it references. The key prefixes keep overlay streams from colliding with generated
 // resources.
-internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im")
+internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im") : IDisposable
 {
     private byte[] buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(1024);
     private int length;
+    private bool returned;
     private readonly Dictionary<string, string> keysByBaseFont = new(StringComparer.Ordinal);
     private readonly List<KeyValuePair<string, ImageXObject>> images = [];
 
@@ -175,5 +176,18 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         buffer.AsSpan(0, length).CopyTo(replacement);
         pool.Return(buffer);
         buffer = replacement;
+    }
+
+    // Returns the live buffer to the pool. Callers dispose only after ToArray has copied
+    // out the bytes they need; the Fonts/Images maps stay valid for later resource emit.
+    public void Dispose()
+    {
+        if (returned)
+        {
+            return;
+        }
+
+        returned = true;
+        System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
     }
 }

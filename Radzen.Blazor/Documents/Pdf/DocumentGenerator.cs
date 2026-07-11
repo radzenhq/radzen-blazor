@@ -1165,20 +1165,9 @@ internal sealed class DocumentGenerator
     }
 
     private static Dictionary<ushort, int> RemapGidToUnicode(GeneratedFont font)
-    {
-        if (font.CompactGidMap is not { } gidMap)
-        {
-            return font.GidToUnicode;
-        }
-
-        var remapped = new Dictionary<ushort, int>(font.GidToUnicode.Count);
-        foreach (var (gid, codepoint) in font.GidToUnicode)
-        {
-            remapped[gidMap[gid]] = codepoint;
-        }
-
-        return remapped;
-    }
+        => font.CompactGidMap is { } gidMap
+            ? Fonts.Type0FontEmbedder.RemapToCompactGids(font.GidToUnicode, gidMap)
+            : font.GidToUnicode;
 
     // Content emission order: fills and edges (untagged artifacts), untagged images
     // and texts (headers/footers), then tagged content grouped per structure element
@@ -1186,7 +1175,7 @@ internal sealed class DocumentGenerator
     // so BDC order in the stream always equals the tree's reading order.
     private GeneratedPage Finalize(PagePlan plan, int pageIndex)
     {
-        var writer = new ContentWriter();
+        using var writer = new ContentWriter();
 
         foreach (var fill in plan.Fills)
         {

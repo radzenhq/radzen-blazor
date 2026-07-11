@@ -850,7 +850,7 @@ public sealed class Document
         DocumentObject reference;
         if (font.Sfnt is { } sfnt)
         {
-            reference = Fonts.Type0FontEmbedder.Embed(writer, sfnt, font.GidToUnicode);
+            reference = Fonts.Type0FontEmbedder.Embed(writer, sfnt, font.GidToUnicode, font.CompactGidMap);
         }
         else
         {
