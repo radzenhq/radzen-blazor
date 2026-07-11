@@ -330,12 +330,22 @@ internal sealed class DocumentGenerator
             EmitImage(plan, positioned, left, contentTop);
         }
 
+        foreach (var positioned in page.Codes)
+        {
+            EmitCode(plan, positioned, left, contentTop);
+        }
+
         var headerTop = height - page.HeaderTop;
         EmitBandLines(plan, page.Header, left, headerTop, width, pageNumber, pageCount);
 
         foreach (var positioned in page.HeaderImages)
         {
             EmitImage(plan, positioned, left, headerTop);
+        }
+
+        foreach (var positioned in page.HeaderCodes)
+        {
+            EmitCode(plan, positioned, left, headerTop);
         }
 
         foreach (var positioned in page.HeaderTables)
@@ -349,6 +359,11 @@ internal sealed class DocumentGenerator
         foreach (var positioned in page.FooterImages)
         {
             EmitImage(plan, positioned, left, bandTop);
+        }
+
+        foreach (var positioned in page.FooterCodes)
+        {
+            EmitCode(plan, positioned, left, bandTop);
         }
 
         foreach (var positioned in page.FooterTables)
@@ -523,6 +538,89 @@ internal sealed class DocumentGenerator
             Element = ElementOf(positioned.Source),
         });
         plan.UsedImages.Add(xobject);
+    }
+
+    private static readonly Color CodeBlack = Color.FromRgb(0, 0, 0);
+
+    private void EmitCode(PagePlan plan, PositionedCode positioned, double left, double top)
+    {
+        var x = left + positioned.XOffset;
+        var topY = top - positioned.Y;
+        switch (positioned.Source)
+        {
+            case QrCode qr:
+                EmitQrCode(plan, qr, x, topY);
+                break;
+            case Barcode barcode:
+                EmitBarcode(plan, barcode, x, topY);
+                break;
+            default:
+                break;
+        }
+    }
+
+    // One filled square per dark module, scaled so matrix plus quiet zone fits Size x Size.
+    private static void EmitQrCode(PagePlan plan, QrCode qr, double x, double topY)
+    {
+        var matrix = Radzen.Documents.QrEncoder.EncodeUtf8(qr.Value, qr.ErrorCorrection);
+        var modules = matrix.GetLength(0);
+        var quiet = System.Math.Max(0, qr.QuietZoneModules);
+        var module = qr.Size.Point / (modules + (2 * quiet));
+
+        for (var row = 0; row < modules; row++)
+        {
+            for (var column = 0; column < modules; column++)
+            {
+                if (!matrix[row, column])
+                {
+                    continue;
+                }
+
+                plan.Fills.Add(new FillDraw
+                {
+                    X = x + ((quiet + column) * module),
+                    Y = topY - ((quiet + row + 1) * module),
+                    Width = module,
+                    Height = module,
+                    Color = CodeBlack,
+                });
+            }
+        }
+    }
+
+    // Bars come back with X/Width in modules and Y/Height in points, so only X scales.
+    private void EmitBarcode(PagePlan plan, Barcode barcode, double x, double topY)
+    {
+        var (bars, moduleCount, _) = Radzen.Documents.BarcodeEncoder.EncodeToBars(barcode.Type, barcode.Value, barcode.Height.Point, 0);
+        var scaleX = barcode.Width.Point / moduleCount;
+
+        foreach (var bar in bars)
+        {
+            plan.Fills.Add(new FillDraw
+            {
+                X = x + (bar.X * scaleX),
+                Y = topY - bar.Y - bar.Height,
+                Width = bar.Width * scaleX,
+                Height = bar.Height,
+                Color = CodeBlack,
+            });
+        }
+
+        if (!barcode.ShowText)
+        {
+            return;
+        }
+
+        var run = new Run(barcode.Value) { EffectiveFont = barcode.Font };
+        var paragraph = new Paragraph { AlignmentValue = HorizontalAlignment.Center, EffectiveFont = barcode.Font };
+        paragraph.Inlines.Add(run);
+
+        var textTop = topY - barcode.Height.Point;
+        foreach (var box in LineBreaker.Break(paragraph, barcode.Width.Point, fonts))
+        {
+            EmitLine(plan, box, x, textTop, null);
+            textTop -= box.Height;
+        }
     }
 
     private void EmitFragment(PagePlan plan, PositionedTableFragment positioned, double left, double contentTop, int pageNumber, int pageCount)

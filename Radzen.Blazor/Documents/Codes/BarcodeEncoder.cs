@@ -1161,7 +1161,7 @@ public static class BarcodeEncoder
         return sb.ToString();
     }
 
-    static (IReadOnlyList<BarcodeRect> bars, double vbWidth, double vbHeight) EncodeToBars(BarcodeType type, string value, double barHeight, int quietZoneModules)
+    internal static (IReadOnlyList<BarcodeRect> bars, double vbWidth, double vbHeight) EncodeToBars(BarcodeType type, string value, double barHeight, int quietZoneModules)
     {
         switch (type)
         {

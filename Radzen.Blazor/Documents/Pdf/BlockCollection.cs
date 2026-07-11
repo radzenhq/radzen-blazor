@@ -97,6 +97,36 @@ public class BlockCollection : IReadOnlyList<Block>
         return Add(Image.FromStream(stream));
     }
 
+    /// <summary>
+    /// Appends a QR code rendered as vector squares.
+    /// </summary>
+    /// <param name="value">The text to encode.</param>
+    /// <param name="size">The rendered width and height of the code, quiet zone included.</param>
+    /// <param name="errorCorrection">The error-correction level. Defaults to <see cref="QrErrorCorrection.Medium"/>.</param>
+    /// <returns>The newly created QR code.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+    public QrCode AddQrCode(string value, Unit size, QrErrorCorrection errorCorrection = QrErrorCorrection.Medium)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return Add(new QrCode(value, size) { ErrorCorrection = errorCorrection });
+    }
+
+    /// <summary>
+    /// Appends a 1D barcode rendered as vector bars.
+    /// </summary>
+    /// <param name="type">The barcode symbology.</param>
+    /// <param name="value">The value to encode.</param>
+    /// <param name="width">The rendered width of the bars.</param>
+    /// <param name="height">The rendered height of the bars.</param>
+    /// <param name="showText">Whether the human-readable value is drawn centered below the bars.</param>
+    /// <returns>The newly created barcode.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+    public Barcode AddBarcode(BarcodeType type, string value, Unit width, Unit height, bool showText = false)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return Add(new Barcode(type, value, width, height) { ShowText = showText });
+    }
+
     private bool Contains(Block block)
     {
         foreach (var item in items)
