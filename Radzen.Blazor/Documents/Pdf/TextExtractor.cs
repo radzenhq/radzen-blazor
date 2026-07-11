@@ -16,6 +16,11 @@ internal static class TextExtractor
 {
     private const double LineTolerance = 0.5;
 
+    // TJ adjustments are in thousandths of an em; a leftward move (negative) beyond
+    // ~0.2 em is an inter-word gap, smaller values are kerning. Third-party streams
+    // rely on this for word breaks; the authoring path never emits TJ arrays.
+    private const double TjSpaceThreshold = 200.0;
+
     public static string Extract(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts)
     {
         if (content is null || content.Length == 0)
@@ -30,10 +35,11 @@ internal static class TextExtractor
         var ctmStack = new Stack<Matrix>();
         var textMatrix = Matrix.Identity;
         var lineMatrix = Matrix.Identity;
+        var leading = 0.0;
         ReverseFont? font = null;
 
         var operands = new List<Token>();
-        var buffer = new List<byte>();
+        var array = new List<Token>();
 
         for (var i = 0; i < tokens.Count; i++)
         {
@@ -47,16 +53,15 @@ internal static class TextExtractor
                     continue;
 
                 case TokenKind.ArrayStart:
-                    buffer.Clear();
+                    array.Clear();
                     for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.ArrayEnd; i++)
                     {
-                        if (tokens[i].Kind == TokenKind.String)
+                        if (tokens[i].Kind is TokenKind.String or TokenKind.Number)
                         {
-                            buffer.AddRange(tokens[i].Bytes!);
+                            array.Add(tokens[i]);
                         }
                     }
 
-                    operands.Add(new Token(TokenKind.String, 0, null, [.. buffer]));
                     continue;
 
                 case TokenKind.ArrayEnd:
@@ -108,22 +113,34 @@ internal static class TextExtractor
                         ? f
                         : ReverseFont.WinAnsi;
                     break;
-                case "Td":
                 case "TD":
+                    leading = -Number(operands, 1);
+                    goto case "Td";
+                case "Td":
                     lineMatrix = Matrix.Translate(Number(operands, 0), Number(operands, 1)) * lineMatrix;
                     textMatrix = lineMatrix;
+                    break;
+                case "TL":
+                    leading = Number(operands, 0);
                     break;
                 case "Tm":
                     lineMatrix = Components(operands);
                     textMatrix = lineMatrix;
                     break;
                 case "T*":
+                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
                     textMatrix = lineMatrix;
                     break;
                 case "Tj":
+                    Show(fragments, operands, textMatrix * ctm, font);
+                    break;
                 case "TJ":
+                    ShowArray(fragments, array, textMatrix * ctm, font);
+                    break;
                 case "'":
                 case "\"":
+                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
+                    textMatrix = lineMatrix;
                     Show(fragments, operands, textMatrix * ctm, font);
                     break;
             }
@@ -150,6 +167,34 @@ internal static class TextExtractor
 
         var origin = matrix.Transform(0, 0);
         fragments.Add(new Fragment(origin.Y, origin.X, text));
+    }
+
+    private static void ShowArray(List<Fragment> fragments, List<Token> array, Matrix matrix, ReverseFont? font)
+    {
+        var reverse = font ?? ReverseFont.WinAnsi;
+        var builder = new StringBuilder();
+        foreach (var element in array)
+        {
+            if (element.Kind == TokenKind.String)
+            {
+                if (element.Bytes is { Length: > 0 } bytes)
+                {
+                    builder.Append(reverse.Decode(bytes));
+                }
+            }
+            else if (element.Number <= -TjSpaceThreshold)
+            {
+                builder.Append(' ');
+            }
+        }
+
+        if (builder.Length == 0)
+        {
+            return;
+        }
+
+        var origin = matrix.Transform(0, 0);
+        fragments.Add(new Fragment(origin.Y, origin.X, builder.ToString()));
     }
 
     private static string Compose(List<Fragment> fragments)
