@@ -19,6 +19,11 @@ public sealed class AcroForm
 
     private readonly DocumentReader reader;
     private readonly List<FormField> fields = [];
+    private readonly List<string> fieldNames = [];
+
+    // Terminal fields keyed by their fully qualified dotted name, each paired with
+    // the widget annotation that renders it (the field dict itself when merged).
+    private readonly Dictionary<string, Terminal> terminals = new(StringComparer.Ordinal);
 
     internal AcroForm(DocumentReader reader, DictionaryObject dictionary)
     {
@@ -30,10 +35,7 @@ public sealed class AcroForm
         {
             foreach (var entry in entries)
             {
-                if (reader.Resolve(entry) is DictionaryObject field)
-                {
-                    fields.Add(new FormField(reader, field));
-                }
+                Collect(entry, string.Empty);
             }
         }
     }
@@ -42,6 +44,77 @@ public sealed class AcroForm
 
     /// <summary>Gets the terminal fields of the form.</summary>
     public IReadOnlyList<FormField> Fields => fields;
+
+    /// <summary>
+    /// Gets the fully qualified dotted names of the terminal fields (parent
+    /// <c>/T</c> joined to each descendant <c>/T</c> with <c>'.'</c>), the names
+    /// accepted by <see cref="FillField"/> and <see cref="CheckField"/>.
+    /// </summary>
+    public IReadOnlyList<string> FieldNames => fieldNames;
+
+    private readonly record struct Terminal(DictionaryObject Field, DictionaryObject Widget);
+
+    // Walks the field tree, recording each terminal under its qualified name. A node
+    // whose /Kids are field dictionaries (they carry /T) is non-terminal; a node with
+    // no /Kids, or whose /Kids are only widget annotations, is itself the terminal.
+    private void Collect(DocumentObject entry, string prefix)
+    {
+        if (reader.Resolve(entry) is not DictionaryObject dict)
+        {
+            return;
+        }
+
+        var partial = PartialName(dict);
+        var qualified = prefix.Length == 0 ? partial : prefix + "." + partial;
+
+        var fieldKids = new List<DocumentObject>();
+        foreach (var kid in Kids(dict))
+        {
+            if (reader.Resolve(kid) is DictionaryObject kidDict && kidDict.ContainsKey("T"))
+            {
+                fieldKids.Add(kid);
+            }
+        }
+
+        if (fieldKids.Count > 0)
+        {
+            foreach (var kid in fieldKids)
+            {
+                Collect(kid, qualified);
+            }
+
+            return;
+        }
+
+        terminals[qualified] = new Terminal(dict, WidgetOf(dict));
+        fieldNames.Add(qualified);
+        fields.Add(new FormField(reader, dict));
+    }
+
+    private IEnumerable<DocumentObject> Kids(DictionaryObject dict)
+        => dict.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids
+            ? kids
+            : [];
+
+    // The annotation that renders a terminal: its first widget-only kid (a separate
+    // widget carries no field /T), or the field dict itself when field and widget merge.
+    private DictionaryObject WidgetOf(DictionaryObject dict)
+    {
+        foreach (var kid in Kids(dict))
+        {
+            if (reader.Resolve(kid) is DictionaryObject kidDict && !kidDict.ContainsKey("T"))
+            {
+                return kidDict;
+            }
+        }
+
+        return dict;
+    }
+
+    private string PartialName(DictionaryObject dict)
+        => dict.TryGetValue("T", out var value) && reader.Resolve(value!) is StringObject text
+            ? text.Value
+            : string.Empty;
 
     /// <summary>
     /// Sets the text value of a field and regenerates its normal appearance
@@ -54,9 +127,11 @@ public sealed class AcroForm
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        var field = Find(name).Dictionary;
-        field["V"] = new StringObject(value);
-        field["AP"] = new DictionaryObject { ["N"] = BuildTextAppearance(field, value) };
+        var terminal = Find(name);
+        terminal.Field["V"] = new StringObject(value);
+        // Write the appearance onto the widget so a separate-widget kid's stale /AP
+        // does not override the new value in a viewer; when merged this is the field.
+        terminal.Widget["AP"] = new DictionaryObject { ["N"] = BuildTextAppearance(terminal.Widget, value) };
     }
 
     /// <summary>
@@ -66,23 +141,15 @@ public sealed class AcroForm
     /// <param name="name">The field name (<c>/T</c>).</param>
     public void CheckField(string name)
     {
-        var field = Find(name).Dictionary;
-        field["V"] = new NameObject(OnState);
-        field["AS"] = new NameObject(OnState);
+        var terminal = Find(name);
+        terminal.Field["V"] = new NameObject(OnState);
+        terminal.Widget["AS"] = new NameObject(OnState);
     }
 
-    private FormField Find(string name)
-    {
-        foreach (var field in fields)
-        {
-            if (string.Equals(field.Name, name, StringComparison.Ordinal))
-            {
-                return field;
-            }
-        }
-
-        throw new ArgumentException($"Field '{name}' not found.", nameof(name));
-    }
+    private Terminal Find(string name)
+        => terminals.TryGetValue(name, out var terminal)
+            ? terminal
+            : throw new ArgumentException($"Field '{name}' not found.", nameof(name));
 
     private StreamObject BuildTextAppearance(DictionaryObject field, string value)
     {
