@@ -4,7 +4,7 @@ namespace Radzen.Documents.Pdf;
 
 #nullable enable
 
-internal sealed class LineFragment
+internal struct LineFragment
 {
     public required Run Run { get; init; }
 
@@ -32,7 +32,7 @@ internal sealed class LineBox
 
 internal static class LineBreaker
 {
-    private sealed class Piece
+    private readonly struct Piece
     {
         public required Run Run { get; init; }
         public required int Start { get; init; }
@@ -41,9 +41,11 @@ internal static class LineBreaker
         public required double Advance { get; init; }
     }
 
-    private sealed class Word
+    // Pieces of a word are contiguous in the shared piece list: [PieceStart, PieceStart + PieceCount).
+    private struct Word
     {
-        public List<Piece> Pieces { get; } = [];
+        public int PieceStart { get; init; }
+        public int PieceCount { get; set; }
         public double Width { get; set; }
         public double GapAfter { get; set; }
         public int TabsAfter { get; set; }
@@ -60,7 +62,7 @@ internal static class LineBreaker
         var boxes = new List<LineBox>();
         var indent = paragraph.LeftIndent.Point;
         var max = maxWidthPoints - indent;
-        foreach (var words in Tokenize(paragraph, fonts))
+        foreach (var words in Tokenize(paragraph, fonts, out var pieces))
         {
             if (words.Count == 0)
             {
@@ -73,7 +75,7 @@ internal static class LineBreaker
             {
                 var (first, last) = lineRanges[li];
                 var isLast = li == lineRanges.Count - 1;
-                boxes.Add(BuildLine(words, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment));
+                boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment));
             }
         }
 
@@ -115,12 +117,14 @@ internal static class LineBreaker
     // Splits the paragraph into forced-break segments ('\n', '\r' and "\r\n"), each a
     // list of words separated by breakable whitespace (' ' and '\t'). NBSP is a word
     // character; control characters never enter fragment text.
-    private static List<List<Word>> Tokenize(Paragraph paragraph, FontCollection fonts)
+    private static List<List<Word>> Tokenize(Paragraph paragraph, FontCollection fonts, out List<Piece> pieces)
     {
         var segments = new List<List<Word>>();
         var words = new List<Word>();
         segments.Add(words);
-        Word? current = null;
+        pieces = [];
+        var current = default(Word);
+        var hasCurrent = false;
 
         foreach (var run in paragraph.Inlines)
         {
@@ -136,9 +140,14 @@ internal static class LineBreaker
                     }
 
                     i++;
+                    if (hasCurrent)
+                    {
+                        words.Add(current);
+                        hasCurrent = false;
+                    }
+
                     words = [];
                     segments.Add(words);
-                    current = null;
                 }
                 else if (IsInlineWhitespace(text[i]))
                 {
@@ -147,10 +156,10 @@ internal static class LineBreaker
                     {
                         if (text[i] == '\t')
                         {
-                            if (current == null)
+                            if (!hasCurrent)
                             {
-                                current = new Word();
-                                words.Add(current);
+                                current = new Word { PieceStart = pieces.Count };
+                                hasCurrent = true;
                             }
 
                             current.TabsAfter++;
@@ -163,7 +172,7 @@ internal static class LineBreaker
                         i++;
                     }
 
-                    if (spaces > 0 && current != null)
+                    if (spaces > 0 && hasCurrent)
                     {
                         current.GapAfter += fonts.MeasureText(new string(' ', spaces), run.ResolvedFont);
                     }
@@ -178,25 +187,35 @@ internal static class LineBreaker
 
                     var segment = text[start..i];
                     var advance = fonts.MeasureText(segment, run.ResolvedFont);
-                    var piece = new Piece
+
+                    if (!hasCurrent || current.GapAfter > 0 || current.TabsAfter > 0)
+                    {
+                        if (hasCurrent)
+                        {
+                            words.Add(current);
+                        }
+
+                        current = new Word { PieceStart = pieces.Count };
+                        hasCurrent = true;
+                    }
+
+                    pieces.Add(new Piece
                     {
                         Run = run,
                         Start = start,
                         Length = i - start,
                         Text = segment,
                         Advance = advance,
-                    };
-
-                    if (current == null || current.GapAfter > 0 || current.TabsAfter > 0)
-                    {
-                        current = new Word();
-                        words.Add(current);
-                    }
-
-                    current.Pieces.Add(piece);
+                    });
+                    current.PieceCount++;
                     current.Width += advance;
                 }
             }
+        }
+
+        if (hasCurrent)
+        {
+            words.Add(current);
         }
 
         return segments;
@@ -233,6 +252,7 @@ internal static class LineBreaker
 
     private static LineBox BuildLine(
         List<Word> words,
+        List<Piece> pieces,
         int first,
         int last,
         double max,
@@ -242,13 +262,21 @@ internal static class LineBreaker
         bool isLast,
         HorizontalAlignment? inheritedAlignment)
     {
-        var fragments = new List<LineFragment>();
+        var count = 0;
+        for (var w = first; w <= last; w++)
+        {
+            count += words[w].PieceCount;
+        }
+
+        var fragments = new List<LineFragment>(count);
         double advances = 0;
         var hasTabs = false;
         for (var w = first; w <= last; w++)
         {
-            foreach (var piece in words[w].Pieces)
+            var word = words[w];
+            for (var p = word.PieceStart; p < word.PieceStart + word.PieceCount; p++)
             {
+                var piece = pieces[p];
                 fragments.Add(new LineFragment
                 {
                     Run = piece.Run,
@@ -260,21 +288,23 @@ internal static class LineBreaker
                 advances += piece.Advance;
             }
 
-            if (w < last && words[w].TabsAfter > 0)
+            if (w < last && word.TabsAfter > 0)
             {
                 hasTabs = true;
             }
         }
+
+        var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
 
         // Natural placement from 0; tab stops are relative to the line origin.
         var cursor = 0.0;
         var fi = 0;
         for (var w = first; w <= last; w++)
         {
-            foreach (var _ in words[w].Pieces)
+            for (var p = 0; p < words[w].PieceCount; p++)
             {
-                fragments[fi].XOffset = cursor;
-                cursor += fragments[fi].Advance;
+                span[fi].XOffset = cursor;
+                cursor += span[fi].Advance;
                 fi++;
             }
 
@@ -300,10 +330,10 @@ internal static class LineBreaker
             fi = 0;
             for (var w = first; w <= last; w++)
             {
-                foreach (var _ in words[w].Pieces)
+                for (var p = 0; p < words[w].PieceCount; p++)
                 {
-                    fragments[fi].XOffset = cursor;
-                    cursor += fragments[fi].Advance;
+                    span[fi].XOffset = cursor;
+                    cursor += span[fi].Advance;
                     fi++;
                 }
 
@@ -326,9 +356,9 @@ internal static class LineBreaker
         var shift = indent + x0;
         if (shift != 0)
         {
-            foreach (var fragment in fragments)
+            for (var f = 0; f < span.Length; f++)
             {
-                fragment.XOffset += shift;
+                span[f].XOffset += shift;
             }
         }
 
@@ -341,9 +371,10 @@ internal static class LineBreaker
     {
         double natural = 0;
         double baseline = 0;
-        foreach (var frag in box.Fragments)
+        var fragments = box.Fragments;
+        for (var i = 0; i < fragments.Count; i++)
         {
-            var (h, asc) = FontExtent(frag.Run.ResolvedFont, fonts);
+            var (h, asc) = FontExtent(fragments[i].Run.ResolvedFont, fonts);
             natural = System.Math.Max(natural, h);
             baseline = System.Math.Max(baseline, asc);
         }
