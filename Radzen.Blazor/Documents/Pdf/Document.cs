@@ -39,6 +39,9 @@ public sealed class Document
     // the sRGB output intent, the trailer /ID and full-embedding enforcement.
     internal PdfAConformance Conformance { get; set; }
 
+    // Files embedded on save (EmbeddedFiles name tree + /AF associated files).
+    internal List<Attachment> Attachments { get; } = [];
+
     /// <summary>
     /// Loads a physical document from a stream. The stream is read in full and
     /// parsed through the internal reader; each page's raw content-stream bytes
@@ -389,6 +392,11 @@ public sealed class Document
             PreserveForm(importer, catalog, pageNodes);
         }
 
+        if (Attachments.Count > 0)
+        {
+            WriteAttachments(writer, catalog);
+        }
+
         if (Conformance != PdfAConformance.None)
         {
             WriteConformance(writer, catalog);
@@ -436,6 +444,46 @@ public sealed class Document
         }
     }
 
+    private void WriteAttachments(DocumentWriter writer, DictionaryObject catalog)
+    {
+        var filespecs = new SortedDictionary<string, ReferenceObject>(StringComparer.Ordinal);
+        var af = new ArrayObject();
+
+        foreach (var attachment in Attachments)
+        {
+            var file = FlateFilter.EncodeStream(attachment.Data);
+            file.Dictionary["Type"] = new NameObject("EmbeddedFile");
+            file.Dictionary["Subtype"] = new NameObject(attachment.MimeType);
+            file.Dictionary["Params"] = new DictionaryObject { ["Size"] = new NumberObject(attachment.Data.Length) };
+
+            var filespec = new DictionaryObject
+            {
+                ["Type"] = new NameObject("Filespec"),
+                ["F"] = new StringObject(attachment.Name),
+                ["UF"] = new StringObject(attachment.Name),
+                ["AFRelationship"] = new NameObject(attachment.Relationship.ToString()),
+                ["EF"] = new DictionaryObject { ["F"] = writer.Add(file) },
+            };
+
+            var reference = writer.Add(filespec);
+            filespecs[attachment.Name] = reference;
+            af.Add(reference);
+        }
+
+        var names = new ArrayObject();
+        foreach (var (name, reference) in filespecs)
+        {
+            names.Add(new StringObject(name));
+            names.Add(reference);
+        }
+
+        catalog["Names"] = new DictionaryObject
+        {
+            ["EmbeddedFiles"] = writer.Add(new DictionaryObject { ["Names"] = names }),
+        };
+        catalog["AF"] = af;
+    }
+
     private void WriteConformance(DocumentWriter writer, DictionaryObject catalog)
     {
         var xmp = new XmpMetadata
@@ -445,6 +493,15 @@ public sealed class Document
             PdfAPart = 3,
             PdfAConformance = Conformance == PdfAConformance.PdfA3A ? "A" : "B",
         };
+
+        foreach (var attachment in Attachments)
+        {
+            if (attachment.Name == "factur-x.xml")
+            {
+                xmp.FacturX = new FacturXMetadata();
+                break;
+            }
+        }
 
         catalog["Metadata"] = writer.Add(xmp.BuildStream());
 

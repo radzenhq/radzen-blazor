@@ -19,6 +19,9 @@ public class DocumentBuilder
     /// <summary>Gets the font collection used to register and resolve fonts.</summary>
     public FontCollection Fonts { get; } = new();
 
+    /// <summary>Gets the files to embed into the produced PDF (e.g. the Factur-X invoice XML).</summary>
+    public AttachmentCollection Attachments { get; } = [];
+
     /// <summary>
     /// Gets or sets the PDF/A conformance level of the output. When not
     /// <see cref="PdfAConformance.None"/> the saved file carries an XMP

@@ -141,6 +141,7 @@ internal sealed class DocumentGenerator
         StyleResolver.Resolve(builder);
 
         var document = new Document { Conformance = builder.Conformance };
+        document.Attachments.AddRange(builder.Attachments);
         document.Info.Title = builder.Info.Title;
         document.Info.Author = builder.Info.Author;
         document.Info.Subject = builder.Info.Subject;
