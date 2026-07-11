@@ -363,7 +363,7 @@ public sealed class FontCollection
             return true;
         }
 
-        return (font.Bold || font.Italic) && TryResolveFamily(font.Name, out primary);
+        return TryResolveFamily(font.Name, out primary);
     }
 
     internal SfntFont ResolvePrimarySfnt(Font font)
