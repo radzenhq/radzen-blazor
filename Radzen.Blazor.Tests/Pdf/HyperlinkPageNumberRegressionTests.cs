@@ -135,6 +135,27 @@ public class HyperlinkPageNumberRegressionTests
         Assert.True(link.Y1 - Tol <= target.Y && target.Y <= link.Y2 + Tol, $"link rect [{link.Y1:F2},{link.Y2:F2}] must cover the linked text baseline {target.Y:F2}");
     }
 
+    // veraPDF ISO 19005-3 6.3.2: every annotation must set the Print flag (bit 3 = 4)
+    // and clear Hidden/NoView, else a hyperlinked PDF/A document is non-conformant.
+    [Fact]
+    public void LinkAnnotation_SetsPrintFlag_ForPdfAConformance()
+    {
+        var (builder, section) = Author();
+        var paragraph = section.Blocks.AddParagraph();
+        SetLink(paragraph.Inlines.Add("Radzen"), Url);
+
+        var reader = BuildTestSupport.Read(builder);
+        var page = ContentTestHelpers.Kid(reader, 0);
+        var annots = Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]));
+        var annot = Assert.IsType<DictionaryObject>(reader.Resolve(annots[0]));
+
+        Assert.True(annot.ContainsKey("F"), "Link annotation must carry the /F flags key (PDF/A 6.3.2)");
+        var flags = Assert.IsType<NumberObject>(reader.Resolve(annot["F"])).IntValue;
+        Assert.True((flags & 4) != 0, "Print flag (bit 3) must be set");
+        Assert.True((flags & 2) == 0, "Hidden flag (bit 2) must be clear");
+        Assert.True((flags & 32) == 0, "NoView flag (bit 6) must be clear");
+    }
+
     [Fact]
     public void LinkOnSecondPage_AnnotationLandsOnThatPage()
     {
