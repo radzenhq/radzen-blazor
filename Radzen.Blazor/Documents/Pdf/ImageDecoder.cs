@@ -194,15 +194,42 @@ internal static class ImageDecoder
             return new ImageXObject(image, null);
         }
 
+        // The color path passes packed indices straight to PDF, but the 8-bit soft mask needs one index per pixel.
+        var pixels = UnpackIndices(indices, width, height, bitDepth);
         var alpha = new byte[width * height];
         for (var i = 0; i < alpha.Length; i++)
         {
-            var index = indices[i];
+            var index = pixels[i];
             alpha[i] = index < transparency.Length ? transparency[index] : (byte)0xFF;
         }
 
         var mask = BuildImage(width, height, 8, new NameObject("DeviceGray"), alpha);
         return new ImageXObject(image, mask);
+    }
+
+    // Expand a paletted scanline buffer, where sub-8-bit indices are packed MSB-first and each row is byte padded, to one index per pixel.
+    private static byte[] UnpackIndices(byte[] indices, int width, int height, int bitDepth)
+    {
+        if (bitDepth == 8)
+        {
+            return indices;
+        }
+
+        var rowLength = ((width * bitDepth) + 7) / 8;
+        var mask = (1 << bitDepth) - 1;
+        var pixels = new byte[width * height];
+        for (var y = 0; y < height; y++)
+        {
+            var rowStart = y * rowLength;
+            for (var x = 0; x < width; x++)
+            {
+                var bit = x * bitDepth;
+                var shift = 8 - bitDepth - (bit % 8);
+                pixels[(y * width) + x] = (byte)((indices[rowStart + (bit / 8)] >> shift) & mask);
+            }
+        }
+
+        return pixels;
     }
 
     private static ImageXObject BuildAlphaPng(int width, int height, NameObject colorSpace, byte[] samples, int colorChannels, int bitDepth)
