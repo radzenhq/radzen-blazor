@@ -452,16 +452,40 @@ internal sealed class DocumentGenerator
         int pageCount,
         HorizontalAlignment? inheritedAlignment = null)
     {
-        var pieces = new List<(Run Run, System.Text.StringBuilder Text, int TabsBefore)>();
+        // Text == null marks a passthrough piece: a non-text run (e.g. InlineImage) re-emitted
+        // as its ORIGINAL instance so the line breaker lays it out instead of coercing it to
+        // empty text.
+        var pieces = new List<(Run Run, System.Text.StringBuilder? Text, int TabsBefore)>();
         var pendingTabs = 0;
         foreach (var run in paragraph.Inlines)
         {
-            var text = run switch
+            string text;
+            switch (run)
             {
-                PageNumberField => pageNumber.ToString(CultureInfo.InvariantCulture),
-                PageCountField => pageCount.ToString(CultureInfo.InvariantCulture),
-                _ => run.Text,
-            };
+                case PageNumberField:
+                    text = pageNumber.ToString(CultureInfo.InvariantCulture);
+                    break;
+                case PageCountField:
+                    text = pageCount.ToString(CultureInfo.InvariantCulture);
+                    break;
+                case InlineImage:
+                    // Flush a pending tab so the image keeps its tab-stop position, then re-emit
+                    // the image itself rather than dropping it as its (empty) Text.
+                    if (pendingTabs > 0)
+                    {
+                        pieces.Add((run, new System.Text.StringBuilder(), pendingTabs));
+                        pendingTabs = 0;
+                    }
+
+                    pieces.Add((run, null, 0));
+                    continue;
+                case { } when run.GetType() == typeof(Run):
+                    text = run.Text;
+                    break;
+                default:
+                    throw new System.NotSupportedException(
+                        $"ResolveFields cannot resolve inline run of type '{run!.GetType().Name}'.");
+            }
 
             var parts = text.Split('\t');
             for (var pi = 0; pi < parts.Length; pi++)
@@ -477,9 +501,9 @@ internal sealed class DocumentGenerator
                     continue;
                 }
 
-                if (pendingTabs == 0 && pieces.Count > 0 && SameStyle(pieces[^1].Run, run))
+                if (pendingTabs == 0 && pieces.Count > 0 && pieces[^1].Text is { } previous && SameStyle(pieces[^1].Run, run))
                 {
-                    pieces[^1].Text.Append(part);
+                    previous.Append(part);
                 }
                 else
                 {
@@ -512,6 +536,12 @@ internal sealed class DocumentGenerator
 
         foreach (var (run, builderText, tabsBefore) in pieces)
         {
+            if (builderText is null)
+            {
+                resolved.Inlines.Add(run);
+                continue;
+            }
+
             resolved.Inlines.Add(new Run(new string('\t', tabsBefore) + builderText.ToString())
             {
                 EffectiveFont = run.ResolvedFont,
