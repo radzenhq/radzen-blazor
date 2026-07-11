@@ -20,6 +20,7 @@ internal static class GlyfSubsetter
     private const ushort XAndYScale = 0x0040;
     private const ushort TwoByTwo = 0x0080;
     private const uint ChecksumMagic = 0xB1B0AFBA;
+    private static readonly string[] HintingTables = ["cvt ", "fpgm", "prep"];
 
     public static byte[] Subset(SfntFont font, IReadOnlyCollection<ushort> glyphIds)
     {
@@ -143,6 +144,15 @@ internal static class GlyfSubsetter
         Enqueue(0);
         foreach (var gid in requested)
         {
+            // A corrupt font (e.g. a cmap returning a gid past the glyph count) must
+            // fail loudly here rather than silently drop the glyph and later throw an
+            // opaque KeyNotFoundException while remapping.
+            if (gid >= numGlyphs)
+            {
+                throw new ArgumentOutOfRangeException(nameof(requested), gid,
+                    $"Requested glyph id {gid} is outside the font's glyph range [0, {numGlyphs}).");
+            }
+
             Enqueue(gid);
         }
 
@@ -341,6 +351,17 @@ internal static class GlyfSubsetter
             tables.Add(("post", BuildPost(post.Span)));
         }
 
+        // Glyph outlines are copied verbatim including their instruction bytecode,
+        // which CALLs fpgm functions and reads cvt; carry those and prep through so
+        // hint-executing rasterizers do not error on missing data.
+        foreach (var tag in HintingTables)
+        {
+            if (font.TryGetTableMemory(tag, out var hinting))
+            {
+                tables.Add((tag, hinting));
+            }
+        }
+
         tables.Sort(static (a, b) => string.CompareOrdinal(a.Tag, b.Tag));
 
         var numTables = tables.Count;
@@ -365,33 +386,43 @@ internal static class GlyfSubsetter
         }
 
         length = cursor;
-        var file = System.Buffers.ArrayPool<byte>.Shared.Rent(cursor);
+        var pool = System.Buffers.ArrayPool<byte>.Shared;
+        var file = pool.Rent(cursor);
 
-        WriteUInt32(file, 0, 0x00010000);
-        WriteUInt16(file, 4, (ushort)numTables);
-        WriteUInt16(file, 6, (ushort)searchRange);
-        WriteUInt16(file, 8, (ushort)entrySelector);
-        WriteUInt16(file, 10, (ushort)rangeShift);
-
-        for (var i = 0; i < numTables; i++)
+        // The caller owns the buffer on success; a throw before that must return it.
+        try
         {
-            var (tag, data) = tables[i];
-            data.Span.CopyTo(file.AsSpan(offsets[i]));
-            file.AsSpan(offsets[i] + data.Length, Align4(data.Length) - data.Length).Clear();
+            WriteUInt32(file, 0, 0x00010000);
+            WriteUInt16(file, 4, (ushort)numTables);
+            WriteUInt16(file, 6, (ushort)searchRange);
+            WriteUInt16(file, 8, (ushort)entrySelector);
+            WriteUInt16(file, 10, (ushort)rangeShift);
 
-            var rec = 12 + i * 16;
-            WriteTag(file, rec, tag);
-            WriteUInt32(file, rec + 4, TableChecksum(file, offsets[i], Align4(data.Length)));
-            WriteUInt32(file, rec + 8, (uint)offsets[i]);
-            WriteUInt32(file, rec + 12, (uint)data.Length);
+            for (var i = 0; i < numTables; i++)
+            {
+                var (tag, data) = tables[i];
+                data.Span.CopyTo(file.AsSpan(offsets[i]));
+                file.AsSpan(offsets[i] + data.Length, Align4(data.Length) - data.Length).Clear();
+
+                var rec = 12 + i * 16;
+                WriteTag(file, rec, tag);
+                WriteUInt32(file, rec + 4, TableChecksum(file, offsets[i], Align4(data.Length)));
+                WriteUInt32(file, rec + 8, (uint)offsets[i]);
+                WriteUInt32(file, rec + 12, (uint)data.Length);
+            }
+
+            var headIndex = tables.FindIndex(static t => t.Tag == "head");
+            var headOffset = offsets[headIndex];
+            var adjustment = unchecked(ChecksumMagic - TableChecksum(file, 0, cursor));
+            WriteUInt32(file, headOffset + 8, adjustment);
+
+            return file;
         }
-
-        var headIndex = tables.FindIndex(static t => t.Tag == "head");
-        var headOffset = offsets[headIndex];
-        var adjustment = unchecked(ChecksumMagic - TableChecksum(file, 0, cursor));
-        WriteUInt32(file, headOffset + 8, adjustment);
-
-        return file;
+        catch
+        {
+            pool.Return(file);
+            throw;
+        }
     }
 
     private static int Align4(int value) => (value + 3) & ~3;
