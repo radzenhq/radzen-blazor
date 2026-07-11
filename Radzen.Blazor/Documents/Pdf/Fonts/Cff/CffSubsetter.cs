@@ -6,7 +6,8 @@ using System.Text;
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
 // Rebuilds a compact CID-keyed CFF holding only the closure of the requested glyphs
-// (requested original gids plus glyph 0). Charstrings are copied verbatim and the whole
+// (requested original gids plus glyph 0), renumbered into a contiguous 0..N-1 space with
+// an identity charset (CID == new gid). Charstrings are copied verbatim and the whole
 // FDArray, its Private DICTs, local subrs and the global subrs are preserved, so a re-parse
 // recovers identical advance widths. Offsets use the forced 5-byte integer form so every
 // DICT has a layout-independent size and positions resolve in a single pass.
@@ -24,13 +25,11 @@ internal static class CffSubsetter
         var glyphCount = closure.Length;
 
         var charStrings = new byte[glyphCount][];
-        var cids = new int[glyphCount];
         var fdSelect = new int[glyphCount];
         for (var i = 0; i < glyphCount; i++)
         {
             var gid = closure[i];
             charStrings[i] = font.GetCharStringBytes(gid);
-            cids[i] = font.Charset[gid];
             fdSelect[i] = font.GetFd(gid);
         }
 
@@ -43,7 +42,7 @@ internal static class CffSubsetter
         var nameIndex = CffIndex.Write([nameBytes]);
         var stringIndex = CffIndex.Write([Encoding.ASCII.GetBytes(registry), Encoding.ASCII.GetBytes(ordering)]);
         var globalSubrIndex = CffIndex.Write(font.GetGlobalSubrBytes());
-        var charsetBytes = BuildCharset(cids);
+        var charsetBytes = BuildIdentityCharset(glyphCount);
         var fdSelectBytes = BuildFdSelect(fdSelect);
         var charStringsIndex = CffIndex.Write(charStrings);
 
@@ -120,6 +119,29 @@ internal static class CffSubsetter
         return result;
     }
 
+    // The compact renumbering for a request: original gid -> new gid, covering the
+    // requested glyphs plus .notdef, assigned in ascending original-gid order.
+    // Deterministic, so content generation and embedding agree on the codes.
+    public static Dictionary<ushort, ushort> BuildCompactGidMap(IReadOnlyCollection<ushort> glyphIds)
+    {
+        ArgumentNullException.ThrowIfNull(glyphIds);
+
+        var closure = new SortedSet<ushort> { 0 };
+        foreach (var gid in glyphIds)
+        {
+            closure.Add(gid);
+        }
+
+        var map = new Dictionary<ushort, ushort>(closure.Count);
+        ushort next = 0;
+        foreach (var gid in closure)
+        {
+            map[gid] = next++;
+        }
+
+        return map;
+    }
+
     private static int[] BuildClosure(CffFont font, IReadOnlyCollection<int> glyphIds)
     {
         var set = new SortedSet<int> { 0 };
@@ -134,16 +156,16 @@ internal static class CffSubsetter
         return [.. set];
     }
 
-    private static byte[] BuildCharset(int[] cids)
+    private static byte[] BuildIdentityCharset(int glyphCount)
     {
         // Format 0: leading byte then a Card16 CID per glyph 1..n-1 (glyph 0 is implicit CID 0).
-        var bytes = new byte[1 + ((cids.Length - 1) * 2)];
+        var bytes = new byte[1 + ((glyphCount - 1) * 2)];
         bytes[0] = 0;
         var p = 1;
-        for (var i = 1; i < cids.Length; i++)
+        for (var i = 1; i < glyphCount; i++)
         {
-            bytes[p++] = (byte)(cids[i] >> 8);
-            bytes[p++] = (byte)cids[i];
+            bytes[p++] = (byte)(i >> 8);
+            bytes[p++] = (byte)i;
         }
 
         return bytes;
