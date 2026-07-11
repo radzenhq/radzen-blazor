@@ -72,6 +72,13 @@ public class Paragraph : Block
     /// <summary>Gets or sets the name of the applied named style.</summary>
     public string? StyleName { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the last tab character on a line advances to a
+    /// right-aligned tab stop at the content-box right edge, making the text after it flush right
+    /// on the same baseline. Earlier tabs keep the default left tab stops. Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool RightTabStop { get; set; }
+
     /// <summary>Gets or sets a value indicating whether the paragraph is kept on a single page.</summary>
     public bool KeepTogether { get; set; }
 
