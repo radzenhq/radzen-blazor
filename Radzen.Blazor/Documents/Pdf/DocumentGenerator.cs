@@ -67,6 +67,7 @@ internal sealed class DocumentGenerator
         public required GeneratedFont Font { get; init; }
         public required byte[] Bytes { get; init; }
         public double StrokeWidth { get; init; }
+        public double Shear { get; init; }
         public Rect? Clip { get; set; }
     }
 
@@ -263,6 +264,7 @@ internal sealed class DocumentGenerator
             && fontA.Bold == fontB.Bold
             && fontA.Italic == fontB.Italic
             && fontA.Underline == fontB.Underline
+            && fontA.Strikethrough == fontB.Strikethrough
             && fontA.Color.Equals(fontB.Color);
     }
 
@@ -555,6 +557,7 @@ internal sealed class DocumentGenerator
         }
 
         EmitUnderlines(plan, line, originX, y);
+        EmitStrikethroughs(plan, line, originX, y);
         EmitLinks(plan, line, originX, y);
     }
 
@@ -629,6 +632,46 @@ internal sealed class DocumentGenerator
                 Y1 = underlineY,
                 X2 = originX + end,
                 Y2 = underlineY,
+                LineWidth = System.Math.Max(font.Size * 0.06, 0.5),
+                Color = font.Color,
+                Style = BorderStyle.Solid,
+            });
+
+            i = j;
+        }
+    }
+
+    // One strike per maximal group of consecutive strikethrough fragments (across
+    // runs), drawn at roughly the x-height midline above the baseline.
+    private static void EmitStrikethroughs(PagePlan plan, LineBox line, double originX, double y)
+    {
+        var fragments = line.Fragments;
+        var i = 0;
+        while (i < fragments.Count)
+        {
+            var font = fragments[i].Run.ResolvedFont;
+            if (!font.Strikethrough || fragments[i].Text.Length == 0)
+            {
+                i++;
+                continue;
+            }
+
+            var start = fragments[i].XOffset;
+            var end = fragments[i].XOffset + fragments[i].Advance;
+            var j = i + 1;
+            while (j < fragments.Count && fragments[j].Run.ResolvedFont.Strikethrough)
+            {
+                end = fragments[j].XOffset + fragments[j].Advance;
+                j++;
+            }
+
+            var strikeY = y + (font.Size * 0.3);
+            plan.Edges.Add(new EdgeDraw
+            {
+                X1 = originX + start,
+                Y1 = strikeY,
+                X2 = originX + end,
+                Y2 = strikeY,
                 LineWidth = System.Math.Max(font.Size * 0.06, 0.5),
                 Color = font.Color,
                 Style = BorderStyle.Solid,
@@ -773,6 +816,9 @@ internal sealed class DocumentGenerator
                 // Synthetic bold: no real bold face is available, so the glyphs are
                 // thickened by fill+stroke with a small stroke width at emission.
                 StrokeWidth = font.Bold && !face.Bold ? size * 0.03 : 0,
+                // Synthetic italic: no real italic face, so the run is slanted by a
+                // sheared text matrix (tan of about 12 degrees).
+                Shear = font.Italic && !face.Italic ? 0.21 : 0,
             });
 
             runX += advance;
@@ -941,10 +987,23 @@ internal sealed class DocumentGenerator
                 writer.WriteRaw(" w\n2 Tr\n");
             }
 
-            writer.WriteNumber(text.X);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(text.Baseline);
-            writer.WriteRaw(" Td\n");
+            if (text.Shear != 0)
+            {
+                writer.WriteRaw("1 0 ");
+                writer.WriteNumber(text.Shear);
+                writer.WriteRaw(" 1 ");
+                writer.WriteNumber(text.X);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(text.Baseline);
+                writer.WriteRaw(" Tm\n");
+            }
+            else
+            {
+                writer.WriteNumber(text.X);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(text.Baseline);
+                writer.WriteRaw(" Td\n");
+            }
             writer.WriteString(text.Bytes);
             writer.WriteRaw(" Tj\n");
             if (text.StrokeWidth > 0)

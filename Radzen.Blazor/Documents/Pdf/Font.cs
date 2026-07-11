@@ -12,6 +12,7 @@ public class Font
     private bool? bold;
     private bool? italic;
     private bool? underline;
+    private bool? strikethrough;
     private Color? color;
 
     /// <summary>Gets or sets the font family name.</summary>
@@ -49,6 +50,13 @@ public class Font
         set => underline = value;
     }
 
+    /// <summary>Gets or sets a value indicating whether the text is struck through.</summary>
+    public bool Strikethrough
+    {
+        get => strikethrough ?? false;
+        set => strikethrough = value;
+    }
+
     /// <summary>Gets or sets the text color. Defaults to black.</summary>
     public Color Color
     {
@@ -66,6 +74,8 @@ public class Font
 
     internal bool? UnderlineValue => underline;
 
+    internal bool? StrikethroughValue => strikethrough;
+
     internal Color? ColorValue => color;
 
     // Fills any property this font leaves unset from the next font in the cascade.
@@ -76,6 +86,7 @@ public class Font
         bold ??= parent.bold;
         italic ??= parent.italic;
         underline ??= parent.underline;
+        strikethrough ??= parent.strikethrough;
         color ??= parent.color;
     }
 }
