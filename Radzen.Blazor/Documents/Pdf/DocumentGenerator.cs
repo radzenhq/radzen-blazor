@@ -20,9 +20,9 @@ internal sealed class GeneratedFont
 
     public Dictionary<ushort, int> GidToUnicode { get; } = [];
 
-    // Compact glyf renumbering (original gid -> new gid) computed once all pages
-    // are planned; content streams emit the NEW gid so CID == gid stays true for
-    // the compact embedded subset. Null for CFF faces (identity CIDs).
+    // Compact renumbering (original gid -> new gid) computed once all pages are
+    // planned; content streams emit the NEW gid so CID == gid stays true for the
+    // compact embedded subset (glyf and CFF alike). Null for base-14 faces.
     public Dictionary<ushort, ushort>? CompactGidMap { get; set; }
 }
 
@@ -174,6 +174,10 @@ internal sealed class DocumentGenerator
             if (font.Sfnt is { IsCff: false } sfnt)
             {
                 font.CompactGidMap = GlyfSubsetter.BuildCompactGidMap(sfnt, font.GidToUnicode.Keys);
+            }
+            else if (font.Sfnt is { IsCff: true })
+            {
+                font.CompactGidMap = Fonts.Cff.CffSubsetter.BuildCompactGidMap(font.GidToUnicode.Keys);
             }
         }
 
