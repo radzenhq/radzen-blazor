@@ -25,12 +25,14 @@ internal sealed class CffFont
         string? ordering,
         int supplement,
         bool isCidKeyed,
+        double[]? fontMatrix,
         int[] charset,
         int[] fdSelect,
         FdInfo[] fdArray,
         CffIndex charStrings,
         CffIndex globalSubrs)
     {
+        FontMatrix = fontMatrix;
         FontName = fontName;
         Registry = registry;
         Ordering = ordering;
@@ -51,6 +53,9 @@ internal sealed class CffFont
     public string? Ordering { get; }
 
     public int Supplement { get; }
+
+    // Top DICT FontMatrix (12 7), or null when the font uses the default 0.001 matrix.
+    public double[]? FontMatrix { get; }
 
     public bool IsCidKeyed => isCidKeyed;
 
@@ -96,6 +101,8 @@ internal sealed class CffFont
 
     internal double GetNominalWidthX(int fd) => fdArray[fd].NominalWidthX;
 
+    internal double[]? GetFdFontMatrix(int fd) => fdArray[fd].FontMatrix;
+
     private static byte[][] Extract(CffIndex index)
     {
         var result = new byte[index.Count][];
@@ -126,7 +133,7 @@ internal sealed class CffFont
         var fontName = nameIndex.Count > 0 ? Ascii(nameIndex.GetBytes(0)) : null;
         var topDict = CffDict.Parse(topDictIndex.GetBytes(0));
 
-        if (!topDict.TryGetValue(17, out var charStringsOp))
+        if (!topDict.TryGetValue(17, out var charStringsOp) || charStringsOp.Length == 0)
         {
             throw new InvalidDataException("CFF Top DICT is missing CharStrings.");
         }
@@ -134,7 +141,9 @@ internal sealed class CffFont
         var charStrings = CffIndex.Read(cffData, (int)charStringsOp[0]);
         var glyphCount = charStrings.Count;
 
-        var isCidKeyed = topDict.TryGetValue(1230, out var ros) && ros is not null;
+        var fontMatrix = topDict.TryGetValue(1207, out var matrix) && matrix.Length == 6 ? matrix : null;
+
+        var isCidKeyed = topDict.TryGetValue(1230, out var ros) && ros is not null && ros.Length >= 3;
         string? registry = null;
         string? ordering = null;
         var supplement = 0;
@@ -160,13 +169,13 @@ internal sealed class CffFont
             fdSelect = [];
         }
 
-        return new CffFont(fontName, registry, ordering, supplement, isCidKeyed, charset, fdSelect, fdArray, charStrings, globalSubrs);
+        return new CffFont(fontName, registry, ordering, supplement, isCidKeyed, fontMatrix, charset, fdSelect, fdArray, charStrings, globalSubrs);
     }
 
     private static int[] ReadCharset(byte[] data, Dictionary<int, double[]> topDict, int glyphCount)
     {
         var charset = new int[glyphCount];
-        var offset = topDict.TryGetValue(15, out var op) ? (int)op[0] : 0;
+        var offset = topDict.TryGetValue(15, out var op) && op.Length > 0 ? (int)op[0] : 0;
 
         // 0/1/2 are predefined charsets; the CID fonts we target always carry a real offset.
         if (offset <= 2)
@@ -227,7 +236,7 @@ internal sealed class CffFont
 
     private static int[] ReadFdSelect(byte[] data, Dictionary<int, double[]> topDict, int glyphCount)
     {
-        if (!topDict.TryGetValue(1237, out var op))
+        if (!topDict.TryGetValue(1237, out var op) || op.Length == 0)
         {
             throw new InvalidDataException("CID-keyed CFF is missing FDSelect.");
         }
@@ -270,7 +279,7 @@ internal sealed class CffFont
 
     private static FdInfo[] ReadFdArray(byte[] data, Dictionary<int, double[]> topDict)
     {
-        if (!topDict.TryGetValue(1236, out var op))
+        if (!topDict.TryGetValue(1236, out var op) || op.Length == 0)
         {
             throw new InvalidDataException("CID-keyed CFF is missing FDArray.");
         }
@@ -287,9 +296,15 @@ internal sealed class CffFont
 
     private static FdInfo ReadPrivate(byte[] data, Dictionary<int, double[]> dict)
     {
+        var fontMatrix = dict.TryGetValue(1207, out var matrix) && matrix.Length == 6 ? matrix : null;
         if (!dict.TryGetValue(18, out var op))
         {
-            return new FdInfo(0, 0, null, 0);
+            return new FdInfo(0, 0, null, 0, fontMatrix);
+        }
+
+        if (op.Length < 2)
+        {
+            throw new InvalidDataException("CFF Private operator requires size and offset operands.");
         }
 
         var size = (int)op[0];
@@ -298,18 +313,18 @@ internal sealed class CffFont
         Array.Copy(data, offset, privateBytes, 0, size);
         var privateDict = CffDict.Parse(privateBytes);
 
-        var defaultWidthX = privateDict.TryGetValue(20, out var dw) ? dw[0] : 0;
-        var nominalWidthX = privateDict.TryGetValue(21, out var nw) ? nw[0] : 0;
+        var defaultWidthX = privateDict.TryGetValue(20, out var dw) && dw.Length > 0 ? dw[0] : 0;
+        var nominalWidthX = privateDict.TryGetValue(21, out var nw) && nw.Length > 0 ? nw[0] : 0;
 
         CffIndex? localSubrs = null;
         var localBias = 0;
-        if (privateDict.TryGetValue(19, out var subrsOp))
+        if (privateDict.TryGetValue(19, out var subrsOp) && subrsOp.Length > 0)
         {
             localSubrs = CffIndex.Read(data, offset + (int)subrsOp[0]);
             localBias = Bias(localSubrs.Count);
         }
 
-        return new FdInfo(defaultWidthX, nominalWidthX, localSubrs, localBias);
+        return new FdInfo(defaultWidthX, nominalWidthX, localSubrs, localBias, fontMatrix);
     }
 
     private static string GetString(int sid, CffIndex stringIndex)
@@ -328,7 +343,7 @@ internal sealed class CffFont
 
     private static int Bias(int subrCount) => subrCount < 1240 ? 107 : subrCount < 33900 ? 1131 : 32768;
 
-    private readonly struct FdInfo(double defaultWidthX, double nominalWidthX, CffIndex? localSubrs, int localBias)
+    private readonly struct FdInfo(double defaultWidthX, double nominalWidthX, CffIndex? localSubrs, int localBias, double[]? fontMatrix)
     {
         public double DefaultWidthX => defaultWidthX;
 
@@ -337,6 +352,8 @@ internal sealed class CffFont
         public CffIndex? LocalSubrs => localSubrs;
 
         public int LocalBias => localBias;
+
+        public double[]? FontMatrix => fontMatrix;
     }
 
     // Executes a Type 2 charstring only far enough to recover the optional leading width

@@ -5,8 +5,8 @@ using System.Globalization;
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
 // CFF DICT (spec section 4): operands precede an operator. Two-byte operators use the
-// 12 escape and are keyed here as 1200 + b1. Real operands (b0 == 30) are skipped since
-// every operator this parser consumes carries integer operands.
+// 12 escape and are keyed here as 1200 + b1. Real operands (b0 == 30) are decoded from
+// packed BCD nibbles.
 internal static class CffDict
 {
     private const int TwoByteOperator = 12;
@@ -44,7 +44,8 @@ internal static class CffDict
             }
             else if (b0 == 30)
             {
-                i = SkipReal(data, i + 1);
+                i = ParseReal(data, i + 1, out var real);
+                operands.Add(real);
             }
             else if (b0 <= 246)
             {
@@ -188,17 +189,45 @@ internal static class CffDict
         }
     }
 
-    private static int SkipReal(byte[] data, int i)
+    private static int ParseReal(byte[] data, int i, out double value)
     {
-        while (i < data.Length)
+        var text = new System.Text.StringBuilder();
+        var done = false;
+        while (i < data.Length && !done)
         {
             var b = data[i++];
-            if ((b >> 4) == 0x0f || (b & 0x0f) == 0x0f)
+            for (var shift = 4; shift >= 0 && !done; shift -= 4)
             {
-                break;
+                var nibble = (b >> shift) & 0x0f;
+                switch (nibble)
+                {
+                    case <= 9:
+                        text.Append((char)('0' + nibble));
+                        break;
+                    case 0xa:
+                        text.Append('.');
+                        break;
+                    case 0xb:
+                        text.Append('E');
+                        break;
+                    case 0xc:
+                        text.Append("E-");
+                        break;
+                    case 0xe:
+                        text.Append('-');
+                        break;
+                    case 0xf:
+                        done = true;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
+        value = double.TryParse(text.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)
+            ? parsed
+            : 0;
         return i;
     }
 }
