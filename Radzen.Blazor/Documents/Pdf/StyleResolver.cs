@@ -31,6 +31,10 @@ internal static class StyleResolver
             {
                 ResolveTable(table, styles, inherited);
             }
+            else if (block is Barcode barcode)
+            {
+                ResolveBarcode(barcode, styles, inherited);
+            }
         }
     }
 
@@ -54,6 +58,20 @@ internal static class StyleResolver
                 ResolveBlocks(cell.Blocks, styles, context);
             }
         }
+    }
+
+    // The human-readable line of a barcode inherits like a paragraph without a named style.
+    private static void ResolveBarcode(Barcode barcode, StyleCollection styles, List<Font> inherited)
+    {
+        var effective = new Font();
+        effective.InheritFrom(barcode.Font);
+        foreach (var font in inherited)
+        {
+            effective.InheritFrom(font);
+        }
+
+        effective.InheritFrom(styles.Normal.Font);
+        barcode.EffectiveFont = effective;
     }
 
     private static void ResolveParagraph(Paragraph paragraph, StyleCollection styles, List<Font> inherited)

@@ -28,6 +28,15 @@ internal readonly struct LaidOutImage
     public required double Height { get; init; }
 }
 
+internal readonly struct LaidOutCode
+{
+    public required Block Source { get; init; }
+
+    public required double X { get; init; }
+
+    public required double Y { get; init; }
+}
+
 internal readonly struct LaidOutNestedTable
 {
     public required LaidOutTable Layout { get; init; }
@@ -57,6 +66,8 @@ internal sealed class LaidOutCell
 
     public IReadOnlyList<LaidOutImage> Images { get; init; } = [];
 
+    public IReadOnlyList<LaidOutCode> Codes { get; init; } = [];
+
     public IReadOnlyList<LaidOutNestedTable> Tables { get; init; } = [];
 }
 
@@ -82,6 +93,7 @@ internal static class TableLayout
         public LineBox? Line { get; init; }
         public Block? Source { get; init; }
         public Image? Image { get; init; }
+        public Block? Code { get; init; }
         public LaidOutTable? Table { get; init; }
         public double Width { get; init; }
         public required double Height { get; init; }
@@ -252,6 +264,7 @@ internal static class TableLayout
 
             var lines = new List<LaidOutLine>();
             var laidImages = new List<LaidOutImage>();
+            var laidCodes = new List<LaidOutCode>();
             var nestedTables = new List<LaidOutNestedTable>();
             var cursorY = contentBox.Top + offset;
             foreach (var item in p.Items)
@@ -275,6 +288,15 @@ internal static class TableLayout
                         Y = cursorY,
                         Width = item.Width,
                         Height = item.Height,
+                    });
+                }
+                else if (item.Code is { } code)
+                {
+                    laidCodes.Add(new LaidOutCode
+                    {
+                        Source = code,
+                        X = contentBox.Left + ((contentBox.Width - item.Width) * alignFactor),
+                        Y = cursorY,
                     });
                 }
                 else if (item.Table is { } nested)
@@ -301,6 +323,7 @@ internal static class TableLayout
                 ContentBox = contentBox,
                 Lines = lines,
                 Images = laidImages,
+                Codes = laidCodes,
                 Tables = nestedTables,
             });
         }
@@ -439,6 +462,12 @@ internal static class TableLayout
                     : measureImage(image, contentWidth);
                 items.Add(new CellItem { Image = image, Width = imageWidth, Height = imageHeight });
                 height += imageHeight;
+            }
+            else if (block is QrCode or Barcode)
+            {
+                var (codeWidth, codeHeight) = Paginator.MeasureCode(block);
+                items.Add(new CellItem { Code = block, Width = codeWidth, Height = codeHeight });
+                height += codeHeight;
             }
             else if (block is Table nested)
             {

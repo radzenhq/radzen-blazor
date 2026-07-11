@@ -543,10 +543,11 @@ internal sealed class DocumentGenerator
     private static readonly Color CodeBlack = Color.FromRgb(0, 0, 0);
 
     private void EmitCode(PagePlan plan, PositionedCode positioned, double left, double top)
+        => EmitCodeBlock(plan, positioned.Source, left + positioned.XOffset, top - positioned.Y);
+
+    private void EmitCodeBlock(PagePlan plan, Block source, double x, double topY)
     {
-        var x = left + positioned.XOffset;
-        var topY = top - positioned.Y;
-        switch (positioned.Source)
+        switch (source)
         {
             case QrCode qr:
                 EmitQrCode(plan, qr, x, topY);
@@ -611,8 +612,9 @@ internal sealed class DocumentGenerator
             return;
         }
 
-        var run = new Run(barcode.Value) { EffectiveFont = barcode.Font };
-        var paragraph = new Paragraph { AlignmentValue = HorizontalAlignment.Center, EffectiveFont = barcode.Font };
+        var font = barcode.EffectiveFont ?? barcode.Font;
+        var run = new Run(barcode.Value) { EffectiveFont = font };
+        var paragraph = new Paragraph { AlignmentValue = HorizontalAlignment.Center, EffectiveFont = font };
         paragraph.Inlines.Add(run);
 
         var textTop = topY - barcode.Height.Point;
@@ -756,6 +758,11 @@ internal sealed class DocumentGenerator
                 Element = element,
             });
             plan.UsedImages.Add(xobject);
+        }
+
+        foreach (var code in cell.Codes)
+        {
+            EmitCodeBlock(plan, code.Source, left + code.X, contentTop - (code.Y + delta));
         }
 
         foreach (var nested in cell.Tables)

@@ -143,6 +143,112 @@ public class CodeElementTests
     }
 
     [Fact]
+    public void Barcode_ShowText_WithoutExplicitFont_UsesDocumentDefaultFont_InPdfA()
+    {
+        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
+        builder.Info.Title = "Barcode";
+        BuildTestSupport.RegisterLatin(builder);
+        builder.Styles.Normal.Font.Name = BuildTestSupport.Latin;
+        var section = builder.Sections.Add();
+        section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+
+        var reader = BuildTestSupport.Read(builder);
+
+        Assert.DoesNotContain(BuildTestSupport.Fonts(reader), f =>
+            f.TryGetValue("BaseFont", out var baseFont)
+            && reader.Resolve(baseFont!) is NameObject name
+            && name.Value == "Helvetica");
+        Assert.NotEmpty(BuildTestSupport.Type0Fonts(reader));
+    }
+
+    [Fact]
+    public void Barcode_ShowText_WithoutExplicitFont_InheritsDefaultFontSize()
+    {
+        var builder = new DocumentBuilder();
+        builder.Styles.Normal.Font.Size = 14;
+        var section = builder.Sections.Add();
+        section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+
+        Assert.Contains(14.0, sizes);
+        Assert.DoesNotContain(10.0, sizes);
+    }
+
+    [Fact]
+    public void Barcode_ShowText_ExplicitFont_WinsOverDefault()
+    {
+        var builder = new DocumentBuilder();
+        builder.Styles.Normal.Font.Size = 14;
+        var section = builder.Sections.Add();
+        var barcode = section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        barcode.Font.Name = "Courier";
+        barcode.Font.Size = 8;
+
+        var reader = BuildTestSupport.Read(builder);
+        var content = CascadeTestSupport.FirstPageContent(builder);
+
+        Assert.Contains(8.0, CascadeTestSupport.TfSizes(content));
+        Assert.Contains(BuildTestSupport.Fonts(reader), f =>
+            f.TryGetValue("BaseFont", out var baseFont)
+            && reader.Resolve(baseFont!) is NameObject name
+            && name.Value == "Courier");
+    }
+
+    [Fact]
+    public void QrCode_InTableCell_EmitsModuleRects_AndReservesRowHeight()
+    {
+        const string value = "cell qr";
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        table.Rows.Add().Cells[0].Blocks.AddQrCode(value, Unit.FromPoint(90));
+        table.Rows.Add().Cells[0].Text = "below";
+
+        var matrix = QrEncoder.EncodeUtf8(value, QrErrorCorrection.Medium);
+        var reader = BuildTestSupport.Read(builder);
+        var content = ContentTestHelpers.PageContent(reader, 0);
+        var rects = FilledRects(content);
+
+        Assert.Equal(DarkModules(matrix), rects.Count);
+
+        var qrBottom = rects.Min(r => r.Y);
+        var textBaseline = CascadeTestSupport.TdPositions(Encoding.Latin1.GetString(content)).Max(p => p.Y);
+        Assert.True(textBaseline < qrBottom, $"second-row text baseline {textBaseline} is not below the QR bottom {qrBottom}");
+    }
+
+    [Fact]
+    public void Barcode_InTableCell_EmitsBarRects()
+    {
+        const string value = "RADZEN";
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        table.Rows.Add().Cells[0].Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40));
+
+        var widths = BarcodeEncoder.EncodeCode128B(value);
+        var expectedBars = 0;
+        var isBar = true;
+        foreach (var w in widths)
+        {
+            if (isBar && w > 0)
+            {
+                expectedBars++;
+            }
+
+            isBar = !isBar;
+        }
+
+        var reader = BuildTestSupport.Read(builder);
+        var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
+
+        Assert.Equal(expectedBars, rects.Count);
+        Assert.All(rects, r => Assert.Equal(40.0, r.H, 3));
+    }
+
+    [Fact]
     public void Document_WithQrCodeAndBarcode_KeepsPdfA3BConformance()
     {
         var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
