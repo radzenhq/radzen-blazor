@@ -1,19 +1,21 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
 using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-// Big-endian primitive reader over a byte[] with a movable cursor.
-internal sealed class SfntReader(byte[] data, int position = 0)
+// Big-endian primitive reader over a byte[] with a movable cursor. A struct so
+// hot paths (cmap lookup, table parsing) can read without heap allocation.
+internal struct SfntReader(byte[] data, int position = 0)
 {
     private readonly byte[] data = data ?? throw new ArgumentNullException(nameof(data));
 
     public int Position { get; set; } = position;
 
-    public int Length => data.Length;
+    public readonly int Length => data.Length;
 
-    private void Require(int count)
+    private readonly void Require(int count)
     {
         if (Position < 0 || Position + count > data.Length)
         {
@@ -30,7 +32,7 @@ internal sealed class SfntReader(byte[] data, int position = 0)
     public ushort ReadUInt16()
     {
         Require(2);
-        var value = (ushort)((data[Position] << 8) | data[Position + 1]);
+        var value = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(Position));
         Position += 2;
         return value;
     }
@@ -40,10 +42,7 @@ internal sealed class SfntReader(byte[] data, int position = 0)
     public uint ReadUInt32()
     {
         Require(4);
-        var value = ((uint)data[Position] << 24)
-            | ((uint)data[Position + 1] << 16)
-            | ((uint)data[Position + 2] << 8)
-            | data[Position + 3];
+        var value = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(Position));
         Position += 4;
         return value;
     }
@@ -53,7 +52,7 @@ internal sealed class SfntReader(byte[] data, int position = 0)
     public string ReadTag()
     {
         Require(4);
-        var chars = new char[4];
+        Span<char> chars = stackalloc char[4];
         for (var i = 0; i < 4; i++)
         {
             chars[i] = (char)data[Position + i];

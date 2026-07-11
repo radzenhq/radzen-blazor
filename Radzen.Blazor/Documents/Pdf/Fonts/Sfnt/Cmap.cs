@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
 using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -8,11 +9,31 @@ namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 // and 12; when both are present the format 12 subtable wins (full Unicode range).
 internal sealed class Cmap
 {
+    // Covers Latin, Latin Extended, Greek and Cyrillic; entries store glyph+1 so 0
+    // means "not resolved yet". Writes are idempotent, so races are benign.
+    private const int MemoSize = 0x800;
+
     private readonly ICmapSubtable subtable;
+    private int[]? memo;
 
     private Cmap(ICmapSubtable subtable) => this.subtable = subtable;
 
-    public ushort GetGlyphId(int codepoint) => subtable.GetGlyphId(codepoint);
+    public ushort GetGlyphId(int codepoint)
+    {
+        if ((uint)codepoint < MemoSize)
+        {
+            var cache = memo ??= new int[MemoSize];
+            var value = cache[codepoint];
+            if (value == 0)
+            {
+                cache[codepoint] = value = subtable.GetGlyphId(codepoint) + 1;
+            }
+
+            return (ushort)(value - 1);
+        }
+
+        return subtable.GetGlyphId(codepoint);
+    }
 
     public static Cmap Parse(byte[] cmapTable)
     {
@@ -161,35 +182,52 @@ internal sealed class Format4Subtable : ICmapSubtable
             return 0;
         }
 
-        var c = (ushort)codepoint;
-        for (var i = 0; i < endCode.Length; i++)
+        if (endCode.Length == 0)
         {
-            if (c > endCode[i])
-            {
-                continue;
-            }
-
-            if (c < startCode[i])
-            {
-                return 0;
-            }
-
-            if (idRangeOffset[i] == 0)
-            {
-                return (ushort)((c + idDelta[i]) & 0xFFFF);
-            }
-
-            var glyphIndexOffset = idRangeOffsetBase + (i * 2) + idRangeOffset[i] + ((c - startCode[i]) * 2);
-            var glyph = new SfntReader(data).ReadUInt16At(glyphIndexOffset);
-            if (glyph == 0)
-            {
-                return 0;
-            }
-
-            return (ushort)((glyph + idDelta[i]) & 0xFFFF);
+            return 0;
         }
 
-        return 0;
+        var c = (ushort)codepoint;
+
+        // First segment whose endCode >= c, matching the spec's ordered-segment search.
+        var lo = 0;
+        var hi = endCode.Length - 1;
+        while (lo < hi)
+        {
+            var mid = (lo + hi) / 2;
+            if (endCode[mid] < c)
+            {
+                lo = mid + 1;
+            }
+            else
+            {
+                hi = mid;
+            }
+        }
+
+        if (c > endCode[lo] || c < startCode[lo])
+        {
+            return 0;
+        }
+
+        if (idRangeOffset[lo] == 0)
+        {
+            return (ushort)((c + idDelta[lo]) & 0xFFFF);
+        }
+
+        var glyphIndexOffset = idRangeOffsetBase + (lo * 2) + idRangeOffset[lo] + ((c - startCode[lo]) * 2);
+        if (glyphIndexOffset < 0 || glyphIndexOffset + 2 > data.Length)
+        {
+            throw new InvalidDataException("Attempt to read past the end of the sfnt data.");
+        }
+
+        var glyph = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(glyphIndexOffset));
+        if (glyph == 0)
+        {
+            return 0;
+        }
+
+        return (ushort)((glyph + idDelta[lo]) & 0xFFFF);
     }
 }
 
