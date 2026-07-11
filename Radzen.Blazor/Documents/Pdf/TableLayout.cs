@@ -431,7 +431,8 @@ internal static class TableLayout
     {
         var items = new List<CellItem>();
         double height = 0;
-        foreach (var block in cell.Blocks)
+        // Lists expand to marker paragraphs exactly as in section content.
+        foreach (var block in Paginator.ExpandBlocks(cell.Blocks))
         {
             if (block is Paragraph paragraph)
             {
@@ -474,6 +475,14 @@ internal static class TableLayout
                 var layout = Layout(nested, System.Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage);
                 items.Add(new CellItem { Table = layout, Height = layout.Height });
                 height += layout.Height;
+            }
+            else if (block is PageBreak)
+            {
+                // A cell cannot break across pages by itself, so a page break inside one is a no-op.
+            }
+            else
+            {
+                throw new System.NotSupportedException($"Block type '{block.GetType().Name}' is not supported inside a table cell.");
             }
         }
 
