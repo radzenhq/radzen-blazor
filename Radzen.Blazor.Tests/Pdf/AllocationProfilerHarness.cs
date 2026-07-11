@@ -74,7 +74,8 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
     private static DocumentBuilder BuildInvoice(byte[] fontBytes)
     {
         var builder = new DocumentBuilder();
-        builder.Fonts.Register(Family, new MemoryStream(fontBytes));
+        // Exposed buffer lets the weak-keyed parse cache key on the array's identity.
+        builder.Fonts.Register(Family, new MemoryStream(fontBytes, 0, fontBytes.Length, writable: false, publiclyVisible: true));
 
         var section = builder.Sections.Add();
         section.PageSize = PageSizes.A4;
@@ -173,6 +174,17 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
         return gids;
     }
 
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static (WeakReference Font, WeakReference Bytes) BuildAndRelease(string fontPath)
+    {
+        var bytes = File.ReadAllBytes(fontPath);
+        var builder = BuildInvoice(bytes);
+        using var stream = new MemoryStream();
+        builder.SaveToStream(stream);
+        var font = builder.Fonts.ResolvePrimarySfnt(new Font { Name = Family });
+        return (new WeakReference(font), new WeakReference(bytes));
+    }
+
     [Fact]
     [Trait("Category", "Profiler")]
     public void ProfileInvoiceAllocations()
@@ -264,6 +276,24 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
             using var stream = new MemoryStream();
             document.SaveToStream(stream);
         }));
+
+        // Comparison: fresh array identity per build defeats the parse cache and shows
+        // the uncached (pre-cache) cost.
+        Report("full WARM (fresh array, no cache)", Median(iterations, () =>
+        {
+            using var stream = new MemoryStream();
+            BuildInvoice((byte[])fontBytes.Clone()).SaveToStream(stream);
+        }));
+
+        // Leak check: once the source array is unreachable the cache entry must be
+        // collectible - the parsed font must not be rooted by the static cache.
+        var (fontRef, bytesRef) = BuildAndRelease(fontPath);
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+        output.WriteLine($"leak check: font alive={fontRef.IsAlive}, bytes alive={bytesRef.IsAlive}");
+        Assert.False(fontRef.IsAlive);
+        Assert.False(bytesRef.IsAlive);
 
         // Baseline: same invoice with a small (~140 KB) Latin font shows how much of the
         // pipeline cost scales with font size. Cyrillic falls back to notdef there; layout

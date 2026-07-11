@@ -3,6 +3,7 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Radzen.Documents.Pdf;
 
@@ -15,6 +16,20 @@ public sealed class FontCollection
 
     private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];
     private readonly List<string> fallback = [];
+
+    // Weak-keyed parse cache: entries are keyed on the identity of the caller's font
+    // array and live only while that array is reachable, so nothing is rooted for the
+    // life of the process. Values are immutable parsed faces safe to share.
+    private static readonly ConditionalWeakTable<byte[], ParsedSource> parseCache = [];
+
+    private sealed class ParsedSource(byte[] data, bool isCollection, IReadOnlyList<SfntFont> faces)
+    {
+        public byte[] Data { get; } = data;
+
+        public bool IsCollection { get; } = isCollection;
+
+        public IReadOnlyList<SfntFont> Faces { get; } = faces;
+    }
 
     /// <summary>
     /// Registers a font as the regular face of the given family. The stream is buffered fully so
@@ -40,18 +55,43 @@ public sealed class FontCollection
         ArgumentNullException.ThrowIfNull(family);
         ArgumentNullException.ThrowIfNull(font);
 
-        var bytes = ReadFully(font);
-        registered[(family, bold, italic)] = IsCollection(bytes)
-            ? SelectCollectionFace(bytes, family, bold, italic)
-            : SfntFont.Parse(bytes);
+        var parsed = ParseSource(font);
+        registered[(family, bold, italic)] = parsed.IsCollection
+            ? SelectCollectionFace(parsed.Faces, family, bold, italic)
+            : parsed.Faces[0];
     }
+
+    // Serves the parsed faces from the weak-keyed cache when the stream exposes its
+    // backing array; otherwise buffers and parses without caching. Faces are always
+    // parsed from a private copy, and a hit re-verifies content against that copy so
+    // in-place mutation of the source array is never served stale.
+    private static ParsedSource ParseSource(Stream font)
+    {
+        if (font is MemoryStream ms && ms.TryGetBuffer(out var segment)
+            && segment.Array is { } key && segment.Offset == 0 && segment.Count == key.Length)
+        {
+            if (parseCache.TryGetValue(key, out var cached) && cached.Data.AsSpan().SequenceEqual(key))
+            {
+                return cached;
+            }
+
+            var parsed = ParseCopy([.. key]);
+            parseCache.AddOrUpdate(key, parsed);
+            return parsed;
+        }
+
+        return ParseCopy(ReadFully(font));
+    }
+
+    private static ParsedSource ParseCopy(byte[] bytes)
+        => new(bytes, IsCollection(bytes), SfntFont.ParseCollection(bytes));
 
     // Prefers the family-named face whose parsed Bold/Italic flags match the requested
     // style; falls back to the first face matching the family name.
-    private static SfntFont SelectCollectionFace(byte[] data, string family, bool bold, bool italic)
+    private static SfntFont SelectCollectionFace(IReadOnlyList<SfntFont> faces, string family, bool bold, bool italic)
     {
         SfntFont? named = null;
-        foreach (var face in SfntFont.ParseCollection(data))
+        foreach (var face in faces)
         {
             if (!string.Equals(face.FamilyName, family, StringComparison.Ordinal))
             {
