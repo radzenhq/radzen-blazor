@@ -1,0 +1,207 @@
+#nullable enable
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using Radzen.Documents.Pdf;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// Regression tests for header/footer band geometry. The header used to render flush
+// to the physical page top (its ascender in the unprintable zone) and the footer hung
+// from the body bottom instead of sitting on the page bottom. Section must expose
+// HeaderDistance/FooterDistance (Unit, default ~1.25cm) so the header band STARTS
+// HeaderDistance below the page top and the footer band ENDS FooterDistance above the
+// page bottom, shrinking the body when a band plus its distance exceeds the margin.
+// Asserted on the real emitted PDF (Build -> bytes -> content-stream Td baselines).
+public class HeaderFooterDistanceTests
+{
+    private const double Tol = 0.5;
+    private const double PageWidth = 400;
+    private const double PageHeight = 500;
+    private const double FontSize = 12;
+
+    private static (double Height, double Baseline) LineMetrics(double size)
+    {
+        var paragraph = new Paragraph();
+        var run = paragraph.Inlines.Add("Xg");
+        run.Font.Size = size;
+        var box = LineBreaker.Break(paragraph, 100000, new FontCollection())[0];
+        return (box.Height, box.Baseline);
+    }
+
+    private static Paragraph Text(string text, double size = FontSize)
+    {
+        var paragraph = new Paragraph();
+        var run = paragraph.Inlines.Add(text);
+        run.Font.Size = size;
+        return paragraph;
+    }
+
+    private static (DocumentBuilder Builder, Section Section) Author(double margin)
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
+        section.Margin = Unit.FromPoint(margin);
+        return (builder, section);
+    }
+
+    // (shown text, baseline Y in PDF space, origin at page BOTTOM) pairs from the
+    // base-14 literal-string "x y Td (text) Tj" pattern.
+    private static List<(string Text, double Y)> TextRuns(string content)
+    {
+        var runs = new List<(string, double)>();
+        foreach (Match m in Regex.Matches(content, @"(-?[\d.]+)\s+(-?[\d.]+)\s+Td\s*\((.*?)\)\s*Tj", RegexOptions.Singleline))
+        {
+            runs.Add((m.Groups[3].Value, double.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture)));
+        }
+
+        return runs;
+    }
+
+    private static double Distance(Section section, string name)
+    {
+        var property = typeof(Section).GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
+        Assert.True(property is not null, $"Section must expose a public {name} property");
+        Assert.Equal(typeof(Unit), property!.PropertyType);
+        return ((Unit)property.GetValue(section)!).Point;
+    }
+
+    private static void SetDistance(Section section, string name, double points)
+    {
+        var property = typeof(Section).GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
+        Assert.True(property is not null, $"Section must expose a public {name} property");
+        property!.SetValue(section, Unit.FromPoint(points));
+    }
+
+    [Fact]
+    public void Header_IsNotFlushToPhysicalPageTop()
+    {
+        var (builder, section) = Author(margin: 20);
+        section.Header.Blocks.Add(Text("HDR"));
+        section.Blocks.Add(Text("BODY"));
+
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var headerY = Assert.Single(runs, r => r.Text == "HDR").Y;
+        var (_, baseline) = LineMetrics(FontSize);
+
+        var headerTopEdge = headerY + baseline;
+        Assert.True(
+            PageHeight - headerTopEdge >= 8,
+            $"the header line top edge {headerTopEdge:F2} must sit clearly below the page top {PageHeight:F2}");
+    }
+
+    [Fact]
+    public void Footer_SitsNearPageBottom_NotHangingFromBody()
+    {
+        var (builder, section) = Author(margin: 20);
+        section.Footer.Blocks.Add(Text("FTR"));
+        section.Blocks.Add(Text("BODY"));
+
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var footerY = Assert.Single(runs, r => r.Text == "FTR").Y;
+        var (lineHeight, baseline) = LineMetrics(FontSize);
+
+        // Currently the band hangs from the body bottom: its bottom edge lands at
+        // margin - lineHeight (about 6pt). Anchored FooterDistance above the page
+        // bottom it must end at least ~15pt up (the default distance is ~1.25cm).
+        var footerBottomEdge = footerY - (lineHeight - baseline);
+        Assert.True(
+            footerBottomEdge >= 15,
+            $"the footer band bottom edge {footerBottomEdge:F2} must end well above the page bottom");
+    }
+
+    [Fact]
+    public void DefaultHeaderDistance_PositionsHeaderAndReducesBody()
+    {
+        var (builder, section) = Author(margin: 40);
+        var distance = Distance(section, "HeaderDistance");
+        Assert.InRange(distance, 30.0, 40.0);
+
+        section.Header.Blocks.Add(Text("HDR"));
+        section.Blocks.Add(Text("BODY"));
+
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var headerY = Assert.Single(runs, r => r.Text == "HDR").Y;
+        var bodyY = Assert.Single(runs, r => r.Text == "BODY").Y;
+        var (lineHeight, baseline) = LineMetrics(FontSize);
+
+        Assert.True(
+            System.Math.Abs(headerY - (PageHeight - distance - baseline)) <= Tol,
+            $"header baseline {headerY:F2} must start HeaderDistance {distance:F2} below the page top");
+
+        var bandBottomEdge = PageHeight - distance - lineHeight;
+        var bodyTopEdge = bodyY + baseline;
+        Assert.True(
+            bodyTopEdge <= bandBottomEdge + Tol,
+            $"body top edge {bodyTopEdge:F2} must be at or below the header band bottom {bandBottomEdge:F2}");
+    }
+
+    [Fact]
+    public void DefaultFooterDistance_PositionsFooterAndReducesBody()
+    {
+        var (builder, section) = Author(margin: 40);
+        var distance = Distance(section, "FooterDistance");
+        Assert.InRange(distance, 30.0, 40.0);
+
+        section.Footer.Blocks.Add(Text("FTR"));
+
+        var (lineHeight, baseline) = LineMetrics(FontSize);
+        var fullBodyLines = (int)((PageHeight - 2 * 40) / lineHeight);
+        for (var i = 0; i < fullBodyLines; i++)
+        {
+            section.Blocks.Add(Text($"B{i}"));
+        }
+
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var footerY = Assert.Single(runs, r => r.Text == "FTR").Y;
+        var bodyYs = runs.Where(r => r.Text.StartsWith("B", System.StringComparison.Ordinal)).Select(r => r.Y).ToList();
+        Assert.NotEmpty(bodyYs);
+
+        var bandTopEdge = distance + lineHeight;
+        Assert.True(
+            System.Math.Abs(footerY - (bandTopEdge - baseline)) <= Tol,
+            $"footer baseline {footerY:F2} must end FooterDistance {distance:F2} above the page bottom");
+
+        Assert.All(bodyYs, y => Assert.True(
+            y - (lineHeight - baseline) >= bandTopEdge - Tol,
+            $"body line bottom {y - (lineHeight - baseline):F2} must stay above the footer band top {bandTopEdge:F2}"));
+    }
+
+    [Fact]
+    public void ExplicitDistances_ControlBandPositions_WithoutMovingBodyInsideMargins()
+    {
+        const double margin = 60;
+        const double headerDistance = 20;
+        const double footerDistance = 25;
+
+        var (builder, section) = Author(margin);
+        SetDistance(section, "HeaderDistance", headerDistance);
+        SetDistance(section, "FooterDistance", footerDistance);
+
+        section.Header.Blocks.Add(Text("HDR"));
+        section.Footer.Blocks.Add(Text("FTR"));
+        section.Blocks.Add(Text("BODY"));
+
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var headerY = Assert.Single(runs, r => r.Text == "HDR").Y;
+        var footerY = Assert.Single(runs, r => r.Text == "FTR").Y;
+        var bodyY = Assert.Single(runs, r => r.Text == "BODY").Y;
+        var (lineHeight, baseline) = LineMetrics(FontSize);
+
+        Assert.True(
+            System.Math.Abs(headerY - (PageHeight - headerDistance - baseline)) <= Tol,
+            $"header baseline {headerY:F2} must reflect HeaderDistance {headerDistance}");
+        Assert.True(
+            System.Math.Abs(footerY - (footerDistance + lineHeight - baseline)) <= Tol,
+            $"footer baseline {footerY:F2} must reflect FooterDistance {footerDistance}");
+
+        // Bands plus distances fit inside the 60pt margins, so the body keeps them.
+        Assert.True(
+            System.Math.Abs(bodyY - (PageHeight - margin - baseline)) <= Tol,
+            $"body baseline {bodyY:F2} must stay at the margin when the bands fit inside it");
+    }
+}
