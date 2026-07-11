@@ -27,6 +27,15 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     // keeps the original /Font reference instead of registering a base-14 face.
     internal string? FontResourceName { get; set; }
 
+    // Original show-string bytes captured when materializing a loaded page. A Type0/CID
+    // run carries 2-byte codes that a WinAnsi re-encode would corrupt, so it is re-emitted
+    // verbatim. The plain generate path leaves this null and encodes via WinAnsi.
+    internal byte[]? SourceBytes { get; set; }
+
+    // The decoded text as materialized. When the caller has edited Text away from this,
+    // SourceBytes no longer describes it and the run is re-encoded through WinAnsi.
+    internal string? SourceText { get; set; }
+
     internal override void EmitBody(ContentWriter writer)
     {
         var key = FontResourceName ?? writer.RegisterFont(Font);
@@ -41,7 +50,7 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         writer.WriteRaw(" ");
         writer.WriteNumber(y.Point);
         writer.WriteRaw(" Td\n");
-        writer.WriteString(Encode(Text));
+        writer.WriteString(SourceBytes is not null && Text == SourceText ? SourceBytes : Encode(Text));
         writer.WriteRaw(" Tj\n");
         writer.WriteRaw("ET\n");
     }

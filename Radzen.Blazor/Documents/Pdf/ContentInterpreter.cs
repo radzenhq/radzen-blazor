@@ -278,10 +278,13 @@ internal static class ContentInterpreter
             return;
         }
 
-        target.Add(new TextContent(Decode(bytes), 0, 0)
+        var decoded = Decode(bytes);
+        target.Add(new TextContent(decoded, 0, 0)
         {
             Font = new Font { Size = fontSize },
             FontResourceName = fontName,
+            SourceBytes = bytes,
+            SourceText = decoded,
             Color = state.Fill,
             Transform = textMatrix * state.Ctm,
             IsArtifact = artifactDepth > 0,
