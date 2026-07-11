@@ -84,10 +84,9 @@ internal static class ToUnicodeCMap
             }
             else if (index < tokens.Count && tokens[index].Hex is { } dst)
             {
-                var start = Code(dst);
                 for (var code = low; code <= high; code++)
                 {
-                    map[code] = char.ConvertFromUtf32(start + (code - low));
+                    map[code] = Incremental(dst, code - low);
                 }
 
                 index++;
@@ -117,6 +116,51 @@ internal static class ToUnicodeCMap
         }
 
         return new string(chars);
+    }
+
+    // Incremental bfrange destination: decode as UTF-16BE (the bfchar form) and
+    // advance the LAST code unit by offset, so a surrogate-pair base like <D835DC00>
+    // walks the low surrogate and stays a valid supra-BMP scalar. A malformed or
+    // lone-surrogate result falls back to U+FFFD rather than throwing.
+    private static string Incremental(byte[] bytes, int offset)
+    {
+        var chars = Utf16(bytes).ToCharArray();
+        if (chars.Length == 0)
+        {
+            return offset == 0 ? string.Empty : "\uFFFD";
+        }
+
+        var advanced = chars[^1] + offset;
+        if (advanced is < 0 or > 0xFFFF)
+        {
+            return "\uFFFD";
+        }
+
+        chars[^1] = (char)advanced;
+        var result = new string(chars);
+        return IsWellFormedUtf16(result) ? result : "\uFFFD";
+    }
+
+    private static bool IsWellFormedUtf16(string value)
+    {
+        for (var i = 0; i < value.Length; i++)
+        {
+            if (char.IsHighSurrogate(value[i]))
+            {
+                if (i + 1 >= value.Length || !char.IsLowSurrogate(value[i + 1]))
+                {
+                    return false;
+                }
+
+                i++;
+            }
+            else if (char.IsLowSurrogate(value[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static List<Token> Tokenize(byte[] data)
