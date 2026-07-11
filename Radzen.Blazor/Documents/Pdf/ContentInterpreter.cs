@@ -34,6 +34,7 @@ internal static class ContentInterpreter
         var operands = new List<Token>();
         var stringBuffer = new List<byte>();
         var artifactDepth = 0;
+        var markedContent = new Stack<bool>();
 
         for (var i = 0; i < tokens.Count; i++)
         {
@@ -135,10 +136,9 @@ internal static class ContentInterpreter
                     break;
 
                 case "Tj":
-                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth);
-                    break;
-
                 case "TJ":
+                case "'":
+                case "\"":
                     EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth);
                     break;
 
@@ -246,11 +246,19 @@ internal static class ContentInterpreter
 
                 case "BDC":
                 case "BMC":
-                    artifactDepth++;
+                {
+                    var isArtifact = FirstName(operands) == "Artifact";
+                    markedContent.Push(isArtifact);
+                    if (isArtifact)
+                    {
+                        artifactDepth++;
+                    }
+
                     break;
+                }
 
                 case "EMC":
-                    if (artifactDepth > 0)
+                    if (markedContent.Count > 0 && markedContent.Pop())
                     {
                         artifactDepth--;
                     }
@@ -403,6 +411,21 @@ internal static class ContentInterpreter
         return null;
     }
 
+    // The BDC/BMC tag is the first name operand; the optional property list may itself
+    // be a name, so LastName would misread it.
+    private static string? FirstName(List<Token> operands)
+    {
+        foreach (var token in operands)
+        {
+            if (token.Kind == TokenKind.Name)
+            {
+                return token.Text;
+            }
+        }
+
+        return null;
+    }
+
     private static byte[]? LastString(List<Token> operands)
     {
         for (var i = operands.Count - 1; i >= 0; i--)
@@ -529,10 +552,54 @@ internal static class ContentInterpreter
                 continue;
             }
 
-            tokens.Add(new Token(TokenKind.Operator, 0, Latin1(data, keywordStart, position - keywordStart), null));
+            var keyword = Latin1(data, keywordStart, position - keywordStart);
+            if (keyword == "BI")
+            {
+                SkipInlineImage(data, ref position);
+                continue;
+            }
+
+            tokens.Add(new Token(TokenKind.Operator, 0, keyword, null));
         }
 
         return tokens;
+    }
+
+    // After a BI operator, skip the inline-image dict and its binary payload, resuming
+    // past the whitespace-delimited EI so the binary is not lexed as operators. EI may
+    // occur inside the binary, so it only terminates when bounded by whitespace/EOF.
+    private static void SkipInlineImage(byte[] data, ref int position)
+    {
+        while (position < data.Length)
+        {
+            if (data[position] == (byte)'I' && position + 1 < data.Length && data[position + 1] == (byte)'D'
+                && (position == 0 || IsWhitespace(data[position - 1]) || IsDelimiter(data[position - 1]))
+                && (position + 2 >= data.Length || IsWhitespace(data[position + 2]) || IsDelimiter(data[position + 2])))
+            {
+                position += 2;
+                break;
+            }
+
+            position++;
+        }
+
+        if (position < data.Length && IsWhitespace(data[position]))
+        {
+            position++;
+        }
+
+        while (position < data.Length)
+        {
+            if (IsWhitespace(data[position]) && position + 2 < data.Length
+                && data[position + 1] == (byte)'E' && data[position + 2] == (byte)'I'
+                && (position + 3 >= data.Length || IsWhitespace(data[position + 3]) || IsDelimiter(data[position + 3])))
+            {
+                position += 3;
+                return;
+            }
+
+            position++;
+        }
     }
 
     private static byte[] ReadLiteralString(byte[] data, ref int position)

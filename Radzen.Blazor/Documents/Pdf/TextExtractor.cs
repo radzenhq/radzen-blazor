@@ -327,10 +327,54 @@ internal static class TextExtractor
                 continue;
             }
 
-            tokens.Add(new Token(TokenKind.Op, 0, Latin1(data, keywordStart, position - keywordStart), null));
+            var keyword = Latin1(data, keywordStart, position - keywordStart);
+            if (keyword == "BI")
+            {
+                SkipInlineImage(data, ref position);
+                continue;
+            }
+
+            tokens.Add(new Token(TokenKind.Op, 0, keyword, null));
         }
 
         return tokens;
+    }
+
+    // After a BI operator, skip the inline-image dict and its binary payload, resuming
+    // past the whitespace-delimited EI so the binary is not lexed as operators. EI may
+    // occur inside the binary, so it only terminates when bounded by whitespace/EOF.
+    private static void SkipInlineImage(byte[] data, ref int position)
+    {
+        while (position < data.Length)
+        {
+            if (data[position] == (byte)'I' && position + 1 < data.Length && data[position + 1] == (byte)'D'
+                && (position == 0 || IsWhitespace(data[position - 1]) || IsDelimiter(data[position - 1]))
+                && (position + 2 >= data.Length || IsWhitespace(data[position + 2]) || IsDelimiter(data[position + 2])))
+            {
+                position += 2;
+                break;
+            }
+
+            position++;
+        }
+
+        if (position < data.Length && IsWhitespace(data[position]))
+        {
+            position++;
+        }
+
+        while (position < data.Length)
+        {
+            if (IsWhitespace(data[position]) && position + 2 < data.Length
+                && data[position + 1] == (byte)'E' && data[position + 2] == (byte)'I'
+                && (position + 3 >= data.Length || IsWhitespace(data[position + 3]) || IsDelimiter(data[position + 3])))
+            {
+                position += 3;
+                return;
+            }
+
+            position++;
+        }
     }
 
     private static void SkipDictionary(byte[] data, ref int position)
