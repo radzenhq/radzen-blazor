@@ -203,4 +203,81 @@ public class TableLayoutTests
 
         Assert.Equal((200 - wHello) / 2.0, c.Lines[0].Line.Fragments[0].XOffset, 5);
     }
+
+    [Fact]
+    public void PerEdgePadding_InsetsContentBoxByEachEdge()
+    {
+        var fonts = TableLayoutSupport.Fonts();
+        var lh = TableLayoutSupport.LineHeight(fonts);
+        var table = new Table();
+        table.Columns.Add(Unit.FromPoint(200));
+        var cell = table.Rows.Add().Cells[0];
+        cell.PaddingLeft = Unit.FromPoint(3);
+        cell.PaddingRight = Unit.FromPoint(7);
+        cell.PaddingTop = Unit.FromPoint(11);
+        cell.PaddingBottom = Unit.FromPoint(13);
+        TableLayoutSupport.Fill(cell, "Hi");
+
+        var laid = TableLayout.Layout(table, 200, fonts);
+        var c = TableLayoutSupport.CellAt(laid, 0, 0);
+
+        Assert.Equal(new Rect(0, 0, 200, lh + 24), c.Bounds);
+        Assert.Equal(new Rect(3, 11, 190, lh), c.ContentBox);
+        Assert.Equal(3, c.Lines[0].X, 6);
+        Assert.Equal(11, c.Lines[0].Y, 6);
+    }
+
+    [Fact]
+    public void PerEdgePadding_UnsetEdgeFallsBackToUniformPadding()
+    {
+        var fonts = TableLayoutSupport.Fonts();
+        var lh = TableLayoutSupport.LineHeight(fonts);
+        var table = new Table();
+        table.Columns.Add(Unit.FromPoint(200));
+        var cell = table.Rows.Add().Cells[0];
+        cell.Padding = Unit.FromPoint(5);
+        cell.PaddingLeft = Unit.FromPoint(20);
+        TableLayoutSupport.Fill(cell, "Hi");
+
+        var laid = TableLayout.Layout(table, 200, fonts);
+        var c = TableLayoutSupport.CellAt(laid, 0, 0);
+
+        // Left is explicit (20); right/top/bottom fall back to the uniform 5.
+        Assert.Equal(new Rect(20, 5, 175, lh), c.ContentBox);
+        Assert.Equal(new Rect(0, 0, 200, lh + 10), c.Bounds);
+    }
+
+    [Fact]
+    public void PadEdges_AllUnset_MatchesUniformPaddingGeometry()
+    {
+        var fonts = TableLayoutSupport.Fonts();
+
+        static LaidOutCell Build(FontCollection f, bool perEdge)
+        {
+            var table = new Table();
+            table.Columns.Add(Unit.FromPoint(200));
+            var cell = table.Rows.Add().Cells[0];
+            if (perEdge)
+            {
+                cell.PaddingLeft = Unit.FromPoint(6);
+                cell.PaddingRight = Unit.FromPoint(6);
+                cell.PaddingTop = Unit.FromPoint(6);
+                cell.PaddingBottom = Unit.FromPoint(6);
+            }
+            else
+            {
+                cell.Padding = Unit.FromPoint(6);
+            }
+
+            TableLayoutSupport.Fill(cell, "Hello World Again");
+            return TableLayoutSupport.CellAt(TableLayout.Layout(table, 200, f), 0, 0);
+        }
+
+        // Old way (uniform Padding, per-edge all unset) == setting all four edges equally.
+        var legacy = Build(fonts, perEdge: false);
+        var perEdge = Build(fonts, perEdge: true);
+
+        Assert.Equal(legacy.Bounds, perEdge.Bounds);
+        Assert.Equal(legacy.ContentBox, perEdge.ContentBox);
+    }
 }

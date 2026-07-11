@@ -151,6 +151,75 @@ public class StyleCascadeTests
     }
 
     [Fact]
+    public void TableFont_SizeAppliesToCellWithNoExplicitFont()
+    {
+        var builder = Builder(out var section);
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        table.Font.Size = 18;
+        table.Rows.Add().Cells[0].Text = "Cell";
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+
+        Assert.Contains(18.0, sizes);
+        Assert.DoesNotContain(10.0, sizes);
+    }
+
+    [Fact]
+    public void TableFont_OverriddenByExplicitCellFont()
+    {
+        var builder = Builder(out var section);
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        table.Font.Size = 18;
+        var cell = table.Rows.Add().Cells[0];
+        cell.Text = "Cell";
+        cell.Font.Size = 22;
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+
+        Assert.Contains(22.0, sizes);
+        Assert.DoesNotContain(18.0, sizes);
+    }
+
+    [Fact]
+    public void CellStyleName_FontSizeApplies()
+    {
+        var builder = Builder(out var section);
+        var style = builder.Styles.Add("Number");
+        style.Font.Size = 26;
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        var cell = table.Rows.Add().Cells[0];
+        cell.Text = "42";
+        cell.StyleName = "Number";
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+
+        Assert.Contains(26.0, sizes);
+        Assert.DoesNotContain(10.0, sizes);
+    }
+
+    [Fact]
+    public void CellStyleName_OverriddenByExplicitCellFont()
+    {
+        var builder = Builder(out var section);
+        var style = builder.Styles.Add("Number");
+        style.Font.Size = 26;
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        var cell = table.Rows.Add().Cells[0];
+        cell.Text = "42";
+        cell.StyleName = "Number";
+        cell.Font.Size = 8;
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+
+        Assert.Contains(8.0, sizes);
+        Assert.DoesNotContain(26.0, sizes);
+    }
+
+    [Fact]
     public void ExplicitRunFont_WinsOverParagraphAndCellFonts()
     {
         var builder = Builder(out var section);

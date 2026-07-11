@@ -78,6 +78,42 @@ public class Cell
     /// <summary>Gets or sets the padding applied on every edge of the cell.</summary>
     public Unit Padding { get; set; }
 
+    private Unit? paddingLeft;
+    private Unit? paddingRight;
+    private Unit? paddingTop;
+    private Unit? paddingBottom;
+
+    /// <summary>Gets or sets the left padding. Falls back to <see cref="Padding"/> when unset.</summary>
+    public Unit PaddingLeft
+    {
+        get => paddingLeft ?? Padding;
+        set => paddingLeft = value;
+    }
+
+    /// <summary>Gets or sets the right padding. Falls back to <see cref="Padding"/> when unset.</summary>
+    public Unit PaddingRight
+    {
+        get => paddingRight ?? Padding;
+        set => paddingRight = value;
+    }
+
+    /// <summary>Gets or sets the top padding. Falls back to <see cref="Padding"/> when unset.</summary>
+    public Unit PaddingTop
+    {
+        get => paddingTop ?? Padding;
+        set => paddingTop = value;
+    }
+
+    /// <summary>Gets or sets the bottom padding. Falls back to <see cref="Padding"/> when unset.</summary>
+    public Unit PaddingBottom
+    {
+        get => paddingBottom ?? Padding;
+        set => paddingBottom = value;
+    }
+
+    /// <summary>Gets or sets the name of the applied named style, or <see langword="null"/> for none.</summary>
+    public string? StyleName { get; set; }
+
     /// <summary>Gets or sets the cell background color, or <see langword="null"/> for none.</summary>
     public Color? Background { get; set; }
 

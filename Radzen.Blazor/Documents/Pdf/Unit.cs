@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
@@ -44,6 +45,57 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
     /// Converts a <see cref="double"/> value, interpreted as points, to a <see cref="Unit"/>.
     /// </summary>
     public static implicit operator Unit(double value) => new(value);
+
+    /// <summary>
+    /// Parses a measurement such as "9cm", "5mm", "1in", "12pt" or a bare number (interpreted as points,
+    /// matching MigraDoc). Parsing is culture-invariant.
+    /// </summary>
+    /// <param name="value">The measurement text.</param>
+    /// <returns>The parsed <see cref="Unit"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+    /// <exception cref="FormatException"><paramref name="value"/> is not a valid measurement.</exception>
+    public static Unit Parse(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        var text = value.Trim();
+        var number = text;
+        var factor = 1.0;
+        if (text.Length >= 2)
+        {
+            var scale = text[^2..].ToLowerInvariant() switch
+            {
+                "cm" => PointsPerCentimeter,
+                "mm" => PointsPerMillimeter,
+                "in" => PointsPerInch,
+                "pt" => 1.0,
+                _ => (double?)null,
+            };
+
+            if (scale is { } resolved)
+            {
+                factor = resolved;
+                number = text[..^2].Trim();
+            }
+        }
+
+        if (!double.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed))
+        {
+            throw new FormatException($"'{value}' is not a valid measurement.");
+        }
+
+        return new(parsed * factor);
+    }
+
+    /// <summary>
+    /// Converts a measurement string (see <see cref="Parse"/>) to a <see cref="Unit"/>.
+    /// </summary>
+    public static implicit operator Unit(string value) => Parse(value);
+
+    /// <summary>
+    /// Creates a <see cref="Unit"/> from a measurement string (see <see cref="Parse"/>).
+    /// </summary>
+    public static Unit FromString(string value) => Parse(value);
 
     /// <summary>
     /// Converts a <see cref="double"/> value, interpreted as points, to a <see cref="Unit"/>.
