@@ -506,6 +506,23 @@ public sealed class DocumentReader
         return new ObjectParser(lexer).ParseValue();
     }
 
+    private bool IsObjectStream(int number)
+    {
+        DocumentObject value;
+        try
+        {
+            value = GetObject(number);
+        }
+        catch (DocumentParseException)
+        {
+            return false;
+        }
+
+        return value is StreamObject stream
+            && stream.Dictionary.TryGetValue("Type", out var type) && type is NameObject name
+            && string.Equals(name.Value, "ObjStm", StringComparison.Ordinal);
+    }
+
     private ObjectStream GetObjectStream(int streamNumber)
     {
         if (objectStreams.TryGetValue(streamNumber, out var cached))
@@ -834,11 +851,44 @@ public sealed class DocumentReader
             }
         }
 
+        // The header scan only sees each ObjStm container's "N G obj"; register
+        // type-2 entries for its members so compressed objects and /Root resolve.
+        foreach (var number in new List<int>(entries.Keys))
+        {
+            if (!IsObjectStream(number))
+            {
+                continue;
+            }
+
+            ObjectStream container;
+            try
+            {
+                container = GetObjectStream(number);
+            }
+            catch (DocumentParseException)
+            {
+                continue;
+            }
+
+            for (var index = 0; index < container.Members.Count; index++)
+            {
+                var member = container.Members[index];
+                if (!entries.ContainsKey(member.Number))
+                {
+                    entries[member.Number] = new XrefEntry(2, number, index);
+                    if (member.Number > maxNumber)
+                    {
+                        maxNumber = member.Number;
+                    }
+                }
+            }
+        }
+
         trailer = new DictionaryObject();
 
         // Newest catalog wins: scan object numbers in descending order so a stale
         // catalog left behind by an incremental update never shadows the current one.
-        var numbers = new List<int>(offsets.Keys);
+        var numbers = new List<int>(entries.Keys);
         numbers.Sort();
         numbers.Reverse();
         foreach (var number in numbers)
