@@ -16,6 +16,8 @@ public sealed class Document
 {
     private readonly Dictionary<Page, DictionaryObject> sourcePages = [];
     private readonly Dictionary<Page, DictionaryObject> sourceResources = [];
+    private readonly Dictionary<Page, ArrayObject> sourceBoxes = [];
+    private readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Resources)> appendedResources = [];
     private DocumentReader? source;
     private DictionaryObject? sourceAcroForm;
 
@@ -126,6 +128,24 @@ public sealed class Document
                 page.SetContent([.. content]);
             }
 
+            // Carry the source page's resource closure so appended fonts/images still
+            // resolve: a built page keeps its GeneratedPage; a loaded page keeps a
+            // handle to its reader and effective /Resources, imported lazily on save.
+            if (source.Generated is { } generated)
+            {
+                page.Generated = generated;
+            }
+            else if (other.source is not null && other.sourceResources.TryGetValue(source, out var loadedResources))
+            {
+                appendedResources[page] = (other.source, loadedResources);
+                page.SetTextFonts(BuildTextFonts(other.source, loadedResources));
+            }
+
+            if (other.sourceBoxes.TryGetValue(source, out var box))
+            {
+                sourceBoxes[page] = box;
+            }
+
             Pages.Insert(Pages.Count, page);
         }
     }
@@ -167,6 +187,11 @@ public sealed class Document
         if (resources is not null)
         {
             document.sourceResources[page] = resources;
+        }
+
+        if (box is not null && box.Count >= 4)
+        {
+            document.sourceBoxes[page] = box;
         }
     }
 
@@ -294,6 +319,7 @@ public sealed class Document
         var pagesRef = writer.Add(pagesNode);
 
         var importer = source is not null ? new GraphImporter(source, writer) : null;
+        Dictionary<DocumentReader, GraphImporter>? appendImporters = null;
         var pageNodes = new List<(Page Page, DictionaryObject Node, ReferenceObject Reference)>();
 
         var fontRefs = new Dictionary<GeneratedFont, DocumentObject>();
@@ -364,10 +390,28 @@ public sealed class Document
 
             var activeEmitter = emitter ?? pageOverlayEmitter;
             var emitted = activeEmitter is not null ? BuildResources(writer, activeEmitter) : null;
-            var merged = importer is not null && source is not null
-                && sourceResources.TryGetValue(page, out var loadedResources)
-                ? MergeResources(importer, source, loadedResources, emitted)
-                : emitted;
+            DictionaryObject? merged;
+            if (importer is not null && source is not null
+                && sourceResources.TryGetValue(page, out var loadedResources))
+            {
+                merged = MergeResources(importer, source, loadedResources, emitted);
+            }
+            else if (appendedResources.TryGetValue(page, out var appended))
+            {
+                appendImporters ??= [];
+                if (!appendImporters.TryGetValue(appended.Reader, out var appendImporter))
+                {
+                    appendImporter = new GraphImporter(appended.Reader, writer);
+                    appendImporters[appended.Reader] = appendImporter;
+                }
+
+                merged = MergeResources(appendImporter, appended.Reader, appended.Resources, emitted);
+            }
+            else
+            {
+                merged = emitted;
+            }
+
             if (merged is not null)
             {
                 pageNode["Resources"] = merged;
@@ -899,13 +943,29 @@ public sealed class Document
         return resources;
     }
 
-    private static ArrayObject MediaBox(Page page) =>
-    [
-        new NumberObject(0.0),
-        new NumberObject(0.0),
-        new NumberObject(page.Width.Point),
-        new NumberObject(page.Height.Point),
-    ];
+    private ArrayObject MediaBox(Page page)
+    {
+        // Re-emit a loaded page's original box so a non-zero origin round-trips;
+        // content coordinates are preserved verbatim and would otherwise shift.
+        if (sourceBoxes.TryGetValue(page, out var box))
+        {
+            return
+            [
+                new NumberObject(Number(box[0])),
+                new NumberObject(Number(box[1])),
+                new NumberObject(Number(box[2])),
+                new NumberObject(Number(box[3])),
+            ];
+        }
+
+        return
+        [
+            new NumberObject(0.0),
+            new NumberObject(0.0),
+            new NumberObject(page.Width.Point),
+            new NumberObject(page.Height.Point),
+        ];
+    }
 
     private DictionaryObject? BuildInfo()
     {

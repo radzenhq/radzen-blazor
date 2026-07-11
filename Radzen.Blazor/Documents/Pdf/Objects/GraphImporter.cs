@@ -50,6 +50,16 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
             return existing;
         }
 
+        // A resolved scalar (Number/String/Name/Boolean/...) has no sub-graph to
+        // populate; register it directly so its value survives instead of becoming
+        // an empty dictionary shell.
+        if (target is not StreamObject and not ArrayObject and not DictionaryObject)
+        {
+            var scalar = writer.Add(target);
+            map[target] = scalar;
+            return scalar;
+        }
+
         DocumentObject shell = target switch
         {
             StreamObject stream => new StreamObject(stream.Data),
